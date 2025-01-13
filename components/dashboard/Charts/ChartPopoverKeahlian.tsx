@@ -345,60 +345,48 @@ const ChartPopoverKeahlian: React.FC<{ data: BlankoKeluar[] }> = ({ data }) => {
     });
 
   React.useEffect(() => {
-    const updatedStateAllKeahlianByJenisPendidikanSeries = [
-      data
-        .filter(
-          (item) =>
-            item.NamaProgram === "Ahli Nautika Kapal Penangkap Ikan Tingkat I"
-        )
-        .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-      data
-        .filter(
-          (item) =>
-            item.NamaProgram === "Ahli Teknika Kapal Penangkap Ikan Tingkat I"
-        )
-        .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-      data
-        .filter(
-          (item) =>
-            item.NamaProgram === "Ahli Nautika Kapal Penangkap Ikan Tingkat II"
-        )
-        .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-      data
-        .filter(
-          (item) =>
-            item.NamaProgram === "Ahli Teknika Kapal Penangkap Ikan Tingkat II"
-        )
-        .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-      data
-        .filter(
-          (item) =>
-            item.NamaProgram === "Ahli Nautika Kapal Penangkap Ikan Tingkat III"
-        )
-        .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-      data
-        .filter(
-          (item) =>
-            item.NamaProgram === "Ahli Teknika Kapal Penangkap Ikan Tingkat III"
-        )
-        .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-      data
-        .filter((item) => item.NamaProgram === "Rating Keahlian")
-        .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
+    // Helper function to filter data based on selectedSummaryAKP
+    const filterBySummaryAKP = (item: any, selectedSummaryAKP: any) => {
+      const isBPPP = item.NamaPelaksana?.includes("BPPP");
+      const isPoltek = item.NamaPelaksana?.includes("Poltek");
+      if (selectedSummaryAKP === "All") return true;
+      if (selectedSummaryAKP === "Balai Pelatihan KP") return isBPPP;
+      if (selectedSummaryAKP === "Satuan Pendidikan KP") return isPoltek;
+      return false;
+    };
+
+    // Array of program names
+    const programNames = [
+      "Ahli Nautika Kapal Penangkap Ikan Tingkat I",
+      "Ahli Teknika Kapal Penangkap Ikan Tingkat I",
+      "Ahli Nautika Kapal Penangkap Ikan Tingkat II",
+      "Ahli Teknika Kapal Penangkap Ikan Tingkat II",
+      "Ahli Nautika Kapal Penangkap Ikan Tingkat III",
+      "Ahli Teknika Kapal Penangkap Ikan Tingkat III",
+      "Rating Keahlian",
     ];
+
+    // Generate series data dynamically
+    const updatedStateAllKeahlianByJenisPendidikanSeries = programNames.map((programName) =>
+      data
+        .filter((item) => filterBySummaryAKP(item, selectedSummaryAKP)) // Apply summary filter first
+        .filter((item) => item.NamaProgram === programName) // Then filter by program
+        .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) // Sum up values
+    );
+
 
     const updatedStateAllKeahlianByUPTPelatihan = [
       data
         .filter(
           (item) =>
-            item.NamaPelaksana === "BPPP Medan" &&
+            item.NamaPelaksana === "BPPP Tegal" &&
             item.TipeBlanko == "Certificate of Competence (CoC)"
         )
         .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
       data
         .filter(
           (item) =>
-            item.NamaPelaksana === "BPPP Tegal" &&
+            item.NamaPelaksana === "BPPP Medan" &&
             item.TipeBlanko == "Certificate of Competence (CoC)"
         )
         .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
@@ -535,7 +523,7 @@ const ChartPopoverKeahlian: React.FC<{ data: BlankoKeluar[] }> = ({ data }) => {
     });
 
     setStatePNBP({ series: updatedSeriesPNBP });
-  }, [selectedLemdiklat, data]);
+  }, [selectedLemdiklat, data,]);
 
   const totalSum = [
     {
@@ -751,43 +739,7 @@ const ChartPopoverKeahlian: React.FC<{ data: BlankoKeluar[] }> = ({ data }) => {
 
         <TabsContent value={selectedSummaryAKP}>
           <Tabs defaultValue={selectedLemdiklat} className="w-full mb-3">
-            {selectedSummaryAKP == "Balai Pelatihan KP" ? (
-              <TabsList className="w-full">
-                <TabsTrigger
-                  onClick={() => setSelectedLemdiklat("All")}
-                  value={"All"}
-                >
-                  All
-                </TabsTrigger>
-                {BALAI_PELATIHAN.map((UPTPelatihan, index) => (
-                  <TabsTrigger
-                    onClick={() => setSelectedLemdiklat(UPTPelatihan.Name)}
-                    value={UPTPelatihan!.Name}
-                  >
-                    {UPTPelatihan!.Name}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            ) : selectedSummaryAKP == "Satuan Pendidikan KP" ? (
-              <TabsList className="w-full flex flex-wrap h-full">
-                <TabsTrigger
-                  onClick={() => setSelectedLemdiklat("All")}
-                  value={"All"}
-                >
-                  All
-                </TabsTrigger>
-                {SATUAN_PENDIDIKAN_KEAHLIAN.map((UPTPendidikan, index) => (
-                  <TabsTrigger
-                    onClick={() => setSelectedLemdiklat(UPTPendidikan.Name)}
-                    value={UPTPendidikan!.Name}
-                  >
-                    {UPTPendidikan!.Name}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            ) : (
-              <></>
-            )}
+
 
             <TabsContent value={selectedLemdiklat}>
               <div className="flex gap-2 w-full">
@@ -917,7 +869,7 @@ const ChartPopoverKeahlian: React.FC<{ data: BlankoKeluar[] }> = ({ data }) => {
                       </div>
                     </CardFooter>
                   </Card>
-                ) : (
+                ) : selectedSummaryAKP == "Satuan Pendidikan KP" ? (
                   <Card className="w-[50%] h-full">
                     <CardHeader>
                       <div className="w-full flex justify-between items-center">
@@ -983,7 +935,7 @@ const ChartPopoverKeahlian: React.FC<{ data: BlankoKeluar[] }> = ({ data }) => {
                       </div>
                     </CardFooter>
                   </Card>
-                )}
+                ) : <></>}
               </div>
             </TabsContent>
           </Tabs>
