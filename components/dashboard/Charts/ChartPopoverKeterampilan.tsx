@@ -51,14 +51,6 @@ const chartConfig = {
     label: "SKPI",
     color: "#EB8317",
   },
-  other: {
-    label: "Rating Keahlian",
-    color: "#10375C",
-  },
-  other2: {
-    label: "Fisihing Master",
-    color: "#1E0342",
-  },
 } satisfies ChartConfig;
 
 const chartConfigPNBP = {
@@ -380,7 +372,7 @@ const ChartPopoverKeterampilan: React.FC<{ data: BlankoKeluar[] }> = ({
           } else {
             return item.NamaPelaksana.includes("BPPP");
           }
-        })
+        }).filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
         .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
 
       data
@@ -393,7 +385,7 @@ const ChartPopoverKeterampilan: React.FC<{ data: BlankoKeluar[] }> = ({
           } else {
             return item.NamaPelaksana.includes("BPPP");
           }
-        })
+        }).filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
         .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
 
       data
@@ -404,7 +396,7 @@ const ChartPopoverKeterampilan: React.FC<{ data: BlankoKeluar[] }> = ({
           } else {
             return item.NamaPelaksana.includes("BPPP");
           }
-        })
+        }).filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
         .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
 
       data
@@ -418,54 +410,34 @@ const ChartPopoverKeterampilan: React.FC<{ data: BlankoKeluar[] }> = ({
           } else {
             return item.NamaPelaksana.includes("BPPP");
           }
-        })
+        }).filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
         .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
 
-      data
-        .filter((item) => item.NamaProgram === "Rating Keahlian")
-        .filter((item) => {
-          if (selectedSummaryAKP === "Satuan Pendidikan KP") {
-            return item.NamaPelaksana.includes("Politeknik");
-          } else {
-            return item.NamaPelaksana.includes("BPPP");
-          }
-        })
-        .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
 
-      data
-        .filter((item) => item.NamaProgram === "Fishing Master")
-        .filter((item) => {
-          if (selectedSummaryAKP === "Satuan Pendidikan KP") {
-            return item.NamaPelaksana.includes("Politeknik");
-          } else {
-            return item.NamaPelaksana.includes("BPPP");
-          }
-        })
-        .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
+
     ];
 
     const updatedAllKeterampilanByLemdiklatek = [
       data
         .filter((item) => item.NamaPelaksana === "BPPP Tegal")
+        .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
         .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
       data
         .filter((item) => item.NamaPelaksana === "BPPP Medan")
+        .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
         .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
       data
         .filter((item) => item.NamaPelaksana === "BPPP Banyuwangi")
+        .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
         .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
       data
         .filter((item) => item.NamaPelaksana === "BPPP Bitung")
+        .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
         .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
       data
         .filter((item) => item.NamaPelaksana === "BPPP Ambon")
+        .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
         .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-      // data
-      //   .filter((item) => item.NamaPelaksana === "Politeknik AUP Jakarta")
-      //   .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-      // data
-      //   .filter((item) => item.NamaPelaksana === "LMTC")
-      //   .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
     ];
 
     const updatedAllKeterampilanBySatuanPendidikanKP = [
@@ -533,53 +505,6 @@ const ChartPopoverKeterampilan: React.FC<{ data: BlankoKeluar[] }> = ({
       ],
     });
 
-  const [stateLemdiklatBSTFII, setStateLemdiklatBSTFII] =
-    useState<ChartThreeState>({
-      series: [
-        data
-          .filter(
-            (item) =>
-              item.NamaPelaksana === "BPPP Tegal" &&
-              item.NamaProgram === "Basic Safety Training Fisheries II"
-          )
-          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-        data
-          .filter(
-            (item) =>
-              item.NamaPelaksana === "BPPP Medan" &&
-              item.NamaProgram === "Basic Safety Training Fisheries II"
-          )
-          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-        data
-          .filter(
-            (item) =>
-              item.NamaPelaksana === "BPPP Banyuwangi" &&
-              item.NamaProgram === "Basic Safety Training Fisheries II"
-          )
-          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-        data
-          .filter(
-            (item) =>
-              item.NamaPelaksana === "BPPP Bitung" &&
-              item.NamaProgram === "Basic Safety Training Fisheries II"
-          )
-          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-        data
-          .filter(
-            (item) =>
-              item.NamaPelaksana === "BPPP Ambon" &&
-              item.NamaProgram === "Basic Safety Training Fisheries II"
-          )
-          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-        data
-          .filter(
-            (item) =>
-              item.NamaPelaksana === "Politeknik AUP Jakarta" &&
-              item.NamaProgram === "Basic Safety Training Fisheries II"
-          )
-          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-      ],
-    });
 
   const totalSum = [
     {
@@ -663,16 +588,6 @@ const ChartPopoverKeterampilan: React.FC<{ data: BlankoKeluar[] }> = ({
       browser: "edge",
       visitors: stateAllKeterampilan.series[3],
       fill: "var(--color-edge)",
-    },
-    {
-      browser: "other",
-      visitors: stateAllKeterampilan.series[4],
-      fill: "var(--color-other)",
-    },
-    {
-      browser: "other2",
-      visitors: stateAllKeterampilan.series[5],
-      fill: "var(--color-other2)",
     },
   ];
 
