@@ -560,12 +560,7 @@ const ChartPopoverKeterampilan: React.FC<{ data: BlankoKeluar[] }> = ({
       fill: "var(--color-firefox)",
     },
     { browser: "edge", visitors: state.series[3], fill: "var(--color-edge)" },
-    { browser: "other", visitors: state.series[4], fill: "var(--color-other)" },
-    {
-      browser: "other2",
-      visitors: state.series[5],
-      fill: "var(--color-other2)",
-    },
+
   ];
 
   const chartDataAllKeterampilan = [
@@ -612,16 +607,7 @@ const ChartPopoverKeterampilan: React.FC<{ data: BlankoKeluar[] }> = ({
       visitors: statePNBP.series[3],
       fill: "var(--color-edge)",
     },
-    {
-      browser: "other",
-      visitors: statePNBP.series[4],
-      fill: "var(--color-other)",
-    },
-    {
-      browser: "other2",
-      visitors: statePNBP.series[5],
-      fill: "var(--color-other2)",
-    },
+
   ];
 
   const chartDataSatuanPendidikanKP = [
