@@ -743,65 +743,67 @@ const ChartPopoverKeahlian: React.FC<{ data: BlankoKeluar[] }> = ({ data }) => {
 
             <TabsContent value={selectedLemdiklat}>
               <div className="flex gap-2 w-full">
-                <Card className="w-[50%] h-full">
-                  <CardHeader>
-                    <div className="w-full flex justify-between items-center">
-                      <div className="flex flex-col gap-1">
-                        <CardTitle>Berdasarkan Jenis Pendidikan</CardTitle>
-                        <CardDescription>
-                          27 May 2024 - Now 2025
-                        </CardDescription>
+                {
+                  selectedSummaryAKP != 'Satuan Pendidikan KP' && <Card className="w-[50%] h-full">
+                    <CardHeader>
+                      <div className="w-full flex justify-between items-center">
+                        <div className="flex flex-col gap-1">
+                          <CardTitle>Berdasarkan Jenis Pendidikan</CardTitle>
+                          <CardDescription>
+                            27 May 2024 - Now 2025
+                          </CardDescription>
+                        </div>
+                        <div className="flex bg-gray-100 text-sm text-black px-3 py-2 rounded-full">
+                          Total Sertifikat :{" "}
+                          {chartData
+                            .reduce((sum, item) => sum + item.visitors, 0)
+                            .toLocaleString("ID")}
+                        </div>
                       </div>
-                      <div className="flex bg-gray-100 text-sm text-black px-3 py-2 rounded-full">
-                        Total Sertifikat :{" "}
-                        {chartData
-                          .reduce((sum, item) => sum + item.visitors, 0)
-                          .toLocaleString("ID")}
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <ChartContainer config={chartConfig}>
-                      <BarChart accessibilityLayer data={chartData}>
-                        <CartesianGrid vertical={false} />
-                        <XAxis
-                          dataKey="browser"
-                          tickLine={false}
-                          tickMargin={10}
-                          axisLine={false}
-                          tickFormatter={(value) =>
-                            chartConfig[value as keyof typeof chartConfig]
-                              ?.label
-                          }
-                        />
-                        <ChartTooltip
-                          cursor={false}
-                          content={<ChartTooltipContent hideLabel />}
-                        />
-                        <Bar
-                          dataKey="visitors"
-                          strokeWidth={2}
-                          radius={8}
-                          max={20000}
-                          activeIndex={2}
-                        >
-                          <LabelList
-                            position="inside"
-                            offset={12}
-                            className="fill-white text-white"
-                            fontSize={12}
-                            fill="#000"
+                    </CardHeader>
+                    <CardContent>
+                      <ChartContainer config={chartConfig}>
+                        <BarChart accessibilityLayer data={chartData}>
+                          <CartesianGrid vertical={false} />
+                          <XAxis
+                            dataKey="browser"
+                            tickLine={false}
+                            tickMargin={10}
+                            axisLine={false}
+                            tickFormatter={(value) =>
+                              chartConfig[value as keyof typeof chartConfig]
+                                ?.label
+                            }
                           />
-                        </Bar>
-                      </BarChart>
-                    </ChartContainer>
-                  </CardContent>
-                  <CardFooter className="flex-col items-start gap-2 text-sm">
-                    <div className="leading-none text-muted-foreground">
-                      Showing total certificate issued since 27 May 2024
-                    </div>
-                  </CardFooter>
-                </Card>
+                          <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent hideLabel />}
+                          />
+                          <Bar
+                            dataKey="visitors"
+                            strokeWidth={2}
+                            radius={8}
+                            max={20000}
+                            activeIndex={2}
+                          >
+                            <LabelList
+                              position="inside"
+                              offset={12}
+                              className="fill-white text-white"
+                              fontSize={12}
+                              fill="#000"
+                            />
+                          </Bar>
+                        </BarChart>
+                      </ChartContainer>
+                    </CardContent>
+                    <CardFooter className="flex-col items-start gap-2 text-sm">
+                      <div className="leading-none text-muted-foreground">
+                        Showing total certificate issued since 27 May 2024
+                      </div>
+                    </CardFooter>
+                  </Card>
+                }
 
                 {selectedSummaryAKP == "Balai Pelatihan KP" ? (
                   <Card className="w-[50%] h-full">
@@ -870,7 +872,7 @@ const ChartPopoverKeahlian: React.FC<{ data: BlankoKeluar[] }> = ({ data }) => {
                     </CardFooter>
                   </Card>
                 ) : selectedSummaryAKP == "Satuan Pendidikan KP" ? (
-                  <Card className="w-[50%] h-full">
+                  <Card className="w-full h-full">
                     <CardHeader>
                       <div className="w-full flex justify-between items-center">
                         <div className="flex flex-col gap-1">
