@@ -252,6 +252,13 @@ const ChartPopoverKeterampilan: React.FC<{ data: BlankoKeluar[] }> = ({
   });
 
   const [
+    stateAllKeterampilanByPelabuhan,
+    setStateAllKeterampilanByPelabuhan,
+  ] = useState<ChartThreeState>({
+    series: [],
+  });
+
+  const [
     stateAllKeterampilanBySatuanPendidikanKP,
     setStateAllKeterampilanBySatuanPendidikanKP,
   ] = useState<ChartThreeState>({
@@ -440,6 +447,153 @@ const ChartPopoverKeterampilan: React.FC<{ data: BlankoKeluar[] }> = ({
         .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
     ];
 
+    const updatedAllKeterampilanByPelabuhan = [
+      pelabuhanKPConfig.bbpi ?
+        data
+          .filter((item) => item.NamaPelaksana === "BBPI Semarang")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.ppsNizamZachmanJakarta ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPS Kepala PPS Nizam Zachman Jakarta")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.ppsKendari ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPS Kendari")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.ppsCilacap ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPS Cilacap")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.ppsBungus ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPS Bungus")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.ppsBelawan ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPS Belawan")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.ppsBitung ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPS Bitung")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.ppnAmbon ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPN Ambon")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.ppnPelabuhanRatu ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPN Pelabuhan Ratu")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.ppnTernate ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPN Ternate")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.ppnPrigi ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPN Prigi")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.ppnPemangkat ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPN Pemangkat")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.ppnSibolga ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPN Sibolga")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.ppnTual ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPN Tual")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.ppnKejawanan ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPN Kejawanan")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.ppnPekalongan ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPN Pekalongan")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.ppnBrondong ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPN Brondong")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.ppnTanjungPandan ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPN Tanjung Pandan")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.ppnSungailiat ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPN Sungailiat")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.ppnPengambengan ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPN Pengambengan")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.ppnKarangantu ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPN Karangantu")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.ppnKwandang ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPN Kwandang")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.pppSebatik ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPP Sebatik")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+
+      pelabuhanKPConfig.pppUntia ?
+        data
+          .filter((item) => item.NamaPelaksana === "PPP Untia")
+          .filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
+          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) : 0,
+    ];
+
+
     const updatedAllKeterampilanBySatuanPendidikanKP = [
       data
         .filter((item) => item.NamaPelaksana === "Politeknik AUP Jakarta")
@@ -456,54 +610,6 @@ const ChartPopoverKeterampilan: React.FC<{ data: BlankoKeluar[] }> = ({
     });
     setStatePNBP({ series: updatedSeriesPNBP });
   }, [selectedLemdiklat, data]);
-
-  const [stateLemdiklatBSTFI, setStateLemdiklatBSTFI] =
-    useState<ChartThreeState>({
-      series: [
-        data
-          .filter(
-            (item) =>
-              item.NamaPelaksana === "BPPP Tegal" &&
-              item.NamaProgram === "Basic Safety Training Fisheries I"
-          )
-          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-        data
-          .filter(
-            (item) =>
-              item.NamaPelaksana === "BPPP Medan" &&
-              item.NamaProgram === "Basic Safety Training Fisheries I"
-          )
-          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-        data
-          .filter(
-            (item) =>
-              item.NamaPelaksana === "BPPP Banyuwangi" &&
-              item.NamaProgram === "Basic Safety Training Fisheries I"
-          )
-          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-        data
-          .filter(
-            (item) =>
-              item.NamaPelaksana === "BPPP Bitung" &&
-              item.NamaProgram === "Basic Safety Training Fisheries I"
-          )
-          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-        data
-          .filter(
-            (item) =>
-              item.NamaPelaksana === "BPPP Ambon" &&
-              item.NamaProgram === "Basic Safety Training Fisheries I"
-          )
-          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-        data
-          .filter(
-            (item) =>
-              item.NamaPelaksana === "Politeknik AUP Jakarta" &&
-              item.NamaProgram === "Basic Safety Training Fisheries I"
-          )
-          .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-      ],
-    });
 
 
   const totalSum = [
@@ -618,6 +724,8 @@ const ChartPopoverKeterampilan: React.FC<{ data: BlankoKeluar[] }> = ({
     },
   ];
 
+
+
   const chartDataLemdiklat = [
     {
       browser: "chrome",
@@ -645,6 +753,135 @@ const ChartPopoverKeterampilan: React.FC<{ data: BlankoKeluar[] }> = ({
       fill: "var(--color-other)",
     },
   ];
+
+  const chartDataPelabuhanKP = [
+    {
+      browser: "Sertifikat",
+      visitors: stateAllKeterampilanByLemdiklatek.series[0],
+      fill: "var(--color-sertifikat)",
+    },
+    {
+      browser: "BBPI Semarang",
+      visitors: stateAllKeterampilanByLemdiklatek.series[1],
+      fill: "#211951", // Corresponding color for BBPI Semarang
+    },
+    {
+      browser: "PPS Kepala PPS Nizam Zachman Jakarta",
+      visitors: stateAllKeterampilanByLemdiklatek.series[2],
+      fill: "#211951",
+    },
+    {
+      browser: "PPS Kendari",
+      visitors: stateAllKeterampilanByLemdiklatek.series[3],
+      fill: "#211951",
+    },
+    {
+      browser: "PPS Cilacap",
+      visitors: stateAllKeterampilanByLemdiklatek.series[4],
+      fill: "#211951",
+    },
+    {
+      browser: "PPS Bungus",
+      visitors: stateAllKeterampilanByLemdiklatek.series[5],
+      fill: "#211951",
+    },
+    {
+      browser: "PPS Belawan",
+      visitors: stateAllKeterampilanByLemdiklatek.series[6],
+      fill: "#211951",
+    },
+    {
+      browser: "PPS Bitung",
+      visitors: stateAllKeterampilanByLemdiklatek.series[7],
+      fill: "#211951",
+    },
+    {
+      browser: "PPN Ambon",
+      visitors: stateAllKeterampilanByLemdiklatek.series[8],
+      fill: "#211951",
+    },
+    {
+      browser: "PPN Pelabuhan Ratu",
+      visitors: stateAllKeterampilanByLemdiklatek.series[9],
+      fill: "#211951",
+    },
+    {
+      browser: "PPN Ternate",
+      visitors: stateAllKeterampilanByLemdiklatek.series[10],
+      fill: "#211951",
+    },
+    {
+      browser: "PPN Prigi",
+      visitors: stateAllKeterampilanByLemdiklatek.series[11],
+      fill: "#211951",
+    },
+    {
+      browser: "PPN Pemangkat",
+      visitors: stateAllKeterampilanByLemdiklatek.series[12],
+      fill: "#211951",
+    },
+    {
+      browser: "PPN Sibolga",
+      visitors: stateAllKeterampilanByLemdiklatek.series[13],
+      fill: "#211951",
+    },
+    {
+      browser: "PPN Tual",
+      visitors: stateAllKeterampilanByLemdiklatek.series[14],
+      fill: "#211951",
+    },
+    {
+      browser: "PPN Kejawanan",
+      visitors: stateAllKeterampilanByLemdiklatek.series[15],
+      fill: "#211951",
+    },
+    {
+      browser: "PPN Pekalongan",
+      visitors: stateAllKeterampilanByLemdiklatek.series[16],
+      fill: "#211951",
+    },
+    {
+      browser: "PPN Brondong",
+      visitors: stateAllKeterampilanByLemdiklatek.series[17],
+      fill: "#211951",
+    },
+    {
+      browser: "PPN Tanjung Pandan",
+      visitors: stateAllKeterampilanByLemdiklatek.series[18],
+      fill: "#211951",
+    },
+    {
+      browser: "PPN Sungailiat",
+      visitors: stateAllKeterampilanByLemdiklatek.series[19],
+      fill: "#211951",
+    },
+    {
+      browser: "PPN Pengambengan",
+      visitors: stateAllKeterampilanByLemdiklatek.series[20],
+      fill: "#211951",
+    },
+    {
+      browser: "PPN Karangantu",
+      visitors: stateAllKeterampilanByLemdiklatek.series[21],
+      fill: "#211951",
+    },
+    {
+      browser: "PPN Kwandang",
+      visitors: stateAllKeterampilanByLemdiklatek.series[22],
+      fill: "#211951",
+    },
+    {
+      browser: "PPP Sebatik",
+      visitors: stateAllKeterampilanByLemdiklatek.series[23],
+      fill: "#211951",
+    },
+    {
+      browser: "PPP Untia",
+      visitors: stateAllKeterampilanByLemdiklatek.series[24],
+      fill: "#211951",
+    },
+  ];
+
 
   const [selectedSummaryAKP, setSelectedSummaryAKP] =
     React.useState<string>("All");
@@ -744,17 +981,6 @@ const ChartPopoverKeterampilan: React.FC<{ data: BlankoKeluar[] }> = ({
             )}
 
             <TabsContent value={selectedLemdiklat}>
-              {
-                selectedSummaryAKP == 'All' && <MapProvider>
-                  <div className="mt-3 flex flex-col h-full grid-cols-1 gap-5 xl:grid-cols-2 2xl:grid-cols-3 mb-10">
-                    <MapComponent
-                      data={data}
-                      selectedSummary={selectedSummaryAKP}
-                    />
-                  </div>
-                </MapProvider>
-              }
-
               {selectedLemdiklat == "All" ? (
                 <div className="flex gap-2 w-full h-full">
                   <div className="w-full ">
@@ -762,7 +988,7 @@ const ChartPopoverKeterampilan: React.FC<{ data: BlankoKeluar[] }> = ({
                       <CardHeader>
                         <div className="w-full flex justify-between items-center">
                           <div className="flex flex-col gap-1">
-                            <CardTitle>BERDASARKAN LEMBAGA PELATIHAN</CardTitle>
+                            <CardTitle>BERDASARKAN {selectedSummaryAKP == 'Balai Pelatihan' ? 'LEMBAGA PELATIHAN' : selectedSummaryAKP == 'Satuan Pendidikan KP' ? 'LEMBAGA PENDIDIKAN' : 'PELABUHAN PERIKANAN'}</CardTitle>
                             <CardDescription>
                               27 May 2024 - Now 2025
                             </CardDescription>
@@ -773,9 +999,11 @@ const ChartPopoverKeterampilan: React.FC<{ data: BlankoKeluar[] }> = ({
                               ? chartDataLemdiklat
                                 .reduce((sum, item) => sum + item.visitors, 0)
                                 .toLocaleString("ID")
-                              : chartDataSatuanPendidikanKP
+                              : selectedSummaryAKP == "Satuan Pendidikan KP" ? chartDataSatuanPendidikanKP
                                 .reduce((sum, item) => sum + item.visitors, 0)
-                                .toLocaleString("ID")}
+                                .toLocaleString("ID") : chartDataPelabuhanKP
+                                  .reduce((sum, item) => sum + item.visitors, 0)
+                                  .toLocaleString("ID")}
                           </div>
                         </div>
                       </CardHeader>

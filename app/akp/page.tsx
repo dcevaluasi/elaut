@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 
 export default function page() {
   return (
-    <section className="m-16">
+    <section className="m-10 md:m-16">
       <AKP />
     </section>
   );

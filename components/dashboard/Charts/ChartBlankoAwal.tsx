@@ -76,7 +76,7 @@ const ChartBlankoAwal: React.FC<{ data: Blanko[] }> = ({ data }) => {
 
   return (
     <div
-      className={`col-span-12 rounded-sm border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default  sm:px-7.5 xl:col-span-5 w-full`}
+      className={`col-span-6 md:col-span-12 rounded-sm border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default  sm:px-7.5 xl:col-span-5 w-full`}
     >
       <div className="mb-3 justify-between gap-4 sm:flex w-full">
         <div>

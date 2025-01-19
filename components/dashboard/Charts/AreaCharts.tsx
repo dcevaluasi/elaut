@@ -34,7 +34,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function AreaCharts({ data }: { data: BlankoKeluar[] }) {
+export function AreaCharts({ data, dataSertifikat }: { data: BlankoKeluar[], dataSertifikat: any }) {
   const [timeRange, setTimeRange] = React.useState("2024");
 
   // Generate dynamic years starting from 2024

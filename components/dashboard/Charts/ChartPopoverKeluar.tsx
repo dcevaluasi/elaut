@@ -53,12 +53,12 @@ const options: ApexOptions = {
 };
 
 const ChartPopoverKeluar: React.FC<{
-  data: BlankoKeluar[];
+  dataSertifikat: any;
   dataBlankoRusak: BlankoRusak[];
-}> = ({ data, dataBlankoRusak }) => {
+}> = ({ dataSertifikat, dataBlankoRusak }) => {
   const [state, setState] = useState<ChartThreeState>({
     series: [
-      data.reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
+      dataSertifikat.CoC + dataSertifikat.CoP,
       dataBlankoRusak.length,
     ],
   });
@@ -103,10 +103,7 @@ const ChartPopoverKeluar: React.FC<{
             </p>
             <span>
               {" "}
-              {data.reduce(
-                (total, item) => total + item.JumlahBlankoDisetujui,
-                0
-              )}
+              {dataSertifikat.CoC + dataSertifikat.CoP}
             </span>
           </div>
         </div>
@@ -126,10 +123,3 @@ const ChartPopoverKeluar: React.FC<{
 };
 
 export default ChartPopoverKeluar;
-
-// data
-//                 .filter(
-//                   (item) =>
-//                     item.TipeBlanko === "Certificate of Proficiency (CoP)"
-//                 )
-//                 .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0)
