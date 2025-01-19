@@ -279,9 +279,9 @@ const AKP: React.FC = () => {
       {
         isFetchingSertifikatByTypeBlankoCoC && isFetchingSertifikatByTypeBlankoCoP ? <></> : dataSertifikatByTypeBlankoCoC != null && dataSertifikatByTypeBlankoCoP != null ? dataSertifikatByTypeBlankoCoC.data != null && dataSertifikatByTypeBlankoCoP.data != null ?
           <div className="w-full mt-8">
-            <ChartCertificatesMonthly data={data!} dataSertifikat={{
+            {/* <ChartCertificatesMonthly data={data!} dataSertifikat={{
               CoC: dataSertifikatByTypeBlankoCoC!.data.reduce((total, item) => total + item.jumlah_sertifikat, 0), CoP: dataSertifikatByTypeBlankoCoP?.data.reduce((total, item) => total + item.jumlah_sertifikat, 0)
-            }} />
+            }} /> */}
 
             <Tabs defaultValue={"CoP"} className="w-full mb-3 -mt-4">
               <TabsList className="flex gap-2 w-full">
@@ -293,10 +293,15 @@ const AKP: React.FC = () => {
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="CoC">
-                <ChartPopoverKeahlian data={data!} />
+                <ChartPopoverKeahlian data={data!} dataSertifikat={{
+                  CoC: dataSertifikatByTypeBlankoCoC?.data,
+                  CoP: dataSertifikatByTypeBlankoCoP?.data
+                }} />
               </TabsContent>
               <TabsContent value="CoP">
-                <ChartPopoverKeterampilan data={data!} />
+                <ChartPopoverKeterampilan data={data!} dataSertifikat={{
+                  CoP: dataSertifikatByTypeBlankoCoP?.data
+                }} />
               </TabsContent>
             </Tabs>
           </div>

@@ -316,7 +316,7 @@ const options1: ApexOptions = {
   ],
 };
 
-const ChartPopoverKeahlian: React.FC<{ data: BlankoKeluar[] }> = ({ data }) => {
+const ChartPopoverKeahlian: React.FC<{ data: BlankoKeluar[], dataSertifikat: any }> = ({ data, dataSertifikat }) => {
   const [selectedLemdiklat, setSelectedLemdiklat] =
     React.useState<string>("BPPP Tegal");
   const [state, setState] = useState<ChartThreeState>({
@@ -367,12 +367,15 @@ const ChartPopoverKeahlian: React.FC<{ data: BlankoKeluar[] }> = ({ data }) => {
     ];
 
     // Generate series data dynamically
-    const updatedStateAllKeahlianByJenisPendidikanSeries = programNames.map((programName) =>
-      data
-        .filter((item) => filterBySummaryAKP(item, selectedSummaryAKP)) // Apply summary filter first
-        .filter((item) => item.NamaProgram === programName) // Then filter by program
-        .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0) // Sum up values
-    );
+    const updatedStateAllKeahlianByJenisPendidikanSeries = [
+      dataSertifikat.CoC![0].jumlah_sertifikat,
+      dataSertifikat.CoC![3].jumlah_sertifikat,
+      dataSertifikat.CoC![4].jumlah_sertifikat,
+      dataSertifikat.CoC![5].jumlah_sertifikat,
+      dataSertifikat.CoC![1].jumlah_sertifikat,
+      dataSertifikat.CoC![2].jumlah_sertifikat,
+      dataSertifikat.CoP![2].jumlah_sertifikat,
+    ]
 
 
     const updatedStateAllKeahlianByUPTPelatihan = [
@@ -526,51 +529,43 @@ const ChartPopoverKeahlian: React.FC<{ data: BlankoKeluar[] }> = ({ data }) => {
   }, [selectedLemdiklat, data,]);
 
   const totalSum = [
-    {
-      label: "Ujian Ahli Nautika Kapal Penangkap Ikan Tingkat I",
-      color: "bg-primary",
-      multiplier: 565000,
-    },
-    {
-      label: "Ujian Ahli Teknika Kapal Penangkap Ikan Tingkat I",
-      color: "bg-[#8FD0EF]",
-      multiplier: 565000,
-    },
+
     {
       label: "Ujian Ahli Nautika Kapal Penangkap Ikan Tingkat II",
       color: "bg-[#026bec]",
       multiplier: 540000,
+      value: stateAllKeahlianByJenisPendidikan.series[2],
     },
     {
       label: "Ujian Ahli Teknika Kapal Penangkap Ikan Tingkat II",
       color: "bg-[#991dce]",
       multiplier: 540000,
+      value: stateAllKeahlianByJenisPendidikan.series[3],
     },
     {
       label: "Ujian Ahli Nautika Kapal Penangkap Ikan Tingkat III",
       color: "bg-[#0FADCF]",
       multiplier: 693000,
+      value: stateAllKeahlianByJenisPendidikan.series[4],
     },
     {
       label: "Ujian Ahli Teknika Kapal Penangkap Ikan Tingkat III",
       color: "bg-[#25ca46]",
       multiplier: 693000,
+      value: stateAllKeahlianByJenisPendidikan.series[5],
     },
     {
       label: "Ujian Rating Keahlian",
       color: "bg-[#12e7d2]",
       multiplier: 2031000,
+      value: stateAllKeahlianByJenisPendidikan.series[6],
     },
   ].reduce(
     (acc, item) => {
-      const totalBlanko = data
-        .filter((d) => "Ujian " + d.NamaProgram === item.label)
-        .reduce((total, d) => total + d.JumlahBlankoDisetujui, 0);
 
-      const totalAmount = totalBlanko * item.multiplier;
+      const totalAmount = item.value * item.multiplier;
 
       acc.totalAmount += totalAmount;
-      acc.totalBlanko += totalBlanko;
 
       return acc;
     },
@@ -748,7 +743,7 @@ const ChartPopoverKeahlian: React.FC<{ data: BlankoKeluar[] }> = ({ data }) => {
                     <CardHeader>
                       <div className="w-full flex justify-between items-center">
                         <div className="flex flex-col gap-1">
-                          <CardTitle>Berdasarkan Jenis Pendidikan</CardTitle>
+                          <CardTitle>BERDASARKAN JENIS PROGRAM</CardTitle>
                           <CardDescription>
                             27 May 2024 - Now 2025
                           </CardDescription>
@@ -777,7 +772,7 @@ const ChartPopoverKeahlian: React.FC<{ data: BlankoKeluar[] }> = ({ data }) => {
                           />
                           <ChartTooltip
                             cursor={false}
-                            content={<ChartTooltipContent hideLabel />}
+                            content={<ChartTooltipContent />}
                           />
                           <Bar
                             dataKey="visitors"
@@ -944,7 +939,7 @@ const ChartPopoverKeahlian: React.FC<{ data: BlankoKeluar[] }> = ({ data }) => {
         </TabsContent>
       </Tabs>
 
-      <div className="flex gap-2 flex-col mt-10">
+      <div className="flex gap-2 flex-col mt-5">
         <Card className="w-full">
           <CardHeader>
             <CardTitle>Total Perkiraan Penerimaan PNBP</CardTitle>
@@ -954,43 +949,39 @@ const ChartPopoverKeahlian: React.FC<{ data: BlankoKeluar[] }> = ({ data }) => {
               <span className="font-semibold">BPPP Tegal</span>
             </CardDescription>
           </CardHeader>
+
           <CardContent>
-            <div className="p-8 flex flex-wrap items-center justify-center gap-y-3 mt-0 border-t border-t-gray-200">
+            <div className="p-8 flex flex-wrap items-center justify-center gap-y-3 border-t border-t-gray-200">
               {[
-                {
-                  label: "Ujian Ahli Nautika Kapal Penangkap Ikan Tingkat I",
-                  color: "bg-primary",
-                  multiplier: 565000,
-                },
-                {
-                  label: "Ujian Ahli Teknika Kapal Penangkap Ikan Tingkat I",
-                  color: "bg-[#8FD0EF]",
-                  multiplier: 565000,
-                },
                 {
                   label: "Ujian Ahli Nautika Kapal Penangkap Ikan Tingkat II",
                   color: "bg-[#026bec]",
                   multiplier: 540000,
+                  value: stateAllKeahlianByJenisPendidikan.series[2],
                 },
                 {
                   label: "Ujian Ahli Teknika Kapal Penangkap Ikan Tingkat II",
                   color: "bg-[#991dce]",
                   multiplier: 540000,
+                  value: stateAllKeahlianByJenisPendidikan.series[3],
                 },
                 {
                   label: "Ujian Ahli Nautika Kapal Penangkap Ikan Tingkat III",
                   color: "bg-[#0FADCF]",
                   multiplier: 693000,
+                  value: stateAllKeahlianByJenisPendidikan.series[4],
                 },
                 {
                   label: "Ujian Ahli Teknika Kapal Penangkap Ikan Tingkat III",
                   color: "bg-[#25ca46]",
                   multiplier: 693000,
+                  value: stateAllKeahlianByJenisPendidikan.series[5],
                 },
                 {
                   label: "Ujian Rating Keahlian",
                   color: "bg-[#12e7d2]",
                   multiplier: 2031000,
+                  value: stateAllKeahlianByJenisPendidikan.series[6],
                 },
               ].map((item, index) => (
                 <div className="w-full px-8 " key={index}>
@@ -1016,26 +1007,11 @@ const ChartPopoverKeahlian: React.FC<{ data: BlankoKeluar[] }> = ({ data }) => {
                     <span className="w-full flex items-end justify-end">
                       Rp.
                       {(
-                        data
-                          .filter(
-                            (d) => "Ujian " + d.NamaProgram === item.label
-                          )
-                          .reduce(
-                            (total, d) => total + d.JumlahBlankoDisetujui,
-                            0
-                          ) * item.multiplier
+                        item.value * item.multiplier
                       ).toLocaleString("id-ID")}{" "}
                       <span className="font-semibold text-xs ml-3">
                         (
-                        {data
-                          .filter(
-                            (d) => "Ujian " + d.NamaProgram === item.label
-                          )
-                          .reduce(
-                            (total, d) => total + d.JumlahBlankoDisetujui,
-                            0
-                          )
-                          .toLocaleString("id-ID")}
+                        {item.value}
                         Sertifikat )
                       </span>
                     </span>
@@ -1053,7 +1029,17 @@ const ChartPopoverKeahlian: React.FC<{ data: BlankoKeluar[] }> = ({ data }) => {
                     />
                   </h5>
                   <span className="font-semibold text-xs ml-3">
-                    ({totalSum.totalBlanko}
+                    ({(dataSertifikat.CoC
+                      .reduce(
+                        (total: any, d: any) => total + d.jumlah_sertifikat,
+                        0
+                      ) + dataSertifikat.CoP
+                        .filter((item: any) => item.jenis_sertifikat === 'Rating Awak Kapal Perikanan')
+                        .reduce(
+                          (total: any, d: any) => total + d.jumlah_sertifikat,
+                          0
+                        ) - stateAllKeahlianByJenisPendidikan.series[0] - stateAllKeahlianByJenisPendidikan.series[1])
+                      .toLocaleString("id-ID")}
                     Sertifikat )
                   </span>
                 </div>

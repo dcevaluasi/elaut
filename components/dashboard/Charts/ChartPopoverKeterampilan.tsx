@@ -26,8 +26,6 @@ import {
 import TableDataSertifikatKeterampilan from "../Pelatihan/TableDataSertifikatKeterampilan";
 import { BALAI_PELATIHAN, SATUAN_PENDIDIKAN } from "@/constants/pelatihan";
 import { PELABUHAN_PERIKANAN, PILIHAN_SUMMARY_AKP } from "@/constants/akp";
-import { MapProvider } from "@/components/MapProvider";
-import { MapComponent } from "@/components/MapComponent";
 
 export const description = "A bar chart with an active bar";
 
@@ -36,7 +34,7 @@ const chartConfig = {
     label: "Sertifikat",
   },
   chrome: {
-    label: "BSTF I",
+    label: "SKN",
     color: "#211951",
   },
   safari: {
@@ -44,7 +42,7 @@ const chartConfig = {
     color: "#836FFF",
   },
   firefox: {
-    label: "SKN",
+    label: "BSTF I",
     color: "#15F5BA",
   },
   edge: {
@@ -225,8 +223,8 @@ interface ChartThreeState {
   series: number[];
 }
 
-const ChartPopoverKeterampilan: React.FC<{ data: BlankoKeluar[] }> = ({
-  data,
+const ChartPopoverKeterampilan: React.FC<{ data: BlankoKeluar[], dataSertifikat: any }> = ({
+  data, dataSertifikat
 }) => {
   const [selectedLemdiklat, setSelectedLemdiklat] =
     React.useState<string>("All");
@@ -369,59 +367,10 @@ const ChartPopoverKeterampilan: React.FC<{ data: BlankoKeluar[] }> = ({
     ];
 
     const updatedAllKeterampilan = [
-      data
-        .filter(
-          (item) => item.NamaProgram === "Basic Safety Training Fisheries I"
-        )
-        .filter((item) => {
-          if (selectedSummaryAKP === "Satuan Pendidikan KP") {
-            return item.NamaPelaksana.includes("Politeknik");
-          } else {
-            return item.NamaPelaksana.includes("BPPP");
-          }
-        }).filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
-        .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-
-      data
-        .filter(
-          (item) => item.NamaProgram === "Basic Safety Training Fisheries II"
-        )
-        .filter((item) => {
-          if (selectedSummaryAKP === "Satuan Pendidikan KP") {
-            return item.NamaPelaksana.includes("Politeknik");
-          } else {
-            return item.NamaPelaksana.includes("BPPP");
-          }
-        }).filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
-        .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-
-      data
-        .filter((item) => item.NamaProgram === "Sertifikat Kecakapan Nelayan")
-        .filter((item) => {
-          if (selectedSummaryAKP === "Satuan Pendidikan KP") {
-            return item.NamaPelaksana.includes("Politeknik");
-          } else {
-            return item.NamaPelaksana.includes("BPPP");
-          }
-        }).filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
-        .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-
-      data
-        .filter(
-          (item) =>
-            item.NamaProgram === "Sertifikat Keterampilan Penanganan Ikan"
-        )
-        .filter((item) => {
-          if (selectedSummaryAKP === "Satuan Pendidikan KP") {
-            return item.NamaPelaksana.includes("Politeknik");
-          } else {
-            return item.NamaPelaksana.includes("BPPP");
-          }
-        }).filter((item) => item.TipeBlanko === "Certificate of Proficiency (CoP)")
-        .reduce((total, item) => total + item.JumlahBlankoDisetujui, 0),
-
-
-
+      dataSertifikat.CoP![0].jumlah_sertifikat,
+      dataSertifikat.CoP![1].jumlah_sertifikat,
+      dataSertifikat.CoP![3].jumlah_sertifikat,
+      dataSertifikat.CoP![4].jumlah_sertifikat,
     ];
 
     const updatedAllKeterampilanByLemdiklatek = [
@@ -611,6 +560,7 @@ const ChartPopoverKeterampilan: React.FC<{ data: BlankoKeluar[] }> = ({
     setStatePNBP({ series: updatedSeriesPNBP });
   }, [selectedLemdiklat, data]);
 
+  console.log({ stateAllKeterampilan })
 
   const totalSum = [
     {
@@ -1108,7 +1058,7 @@ const ChartPopoverKeterampilan: React.FC<{ data: BlankoKeluar[] }> = ({
                             />
                             <ChartTooltip
                               cursor={false}
-                              content={<ChartTooltipContent hideLabel />}
+                              content={<ChartTooltipContent />}
                             />
                             <Bar
                               dataKey="visitors"
