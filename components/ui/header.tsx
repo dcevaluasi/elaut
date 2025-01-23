@@ -55,8 +55,7 @@ export default function Header() {
             }}
           >
             <div
-              className={`font-medium ${
-                top &&
+              className={`font-medium ${top &&
                 (usePathname() == "/" ||
                   usePathname() == "/lembaga/p2mkp" ||
                   usePathname().includes("bppp") ||
@@ -68,18 +67,18 @@ export default function Header() {
                   usePathname().includes("login") ||
                   usePathname().includes("forget-password") ||
                   usePathname().includes("cek-sertifikat"))
-                  ? "text-gray-200 hover:text-white hover:scale-105"
-                  : top && usePathname().includes("program")
+                ? "text-gray-200 hover:text-white hover:scale-105"
+                : top && usePathname().includes("program")
                   ? "text-gray-200 hover:text-white hover:scale-105"
                   : (top && usePathname().includes("pelatihan")) ||
                     usePathname().includes("sertifikasi") ||
                     usePathname().includes("users")
-                  ? "text-gray-900 hover:text-gray-900 hover:scale-105"
-                  : usePathname().includes("complete-profile") ||
-                    usePathname().includes("program")
-                  ? "text-gray-600 hover:text-gray-900 hover:scale-105"
-                  : "text-gray-600 hover:text-gray-900 hover:scale-105"
-              }  px-2 py-3 flex items-center transition  duration-150 ease-in-out font-medium`}
+                    ? "text-gray-900 hover:text-gray-900 hover:scale-105"
+                    : usePathname().includes("complete-profile") ||
+                      usePathname().includes("program")
+                      ? "text-gray-600 hover:text-gray-900 hover:scale-105"
+                      : "text-gray-600 hover:text-gray-900 hover:scale-105"
+                }  px-2 py-3 flex items-center transition  duration-150 ease-in-out font-medium`}
             >
               {name} <HiMiniChevronDown className="text-lg" />
             </div>
@@ -88,9 +87,8 @@ export default function Header() {
         {name == currentName && (
           <PopoverContent
             onMouseLeave={() => setOpenModal(false)}
-            className={`w-80 flex flex-col z-[1000000] gap-1 ${
-              top ? "-mt-3" : "mt-7"
-            }`}
+            className={`w-80 flex flex-col z-[1000000] gap-1 ${top ? "-mt-3" : "mt-7"
+              }`}
           >
             <ul>{children}</ul>
           </PopoverContent>
@@ -114,32 +112,30 @@ export default function Header() {
       <li>
         <Link
           href={href}
-          target={`${
-            name == "Balai Pelatihan dan Penyuluhan Perikanan Tegal" ||
+          target={`${name == "Balai Pelatihan dan Penyuluhan Perikanan Tegal" ||
             name == "Balai Pelatihan dan Penyuluhan Perikanan Banyuwangi" ||
             name == "Balai Pelatihan dan Penyuluhan Perikanan Ambon" ||
             name == "Balai Pelatihan dan Penyuluhan Perikanan Medan" ||
             name == "Balai Pelatihan dan Penyuluhan Perikanan Bitung" ||
             name == "Balai Pendidikan dan Pelatihan Aparatur Sukamandi"
-              ? "_target"
-              : "_self"
-          }`}
+            ? "_target"
+            : "_self"
+            }`}
           onClick={(e) => setOpenModal(false)}
-          className={`font-medium ${
-            top && usePathname().includes("layanan")
-              ? "text-gray-600 hover:text-gray-900 hover:scale-105"
-              : (top && usePathname().includes("program")) ||
-                (top && usePathname().includes("dashboard"))
+          className={`font-medium ${top && usePathname().includes("layanan")
+            ? "text-gray-600 hover:text-gray-900 hover:scale-105"
+            : (top && usePathname().includes("program")) ||
+              (top && usePathname().includes("dashboard"))
               ? "text-gray-200 hover:text-white hover:scale-105"
               : (top && usePathname().includes("pelatihan")) ||
                 usePathname().includes("sertifikasi") ||
                 usePathname().includes("users")
-              ? "text-gray-900 hover:text-gray-900 hover:scale-105"
-              : usePathname().includes("complete-profile") ||
-                usePathname().includes("layanan")
-              ? "text-gray-600 hover:text-gray-900 hover:scale-105"
-              : "text-gray-600 hover:text-gray-900 hover:scale-105"
-          }  px-5 py-3 flex items-center transition duration-150 ease-in-out font-medium`}
+                ? "text-gray-900 hover:text-gray-900 hover:scale-105"
+                : usePathname().includes("complete-profile") ||
+                  usePathname().includes("layanan")
+                  ? "text-gray-600 hover:text-gray-900 hover:scale-105"
+                  : "text-gray-600 hover:text-gray-900 hover:scale-105"
+            }  px-5 py-3 flex items-center transition duration-150 ease-in-out font-medium`}
         >
           {children}
         </Link>
@@ -160,8 +156,7 @@ export default function Header() {
       <li>
         <Link
           href={href}
-          className={`font-medium ${
-            top &&
+          className={`font-medium ${top &&
             (usePathname() == "/" ||
               usePathname() == "/lembaga/p2mkp" ||
               usePathname().includes("bppp") ||
@@ -173,19 +168,19 @@ export default function Header() {
               usePathname().includes("login") ||
               usePathname().includes("forget-password") ||
               usePathname().includes("cek-sertifikat"))
-              ? "text-gray-200 hover:text-white hover:scale-105"
-              : top && usePathname().includes("program")
+            ? "text-gray-200 hover:text-white hover:scale-105"
+            : top && usePathname().includes("program")
               ? "text-gray-200 hover:text-white hover:scale-105"
               : (top && usePathname().includes("pelatihan")) ||
                 usePathname().includes("sertifikasi") ||
                 usePathname().includes("users")
-              ? "text-gray-900 hover:text-gray-900 hover:scale-105"
-              : usePathname().includes("complete-profile") ||
-                usePathname().includes("layanan") ||
-                usePathname().includes("program")
-              ? "text-gray-600 hover:text-gray-900 hover:scale-105"
-              : "text-gray-600 hover:text-gray-900 hover:scale-105"
-          }  px-5 py-3 flex items-center transition duration-150 ease-in-out`}
+                ? "text-gray-900 hover:text-gray-900 hover:scale-105"
+                : usePathname().includes("complete-profile") ||
+                  usePathname().includes("layanan") ||
+                  usePathname().includes("program")
+                  ? "text-gray-600 hover:text-gray-900 hover:scale-105"
+                  : "text-gray-600 hover:text-gray-900 hover:scale-105"
+            }  px-5 py-3 flex items-center transition duration-150 ease-in-out`}
         >
           {name}
         </Link>
@@ -209,8 +204,7 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed ${
-        usePathname().includes("pre-test") ||
+      className={`fixed ${usePathname().includes("pre-test") ||
         usePathname().includes("post-test") ||
         usePathname().includes("/dpkakp/admin") ||
         usePathname().includes("/dpkakp/user") ||
@@ -221,29 +215,27 @@ export default function Header() {
         usePathname().includes("/pukakp/user") ||
         usePathname().includes("/pukakp/penguji") ||
         usePathname().includes("/dev-dashboard")
-          ? "hidden"
-          : "block"
-      } w-full z-[150] md:bg-opacity-90 transition duration-300 ease-in-out ${
-        (top && usePathname().includes("layanan")) ||
-        usePathname() == "/dashboard" ||
-        usePathname() == "/registrasi" ||
-        usePathname().includes("forget-password") ||
-        usePathname() == "/login"
+        ? "hidden"
+        : "block"
+        } w-full z-[150] md:bg-opacity-90 transition duration-300 ease-in-out ${(top && usePathname().includes("layanan")) ||
+          usePathname() == "/dashboard" ||
+          usePathname() == "/registrasi" ||
+          usePathname().includes("forget-password") ||
+          usePathname() == "/login"
           ? "pt-0"
           : top && "pt-6"
-      }  ${
-        !top
+        }  ${!top
           ? `bg-white backdrop-blur-sm shadow-lg`
           : usePathname().includes("program")
-          ? "bg-none  pt-6"
-          : usePathname().includes("pelatihan") ||
-            usePathname().includes("sertifikasi") ||
-            usePathname().includes("users")
-          ? `bg-white backdrop-blur-sm shadow-lg !pt-0`
-          : usePathname().includes("complete-profile")
-          ? "bg-white backdrop-blur-sm shadow-lg"
-          : ""
-      } ${usePathname().includes("program") && "bg-transparent"}`}
+            ? "bg-none  pt-6"
+            : usePathname().includes("pelatihan") ||
+              usePathname().includes("sertifikasi") ||
+              usePathname().includes("users")
+              ? `bg-white backdrop-blur-sm shadow-lg !pt-0`
+              : usePathname().includes("complete-profile")
+                ? "bg-white backdrop-blur-sm shadow-lg"
+                : ""
+        } ${usePathname().includes("program") && "bg-transparent"}`}
     >
       <div className=" mx-auto  max-w-7xl ">
         <div className="flex items-center justify-between h-24 md:h-24 py-3">
@@ -254,19 +246,19 @@ export default function Header() {
             usePathname().includes("forget-password") ||
             usePathname().includes("cek-sertifikat") ||
             usePathname().includes("login")) && (
-            <Link
-              href={"/"}
-              className="shrink-0 ml-6 md:mr-4 flex items-center gap-4"
-            >
-              <Image
-                className={getSizeLogoHeader()}
-                width={0}
-                height={0}
-                src={getLogoHeader()}
-                alt="Kementrian Kelautan dan Perikanan RI Logo"
-              />
-            </Link>
-          )}
+              <Link
+                href={"/"}
+                className="shrink-0 ml-6 md:mr-4 flex items-center gap-4"
+              >
+                <Image
+                  className={getSizeLogoHeader()}
+                  width={0}
+                  height={0}
+                  src={getLogoHeader()}
+                  alt="Kementrian Kelautan dan Perikanan RI Logo"
+                />
+              </Link>
+            )}
 
           <nav className="hidden md:flex md:grow">
             <ul className="flex grow gap-0 justify-end flex-wrap items-center w-fit">
@@ -287,7 +279,7 @@ export default function Header() {
                     </div>
                   </NavLink>
                   <NavLink
-                    href="https://www.bpppbanyuwangi.com/"
+                    href="#"
                     name="Balai Pelatihan dan Penyuluhan Perikanan Banyuwangi"
                     top={top}
                   >
