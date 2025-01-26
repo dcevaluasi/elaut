@@ -40,14 +40,16 @@ import { IoMdCloseCircle } from "react-icons/io";
 import ReCAPTCHA from "react-google-recaptcha";
 import { Slide } from "react-awesome-reveal";
 import Footer from "../ui/footer";
-import { HiMiniUserGroup } from "react-icons/hi2";
+import { HiMiniUserGroup, HiOutlineEye } from "react-icons/hi2";
 import { elautBaseUrl, manningAgentDevUrl } from "@/constants/urls";
+import { sanitizedDangerousChars, validateIsDangerousChars } from "@/utils/input";
+import { HiOutlineEyeOff } from "react-icons/hi";
 
 function FormRegistrasi() {
   const router = useRouter();
 
   const recaptchaRef = React.createRef();
-  const [role, setRole] = React.useState<string>("");
+  const [role, setRole] = React.useState<string>("Perseorangan");
 
   const [captcha, setCaptcha] = React.useState<string | null>();
 
@@ -90,52 +92,61 @@ function FormRegistrasi() {
 
   const handleCheckingNoKusuka = async (e: any) => {
     e.preventDefault();
-    try {
-      const url = `${process.env.NEXT_PUBLIC_BASE_URL}/getDataKusuka?nomor_kusuka=${noKusuka}`;
-      console.log("Request URL:", url);
-
-      const response = await axios.get(url);
-      setOpenInfoKusuka(false);
-      if (response.data.data == "Anda tidak memiliki akses") {
-        Toast.fire({
-          icon: "error",
-          title: `Internal server error, token tidak memiliki akses!`,
-        });
-        setOpenInfoKusuka(false);
-      }
-
-      if (Array.isArray(response.data.data) && response.data.data.length > 0) {
-        const data = response.data.data[0];
-        console.log({ response });
-        setIsKusukaUser(true);
-        setName(data.NamaPelakuUtama);
-        setEmail("");
-        setNik(data.NomorKUSUKA);
-        setPhoneNumber("");
-        setOpenInfoKusuka(true);
-      } else {
-        console.log({ response });
-        setOpenInfoKusuka(true);
-        setIsKusukaUser(false);
-      }
-    } catch (error: any) {
-      setOpenInfoKusuka(false);
-      setIsKusukaUser(false);
+    if (validateIsDangerousChars(noKusuka)) {
       Toast.fire({
         icon: "error",
-        title: `Internal server error, hubungi helpdesk!`,
+        title: "Oopsss!",
+        text: `Kamu memasukkan karakter berbahaya pada input no kusuka, pencarian no kusuka tidak dapat diproses!`,
       });
-      if (error.response) {
-        console.error("Response data:", error.response.data);
-        console.error("Response status:", error.response.status);
-        console.error("Response headers:", error.response.headers);
-      } else if (error.request) {
-        console.error("Request data:", error.request);
-      } else {
-        console.error("Error message:", error.message);
+    } else {
+      try {
+        const url = `${process.env.NEXT_PUBLIC_BASE_URL}/getDataKusuka?nomor_kusuka=${sanitizedDangerousChars(noKusuka)}`;
+        const response = await axios.get(url);
+        setOpenInfoKusuka(false);
+        if (response.data.data == "Anda tidak memiliki akses") {
+          Toast.fire({
+            icon: "error",
+            title: 'Oopsss!',
+            text: `Internal server error, token tidak memiliki akses!`,
+          });
+          setOpenInfoKusuka(false);
+        }
+
+        if (Array.isArray(response.data.data) && response.data.data.length > 0) {
+          const data = response.data.data[0];
+          console.log({ response });
+          setIsKusukaUser(true);
+          setName(data.NamaPelakuUtama);
+          setEmail("");
+          setNik(data.NomorKUSUKA);
+          setPhoneNumber("");
+          setOpenInfoKusuka(true);
+        } else {
+          console.log({ response });
+          setOpenInfoKusuka(true);
+          setIsKusukaUser(false);
+        }
+      } catch (error: any) {
+        setOpenInfoKusuka(false);
+        setIsKusukaUser(false);
+        Toast.fire({
+          icon: "error",
+          title: 'Oopsss!',
+          text: `Internal server error, hubungi helpdesk!`,
+        });
+        if (error.response) {
+          console.error("Response data:", error.response.data);
+          console.error("Response status:", error.response.status);
+          console.error("Response headers:", error.response.headers);
+        } else if (error.request) {
+          console.error("Request data:", error.request);
+        } else {
+          console.error("Error message:", error.message);
+        }
+        console.error("Error config:", error.config);
       }
-      console.error("Error config:", error.config);
     }
+
   };
 
   /* state variable to store basic user information to register */
@@ -144,6 +155,7 @@ function FormRegistrasi() {
   const [phoneNumber, setPhoneNumber] = React.useState<string>("");
   const [email, setEmail] = React.useState<string>("");
   const [password, setPassword] = React.useState<string>("");
+  const [confirmPassword, setConfirmPassword] = React.useState<string>("");
 
   const clearForm = () => {
     setName("");
@@ -151,10 +163,12 @@ function FormRegistrasi() {
     setPhoneNumber("");
     setEmail("");
     setPassword("");
+    setConfirmPassword("");
   };
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const [isInputError, setIsInputError] = React.useState(false);
+  const [isInputErrorNIK, setIsInputErrorNIK] = React.useState(false);
   const [isKUSUKA, setIsKUSUKA] = React.useState("");
 
   const handleRegistrasiAkun = async (e: FormEvent) => {
@@ -167,52 +181,60 @@ function FormRegistrasi() {
         });
         setIsInputError(true);
       } else {
-        if (captcha) {
-          try {
-            const response: AxiosResponse = await axios.post(
-              `${baseUrl}/users/registerUser`,
-              JSON.stringify({
-                nik: nik,
-                nama: name,
-                password: password,
-                no_number: phoneNumber.toString(),
-                kusuka_users: isKUSUKA,
-              }),
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                },
+        if (validateIsDangerousChars(name) || validateIsDangerousChars(nik) || validateIsDangerousChars(phoneNumber) || validateIsDangerousChars(password)) {
+          Toast.fire({
+            icon: "error",
+            title: "Oopsss!",
+            text: `Kamu memasukkan karakter berbahaya pada form registrasi, registrasi akun tidak dapat diproses!`,
+          });
+        } else {
+          if (captcha) {
+            try {
+              const response: AxiosResponse = await axios.post(
+                `${baseUrl}/users/registerUser`,
+                JSON.stringify({
+                  nik: sanitizedDangerousChars(nik),
+                  nama: sanitizedDangerousChars(name),
+                  password: sanitizedDangerousChars(password),
+                  no_number: sanitizedDangerousChars(phoneNumber.toString()),
+                  kusuka_users: sanitizedDangerousChars(isKUSUKA),
+                }),
+                {
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                }
+              );
+
+              Cookies.set("XSRF083", "true");
+
+              Toast.fire({
+                icon: "success",
+                title: `Berhasil melakukan registrasi akun, silahkan untuk login terlebih dahulu!`,
+              });
+              router.push("/login");
+            } catch (error: any) {
+              console.error({ error });
+              if (
+                error.response &&
+                error.response.data &&
+                error.response.data.Message
+              ) {
+                const errorMsg = error.response.data.Message;
+                Toast.fire({
+                  icon: "error",
+                  title: `Gagal melakukan registrasi akun, ${errorMsg}!`,
+                });
+              } else {
+                Toast.fire({
+                  icon: "error",
+                  title: `Gagal melakukan registrasi akun. Terjadi kesalahan tidak diketahui.`,
+                });
               }
-            );
-            console.log({ response });
-
-            Cookies.set("XSRF083", "true");
-
-            Toast.fire({
-              icon: "success",
-              title: `Berhasil melakukan registrasi akun, silahkan untuk login terlebih dahulu!`,
-            });
-            router.push("/login");
-          } catch (error: any) {
-            console.error({ error });
-            if (
-              error.response &&
-              error.response.data &&
-              error.response.data.Message
-            ) {
-              const errorMsg = error.response.data.Message;
-              Toast.fire({
-                icon: "error",
-                title: `Gagal melakukan registrasi akun, ${errorMsg}!`,
-              });
-            } else {
-              Toast.fire({
-                icon: "error",
-                title: `Gagal melakukan registrasi akun. Terjadi kesalahan tidak diketahui.`,
-              });
             }
           }
         }
+
       }
     }
   };
@@ -253,58 +275,66 @@ function FormRegistrasi() {
         });
         setIsInputError(true);
       } else {
-        if (captcha) {
-          try {
-            const response: AxiosResponse = await axios.post(
-              `${elautBaseUrl}/manningAgent/registerManningAgent`,
-              JSON.stringify({
-                email: emailManningAgent,
-                password: passwordManningAgent,
-                nama_maning_agent: namaManningAgent,
-                no_telpon: noTelponManingAgent,
-                nama_penanggung_jawab: namaPenanggungJawabManningAgent,
-                alamat: alamat,
-              }),
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                },
+        if (validateIsDangerousChars(emailManningAgent) || validateIsDangerousChars(passwordManningAgent) || validateIsDangerousChars(namaManningAgent) || validateIsDangerousChars(noTelponManingAgent) || validateIsDangerousChars(namaPenanggungJawabManningAgent) || validateIsDangerousChars(alamat)) {
+          Toast.fire({
+            icon: "error",
+            title: "Oopsss!",
+            text: `Kamu memasukkan karakter berbahaya pada form registrasi, registrasi akun tidak dapat diproses!`,
+          });
+        } else {
+          if (captcha) {
+            try {
+              const response: AxiosResponse = await axios.post(
+                `${elautBaseUrl}/manningAgent/registerManningAgent`,
+                JSON.stringify({
+                  email: sanitizedDangerousChars(emailManningAgent),
+                  password: sanitizedDangerousChars(passwordManningAgent),
+                  nama_maning_agent: sanitizedDangerousChars(namaManningAgent),
+                  no_telpon: sanitizedDangerousChars(noTelponManingAgent),
+                  nama_penanggung_jawab: sanitizedDangerousChars(namaPenanggungJawabManningAgent),
+                  alamat: sanitizedDangerousChars(alamat),
+                }),
+                {
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                }
+              );
+              Cookies.set("XSRF083", "true");
+
+              Toast.fire({
+                icon: "success",
+                title: `Berhasil melakukan registrasi akun, silahkan untuk login terlebih dahulu!`,
+              });
+              router.push("/login");
+              clearFormManningAgent();
+            } catch (error: any) {
+              console.error({ error });
+              if (
+                error.response &&
+                error.response.data &&
+                error.response.data.Message
+              ) {
+                const errorMsg = error.response.data.Message;
+                Toast.fire({
+                  icon: "error",
+                  title: `Gagal melakukan registrasi akun, ${errorMsg}!`,
+                });
+                clearFormManningAgent();
+              } else {
+                Toast.fire({
+                  icon: "error",
+                  title: `Gagal melakukan registrasi akun. Terjadi kesalahan tidak diketahui.`,
+                });
+                clearFormManningAgent();
               }
-            );
-            console.log({ response });
-
-            Cookies.set("XSRF083", "true");
-
-            Toast.fire({
-              icon: "success",
-              title: `Berhasil melakukan registrasi akun, silahkan untuk login terlebih dahulu!`,
-            });
-            router.push("/login");
-            clearFormManningAgent();
-          } catch (error: any) {
-            console.error({ error });
-            if (
-              error.response &&
-              error.response.data &&
-              error.response.data.Message
-            ) {
-              const errorMsg = error.response.data.Message;
-              Toast.fire({
-                icon: "error",
-                title: `Gagal melakukan registrasi akun, ${errorMsg}!`,
-              });
-              clearFormManningAgent();
-            } else {
-              Toast.fire({
-                icon: "error",
-                title: `Gagal melakukan registrasi akun. Terjadi kesalahan tidak diketahui.`,
-              });
-              clearFormManningAgent();
             }
           }
         }
+
       }
     }
+
   };
 
   const [openInfoKusuka, setOpenInfoKusuka] = React.useState(false);
@@ -326,6 +356,47 @@ function FormRegistrasi() {
 
     return () => clearInterval(interval);
   }, []);
+
+  const [isInputErrorNoTelpon, setIsInputErrorNoTelpon] = React.useState<boolean>(true)
+
+  const [isMatch, setIsMatch] = React.useState<boolean>(true); // Untuk mengecek apakah password sesuai
+  const [isMatchManning, setIsMatchManning] = React.useState<boolean>(true); // Untuk mengecek apakah password sesuai
+
+  const handlePasswordChange = (e: any) => {
+    const value = e.target.value;
+    setPassword(value);
+
+    // Cek kesesuaian dengan confirmPassword
+    setIsMatch(value === confirmPassword);
+  };
+
+  const handleConfirmPasswordChange = (e: any) => {
+    const value = e.target.value;
+    setConfirmPassword(value);
+
+    // Cek kesesuaian dengan password
+    setIsMatch(password === value);
+  };
+
+  const handlePasswordManningChange = (e: any) => {
+    const value = e.target.value;
+    setPasswordManningAgent(value);
+
+    // Cek kesesuaian dengan confirmPassword
+    setIsMatchManning(value === confirmPassword);
+  };
+
+  const handleConfirmPasswordManningChange = (e: any) => {
+    const value = e.target.value;
+    setConfirmPassword(value);
+
+    // Cek kesesuaian dengan password
+    setIsMatchManning(passwordManningAgent === value);
+  };
+
+  const [isShowPassword, setIsShowPassword] = React.useState<boolean>(false);
+  const [isShowConfirmPassword, setIsShowConfirmPassword] = React.useState<boolean>(false);
+
 
   return (
     <section className="flex flex-col">
@@ -405,28 +476,26 @@ function FormRegistrasi() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="pt-32  md:pt-40 ">
             <div className="w-full mx-auto text-center pb-0 md:pb-0">
-              <h1 className="font-semibold text-4xl leading-[110%] md:text-4xl text-gray-200">
-                <span className="font-calsans text-[3.4rem] md:text-[3.7rem]">
-                  Registrasi
+              <h1 className="font-bold text-4xl leading-[110%] text-gray-200 font-calsans">
+                <span className="">
+                  Registrasi Akun
                 </span>{" "}
-                <br />
-                <span className="z-0 bg-clip-text text-[3.4rem] w-[600px] md:text-[3.7rem] leading-[110%]  text-transparent bg-gradient-to-r font-calsans from-blue-500  to-teal-400">
-                  Pelatihan dan Sertifikasi
+                <span className="z-0 bg-clip-text  w-[600px] leading-[110%]  text-transparent bg-gradient-to-r  from-blue-500  to-teal-400">
+                  ELAUT
                 </span>{" "}
               </h1>
-              <p className="text-base text-center mx-auto text-gray-200  max-w-3xl">
-                Registrasi tersedia dalam tiga opsi: Mandiri untuk individu,
+              <p className="text-base text-center mx-auto text-gray-200 mt-2  max-w-3xl">
+                Registrasi tersedia dalam tiga opsi: Perseorangan untuk individu,
                 Corporate untuk grup, dan Portofolio untuk yang punya rekam
                 jejak atau sertifikasi. Fleksibel sesuai kebutuhan!
               </p>
             </div>
 
             <div
-              className={`${
-                role == "Mandiri" || role == "" || role == "Portfolio"
-                  ? "max-w-sm"
-                  : "max-w-4xl"
-              }  mx-5 md:mx-auto mt-5`}
+              className={`${role == "Perseorangan" || role == "" || role == "Portfolio"
+                ? "max-w-sm"
+                : "max-w-4xl"
+                }  mx-5 md:mx-auto mt-5`}
             >
               <div className="flex flex-col gap-1">
                 <label
@@ -437,7 +506,7 @@ function FormRegistrasi() {
                 </label>
                 <Select
                   value={role}
-                  onValueChange={(value: string) => setRole(value)}
+                  onValueChange={(value: string) => { setRole(value); setIsShowPassword(false); setIsShowConfirmPassword(false); setConfirmPassword('') }}
                 >
                   <SelectTrigger className="form-input w-full py-6 bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200">
                     <p className="mr-3 flex items-center gap-1 text-base text-gray-300">
@@ -448,8 +517,8 @@ function FormRegistrasi() {
                   <SelectContent side="bottom">
                     <SelectGroup>
                       <SelectLabel>Mendaftar Sebagai</SelectLabel>
-                      <SelectItem value="Mandiri">Mandiri</SelectItem>
-                      <SelectItem value="Corporate/Manning Agent">
+                      <SelectItem value="Perseorangan">Perseorangan</SelectItem>
+                      <SelectItem value="Corporate/Manning Agent" >
                         Corporate/Manning Agent
                       </SelectItem>
                       {/* <SelectItem value="Portfolio">Portfolio</SelectItem> */}
@@ -460,7 +529,7 @@ function FormRegistrasi() {
               {useKUSUKA && (
                 <form
                   onSubmit={(e) => handleCheckingNoKusuka(e)}
-                  className="w-full flex gap-1"
+                  className="w-full flex gap-1 mt-2"
                 >
                   <div className="w-full">
                     <label
@@ -492,7 +561,7 @@ function FormRegistrasi() {
                 </form>
               )}
 
-              {role == "Mandiri" && (
+              {role == "Perseorangan" && (
                 <>
                   <div className="flex items-center my-6">
                     <div
@@ -526,7 +595,7 @@ function FormRegistrasi() {
                           required
                         />
                         {isInputError && (
-                          <span className="text-[#FF0000] font-medium">
+                          <span className="text-rose-500 font-medium">
                             *Masukkan nama lengkap!
                           </span>
                         )}
@@ -543,19 +612,28 @@ function FormRegistrasi() {
                         <input
                           id="nik"
                           type="text"
-                          className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
+                          className={`form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200 active:border-gray-200 text-gray-200 ${isInputError ? "border-red-600" : ""
+                            }`}
                           placeholder="Masukkan NIK"
                           value={nik}
-                          onChange={(e) => setNik(e.target.value)}
+                          maxLength={16}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setNik(value);
+                            setIsInputErrorNIK(value.length > 0 && value.length < 16);
+                          }}
                           required
                         />
-                        {isInputError && (
-                          <span className="text-[#FF0000] font-medium">
-                            *Masukkan NIK!
+                        {isInputErrorNIK ? (
+                          <span className="text-rose-500 font-medium text-xs">
+                            *NIK harus 16 karakter!
                           </span>
-                        )}
+                        ) : <p className="text-gray-300 leading-[100%] text-xs font-medium mt-2">
+                          * NIK harus sesuai KTP karena untuk kebutuhan sertifikat
+                        </p>}
                       </div>
                     </div>
+
                     <div className="flex flex-wrap -mx-3 mb-1">
                       <div className="w-full px-3">
                         <label
@@ -570,11 +648,22 @@ function FormRegistrasi() {
                           className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
                           placeholder="Masukkan no telpon/WA"
                           value={phoneNumber}
-                          onChange={(e) => setPhoneNumber(e.target.value)}
+                          minLength={12}
+                          maxLength={13}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            setPhoneNumber(value);
+                            setIsInputErrorNoTelpon(value.length > 0 && value.length < 12);
+                          }}
                           required
                         />
+                        {isInputErrorNoTelpon && phoneNumber != '' && (
+                          <span className="text-rose-500 font-medium text-xs">
+                            *No Telpon minimal 12 digit!
+                          </span>
+                        )}
                         {isInputError && (
-                          <span className="text-[#FF0000] font-medium">
+                          <span className="text-rose-500 font-medium">
                             *Masukkan no telpon!
                           </span>
                         )}
@@ -588,17 +677,27 @@ function FormRegistrasi() {
                         >
                           Password <span className="text-red-600">*</span>
                         </label>
-                        <input
-                          id="password"
-                          type="password"
-                          className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                          placeholder="Buat password"
-                          required
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                        />
+                        <span className="relative w-full h-fit">
+                          <input
+                            id="password"
+                            type={isShowPassword ? 'text' : 'password'}
+                            className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
+                            placeholder="Buat password"
+                            required
+                            value={password}
+                            onChange={(e) => handlePasswordChange(e)}
+                          />
+                          <span onClick={(e) => setIsShowPassword(!isShowPassword)}>
+                            {isShowPassword ? (
+                              <HiOutlineEyeOff className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
+                            ) : (
+                              <HiOutlineEye className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
+                            )}
+                          </span>
+                        </span>
+
                         {isInputError ? (
-                          <span className="text-[#FF0000] font-medium">
+                          <span className="text-rose-500 font-medium">
                             *Masukkan password!
                           </span>
                         ) : (
@@ -609,7 +708,46 @@ function FormRegistrasi() {
                         )}
                       </div>
                     </div>
-                    {password != "" && (
+                    <div className="flex flex-wrap -mx-3 mb-1">
+                      <div className="w-full px-3">
+                        <label
+                          className="block text-gray-200 text-sm font-medium mb-1"
+                          htmlFor="password"
+                        >
+                          Konfirmasi Password <span className="text-red-600">*</span>
+                        </label>
+                        <span className="relative w-full h-fit">
+                          <input
+                            id="confirmPassword"
+                            type={isShowConfirmPassword ? 'text' : 'password'}
+                            className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
+                            placeholder="Konfirmasi password"
+                            required
+                            value={confirmPassword}
+                            onChange={(e) => handleConfirmPasswordChange(e)}
+                          />
+                          <span onClick={(e) => setIsShowConfirmPassword(!isShowConfirmPassword)}>
+                            {isShowConfirmPassword ? (
+                              <HiOutlineEyeOff className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
+                            ) : (
+                              <HiOutlineEye className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
+                            )}
+                          </span>
+                        </span>
+
+                        {(!isMatch && confirmPassword != '') && (
+                          <span className="text-rose-500 text-xs font-medium">
+                            *Password dan konfirmasi password tidak sesuai!
+                          </span>
+                        )}
+                        {isInputError && (
+                          <span className="text-rose-500 font-medium">
+                            *Masukkan konfirmasi password!
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    {(confirmPassword != "" && nik != "" && password != "" && phoneNumber != '' && name != '') && (
                       <div
                         className="flex flex-wrap w-full mb-1"
                         style={{ width: "100% !important" }}
@@ -638,13 +776,15 @@ function FormRegistrasi() {
                     )}
                     <div className="flex flex-wrap -mx-3 mt-3">
                       <div className="w-full px-3 flex flex-col gap-2">
-                        <button
+                        <Button
                           type="submit"
-                          className="btn text-white bg-blue-500 hover:bg-blue-600 w-full"
+                          disabled={captcha == null}
+                          className="btn text-white bg-blue-500 py-5 hover:bg-blue-600 bg-opacity-100 w-full text-lg"
                         >
                           Registrasi
-                        </button>
-                        {!useKUSUKA && role == "Mandiri" && (
+                        </Button>
+
+                        {!useKUSUKA && role == "Perseorangan" && (
                           <button
                             type="button"
                             onClick={(e) => {
@@ -718,7 +858,7 @@ function FormRegistrasi() {
                             required
                           />
                           {isInputError && (
-                            <span className="text-[#FF0000] font-medium">
+                            <span className="text-rose-500 font-medium">
                               *Masukkan nama lengkap!
                             </span>
                           )}
@@ -738,13 +878,22 @@ function FormRegistrasi() {
                             className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
                             placeholder="Masukkan No Telpon"
                             value={noTelponManingAgent}
-                            onChange={(e) =>
-                              setNoTelponManningAgent(e.target.value)
-                            }
+                            minLength={12}
+                            maxLength={13}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              setNoTelponManningAgent(value);
+                              setIsInputErrorNoTelpon(value.length > 0 && value.length < 12);
+                            }}
                             required
                           />
+                          {isInputErrorNoTelpon && phoneNumber != '' && (
+                            <span className="text-rose-500 font-medium text-xs">
+                              *No Telpon minimal 12 digit!
+                            </span>
+                          )}
                           {isInputError && (
-                            <span className="text-[#FF0000] font-medium">
+                            <span className="text-rose-500 font-medium">
                               *Masukkan No Telpon!
                             </span>
                           )}
@@ -770,7 +919,7 @@ function FormRegistrasi() {
                             required
                           />
                           {isInputError && (
-                            <span className="text-[#FF0000] font-medium">
+                            <span className="text-rose-500 font-medium">
                               *Masukkan email!
                             </span>
                           )}
@@ -797,7 +946,7 @@ function FormRegistrasi() {
                             required
                           />
                           {isInputError && (
-                            <span className="text-[#FF0000] font-medium">
+                            <span className="text-rose-500 font-medium">
                               *Masukkan nama penanggung jawab!
                             </span>
                           )}
@@ -821,7 +970,7 @@ function FormRegistrasi() {
                             required
                           />
                           {isInputError && (
-                            <span className="text-[#FF0000] font-medium">
+                            <span className="text-rose-500 font-medium">
                               *Masukkan alamat!
                             </span>
                           )}
@@ -835,19 +984,27 @@ function FormRegistrasi() {
                           >
                             Password <span className="text-red-600">*</span>
                           </label>
-                          <input
-                            id="password"
-                            type="password"
-                            className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                            placeholder="Masukkan password"
-                            required
-                            value={passwordManningAgent}
-                            onChange={(e) =>
-                              setPasswordManningAgent(e.target.value)
-                            }
-                          />
+                          <span className="relative w-full h-fit">
+                            <input
+                              id="password"
+                              type={isShowPassword ? 'text' : 'password'}
+                              className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
+                              placeholder="Masukkan password"
+                              required
+                              value={passwordManningAgent}
+                              onChange={(e) => handlePasswordManningChange(e)}
+                            />
+                            <span onClick={(e) => setIsShowPassword(!isShowPassword)}>
+                              {isShowPassword ? (
+                                <HiOutlineEyeOff className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
+                              ) : (
+                                <HiOutlineEye className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
+                              )}
+                            </span>
+                          </span>
+
                           {isInputError ? (
-                            <span className="text-[#FF0000] font-medium">
+                            <span className="text-rose-500 font-medium">
                               *Masukkan password!
                             </span>
                           ) : (
@@ -861,7 +1018,47 @@ function FormRegistrasi() {
                       </div>
                     </div>
 
-                    {passwordManningAgent != "" && (
+                    <div className="flex flex-wrap -mx-3 mb-1">
+                      <div className="w-full px-3">
+                        <label
+                          className="block text-gray-200 text-sm font-medium mb-1"
+                          htmlFor="password"
+                        >
+                          Konfirmasi Password <span className="text-red-600">*</span>
+                        </label>
+                        <span className="relative w-full h-fit">
+                          <input
+                            id="confirmPassword"
+                            type={isShowConfirmPassword ? 'text' : 'password'}
+                            className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
+                            placeholder="Konfirmasi password"
+                            required
+                            value={confirmPassword}
+                            onChange={(e) => handleConfirmPasswordManningChange(e)}
+                          />
+                          <span onClick={(e) => setIsShowConfirmPassword(!isShowConfirmPassword)}>
+                            {isShowConfirmPassword ? (
+                              <HiOutlineEyeOff className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
+                            ) : (
+                              <HiOutlineEye className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
+                            )}
+                          </span>
+                        </span>
+
+                        {(!isMatchManning && confirmPassword != '') && (
+                          <span className="text-rose-500 text-xs font-medium">
+                            *Password dan konfirmasi password tidak sesuai!
+                          </span>
+                        )}
+                        {isInputError && (
+                          <span className="text-rose-500 font-medium">
+                            *Masukkan konfirmasi password!
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {(passwordManningAgent != "" && confirmPassword != '' && namaPenanggungJawabManningAgent != '' && noTelponManingAgent != '' && emailManningAgent != '' && namaManningAgent != '' && alamat != '') && (
                       <div
                         className="flex flex-wrap w-full mb-1"
                         style={{ width: "100% !important" }}
@@ -948,7 +1145,7 @@ function FormRegistrasi() {
                           required
                         />
                         {isInputError && (
-                          <span className="text-[#FF0000] font-medium">
+                          <span className="text-rose-500 font-medium">
                             *Masukkan nama lengkap!
                           </span>
                         )}
@@ -972,7 +1169,7 @@ function FormRegistrasi() {
                           required
                         />
                         {isInputError && (
-                          <span className="text-[#FF0000] font-medium">
+                          <span className="text-rose-500 font-medium">
                             *Masukkan NIK!
                           </span>
                         )}
@@ -996,7 +1193,7 @@ function FormRegistrasi() {
                           required
                         />
                         {isInputError && (
-                          <span className="text-[#FF0000] font-medium">
+                          <span className="text-rose-500 font-medium">
                             *Masukkan no telpon!
                           </span>
                         )}
@@ -1020,7 +1217,7 @@ function FormRegistrasi() {
                           required
                         />
                         {isInputError && (
-                          <span className="text-[#FF0000] font-medium">
+                          <span className="text-rose-500 font-medium">
                             *Masukkan no telpon!
                           </span>
                         )}
@@ -1044,7 +1241,7 @@ function FormRegistrasi() {
                           onChange={(e) => setPassword(e.target.value)}
                         />
                         {isInputError ? (
-                          <span className="text-[#FF0000] font-medium">
+                          <span className="text-rose-500 font-medium">
                             *Masukkan password!
                           </span>
                         ) : (

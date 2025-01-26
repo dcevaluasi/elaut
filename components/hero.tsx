@@ -52,7 +52,6 @@ import { Bounce, Slide } from "react-awesome-reveal";
 import ListProgram from "./lists";
 import Logo from "./ui/logo";
 import Link from "next/link";
-import Footer from "./ui/footer";
 
 export default function Hero() {
   const programPelatihan = [
@@ -193,17 +192,15 @@ export default function Hero() {
 
               {selectedProgram != null && (
                 <Link
-                  href={`/layanan/program/${
-                    programPelatihan[selectedProgram]!.slug
-                  }`}
-                  className={`btn-sm ${
-                    top
-                      ? usePathname().includes("pelatihan") ||
-                        usePathname().includes("searching")
-                        ? "text-blue-500 hover:text-white"
-                        : "text-gray-200"
-                      : "text-blue-500 hover:text-white"
-                  } bg-transparent border border-blue-500 hover:bg-blue-500 w-fit`}
+                  href={`/layanan/program/${programPelatihan[selectedProgram]!.slug
+                    }`}
+                  className={`btn-sm ${top
+                    ? usePathname().includes("pelatihan") ||
+                      usePathname().includes("searching")
+                      ? "text-blue-500 hover:text-white"
+                      : "text-gray-200"
+                    : "text-blue-500 hover:text-white"
+                    } bg-transparent border border-blue-500 hover:bg-blue-500 w-fit`}
                 >
                   <span>Lihat Selengkapnya</span>
                 </Link>
@@ -212,19 +209,17 @@ export default function Hero() {
           </div>
 
           <div
-            className={`w-full flex flex-col md:flex-row gap-5 md:gap-14 items-center justify-center  z-[10000] pt-10 md:pt-16 ${
-              selectedProgram === null ? " md:mt-7" : "mt-0"
-            }`}
+            className={`w-full flex flex-col md:flex-row gap-5 md:gap-14 items-center justify-center  z-[10000] pt-10 md:pt-16 ${selectedProgram === null ? " md:mt-7" : "mt-0"
+              }`}
           >
             {programPelatihan.map((item, index) => (
               <Slide direction="up" duration={index * 1200}>
                 <div
                   onClick={(e) => setSelectedProgram(index)}
-                  className={`flex w-[80%] mx-auto md:mx-0 md:w-full flex-col gap-1 items-center justify-center hover:scale-110 duration-700 cursor-pointer hover:opacity-100 border text-center rounded-3xl border-gray-200 px-20 md:px-9 py-7 ${
-                    selectedProgram == index
-                      ? "opacity-100 animate-pulse my-10 !px-9"
-                      : "opacity-40  "
-                  }`}
+                  className={`flex w-[80%] mx-auto md:mx-0 md:w-full flex-col gap-1 items-center justify-center hover:scale-110 duration-700 cursor-pointer hover:opacity-100 border text-center rounded-3xl border-gray-200 px-20 md:px-9 py-7 ${selectedProgram == index
+                    ? "opacity-100 animate-pulse my-10 !px-9"
+                    : "opacity-40  "
+                    }`}
                 >
                   <Image
                     src={item.icon}
@@ -253,17 +248,15 @@ export default function Hero() {
 
                       {selectedProgram != null && (
                         <Link
-                          href={`/layanan/program/${
-                            programPelatihan[selectedProgram]!.slug
-                          }`}
-                          className={`btn-sm ${
-                            top
-                              ? usePathname().includes("pelatihan") ||
-                                usePathname().includes("searching")
-                                ? "text-blue-500 hover:text-white"
-                                : "text-gray-200"
-                              : "text-blue-500 hover:text-white"
-                          } bg-transparent border border-blue-500 text-center hover:bg-blue-500 w-fit`}
+                          href={`/layanan/program/${programPelatihan[selectedProgram]!.slug
+                            }`}
+                          className={`btn-sm ${top
+                            ? usePathname().includes("pelatihan") ||
+                              usePathname().includes("searching")
+                              ? "text-blue-500 hover:text-white"
+                              : "text-gray-200"
+                            : "text-blue-500 hover:text-white"
+                            } bg-transparent border border-blue-500 text-center hover:bg-blue-500 w-fit`}
                         >
                           <span>Lihat Selengkapnya</span>
                         </Link>
