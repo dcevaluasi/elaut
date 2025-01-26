@@ -19,42 +19,46 @@ import {
 import { Button } from "./ui/button";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { addFiveYears } from "@/utils/pelatihan";
+import { sanitizedDangerousChars, validateIsDangerousChars } from "@/utils/input";
 
 export default function Newsletter() {
   const [noRegistrasi, setNoRegistrasi] = React.useState<string>("");
-  const [isError, setIsError] = React.useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = React.useState<string>("");
+  const [isInputErrorNoRegistrasi, setIsInputErrorNoRegistrasi] = React.useState<boolean>(true)
   const [validSertifikat, setValidSertifikat] =
     React.useState<UserPelatihan | null>(null);
   const [isShowValidForm, setIsShowValidForm] = React.useState<boolean>(false);
   const handleCekValiditasSertifikat = async () => {
-    console.log({ noRegistrasi });
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/cekSertifikat`,
-        {
-          no_registrasi: noRegistrasi,
+    if (validateIsDangerousChars(noRegistrasi)) {
+      Toast.fire({
+        icon: "error",
+        title: "Oopsss!",
+        text: `Kamu memasukkan karakter berbahaya pada input NIK-mu, cek akun tidak dapat diproses!`,
+      });
+    } else {
+      try {
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/cekSertifikat`,
+          {
+            no_registrasi: sanitizedDangerousChars(noRegistrasi),
+          }
+        );
+        setValidSertifikat(response.data.data);
+        setIsShowValidForm(!isShowValidForm);
+        setNoRegistrasi("");
+      } catch (error) {
+        if (isAxiosError(error)) {
+          Toast.fire({
+            icon: "error",
+            title: error.response?.data?.Pesan || "An error occurred",
+          });
+        } else {
+          Toast.fire({
+            icon: "error",
+            title: "An unknown error occurred",
+          });
         }
-      );
-
-      console.log("NO SERTIFIKAT VALID: ", response);
-      setValidSertifikat(response.data.data);
-      setIsShowValidForm(!isShowValidForm);
-      setNoRegistrasi("");
-    } catch (error) {
-      if (isAxiosError(error)) {
-        Toast.fire({
-          icon: "error",
-          title: error.response?.data?.Pesan || "An error occurred",
-        });
-      } else {
-        Toast.fire({
-          icon: "error",
-          title: "An unknown error occurred",
-        });
+        setNoRegistrasi("");
       }
-      setNoRegistrasi("");
-      console.error({ error });
     }
   };
   return (
@@ -278,28 +282,38 @@ export default function Newsletter() {
                 </p>
 
                 {/* CTA form */}
-                <form className="w-full lg:w-auto">
+                <form className="w-full lg:w-auto" autoComplete="off">
                   <div className="flex flex-col sm:flex-row justify-center max-w-xs mx-auto sm:max-w-md lg:mx-0">
                     <input
                       type="text"
                       className="form-input w-full appearance-none bg-transparent border border-gray-200 focus:border-gray-600 rounded-sm px-4 py-3 mb-2 sm:mb-0 sm:mr-2 text-white placeholder:text-gray-200"
                       placeholder="No Registrasi"
                       aria-label="No Register"
+                      maxLength={18}
+                      required
                       value={noRegistrasi}
-                      onChange={(e) => setNoRegistrasi(e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setNoRegistrasi(value);
+                        setIsInputErrorNoRegistrasi(value.length > 0 && value.length < 18);
+                      }}
                     />
-                    <div
-                      className="btn text-white bg-blue-600 hover:bg-blue-700 shadow"
+                    <button type="button"
                       onClick={(e) => handleCekValiditasSertifikat()}
+                      disabled={noRegistrasi.length < 18}
+                      className="btn text-white bg-blue-600 hover:bg-blue-700 shadow cursor-pointer"
                     >
                       Cek
-                    </div>
+                    </button>
                   </div>
-                  {/* Success message */}
-                  {/* <p className="text-sm text-gray-400 mt-3">Thanks for subscribing!</p> */}
-                  <p className="text-sm text-gray-300 mt-3">
-                    Masukkan nomor registrasi kamu
-                  </p>
+                  {isInputErrorNoRegistrasi && noRegistrasi != '' ? (
+                    <p className="text-rose-500 font-medium text-sm mt-3">
+                      *No Registrasi tidak sesuai format, harus terdiri dari 18 digit
+                    </p>
+                  ) : <p className="text-sm text-gray-300 mt-3">
+                    *Masukkan nomor registrasi kamu
+                  </p>}
+
                 </form>
               </div>
             </div>

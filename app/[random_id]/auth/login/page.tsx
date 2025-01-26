@@ -151,13 +151,13 @@ function page() {
               E-LAUT
             </div>
 
-            <h1 className="font-bold font-calsans text-gray-200 text-[3.7rem] -mt-2">
+            <h1 className="font-bold font-calsans text-gray-200 text-4xl -mt-2">
               Login Admin{" "}
               <span className=" bg-clip-text text-transparent bg-gradient-to-r leading-none pt-0 from-blue-500 to-teal-400">
                 E-LAUT
               </span>
             </h1>
-            <p className="font-jakarta max-w-[42rem] leading-[115%] text-gray-300  sm:text-base -mt-6">
+            <p className="font-jakarta max-w-[42rem] leading-[115%] text-gray-300  sm:text-base -mt-3">
               Selamat datang kembali, silahkan login untuk mengakses dashboard
               admin Elektronik Layanan Pelatihan Kelautan dan Perikanan Utama
               Terpadu!
