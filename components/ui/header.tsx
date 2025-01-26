@@ -78,7 +78,7 @@ export default function Header() {
                       usePathname().includes("program")
                       ? "text-gray-600 hover:text-gray-900 hover:scale-105"
                       : "text-gray-600 hover:text-gray-900 hover:scale-105"
-                }  px-2 py-3 flex items-center transition  duration-150 ease-in-out font-medium`}
+                }  px-2 py-3 flex items-center transition  duration-150 ease-in-out font-semibold text-[#979797] hover:!text-blue-500`}
             >
               {name} <HiMiniChevronDown className="text-lg" />
             </div>
@@ -122,7 +122,7 @@ export default function Header() {
             : "_self"
             }`}
           onClick={(e) => setOpenModal(false)}
-          className={`font-medium ${top && usePathname().includes("layanan")
+          className={`font-semibold ${top && usePathname().includes("layanan")
             ? "text-gray-600 hover:text-gray-900 hover:scale-105"
             : (top && usePathname().includes("program")) ||
               (top && usePathname().includes("dashboard"))
@@ -135,7 +135,7 @@ export default function Header() {
                   usePathname().includes("layanan")
                   ? "text-gray-600 hover:text-gray-900 hover:scale-105"
                   : "text-gray-600 hover:text-gray-900 hover:scale-105"
-            }  px-5 py-3 flex items-center transition duration-150 ease-in-out font-medium`}
+            }  px-5 py-3 flex items-center transition duration-150 ease-in-out font-semibold text-[#979797] hover:!text-blue-500`}
         >
           {children}
         </Link>
@@ -156,7 +156,7 @@ export default function Header() {
       <li>
         <Link
           href={href}
-          className={`font-medium ${top &&
+          className={`font-semibold ${top &&
             (usePathname() == "/" ||
               usePathname() == "/lembaga/p2mkp" ||
               usePathname().includes("bppp") ||
@@ -180,7 +180,7 @@ export default function Header() {
                   usePathname().includes("program")
                   ? "text-gray-600 hover:text-gray-900 hover:scale-105"
                   : "text-gray-600 hover:text-gray-900 hover:scale-105"
-            }  px-5 py-3 flex items-center transition duration-150 ease-in-out`}
+            }  px-5 py-3 flex items-center transition duration-150 ease-in-out text-[#979797] hover:!text-blue-500`}
         >
           {name}
         </Link>
@@ -204,7 +204,7 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed ${usePathname().includes("pre-test") ||
+      className={`fixed mx-auto left-0 right-0 ${usePathname().includes("pre-test") ||
         usePathname().includes("post-test") ||
         usePathname().includes("/dpkakp/admin") ||
         usePathname().includes("/dpkakp/user") ||
@@ -216,8 +216,8 @@ export default function Header() {
         usePathname().includes("/pukakp/penguji") ||
         usePathname().includes("/dev-dashboard")
         ? "hidden"
-        : "block"
-        } w-full z-[150] md:bg-opacity-90 transition duration-300 ease-in-out ${(top && usePathname().includes("layanan")) ||
+        : ""
+        }  z-[150] md:bg-opacity-90 transition duration-300 ease-in-out ${(top && usePathname().includes("layanan")) ||
           usePathname() == "/dashboard" ||
           usePathname() == "/registrasi" ||
           usePathname().includes("forget-password") ||
@@ -225,20 +225,20 @@ export default function Header() {
           ? "pt-0"
           : top && "pt-6"
         }  ${!top
-          ? `bg-white backdrop-blur-sm shadow-lg`
+          ? `bg-white backdrop-blur-sm shadow-lg `
           : usePathname().includes("program")
             ? "bg-none  pt-6"
             : usePathname().includes("pelatihan") ||
               usePathname().includes("sertifikasi") ||
               usePathname().includes("users")
-              ? `bg-white backdrop-blur-sm shadow-lg !pt-0`
+              ? ` backdrop-blur-sm !pt-0 shadow-custom !text-[#979797] hover:!text-blue-500 `
               : usePathname().includes("complete-profile")
-                ? "bg-white backdrop-blur-sm shadow-lg"
+                ? "bg-white backdrop-blur-sm shadow-lg "
                 : ""
-        } ${usePathname().includes("program") && "bg-transparent"}`}
+        } ${usePathname().includes("program") && "bg-transparent"} max-w-6xl w-full mt-8  rounded-3xl bg-white px-5`}
     >
-      <div className=" mx-auto  max-w-7xl ">
-        <div className="flex items-center justify-between h-24 md:h-24 py-3">
+      <div className="w-full mx-auto">
+        <div className="flex items-center justify-between h-24 md:h-24 py-3 w-full mx-auto">
           {(usePathname().includes("program") ||
             usePathname().includes("registrasi") ||
             usePathname().includes("pelatihan") ||
@@ -349,11 +349,11 @@ export default function Header() {
                   name="Cek Sertifikat"
                   top={top}
                 />
-                <NavLinkDefault
+                {/* <NavLinkDefault
                   href="/#cek-sertifikat"
                   name="Buku Petunjuk"
                   top={top}
-                />
+                /> */}
                 {Cookies.get("XSRF081") ? (
                   <div className="flex items-center gap-3 2xsm:gap-7">
                     {/* <!-- User Area --> */}

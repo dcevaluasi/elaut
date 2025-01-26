@@ -132,10 +132,10 @@ function FormRegistrationTraining({
       selectedKonsumsi != null && selectedPenginapan != null
         ? parseInt(harga) + selectedKonsumsi.Harga + selectedPenginapan.Harga
         : selectedKonsumsi != null
-        ? parseInt(harga) + selectedKonsumsi.Harga
-        : selectedPenginapan != null
-        ? parseInt(harga) + selectedPenginapan.Harga
-        : pelatihan?.HargaPelatihan;
+          ? parseInt(harga) + selectedKonsumsi.Harga
+          : selectedPenginapan != null
+            ? parseInt(harga) + selectedPenginapan.Harga
+            : pelatihan?.HargaPelatihan;
 
     if (Cookies.get("isManningAgent")) {
       setIsOpenFormPeserta(!isOpenFormPeserta);
@@ -185,14 +185,14 @@ function FormRegistrationTraining({
     const totalBayarPeserta =
       selectedKonsumsi != null && selectedPenginapan != null
         ? (parseInt(harga) +
-            selectedKonsumsi.Harga +
-            selectedPenginapan.Harga) *
-          jumlahPeserta
+          selectedKonsumsi.Harga +
+          selectedPenginapan.Harga) *
+        jumlahPeserta
         : selectedKonsumsi != null
-        ? (parseInt(harga) + selectedKonsumsi.Harga) * jumlahPeserta
-        : selectedPenginapan != null
-        ? (parseInt(harga) + selectedPenginapan.Harga) * jumlahPeserta
-        : pelatihan?.HargaPelatihan * jumlahPeserta;
+          ? (parseInt(harga) + selectedKonsumsi.Harga) * jumlahPeserta
+          : selectedPenginapan != null
+            ? (parseInt(harga) + selectedPenginapan.Harga) * jumlahPeserta
+            : pelatihan?.HargaPelatihan * jumlahPeserta;
 
     try {
       const formData = new FormData();
@@ -234,7 +234,7 @@ function FormRegistrationTraining({
     }
   };
 
-  const [indexFormTab, setIndexFormTab] = React.useState(0);
+  const [indexFormTab, setIndexFormTab] = React.useState(1);
 
   const [selectedPenginapan, setSelectedPenginapan] =
     React.useState<Sarpras | null>(null);
@@ -283,9 +283,9 @@ function FormRegistrationTraining({
             <div className="flex flex-col gap-2">
               {pelatihan.SarprasPelatihan != null ? (
                 pelatihan.SarprasPelatihan.length === 0 ||
-                pelatihan.SarprasPelatihan.filter(
-                  (item) => item.Jenis === "Penginapan"
-                ).length === 0 ? (
+                  pelatihan.SarprasPelatihan.filter(
+                    (item) => item.Jenis === "Penginapan"
+                  ).length === 0 ? (
                   <div className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
                     <div className="space-y-1 leading-none">
                       <label>Fasilitas Penginapan Tidak Tersedia</label>
@@ -338,9 +338,9 @@ function FormRegistrationTraining({
               </label>
               <div className="flex flex-col gap-2">
                 {pelatihan.SarprasPelatihan.length === 0 ||
-                pelatihan.SarprasPelatihan.filter(
-                  (item) => item.Jenis === "Konsumsi"
-                ).length === 0 ? (
+                  pelatihan.SarprasPelatihan.filter(
+                    (item) => item.Jenis === "Konsumsi"
+                  ).length === 0 ? (
                   <div className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
                     <div className="space-y-1 leading-none">
                       <label>Fasilitas Konsumsi Tidak Tersedia</label>
@@ -391,41 +391,40 @@ function FormRegistrationTraining({
     return (
       <form
         autoComplete="off"
-        className={`${
-          isManningAgent == "true"
-            ? indexFormTab == 2
-              ? "block"
-              : "hidden"
-            : indexFormTab == 1
+        className={`${isManningAgent == "true"
+          ? indexFormTab == 2
             ? "block"
             : "hidden"
-        }`}
+          : indexFormTab == 1
+            ? "block"
+            : "hidden"
+          }`}
       >
         <div className="flex flex-wrap -mx-3 mb-1">
           <div className="w-full px-3">
             <label
-              className="block text-gray-800 text-sm font-medium mb-1"
+              className="block text-[#979797] text-sm font-medium mb-1"
               htmlFor="email"
             >
-              Rincian Harga <span className="text-red-600"></span>
+              Rincian Pelatihan <span className="text-red-600"></span>
             </label>
             <Select>
               <SelectTrigger className="w-full text-base py-14 flex items-center justify-between">
-                <div className="flex flex-col items-start gap-1 w-full">
-                  <p className="font-medium font-calsans text-lg text-left">
+                <div className="flex flex-col items-start w-full">
+                  <p className="font-medium font-calsans text-blue-500 text-lg text-left">
                     Pelatihan
                   </p>
-                  <p className="text-left">{pelatihan.NamaPelatihan}</p>
-                  <p className="font-medium text-lg font-calsans">
+                  <p className="text-left text-[#979797]">{pelatihan.NamaPelatihan}</p>
+                  <p className="font-medium text-lg font-calsans text-blue-500 ">
                     {formatToRupiah(pelatihan.HargaPelatihan)} x{" "}
                     {isManningAgent == "true" ? jumlahPeserta : 1} Orang
                   </p>
                 </div>
 
-                <p className="font-medium text-2xl w-fit font-calsans">
+                <p className="font-medium text-2xl w-fit  font-calsans text-[#979797] ">
                   {formatToRupiah(
                     pelatihan.HargaPelatihan *
-                      (isManningAgent == "true" ? jumlahPeserta : 1)
+                    (isManningAgent == "true" ? jumlahPeserta : 1)
                   )}
                 </p>
               </SelectTrigger>
@@ -456,12 +455,12 @@ function FormRegistrationTraining({
                   <p className="font-medium text-2xl w-fit font-calsans">
                     {formatToRupiah(
                       selectedPenginapan?.Harga! *
-                        (hitungHariPelatihan(
-                          pelatihan?.TanggalMulaiPelatihan,
-                          pelatihan?.TanggalBerakhirPelatihan
-                        ) -
-                          1) *
-                        (isManningAgent == "true" ? jumlahPeserta : 1)
+                      (hitungHariPelatihan(
+                        pelatihan?.TanggalMulaiPelatihan,
+                        pelatihan?.TanggalBerakhirPelatihan
+                      ) -
+                        1) *
+                      (isManningAgent == "true" ? jumlahPeserta : 1)
                     )}
                   </p>
                 </SelectTrigger>
@@ -493,11 +492,11 @@ function FormRegistrationTraining({
                   <p className="font-medium text-2xl w-fit font-calsans">
                     {formatToRupiah(
                       selectedKonsumsi?.Harga! *
-                        hitungHariPelatihan(
-                          pelatihan?.TanggalMulaiPelatihan,
-                          pelatihan?.TanggalBerakhirPelatihan
-                        ) *
-                        (isManningAgent == "true" ? jumlahPeserta : 1)
+                      hitungHariPelatihan(
+                        pelatihan?.TanggalMulaiPelatihan,
+                        pelatihan?.TanggalBerakhirPelatihan
+                      ) *
+                      (isManningAgent == "true" ? jumlahPeserta : 1)
                     )}
                   </p>
                 </SelectTrigger>
@@ -506,71 +505,74 @@ function FormRegistrationTraining({
 
             <div className="h-1 w-full rounded-full my-2 bg-blue-500"></div>
             <div className="flex items-center justify-between">
-              <p className="font-bold text-lg">Total</p>
-              <p className="font-bold text-blue-500 text-3xl">
+              <p className="font-bold text-lg text-[#979797]">Total</p>
+              <p className=" text-blue-500 font-calsans text-3xl">
                 {selectedKonsumsi != null && selectedPenginapan != null
                   ? formatToRupiah(
-                      (parseInt(harga) +
-                        selectedKonsumsi.Harga *
-                          hitungHariPelatihan(
-                            pelatihan.TanggalMulaiPelatihan,
-                            pelatihan.TanggalBerakhirPelatihan
-                          ) +
-                        selectedPenginapan.Harga *
-                          (hitungHariPelatihan(
-                            pelatihan.TanggalMulaiPelatihan,
-                            pelatihan.TanggalBerakhirPelatihan
-                          ) -
-                            1)) *
-                        (isManningAgent == "true" ? jumlahPeserta : 1)
-                    )
+                    (parseInt(harga) +
+                      selectedKonsumsi.Harga *
+                      hitungHariPelatihan(
+                        pelatihan.TanggalMulaiPelatihan,
+                        pelatihan.TanggalBerakhirPelatihan
+                      ) +
+                      selectedPenginapan.Harga *
+                      (hitungHariPelatihan(
+                        pelatihan.TanggalMulaiPelatihan,
+                        pelatihan.TanggalBerakhirPelatihan
+                      ) -
+                        1)) *
+                    (isManningAgent == "true" ? jumlahPeserta : 1)
+                  )
                   : selectedKonsumsi != null
-                  ? formatToRupiah(
+                    ? formatToRupiah(
                       (parseInt(harga) +
                         selectedKonsumsi.Harga *
-                          hitungHariPelatihan(
-                            pelatihan.TanggalMulaiPelatihan,
-                            pelatihan.TanggalBerakhirPelatihan
-                          )) *
-                        (isManningAgent == "true" ? jumlahPeserta : 1)
+                        hitungHariPelatihan(
+                          pelatihan.TanggalMulaiPelatihan,
+                          pelatihan.TanggalBerakhirPelatihan
+                        )) *
+                      (isManningAgent == "true" ? jumlahPeserta : 1)
                     )
-                  : selectedPenginapan != null
-                  ? formatToRupiah(
-                      (parseInt(harga) +
-                        selectedPenginapan.Harga *
+                    : selectedPenginapan != null
+                      ? formatToRupiah(
+                        (parseInt(harga) +
+                          selectedPenginapan.Harga *
                           (hitungHariPelatihan(
                             pelatihan.TanggalMulaiPelatihan,
                             pelatihan.TanggalBerakhirPelatihan
                           ) -
                             1)) *
                         (isManningAgent == "true" ? jumlahPeserta : 1)
-                    )
-                  : formatToRupiah(
-                      parseInt(harga) *
+                      )
+                      : formatToRupiah(
+                        parseInt(harga) *
                         (isManningAgent == "true" ? jumlahPeserta : 1)
-                    )}
+                      )}
               </p>
             </div>
-            <div className="flex items-center space-x-2 py-3 mt-5">
-              <Checkbox
-                id="terms"
-                checked={isAgreeWithAggreement}
-                onCheckedChange={(e) =>
-                  setIsAgreeWithAgreement(!isAgreeWithAggreement)
-                }
-              />
-              <label
-                htmlFor="terms"
-                className="text-base  peer-disabled:cursor-not-allowed text-gray-500 peer-disabled:opacity-70"
-              >
-                Dengan melakukan pendaftaran, saya setuju dengan Kebijakan{" "}
-                <span className="text-blue-500 font-bold">Privasi</span> dan{" "}
-                <span className="text-blue-500 font-bold">
-                  Syarat & Ketentuan
-                </span>{" "}
-                Kementrian Kelautan dan Perikanan Republik Indonesia
-              </label>
+            <div className="w-full flex items-end justify-end max-w-2xl">
+              <div className="flex items-center space-x-2 py-3 mt-5">
+                <Checkbox
+                  id="terms"
+                  checked={isAgreeWithAggreement}
+                  onCheckedChange={(e) =>
+                    setIsAgreeWithAgreement(!isAgreeWithAggreement)
+                  }
+                />
+                <label
+                  htmlFor="terms"
+                  className="text-sm  peer-disabled:cursor-not-allowed text-[#979797] peer-disabled:opacity-70"
+                >
+                  Dengan melakukan pendaftaran, saya setuju dengan Kebijakan{" "}
+                  <span className="text-blue-500 font-bold">Privasi</span> dan{" "}
+                  <span className="text-blue-500 font-bold">
+                    Syarat & Ketentuan
+                  </span>{" "}
+                  Kementrian Kelautan dan Perikanan Republik Indonesia
+                </label>
+              </div>
             </div>
+
           </div>
         </div>
       </form>
@@ -599,29 +601,33 @@ function FormRegistrationTraining({
                     <span className="mt-2">Pilih Fasilitas</span>
                   </h2>
                 ) : indexFormTab == 1 ? (
-                  <h2 className="font-bold text-2xl leading-[100%] my-6 md:text-2xl text-black font-calsans flex items-center gap-1">
-                    <HiUserGroup />
-                    <span className="mt-2">Upload Peserta Pelatihan</span>
-                  </h2>
+                  // <h2 className="font-bold text-2xl leading-[100%] my-6 md:text-2xl text-black font-calsans flex items-center gap-1">
+                  //   <HiUserGroup />
+                  //   <span className="mt-2">Upload Peserta Pelatihan</span>
+                  // </h2>
+                  <></>
                 ) : (
-                  <h2 className="font-bold text-2xl leading-[100%] my-6 md:text-2xl text-black font-calsans flex items-center gap-1">
-                    <TbMoneybag />
-                    <span className="mt-2">Pembayaran</span>
-                  </h2>
+                  // <h2 className="font-bold text-2xl leading-[100%] my-6 md:text-2xl text-black font-calsans flex items-center gap-1">
+                  //   <TbMoneybag />
+                  //   <span className="mt-2">Pembayaran</span>
+                  // </h2>
+                  <></>
                 )
               ) : indexFormTab == 0 ? (
-                <h2 className="font-bold text-2xl md:text-3xl leading-[100%] my-6 text-black font-calsans flex items-center gap-1">
-                  <TbBox />
-                  <span className="mt-2">Pilih Fasilitas</span>
-                </h2>
+                // <h2 className="font-bold text-2xl md:text-3xl leading-[100%] my-6 text-black font-calsans flex items-center gap-1">
+                //   <TbBox />
+                //   <span className="mt-2">Pilih Fasilitas</span>
+                // </h2>
+                <></>
               ) : (
-                <h2 className="font-bold text-2xl leading-[100%] my-6 md:text-2xl text-black font-calsans flex items-center gap-1">
-                  <TbMoneybag />
-                  <span className="mt-2">Pembayaran</span>
-                </h2>
+                // <h2 className="font-bold text-2xl leading-[100%] my-6 md:text-2xl text-black font-calsans flex items-center gap-1">
+                //   <TbMoneybag />
+                //   <span className="mt-2">Pembayaran</span>
+                // </h2>
+                <></>
               )}
 
-              <p className="text-base">
+              {/* <p className="text-base">
                 {isManningAgent == "true" ? (
                   indexFormTab == 0 ? (
                     <span className="font-bold  leading-[100%] my-6 text-blue-500 ">
@@ -646,27 +652,26 @@ function FormRegistrationTraining({
                   </span>
                 )}
                 of {isManningAgent == "true" ? 3 : 2}
-              </p>
+              </p> */}
             </div>
             <div className="flex w-full -mt-2 mb-4">
-              <Progress
+              {/* <Progress
                 value={
                   isManningAgent == "true"
                     ? (indexFormTab + 1) * 33.3
                     : (indexFormTab + 1) * 50
                 }
                 max={isManningAgent == "true" ? 3 : 2}
-              />
+              /> */}
             </div>
-            <FormFasilitas />
+            {/* <FormFasilitas /> */}
             {isManningAgent == "true" && (
               <form
                 autoComplete="off"
-                className={`${
-                  indexFormTab == 1 && Cookies.get("isManningAgent")
-                    ? "block"
-                    : "hidden"
-                }`}
+                className={`${indexFormTab == 1 && Cookies.get("isManningAgent")
+                  ? "block"
+                  : "hidden"
+                  }`}
               >
                 {/* Penginapan Section */}
                 <div className="flex flex-wrap -mx-3 mb-1">
@@ -704,7 +709,7 @@ function FormRegistrationTraining({
             )}
             <FormPembayaran />
             <div className="flex  -mx-3 mt-5 gap-2 px-3">
-              <div className={`w-full ${indexFormTab == 0 && "hidden"}`}>
+              <div className={`w-full ${indexFormTab == 1 && "hidden"}`}>
                 <button
                   type="submit"
                   className="btn text-white bg-blue-600 hover:bg-blue-700 w-full"
@@ -719,11 +724,9 @@ function FormRegistrationTraining({
 
               {isManningAgent == "true" ? (
                 <div
-                  className={`w-full ${
-                    indexFormTab == 2 ? "hidden" : "block"
-                  } ${
-                    indexFormTab == 1 && jumlahPeserta == 0 ? "hidden" : "block"
-                  }`}
+                  className={`w-full ${indexFormTab == 2 ? "hidden" : "block"
+                    } ${indexFormTab == 1 && jumlahPeserta == 0 ? "hidden" : "block"
+                    }`}
                 >
                   <button
                     type="submit"
@@ -755,15 +758,14 @@ function FormRegistrationTraining({
 
               {isAgreeWithAggreement && (
                 <div
-                  className={`w-full ${
-                    isManningAgent == "true"
-                      ? indexFormTab == 2
-                        ? "block"
-                        : "hidden"
-                      : indexFormTab == 1
+                  className={`w-full flex items-end ${isManningAgent == "true"
+                    ? indexFormTab == 2
                       ? "block"
                       : "hidden"
-                  }`}
+                    : indexFormTab == 1
+                      ? "block"
+                      : "hidden"
+                    }`}
                 >
                   {pelatihan?.JenisPelatihan == "PNBP/BLU" ? (
                     <AlertDialog
@@ -771,14 +773,13 @@ function FormRegistrationTraining({
                       onOpenChange={setIsOpenFormPembayaran}
                     >
                       <AlertDialogTrigger className="w-full">
-                        <button
-                          onClick={(e) =>
-                            setIsOpenFormPembayaran(!isOpenFormPembayaran)
-                          }
-                          className="btn text-white bg-blue-600 hover:bg-blue-700 w-full"
-                        >
-                          Daftar
-                        </button>
+                        <Button onClick={(e) =>
+                          setIsOpenFormPembayaran(!isOpenFormPembayaran)
+                        } className='bg-[#625BF9] text-white font-calsans w-full rounded-full text-2xl px-24 py-7 -mt-8'>
+                          Daftar Pelatihan
+
+                        </Button>
+
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <>
@@ -958,17 +959,7 @@ function FormRegistrationTraining({
                             ) : (
                               <></>
                             )}
-                            {metodePembayaran == "Virtual Account" && (
-                              // <Button
-                              //   onClick={(e) =>
-                              //     handleRegistrationTrainingForPeople(e)
-                              //   }
-                              //   className="btn text-white bg-blue-600 hover:bg-blue-700 w-full"
-                              // >
-                              //   Daftar
-                              // </Button>
-                              <></>
-                            )}
+
                             <Button
                               type="button"
                               onClick={(e) =>
@@ -983,12 +974,11 @@ function FormRegistrationTraining({
                       </AlertDialogContent>
                     </AlertDialog>
                   ) : (
-                    <button
-                      onClick={(e) => handleRegistrationTrainingForPeople(e)}
-                      className="btn text-white bg-blue-600 hover:bg-blue-700 w-full"
-                    >
-                      Daftar
-                    </button>
+                    <Button onClick={(e) => handleRegistrationTrainingForPeople(e)
+                    } className='bg-[#625BF9] text-white font-calsans w-fit rounded-full text-2xl px-24 py-7 -mt-8'>
+                      Daftar Pelatihan
+
+                    </Button>
                   )}
                 </div>
               )}

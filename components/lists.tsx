@@ -10,11 +10,13 @@ import "swiper/css/free-mode";
 // Import Swiper modules
 import { Pagination, Navigation, FreeMode } from "swiper/modules";
 import Image from "next/image";
-import { TbClockHour2 } from "react-icons/tb";
+import { TbClockHour2, TbMapPin } from "react-icons/tb";
 import Link from "next/link";
 import { createSlug, truncateText } from "@/utils";
 import { PelatihanMasyarakat } from "@/types/product";
 import { formatToRupiah, replaceUrl } from "@/lib/utils";
+import { generateTanggalPelatihan } from "@/utils/text";
+import '../app/css/navigation.css'
 
 function ListProgram({
   pelatihan,
@@ -38,7 +40,7 @@ function ListProgram({
           }}
           navigation={true} // Enable navigation arrows
           modules={[FreeMode, Navigation]} // Add Pagination and Navigation modules
-          className="mySwiper w-full md:max-w-6xl"
+          className="mySwiper w-full md:max-w-7xl"
           breakpoints={{
             640: {
               slidesPerView: 1,
@@ -63,7 +65,7 @@ function ListProgram({
           )}
         </Swiper>
       ) : (
-        <div className="relative max-w-6xl w-full mx-auto px-4 sm:px-6">
+        <div className="relative max-w-7xl w-full mx-auto px-4 sm:px-6">
           <div className="pt-7 md:pt-0 flex flex-col items-center">
             <Image
               src={"/illustrations/not-found.png"}
@@ -90,58 +92,75 @@ function ListProgram({
 
 const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
   return (
-    <div className="coverflow flex flex-col shadow-custom relative w-[350px] h-fit rounded-3xl">
-      <div className="w-fit absolute top-4 right-4 flex gap-1 z-[60]">
-        <div className="text-xs font-medium px-4 py-2 bg-blue-500 rounded-3xl text-white">
-          {pelatihan.HargaPelatihan == 0
-            ? "Gratis"
-            : "Rp. " + formatToRupiah(pelatihan.HargaPelatihan)}
-        </div>
-        <div className="text-xs font-medium px-4 py-2 bg-blue-500 rounded-3xl text-white">
-          {pelatihan.BidangPelatihan}
-        </div>
-      </div>
-      <div className="w-full relative h-[240px]">
-        <div className="flex w-full absolute h-[240px] bg-gradient-to-r opacity-40 from-blue-500 to-teal-400 bg-opacity-20 rounded-tl-3xl rounded-tr-3xl"></div>
+    <div className="shadow-custom flex flex-col relative w-[380px] h-fit rounded-3xl bg-white p-6">
+      <div className="w-full h-[200px]">
         <Image
-          className="w-full rounded-tl-3xl rounded-tr-3xl h-full object-cover"
+          className="w-full !h-[200px] rounded-2xl object-cover shadow-custom mb-2"
           alt=""
-          src={`${replaceUrl(pelatihan.FotoPelatihan)}`}
+          src={replaceUrl(pelatihan?.FotoPelatihan!)}
           width={0}
           height={0}
         />
       </div>
 
-      <div className="py-3 relative ">
-        <div className="w-full pb-4 px-6">
-          <h2 className="font-calsans text-xl duration-1000 text-black mt-2 leading-[110%]">
-            {truncateText(pelatihan?.NamaPelatihan, 50, "...")}
-          </h2>
-          <div className="flex gap-1 my-1 text-gray-600 text-sm items-center">
-            <TbClockHour2 />
-            Penyelenggara :<p>{pelatihan.PenyelenggaraPelatihan}</p>
-          </div>
-          <p
-            dangerouslySetInnerHTML={{
-              __html:
-                pelatihan &&
-                truncateText(pelatihan?.DetailPelatihan, 150, "..."),
-            }}
-            className="text-sm font-normal group-hover:text-xs text-gray-600 group-hover:duration-1000"
-          />
+      {/* Header */}
+      <div className="flex justify-between items-center gap-3 mt-3">
+        <h2 className="text-2xl font-calsans text-blue-500 leading-none">
+          {truncateText(pelatihan?.NamaPelatihan, 50, "...")}
+        </h2>
+        {/* <div className="text-sm font-medium w-fit px-4 py-2 bg-[#625BF9] rounded-3xl text-white leading-none">
+          {generateTanggalPelatihan(pelatihan.TanggalMulaiPelatihan)}
+        </div> */}
+      </div>
 
-          <Link
-            href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${
-              pelatihan?.KodePelatihan
-            }/${pelatihan?.IdPelatihan}`}
-            className="w-full mt-4 block text-sm text-center font-medium px-6 py-2 bg-blue-500 rounded-3xl text-white"
-          >
-            Registrasi
-          </Link>
+      {/* Location */}
+      <div className="flex items-center gap-2 text-blue-500 mb-4">
+        <TbMapPin size={18} />
+        <p className="text-sm font-medium">{pelatihan.LokasiPelatihan}</p>
+      </div>
+
+      {/* Description */}
+      <p
+        dangerouslySetInnerHTML={{
+          __html: pelatihan && truncateText(pelatihan?.DetailPelatihan, 150, "..."),
+        }}
+        className="text-gray-600 text-sm leading-relaxed mb-4"
+      />
+
+      {/* Contact Info */}
+      <div className="flex justify-between text-sm text-blue-500 mb-4">
+        <div>
+          <p className="font-semibold">Layanan {pelatihan.PenyelenggaraPelatihan}</p>
+          <p>62887972983</p>
+        </div>
+        <div>
+          <p className="font-semibold">PTSP BLU</p>
+          <p>62889812833</p>
         </div>
       </div>
+
+      {/* Pricing */}
+      <div className=" mb-4">
+        <p className="text-blue-500 font-bold text-3xl font-calsans">
+          {pelatihan.HargaPelatihan === 0
+            ? "Gratis"
+            : `${formatToRupiah(pelatihan.HargaPelatihan)}`}
+        </p>
+        <p className="text-sm font-normal text-blue-500">
+          * Tidak termasuk akomodasi & konsumsi <br />* Minimal 10 Peserta
+        </p>
+      </div>
+
+      {/* Button */}
+      <Link
+        href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${pelatihan?.KodePelatihan}/${pelatihan?.IdPelatihan}`}
+        className="w-full block text-center font-semibold px-6 py-3 bg-[#625BF9] rounded-3xl text-white"
+      >
+        Lihat Detail
+      </Link>
     </div>
   );
 };
+
 
 export default ListProgram;

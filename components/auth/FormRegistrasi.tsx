@@ -188,7 +188,7 @@ function FormRegistrasi() {
             text: `Kamu memasukkan karakter berbahaya pada form registrasi, registrasi akun tidak dapat diproses!`,
           });
         } else {
-          if ((password.length > 0 && password.length < 16) || (phoneNumber.length > 0 && phoneNumber.length < 12)) {
+          if ((nik.length > 0 && nik.length < 16) || (phoneNumber.length > 0 && phoneNumber.length < 12)) {
             Toast.fire({
               icon: "error",
               title: "Oopsss!",

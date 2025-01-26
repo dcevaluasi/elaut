@@ -61,25 +61,17 @@ export default function Features() {
 
   return (
     <section className="relative h-fit pb-10 mt-0" id="explore">
-      {/* Section background (needs .relative class on parent and next sibling elements) */}
-      <div
-        className="absolute inset-0 bg-white pointer-events-none mb-16 pb-10 h-full"
-        aria-hidden="true"
-      ></div>
-      <div className="absolute left-0 right-0 m-auto w-px p-px h-28 bg-gray-200 transform -translate-y-1/2"></div>
+      <div className="absolute left-0 right-0 m-auto w-px p-px h-28 bg-gray-300 transform -translate-y-1/2"></div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
         <div className="pt-12 md:pt-20">
-          {/* Section header */}
-
-          <div className="max-w-3xl w-full mx-auto text-center pflex flex-col items-center justify-center pb-5 md:pb-8">
-            <h1 className="text-4xl font-calsans leading-[100%]">
-              Pelatihan dan Sertifikasi
+          <div className="max-w-3xl w-full mx-auto text-center flex gap-2 flex-col items-center justify-center pb-5 md:pb-8">
+            <h1 className="text-4xl text-blue-500 font-calsans leading-[100%]">
+              Pelatihan Lainnya
             </h1>
-            <p className="text-base text-gray-60">
-              Pelatihan dan sertifikasi terakreditasi yang berfokus pada <br />{" "}
-              peningkatan SDM KP yang berkompetensi dan cari pelatihan dan
-              sertifikasi yang ingin kamu ikuti.
+            <p className="text-base text-[#979797]">
+              Pelatihan  serupa lainnya yang berfokus pada <br />{" "}
+              peningkatan SDM KP yang berkompetensi dan cari pelatihan yang ingin kamu ikuti.
             </p>
           </div>
           <ListProgram pelatihan={data} type="" />
