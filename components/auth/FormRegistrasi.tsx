@@ -188,51 +188,60 @@ function FormRegistrasi() {
             text: `Kamu memasukkan karakter berbahaya pada form registrasi, registrasi akun tidak dapat diproses!`,
           });
         } else {
-          if (captcha) {
-            try {
-              const response: AxiosResponse = await axios.post(
-                `${baseUrl}/users/registerUser`,
-                JSON.stringify({
-                  nik: sanitizedDangerousChars(nik),
-                  nama: sanitizedDangerousChars(name),
-                  password: sanitizedDangerousChars(password),
-                  no_number: sanitizedDangerousChars(phoneNumber.toString()),
-                  kusuka_users: sanitizedDangerousChars(isKUSUKA),
-                }),
-                {
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
+          if ((password.length > 0 && password.length < 16) || (phoneNumber.length > 0 && phoneNumber.length < 12)) {
+            Toast.fire({
+              icon: "error",
+              title: "Oopsss!",
+              text: `NIK atau no telpon-mu tidak sesuai digit yang diharuskan!`,
+            });
+          } else {
+            if (captcha) {
+              try {
+                const response: AxiosResponse = await axios.post(
+                  `${baseUrl}/users/registerUser`,
+                  JSON.stringify({
+                    nik: sanitizedDangerousChars(nik),
+                    nama: sanitizedDangerousChars(name),
+                    password: sanitizedDangerousChars(password),
+                    no_number: sanitizedDangerousChars(phoneNumber.toString()),
+                    kusuka_users: sanitizedDangerousChars(isKUSUKA),
+                  }),
+                  {
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                  }
+                );
+
+                Cookies.set("XSRF083", "true");
+
+                Toast.fire({
+                  icon: "success",
+                  title: `Berhasil melakukan registrasi akun, silahkan untuk login terlebih dahulu!`,
+                });
+                router.push("/login");
+              } catch (error: any) {
+                console.error({ error });
+                if (
+                  error.response &&
+                  error.response.data &&
+                  error.response.data.Message
+                ) {
+                  const errorMsg = error.response.data.Message;
+                  Toast.fire({
+                    icon: "error",
+                    title: `Gagal melakukan registrasi akun, ${errorMsg}!`,
+                  });
+                } else {
+                  Toast.fire({
+                    icon: "error",
+                    title: `Gagal melakukan registrasi akun. Terjadi kesalahan tidak diketahui.`,
+                  });
                 }
-              );
-
-              Cookies.set("XSRF083", "true");
-
-              Toast.fire({
-                icon: "success",
-                title: `Berhasil melakukan registrasi akun, silahkan untuk login terlebih dahulu!`,
-              });
-              router.push("/login");
-            } catch (error: any) {
-              console.error({ error });
-              if (
-                error.response &&
-                error.response.data &&
-                error.response.data.Message
-              ) {
-                const errorMsg = error.response.data.Message;
-                Toast.fire({
-                  icon: "error",
-                  title: `Gagal melakukan registrasi akun, ${errorMsg}!`,
-                });
-              } else {
-                Toast.fire({
-                  icon: "error",
-                  title: `Gagal melakukan registrasi akun. Terjadi kesalahan tidak diketahui.`,
-                });
               }
             }
           }
+
         }
 
       }
@@ -282,54 +291,63 @@ function FormRegistrasi() {
             text: `Kamu memasukkan karakter berbahaya pada form registrasi, registrasi akun tidak dapat diproses!`,
           });
         } else {
-          if (captcha) {
-            try {
-              const response: AxiosResponse = await axios.post(
-                `${elautBaseUrl}/manningAgent/registerManningAgent`,
-                JSON.stringify({
-                  email: sanitizedDangerousChars(emailManningAgent),
-                  password: sanitizedDangerousChars(passwordManningAgent),
-                  nama_maning_agent: sanitizedDangerousChars(namaManningAgent),
-                  no_telpon: sanitizedDangerousChars(noTelponManingAgent),
-                  nama_penanggung_jawab: sanitizedDangerousChars(namaPenanggungJawabManningAgent),
-                  alamat: sanitizedDangerousChars(alamat),
-                }),
-                {
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                }
-              );
-              Cookies.set("XSRF083", "true");
+          if ((passwordManningAgent.length > 0 && passwordManningAgent.length < 16) || (noTelponManingAgent.length > 0 && noTelponManingAgent.length < 12)) {
+            Toast.fire({
+              icon: "error",
+              title: "Oopsss!",
+              text: `NIK atau no telpon-mu tidak sesuai digit yang diharuskan!`,
+            });
+          } else {
+            if (captcha) {
+              try {
+                const response: AxiosResponse = await axios.post(
+                  `${elautBaseUrl}/manningAgent/registerManningAgent`,
+                  JSON.stringify({
+                    email: sanitizedDangerousChars(emailManningAgent),
+                    password: sanitizedDangerousChars(passwordManningAgent),
+                    nama_maning_agent: sanitizedDangerousChars(namaManningAgent),
+                    no_telpon: sanitizedDangerousChars(noTelponManingAgent),
+                    nama_penanggung_jawab: sanitizedDangerousChars(namaPenanggungJawabManningAgent),
+                    alamat: sanitizedDangerousChars(alamat),
+                  }),
+                  {
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                  }
+                );
+                Cookies.set("XSRF083", "true");
 
-              Toast.fire({
-                icon: "success",
-                title: `Berhasil melakukan registrasi akun, silahkan untuk login terlebih dahulu!`,
-              });
-              router.push("/login");
-              clearFormManningAgent();
-            } catch (error: any) {
-              console.error({ error });
-              if (
-                error.response &&
-                error.response.data &&
-                error.response.data.Message
-              ) {
-                const errorMsg = error.response.data.Message;
                 Toast.fire({
-                  icon: "error",
-                  title: `Gagal melakukan registrasi akun, ${errorMsg}!`,
+                  icon: "success",
+                  title: `Berhasil melakukan registrasi akun, silahkan untuk login terlebih dahulu!`,
                 });
+                router.push("/login");
                 clearFormManningAgent();
-              } else {
-                Toast.fire({
-                  icon: "error",
-                  title: `Gagal melakukan registrasi akun. Terjadi kesalahan tidak diketahui.`,
-                });
-                clearFormManningAgent();
+              } catch (error: any) {
+                console.error({ error });
+                if (
+                  error.response &&
+                  error.response.data &&
+                  error.response.data.Message
+                ) {
+                  const errorMsg = error.response.data.Message;
+                  Toast.fire({
+                    icon: "error",
+                    title: `Gagal melakukan registrasi akun, ${errorMsg}!`,
+                  });
+                  clearFormManningAgent();
+                } else {
+                  Toast.fire({
+                    icon: "error",
+                    title: `Gagal melakukan registrasi akun. Terjadi kesalahan tidak diketahui.`,
+                  });
+                  clearFormManningAgent();
+                }
               }
             }
           }
+
         }
 
       }
@@ -747,7 +765,7 @@ function FormRegistrasi() {
                         )}
                       </div>
                     </div>
-                    {(confirmPassword != "" && nik != "" && password != "" && phoneNumber != '' && name != '') && (
+                    {(confirmPassword != "" && nik != "" && password != "" && phoneNumber != '' && name != '') && isMatch && (
                       <div
                         className="flex flex-wrap w-full mb-1"
                         style={{ width: "100% !important" }}
@@ -1058,7 +1076,7 @@ function FormRegistrasi() {
                       </div>
                     </div>
 
-                    {(passwordManningAgent != "" && confirmPassword != '' && namaPenanggungJawabManningAgent != '' && noTelponManingAgent != '' && emailManningAgent != '' && namaManningAgent != '' && alamat != '') && (
+                    {(passwordManningAgent != "" && confirmPassword != '' && namaPenanggungJawabManningAgent != '' && noTelponManingAgent != '' && emailManningAgent != '' && namaManningAgent != '' && alamat != '') && isMatchManning && (
                       <div
                         className="flex flex-wrap w-full mb-1"
                         style={{ width: "100% !important" }}
