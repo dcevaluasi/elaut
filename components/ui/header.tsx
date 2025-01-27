@@ -65,8 +65,7 @@ export default function Header() {
                   usePathname() == "/dashboard" ||
                   usePathname().includes("registrasi") ||
                   usePathname().includes("login") ||
-                  usePathname().includes("forget-password") ||
-                  usePathname().includes("cek-sertifikat"))
+                  usePathname().includes("forget-password"))
                 ? "text-gray-200 hover:text-white hover:scale-105"
                 : top && usePathname().includes("program")
                   ? "text-gray-200 hover:text-white hover:scale-105"
@@ -166,8 +165,7 @@ export default function Header() {
               usePathname() == "/dashboard" ||
               usePathname().includes("registrasi") ||
               usePathname().includes("login") ||
-              usePathname().includes("forget-password") ||
-              usePathname().includes("cek-sertifikat"))
+              usePathname().includes("forget-password"))
             ? "text-gray-200 hover:text-white hover:scale-105"
             : top && usePathname().includes("program")
               ? "text-gray-200 hover:text-white hover:scale-105"
@@ -243,8 +241,8 @@ export default function Header() {
             usePathname().includes("registrasi") ||
             usePathname().includes("pelatihan") ||
             usePathname().includes("dashboard") ||
-            usePathname().includes("forget-password") ||
             usePathname().includes("cek-sertifikat") ||
+            usePathname().includes("forget-password") ||
             usePathname().includes("login")) && (
               <Link
                 href={"/"}

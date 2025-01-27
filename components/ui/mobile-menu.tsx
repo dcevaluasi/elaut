@@ -50,9 +50,8 @@ export default function MobileMenu({ isTop }: { isTop: boolean }) {
       >
         <span className="sr-only">Menu</span>
         <svg
-          className={`w-6 h-6 fill-current ${
-            isTop ? "text-white" : "text-gray-900"
-          }`}
+          className={`w-6 h-6 fill-current ${isTop ? "text-[#979797]" : "text-gray-900"
+            }`}
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
         >

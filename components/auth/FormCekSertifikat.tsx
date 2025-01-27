@@ -70,72 +70,22 @@ function FormCekSertifikat() {
     return () => clearInterval(interval);
   }, []);
 
-  return (
-    <section className="flex flex-col">
+  return (<>
+    <section className="flex flex-col bg-[#EEEAEB] h-full">
       <div className="relative w-full h-full pb-10">
-        <Image
-          src={images[imageIndex]}
-          className="absolute w-full h-full hidden md:block object-cover duration-1000 -z-40"
-          alt=""
-          layout="fill"
-          priority
-        />
 
-        <Image
-          src={imagesMob[imageMobIndex]}
-          className="absolute w-full h-full block md:hidden object-cover duration-1000 -z-40"
-          alt=""
-          layout="fill"
-          priority
-        />
 
-        <div className="absolute w-full h-full bg-black bg-opacity-70 -z-30"></div>
-
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto">
           <div className="pt-32  md:pt-40 ">
-            <div className="w-full mx-auto text-center pb-0 md:pb-0">
-              <h1 className="font-semibold text-4xl leading-[110%]  text-gray-200">
-                <span className="font-calsans">
-                  Cek Validitas
-                </span>{" "}
-                <br />
-                <span className="z-0 bg-clip-text  w-[600px] leading-[110%]  text-transparent bg-gradient-to-r font-calsans from-blue-500  to-teal-400">
-                  Sertifikat Pelatihan
-                </span>{" "}
-              </h1>
-            </div>
 
             <Newsletter />
 
-            <div
-              className={`${role == "Mandiri" || role == "" ? "max-w-sm" : "max-w-4xl"
-                }  mx-5 md:mx-auto -mt-12`}
-            >
-              <div className="flex items-center my-6">
-                <div
-                  className="border-t border-gray-300 grow mr-3"
-                  aria-hidden="true"
-                ></div>
-                <div
-                  className="border-t border-gray-300 grow ml-3"
-                  aria-hidden="true"
-                ></div>
-              </div>
-              <div className="text-gray-200 text-center mt-6">
-                Belum punya sertifikat pelatihan?{" "}
-                <Link
-                  href={"/layanan/program/akp"}
-                  className="text-blue-500 hover:underline transition duration-150 ease-in-out"
-                >
-                  Cari Pelatihan
-                </Link>
-              </div>
-            </div>
           </div>
         </div>
       </div>
-      <Footer />
     </section>
+  </>
+
   );
 }
 

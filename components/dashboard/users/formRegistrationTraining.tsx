@@ -590,7 +590,7 @@ function FormRegistrationTraining({
   return (
     <section className="relative w-full -mt-5">
       <div className="max-w-6xl md:max-w-[81rem]  md:-mt-8">
-        <div className="pb-12 md:pb-20">
+        <div className="">
           {/* Form */}
           <div className="max-w-sm md:max-w-7xl mx-auto mt-5 md:mt-10">
             <div className="flex items-center justify-between">
