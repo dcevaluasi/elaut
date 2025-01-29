@@ -17,6 +17,7 @@ import {
   TbCalendarCheck,
   TbClockHour2,
   TbLayoutGrid,
+  TbMapPin,
   TbTargetArrow,
 } from "react-icons/tb";
 
@@ -49,8 +50,8 @@ function PencarianPelatihan() {
     usePathname() == "/layanan/program/akp"
       ? "Awak Kapal Perikanan"
       : usePathname() == "/layanan/program/perikanan"
-      ? "Perikanan"
-      : "Kelautan";
+        ? "Perikanan"
+        : "Kelautan";
 
   const handleFetchingPublicTrainingData = async () => {
     setLoading(true);
@@ -335,19 +336,19 @@ function PencarianPelatihan() {
                     selectedBidangPelatihan !== "" ||
                     selectedProgramPelatihan !== "" ||
                     selectedBulanPelatihan != "") && (
-                    <div
-                      onClick={() => handleClearFilter()}
-                      className="inline-flex gap-2 w-fit px-3 text-sm items-center rounded-md bg-white p-1.5 cursor-pointer border border-gray-300"
-                    >
-                      <MdClear />
-                      Bersihkan Filter
-                    </div>
-                  )}
+                      <div
+                        onClick={() => handleClearFilter()}
+                        className="inline-flex gap-2 w-fit px-3 text-sm items-center rounded-md bg-white p-1.5 cursor-pointer border border-gray-300"
+                      >
+                        <MdClear />
+                        Bersihkan Filter
+                      </div>
+                    )}
 
                   <div className="hidden md:flex w-full">
                     <Button
                       onClick={(e) => handleFetchingPublicTrainingData()}
-                      className="btn-sm text-sm w-full text-white bg-blue-500 hover:bg-blue-600 cursor-pointer"
+                      className="btn-sm text-sm w-full text-white bg-[#625BF9] cursor-pointer"
                     >
                       <span className="mr-2">Cari</span>
                       <FiSearch />
@@ -385,15 +386,15 @@ function PencarianPelatihan() {
                 )}
 
                 {/* Table */}
-                <div className="bg-white shadow-custom text-black text-center hidden md:grid grid-cols-5 gap-2 p-4 rounded-xl font-calsans text-lg mt-4">
+                {/* <div className="bg-white shadow-custom text-black text-center hidden md:grid grid-cols-5 gap-2 p-4 rounded-xl font-calsans text-lg mt-4">
                   <div>Pelatihan</div>
                   <div>Penyelenggara</div>
                   <div></div>
                   <div>Pelaksanaan</div>
                   <div>Harga</div>
-                </div>
+                </div> */}
 
-                <div className="flex-col gap-4 flex w-full mt-4">
+                <div className=" gap-4 flex w-full mt-4">
                   {data == null || data.length === 0 ? (
                     <div className="flex flex-col w-full items-center justify-center h-fit">
                       <Image
@@ -414,7 +415,7 @@ function PencarianPelatihan() {
                       </div>
                     </div>
                   ) : (
-                    <div className="w-full ">
+                    <div className="w-full grid grid-cols-1 gap-3 md:gap-0 justify-center md:grid-cols-3">
                       {data.map((pelatihan, index) => (
                         <CardPelatihan key={index} pelatihan={pelatihan} />
                       ))}
@@ -430,83 +431,156 @@ function PencarianPelatihan() {
   );
 }
 
+// const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
+//   return (
+//     <div className="bg-white shadow-custom text-black p-4 rounded-xl grid grid-cols-1 md:grid-cols-5 mb-4 items-center">
+//       {/* Train Info */}
+//       <div className="max-w-xs leading-[115%]">
+//         <h3 className="text-xl font-bold">{pelatihan.NamaPelatihan}</h3>
+//         <p className="text-sm">{pelatihan.BidangPelatihan} (S)</p>
+//       </div>
+
+//       {/* Departure Info */}
+//       <div className="text-left md:text-center">
+//         <p className="font-bold">{pelatihan.PenyelenggaraPelatihan}</p>
+//         <p className="text-sm leading-[100%]">{pelatihan.LokasiPelatihan}</p>
+//       </div>
+
+//       {/* Arrow and Duration */}
+//       <div className="hidden md:flex flex-col items-start md:items-center">
+//         <div className="bg-blue-500 p-2 rounded-full">
+//           <svg
+//             xmlns="http://www.w3.org/2000/svg"
+//             fill="none"
+//             viewBox="0 0 24 24"
+//             strokeWidth={2}
+//             stroke="#000"
+//             className="w-6 h-6 text-white stroke-white"
+//           >
+//             <path
+//               strokeLinecap="round"
+//               strokeLinejoin="round"
+//               d="M13 5l7 7-7 7M5 12h14"
+//               className="text-white"
+//             />
+//           </svg>
+//         </div>
+//       </div>
+
+//       {/* Arrival Info */}
+//       <div className="text-left md:text-center">
+//         <p className="font-bold">{pelatihan.PelaksanaanPelatihan}</p>
+//         {pelatihan!.TanggalMulaiPelatihan != "" ? (
+//           <span className="text-sm leading-[100%] block">
+//             {generateTanggalPelatihan(pelatihan.TanggalMulaiPelatihan)} -{" "}
+//             {generateTanggalPelatihan(pelatihan.TanggalBerakhirPelatihan)}
+//           </span>
+//         ) : (
+//           <span className="text-sm leading-[100%] block">
+//             Waktu Pendaftaran <br />
+//             {generateTanggalPelatihan(pelatihan.TanggalMulaiPendaftaran)} -{" "}
+//             {generateTanggalPelatihan(pelatihan!.TanggalBerakhirPendaftaran)}
+//           </span>
+//         )}
+//       </div>
+
+//       {/* Price and Button */}
+//       <div className="text-center flex md:items-center md:justify-center flex-col">
+//         {pelatihan?.StatusApproval != "Selesai" && (
+//           <p className="text-blue-500 text-left text-xl font-bold">
+//             {formatToRupiah(pelatihan.HargaPelatihan)}
+//           </p>
+//         )}
+
+//         <Link
+//           onClick={(e) => Cookies.set("JenisProgram", pelatihan?.JenisProgram)}
+//           href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${
+//             pelatihan?.KodePelatihan
+//           }/${pelatihan?.IdPelatihan}`}
+//           className={`${
+//             pelatihan?.StatusApproval == "Selesai"
+//               ? "bg-gray-500"
+//               : "bg-blue-500"
+//           } text-white px-4 py-2 text-base rounded-md mb-1 mt-2 w-full md:w-fit block`}
+//         >
+//           {pelatihan.StatusApproval == "Selesai"
+//             ? "Sudah Selesai"
+//             : "Lihat Detail"}
+//         </Link>
+//       </div>
+//     </div>
+//   );
+// };
+
+
 const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
   return (
-    <div className="bg-white shadow-custom text-black p-4 rounded-xl grid grid-cols-1 md:grid-cols-5 mb-4 items-center">
-      {/* Train Info */}
-      <div className="max-w-xs leading-[115%]">
-        <h3 className="text-xl font-bold">{pelatihan.NamaPelatihan}</h3>
-        <p className="text-sm">{pelatihan.BidangPelatihan} (S)</p>
+    <div className="shadow-custom flex flex-col relative w-[380px] h-fit rounded-3xl bg-white p-6">
+      <div className="w-full h-[200px]">
+        <Image
+          className="w-full !h-[200px] rounded-2xl object-cover shadow-custom mb-2"
+          alt=""
+          src={replaceUrl(pelatihan?.FotoPelatihan!)}
+          width={0}
+          height={0}
+        />
       </div>
 
-      {/* Departure Info */}
-      <div className="text-left md:text-center">
-        <p className="font-bold">{pelatihan.PenyelenggaraPelatihan}</p>
-        <p className="text-sm leading-[100%]">{pelatihan.LokasiPelatihan}</p>
+      {/* Header */}
+      <div className="flex justify-between items-center gap-3 mt-3">
+        <h2 className="text-2xl font-calsans text-blue-500 leading-none">
+          {truncateText(pelatihan?.NamaPelatihan, 50, "...")}
+        </h2>
+        {/* <div className="text-sm font-medium w-fit px-4 py-2 bg-[#625BF9] rounded-3xl text-white leading-none">
+          {generateTanggalPelatihan(pelatihan.TanggalMulaiPelatihan)}
+        </div> */}
       </div>
 
-      {/* Arrow and Duration */}
-      <div className="hidden md:flex flex-col items-start md:items-center">
-        <div className="bg-blue-500 p-2 rounded-full">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            stroke="#000"
-            className="w-6 h-6 text-white stroke-white"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M13 5l7 7-7 7M5 12h14"
-              className="text-white"
-            />
-          </svg>
+      {/* Location */}
+      <div className="flex items-center gap-2 text-blue-500 mb-4">
+        <TbMapPin size={18} />
+        <p className="text-sm font-medium">{pelatihan.LokasiPelatihan}</p>
+      </div>
+
+      {/* Description */}
+      <p
+        dangerouslySetInnerHTML={{
+          __html: pelatihan && truncateText(pelatihan?.DetailPelatihan, 150, "..."),
+        }}
+        className="text-gray-600 text-sm leading-relaxed mb-4"
+      />
+
+      {/* Contact Info */}
+      <div className="flex justify-between text-sm text-blue-500 mb-4">
+        <div>
+          <p className="font-semibold">Layanan {pelatihan.PenyelenggaraPelatihan}</p>
+          <p>62887972983</p>
+        </div>
+        <div>
+          <p className="font-semibold">PTSP BLU</p>
+          <p>62889812833</p>
         </div>
       </div>
 
-      {/* Arrival Info */}
-      <div className="text-left md:text-center">
-        <p className="font-bold">{pelatihan.PelaksanaanPelatihan}</p>
-        {pelatihan!.TanggalMulaiPelatihan != "" ? (
-          <span className="text-sm leading-[100%] block">
-            {generateTanggalPelatihan(pelatihan.TanggalMulaiPelatihan)} -{" "}
-            {generateTanggalPelatihan(pelatihan.TanggalBerakhirPelatihan)}
-          </span>
-        ) : (
-          <span className="text-sm leading-[100%] block">
-            Waktu Pendaftaran <br />
-            {generateTanggalPelatihan(pelatihan.TanggalMulaiPendaftaran)} -{" "}
-            {generateTanggalPelatihan(pelatihan!.TanggalBerakhirPendaftaran)}
-          </span>
-        )}
+      {/* Pricing */}
+      <div className=" mb-4">
+        <p className="text-blue-500 font-bold text-3xl font-calsans">
+          {pelatihan.HargaPelatihan === 0
+            ? "Gratis"
+            : `${formatToRupiah(pelatihan.HargaPelatihan)}`}
+        </p>
+        <p className="text-sm font-normal text-blue-500">
+          * Tidak termasuk akomodasi & konsumsi <br />* Minimal 10 Peserta
+        </p>
       </div>
 
-      {/* Price and Button */}
-      <div className="text-center flex md:items-center md:justify-center flex-col">
-        {pelatihan?.StatusApproval != "Selesai" && (
-          <p className="text-blue-500 text-left text-xl font-bold">
-            {formatToRupiah(pelatihan.HargaPelatihan)}
-          </p>
-        )}
-
-        <Link
-          onClick={(e) => Cookies.set("JenisProgram", pelatihan?.JenisProgram)}
-          href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${
-            pelatihan?.KodePelatihan
-          }/${pelatihan?.IdPelatihan}`}
-          className={`${
-            pelatihan?.StatusApproval == "Selesai"
-              ? "bg-gray-500"
-              : "bg-blue-500"
-          } text-white px-4 py-2 text-base rounded-md mb-1 mt-2 w-full md:w-fit block`}
-        >
-          {pelatihan.StatusApproval == "Selesai"
-            ? "Sudah Selesai"
-            : "Lihat Detail"}
-        </Link>
-      </div>
+      {/* Button */}
+      <Link
+        href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${pelatihan?.KodePelatihan}/${pelatihan?.IdPelatihan}`}
+        className="w-full block text-center font-semibold px-6 py-3 bg-[#625BF9] rounded-3xl text-white"
+      >
+        Lihat Detail
+      </Link>
     </div>
   );
 };

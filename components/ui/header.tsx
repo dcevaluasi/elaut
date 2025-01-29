@@ -66,9 +66,9 @@ export default function Header() {
                   usePathname().includes("registrasi") ||
                   usePathname().includes("login") ||
                   usePathname().includes("forget-password"))
-                ? "text-gray-200 hover:text-white hover:scale-105"
+                ? "hover:text-white hover:scale-105 text-white"
                 : top && usePathname().includes("program")
-                  ? "text-gray-200 hover:text-white hover:scale-105"
+                  ? "hover:text-white hover:scale-105"
                   : (top && usePathname().includes("pelatihan")) ||
                     usePathname().includes("sertifikasi") ||
                     usePathname().includes("users")
@@ -125,7 +125,7 @@ export default function Header() {
             ? "text-gray-600 hover:text-gray-900 hover:scale-105"
             : (top && usePathname().includes("program")) ||
               (top && usePathname().includes("dashboard"))
-              ? "text-gray-200 hover:text-white hover:scale-105"
+              ? "hover:text-white hover:scale-105"
               : (top && usePathname().includes("pelatihan")) ||
                 usePathname().includes("sertifikasi") ||
                 usePathname().includes("users")
@@ -166,16 +166,15 @@ export default function Header() {
               usePathname().includes("registrasi") ||
               usePathname().includes("login") ||
               usePathname().includes("forget-password"))
-            ? "text-gray-200 hover:text-white hover:scale-105"
+            ? "hover:text-white hover:scale-105 text-white"
             : top && usePathname().includes("program")
-              ? "text-gray-200 hover:text-white hover:scale-105"
+              ? "hover:text-white hover:scale-105"
               : (top && usePathname().includes("pelatihan")) ||
                 usePathname().includes("sertifikasi") ||
                 usePathname().includes("users")
                 ? "text-gray-900 hover:text-gray-900 hover:scale-105"
                 : usePathname().includes("complete-profile") ||
-                  usePathname().includes("layanan") ||
-                  usePathname().includes("program")
+                  usePathname().includes("layanan")
                   ? "text-gray-600 hover:text-gray-900 hover:scale-105"
                   : "text-gray-600 hover:text-gray-900 hover:scale-105"
             }  px-5 py-3 flex items-center transition duration-150 ease-in-out text-[#979797] hover:!text-blue-500`}
@@ -225,7 +224,7 @@ export default function Header() {
         }  ${!top
           ? `bg-white backdrop-blur-sm shadow-lg `
           : usePathname().includes("program")
-            ? "bg-none  pt-6"
+            ? "bg-none"
             : usePathname().includes("pelatihan") ||
               usePathname().includes("sertifikasi") ||
               usePathname().includes("users")
@@ -233,7 +232,7 @@ export default function Header() {
               : usePathname().includes("complete-profile")
                 ? "bg-white backdrop-blur-sm shadow-lg "
                 : ""
-        } ${usePathname().includes("program") && "bg-transparent"} max-w-6xl w-full mt-8  rounded-3xl bg-white px-5`}
+        }  ${usePathname().includes("program") && "bg-transparent"} ${top && usePathname().includes('login') && 'bg-transparent !text-white'} max-w-6xl w-full mt-8   rounded-3xl  px-5`}
     >
       <div className="w-full mx-auto">
         <div className="flex items-center justify-between h-24 md:h-24 py-3 w-full mx-auto">

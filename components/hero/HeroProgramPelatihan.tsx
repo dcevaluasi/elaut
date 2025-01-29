@@ -55,8 +55,8 @@ export default function HeroProgramPelatihan({ program }: { program: string }) {
     program == "akp"
       ? "Awak Kapal Perikanan"
       : program == "perikanan"
-      ? "Perikanan"
-      : "Kelautan";
+        ? "Perikanan"
+        : "Kelautan";
 
   const detailProgramPelatihan: DetailProgramPelatihan = {
     akp: {
@@ -79,7 +79,7 @@ export default function HeroProgramPelatihan({ program }: { program: string }) {
         "/images/program-pelatihan/dummies/perikanan/perikanan-2.jpg",
         "/images/program-pelatihan/dummies/perikanan/perikanan-3.jpg",
         "/images/program-pelatihan/dummies/perikanan/perikanan-5.jpg",
-        "/images/program-pelatihan/dummies/perikanan/perikanan-5.jpg",
+        "/images/program-pelatihan/dummies/perikanan/perikanan-7.jpg",
         "/images/program-pelatihan/dummies/perikanan/perikanan-6.jpg",
       ],
     },
@@ -108,13 +108,13 @@ export default function HeroProgramPelatihan({ program }: { program: string }) {
 
   const [imageIndex, setImageIndex] = React.useState(0);
 
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 5000);
+  // React.useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+  //   }, 5000);
 
-    return () => clearInterval(interval);
-  }, []);
+  //   return () => clearInterval(interval);
+  // }, []);
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -129,11 +129,11 @@ export default function HeroProgramPelatihan({ program }: { program: string }) {
   );
 
   return (
-    <div className="flex flex-col gap-2 w-full ">
-      <section className="relative h-[80vh]  flex items-center ">
+    <div className="flex flex-col gap-2 w-full px-10 py-5">
+      <section className="relative h-[60vh] rounded-3xl  flex items-center ">
         <Image
           src={images[imageIndex]}
-          className="absolute w-full h-[80vh]  object-cover duration-1000  "
+          className="absolute w-full h-[60vh] rounded-3xl  object-cover duration-1000  "
           alt=""
           layout="fill"
           priority
@@ -141,7 +141,7 @@ export default function HeroProgramPelatihan({ program }: { program: string }) {
         />
 
         <div
-          className="absolute w-full h-[80vh]  bg-black bg-opacity-70  "
+          className="absolute w-full h-[60vh] rounded-3xl bg-black bg-opacity-70  "
           onClick={(e) => setSelectedProgram(null)}
         ></div>
 
@@ -181,21 +181,21 @@ export default function HeroProgramPelatihan({ program }: { program: string }) {
           {/* Hero content */}
           <div className="flex w-full flex-col items-center justify-between">
             {/* Section header */}
-            <div className=" flex flex-col h- justify-center w-full items-center px-6 md:px-0 text-center -mt-10 relative">
-              <h1 className="font-bold text-black text-[4rem] md:text-[5.5rem] font-calsans leading-none w-full text-center">
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-500">
-                  {programPelatihan}{" "}
-                </span>
+            <div className=" flex flex-col h- justify-center w-full items-center px-6 md:px-0 mt-3 text-center relative">
+              <h1 className="font-bold text-blue-500 text-5xl md:text-6xl font-calsans leading-none w-full text-center">
+                {/* <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-500"> */}
+                {programPelatihan}{" "}
+                {/* </span> */}
               </h1>
               {program == "akp" ? (
-                <p className="text-white leading-relaxed text-center max-w-3xl w-full text-base md:text-lg mx-auto">
+                <p className="text-gray-200 leading-none text-center max-w-3xl w-full text-base md:text-lg mx-auto">
                   Pendidikan dan Pelatihan Awak Kapal Perikanan adalah
                   pendidikan dan/atau pelatihan untuk mencapai tingkat keahlian
                   dan/atau keterampilan tertentu sesuai dengan jenjang,
                   kompetensi, dan jabatan untuk awak Kapal Perikanan.
                 </p>
               ) : program == "perikanan" ? (
-                <p className="text-white leading-relaxed text-center max-w-3xl w-full text-base md:text-lg mx-auto">
+                <p className="text-gray-200 leading-none text-center max-w-3xl w-full text-base md:text-lg mx-auto">
                   Pelatihan Perikanan adalah program pendidikan dan/atau
                   pelatihan yang bertujuan untuk meningkatkan keterampilan dan
                   pengetahuan dalam bidang perikanan, mencakup teknik
@@ -203,7 +203,7 @@ export default function HeroProgramPelatihan({ program }: { program: string }) {
                   pengolahan hasil tangkapan.
                 </p>
               ) : (
-                <p className="text-white leading-relaxed text-center max-w-3xl w-full text-base md:text-lg mx-auto">
+                <p className="text-gray-200 leading-none text-center max-w-3xl w-full text-base md:text-lg mx-auto">
                   Pelatihan Kelautan adalah pendidikan dan/atau pelatihan yang
                   dirancang untuk meningkatkan kompetensi dan keterampilan dalam
                   bidang kelautan, meliputi pengelolaan sumber daya laut,
