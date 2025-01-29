@@ -243,21 +243,17 @@ export default function Newsletter() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 items-end w-full text-left bg-white rounded-3xl p-10 ">
-          <h2 className="text-blue-500 text-[3.6rem]  font-calsans leading-none">
-            Validitas Sertifikat
-          </h2>
-          <div className="flex flex-col items-end">
-            <p className="text-blue-500">*Hanya menampilkan <span className="font-bold">detail pelatihan</span> yang diikuti bukan <span className="font-bold">sertifikat</span></p>
-            <p className="text-blue-500">*Masukkan<span className="font-bold"> nomor registrasi</span> untuk mengecek validitas</p>
+        {
+          isShowValidForm && <div className="flex flex-col gap-2 items-center justify-center text-center w-full bg-white rounded-3xl p-10 ">
+            <h2 className="text-blue-500 text-[3.6rem]  font-calsans leading-none">
+              Validitas Sertifikat
+            </h2>
+            <div className="flex flex-col ">
+              <p className="text-blue-500">*Hanya menampilkan <span className="font-bold">detail pelatihan</span> yang diikuti bukan <span className="font-bold">sertifikat</span></p>
+              <p className="text-blue-500">*Masukkan<span className="font-bold"> nomor registrasi</span> untuk mengecek validitas</p>
+            </div>
           </div>
-
-
-
-
-        </div>
-
+        }
       </div></>
-
   );
 }

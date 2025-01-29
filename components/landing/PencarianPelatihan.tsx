@@ -386,13 +386,13 @@ function PencarianPelatihan() {
                 )}
 
                 {/* Table */}
-                {/* <div className="bg-white shadow-custom text-black text-center hidden md:grid grid-cols-5 gap-2 p-4 rounded-xl font-calsans text-lg mt-4">
+                <div className="bg-white shadow-custom text-black text-center hidden md:grid grid-cols-5 gap-2 p-4 rounded-xl font-calsans text-lg mt-4">
                   <div>Pelatihan</div>
                   <div>Penyelenggara</div>
                   <div></div>
                   <div>Pelaksanaan</div>
                   <div>Harga</div>
-                </div> */}
+                </div>
 
                 <div className=" gap-4 flex w-full mt-4">
                   {data == null || data.length === 0 ? (

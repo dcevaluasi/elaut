@@ -68,13 +68,12 @@ export default function Header() {
                   usePathname().includes("forget-password"))
                 ? "hover:text-white hover:scale-105 text-white"
                 : top && usePathname().includes("program")
-                  ? "hover:text-white hover:scale-105"
+                  ? "hover:text-white hover:scale-105 text-white"
                   : (top && usePathname().includes("pelatihan")) ||
                     usePathname().includes("sertifikasi") ||
                     usePathname().includes("users")
                     ? "text-gray-900 hover:text-gray-900 hover:scale-105"
-                    : usePathname().includes("complete-profile") ||
-                      usePathname().includes("program")
+                    : usePathname().includes("complete-profile")
                       ? "text-gray-600 hover:text-gray-900 hover:scale-105"
                       : "text-gray-600 hover:text-gray-900 hover:scale-105"
                 }  px-2 py-3 flex items-center transition  duration-150 ease-in-out font-semibold text-[#979797] hover:!text-blue-500`}
@@ -168,7 +167,7 @@ export default function Header() {
               usePathname().includes("forget-password"))
             ? "hover:text-white hover:scale-105 text-white"
             : top && usePathname().includes("program")
-              ? "hover:text-white hover:scale-105"
+              ? "hover:text-white hover:scale-105 text-white"
               : (top && usePathname().includes("pelatihan")) ||
                 usePathname().includes("sertifikasi") ||
                 usePathname().includes("users")
@@ -222,15 +221,15 @@ export default function Header() {
           ? "pt-0"
           : top && "pt-6"
         }  ${!top
-          ? `bg-white backdrop-blur-sm shadow-lg `
+          ? `bg-white backdrop-blur-sm shadow-custom `
           : usePathname().includes("program")
             ? "bg-none"
             : usePathname().includes("pelatihan") ||
               usePathname().includes("sertifikasi") ||
               usePathname().includes("users")
               ? ` backdrop-blur-sm !pt-0 shadow-custom !text-[#979797] hover:!text-blue-500 `
-              : usePathname().includes("complete-profile")
-                ? "bg-white backdrop-blur-sm shadow-lg "
+              : usePathname().includes("complete-profile") || usePathname().includes("cek-sertifikat")
+                ? "bg-white backdrop-blur-sm shadow-custom "
                 : ""
         }  ${usePathname().includes("program") && "bg-transparent"} ${top && usePathname().includes('login') && 'bg-transparent !text-white'} max-w-6xl w-full mt-8   rounded-3xl  px-5`}
     >

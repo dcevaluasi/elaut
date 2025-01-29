@@ -154,7 +154,7 @@ export default function Hero() {
           </svg>
         </div>
 
-        <div className="max-w-7xl z-[40] w-full mx-auto relative flex flex-col items-start justify-center text-left px-6 pb-10 md:pb-0 mt-32 md:mt-0">
+        <div className="max-w-7xl z-[40] w-full mx-auto relative flex flex-col items-start justify-center text-left px-6 pb-10 -mb-10 md:pb-0 mt-36 md:mt-0">
           {/* Hero content */}
           <div className="flex flex-col md:flex-row w-full items-center justify-center md:justify-between">
             {/* Section header */}
@@ -209,15 +209,15 @@ export default function Hero() {
           </div>
 
           <div
-            className={`w-full flex flex-col md:flex-row gap-5 md:gap-14 items-center justify-center  z-[10000] pt-10 md:pt-16 ${selectedProgram === null ? " md:mt-7" : "mt-0"
+            className={`w-full flex flex-col md:flex-row gap-5 md:gap-14 items-center justify-center  z-[10000] pt-10 md:pt-0 ${selectedProgram === null ? " md:mt-7" : "mt-0 px-10"
               }`}
           >
             {programPelatihan.map((item, index) => (
               <Slide direction="up" duration={index * 1200}>
                 <div
                   onClick={(e) => setSelectedProgram(index)}
-                  className={`flex w-[80%] mx-auto md:mx-0 md:w-full flex-col gap-1 items-center justify-center hover:scale-110 duration-700 cursor-pointer hover:opacity-100 border text-center rounded-3xl border-gray-200 px-20 md:px-9 py-7 ${selectedProgram == index
-                    ? "opacity-100 animate-pulse my-10 !px-9"
+                  className={`flex  w-full mx-auto md:mx-0 md:w-full flex-col gap-1 items-center justify-center hover:scale-110 duration-700 cursor-pointer hover:opacity-100 border text-center rounded-3xl border-gray-200 px-16  md:px-9 py-7 ${selectedProgram == index
+                    ? "opacity-100 animate-pulse my-10 "
                     : "opacity-40  "
                     }`}
                 >
