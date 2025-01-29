@@ -492,7 +492,7 @@ function FormRegistrasi() {
         <div className="absolute w-full h-full bg-black bg-opacity-70 -z-30"></div>
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="pt-32  md:pt-40 ">
+          <div className="pt-44 ">
             <div className="w-full mx-auto text-center pb-0 md:pb-0">
               <h1 className="font-bold text-4xl leading-[110%] text-gray-200 font-calsans">
                 <span className="">
