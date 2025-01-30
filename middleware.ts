@@ -54,6 +54,23 @@ export function middleware(request: any) {
       '/admin/lemdiklat/pelatihan',
       '/admin/lemdiklat/pelatihan/penerbitan-sttpl',
       '/admin/lemdiklat/pelatihan/[kode-pelatihan]/peserta-pelatihan/[id]',
+      '/admin/lemdiklat/pelatihan/[kode-pelatihan]/bank-soal/[id]',
+      '/admin/lemdiklat/pelatihan/[kode-pelatihan]/peserta-pelatihan/[id]/[id_user_pelatihan]/[id_user]',
+      '/admin/lemdiklat/pelatihan/detail-pelatihan/[kode_pelatihan]/[id_pelatihan]',
+      '/admin/lemdiklat/pelatihan/detail/[kode_pelatihan]/[id_pelatihan]',
+      '/admin/lemdiklat/pelatihan/edit-pelatihan/[id]',
+      '/admin/lemdiklat/pelatihan/pemberitahuan-pelatihan',
+      '/admin/lemdiklat/pelatihan/penerbitan-sertifikat',
+      '/admin/lemdiklat/pelatihan/penerbitan-sertifikat/detail-pelatihan/[kode_pelatihan]/[id_pelatihan]',
+      '/admin/lemdiklat/pelatihan/pengajuan-sttpl',
+      '/admin/lemdiklat/uji-kompetensi',
+      '/admin/lemdiklat/uji-kompetensi/[kode_pelatihan]/bank-soal/[id]',
+      '/admin/lemdiklat/uji-kompetensi/[kode_pelatihan]/peserta-pelatihan/[id]',
+      '/admin/lemdiklat/uji-kompetensi/[kode_pelatihan]/peserta-pelatihan/[id]/[id_user]',
+      '/admin/lemdiklat/uji-kompetensi/edit-pelatihan/[id]',
+      '/admin/lemdiklat/uji-kompetensi/pemberitahuan-pelatihan',
+      '/admin/lemdiklat/uji-kompetensi/pengajuan-sttpl',
+      '/admin/lemdiklat/uji-kompetensi/tambah-ujikom',
     ]
 
     const isAdminProtectedPath = adminProtectedPaths.some((protectedPath) => {
