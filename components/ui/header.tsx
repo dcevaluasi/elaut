@@ -74,8 +74,8 @@ export default function Header() {
                     usePathname().includes("users")
                     ? "text-gray-900 hover:text-gray-900 hover:scale-105"
                     : usePathname().includes("complete-profile")
-                      ? "text-gray-600 hover:text-gray-900 hover:scale-105"
-                      : "text-gray-600 hover:text-gray-900 hover:scale-105"
+                      ? "text-[#979797] hover:text-gray-900 hover:scale-105"
+                      : "text-[#979797] hover:text-gray-900 hover:scale-105"
                 }  px-2 py-3 flex items-center transition  duration-150 ease-in-out font-semibold text-[#979797] hover:!text-blue-500`}
             >
               {name} <HiMiniChevronDown className="text-lg" />
@@ -121,7 +121,7 @@ export default function Header() {
             }`}
           onClick={(e) => setOpenModal(false)}
           className={`font-semibold ${top && usePathname().includes("layanan")
-            ? "text-gray-600 hover:text-gray-900 hover:scale-105"
+            ? "text-[#979797] hover:text-gray-900 hover:scale-105"
             : (top && usePathname().includes("program")) ||
               (top && usePathname().includes("dashboard"))
               ? "hover:text-white hover:scale-105"
@@ -131,8 +131,8 @@ export default function Header() {
                 ? "text-gray-900 hover:text-gray-900 hover:scale-105"
                 : usePathname().includes("complete-profile") ||
                   usePathname().includes("layanan")
-                  ? "text-gray-600 hover:text-gray-900 hover:scale-105"
-                  : "text-gray-600 hover:text-gray-900 hover:scale-105"
+                  ? "text-[#979797] hover:text-gray-900 hover:scale-105"
+                  : "text-[#979797] hover:text-gray-900 hover:scale-105"
             }  px-5 py-3 flex items-center transition duration-150 ease-in-out font-semibold text-[#979797] hover:!text-blue-500`}
         >
           {children}
@@ -174,8 +174,8 @@ export default function Header() {
                 ? "text-gray-900 hover:text-gray-900 hover:scale-105"
                 : usePathname().includes("complete-profile") ||
                   usePathname().includes("layanan")
-                  ? "text-gray-600 hover:text-gray-900 hover:scale-105"
-                  : "text-gray-600 hover:text-gray-900 hover:scale-105"
+                  ? "text-[#979797] hover:text-gray-900 hover:scale-105"
+                  : "text-[#979797] hover:text-gray-900 hover:scale-105"
             }  px-5 py-3 flex items-center transition duration-150 ease-in-out text-[#979797] hover:!text-blue-500`}
         >
           {name}

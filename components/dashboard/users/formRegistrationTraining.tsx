@@ -775,7 +775,7 @@ function FormRegistrationTraining({
                       <AlertDialogTrigger className="w-full">
                         <Button onClick={(e) =>
                           setIsOpenFormPembayaran(!isOpenFormPembayaran)
-                        } className='bg-[#625BF9] text-white font-calsans w-full rounded-full text-2xl px-24 py-7 -mt-8'>
+                        } className='bg-[#625BF9] hover:bg-[#4b45bf] text-white font-calsans w-full rounded-full text-2xl px-24 py-7 -mt-8'>
                           Daftar Pelatihan
 
                         </Button>
