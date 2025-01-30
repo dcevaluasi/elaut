@@ -1,30 +1,31 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import { NextResponse } from 'next/server'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  const randomId = Math.random().toString(36).substring(2, 10);
-  res.redirect(307, `/${randomId}/auth/login`);
+  const randomId = Math.random().toString(36).substring(2, 10)
+  res.redirect(307, `/${randomId}/auth/login`)
 }
 
 export function middleware(request: any) {
   const XSRF091 = request.cookies.get('XSRF091')
   const XSRF081 = request.cookies.get('XSRF081')
-
   const XSRF095 = request.cookies.get('XSRF095') // DPKAKP ADMIN
   const XSRF096 = request.cookies.get('XSRF096') // DPKAKP USERS
   const XSRF097 = request.cookies.get('XSRF097') // DPKAKP USERS
 
+  const path = request.nextUrl.pathname
 
+  // Role-based access control
   if (!XSRF081) {
     const protectedPaths = ['/dashboard/complete-profile', '/dashboard']
 
-    if (protectedPaths.includes(request.nextUrl.pathname)) {
+    if (protectedPaths.includes(path)) {
       return NextResponse.redirect(new URL('/', request.url))
     }
   } else {
     const protectedPaths = ['/registrasi', '/login']
 
-    if (protectedPaths.includes(request.nextUrl.pathname)) {
+    if (protectedPaths.includes(path)) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
   }
@@ -38,34 +39,44 @@ export function middleware(request: any) {
       '/lembaga/pukakp/admin/dashboard/ujian',
     ]
 
-    if (protectedPaths.includes(request.nextUrl.pathname)) {
-      return NextResponse.redirect(new URL('/lembaga/dpkakp/admin/auth/login', request.url))
+    if (protectedPaths.includes(path)) {
+      return NextResponse.redirect(
+        new URL('/lembaga/dpkakp/admin/auth/login', request.url),
+      )
     }
   }
 
-
-
-
   if (!XSRF091) {
-    const protectedPaths = [
+    const adminProtectedPaths = [
       '/admin/lemdiklat/dashboard',
       '/admin/pusat/dashboard',
       '/admin/pusat/pelatihan/penerbitan-sertifikat',
       '/admin/lemdiklat/pelatihan',
       '/admin/lemdiklat/pelatihan/penerbitan-sttpl',
-      'admin/lemdiklat/pelatihan/[kode-pelatihan]/peserta-pelatihan/[id]'
+      '/admin/lemdiklat/pelatihan/[kode-pelatihan]/peserta-pelatihan/[id]',
     ]
 
-    if (protectedPaths.includes(request.nextUrl.pathname)) {
+    const isAdminProtectedPath = adminProtectedPaths.some((protectedPath) => {
+      const regex = new RegExp(
+        `^${protectedPath.replace(/\[.*?\]/g, '[^/]+')}$`,
+      )
+      return regex.test(path)
+    })
+
+    if (isAdminProtectedPath) {
       return NextResponse.redirect(new URL('/admin/auth/login', request.url))
     }
   } else {
     const protectedPaths = ['/admin/auth/login']
 
-    if (protectedPaths.includes(request.nextUrl.pathname)) {
+    if (protectedPaths.includes(path)) {
       return NextResponse.redirect(
         new URL('/admin/lemdiklat/pelatihan', request.url),
       )
     }
   }
+
+  // Additional role-based checks can be added here
+
+  return NextResponse.next()
 }
