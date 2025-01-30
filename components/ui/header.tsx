@@ -72,7 +72,7 @@ export default function Header() {
                   : (top && usePathname().includes("pelatihan")) ||
                     usePathname().includes("sertifikasi") ||
                     usePathname().includes("users")
-                    ? "text-gray-900 hover:text-gray-900 hover:scale-105"
+                    ? "text-[#979797] hover:text-gray-900 hover:scale-105"
                     : usePathname().includes("complete-profile")
                       ? "text-[#979797] hover:text-gray-900 hover:scale-105"
                       : "text-[#979797] hover:text-gray-900 hover:scale-105"
@@ -128,7 +128,7 @@ export default function Header() {
               : (top && usePathname().includes("pelatihan")) ||
                 usePathname().includes("sertifikasi") ||
                 usePathname().includes("users")
-                ? "text-gray-900 hover:text-gray-900 hover:scale-105"
+                ? "text-[#979797] hover:text-gray-900 hover:scale-105"
                 : usePathname().includes("complete-profile") ||
                   usePathname().includes("layanan")
                   ? "text-[#979797] hover:text-gray-900 hover:scale-105"
@@ -171,7 +171,7 @@ export default function Header() {
               : (top && usePathname().includes("pelatihan")) ||
                 usePathname().includes("sertifikasi") ||
                 usePathname().includes("users")
-                ? "text-gray-900 hover:text-gray-900 hover:scale-105"
+                ? "text-[#979797] hover:text-gray-900 hover:scale-105"
                 : usePathname().includes("complete-profile") ||
                   usePathname().includes("layanan")
                   ? "text-[#979797] hover:text-gray-900 hover:scale-105"
@@ -227,7 +227,7 @@ export default function Header() {
             : usePathname().includes("pelatihan") ||
               usePathname().includes("sertifikasi") ||
               usePathname().includes("users")
-              ? ` backdrop-blur-sm !pt-0 shadow-custom !text-[#979797] hover:!text-blue-500 `
+              ? `bg-white backdrop-blur-sm !pt-0 shadow-custom !text-[#979797] hover:!text-blue-500 `
               : usePathname().includes("complete-profile") || usePathname().includes("cek-sertifikat")
                 ? "bg-white backdrop-blur-sm shadow-custom "
                 : ""
