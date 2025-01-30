@@ -12,18 +12,6 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import React, { FormEvent } from "react";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import Image from "next/image";
 import { TbFileStack, TbMapPinSearch, TbUserEdit } from "react-icons/tb";
 
 import { Progress } from "@/components/ui/progress";
@@ -32,6 +20,8 @@ import axios, { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
 import { User } from "@/types/user";
 import { HashLoader } from "react-spinners";
+import Image from "next/image";
+import { ALLOWED_EXTENSIONS, MAX_FILE_SIZE, MIN_FILE_SIZE } from "@/utils/file";
 
 function FormCompleteProfile() {
   const router = useRouter();
@@ -65,25 +55,52 @@ function FormCompleteProfile() {
   const [ijazah, setIjazah] = React.useState<any>(null);
   const [suratKesehatan, setSuratKesehatan] = React.useState<any>(null);
 
-  const handleFotoChange = (event: any) => {
-    setFoto(event.target.files[0]);
+  const validateFile = (file: File) => {
+    const extension = file.name.split('.').pop()?.toLowerCase();
+    if (!extension || !ALLOWED_EXTENSIONS.includes(extension)) {
+      Toast.fire({
+        icon: 'error',
+        title: 'File tidak valid',
+        text: 'Hanya file dengan ekstensi PDF, PNG, JPEG, JPG, dan CSV yang diperbolehkan.',
+      });
+      return false;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      Toast.fire({
+        icon: 'error',
+        title: 'File terlalu besar',
+        text: 'Ukuran file tidak boleh melebihi 100MB.',
+      });
+      return false;
+    }
+
+    if (file.size < MIN_FILE_SIZE) {
+      Toast.fire({
+        icon: 'error',
+        title: 'File terlalu kecil',
+        text: 'Ukuran file tidak boleh kurang dari 1 byte.',
+      });
+      return false;
+    }
+
+    return true;
   };
 
-  const handleKtpChange = (event: any) => {
-    setKtp(event.target.files[0]);
+  const handleFileChange = (setter: any, event: any) => {
+    const file = event.target.files[0];
+    if (file && validateFile(file)) {
+      setter(file);
+    } else {
+      event.target.value = ''; // Reset input file
+    }
   };
 
-  const handleKkChange = (event: any) => {
-    setKk(event.target.files[0]);
-  };
-
-  const handleIjazahChange = (event: any) => {
-    setIjazah(event.target.files[0]);
-  };
-
-  const handleSuratKesehatanChange = (event: any) => {
-    setSuratKesehatan(event.target.files[0]);
-  };
+  const handleFotoChange = (event: any) => handleFileChange(setFoto, event);
+  const handleKtpChange = (event: any) => handleFileChange(setKtp, event);
+  const handleKkChange = (event: any) => handleFileChange(setKk, event);
+  const handleIjazahChange = (event: any) => handleFileChange(setIjazah, event);
+  const handleSuratKesehatanChange = (event: any) => handleFileChange(setSuratKesehatan, event);
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -112,6 +129,16 @@ function FormCompleteProfile() {
       console.log({ response });
       setUserDetail(response.data);
       setName(response.data?.Nama);
+      setEmail(response.data?.Email);
+      setTanggalLahir(response.data?.TanggalLahir);
+      setJenisKelamin(response.data?.JenisKelamin)
+      setGolonganDarah(response.data?.GolonganDarah)
+      setIbuKandung(response.data?.IbuKandung);
+      setStatusMenikah(response.data?.StatusMenikah);
+      setKewarganegaraan(response.data?.Kewarganegaraan);
+      setPendidikanTerakhir(response.data?.PendidikanTerakhir);
+      setNegaraTujuanBekerja(response.data?.NegaraTujuanBekerja);
+      setTempatLahir(response.data?.TempatLahir);
       setNik(response.data?.Nik);
       setPhoneNumber(response.data?.NoTelpon);
     } catch (error) {
@@ -215,14 +242,16 @@ function FormCompleteProfile() {
         className="fixed -z-10 w-[450px] -bottom-10 left-10 animate-float"
       />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 md:-mt-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-8">
         <form className="pt-32 pb-12 md:pt-40 md:pb-20">
           {/* Page header */}
           <div className="max-w-3xl mx-auto text-center pb-0 md:pb-0">
             <h1 className="font-bold text-4xl leading-[100%] md:text-4xl text-black font-calsans">
-              Lengkapi Data Akun Pengguna E-Laut
+              Update dan Lengkapi Data <br />  <span className="bg-clip-text text-transparent bg-gradient-to-r leading-none pt-0 from-blue-500 to-teal-400">
+                Akun Pengguna ELAUT
+              </span>
             </h1>
-            <p className="text-base text-gray-600 max-w-4x">
+            <p className="text-base text-gray-600 max-w-4x mt-4">
               Hanya isi sekali bisa digunakan untuk setiap proses pendaftaran,
               segera lengkapi data-mu!
             </p>
@@ -402,23 +431,18 @@ function FormCompleteProfile() {
                   </div>
                   <div className="flex flex-wrap -mx-3 mb-1">
                     <div className="w-full px-3">
-                      <label
-                        className="block text-gray-800 text-sm font-medium mb-1"
-                        htmlFor="email"
-                      >
+                      <label className="block text-gray-800 text-sm font-medium mb-1" htmlFor="jenisKelamin">
                         Jenis Kelamin <span className="text-red-600">*</span>
                       </label>
                       <Select
-                        value={jenisKelamin}
+                        value={jenisKelamin || undefined} // Ensure it's undefined if empty
                         onValueChange={(value) => setJenisKelamin(value)}
                       >
                         <SelectTrigger className="w-full text-base py-6">
                           <SelectValue placeholder="Pilih jenis kelamin" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Laki - Laki">
-                            Laki - Laki
-                          </SelectItem>
+                          <SelectItem value="Laki - Laki">Laki - Laki</SelectItem>
                           <SelectItem value="Perempuan">Perempuan</SelectItem>
                         </SelectContent>
                       </Select>
@@ -427,14 +451,11 @@ function FormCompleteProfile() {
 
                   <div className="flex flex-wrap -mx-3 mb-1">
                     <div className="w-full px-3">
-                      <label
-                        className="block text-gray-800 text-sm font-medium mb-1"
-                        htmlFor="email"
-                      >
+                      <label className="block text-gray-800 text-sm font-medium mb-1" htmlFor="golonganDarah">
                         Golongan Darah <span className="text-red-600">*</span>
                       </label>
                       <Select
-                        value={golonganDarah}
+                        value={golonganDarah || undefined} // Ensure it's undefined if empty
                         onValueChange={(value) => setGolonganDarah(value)}
                       >
                         <SelectTrigger className="w-full text-base py-6">
@@ -449,6 +470,7 @@ function FormCompleteProfile() {
                       </Select>
                     </div>
                   </div>
+
                   <div className="flex flex-wrap -mx-3 mb-1">
                     <div className="w-full px-3">
                       <label
@@ -768,16 +790,11 @@ function FormCompleteProfile() {
                 <div className={`${indexFormTab == 3 ? "block" : "hidden"}`}>
                   <div className="flex flex-wrap -mx-3 mb-1">
                     <div className="w-full px-3 ">
-                      <label
-                        className="block text-gray-800 text-sm font-medium mb-1"
-                        htmlFor="email"
-                      >
-                        File Surat Kesehatan{" "}
-                        <span className="text-red-600">*</span>
+                      <label className="block text-gray-800 text-sm font-medium mb-1" htmlFor="email">
+                        File Surat Kesehatan <span className="text-red-600">*</span>
                         <br />
                         <span className="text-gray-600">
-                          Anda wajib mengisi dokumen ini karena mempunya surat
-                          kesehatan
+                          Anda wajib mengisi dokumen ini karena mempunya surat kesehatan
                         </span>
                       </label>
                       <input
@@ -791,10 +808,7 @@ function FormCompleteProfile() {
 
                   <div className="flex flex-wrap -mx-3 mb-1">
                     <div className="w-full px-3 ">
-                      <label
-                        className="block text-gray-800 text-sm font-medium mb-1"
-                        htmlFor="email"
-                      >
+                      <label className="block text-gray-800 text-sm font-medium mb-1" htmlFor="email">
                         Pas Foto <span className="text-red-600">*</span>
                       </label>
                       <input
@@ -808,10 +822,7 @@ function FormCompleteProfile() {
 
                   <div className="flex flex-wrap -mx-3 mb-1">
                     <div className="w-full px-3 ">
-                      <label
-                        className="block text-gray-800 text-sm font-medium mb-1"
-                        htmlFor="email"
-                      >
+                      <label className="block text-gray-800 text-sm font-medium mb-1" htmlFor="email">
                         File KTP <span className="text-red-600">*</span>
                       </label>
                       <input
@@ -825,14 +836,9 @@ function FormCompleteProfile() {
 
                   <div className="flex flex-wrap -mx-3 mb-1">
                     <div className="w-full px-3">
-                      <label
-                        className="block text-gray-800 text-sm font-medium mb-1"
-                        htmlFor="email"
-                      >
-                        File Kartu Keluarga{" "}
-                        <span className="text-red-600">*</span>
+                      <label className="block text-gray-800 text-sm font-medium mb-1" htmlFor="email">
+                        File Kartu Keluarga <span className="text-red-600">*</span>
                       </label>
-
                       <input
                         type="file"
                         className=" text-black h-10 text-base flex items-center cursor-pointer w-full border border-neutral-200 rounded-md"
@@ -844,10 +850,7 @@ function FormCompleteProfile() {
 
                   <div className="flex flex-wrap -mx-3 mb-1">
                     <div className="w-full px-3 ">
-                      <label
-                        className="block text-gray-800 text-sm font-medium mb-1"
-                        htmlFor="email"
-                      >
+                      <label className="block text-gray-800 text-sm font-medium mb-1" htmlFor="email">
                         Ijazah <span className="text-red-600">*</span>
                       </label>
                       <input
@@ -861,12 +864,10 @@ function FormCompleteProfile() {
 
                   <div className="text-sm text-gray-800 text-left mt-3">
                     Demi alasan keamanan maka Anda wajib mengisi foto/file
-                    <span className="underline text-blue-500 font-medium">
-                      {" "}
-                      KTP, KK, Akta, Ijazah
-                    </span>{" "}
-                    untuk memvalidasi kepemilikan KTP.
+                    <span className="underline text-blue-500 font-medium"> KTP, KK, Akta, Ijazah</span> untuk memvalidasi kepemilikan KTP.
                   </div>
+
+
                 </div>
                 <div className="flex -mx-3 mt-5 gap-2 px-3">
                   <div className={`w-full ${indexFormTab == 0 && "hidden"}`}>
@@ -882,9 +883,8 @@ function FormCompleteProfile() {
                     </button>
                   </div>
                   <div
-                    className={`w-full ${
-                      indexFormTab == 3 ? "hidden" : "block"
-                    }`}
+                    className={`w-full ${indexFormTab == 3 ? "hidden" : "block"
+                      }`}
                   >
                     <button
                       type="submit"
@@ -895,9 +895,8 @@ function FormCompleteProfile() {
                     </button>
                   </div>
                   <div
-                    className={`w-full ${
-                      indexFormTab == 3 ? "block" : "hidden"
-                    }`}
+                    className={`w-full ${indexFormTab == 3 ? "block" : "hidden"
+                      }`}
                   >
                     <button
                       onClick={(e) => {
