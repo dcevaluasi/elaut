@@ -930,10 +930,35 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
 
                       <p className="text-base flex gap-2 border-b border-b-gray-300 pb-2 mb-2 items-center text-gray-900 font-semibold max-w-md mt-2">
                         <FiBookOpen />{" "}
-                        <span>Silabus atau Kurikulum Pembelajaran</span>
+                        <span>Instruktur dan Silabus atau Kurikulum Pembelajaran</span>
                       </p>
 
-                      <div className="flex flex-wrap  mb-1 w-full">
+                      <div className="flex flex-col flex-wrap  mb-1 w-full">
+                        <div className="flex flex-wrap -mx-3 mb-1 w-full">
+                          <div className="w-full px-3">
+                            <label
+                              className="block text-gray-800 text-sm font-medium mb-1"
+                              htmlFor="instruktur"
+                            >
+                              Instruktur{" "}
+                              <span className="text-red-600">*</span>
+                            </label>
+                            <input
+                              id="instruktur"
+                              type="text"
+                              className="form-input w-full text-black border-gray-300 rounded-md"
+                              placeholder="Masukkan nama-nama instruktur"
+                              required
+                              value={instruktur}
+                              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                setInstruktur(e.target.value)
+                              }
+                            />
+                            <p className="text-xs text-gray-600">
+                              Isi list instruktur lengkap dengan gelarny dengan format 1) Nama, gelar 2) berikan spasi dan penomoran seperti format tersebut
+                            </p>
+                          </div>
+                        </div>
                         <div className="w-full">
                           <label
                             className="block text-gray-800 text-sm font-medium mb-1"

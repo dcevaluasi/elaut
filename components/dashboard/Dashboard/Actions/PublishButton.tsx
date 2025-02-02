@@ -151,10 +151,10 @@ const PublishButton: React.FC<PublishButtonProps> = ({
       >
         {title == "Publish" ? (
           <>
-            <TbBroadcast className="h-5 w-5" /> <span>Publish Pelatihan</span></>
+            <TbBroadcast className="h-5 w-5" /> <span>Publish</span></>
         ) : (
           <>
-            <TbWorldCancel className="h-5 w-5" />Takedown Pelatihan</>
+            <TbWorldCancel className="h-5 w-5" />Takedown</>
         )}
       </Button>
     </>

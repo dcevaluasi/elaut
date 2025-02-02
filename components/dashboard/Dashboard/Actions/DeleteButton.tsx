@@ -119,7 +119,7 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({
         title="Hapus Pelatihan"
         className="ml-auto text-neutral-100  bg-rose-600 hover:bg-rose-600 hover:text-neutral-100 duration-700"
       >
-        <Trash className="h-5 w-5" />
+        <Trash className="h-5 w-5" /> Hapus Pelatihan
       </Button>
     </>
   );

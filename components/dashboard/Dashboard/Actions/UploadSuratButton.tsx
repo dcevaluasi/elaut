@@ -50,6 +50,7 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
   const handleUploadSuratPemberitahuan = async (id: string) => {
     setIsUploading(true);
     const formData = new FormData();
+    formData.append("StatusPenerbitan", "Verifikasi Pelaksanaan");
     if (suratPemberitahuanFile != null) {
       formData.append("SuratPemberitahuan", suratPemberitahuanFile);
     }
@@ -172,7 +173,7 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
       </AlertDialog>
 
       {suratPemberitahuan !=
-      "https://elaut-bppsdm.kkp.go.id/api-elaut//public/static/suratPemberitahuan/" ? (
+        "https://elaut-bppsdm.kkp.go.id/api-elaut//public/static/suratPemberitahuan/" ? (
         <Link
           href={
             "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/suratPemberitahuan/" +
@@ -182,7 +183,7 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
           target="_blank"
           className="border border-neutral-200  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-gray-800 hover:bg-gray-800 hover:text-white text-white rounded-md"
         >
-          <LucideFileCheck2 className="h-5 w-5" />
+          <LucideFileCheck2 className="h-5 w-5" /> Surat Pemberitahuan
         </Link>
       ) : (
         <Button
@@ -193,7 +194,7 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
           title="Upload Surat Pemberitahuan"
           className="border border-neutral-200  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-gray-800 hover:bg-gray-800 hover:text-white text-white rounded-md"
         >
-          <FiUploadCloud className="h-5 w-5" />
+          <FiUploadCloud className="h-5 w-5" /> Upload Surat Pemberitahuan
         </Button>
       )}
     </>

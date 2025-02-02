@@ -100,6 +100,8 @@ function DetailPelatihan() {
     handleFetchDetailPelatihan();
   }, []);
 
+  const typeRole = Cookies.get('XSRF093')
+
   return (
     <section className="">
       <div className="flex flex-col w-full">
@@ -393,18 +395,21 @@ function DetailPelatihan() {
               </h2>
             </div>
             <table className="w-full">
-              <tr className="border-b border-b-gray-200 w-full">
-                <td className="font-semibold p-4 w-[20%]">
-                  Tanggal Pendaftaran
-                </td>
-                <td className="p-4 w-2/3">
-                  {generateTanggalPelatihan(pelatihan.TanggalMulaiPendaftaran)}{" "}
-                  s.d.{" "}
-                  {generateTanggalPelatihan(
-                    pelatihan!.TanggalBerakhirPendaftaran
-                  )}
-                </td>
-              </tr>
+              {
+                pelatihan.TanggalMulaiPendaftaran != '' && <tr className="border-b border-b-gray-200 w-full">
+                  <td className="font-semibold p-4 w-[20%]">
+                    Tanggal Pendaftaran
+                  </td>
+                  <td className="p-4 w-2/3">
+                    {generateTanggalPelatihan(pelatihan.TanggalMulaiPendaftaran)}{" "}
+                    s.d.{" "}
+                    {generateTanggalPelatihan(
+                      pelatihan!.TanggalBerakhirPendaftaran
+                    )}
+                  </td>
+                </tr>
+              }
+
               <tr className="border-b border-b-gray-200 w-full">
                 <td className="font-semibold p-4 w-[20%]">Tarif Pelatihan</td>
                 <td className="p-4 w-2/3">
@@ -494,7 +499,7 @@ function DetailPelatihan() {
                   </Link>
                 </td>
               </tr>
-              {pelatihan?.UjiKompotensi != "Ujian Pre-test dan Post-test" ? (
+              {typeRole != 'satdik' ? pelatihan?.UjiKompotensi != "Ujian Pre-test dan Post-test" ? (
                 <></>
               ) : (
                 <tr className="border-b border-b-gray-200 w-full">
@@ -513,7 +518,7 @@ function DetailPelatihan() {
                     </Link>
                   </td>
                 </tr>
-              )}
+              ) : <></>}
             </table>
           </div>
         </div>

@@ -46,7 +46,7 @@ const DetailPelatihan: React.FC<DetailPelatihanProps> = ({ data, isRegistrasi, h
                                     }
 
                                     {
-                                        data!.PenyelenggaraPelatihan.includes('Politeknik') && <span
+                                        data!.Status == 'Selesai' && <span
                                             className="w-fit block text-center font-semibold px-4 py-2 bg-blue-600 rounded-3xl text-white "
                                         >
                                             Telah Berakhir
@@ -99,26 +99,21 @@ const DetailPelatihan: React.FC<DetailPelatihanProps> = ({ data, isRegistrasi, h
                                 !Cookies.get("XSRF081") ? (
                                     <Button
                                         onClick={() => router.replace("/registrasi")}
-                                        className="bg-blue-600 text-white font-extrabold w-fit rounded-full text-2xl px-24 py-7 -mt-8"
+                                        className="bg-blue-600 text-white font-extrabold w-fit rounded-full text-2xl px-24 py-7 "
                                     >
                                         DAFTAR
                                     </Button>
                                 ) : (
                                     <Button
                                         onClick={handleRegistration}
-                                        className="bg-blue-600 text-white font-extrabold w-fit rounded-full text-2xl px-24 py-7 -mt-8"
+                                        className="bg-blue-600 text-white font-extrabold w-fit rounded-full text-2xl px-24 py-7 "
                                     >
                                         DAFTAR
                                     </Button>
                                 )
                             )}
 
-                            <Button
-                                onClick={handleRegistration}
-                                className="bg-blue-600 text-white font-extrabold w-fit rounded-full text-2xl px-24 py-7 -mt-8"
-                            >
-                                DAFTAR
-                            </Button>
+
                         </div>
 
                         {isRegistrasi && (

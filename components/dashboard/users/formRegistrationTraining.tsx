@@ -975,7 +975,7 @@ function FormRegistrationTraining({
                     </AlertDialog>
                   ) : (
                     <Button onClick={(e) => handleRegistrationTrainingForPeople(e)
-                    } className='bg-blue-600 text-white font-calsans w-fit rounded-full text-2xl px-24 py-7 -mt-8'>
+                    } className='bg-blue-600 text-white font-calsans w-full mt-8 rounded-full text-2xl px-24 py-7 '>
                       Daftar Pelatihan
 
                     </Button>

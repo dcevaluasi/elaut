@@ -75,15 +75,15 @@ export default function LayoutAdminElaut({
 
   const navs = pathname.includes("pusat")
     ? [
-      // {
-      //   title: "Dashboard Pelatihan",
-      //   href: "/admin/pusat/dashboard/",
-      //   iconPath:
-      //     "M12 6.453l9 8.375v9.172h-6v-6h-6v6h-6v-9.172l9-8.375zm12 5.695l-12-11.148-12 11.133 1.361 1.465 10.639-9.868 10.639 9.883 1.361-1.465z",
-      // },
       {
         title: "Penerbitan Sertifikat",
         href: "/admin/pusat/pelatihan/penerbitan-sertifikat",
+        iconPath:
+          "M18.546 3h-13.069l-5.477 8.986v9.014h24v-9.014l-5.454-8.986zm-3.796 12h-5.5l-2.25-3h-4.666l4.266-7h10.82l4.249 7h-4.669l-2.25 3zm-9.75-4l.607-1h12.787l.606 1h-14zm12.18-3l.607 1h-11.573l.607-1h10.359zm-1.214-2l.606 1h-9.144l.607-1h7.931z",
+      },
+      {
+        title: "Pemberitahuan Pelatihan",
+        href: "/admin/pusat/pelatihan/pemberitahuan-pelatihan",
         iconPath:
           "M18.546 3h-13.069l-5.477 8.986v9.014h24v-9.014l-5.454-8.986zm-3.796 12h-5.5l-2.25-3h-4.666l4.266-7h10.82l4.249 7h-4.669l-2.25 3zm-9.75-4l.607-1h12.787l.606 1h-14zm12.18-3l.607 1h-11.573l.607-1h10.359zm-1.214-2l.606 1h-9.144l.607-1h7.931z",
       },
