@@ -49,6 +49,7 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
     setBeritaAcara(e.target.files[0]);
   };
   const [isUploading, setIsUploading] = React.useState<boolean>(false);
+  const typeRole = Cookies.get('XSRF093')
 
   const handleGenerateSertifikat = async () => {
     setIsUploading(!isUploading);
@@ -114,7 +115,7 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
           <>
             <AlertDialogHeader>
               <AlertDialogTitle>
-                Generate No dan Permohonan Penerbitan Sertifikat
+                Permohonan Penerbitan Sertifikat
               </AlertDialogTitle>
               <AlertDialogDescription className="-mt-2">
                 Lampirkan Berita acara sebagai bukti pelaksanaan pelatihan yang
@@ -172,26 +173,31 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
                     >
                       Kepala BPPSDM KP
                     </option>
-                    <option
-                      onClick={(e) =>
-                        setTtdSertifikat(
-                          "Kepala Pusat Pelatihan Kelautan dan Perikanan"
-                        )
-                      }
-                      value={"Kepala Pusat Pelatihan Kelautan dan Perikanan"}
-                    >
-                      Kepala Pusat Pelatihan KP
-                    </option>
-                    <option
-                      onClick={(e) =>
-                        setTtdSertifikat(
-                          "Kepala Balai Pelatihan dan Penyuluhan Perikanan"
-                        )
-                      }
-                      value={"Kepala Balai Pelatihan dan Penyuluhan Perikanan"}
-                    >
-                      Kepala Balai Pelatihan
-                    </option>
+                    {
+                      typeRole == 'balai' && <>
+                        <option
+                          onClick={(e) =>
+                            setTtdSertifikat(
+                              "Kepala Pusat Pelatihan Kelautan dan Perikanan"
+                            )
+                          }
+                          value={"Kepala Pusat Pelatihan Kelautan dan Perikanan"}
+                        >
+                          Kepala Pusat Pelatihan KP
+                        </option>
+                        <option
+                          onClick={(e) =>
+                            setTtdSertifikat(
+                              "Kepala Balai Pelatihan dan Penyuluhan Perikanan"
+                            )
+                          }
+                          value={"Kepala Balai Pelatihan dan Penyuluhan Perikanan"}
+                        >
+                          Kepala Balai Pelatihan
+                        </option>
+                      </>
+                    }
+
                   </select>
                 </div>
               </div>
@@ -299,7 +305,7 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
               setOpenFormSertifikat(true);
             }}
             variant="outline"
-            title="Generate No Sertifikat"
+            title="Permohonan Penerbitan Sertifikat"
             className="ml-auto bg-blue-600 hover:bg-blue-600 duration-700 text-neutral-100 hover:text-neutral-100"
           >
             <RiVerifiedBadgeFill className="h-5 w-5" />

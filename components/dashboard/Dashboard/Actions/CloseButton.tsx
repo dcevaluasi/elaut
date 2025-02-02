@@ -60,7 +60,8 @@ const CloseButton: React.FC<CloseButtonProps> = ({
       );
       Toast.fire({
         icon: "success",
-        title: `Berhasil mempublish informasi pelatihan masyarakat ke laman E-LAUT!`,
+        title: `Yeayyy!`,
+        text: 'Berhasil menutup pelatihan!',
       });
       console.log("UPDATE PELATIHAN: ", response);
       handleFetchingData();
@@ -70,7 +71,8 @@ const CloseButton: React.FC<CloseButtonProps> = ({
       console.error("ERROR UPDATE PELATIHAN: ", error);
       Toast.fire({
         icon: "error",
-        title: `Gagal mempublish informasi pelatihan masyarakat ke laman E-LAUT!`,
+        title: `Oopsss!`,
+        text: 'Gagal menutup pelatihan!',
       });
       handleFetchingData();
     }
@@ -151,7 +153,7 @@ const CloseButton: React.FC<CloseButtonProps> = ({
             variant="outline"
             className="ml-auto hover:bg-primary bg-primary hover:text-neutral-100 text-neutral-100 duration-700"
           >
-            <HiLockClosed className="h-5 w-5" />
+            <HiLockClosed className="h-5 w-5" /> Tutup Pelatihan
           </Button>
         )}
     </>

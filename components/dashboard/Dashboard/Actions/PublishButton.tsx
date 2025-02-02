@@ -58,7 +58,8 @@ const PublishButton: React.FC<PublishButtonProps> = ({
       );
       Toast.fire({
         icon: "success",
-        title: `Berhasil mempublish informasi pelatihan masyarakat ke laman E-LAUT!`,
+        title: `Yeayyy!`,
+        text: 'Berhasil mempublish informasi pelatihan masyarakat ke laman E-LAUT!',
       });
       console.log("UPDATE PELATIHAN: ", response);
       handleFetchingData();
@@ -68,7 +69,8 @@ const PublishButton: React.FC<PublishButtonProps> = ({
       console.error("ERROR UPDATE PELATIHAN: ", error);
       Toast.fire({
         icon: "error",
-        title: `Gagal mempublish informasi pelatihan masyarakat ke laman E-LAUT!`,
+        title: `Oopsss!`,
+        text: 'Gagal mempublish informasi pelatihan masyarakat ke laman E-LAUT!'
       });
       handleFetchingData();
     }
@@ -142,16 +144,17 @@ const PublishButton: React.FC<PublishButtonProps> = ({
           setIsOpenFormPublishedPelatihan(!isOpenFormPublishedPelatihan);
         }}
         variant="outline"
-        className={`ml-auto hover:text-neutral-100  text-neutral-100  duration-700 ${
-          title == "Publish"
-            ? "bg-purple-600 hover:bg-purple-600"
-            : "bg-teal-600 hover:bg-teal-600"
-        }`}
+        className={`ml-auto hover:text-neutral-100  text-neutral-100  duration-700 ${title == "Publish"
+          ? "bg-purple-600 hover:bg-purple-600"
+          : "bg-teal-600 hover:bg-teal-600"
+          }`}
       >
         {title == "Publish" ? (
-          <TbBroadcast className="h-5 w-5" />
+          <>
+            <TbBroadcast className="h-5 w-5" /> <span>Publish Pelatihan</span></>
         ) : (
-          <TbWorldCancel className="h-5 w-5" />
+          <>
+            <TbWorldCancel className="h-5 w-5" />Takedown Pelatihan</>
         )}
       </Button>
     </>

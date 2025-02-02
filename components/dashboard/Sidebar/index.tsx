@@ -716,7 +716,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                   <Link
                                     href={`/${generateRandomId()}/balai/pelatihan`}
                                     className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${pathname ===
-                                      "/admin/balai/pelatihan" &&
+                                      "/admin/lemdiklat/pelatihan" &&
                                       "text-white"
                                       }`}
                                   >
@@ -727,7 +727,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                   <Link
                                     href={`/${generateRandomId()}/balai/uji-kompetensi`}
                                     className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${pathname ===
-                                      "/admin/balai/pelatihan" &&
+                                      "/admin/lemdiklat/pelatihan" &&
                                       "text-white"
                                       }`}
                                   >
@@ -1104,9 +1104,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
                                 <li>
                                   <Link
-                                    href="/admin/balai/fasilitas/penginapan"
+                                    href="/admin/lemdiklat/fasilitas/penginapan"
                                     className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${pathname ===
-                                      "/admin/balai/fasilitas/penginapan" &&
+                                      "/admin/lemdiklat/fasilitas/penginapan" &&
                                       "text-white"
                                       }`}
                                   >
@@ -1115,9 +1115,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 </li>
                                 <li>
                                   <Link
-                                    href="/admin/balai/fasilitas/konsumsi"
+                                    href="/admin/lemdiklat/fasilitas/konsumsi"
                                     className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${pathname ===
-                                      "/admin/balai/fasilitas/konsumsi" &&
+                                      "/admin/lemdiklat/fasilitas/konsumsi" &&
                                       "text-white"
                                       }`}
                                   >
@@ -1148,8 +1148,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     (!pathname.includes("pukakp") && (
                       <li>
                         <Link
-                          href="/admin/balai/pnbp"
-                          className={`group relative flex items-center gap-2.5 rounded-sm  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${(pathname === "/admin/balai/pnbp" ||
+                          href="/admin/lemdiklat/pnbp"
+                          className={`group relative flex items-center gap-2.5 rounded-sm  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${(pathname === "/admin/lemdiklat/pnbp" ||
                             pathname.includes("pnbp")) &&
                             "bg-graydark "
                             }`}

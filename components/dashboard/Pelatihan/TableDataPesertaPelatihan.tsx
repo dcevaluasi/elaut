@@ -95,6 +95,7 @@ const TableDataPesertaPelatihan = () => {
   const id = extractLastSegment(pathname);
   const paths = pathname.split("/");
   const [noSertifikatTerbitkan, setNoSertifikatTerbitkan] = React.useState("");
+  const typeRole = Cookies.get('XSRF093')
 
   const [dataPelatihan, setDataPelatihan] =
     React.useState<PelatihanMasyarakat | null>(null);
@@ -295,11 +296,9 @@ const TableDataPesertaPelatihan = () => {
           {usePathname().includes("lemdiklat") ? (
             row.original.Keterangan == "Valid" ? (
               <Link
-                href={`/admin/${
-                  usePathname().includes("lemdiklat") ? "lemdiklat" : "pusat"
-                }/pelatihan/${paths[paths.length - 3]}/peserta-pelatihan/${
-                  row.original.IdPelatihan
-                }/${row.original.IdUserPelatihan}/${row.original.IdUsers}`}
+                href={`/admin/${usePathname().includes("lemdiklat") ? "lemdiklat" : "pusat"
+                  }/pelatihan/${paths[paths.length - 3]}/peserta-pelatihan/${row.original.IdPelatihan
+                  }/${row.original.IdUserPelatihan}/${row.original.IdUsers}`}
                 className=" border border-green-500  text-white shadow-sm hover:bg-green-500 bg-green-500 hover:text-white h-9 px-4 py-2 mx-0 rounded-md  flex text-base items-center gap-2"
               >
                 <RiVerifiedBadgeFill className="h-4 w-4 " />{" "}
@@ -307,11 +306,9 @@ const TableDataPesertaPelatihan = () => {
               </Link>
             ) : (
               <Link
-                href={`/admin/${
-                  usePathname().includes("lemdiklat") ? "lemdiklat" : "pusat"
-                }/pelatihan/${paths[paths.length - 3]}/peserta-pelatihan/${
-                  row.original.IdPelatihan
-                }/${row.original.IdUserPelatihan}/${row.original.IdUsers}`}
+                href={`/admin/${usePathname().includes("lemdiklat") ? "lemdiklat" : "pusat"
+                  }/pelatihan/${paths[paths.length - 3]}/peserta-pelatihan/${row.original.IdPelatihan
+                  }/${row.original.IdUserPelatihan}/${row.original.IdUsers}`}
                 className=" border border-rose-500  text-white   shadow-sm hover:bg-rose-500 bg-rose-500 hover:text-white h-9 px-4 py-2 mx-0 rounded-md  flex text-base items-center gap-2"
               >
                 <RiVerifiedBadgeFill className="h-4 w-4 " />{" "}
@@ -321,11 +318,9 @@ const TableDataPesertaPelatihan = () => {
           ) : (
             <>
               <Link
-                href={`/admin/${
-                  usePathname().includes("lemdiklat") ? "lemdiklat" : "pusat"
-                }/pelatihan/${paths[paths.length - 3]}/peserta-pelatihan/${
-                  row.original.IdPelatihan
-                }/${row.original.IdUserPelatihan}/${row.original.IdUsers}`}
+                href={`/admin/${usePathname().includes("lemdiklat") ? "lemdiklat" : "pusat"
+                  }/pelatihan/${paths[paths.length - 3]}/peserta-pelatihan/${row.original.IdPelatihan
+                  }/${row.original.IdUserPelatihan}/${row.original.IdUsers}`}
                 className=" border border-neutral-800  text-white  shadow-sm hover:bg-neutral-800 bg-neutral-800 hover:text-white h-9 px-4 py-2 mx-0 rounded-md flex text-sm items-center gap-2"
               >
                 <LucideInfo className="h-4 w-4 " />{" "}
@@ -427,9 +422,9 @@ const TableDataPesertaPelatihan = () => {
                           onClick={(e) =>
                             dataPelatihan?.NoSertifikat !== ""
                               ? handleUpdatePublishPelatihanToELAUT(
-                                  row.original.IdUserPelatihan,
-                                  dataPelatihan?.NoSertifikat!
-                                )
+                                row.original.IdUserPelatihan,
+                                dataPelatihan?.NoSertifikat!
+                              )
                               : null
                           }
                         >
@@ -542,7 +537,7 @@ const TableDataPesertaPelatihan = () => {
         return (
           <Button
             variant="ghost"
-            className={`text-black font-semibold w-fit p-0 flex justify-start items-centee`}
+            className={`text-black font-semibold w-fit p-0 ${typeRole != 'satdik' ? 'flex' : 'hidden'} justify-start items-center`}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             <p className="leading-[105%]"> Pembayaran</p>
@@ -552,7 +547,7 @@ const TableDataPesertaPelatihan = () => {
         );
       },
       cell: ({ row }) => (
-        <div className={`${"ml-0"} text-left capitalize`}>
+        <div className={`${"ml-0"} text-left capitalize ${typeRole != 'satdik' ? 'block' : 'hidden'}`}>
           <p className="text-base font-semibold tracking-tight leading-none">
             {formatToRupiah(parseInt(row.original.TotalBayar))}
           </p>
@@ -566,11 +561,9 @@ const TableDataPesertaPelatihan = () => {
         return (
           <Button
             variant="ghost"
-            className={`flex  ${
-              usePathname().includes("puslat") && "hidden"
-            } items-center justify-center p-0 leading-[105%] w-full text-gray-900 font-semibold ${
-              usePathname().includes("lemdiklat") ? "flex" : "hidden"
-            }`}
+            className={`flex  ${usePathname().includes("puslat") && "hidden"
+              } items-center justify-center p-0 leading-[105%] w-full text-gray-900 font-semibold ${usePathname().includes("lemdiklat") ? "flex" : "hidden"
+              }`}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Input <br />
@@ -581,9 +574,8 @@ const TableDataPesertaPelatihan = () => {
       },
       cell: ({ row }) => (
         <div
-          className={` ${
-            usePathname().includes("lemdiklat") ? "flex" : "hidden"
-          } items-center justify-center w-full gap-1`}
+          className={` ${usePathname().includes("lemdiklat") ? "flex" : "hidden"
+            } items-center justify-center w-full gap-1`}
         >
           <Button
             onClick={(e) => {
@@ -619,13 +611,12 @@ const TableDataPesertaPelatihan = () => {
       },
       cell: ({ row }) => (
         <div
-          className={` flex items-center justify-center w-full gap-1 font-semibold ${
-            row.original.PreTest > 70
-              ? "text-green-500"
-              : row.original.PreTest > 50
+          className={` flex items-center justify-center w-full gap-1 font-semibold ${row.original.PreTest > 70
+            ? "text-green-500"
+            : row.original.PreTest > 50
               ? "text-yellow-500"
               : "text-rose-500"
-          }`}
+            }`}
         >
           {row.original.PreTest}
         </div>
@@ -637,13 +628,12 @@ const TableDataPesertaPelatihan = () => {
         return (
           <Button
             variant="ghost"
-            className={`${
-              dataPelatihan != null
-                ? dataPelatihan!.UjiKompotensi == "Portfolio"
-                  ? "hidden"
-                  : "flex items-center justify-center"
-                : ""
-            }  p-0 leading-[105%] w-full text-gray-900 font-semibold`}
+            className={`${dataPelatihan != null
+              ? dataPelatihan!.UjiKompotensi == "Portfolio"
+                ? "hidden"
+                : "flex items-center justify-center"
+              : ""
+              }  p-0 leading-[105%] w-full text-gray-900 font-semibold`}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Post Test
@@ -653,19 +643,17 @@ const TableDataPesertaPelatihan = () => {
       },
       cell: ({ row }) => (
         <div
-          className={` ${
-            dataPelatihan != null
-              ? dataPelatihan!.UjiKompotensi == "Portfolio"
-                ? "hidden"
-                : "flex items-center justify-center"
-              : ""
-          }  w-full gap-1 font-semibold ${
-            row.original.PostTest > 70
+          className={` ${dataPelatihan != null
+            ? dataPelatihan!.UjiKompotensi == "Portfolio"
+              ? "hidden"
+              : "flex items-center justify-center"
+            : ""
+            }  w-full gap-1 font-semibold ${row.original.PostTest > 70
               ? "text-green-500"
               : row.original.PostTest > 50
-              ? "text-yellow-500"
-              : "text-rose-500"
-          }`}
+                ? "text-yellow-500"
+                : "text-rose-500"
+            }`}
         >
           {row.original.PostTest}
         </div>
@@ -677,13 +665,12 @@ const TableDataPesertaPelatihan = () => {
         return (
           <Button
             variant="ghost"
-            className={`text-black w-full font-semibold ${
-              dataPelatihan != null
-                ? dataPelatihan!.UjiKompotensi == "Portfolio"
-                  ? "hidden"
-                  : "flex items-center justify-center"
-                : ""
-            } `}
+            className={`text-black w-full font-semibold ${dataPelatihan != null
+              ? dataPelatihan!.UjiKompotensi == "Portfolio"
+                ? "hidden"
+                : "flex items-center justify-center"
+              : ""
+              } `}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Keterangan
@@ -693,15 +680,13 @@ const TableDataPesertaPelatihan = () => {
       },
       cell: ({ row }) => (
         <div
-          className={`text-center uppercase w-full text-base font-semibold ${
-            dataPelatihan != null
-              ? dataPelatihan!.UjiKompotensi == "Portfolio"
-                ? "hidden"
-                : "flex items-center justify-center"
-              : ""
-          }  ${
-            row.original.PostTest > 65 ? "text-green-500" : "text-rose-500"
-          }`}
+          className={`text-center uppercase w-full text-base font-semibold ${dataPelatihan != null
+            ? dataPelatihan!.UjiKompotensi == "Portfolio"
+              ? "hidden"
+              : "flex items-center justify-center"
+            : ""
+            }  ${row.original.PostTest > 65 ? "text-green-500" : "text-rose-500"
+            }`}
         >
           {row.original.PostTest >= 65 ? "LULUS" : "TIDAK LULUS"}
         </div>
@@ -818,8 +803,7 @@ const TableDataPesertaPelatihan = () => {
 
     try {
       const response = await axios.put(
-        `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${
-          dataPelatihan!.IdPelatihan
+        `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${dataPelatihan!.IdPelatihan
         }`,
         formData,
         {
@@ -883,20 +867,19 @@ const TableDataPesertaPelatihan = () => {
                     <AlertDialogTrigger asChild>
                       {dataPelatihan != null
                         ? dataPelatihan!.StatusPenerbitan != "" && (
-                            <Badge
-                              variant="outline"
-                              className={`w-fit flex items-center cursor-pointer justify-center ${
-                                dataPelatihan!.StatusPenerbitan == "On Progress"
-                                  ? " bg-yellow-300 text-neutral-800"
-                                  : " bg-green-500 text-white"
+                          <Badge
+                            variant="outline"
+                            className={`w-fit flex items-center cursor-pointer justify-center ${dataPelatihan!.StatusPenerbitan == "On Progress"
+                              ? " bg-yellow-300 text-neutral-800"
+                              : " bg-green-500 text-white"
                               }`}
-                            >
-                              {dataPelatihan!.StatusPenerbitan!}{" "}
-                              {usePathname().includes("lemdiklat")
-                                ? "Pengajuan Sertifikat"
-                                : "Penerbitan"}
-                            </Badge>
-                          )
+                          >
+                            {dataPelatihan!.StatusPenerbitan!}{" "}
+                            {usePathname().includes("lemdiklat")
+                              ? "Pengajuan Sertifikat"
+                              : "Penerbitan"}
+                          </Badge>
+                        )
                         : null}
                     </AlertDialogTrigger>
                     <AlertDialogContent className="flex flex-col items-center justify-center !w-[420px]">
@@ -905,7 +888,7 @@ const TableDataPesertaPelatihan = () => {
                           <div className="w-24 h-24 rounded-full bg-gradient-to-b from-gray-200 via-whiter to-white flex items-center justify-center animate-pulse">
                             <div className="w-16 h-16 rounded-full  bg-gradient-to-b from-gray-300 via-whiter to-white flex items-center justify-center animate-pulse">
                               {dataPelatihan!.StatusPenerbitan ==
-                              "On Progress" ? (
+                                "On Progress" ? (
                                 <RiProgress3Line className="h-12 w-12 text-yellow-400" />
                               ) : (
                                 <RiVerifiedBadgeFill className="h-12 w-12 text-green-500" />
@@ -921,7 +904,7 @@ const TableDataPesertaPelatihan = () => {
                               {dataPelatihan!.StatusPenerbitan == "On Progress"
                                 ? "Pengajuan penerbitan sertifikat telah masuk untuk diproses penandatanganan, harap tindak lanjut pengajuan berikut dalam kurun waktu 1x24 jam!"
                                 : "Pengajuan penerbitan telah berhasil dan sertifikat telah terbit dengan ditandatangani anda sebagai" +
-                                  dataPelatihan!.TtdSertifikat}
+                                dataPelatihan!.TtdSertifikat}
                             </AlertDialogDescription>
                           </div>
                         </AlertDialogTitle>
@@ -1178,26 +1161,29 @@ const TableDataPesertaPelatihan = () => {
                     </p>
                   </div>
                 </div>
-                <div className="flex min-w-47.5">
-                  <span className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-secondary">
-                    <span className="block h-2.5 w-full max-w-2.5 rounded-full bg-secondary"></span>
-                  </span>
-                  <div className="w-full">
-                    <p className="font-semibold text-secondary">
-                      Total Telah Bayar
-                    </p>
-                    <p className="text-sm font-medium">
-                      {" "}
-                      {dataPelatihan?.UserPelatihan.length} orang / Rp.{" "}
-                      {dataPelatihan?.UserPelatihan?.reduce(
-                        (total: number, jumlahBayar: UserPelatihan) => {
-                          return total + parseInt(jumlahBayar.TotalBayar);
-                        },
-                        0
-                      )}
-                    </p>
+                {
+                  typeRole != 'satdik' && <div className="flex min-w-47.5">
+                    <span className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-secondary">
+                      <span className="block h-2.5 w-full max-w-2.5 rounded-full bg-secondary"></span>
+                    </span>
+                    <div className="w-full">
+                      <p className="font-semibold text-secondary">
+                        Total Telah Bayar
+                      </p>
+                      <p className="text-sm font-medium">
+                        {" "}
+                        {dataPelatihan?.UserPelatihan.length} orang / Rp.{" "}
+                        {dataPelatihan?.UserPelatihan?.reduce(
+                          (total: number, jumlahBayar: UserPelatihan) => {
+                            return total + parseInt(jumlahBayar.TotalBayar);
+                          },
+                          0
+                        )}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                }
+
                 <div className="flex min-w-47.5">
                   <span className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-green-400">
                     <span className="block h-2.5 w-full max-w-2.5 rounded-full bg-green-500"></span>
@@ -1217,22 +1203,25 @@ const TableDataPesertaPelatihan = () => {
 
             <div className="flex w-full items-center mb-2">
               <div className="flex w-full gap-1 items-start">
-                <Select>
-                  <SelectTrigger className="w-[200px] border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
-                    <div className="inline-flex gap-2 px-3 mr-2 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">
-                      <MdOutlinePayment />
-                      Status Pembayaran
-                    </div>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Status Pembayaran</SelectLabel>
-                      <SelectItem value="pendaftaran">Paid</SelectItem>
-                      <SelectItem value="pelaksanaan">Pending</SelectItem>
-                      <SelectItem value="selesai">Not Paid</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                {
+                  typeRole != 'satdik' && <Select>
+                    <SelectTrigger className="w-[200px] border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
+                      <div className="inline-flex gap-2 px-3 mr-2 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">
+                        <MdOutlinePayment />
+                        Status Pembayaran
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Status Pembayaran</SelectLabel>
+                        <SelectItem value="pendaftaran">Paid</SelectItem>
+                        <SelectItem value="pelaksanaan">Pending</SelectItem>
+                        <SelectItem value="selesai">Not Paid</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                }
+
 
                 <Select>
                   <SelectTrigger className="w-[130px] border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">

@@ -73,6 +73,8 @@ import Toast from "@/components/toast";
 const TableDataPelatihan: React.FC = () => {
   const [data, setData] = React.useState<PelatihanMasyarakat[]>([]);
 
+  const typeRole = Cookies.get('XSRF093')
+
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
 
   // COUNTER
@@ -318,12 +320,16 @@ const TableDataPelatihan: React.FC = () => {
               isSelected={selectedStatusFilter === "All"}
               onClick={() => setSelectedStatusFilter("All")}
             />
-            <StatusButton
-              label="Belum Dipublish"
-              count={countNotPublished}
-              isSelected={selectedStatusFilter === "Belum Dipublish"}
-              onClick={() => setSelectedStatusFilter("Belum Dipublish")}
-            />
+
+            {
+              typeRole == 'balai' && <StatusButton
+                label="Belum Dipublish"
+                count={countNotPublished}
+                isSelected={selectedStatusFilter === "Belum Dipublish"}
+                onClick={() => setSelectedStatusFilter("Belum Dipublish")}
+              />
+            }
+
             <StatusButton
               label="Proses Pengajuan Sertifikat"
               count={countOnProgress}
@@ -625,21 +631,22 @@ const TableDataPelatihan: React.FC = () => {
                         <div className="flex items-center justify-center gap-1 flex-wrap  -mt-2">
                           <Link
                             title="Detail Pelatihan"
-                            href={`/admin/balai/pelatihan/detail/${pelatihan.KodePelatihan}/${pelatihan.IdPelatihan}`}
-                            className="border border-neutral-200  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-gray-400 hover:bg-gray-400 hover:text-white text-white rounded-md"
+                            href={`/admin/lemdiklat/pelatihan/detail/${pelatihan.KodePelatihan}/${pelatihan.IdPelatihan}`}
+                            className="border border-neutral-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-neutral-900 hover:bg-neutral-900 hover:text-white text-white rounded-md"
                           >
-                            <RiInformationFill className="h-5 w-5" />
+                            <RiInformationFill className="h-5 w-5" /> Detail Pelatihan
                           </Link>
                           <Link
                             title="Peserta Pelatihan"
-                            href={`/admin/${usePathname().includes("balai")
-                              ? "balai"
+                            href={`/admin/${usePathname().includes("lemdiklat")
+                              ? "lemdiklat"
                               : "pusat"
                               }/pelatihan/${pelatihan.KodePelatihan
                               }/peserta-pelatihan/${pelatihan.IdPelatihan}`}
+                            target='_blank'
                             className="  shadow-sm bg-green-500 hover:bg-green-500 text-neutral-100  hover:text-neutral-100 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2"
                           >
-                            <HiUserGroup className="h-5 w-5 " />
+                            <HiUserGroup className="h-5 w-5 " /> Peserta Pelatihan
                           </Link>
                           {pelatihan!.TanggalMulaiPelatihan == "" && (
                             <Button

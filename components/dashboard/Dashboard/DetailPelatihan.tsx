@@ -270,8 +270,8 @@ function DetailPelatihan() {
                               <Badge
                                 variant="outline"
                                 className={`w-fit flex items-center cursor-pointer justify-center ${pelatihan!.StatusPenerbitan == "On Progress"
-                                    ? " bg-yellow-300 text-neutral-800"
-                                    : " bg-green-500 text-white"
+                                  ? " bg-yellow-300 text-neutral-800"
+                                  : " bg-green-500 text-white"
                                   }`}
                               >
                                 {pelatihan!.StatusPenerbitan!}{" "}
@@ -505,7 +505,7 @@ function DetailPelatihan() {
                     <Link
                       target="_blank"
                       className="text-blue-500 underline flex gap-2 items-center"
-                      href={`/admin/balai/pelatihan/${pelatihan!.KodePelatihan
+                      href={`/admin/lemdiklat/pelatihan/${pelatihan!.KodePelatihan
                         }/bank-soal/${pelatihan!.IdPelatihan}`}
                     >
                       <FiUploadCloud />

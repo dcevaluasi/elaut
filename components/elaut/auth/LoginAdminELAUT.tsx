@@ -110,8 +110,8 @@ export const LoginAdminELAUT = () => {
             setIsLoadingLogin(false)
 
             const dashboardPath = role === "balai"
-                ? `/${generateRandomId()}/balai/dashboard`
-                : role == 'adminPusat' ? "/admin/pusat/dashboard" : `/${generateRandomId()}/balai/dashboard`;
+                ? `/${generateRandomId()}/lemdiklat/dashboard`
+                : role == 'adminPusat' ? "/admin/pusat/dashboard" : `/${generateRandomId()}/lemdiklat/dashboard`;
             router.push(dashboardPath);
 
         } catch (error) {

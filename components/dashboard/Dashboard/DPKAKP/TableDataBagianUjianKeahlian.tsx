@@ -545,7 +545,7 @@ const TableDataBagianUjianKeahlian: React.FC = () => {
               <div className="flex w-full gap-1 items-start">
                 <div
                   onClick={(e) => {
-                    router.push("/admin/balai/pelatihan/tambah-pelatihan");
+                    router.push("/admin/lemdiklat/pelatihan/tambah-pelatihan");
                   }}
                   className="flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer w-fit"
                 >

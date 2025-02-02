@@ -295,6 +295,7 @@ function PencarianPelatihan() {
                         <SelectItem value={"Aspirasi"}>Aspirasi</SelectItem>
                         <SelectItem value={"PNBP/BLU"}>PNBP/BLU</SelectItem>
                         <SelectItem value={"Reguler"}>Reguler</SelectItem>
+                        <SelectItem value={"Satuan Pendidikan KP"}>Satuan Pendidikan KP</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>

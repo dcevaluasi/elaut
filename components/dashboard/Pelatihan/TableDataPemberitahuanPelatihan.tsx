@@ -242,7 +242,7 @@ const TableDataPemberitahuanPelatihan: React.FC = () => {
             {/* <Button
               onClick={(e) =>
                 router.push(
-                  `/admin/balai/pelatihan/${row.getValue(
+                  `/admin/lemdiklat/pelatihan/${row.getValue(
                     "KodePelatihan"
                   )}/peserta-pelatihan/${row.getValue("IdPelatihan")}`
                 )
