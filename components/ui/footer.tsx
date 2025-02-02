@@ -5,16 +5,16 @@ import LogoFooter from "./logo-footer";
 
 export default function Footer() {
   return (
-    <footer className="bg-white shadow-custom px-10 md:px-0">
+    <footer className="bg-gray-900 shadow-custom px-10 md:px-0">
       <div className="max-w-7xl mx-auto ">
         {/* Top area: Blocks */}
-        <div className="grid sm:grid-cols-12 gap-8 py-8 md:py-12 border-t border-t-[#979797]">
+        <div className="grid sm:grid-cols-12 gap-8 py-8 md:py-12 border-t border-t-gray-200">
           {/* 1st block */}
           <div className="sm:col-span-12 lg:col-span-3">
             <div className="mb-4">
               <LogoFooter />
             </div>
-            <p className="text-[#979797] text-sm leading-normal transition duration-150 ease-in-out">
+            <p className="text-gray-200 text-sm leading-normal transition duration-150 ease-in-out">
               Aplikasi Pelatihan serta sertifikasi KP yang dikembangkan oleh
               BPPSDMKP untuk menjaring masyarakat KP, aparatur KP, dll untuk
               meningkatkan kompetensi di bidang KP.
@@ -22,12 +22,12 @@ export default function Footer() {
           </div>
 
           <div className="sm:col-span-6 md:col-span-3 lg:col-span-2">
-            <h6 className="text-blue-500 font-bold mb-2">Layanan</h6>
+            <h6 className="text-gray-300 font-bold mb-2">Layanan</h6>
             <ul className="text-sm">
               <li className="mb-2">
                 <a
                   href="#0"
-                  className="text-[#979797] hover:text-gray-400 transition duration-150 ease-in-out"
+                  className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                 >
                   Pelatihan Masyarakat
                 </a>
@@ -35,7 +35,7 @@ export default function Footer() {
               <li className="mb-2">
                 <a
                   href="#0"
-                  className="text-[#979797] hover:text-gray-400 transition duration-150 ease-in-out"
+                  className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                 >
                   Pelatihan Aparatur
                 </a>
@@ -43,7 +43,7 @@ export default function Footer() {
               <li className="mb-2">
                 <a
                   href="#0"
-                  className="text-[#979797] hover:text-gray-400 transition duration-150 ease-in-out"
+                  className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                 >
                   Sertifikasi atau Uji Kompetensi
                 </a>
@@ -53,12 +53,12 @@ export default function Footer() {
 
           {/* 3rd block */}
           <div className="sm:col-span-6 md:col-span-3 lg:col-span-2">
-            <h6 className="text-blue-500 font-bold mb-2">Program Pelatihan</h6>
+            <h6 className="text-gray-300 font-bold mb-2">Program Pelatihan</h6>
             <ul className="text-sm">
               <li className="mb-2">
                 <a
                   href="/layanan/program/perikanan"
-                  className="text-[#979797] hover:text-gray-400 transition duration-150 ease-in-out"
+                  className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                 >
                   Perikanan
                 </a>
@@ -66,7 +66,7 @@ export default function Footer() {
               <li className="mb-2">
                 <a
                   href="/layanan/program/akp"
-                  className="text-[#979797] hover:text-gray-400 transition duration-150 ease-in-out"
+                  className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                 >
                   Awak Kapal Perikanan
                 </a>
@@ -74,7 +74,7 @@ export default function Footer() {
               <li className="mb-2">
                 <a
                   href="/layanan/program/kelautan"
-                  className="text-[#979797] hover:text-gray-400 transition duration-150 ease-in-out"
+                  className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                 >
                   Kelautan
                 </a>
@@ -84,14 +84,14 @@ export default function Footer() {
 
           {/* 2nd block */}
           <div className="sm:col-span-6 md:col-span-3 lg:col-span-2">
-            <h6 className="text-blue-500 font-bold mb-2">
+            <h6 className="text-gray-300 font-bold mb-2">
               Balai Pelatihan dan Sertifikasi
             </h6>
             <ul className="text-sm">
               <li className="mb-2">
                 <a
                   href="https://ppid.sipelatihaksi.com/"
-                  className="text-[#979797] hover:text-gray-400 transition duration-150 ease-in-out"
+                  className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                 >
                   BPPP Medan
                 </a>
@@ -99,7 +99,7 @@ export default function Footer() {
               <li className="mb-2">
                 <a
                   href="https://sites.google.com/view/ppidbppakkp"
-                  className="text-[#979797] hover:text-gray-400 transition duration-150 ease-in-out"
+                  className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                 >
                   BDA Sukamandi
                 </a>
@@ -107,7 +107,7 @@ export default function Footer() {
               <li className="mb-2">
                 <a
                   href="https://bppptegal.id/tentang-kami"
-                  className="text-[#979797] hover:text-gray-400 transition duration-150 ease-in-out"
+                  className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                 >
                   BPPP Tegal
                 </a>
@@ -115,7 +115,7 @@ export default function Footer() {
               <li className="mb-2">
                 <a
                   href="https://www.bpppbanyuwangi.com/"
-                  className="text-[#979797] hover:text-gray-400 transition duration-150 ease-in-out"
+                  className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                 >
                   BPPP Banyuwangi
                 </a>
@@ -123,7 +123,7 @@ export default function Footer() {
               <li className="mb-2">
                 <a
                   href="https://bp3ambon.kkp.go.id/"
-                  className="text-[#979797] hover:text-gray-400 transition duration-150 ease-in-out"
+                  className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                 >
                   BPPP Ambon
                 </a>
@@ -131,7 +131,7 @@ export default function Footer() {
               <li className="mb-2">
                 <a
                   href="https://bpppbitung.id/#"
-                  className="text-[#979797] hover:text-gray-400 transition duration-150 ease-in-out"
+                  className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                 >
                   BPPP Bitung
                 </a>
@@ -141,12 +141,12 @@ export default function Footer() {
 
           {/* 4th block */}
           <div className="sm:col-span-6 md:col-span-3 lg:col-span-2">
-            <h6 className="text-blue-500 font-bold mb-2">Lembaga/Instansi</h6>
+            <h6 className="text-gray-300 font-bold mb-2">Lembaga/Instansi</h6>
             <ul className="text-sm">
               <li className="mb-2">
                 <a
                   href="/"
-                  className="text-[#979797] hover:text-gray-400 transition duration-150 ease-in-out"
+                  className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                 >
                   BPPSDM KP
                 </a>
@@ -154,7 +154,7 @@ export default function Footer() {
               <li className="mb-2">
                 <a
                   href="/"
-                  className="text-[#979797] hover:text-gray-400 transition duration-150 ease-in-out"
+                  className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                 >
                   Pusat Pelatihan KP
                 </a>
@@ -162,7 +162,7 @@ export default function Footer() {
               <li className="mb-2">
                 <a
                   href="/lembaga/dpkakp"
-                  className="text-[#979797] hover:text-gray-400 transition duration-150 ease-in-out"
+                  className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                 >
                   DPKAKP
                 </a>
@@ -170,7 +170,7 @@ export default function Footer() {
               <li className="mb-2">
                 <a
                   href="/lembaga/komite-approval"
-                  className="text-[#979797] hover:text-gray-400 transition duration-150 ease-in-out"
+                  className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                 >
                   Komite Approval
                 </a>
@@ -178,7 +178,7 @@ export default function Footer() {
               <li className="mb-2">
                 <a
                   href="/lembaga/p2mkp"
-                  className="text-[#979797] hover:text-gray-400 transition duration-150 ease-in-out"
+                  className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                 >
                   P2MKP
                 </a>
@@ -190,7 +190,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom area */}
-        <div className="md:flex md:items-center md:justify-between py-4 md:py-8 border-t border-[#979797]">
+        <div className="md:flex md:items-center md:justify-between py-4 md:py-8 border-t border-gray-200">
           {/* Social as */}
           <ul className="flex mb-4 md:order-1 md:ml-4 md:mb-0">
             <li>
@@ -241,7 +241,7 @@ export default function Footer() {
           </ul>
 
           {/* Copyrights note */}
-          <div className="text-sm text-[#979797] mr-4">
+          <div className="text-sm text-gray-200 mr-4">
             &copy; BPPSDM KP. All rights reserved.
           </div>
         </div>

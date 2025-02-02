@@ -78,18 +78,45 @@ function page() {
     React.useState(false);
 
   const handleRegistration = () => {
-    if (data!.StatusApproval == "Selesai") {
-      Toast.fire({
-        icon: "error",
-        title: `Yah pelatihan ini sudah berakhir, cari pelatihan lainnya sobat ELAUT!`,
-      });
-    } else {
-      if (Cookies.get("XSRF081")) {
-        setIsRegistrasi(true);
+    if (Cookies.get('status')?.includes('Politeknik')) {
+      if (data!.PenyelenggaraPelatihan.includes('Politeknik') && Cookies.get('status') != data!.PenyelenggaraPelatihan) {
+        Toast.fire({
+          icon: "error",
+          title: 'Oopsss!',
+          text: `Sobat E-LAUT tidak dapat mendaftar pelatihan ini karena bukan dari ${data!.PenyelenggaraPelatihan}`,
+        });
       } else {
-        setIsOpenRegistrationCommand(true);
+        if (data!.StatusApproval == "Selesai") {
+          Toast.fire({
+            icon: "error",
+            title: 'Oopsss!',
+            text: `Yah pelatihan ini sudah berakhir, cari pelatihan lainnya sobat ELAUT!`,
+          });
+        } else {
+          if (Cookies.get("XSRF081")) {
+            setIsRegistrasi(true);
+          } else {
+            setIsOpenRegistrationCommand(true);
+          }
+        }
+      }
+    } else {
+      if (data!.StatusApproval == "Selesai") {
+        Toast.fire({
+          icon: "error",
+          title: 'Oopsss!',
+          text: `Yah pelatihan ini sudah berakhir, cari pelatihan lainnya sobat ELAUT!`,
+        });
+      } else {
+        if (Cookies.get("XSRF081")) {
+          setIsRegistrasi(true);
+        } else {
+          setIsOpenRegistrationCommand(true);
+        }
       }
     }
+
+
   };
 
   const jenisProgram = Cookies.get("JenisProgram");

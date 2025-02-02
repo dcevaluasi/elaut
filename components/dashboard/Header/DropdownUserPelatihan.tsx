@@ -31,6 +31,7 @@ const DropdownUserPelatihan = ({ top }: { top: boolean }) => {
         }
       );
       console.log({ response });
+      Cookies.set('status', response.data!.Pekerjaan)
       setUserDetail(response.data);
     } catch (error) {
       console.error("Error posting training data:", error);
@@ -78,10 +79,12 @@ const DropdownUserPelatihan = ({ top }: { top: boolean }) => {
     Cookies.remove("XSRF081");
     Cookies.remove("XSRF082");
     Cookies.remove("XSRF083");
+    Cookies.remove("status");
     Cookies.remove("isManningAgent");
     Toast.fire({
       icon: "success",
-      title: `Berhasil logout dari dashboard!`,
+      title: 'Yeayyy!',
+      text: `Berhasil logout dari dashboard!`,
     });
     router.push("/");
   };
@@ -122,18 +125,17 @@ const DropdownUserPelatihan = ({ top }: { top: boolean }) => {
       >
         <span className="h-14 w-14 rounded-full">
           <Image
+            src={userDetail?.Foto! == 'https://elaut-bppsdm.kkp.go.id/api-elaut//public/static/profile/fotoProfile/' ? "/dummies/profile.jpg" : userDetail?.Foto!}
+            alt={"profile picture"}
             width={0}
             height={0}
-            src={"/dummies/profile.jpg"}
-            alt="User"
-            className="rounded-full !object-cover w-14 h-14"
+            className="w-14 h-14 rounded-full object-cover"
           />
         </span>
 
         <HiMiniChevronDown
-          className={`${
-            !top ? "text-gray-600 hover:text-gray-900 hover:scale-105" : ""
-          } block text-lg font-medium text-gray-600 hover:text-white hover:scale-105`}
+          className={`${!top ? "text-gray-600 hover:text-gray-900 hover:scale-105" : ""
+            } block text-lg font-medium text-gray-600 hover:text-white hover:scale-105`}
         />
       </Link>
 
@@ -143,9 +145,8 @@ const DropdownUserPelatihan = ({ top }: { top: boolean }) => {
         onMouseLeave={() => setDropdownOpen(false)}
         onFocus={() => setDropdownOpen(true)}
         onBlur={() => setDropdownOpen(false)}
-        className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default   ${
-          dropdownOpen === true ? "block" : "hidden"
-        }`}
+        className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default   ${dropdownOpen === true ? "block" : "hidden"
+          }`}
       >
         <ul className="flex flex-col gap-5 border-b border-stroke px-6 pb-7.5 pt-5">
           <li className="text-[#000] w-full text-center border-b px-0 mx-0 pb-4 font-semibold border-b-gray-200 flex flex-col">
@@ -186,7 +187,7 @@ const DropdownUserPelatihan = ({ top }: { top: boolean }) => {
               Dashboard
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link
               href="#"
               className="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
@@ -206,7 +207,7 @@ const DropdownUserPelatihan = ({ top }: { top: boolean }) => {
               </svg>
               History Pelatihan
             </Link>
-          </li>
+          </li> */}
           <li>
             <Link
               href="/dashboard/edit-profile"

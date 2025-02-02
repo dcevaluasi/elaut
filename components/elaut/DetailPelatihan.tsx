@@ -28,13 +28,35 @@ const DetailPelatihan: React.FC<DetailPelatihanProps> = ({ data, isRegistrasi, h
                 <div className="flex justify-end relative w-full max-w-6xl">
                     <div className="bg-blue-500 shadow-custom w-fit rounded-3xl absolute pb-14 -left-10">
                         <div className="flex flex-col gap-2">
-                            <Image
-                                className="w-[400px] h-[400px] rounded-3xl object-cover shadow-custom m-2 -mt-16"
-                                alt=""
-                                src={replaceUrl(data.FotoPelatihan)}
-                                width={0}
-                                height={0}
-                            />
+                            <div className="m-2 -mt-16 relative w-[400px] h-[400px]">
+                                <Image
+                                    className="w-[400px] h-[400px] rounded-3xl object-cover shadow-custom "
+                                    alt=""
+                                    src={replaceUrl(data.FotoPelatihan)}
+                                    width={0}
+                                    height={0}
+                                />
+                                <div className="flex flex-row gap-2 absolute text-sm top-3 z-50 right-3">
+                                    {
+                                        data!.PenyelenggaraPelatihan.includes('Politeknik') && <span
+                                            className="w-fit block text-center font-semibold px-4 py-2 bg-blue-600 rounded-3xl text-white "
+                                        >
+                                            Khusus Taruna KP
+                                        </span>
+                                    }
+
+                                    {
+                                        data!.PenyelenggaraPelatihan.includes('Politeknik') && <span
+                                            className="w-fit block text-center font-semibold px-4 py-2 bg-blue-600 rounded-3xl text-white "
+                                        >
+                                            Telah Berakhir
+                                        </span>
+                                    }
+                                </div>
+
+
+                            </div>
+
 
                             <div className="flex flex-col px-5 py-2 gap-3 w-[350px]">
                                 <h1 className="text-3xl text-white font-calsans leading-[100%]">
@@ -62,7 +84,7 @@ const DetailPelatihan: React.FC<DetailPelatihanProps> = ({ data, isRegistrasi, h
                                 </p>
                             </div>
 
-                            <Button className="bg-[#625BF9] text-white font-bold w-fit rounded-full text-xl px-7 py-7">
+                            <Button className="bg-blue-600 text-white font-bold w-fit rounded-full text-xl px-7 py-7">
                                 {generateTanggalPelatihan(data.TanggalMulaiPelatihan)} - {generateTanggalPelatihan(data.TanggalBerakhirPelatihan)}
                             </Button>
 
@@ -77,19 +99,26 @@ const DetailPelatihan: React.FC<DetailPelatihanProps> = ({ data, isRegistrasi, h
                                 !Cookies.get("XSRF081") ? (
                                     <Button
                                         onClick={() => router.replace("/registrasi")}
-                                        className="bg-[#625BF9] text-white font-extrabold w-fit rounded-full text-2xl px-24 py-7 -mt-8"
+                                        className="bg-blue-600 text-white font-extrabold w-fit rounded-full text-2xl px-24 py-7 -mt-8"
                                     >
                                         DAFTAR
                                     </Button>
                                 ) : (
                                     <Button
                                         onClick={handleRegistration}
-                                        className="bg-[#625BF9] text-white font-extrabold w-fit rounded-full text-2xl px-24 py-7 -mt-8"
+                                        className="bg-blue-600 text-white font-extrabold w-fit rounded-full text-2xl px-24 py-7 -mt-8"
                                     >
                                         DAFTAR
                                     </Button>
                                 )
                             )}
+
+                            <Button
+                                onClick={handleRegistration}
+                                className="bg-blue-600 text-white font-extrabold w-fit rounded-full text-2xl px-24 py-7 -mt-8"
+                            >
+                                DAFTAR
+                            </Button>
                         </div>
 
                         {isRegistrasi && (

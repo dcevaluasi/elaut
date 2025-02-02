@@ -154,7 +154,7 @@ export default function UserDocuments({ user }: { user: User | null }) {
             <div className="flex flex-col items-center bg-white shadow-custom rounded-md py-6 px-12 max-w-4xl">
               <div className="relative -mt-28">
                 <Image
-                  src={"/dummies/profile.jpg"}
+                  src={user?.Foto! == 'https://elaut-bppsdm.kkp.go.id/api-elaut//public/static/profile/fotoProfile/' ? "/dummies/profile.jpg" : user?.Foto!}
                   alt={"profile picture"}
                   width={0}
                   height={0}
@@ -168,10 +168,13 @@ export default function UserDocuments({ user }: { user: User | null }) {
                 </Link>
               </div>
 
-              <div className="mt-4">
+              <div className="mt-4 flex flex-col items-center justify-center">
                 <h2 className="text-2xl font-calsans text-black">
                   {user?.Nama}
                 </h2>
+                {user?.KusukaUsers == 'yes' && <p className="text-sm text-blue-500 bg-blue-100 px-3 py-1 my-2 rounded-full w-fit text-center">
+                  Anggota/Anak Pelaku Utama
+                </p>}
                 <p className="text-base text-gray-600">
                   {user?.Nik} • {user?.Kewarganegaraan} • {user?.NoTelpon} •{" "}
                   {user?.StatusMenikah}
@@ -291,7 +294,7 @@ export default function UserDocuments({ user }: { user: User | null }) {
                           target="_blank"
                           className="text-sm text-gray-600"
                         >
-                          -
+                          Belum ada file yang diupload, ke menu pengaturan akun untuk mengunggah
                         </Link>
                       )}
                     </div>
@@ -304,16 +307,7 @@ export default function UserDocuments({ user }: { user: User | null }) {
                     >
                       Kembali
                     </button>
-                    <button
-                      className="text-black rounded-md w-full border border-black h-10 md:w-[200px] flex items-center justify-center"
-                      onClick={() =>
-                        router.push(`${tabMenus[indexMenuSelected].name}`)
-                      }
-                    >
-                      {tabMenus[indexMenuSelected].available
-                        ? "Update File"
-                        : "Unggah File"}
-                    </button>
+
                   </div>
                 </div>
               </div>
@@ -340,8 +334,11 @@ const UserInfoItem = ({
         <div className="flex items-center justify-start gap-2 bg-white shadow-custom rounded-md w-full h-fit md:h-24 px-3 py-3 md:py-1">
           <Icon className="text-lg" />
           <div className="flex flex-col gap-0">
+
             <p className="text-xs text-black text-left font-semibold">
-              {title}
+              {
+                value.includes('Politeknik') ? 'Satuan Pendidikan' : title
+              }
             </p>
             <p className="text-sm cursor-pointer hover:underline duration-800 text-gray-600 text-left font-normal leading-[105%]">
               {value}
@@ -382,7 +379,7 @@ const TabMenuItem = ({
           </p>
         ) : (
           <p className="text-xs text-gray-600 leading-[115%]">
-            Belum ada file yang diupload, klik untuk mengupload dokumen
+            Belum ada file yang diupload, ke menu pengaturan akun untuk mengunggah
           </p>
         )}
       </div>

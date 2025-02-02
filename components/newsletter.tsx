@@ -49,12 +49,14 @@ export default function Newsletter() {
         if (isAxiosError(error)) {
           Toast.fire({
             icon: "error",
-            title: error.response?.data?.Pesan || "An error occurred",
+            title: 'Oopsss!',
+            text: error.response?.data?.Pesan || "An error occurred",
           });
         } else {
           Toast.fire({
             icon: "error",
-            title: "An unknown error occurred",
+            title: 'Oopsss!',
+            text: "An unknown error occurred",
           });
         }
         setNoRegistrasi("");
@@ -235,7 +237,7 @@ export default function Newsletter() {
               ) : <p className="text-sm text-[#979797] ">
                 *Masukkan nomor registrasi kamu
               </p>}
-              <Button onClick={() => handleCekValiditasSertifikat()} type="button" className='bg-[#625BF9] text-white font-calsans w-full md:w-fit rounded-full text-2xl md:px-24 py-7  mt-2'>
+              <Button onClick={() => handleCekValiditasSertifikat()} type="button" className='bg-blue-600 hover:bg-blue-700 text-white font-calsans w-full md:w-fit rounded-full text-2xl md:px-24 py-7  mt-2'>
                 CEK SERTIFIKAT
 
               </Button>

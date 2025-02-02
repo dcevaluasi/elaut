@@ -93,7 +93,7 @@ function ListProgram({
 const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
   return (
     <div className="shadow-custom flex flex-col relative w-[380px] h-fit rounded-3xl bg-white p-6">
-      <div className="w-full h-[200px]">
+      <div className="w-full h-[200px] relative">
         <Image
           className="w-full !h-[200px] rounded-2xl object-cover shadow-custom mb-2"
           alt=""
@@ -101,6 +101,14 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
           width={0}
           height={0}
         />
+        {
+          pelatihan.PenyelenggaraPelatihan.includes('Politeknik') && <span
+            className="w-fit block text-center font-semibold px-4 py-2 bg-blue-600 rounded-3xl text-white absolute text-xs top-3 z-50 right-3"
+          >
+            Khusus Taruna KP
+          </span>
+        }
+
       </div>
 
       {/* Header */}
@@ -128,33 +136,36 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
       />
 
       {/* Contact Info */}
-      <div className="flex justify-between text-sm text-blue-500 mb-4">
-        <div>
-          <p className="font-semibold">Layanan {pelatihan.PenyelenggaraPelatihan}</p>
-          <p>62887972983</p>
+      {
+        pelatihan!.PenyelenggaraPelatihan.includes('Politeknik') ? <></> : <div className="flex justify-between text-sm text-blue-500 mb-4">
+          <div>
+            <p className="font-semibold">Layanan {pelatihan.PenyelenggaraPelatihan}</p>
+            <p>62887972983</p>
+          </div>
+          <div>
+            <p className="font-semibold">PTSP BLU</p>
+            <p>62889812833</p>
+          </div>
         </div>
-        <div>
-          <p className="font-semibold">PTSP BLU</p>
-          <p>62889812833</p>
-        </div>
-      </div>
+      }
+
 
       {/* Pricing */}
       <div className=" mb-4">
-        <p className="text-blue-500 font-bold text-3xl font-calsans">
+        <p className="text-blue-500 text-3xl font-calsans">
           {pelatihan.HargaPelatihan === 0
             ? "Gratis"
             : `${formatToRupiah(pelatihan.HargaPelatihan)}`}
         </p>
         <p className="text-sm font-normal text-blue-500">
-          * Tidak termasuk akomodasi & konsumsi <br />* Minimal 10 Peserta
+          * {pelatihan!.PenyelenggaraPelatihan.includes('Politeknik') ? 'Diperuntukkan untuk taruna Poltek KP dan SUPM' : 'Tidak termasuk akomodasi & konsumsi'} <br />* Kuota Kelas {pelatihan!.KoutaPelatihan} Peserta
         </p>
       </div>
 
       {/* Button */}
       <Link
         href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${pelatihan?.KodePelatihan}/${pelatihan?.IdPelatihan}`}
-        className="w-full block text-center font-semibold px-6 py-3 bg-[#625BF9] rounded-3xl text-white"
+        className="w-full block text-center font-semibold px-6 py-3 bg-blue-600 rounded-3xl text-white"
       >
         Lihat Detail
       </Link>

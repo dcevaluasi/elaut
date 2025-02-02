@@ -22,6 +22,7 @@ import { User } from "@/types/user";
 import { HashLoader } from "react-spinners";
 import Image from "next/image";
 import { ALLOWED_EXTENSIONS, MAX_FILE_SIZE, MIN_FILE_SIZE } from "@/utils/file";
+import { SATUAN_PENDIDIKAN, SATUAN_PENDIDIKAN_KEAHLIAN } from "@/constants/pelatihan";
 
 function FormCompleteProfile() {
   const router = useRouter();
@@ -40,6 +41,7 @@ function FormCompleteProfile() {
   const [tanggalLahir, setTanggalLahir] = React.useState<string>("");
   const [tempatLahir, setTempatLahir] = React.useState("");
   const [jenisKelamin, setJenisKelamin] = React.useState("");
+  const [agama, setAgama] = React.useState("");
   const [pekerjaan, setPekerjaan] = React.useState("");
   const [golonganDarah, setGolonganDarah] = React.useState("");
   const [statusMenikah, setStatusMenikah] = React.useState("");
@@ -131,9 +133,12 @@ function FormCompleteProfile() {
       setName(response.data?.Nama);
       setEmail(response.data?.Email);
       setTanggalLahir(response.data?.TanggalLahir);
+      setAlamat(response.data?.Alamat)
       setJenisKelamin(response.data?.JenisKelamin)
       setGolonganDarah(response.data?.GolonganDarah)
       setIbuKandung(response.data?.IbuKandung);
+      setAgama(response.data?.Agama);
+      setPekerjaan(response.data?.Pekerjaan);
       setStatusMenikah(response.data?.StatusMenikah);
       setKewarganegaraan(response.data?.Kewarganegaraan);
       setPendidikanTerakhir(response.data?.PendidikanTerakhir);
@@ -182,6 +187,7 @@ function FormCompleteProfile() {
     formData.append("Nik", nik);
     formData.append("NoTelpon", phoneNumber);
     formData.append("Email", email);
+    formData.append("Agama", agama);
     formData.append("TanggalLahir", tanggalLahir);
     formData.append("TempatLahir", tempatLahir);
     formData.append("JenisKelamin", jenisKelamin);
@@ -191,6 +197,7 @@ function FormCompleteProfile() {
     formData.append("PendidikanTerakhir", pendidikanTerakhir);
     formData.append("Kewarganegaraan", kewarganegaraan);
     formData.append("IbuKandung", ibuKandung);
+    formData.append("Alamat", alamat);
     formData.append("NegaraTujuanBekerja", negaraTujuanBekerja);
     formData.append("Fotos", foto);
     formData.append("Ktps", ktp);
@@ -212,7 +219,8 @@ function FormCompleteProfile() {
       console.log({ response });
       Toast.fire({
         icon: "success",
-        title: `Berhasil mengupdate data profile-mu!`,
+        title: 'Yeayyy!',
+        text: `Berhasil mengupdate data profile-mu!`,
       });
       setIsLoadingCompleteProfile(false);
       router.push("/dashboard");
@@ -229,6 +237,8 @@ function FormCompleteProfile() {
   const [formTab, setFormTab] = React.useState("FormDataUtamaUser");
   const [indexFormTab, setIndexFormTab] = React.useState(0);
 
+  const [selectedStatus, setSelectedStatus] = React.useState<string>('')
+
   console.log({ indexFormTab });
   console.log({ formTab });
 
@@ -239,16 +249,16 @@ function FormCompleteProfile() {
         alt={"Form Complete Profile"}
         width={0}
         height={0}
-        className="fixed -z-10 w-[450px] -bottom-10 left-10 animate-float"
+        className="fixed -z-10 w-[450px] hidden md:block -bottom-10 left-10 animate-float"
       />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-8">
         <form className="pt-32 pb-12 md:pt-40 md:pb-20">
           {/* Page header */}
           <div className="max-w-3xl mx-auto text-center pb-0 md:pb-0">
-            <h1 className="font-bold text-4xl leading-[100%] md:text-4xl text-black font-calsans">
+            <h1 className=" text-4xl leading-[100%] md:text-4xl text-black font-calsans">
               Update dan Lengkapi Data <br />  <span className="bg-clip-text text-transparent bg-gradient-to-r leading-none pt-0 from-blue-500 to-teal-400">
-                Akun Pengguna ELAUT
+                Akun Pengguna E-LAUT
               </span>
             </h1>
             <p className="text-base text-gray-600 max-w-4x mt-4">
@@ -259,25 +269,25 @@ function FormCompleteProfile() {
 
           {/* Form */}
           {userDetail != null && (
-            <div className="max-w-sm mx-auto mt-5">
+            <div className="max-w-md mx-auto mt-5">
               <div className="flex items-center justify-between">
                 {indexFormTab == 0 ? (
-                  <h2 className="font-bold text-2xl leading-[100%] my-6 md:text-2xl text-black font-calsans flex items-center gap-1">
+                  <h2 className=" text-2xl leading-[100%] my-6 md:text-2xl text-black font-calsans flex items-center gap-1">
                     <TbUserEdit />
                     <span className="mt-2">Data Pribadi</span>
                   </h2>
                 ) : indexFormTab == 1 ? (
-                  <h2 className="font-bold text-2xl leading-[100%] my-6 md:text-2xl text-black font-calsans flex items-center gap-1">
+                  <h2 className=" text-2xl leading-[100%] my-6 md:text-2xl text-black font-calsans flex items-center gap-1">
                     <TbMapPinSearch />
                     <span className="mt-2">Alamat Domisili</span>
                   </h2>
                 ) : indexFormTab == 2 ? (
-                  <h2 className="font-bold text-2xl leading-[100%] my-6 md:text-2xl text-black font-calsans flex items-center gap-1">
+                  <h2 className=" text-2xl leading-[100%] my-6 md:text-2xl text-black font-calsans flex items-center gap-1">
                     <MdWorkOutline />
-                    <span className="mt-1">Riwayat Pekerjaan</span>
+                    <span className="mt-1">Riwayat Pendidikan/Pekerjaan</span>
                   </h2>
                 ) : (
-                  <h2 className="font-bold text-2xl leading-[100%] my-6 md:text-2xl text-black font-calsans flex items-center gap-1">
+                  <h2 className=" text-2xl leading-[100%] my-6 md:text-2xl text-black font-calsans flex items-center gap-1">
                     <TbFileStack />
                     <span className="mt-2">Berkas dan Dokumen</span>
                   </h2>
@@ -444,6 +454,30 @@ function FormCompleteProfile() {
                         <SelectContent>
                           <SelectItem value="Laki - Laki">Laki - Laki</SelectItem>
                           <SelectItem value="Perempuan">Perempuan</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap -mx-3 mb-1">
+                    <div className="w-full px-3">
+                      <label className="block text-gray-800 text-sm font-medium mb-1" htmlFor="agama">
+                        Agama <span className="text-red-600">*</span>
+                      </label>
+                      <Select
+                        value={agama || undefined} // Ensure it's undefined if empty
+                        onValueChange={(value) => setAgama(value)}
+                      >
+                        <SelectTrigger className="w-full text-base py-6">
+                          <SelectValue placeholder="Pilih agama" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Islam">Islam</SelectItem>
+                          <SelectItem value="Kriten Protestan">Kristen Protestan</SelectItem>
+                          <SelectItem value="Kriten Katolik">Kristen Katolik</SelectItem>
+                          <SelectItem value="Hindu">Hindu</SelectItem>
+                          <SelectItem value="Buddha">Buddha</SelectItem>
+                          <SelectItem value="Konghucu">Konghucu</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -692,7 +726,7 @@ function FormCompleteProfile() {
                       <textarea
                         id="phone number"
                         rows={4}
-                        placeholder={userDetail!.Alamat}
+                        placeholder={alamat}
                         value={alamat}
                         onChange={(e) => setAlamat(e.target.value)}
                         className="form-input w-full text-black"
@@ -708,90 +742,174 @@ function FormCompleteProfile() {
                         className="block text-gray-800 text-sm font-medium mb-1"
                         htmlFor="email"
                       >
-                        Pekerjaan
-                        <span className="text-red-600">*</span> <br />
-                        <span className="text-gray-500">
-                          Jika tidak ada isi (-)
-                        </span>
+                        Status <span className="text-red-600">*</span>
                       </label>
-                      <input
-                        id="phone number"
-                        type="text"
-                        className="form-input w-full text-black"
-                        placeholder="Masukkan Nama Perusahaan/Tempat Kerja"
-                        required
-                      />
+                      <Select onValueChange={(value) => setSelectedStatus(value)}>
+                        <SelectTrigger className="w-full text-base py-6">
+                          <SelectValue placeholder="Pilih Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Masyarakat/Pelaku Utama/Pelaku Usaha">Masyarakat/Pelaku Utama/Pelaku Usaha</SelectItem>
+                          <SelectItem value="Taruna Satuan Pendidikan KP">
+                            Taruna Satuan Pendidikan KP
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label
-                        className="block text-gray-800 text-sm font-medium mb-1"
-                        htmlFor="email"
-                      >
-                        Nama Perusahaan Tempat Kerja/Kelompok{" "}
-                        <span className="text-red-600">*</span> <br />
-                        <span className="text-gray-500">
-                          Jika tidak ada isi (-)
-                        </span>
-                      </label>
-                      <input
-                        id="phone number"
-                        type="text"
-                        className="form-input w-full text-black"
-                        placeholder="Masukkan Nama Perusahaan/Tempat Kerja"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label
-                        className="block text-gray-800 text-sm font-medium mb-1"
-                        htmlFor="email"
-                      >
-                        Lokasi Perusahaan Tempat Kerja/Kelompok{" "}
-                        <span className="text-red-600">*</span> <br />
-                        <span className="text-gray-500">
-                          Jika tidak ada isi (-)
-                        </span>
-                      </label>
-                      <input
-                        id="phone number"
-                        type="text"
-                        className="form-input w-full text-black"
-                        placeholder="Masukkan Lokasi Perusahaan/Tempat Kerja"
-                        required
-                      />
-                    </div>
-                  </div>
+                  {
+                    selectedStatus == 'Masyarakat/Pelaku Utama/Pelaku Usaha' ? <>
+                      <div className="flex flex-wrap -mx-3 mb-1">
+                        <div className="w-full px-3">
+                          <label
+                            className="block text-gray-800 text-sm font-medium mb-1"
+                            htmlFor="email"
+                          >
+                            Pekerjaan
+                            <span className="text-red-600">*</span> <br />
+                            <span className="text-gray-500">
+                              Jika tidak ada isi (-)
+                            </span>
+                          </label>
+                          <input
+                            id="phone number"
+                            type="text"
+                            value={pekerjaan}
+                            onChange={(e) => setPekerjaan(e.target.value)}
+                            className="form-input w-full text-black"
+                            placeholder="Masukkan Nama Perusahaan/Tempat Kerja"
+                            required
+                          />
+                        </div>
+                      </div>
+                      {/* <div className="flex flex-wrap -mx-3 mb-1">
+                        <div className="w-full px-3">
+                          <label
+                            className="block text-gray-800 text-sm font-medium mb-1"
+                            htmlFor="email"
+                          >
+                            Nama Perusahaan Tempat Kerja/Kelompok{" "}
+                            <span className="text-red-600">*</span> <br />
+                            <span className="text-gray-500">
+                              Jika tidak ada isi (-)
+                            </span>
+                          </label>
+                          <input
+                            id="phone number"
+                            type="text"
 
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label
-                        className="block text-gray-800 text-sm font-medium mb-1"
-                        htmlFor="email"
-                      >
-                        Gaji <span className="text-red-600">*</span> <br />
-                        <span className="text-gray-500">
-                          Jika tidak ada isi (-)
-                        </span>
-                      </label>
-                      <input
-                        id="phone number"
-                        type="number"
-                        className="form-input w-full text-black"
-                        placeholder="Masukkan gaji"
-                        required
-                      />
-                    </div>
-                  </div>
+                            className="form-input w-full text-black"
+                            placeholder="Masukkan Nama Perusahaan/Tempat Kerja"
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap -mx-3 mb-1">
+                        <div className="w-full px-3">
+                          <label
+                            className="block text-gray-800 text-sm font-medium mb-1"
+                            htmlFor="email"
+                          >
+                            Lokasi Perusahaan Tempat Kerja/Kelompok{" "}
+                            <span className="text-red-600">*</span> <br />
+                            <span className="text-gray-500">
+                              Jika tidak ada isi (-)
+                            </span>
+                          </label>
+                          <input
+                            id="phone number"
+                            type="text"
+
+                            className="form-input w-full text-black"
+                            placeholder="Masukkan Lokasi Perusahaan/Tempat Kerja"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap -mx-3 mb-1">
+                        <div className="w-full px-3">
+                          <label
+                            className="block text-gray-800 text-sm font-medium mb-1"
+                            htmlFor="email"
+                          >
+                            Gaji <span className="text-red-600">*</span> <br />
+                            <span className="text-gray-500">
+                              Jika tidak ada isi (-)
+                            </span>
+                          </label>
+                          <input
+                            id="phone number"
+                            type="number"
+                           
+                            className="form-input w-full text-black"
+                            placeholder="Masukkan gaji"
+                            required
+                          />
+                        </div>
+                      </div> */}
+                    </> : selectedStatus == 'Taruna Satuan Pendidikan KP' ? <>
+                      <div className="flex flex-wrap -mx-3 mb-1">
+                        <div className="w-full px-3">
+                          <label
+                            className="block text-gray-800 text-sm font-medium mb-1"
+                            htmlFor="email"
+                          >
+                            Asal Satuan Pendidikan
+                            <span className="text-red-600">*</span> <br />
+                            <span className="text-gray-500">
+                              Jika tidak ada isi (-)
+                            </span>
+                          </label>
+                          <Select
+                            value={pekerjaan || undefined} // Ensure it's undefined if empty
+                            onValueChange={(value) => setPekerjaan(value)}
+                          >
+                            <SelectTrigger className="w-full text-base py-6">
+                              <SelectValue placeholder="Pilih satuan pendidikan" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {
+                                SATUAN_PENDIDIKAN_KEAHLIAN.map((satdik, index) => (
+                                  <SelectItem value={satdik.FullName} key={index}>{satdik.FullName}</SelectItem>
+                                ))
+                              }
+
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      {/* <div className="flex flex-wrap -mx-3 mb-1">
+                        <div className="w-full px-3">
+                          <label
+                            className="block text-gray-800 text-sm font-medium mb-1"
+                            htmlFor="email"
+                          >
+                            Jurusan/Program Studi{" "}
+                            <span className="text-red-600">*</span> <br />
+                            <span className="text-gray-500">
+                              Jika tidak ada isi (-)
+                            </span>
+                          </label>
+                          <input
+                            id="phone number"
+                            type="text"
+                            className="form-input w-full text-black"
+                            placeholder="Masukkan Nama Perusahaan/Tempat Kerja"
+                            required
+                          />
+                        </div>
+                      </div> */}
+
+                    </> : <></>
+                  }
+
                 </div>
                 <div className={`${indexFormTab == 3 ? "block" : "hidden"}`}>
                   <div className="flex flex-wrap -mx-3 mb-1">
                     <div className="w-full px-3 ">
                       <label className="block text-gray-800 text-sm font-medium mb-1" htmlFor="email">
-                        File Surat Kesehatan <span className="text-red-600">*</span>
+                        File Surat Kesehatan
                         <br />
                         <span className="text-gray-600">
                           Anda wajib mengisi dokumen ini karena mempunya surat kesehatan
@@ -809,7 +927,7 @@ function FormCompleteProfile() {
                   <div className="flex flex-wrap -mx-3 mb-1">
                     <div className="w-full px-3 ">
                       <label className="block text-gray-800 text-sm font-medium mb-1" htmlFor="email">
-                        Pas Foto <span className="text-red-600">*</span>
+                        Pas Foto
                       </label>
                       <input
                         type="file"
@@ -823,7 +941,7 @@ function FormCompleteProfile() {
                   <div className="flex flex-wrap -mx-3 mb-1">
                     <div className="w-full px-3 ">
                       <label className="block text-gray-800 text-sm font-medium mb-1" htmlFor="email">
-                        File KTP <span className="text-red-600">*</span>
+                        File KTP
                       </label>
                       <input
                         type="file"
@@ -837,7 +955,7 @@ function FormCompleteProfile() {
                   <div className="flex flex-wrap -mx-3 mb-1">
                     <div className="w-full px-3">
                       <label className="block text-gray-800 text-sm font-medium mb-1" htmlFor="email">
-                        File Kartu Keluarga <span className="text-red-600">*</span>
+                        File Kartu Keluarga
                       </label>
                       <input
                         type="file"
@@ -851,7 +969,7 @@ function FormCompleteProfile() {
                   <div className="flex flex-wrap -mx-3 mb-1">
                     <div className="w-full px-3 ">
                       <label className="block text-gray-800 text-sm font-medium mb-1" htmlFor="email">
-                        Ijazah <span className="text-red-600">*</span>
+                        Ijazah
                       </label>
                       <input
                         type="file"

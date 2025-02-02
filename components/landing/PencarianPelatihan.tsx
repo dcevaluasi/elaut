@@ -5,7 +5,7 @@ import React, { FormEvent } from "react";
 import Hero from "@/components/hero";
 import ListBPPP from "@/components/list-bppp";
 import Footer from "@/components/ui/footer";
-import { BALAI_PELATIHAN, BIDANG_PELATIHAN } from "@/constants/pelatihan";
+import { BALAI_PELATIHAN, BIDANG_PELATIHAN, SATUAN_PENDIDIKAN_KEAHLIAN } from "@/constants/pelatihan";
 import { elautBaseUrl } from "@/constants/urls";
 import { PelatihanMasyarakat } from "@/types/product";
 import { convertDate, createSlug, truncateText } from "@/utils";
@@ -61,7 +61,7 @@ function PencarianPelatihan() {
     }
     try {
       const response: AxiosResponse = await axios.get(
-        `${elautBaseUrl}/lemdik/getPelatihan?${jenisProgram}&penyelenggara_pelatihan=${selectedBalaiPelatihan}&bidang_pelatihan=${selectedBidangPelatihan}&jenis_sertifikat=${selectedJenisPelatihan}&tanggal_mulai_pelatihan=${bulanMulaiPelatihan}&program=${selectedProgramPelatihan}`
+        `${elautBaseUrl}/lemdik/getPelatihan?${jenisProgram}&penyelenggara_pelatihan=${selectedBalaiPelatihan}&bidang_pelatihan=${selectedBidangPelatihan}&jenis_pelatihan=${selectedJenisPelatihan}&tanggal_mulai_pelatihan=${bulanMulaiPelatihan}&program=${selectedProgramPelatihan}`
       );
       setLoading(false);
       setShowResult(true);
@@ -181,7 +181,7 @@ function PencarianPelatihan() {
     // Function to start fetching every 20 seconds
     const intervalId = setInterval(() => {
       handleFetchingPublicTrainingData();
-    }, 60000); // 1 minutes in milliseconds
+    }, 600000); // 1 minutes in milliseconds
 
     // Fetch data immediately on component mount
     handleFetchingPublicTrainingData().finally(() => setLoading(false));
@@ -199,10 +199,32 @@ function PencarianPelatihan() {
           <div className="col-span-2 sm:col-span-1 md:col-span-2 bg-white h-auto w-fit mx-auto items-center justify-center flex flex-col relative shadow-custom rounded-3xl overflow-hidden">
             <div className="group relative flex flex-col overflow-hidden justify-center rounded-3xl px-6  flex-grow group">
               <div className="flex flex-col gap-1  ">
-                <h3 className="text-lg font-semibold mt-5 -mb-3 block md:hidden">
+                <h3 className="text-lg font-calsans mt-5 -mb-3 ">
                   Filter dan Cari Pelatihan
                 </h3>
                 <div className="grid grid-cols-2 md:flex w-fit gap-2 py-5 items-center justify-center">
+                  <Select
+                    value={selectedJenisPelatihan}
+                    onValueChange={(value) => setSelectedJenisPelatihan(value)}
+                  >
+                    <SelectTrigger className="w-[180px] border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
+                      <div className="inline-flex gap-2 px-3 w-full text-sm items-center rounded-md bg-white p-1.5  cursor-pointer border border-gray-300">
+                        <HiViewGrid />
+                        {selectedJenisPelatihan == ""
+                          ? "Jenis Pelatihan"
+                          : selectedJenisPelatihan}
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent className="z-[10000]">
+                      <SelectGroup>
+                        <SelectLabel>Pilih Jenis Pelatihan</SelectLabel>
+                        <SelectItem value={"Aspirasi"}>Aspirasi</SelectItem>
+                        <SelectItem value={"PNBP/BLU"}>PNBP/BLU</SelectItem>
+                        <SelectItem value={"Reguler"}>Reguler</SelectItem>
+                        <SelectItem value={"Satuan Pendidikan"}>Satuan Pendidikan</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                   <Select
                     value={selectedBalaiPelatihan}
                     onValueChange={(value) => setSelectedBalaiPelatihan(value)}
@@ -211,19 +233,29 @@ function PencarianPelatihan() {
                       <div className="inline-flex gap-2 w-full px-3 text-sm items-center rounded-md bg-white p-1.5  cursor-pointer border border-gray-300">
                         <RiSchoolLine />
                         {selectedBalaiPelatihan == ""
-                          ? "Balai Pelatihan"
+                          ? "Lemdiklat KP"
                           : selectedBalaiPelatihan}
                       </div>
                     </SelectTrigger>
                     <SelectContent className="z-[10000]">
-                      <SelectGroup>
-                        <SelectLabel>Balai Pelatihan</SelectLabel>
-                        {BALAI_PELATIHAN.map((balaiPelatihan, index) => (
-                          <SelectItem key={index} value={balaiPelatihan.Name}>
-                            {balaiPelatihan.Name}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
+                      {
+                        selectedJenisPelatihan == 'Satuan Pendidikan' ? <SelectGroup>
+                          <SelectLabel>Satuan Pendidikan KP</SelectLabel>
+                          {SATUAN_PENDIDIKAN_KEAHLIAN.map((balaiPelatihan, index) => (
+                            <SelectItem key={index} value={balaiPelatihan.FullName}>
+                              {balaiPelatihan.FullName}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup> : <SelectGroup>
+                          <SelectLabel>Balai Pelatihan KP</SelectLabel>
+                          {BALAI_PELATIHAN.map((balaiPelatihan, index) => (
+                            <SelectItem key={index} value={balaiPelatihan.Name}>
+                              {balaiPelatihan.Name}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      }
+
                     </SelectContent>
                   </Select>
 
@@ -277,28 +309,7 @@ function PencarianPelatihan() {
                     </SelectContent>
                   </Select>
 
-                  <Select
-                    value={selectedJenisPelatihan}
-                    onValueChange={(value) => setSelectedJenisPelatihan(value)}
-                  >
-                    <SelectTrigger className="w-[180px] border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
-                      <div className="inline-flex gap-2 px-3 w-full text-sm items-center rounded-md bg-white p-1.5  cursor-pointer border border-gray-300">
-                        <HiViewGrid />
-                        {selectedJenisPelatihan == ""
-                          ? "Jenis Pelatihan"
-                          : selectedJenisPelatihan}
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent className="z-[10000]">
-                      <SelectGroup>
-                        <SelectLabel>Pilih Jenis Pelatihan</SelectLabel>
-                        <SelectItem value={"Aspirasi"}>Aspirasi</SelectItem>
-                        <SelectItem value={"PNBP/BLU"}>PNBP/BLU</SelectItem>
-                        <SelectItem value={"Reguler"}>Reguler</SelectItem>
-                        <SelectItem value={"Satuan Pendidikan KP"}>Satuan Pendidikan KP</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
+
 
                   <Select
                     value={selectedBulanPelatihan}
@@ -339,7 +350,7 @@ function PencarianPelatihan() {
                     selectedBulanPelatihan != "") && (
                       <div
                         onClick={() => handleClearFilter()}
-                        className="inline-flex gap-2 w-fit px-3 text-sm items-center rounded-md bg-white p-1.5 cursor-pointer border border-gray-300"
+                        className="inline-flex gap-2 w-full px-3 text-sm items-center rounded-md bg-white p-1.5 cursor-pointer border border-gray-300"
                       >
                         <MdClear />
                         Bersihkan Filter
@@ -349,17 +360,17 @@ function PencarianPelatihan() {
                   <div className="hidden md:flex w-full">
                     <Button
                       onClick={(e) => handleFetchingPublicTrainingData()}
-                      className="btn-sm text-sm w-full text-white bg-[#625BF9] cursor-pointer"
+                      className="btn-sm text-sm w-full text-white bg-blue-600 cursor-pointer"
                     >
                       <span className="mr-2">Cari</span>
                       <FiSearch />
                     </Button>
                   </div>
                 </div>
-                <div className="flex md:hidden w-full mb-5 -mt-2">
+                <div className="flex md:hidden w-fit mb-5 -mt-2">
                   <Button
                     onClick={(e) => handleFetchingPublicTrainingData()}
-                    className="btn-sm text-sm w-full text-white bg-blue-500 hover:bg-blue-600 cursor-pointer"
+                    className="btn-sm text-sm w-fit px-3 text-white bg-blue-500 hover:bg-blue-600 cursor-pointer"
                   >
                     <span className="mr-2">Cari</span>
                     <FiSearch />
@@ -416,7 +427,7 @@ function PencarianPelatihan() {
                       </div>
                     </div>
                   ) : (
-                    <div className="w-full grid grid-cols-1 gap-3 md:gap-0 justify-center md:grid-cols-3">
+                    <div className="w-full grid grid-cols-1 gap-3  justify-center md:grid-cols-3 ">
                       {data.map((pelatihan, index) => (
                         <CardPelatihan key={index} pelatihan={pelatihan} />
                       ))}
@@ -517,7 +528,7 @@ function PencarianPelatihan() {
 const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
   return (
     <div className="shadow-custom flex flex-col relative w-[380px] h-fit rounded-3xl bg-white p-6">
-      <div className="w-full h-[200px]">
+      <div className="w-full h-[200px] relative">
         <Image
           className="w-full !h-[200px] rounded-2xl object-cover shadow-custom mb-2"
           alt=""
@@ -525,6 +536,14 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
           width={0}
           height={0}
         />
+        {
+          pelatihan.PenyelenggaraPelatihan.includes('Politeknik') && <span
+            className="w-fit block text-center font-semibold px-4 py-2 bg-blue-600 rounded-3xl text-white absolute text-xs top-3 z-50 right-3"
+          >
+            Khusus Taruna KP
+          </span>
+        }
+
       </div>
 
       {/* Header */}
@@ -552,33 +571,36 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
       />
 
       {/* Contact Info */}
-      <div className="flex justify-between text-sm text-blue-500 mb-4">
-        <div>
-          <p className="font-semibold">Layanan {pelatihan.PenyelenggaraPelatihan}</p>
-          <p>62887972983</p>
+      {
+        pelatihan!.PenyelenggaraPelatihan.includes('Politeknik') ? <></> : <div className="flex justify-between text-sm text-blue-500 mb-4">
+          <div>
+            <p className="font-semibold">Layanan {pelatihan.PenyelenggaraPelatihan}</p>
+            <p>62887972983</p>
+          </div>
+          <div>
+            <p className="font-semibold">PTSP BLU</p>
+            <p>62889812833</p>
+          </div>
         </div>
-        <div>
-          <p className="font-semibold">PTSP BLU</p>
-          <p>62889812833</p>
-        </div>
-      </div>
+      }
+
 
       {/* Pricing */}
       <div className=" mb-4">
-        <p className="text-blue-500 font-bold text-3xl font-calsans">
+        <p className="text-blue-500 text-3xl font-calsans">
           {pelatihan.HargaPelatihan === 0
             ? "Gratis"
             : `${formatToRupiah(pelatihan.HargaPelatihan)}`}
         </p>
         <p className="text-sm font-normal text-blue-500">
-          * Tidak termasuk akomodasi & konsumsi <br />* Minimal 10 Peserta
+          * {pelatihan!.PenyelenggaraPelatihan.includes('Politeknik') ? 'Diperuntukkan untuk taruna Poltek KP dan SUPM' : 'Tidak termasuk akomodasi & konsumsi'} <br />* Kuota Kelas {pelatihan!.KoutaPelatihan} Peserta
         </p>
       </div>
 
       {/* Button */}
       <Link
         href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${pelatihan?.KodePelatihan}/${pelatihan?.IdPelatihan}`}
-        className="w-full block text-center font-semibold px-6 py-3 bg-[#625BF9] rounded-3xl text-white"
+        className="w-full block text-center font-semibold px-6 py-3 bg-blue-600 rounded-3xl text-white"
       >
         Lihat Detail
       </Link>

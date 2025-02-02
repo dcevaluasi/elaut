@@ -130,10 +130,10 @@ export default function HeroProgramPelatihan({ program }: { program: string }) {
 
   return (
     <div className="flex flex-col gap-2 w-full px-10 py-5">
-      <section className="relative h-[60vh] rounded-3xl  flex items-center ">
+      <section className="relative h-[70vh] rounded-3xl  flex items-center ">
         <Image
           src={images[imageIndex]}
-          className="absolute w-full h-[60vh] rounded-3xl  object-cover duration-1000  "
+          className="absolute w-full h-[70vh] rounded-3xl  object-cover duration-1000  "
           alt=""
           layout="fill"
           priority
@@ -141,7 +141,7 @@ export default function HeroProgramPelatihan({ program }: { program: string }) {
         />
 
         <div
-          className="absolute w-full h-[60vh] rounded-3xl bg-black bg-opacity-70  "
+          className="absolute w-full h-[70vh] rounded-3xl bg-black bg-opacity-70  "
           onClick={(e) => setSelectedProgram(null)}
         ></div>
 
@@ -183,9 +183,9 @@ export default function HeroProgramPelatihan({ program }: { program: string }) {
             {/* Section header */}
             <div className=" flex flex-col h- justify-center w-full items-center px-6 md:px-0 mt-3 text-center relative">
               <h1 className="font-bold text-blue-500 text-5xl md:text-6xl font-calsans leading-none w-full text-center">
-                {/* <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-500"> */}
-                {programPelatihan}{" "}
-                {/* </span> */}
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-teal-500 to-gray-200">
+                  {programPelatihan}{" "}
+                </span>
               </h1>
               {program == "akp" ? (
                 <p className="text-gray-200 leading-none text-center max-w-3xl w-full text-base md:text-lg mx-auto">

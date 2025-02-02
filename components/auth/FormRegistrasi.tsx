@@ -81,7 +81,8 @@ function FormRegistrasi() {
       if (!regex.test(password)) {
         Toast.fire({
           icon: "error",
-          title: message,
+          title: 'Oopsss!',
+          text: message,
         });
         return false;
       }
@@ -90,8 +91,10 @@ function FormRegistrasi() {
     return true;
   };
 
+  const [isHandlingCekKUSUKA, setIsHandlingCekKUSUKA] = React.useState<boolean>(false)
   const handleCheckingNoKusuka = async (e: any) => {
     e.preventDefault();
+    setIsHandlingCekKUSUKA(true)
     if (validateIsDangerousChars(noKusuka)) {
       Toast.fire({
         icon: "error",
@@ -110,6 +113,7 @@ function FormRegistrasi() {
             text: `Internal server error, token tidak memiliki akses!`,
           });
           setOpenInfoKusuka(false);
+          setIsHandlingCekKUSUKA(false)
         }
 
         if (Array.isArray(response.data.data) && response.data.data.length > 0) {
@@ -121,13 +125,16 @@ function FormRegistrasi() {
           setNik(data.NomorKUSUKA);
           setPhoneNumber("");
           setOpenInfoKusuka(true);
+          setIsHandlingCekKUSUKA(false)
         } else {
           console.log({ response });
           setOpenInfoKusuka(true);
           setIsKusukaUser(false);
+          setIsHandlingCekKUSUKA(false)
         }
       } catch (error: any) {
         setOpenInfoKusuka(false);
+        setIsHandlingCekKUSUKA(false)
         setIsKusukaUser(false);
         Toast.fire({
           icon: "error",
@@ -144,6 +151,7 @@ function FormRegistrasi() {
           console.error("Error message:", error.message);
         }
         console.error("Error config:", error.config);
+
       }
     }
 
@@ -177,7 +185,8 @@ function FormRegistrasi() {
       if (name == "" || nik == "" || phoneNumber == "" || password == "") {
         Toast.fire({
           icon: "error",
-          title: `Tolong lengkapi data registrasi!`,
+          title: 'Oopsss!',
+          text: `Tolong lengkapi data registrasi!`,
         });
         setIsInputError(true);
       } else {
@@ -217,7 +226,8 @@ function FormRegistrasi() {
 
                 Toast.fire({
                   icon: "success",
-                  title: `Berhasil melakukan registrasi akun, silahkan untuk login terlebih dahulu!`,
+                  title: 'Yeayyy!',
+                  text: `Berhasil melakukan registrasi akun, silahkan untuk login terlebih dahulu!`,
                 });
                 router.push("/login");
               } catch (error: any) {
@@ -230,12 +240,14 @@ function FormRegistrasi() {
                   const errorMsg = error.response.data.Message;
                   Toast.fire({
                     icon: "error",
-                    title: `Gagal melakukan registrasi akun, ${errorMsg}!`,
+                    title: 'Oopsss!',
+                    text: `Gagal melakukan registrasi akun, ${errorMsg}!`,
                   });
                 } else {
                   Toast.fire({
                     icon: "error",
-                    title: `Gagal melakukan registrasi akun. Terjadi kesalahan tidak diketahui.`,
+                    title: 'Oopsss!',
+                    text: `Gagal melakukan registrasi akun. Terjadi kesalahan tidak diketahui.`,
                   });
                 }
               }
@@ -280,7 +292,8 @@ function FormRegistrasi() {
       ) {
         Toast.fire({
           icon: "error",
-          title: `Tolong lengkapi data registrasi!`,
+          title: 'Oopsss!',
+          text: `Tolong lengkapi data registrasi!`,
         });
         setIsInputError(true);
       } else {
@@ -320,7 +333,8 @@ function FormRegistrasi() {
 
                 Toast.fire({
                   icon: "success",
-                  title: `Berhasil melakukan registrasi akun, silahkan untuk login terlebih dahulu!`,
+                  title: 'Yeayyy!',
+                  text: `Berhasil melakukan registrasi akun, silahkan untuk login terlebih dahulu!`,
                 });
                 router.push("/login");
                 clearFormManningAgent();
@@ -334,13 +348,15 @@ function FormRegistrasi() {
                   const errorMsg = error.response.data.Message;
                   Toast.fire({
                     icon: "error",
-                    title: `Gagal melakukan registrasi akun, ${errorMsg}!`,
+                    title: 'Oopsss!',
+                    text: `Gagal melakukan registrasi akun, ${errorMsg}!`,
                   });
                   clearFormManningAgent();
                 } else {
                   Toast.fire({
                     icon: "error",
-                    title: `Gagal melakukan registrasi akun. Terjadi kesalahan tidak diketahui.`,
+                    title: 'Oopsss!',
+                    text: `Gagal melakukan registrasi akun. Terjadi kesalahan tidak diketahui.`,
                   });
                   clearFormManningAgent();
                 }
@@ -570,9 +586,10 @@ function FormRegistrasi() {
                     <div className="w-full px-3">
                       <button
                         type="submit"
+                        disabled={isHandlingCekKUSUKA ? true : false}
                         className="btn text-white py-3 bg-blue-500 hover:bg-blue-600 w-full"
                       >
-                        Cek
+                        {isHandlingCekKUSUKA ? 'Loading...' : 'Cek'}
                       </button>
                     </div>
                   </div>
