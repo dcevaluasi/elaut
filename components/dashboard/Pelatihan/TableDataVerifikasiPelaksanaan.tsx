@@ -462,20 +462,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
                                                             </Badge>
                                                         )}
 
-                                                    {
-                                                        pelatihan!.StatusPenerbitan == "Sudah Diverifikasi Pelaksanaan" && (
-                                                            <Badge
-                                                                variant="outline"
-                                                                className={`top-4 right-4 absolute cursor-pointer ${pelatihan!.StatusPenerbitan == "Verifikasi Pelaksanaan"
-                                                                    ? " bg-yellow-300 text-neutral-800 hover:bg-yellow-400"
-                                                                    : " bg-green-500 text-white hover:bg-green-600"
-                                                                    }`}
-                                                            >
-                                                                {
-                                                                    pelatihan!.StatusPenerbitan == "Verifikasi Pelaksanaan" ? 'Perlu Diverifikasi' : 'Sudah Diverifikasi'
-                                                                }
-                                                            </Badge>
-                                                        )}
+
                                                 </AlertDialogTrigger>
                                                 <AlertDialogContent className="flex flex-col items-center justify-center !w-[420px]">
                                                     <AlertDialogHeader>
