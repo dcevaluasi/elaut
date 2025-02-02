@@ -88,13 +88,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   return (
     <aside
       ref={sidebar}
-      className={`absolute left-0 top-0 z-50 flex h-screen w-67 flex-col overflow-y-hidden ${
-        pathname.includes("/dpkakp") || pathname.includes("/pukakp")
-          ? "bg-darkDPKAKP"
-          : "bg-gray-900"
-      } duration-300 ease-linear  lg:static lg:translate-x-0 scrollbar-hide ${
-        sidebarOpen ? "translate-x-0" : "-translate-x-full"
-      }`}
+      className={`absolute left-0 top-0 z-50 flex h-screen w-67 flex-col overflow-y-hidden ${pathname.includes("/dpkakp") || pathname.includes("/pukakp")
+        ? "bg-darkDPKAKP"
+        : "bg-gray-900"
+        } duration-300 ease-linear  lg:static lg:translate-x-0 scrollbar-hide ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
     >
       {/* <!-- SIDEBAR HEADER --> */}
       <div className="flex items-center justify-between gap-2 px-6 pb-10 lg:pb-12">
@@ -108,19 +106,19 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               {pathname.includes("/akp")
                 ? "AKAPI"
                 : pathname.includes("/dpkakp")
-                ? "DPKAKP"
-                : pathname.includes("/pukakp")
-                ? "PUKAKP"
-                : ""}
+                  ? "DPKAKP"
+                  : pathname.includes("/pukakp")
+                    ? "PUKAKP"
+                    : ""}
             </p>
             <p className="font-medium text-white text-sm text-center">
               {pathname.includes("/akp")
                 ? "Dashboard Sertifikasi Awak Kapal Perikanan Badan Penyuluhan dan Pengembangan Sumber Daya Manusia"
                 : pathname.includes("/dpkakp")
-                ? "Dashboard Dewan Penguji Keahlian Awak Kapal Perikanan Badan Penyuluhan dan Pengembangan Sumber Daya Manusia"
-                : pathname.includes("/pukakp")
-                ? "Dashboard Pelaksana Ujian Keahlian Awak Kapal Perikanan Badan Penyuluhan dan Pengembangan Sumber Daya Manusia"
-                : "Dashboard Elektronik Layanan Pelatihan Kelautan dan Perikanan Utama Terpadu"}
+                  ? "Dashboard Dewan Penguji Keahlian Awak Kapal Perikanan Badan Penyuluhan dan Pengembangan Sumber Daya Manusia"
+                  : pathname.includes("/pukakp")
+                    ? "Dashboard Pelaksana Ujian Keahlian Awak Kapal Perikanan Badan Penyuluhan dan Pengembangan Sumber Daya Manusia"
+                    : "Dashboard Elektronik Layanan Pelatihan Kelautan dan Perikanan Utama Terpadu"}
             </p>
           </div>
         </Link>
@@ -170,11 +168,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                       <React.Fragment>
                         <Link
                           href="/akp/pusat/dashboard"
-                          className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                            (pathname === "/" ||
-                              pathname.includes("dashboard")) &&
+                          className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${(pathname === "/" ||
+                            pathname.includes("dashboard")) &&
                             "bg-graydark "
-                          }`}
+                            }`}
                         >
                           <svg
                             className="fill-current"
@@ -222,11 +219,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               ? `/${generateRandomId()}/pusat/dashboard`
                               : "admin/pusat/lemdiklat"
                           }
-                          className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                            (pathname === "/" ||
-                              pathname.includes("dashboard")) &&
+                          className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${(pathname === "/" ||
+                            pathname.includes("dashboard")) &&
                             "bg-graydark "
-                          }`}
+                            }`}
                         >
                           <svg
                             className="fill-current"
@@ -272,11 +268,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                       <React.Fragment>
                         <Link
                           href="/akp/pusat/awak-kapal-perikanan"
-                          className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                            (pathname === "/" ||
-                              pathname.includes("awak-kapal-perikanan")) &&
+                          className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${(pathname === "/" ||
+                            pathname.includes("awak-kapal-perikanan")) &&
                             "bg-graydark "
-                          }`}
+                            }`}
                         >
                           <HiOutlineUserGroup className="text-xl" />
                           Awak Kapal Perikanan
@@ -298,11 +293,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                       <React.Fragment>
                         <Link
                           href="#"
-                          className={`group relative flex items-center gap-2.5 rounded-sm  py-2 px-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                            (pathname === "/forms" ||
-                              pathname.includes("forms")) &&
+                          className={`group relative flex items-center gap-2.5 rounded-sm  py-2 px-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${(pathname === "/forms" ||
+                            pathname.includes("forms")) &&
                             "bg-graydark "
-                          }`}
+                            }`}
                           onClick={(e) => {
                             e.preventDefault();
                             sidebarExpanded
@@ -313,9 +307,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           <RiShipLine className="text-xl" />
                           Layanan AKAPI
                           <svg
-                            className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
-                              open && "rotate-180"
-                            }`}
+                            className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${open && "rotate-180"
+                              }`}
                             width="20"
                             height="20"
                             viewBox="0 0 20 20"
@@ -332,9 +325,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         </Link>
                         {/* <!-- Dropdown Menu Start --> */}
                         <div
-                          className={`translate transform overflow-hidden ${
-                            !open && "hidden"
-                          }`}
+                          className={`translate transform overflow-hidden ${!open && "hidden"
+                            }`}
                         >
                           <ul className="mb-5.5 mt-0 flex flex-col gap-1 pl-6">
                             <li>
@@ -346,10 +338,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                     <React.Fragment>
                                       <Link
                                         href="/akp/pusat/blanko"
-                                        className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                                          pathname == "akp/pusat/blanko" &&
+                                        className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${pathname == "akp/pusat/blanko" &&
                                           "bg-graydark "
-                                        }`}
+                                          }`}
                                       >
                                         <TbBuildingSkyscraper className="text-xl" />
                                         Pengesahan Program
@@ -370,11 +361,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                     <React.Fragment>
                                       <Link
                                         href="/akp/pusat/blanko/blanko-keluar"
-                                        className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                                          pathname.includes(
-                                            "akp/pusat/blanko/blanko-keluar"
-                                          ) && "bg-graydark "
-                                        }`}
+                                        className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${pathname.includes(
+                                          "akp/pusat/blanko/blanko-keluar"
+                                        ) && "bg-graydark "
+                                          }`}
                                       >
                                         <TbCalendarPin className="text-xl" />
                                         Pelaksanaan Diklat
@@ -395,11 +385,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                     <React.Fragment>
                                       <Link
                                         href="/akp/pusat/blanko/blanko-keluar"
-                                        className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                                          pathname.includes(
-                                            "akp/pusat/blanko/blanko-keluar"
-                                          ) && "bg-graydark "
-                                        }`}
+                                        className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${pathname.includes(
+                                          "akp/pusat/blanko/blanko-keluar"
+                                        ) && "bg-graydark "
+                                          }`}
                                       >
                                         <RiQuillPenLine className="text-xl" />
                                         Pelaksanaan Ujian
@@ -420,11 +409,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                     <React.Fragment>
                                       <Link
                                         href="/akp/pusat/blanko/blanko-rusak"
-                                        className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                                          pathname.includes(
-                                            "akp/pusat/blanko/blanko-rusak"
-                                          ) && "bg-graydark "
-                                        }`}
+                                        className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${pathname.includes(
+                                          "akp/pusat/blanko/blanko-rusak"
+                                        ) && "bg-graydark "
+                                          }`}
                                       >
                                         <TbFileCertificate className="text-xl" />
                                         Penerbitan Sertifikat
@@ -454,11 +442,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                       <React.Fragment>
                         <Link
                           href="#"
-                          className={`group relative flex items-center gap-2.5 rounded-sm  py-2 px-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                            (pathname === "/forms" ||
-                              pathname.includes("forms")) &&
+                          className={`group relative flex items-center gap-2.5 rounded-sm  py-2 px-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${(pathname === "/forms" ||
+                            pathname.includes("forms")) &&
                             "bg-graydark "
-                          }`}
+                            }`}
                           onClick={(e) => {
                             e.preventDefault();
                             sidebarExpanded
@@ -469,9 +456,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           <IoFileTrayStackedOutline className="text-xl" />
                           Blanko
                           <svg
-                            className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
-                              open && "rotate-180"
-                            }`}
+                            className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${open && "rotate-180"
+                              }`}
                             width="20"
                             height="20"
                             viewBox="0 0 20 20"
@@ -488,9 +474,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         </Link>
                         {/* <!-- Dropdown Menu Start --> */}
                         <div
-                          className={`translate transform overflow-hidden ${
-                            !open && "hidden"
-                          }`}
+                          className={`translate transform overflow-hidden ${!open && "hidden"
+                            }`}
                         >
                           <ul className="mb-5.5 mt-0 flex flex-col gap-1 pl-6">
                             <li>
@@ -502,10 +487,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                     <React.Fragment>
                                       <Link
                                         href="/akp/pusat/blanko"
-                                        className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                                          pathname == "akp/pusat/blanko" &&
+                                        className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${pathname == "akp/pusat/blanko" &&
                                           "bg-graydark "
-                                        }`}
+                                          }`}
                                       >
                                         <RiFilePaperLine className="text-xl" />
                                         Persediaan Blanko
@@ -526,11 +510,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                     <React.Fragment>
                                       <Link
                                         href="/akp/pusat/blanko/blanko-keluar"
-                                        className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                                          pathname.includes(
-                                            "akp/pusat/blanko/blanko-keluar"
-                                          ) && "bg-graydark "
-                                        }`}
+                                        className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${pathname.includes(
+                                          "akp/pusat/blanko/blanko-keluar"
+                                        ) && "bg-graydark "
+                                          }`}
                                       >
                                         <HiOutlineDownload className="text-xl" />
                                         Penggunaan Blanko
@@ -551,11 +534,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                     <React.Fragment>
                                       <Link
                                         href="/akp/pusat/blanko/blanko-rusak"
-                                        className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                                          pathname.includes(
-                                            "akp/pusat/blanko/blanko-rusak"
-                                          ) && "bg-graydark "
-                                        }`}
+                                        className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${pathname.includes(
+                                          "akp/pusat/blanko/blanko-rusak"
+                                        ) && "bg-graydark "
+                                          }`}
                                       >
                                         <PiImageBroken className="text-xl" />
                                         Blanko Rusak
@@ -585,11 +567,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                       <React.Fragment>
                         <Link
                           href="#"
-                          className={`group relative flex items-center gap-2.5 rounded-sm  py-2 px-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                            (pathname === "/forms" ||
-                              pathname.includes("forms")) &&
+                          className={`group relative flex items-center gap-2.5 rounded-sm  py-2 px-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${(pathname === "/forms" ||
+                            pathname.includes("forms")) &&
                             "bg-graydark "
-                          }`}
+                            }`}
                           onClick={(e) => {
                             e.preventDefault();
                             sidebarExpanded
@@ -600,9 +581,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           <FiBox className="text-xl" />
                           Distribusi Sertifikat
                           <svg
-                            className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
-                              open && "rotate-180"
-                            }`}
+                            className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${open && "rotate-180"
+                              }`}
                             width="20"
                             height="20"
                             viewBox="0 0 20 20"
@@ -619,9 +599,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                         </Link>
                         {/* <!-- Dropdown Menu Start --> */}
                         <div
-                          className={`translate transform overflow-hidden ${
-                            !open && "hidden"
-                          }`}
+                          className={`translate transform overflow-hidden ${!open && "hidden"
+                            }`}
                         >
                           <ul className="mb-5.5 mt-0 flex flex-col gap-1 pl-6">
                             <li>
@@ -635,11 +614,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                     <React.Fragment>
                                       <Link
                                         href="/akp/pusat/distribusi/penyerahan-sertifikat"
-                                        className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                                          pathname.includes(
-                                            "penyerahan-sertifikat"
-                                          ) && "bg-graydark "
-                                        }`}
+                                        className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${pathname.includes(
+                                          "penyerahan-sertifikat"
+                                        ) && "bg-graydark "
+                                          }`}
                                       >
                                         <RiShakeHandsLine className="text-xl" />
                                         Penyerahan Sertifikat
@@ -660,11 +638,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                     <React.Fragment>
                                       <Link
                                         href="/akp/pusat/distribusi/pengiriman-sertifikat"
-                                        className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                                          pathname.includes(
-                                            "pengiriman-sertifikat"
-                                          ) && "bg-graydark "
-                                        }`}
+                                        className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${pathname.includes(
+                                          "pengiriman-sertifikat"
+                                        ) && "bg-graydark "
+                                          }`}
                                       >
                                         <GrSend className="text-xl" />
                                         Pengiriman Sertifikat
@@ -687,7 +664,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 <></>
               ) : (
                 <>
-                  {pathname.includes("lemdiklat") ? (
+                  {pathname.includes("balai") ? (
                     <SidebarLinkGroup
                       activeCondition={
                         pathname === "/pelatihan" ||
@@ -699,11 +676,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           <React.Fragment>
                             <Link
                               href="#"
-                              className={`group relative flex items-center gap-2.5 rounded-sm  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                                (pathname === "/pelatihan" ||
-                                  pathname.includes("pelatihan")) &&
+                              className={`group relative flex items-center gap-2.5 rounded-sm  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${(pathname === "/pelatihan" ||
+                                pathname.includes("pelatihan")) &&
                                 "bg-graydark "
-                              }`}
+                                }`}
                               onClick={(e) => {
                                 e.preventDefault();
                                 sidebarExpanded
@@ -714,9 +690,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               <IoMdSchool className="text-xl" />
                               Pelatihan dan Sertifikasi
                               <svg
-                                className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
-                                  open && "rotate-180"
-                                }`}
+                                className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${open && "rotate-180"
+                                  }`}
                                 width="20"
                                 height="20"
                                 viewBox="0 0 20 20"
@@ -733,31 +708,28 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             </Link>
                             {/* <!-- Dropdown Menu Start --> */}
                             <div
-                              className={`translate transform overflow-hidden ${
-                                !open && "hidden"
-                              }`}
+                              className={`translate transform overflow-hidden ${!open && "hidden"
+                                }`}
                             >
                               <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
                                 <li>
                                   <Link
-                                    href={`/${generateRandomId()}/lemdiklat/pelatihan`}
-                                    className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                      pathname ===
-                                        "/admin/lemdiklat/pelatihan" &&
+                                    href={`/${generateRandomId()}/balai/pelatihan`}
+                                    className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${pathname ===
+                                      "/admin/balai/pelatihan" &&
                                       "text-white"
-                                    }`}
+                                      }`}
                                   >
                                     • Database Pelatihan Masyarakat
                                   </Link>
                                 </li>
                                 <li>
                                   <Link
-                                    href={`/${generateRandomId()}/lemdiklat/uji-kompetensi`}
-                                    className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                      pathname ===
-                                        "/admin/lemdiklat/pelatihan" &&
+                                    href={`/${generateRandomId()}/balai/uji-kompetensi`}
+                                    className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${pathname ===
+                                      "/admin/balai/pelatihan" &&
                                       "text-white"
-                                    }`}
+                                      }`}
                                   >
                                     • Database Uji Kompetensi
                                   </Link>
@@ -783,11 +755,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             <React.Fragment>
                               <Link
                                 href="#"
-                                className={`group relative flex items-center gap-2.5 rounded-sm  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                                  (pathname === "/admin/pusat/pelatihan" ||
-                                    pathname.includes("pelatihan")) &&
+                                className={`group relative flex items-center gap-2.5 rounded-sm  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${(pathname === "/admin/pusat/pelatihan" ||
+                                  pathname.includes("pelatihan")) &&
                                   "bg-graydark "
-                                }`}
+                                  }`}
                                 onClick={(e) => {
                                   e.preventDefault();
                                   sidebarExpanded
@@ -798,9 +769,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 <HiMiniComputerDesktop className="text-xl" />
                                 Ujian Keahlian
                                 <svg
-                                  className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
-                                    open && "rotate-180"
-                                  }`}
+                                  className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${open && "rotate-180"
+                                    }`}
                                   width="20"
                                   height="20"
                                   viewBox="0 0 20 20"
@@ -817,19 +787,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               </Link>
                               {/* <!-- Dropdown Menu Start --> */}
                               <div
-                                className={`translate transform overflow-hidden ${
-                                  !open && "hidden"
-                                }`}
+                                className={`translate transform overflow-hidden ${!open && "hidden"
+                                  }`}
                               >
                                 <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
                                   <li>
                                     <Link
                                       href="/lembaga/dpkakp/admin/dashboard/ujian"
-                                      className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                        pathname ===
-                                          "/lembaga/dpkakp/admin/dashboard/ujian" &&
+                                      className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${pathname ===
+                                        "/lembaga/dpkakp/admin/dashboard/ujian" &&
                                         "text-white"
-                                      }`}
+                                        }`}
                                     >
                                       • Ujian Keahlian
                                     </Link>
@@ -852,11 +820,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             <React.Fragment>
                               <Link
                                 href="#"
-                                className={`group relative flex items-center gap-2.5 rounded-sm  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                                  (pathname === "/admin/pusat/pelatihan" ||
-                                    pathname.includes("pelatihan")) &&
+                                className={`group relative flex items-center gap-2.5 rounded-sm  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${(pathname === "/admin/pusat/pelatihan" ||
+                                  pathname.includes("pelatihan")) &&
                                   "bg-graydark "
-                                }`}
+                                  }`}
                                 onClick={(e) => {
                                   e.preventDefault();
                                   sidebarExpanded
@@ -867,9 +834,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 <TbDatabaseEdit className="text-xl" />
                                 Bank Soal
                                 <svg
-                                  className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
-                                    open && "rotate-180"
-                                  }`}
+                                  className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${open && "rotate-180"
+                                    }`}
                                   width="20"
                                   height="20"
                                   viewBox="0 0 20 20"
@@ -886,19 +852,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               </Link>
                               {/* <!-- Dropdown Menu Start --> */}
                               <div
-                                className={`translate transform overflow-hidden ${
-                                  !open && "hidden"
-                                }`}
+                                className={`translate transform overflow-hidden ${!open && "hidden"
+                                  }`}
                               >
                                 <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
                                   <li>
                                     <Link
                                       href="/lembaga/dpkakp/admin/dashboard/bank-soal"
-                                      className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                        pathname ===
-                                          "/lembaga/dpkakp/admin/dashboard/bank-soal" &&
+                                      className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${pathname ===
+                                        "/lembaga/dpkakp/admin/dashboard/bank-soal" &&
                                         "text-white"
-                                      }`}
+                                        }`}
                                     >
                                       • Soal Ujian Keahlian
                                     </Link>
@@ -906,11 +870,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                   <li>
                                     <Link
                                       href="/lembaga/dpkakp/admin/dashboard/bank-soal/gambar"
-                                      className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                        pathname ===
-                                          "/lembaga/dpkakp/admin/dashboard/bank-soal/gambar" &&
+                                      className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${pathname ===
+                                        "/lembaga/dpkakp/admin/dashboard/bank-soal/gambar" &&
                                         "text-white"
-                                      }`}
+                                        }`}
                                     >
                                       • Gambar Soal Ujian
                                     </Link>
@@ -924,11 +887,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                       </SidebarLinkGroup>{" "}
                       <Link
                         href="/lembaga/dpkakp/admin/penguji/"
-                        className={`group relative flex items-center gap-2.5 rounded-sm  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                          (pathname === "/admin/pusat/pelatihan" ||
-                            pathname.includes("pelatihan")) &&
+                        className={`group relative flex items-center gap-2.5 rounded-sm  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${(pathname === "/admin/pusat/pelatihan" ||
+                          pathname.includes("pelatihan")) &&
                           "bg-graydark "
-                        }`}
+                          }`}
                       >
                         <TbSchool className="text-xl" />
                         Dewan Penguji
@@ -948,11 +910,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             <React.Fragment>
                               <Link
                                 href="#"
-                                className={`group relative flex items-center gap-2.5 rounded-sm  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                                  (pathname === "/admin/pusat/pelatihan" ||
-                                    pathname.includes("pelatihan")) &&
+                                className={`group relative flex items-center gap-2.5 rounded-sm  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${(pathname === "/admin/pusat/pelatihan" ||
+                                  pathname.includes("pelatihan")) &&
                                   "bg-graydark "
-                                }`}
+                                  }`}
                                 onClick={(e) => {
                                   e.preventDefault();
                                   sidebarExpanded
@@ -963,9 +924,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 <HiMiniComputerDesktop className="text-xl" />
                                 Ujian Keahlian
                                 <svg
-                                  className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
-                                    open && "rotate-180"
-                                  }`}
+                                  className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${open && "rotate-180"
+                                    }`}
                                   width="20"
                                   height="20"
                                   viewBox="0 0 20 20"
@@ -982,19 +942,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               </Link>
                               {/* <!-- Dropdown Menu Start --> */}
                               <div
-                                className={`translate transform overflow-hidden ${
-                                  !open && "hidden"
-                                }`}
+                                className={`translate transform overflow-hidden ${!open && "hidden"
+                                  }`}
                               >
                                 <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
                                   <li>
                                     <Link
                                       href="/lembaga/pukakp/admin/dashboard/ujian"
-                                      className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                        pathname ===
-                                          "/lembaga/pukakp/admin/dashboard/ujian" &&
+                                      className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${pathname ===
+                                        "/lembaga/pukakp/admin/dashboard/ujian" &&
                                         "text-white"
-                                      }`}
+                                        }`}
                                     >
                                       • Ujian Keahlian
                                     </Link>
@@ -1019,11 +977,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           <React.Fragment>
                             <Link
                               href="#"
-                              className={`group relative flex items-center gap-2.5 rounded-sm  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                                (pathname === "/admin/pusat/pelatihan" ||
-                                  pathname.includes("pelatihan")) &&
+                              className={`group relative flex items-center gap-2.5 rounded-sm  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${(pathname === "/admin/pusat/pelatihan" ||
+                                pathname.includes("pelatihan")) &&
                                 "bg-graydark "
-                              }`}
+                                }`}
                               onClick={(e) => {
                                 e.preventDefault();
                                 sidebarExpanded
@@ -1034,9 +991,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               <IoMdSchool className="text-xl" />
                               Pelatihan Masyarakat
                               <svg
-                                className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
-                                  open && "rotate-180"
-                                }`}
+                                className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${open && "rotate-180"
+                                  }`}
                                 width="20"
                                 height="20"
                                 viewBox="0 0 20 20"
@@ -1053,19 +1009,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             </Link>
                             {/* <!-- Dropdown Menu Start --> */}
                             <div
-                              className={`translate transform overflow-hidden ${
-                                !open && "hidden"
-                              }`}
+                              className={`translate transform overflow-hidden ${!open && "hidden"
+                                }`}
                             >
                               <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-3">
                                 <li>
                                   <Link
                                     href="/admin/pusat/pelatihan/pemberitahuan-pelatihan"
-                                    className={`group relative w-fit flex items-center gap-2 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                      pathname ===
-                                        "/admin/pusat/pelatihan/pemberitahuan-pelatihan" &&
+                                    className={`group relative w-fit flex items-center gap-2 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${pathname ===
+                                      "/admin/pusat/pelatihan/pemberitahuan-pelatihan" &&
                                       "text-white"
-                                    }`}
+                                      }`}
                                   >
                                     <div className="flex-1">
                                       <TbBroadcast className="text-xl" />
@@ -1079,11 +1033,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 <li>
                                   <Link
                                     href="/admin/pusat/pelatihan/penerbitan-sertifikat"
-                                    className={`group relative  w-fit  flex items-center gap-2 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                      pathname ===
-                                        "/admin/pusat/pelatihan/penerbitan-sertifikat" &&
+                                    className={`group relative  w-fit  flex items-center gap-2 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${pathname ===
+                                      "/admin/pusat/pelatihan/penerbitan-sertifikat" &&
                                       "text-white"
-                                    }`}
+                                      }`}
                                   >
                                     <div className="flex-1">
                                       <RiVerifiedBadgeLine className="text-xl" />
@@ -1113,11 +1066,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           <React.Fragment>
                             <Link
                               href="#"
-                              className={`group relative flex items-center gap-2.5 rounded-sm  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                                (pathname === "/forms" ||
-                                  pathname.includes("forms")) &&
+                              className={`group relative flex items-center gap-2.5 rounded-sm  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${(pathname === "/forms" ||
+                                pathname.includes("forms")) &&
                                 "bg-graydark "
-                              }`}
+                                }`}
                               onClick={(e) => {
                                 e.preventDefault();
                                 sidebarExpanded
@@ -1128,9 +1080,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               <FaBoxOpen className="text-xl" />
                               Fasilitas Layanan
                               <svg
-                                className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
-                                  open && "rotate-180"
-                                }`}
+                                className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${open && "rotate-180"
+                                  }`}
                                 width="20"
                                 height="20"
                                 viewBox="0 0 20 20"
@@ -1147,31 +1098,28 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             </Link>
                             {/* <!-- Dropdown Menu Start --> */}
                             <div
-                              className={`translate transform overflow-hidden ${
-                                !open && "hidden"
-                              }`}
+                              className={`translate transform overflow-hidden ${!open && "hidden"
+                                }`}
                             >
                               <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
                                 <li>
                                   <Link
-                                    href="/admin/lemdiklat/fasilitas/penginapan"
-                                    className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                      pathname ===
-                                        "/admin/lemdiklat/fasilitas/penginapan" &&
+                                    href="/admin/balai/fasilitas/penginapan"
+                                    className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${pathname ===
+                                      "/admin/balai/fasilitas/penginapan" &&
                                       "text-white"
-                                    }`}
+                                      }`}
                                   >
                                     • Fasilitas Penginapan
                                   </Link>
                                 </li>
                                 <li>
                                   <Link
-                                    href="/admin/lemdiklat/fasilitas/konsumsi"
-                                    className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                      pathname ===
-                                        "/admin/lemdiklat/fasilitas/konsumsi" &&
+                                    href="/admin/balai/fasilitas/konsumsi"
+                                    className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${pathname ===
+                                      "/admin/balai/fasilitas/konsumsi" &&
                                       "text-white"
-                                    }`}
+                                      }`}
                                   >
                                     • Fasilitas Konsumsi
                                   </Link>
@@ -1179,10 +1127,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 <li>
                                   <Link
                                     href="/forms/form-elements"
-                                    className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                      pathname === "/forms/form-elements" &&
+                                    className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${pathname === "/forms/form-elements" &&
                                       "text-white"
-                                    }`}
+                                      }`}
                                   >
                                     • Fasilitas Peralatan dll
                                   </Link>
@@ -1201,12 +1148,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     (!pathname.includes("pukakp") && (
                       <li>
                         <Link
-                          href="/admin/lemdiklat/pnbp"
-                          className={`group relative flex items-center gap-2.5 rounded-sm  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${
-                            (pathname === "/admin/lemdiklat/pnbp" ||
-                              pathname.includes("pnbp")) &&
+                          href="/admin/balai/pnbp"
+                          className={`group relative flex items-center gap-2.5 rounded-sm  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${(pathname === "/admin/balai/pnbp" ||
+                            pathname.includes("pnbp")) &&
                             "bg-graydark "
-                          }`}
+                            }`}
                         >
                           <FaRupiahSign className="text-3xl" />
                           Pendapatan Negara Bukan Pajak (PNBP)

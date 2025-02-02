@@ -27,6 +27,7 @@ import ChartBlankoAwal from "../Charts/ChartBlankoAwal";
 import ChartPopoverKeterampilan from "../Charts/ChartPopoverKeterampilan";
 import ChartCertificatesMonthly from "../Charts/ChartCertificatesMonthly";
 import useFetchSertifikatByTypeBlanko from "@/hooks/blanko/useFetchSertifikatByTypeBlanko";
+import useFetchSertifikatByLemdiklat from "@/hooks/blanko/useFetchSertifikatByLemdiklat";
 
 const AKP: React.FC = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -119,6 +120,15 @@ const AKP: React.FC = () => {
   });
 
   const {
+    data: dataSertifikatByLemdiklat,
+    isFetching: isFetchingSertifikatByLemdiklat,
+    refetch: refetchSertifikatByLemdiklat,
+  } = useFetchSertifikatByLemdiklat();
+
+
+  console.log({ dataSertifikatByLemdiklat })
+
+  const {
     data: dataSertifikatByTypeBlankoCoC,
     isFetching: isFetchingSertifikatByTypeBlankoCoC,
     refetch: refetchSertifikatByTypeBlankoCoC,
@@ -127,11 +137,6 @@ const AKP: React.FC = () => {
     start_date: startDate,
     end_date: endDate,
   });
-
-
-
-  console.log({ dataSertifikatByTypeBlankoCoP })
-  console.log({ dataSertifikatByTypeBlankoCoC })
 
   return (
     <>
@@ -153,8 +158,6 @@ const AKP: React.FC = () => {
         </div>
       </div>
       <div className="grid grid-cols-1 gap-4 h-fit max-h-fit w-full md:grid-cols-3 md:gap-3 xl:grid-cols-3 2xl:gap-3">
-
-
         {
           isFetchingSertifikatByTypeBlankoCoC && isFetchingSertifikatByTypeBlankoCoP ? <></> : dataSertifikatByTypeBlankoCoC != null && dataSertifikatByTypeBlankoCoP != null ? dataSertifikatByTypeBlankoCoC.data != null && dataSertifikatByTypeBlankoCoP.data != null ?
             <>
@@ -178,7 +181,6 @@ const AKP: React.FC = () => {
                 </PopoverContent>
               </Popover>
 
-
               <span onClick={(e) => setSelectedId(0)}>
                 <CardDataStats
                   title="Total Blanko Terpakai"
@@ -190,9 +192,7 @@ const AKP: React.FC = () => {
                 >
                   <RiLogoutCircleRFill className="text-primary text-3xl" />
                 </CardDataStats>
-
               </span>
-
 
               <Popover>
                 <PopoverTrigger asChild>
@@ -257,6 +257,7 @@ const AKP: React.FC = () => {
               >
                 <RiShipFill className="text-primary text-3xl" />
               </CardDataStats>
+
               <CardDataStats
                 title="Total Blanko Rusak"
                 total={blankoRusak
@@ -267,8 +268,6 @@ const AKP: React.FC = () => {
               >
                 <RiFileCloseFill className="text-primary text-3xl group-hover:scale-110" />
               </CardDataStats>
-
-
             </>
             : <></>
             : <></>

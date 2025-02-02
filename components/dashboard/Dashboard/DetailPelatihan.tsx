@@ -175,7 +175,7 @@ function DetailPelatihan() {
                   </td>
                   <td className="p-4 w-2/3">
                     {pelatihan.TanggalMulaiPelatihan !== "" &&
-                    pelatihan.TanggalBerakhirPelatihan !== "" ? (
+                      pelatihan.TanggalBerakhirPelatihan !== "" ? (
                       <>
                         {generateTanggalPelatihan(
                           pelatihan.TanggalMulaiPelatihan
@@ -267,20 +267,19 @@ function DetailPelatihan() {
                         <AlertDialogTrigger asChild>
                           {pelatihan != null
                             ? pelatihan!.StatusPenerbitan != "" && (
-                                <Badge
-                                  variant="outline"
-                                  className={`w-fit flex items-center cursor-pointer justify-center ${
-                                    pelatihan!.StatusPenerbitan == "On Progress"
-                                      ? " bg-yellow-300 text-neutral-800"
-                                      : " bg-green-500 text-white"
+                              <Badge
+                                variant="outline"
+                                className={`w-fit flex items-center cursor-pointer justify-center ${pelatihan!.StatusPenerbitan == "On Progress"
+                                    ? " bg-yellow-300 text-neutral-800"
+                                    : " bg-green-500 text-white"
                                   }`}
-                                >
-                                  {pelatihan!.StatusPenerbitan!}{" "}
-                                  {usePathname().includes("lemdiklat")
-                                    ? "Pengajuan Sertifikat"
-                                    : "Penerbitan"}
-                                </Badge>
-                              )
+                              >
+                                {pelatihan!.StatusPenerbitan!}{" "}
+                                {usePathname().includes("lemdiklat")
+                                  ? "Pengajuan Sertifikat"
+                                  : "Penerbitan"}
+                              </Badge>
+                            )
                             : null}
                         </AlertDialogTrigger>
                         <AlertDialogContent className="flex flex-col items-center justify-center !w-[420px]">
@@ -289,7 +288,7 @@ function DetailPelatihan() {
                               <div className="w-24 h-24 rounded-full bg-gradient-to-b from-gray-200 via-whiter to-white flex items-center justify-center animate-pulse">
                                 <div className="w-16 h-16 rounded-full  bg-gradient-to-b from-gray-300 via-whiter to-white flex items-center justify-center animate-pulse">
                                   {pelatihan!.StatusPenerbitan ==
-                                  "On Progress" ? (
+                                    "On Progress" ? (
                                     <RiProgress3Line className="h-12 w-12 text-yellow-400" />
                                   ) : (
                                     <RiVerifiedBadgeFill className="h-12 w-12 text-green-500" />
@@ -305,7 +304,7 @@ function DetailPelatihan() {
                                   {pelatihan!.StatusPenerbitan == "On Progress"
                                     ? "Pengajuan penerbitan sertifikat telah masuk untuk diproses penandatanganan, harap tindak lanjut pengajuan berikut dalam kurun waktu 1x24 jam!"
                                     : "Pengajuan penerbitan telah berhasil dan sertifikat telah terbit dengan ditandatangani anda sebagai" +
-                                      pelatihan!.TtdSertifikat}
+                                    pelatihan!.TtdSertifikat}
                                 </AlertDialogDescription>
                               </div>
                             </AlertDialogTitle>
@@ -488,9 +487,8 @@ function DetailPelatihan() {
                   <Link
                     target="_blank"
                     className="text-blue-500 underline"
-                    href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/silabus/pelatihan/${
-                      pelatihan!.SilabusPelatihan
-                    }`}
+                    href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/silabus/pelatihan/${pelatihan!.SilabusPelatihan
+                      }`}
                   >
                     {pelatihan!.SilabusPelatihan}
                   </Link>
@@ -507,9 +505,8 @@ function DetailPelatihan() {
                     <Link
                       target="_blank"
                       className="text-blue-500 underline flex gap-2 items-center"
-                      href={`/admin/lemdiklat/pelatihan/${
-                        pelatihan!.KodePelatihan
-                      }/bank-soal/${pelatihan!.IdPelatihan}`}
+                      href={`/admin/balai/pelatihan/${pelatihan!.KodePelatihan
+                        }/bank-soal/${pelatihan!.IdPelatihan}`}
                     >
                       <FiUploadCloud />
                       Upload Bank Soal

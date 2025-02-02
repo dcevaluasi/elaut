@@ -278,7 +278,7 @@ const TableDataBagianUjianKeahlian: React.FC = () => {
           {row.original.Bagian.map((bagian, index) => (
             <div className="flex gap-2 flex-col">
               <div
-                onClick={(e) => {}}
+                onClick={(e) => { }}
                 className="flex gap-2 px-3 text-sm w-full justify-center items-center rounded-md bg-transparent p-1.5  cursor-pointer text-gray-700 border border-gray-700"
               >
                 <IoMdInformationCircle />
@@ -286,7 +286,7 @@ const TableDataBagianUjianKeahlian: React.FC = () => {
               </div>
 
               <div
-                onClick={(e) => {}}
+                onClick={(e) => { }}
                 className="flex gap-2 px-3 text-sm w-full justify-center items-center rounded-md bg-green-400 p-1.5  cursor-pointer text-white"
               >
                 <BiSolidPaperPlane />
@@ -545,7 +545,7 @@ const TableDataBagianUjianKeahlian: React.FC = () => {
               <div className="flex w-full gap-1 items-start">
                 <div
                   onClick={(e) => {
-                    router.push("/admin/lemdiklat/pelatihan/tambah-pelatihan");
+                    router.push("/admin/balai/pelatihan/tambah-pelatihan");
                   }}
                   className="flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer w-fit"
                 >

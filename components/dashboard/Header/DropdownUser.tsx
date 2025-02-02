@@ -123,7 +123,7 @@ const DropdownUser = ({
       setAlamat("");
       setLastNosertif("");
       setDeskripsi("");
-      router.replace("/admin/lemdiklat/pelatihan");
+      router.replace("/admin/balai/pelatihan");
     } catch (error) {
       Toast.fire({
         icon: "error",
@@ -205,7 +205,7 @@ const DropdownUser = ({
       });
       setOpenDialogLastSertifikat(!openDialogLastSertifikat);
 
-      router.replace("/admin/lemdiklat/pelatihan");
+      router.replace("/admin/balai/pelatihan");
     } catch (error) {
       Toast.fire({
         icon: "error",
@@ -522,15 +522,15 @@ const DropdownUser = ({
             {pathname.includes("lemdiklat")
               ? userLoggedInInfo?.data?.NamaLemdik
               : dataAdminPusat && pathname.includes("pusat")
-              ? dataAdminPusat!.Nama
-              : ""}
+                ? dataAdminPusat!.Nama
+                : ""}
           </span>
           <span className="block text-xs">
             {pathname.includes("lemdiklat")
               ? "Admin Balai Pelatihan"
               : dataAdminPusat && pathname.includes("pusat")
-              ? dataAdminPusat!.Nip
-              : ""}
+                ? dataAdminPusat!.Nip
+                : ""}
           </span>
         </span>
 
@@ -570,9 +570,8 @@ const DropdownUser = ({
         ref={dropdown}
         onFocus={() => setDropdownOpen(true)}
         onBlur={() => setDropdownOpen(false)}
-        className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default  ${
-          dropdownOpen === true ? "block" : "hidden"
-        }`}
+        className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default  ${dropdownOpen === true ? "block" : "hidden"
+          }`}
       >
         <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 ">
           <li>

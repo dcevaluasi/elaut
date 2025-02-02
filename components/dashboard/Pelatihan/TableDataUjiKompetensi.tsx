@@ -431,7 +431,7 @@ const TableDataUjiKompetensi: React.FC = () => {
                 <Button
                   // onClick={(e) =>
                   //   router.push(
-                  //     `/admin/lemdiklat/pelatihan/edit-pelatihan/${row.original.IdUjikom}`
+                  //     `/admin/balai/pelatihan/edit-pelatihan/${row.original.IdUjikom}`
                   //   )
                   // }
                   variant="outline"
@@ -489,9 +489,9 @@ const TableDataUjiKompetensi: React.FC = () => {
                     onClick={(e) =>
                       row.original.StatusApproval != "Selesai"
                         ? handleUpdateClosePelatihanELAUT(
-                            row.original.IdUjikom,
-                            statusPelatihan
-                          )
+                          row.original.IdUjikom,
+                          statusPelatihan
+                        )
                         : null
                     }
                   >
@@ -504,7 +504,7 @@ const TableDataUjiKompetensi: React.FC = () => {
             <Button
               onClick={(e) =>
                 router.push(
-                  `/admin/lemdiklat/pelatihan/${row.getValue(
+                  `/admin/balai/pelatihan/${row.getValue(
                     "KodePelatihan"
                   )}/peserta-pelatihan/${row.getValue("IdPelatihan")}`
                 )
@@ -826,13 +826,13 @@ const TableDataUjiKompetensi: React.FC = () => {
                       onClick={(e) =>
                         row.original.Status == "Belum Publish"
                           ? handleUpdatePublishPelatihanToELAUT(
-                              row.original.IdUjikom,
-                              statusPelatihan
-                            )
+                            row.original.IdUjikom,
+                            statusPelatihan
+                          )
                           : handleUpdatePublishPelatihanToELAUT(
-                              row.original.IdUjikom,
-                              "Belum Publish"
-                            )
+                            row.original.IdUjikom,
+                            "Belum Publish"
+                          )
                       }
                     >
                       {row.original.Status == "Publish"
@@ -847,7 +847,7 @@ const TableDataUjiKompetensi: React.FC = () => {
             <Button
               onClick={(e) =>
                 router.push(
-                  `/admin/lemdiklat/pelatihan/${row.getValue(
+                  `/admin/balai/pelatihan/${row.getValue(
                     "KodePelatihan"
                   )}/bank-soal/${row.getValue("IdPelatihan")}`
                 )
@@ -1453,7 +1453,7 @@ const TableDataUjiKompetensi: React.FC = () => {
                     <div
                       onClick={(e) => {
                         router.push(
-                          "/admin/lemdiklat/pelatihan/tambah-pelatihan"
+                          "/admin/balai/pelatihan/tambah-pelatihan"
                         );
                       }}
                       className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
@@ -1477,7 +1477,7 @@ const TableDataUjiKompetensi: React.FC = () => {
                     <div
                       onClick={(e) => {
                         router.push(
-                          "/admin/lemdiklat/pelatihan/tambah-pelatihan"
+                          "/admin/balai/pelatihan/tambah-pelatihan"
                         );
                       }}
                       className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
@@ -1500,7 +1500,7 @@ const TableDataUjiKompetensi: React.FC = () => {
                     <div
                       onClick={(e) => {
                         router.push(
-                          "/admin/lemdiklat/pelatihan/tambah-pelatihan"
+                          "/admin/balai/pelatihan/tambah-pelatihan"
                         );
                       }}
                       className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
@@ -1522,7 +1522,7 @@ const TableDataUjiKompetensi: React.FC = () => {
               <div className="w-full flex justify-end gap-2">
                 {/* <div
                   onClick={(e) => {
-                    router.push("/admin/lemdiklat/pelatihan/tambah-pelatihan");
+                    router.push("/admin/balai/pelatihan/tambah-pelatihan");
                   }}
                   className="flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer w-fit"
                 >
@@ -1531,7 +1531,7 @@ const TableDataUjiKompetensi: React.FC = () => {
                 </div> */}
                 <div
                   onClick={(e) => {
-                    router.push("/admin/lemdiklat/pelatihan/tambah-ujikom");
+                    router.push("/admin/balai/pelatihan/tambah-ujikom");
                   }}
                   className="flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer w-fit"
                 >

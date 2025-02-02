@@ -147,8 +147,7 @@ const TableDataPelatihan: React.FC = () => {
 
     try {
       const response = await axios.put(
-        `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${
-          selectedPelatihan!.IdPelatihan
+        `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${selectedPelatihan!.IdPelatihan
         }`,
         formData,
         {
@@ -432,14 +431,13 @@ const TableDataPelatihan: React.FC = () => {
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           {pelatihan!.NoSertifikat != "" &&
-                          pelatihan!.StatusPenerbitan != "" ? (
+                            pelatihan!.StatusPenerbitan != "" ? (
                             <Badge
                               variant="outline"
-                              className={`top-4 right-4 absolute cursor-pointer ${
-                                pelatihan!.StatusPenerbitan == "On Progress"
-                                  ? " bg-yellow-300 text-neutral-800 hover:bg-yellow-400"
-                                  : " bg-green-500 text-white hover:bg-green-600"
-                              }`}
+                              className={`top-4 right-4 absolute cursor-pointer ${pelatihan!.StatusPenerbitan == "On Progress"
+                                ? " bg-yellow-300 text-neutral-800 hover:bg-yellow-400"
+                                : " bg-green-500 text-white hover:bg-green-600"
+                                }`}
                             >
                               {pelatihan!.StatusPenerbitan!}{" "}
                               {usePathname().includes("lemdiklat")
@@ -463,7 +461,7 @@ const TableDataPelatihan: React.FC = () => {
                               <div className="w-24 h-24 rounded-full bg-gradient-to-b from-gray-200 via-whiter to-white flex items-center justify-center animate-pulse">
                                 <div className="w-16 h-16 rounded-full  bg-gradient-to-b from-gray-300 via-whiter to-white flex items-center justify-center animate-pulse">
                                   {pelatihan!.StatusPenerbitan ==
-                                  "On Progress" ? (
+                                    "On Progress" ? (
                                     <RiProgress3Line className="h-12 w-12 text-yellow-400" />
                                   ) : (
                                     <RiVerifiedBadgeFill className="h-12 w-12 text-green-500" />
@@ -479,7 +477,7 @@ const TableDataPelatihan: React.FC = () => {
                                   {pelatihan!.StatusPenerbitan == "On Progress"
                                     ? "Pengajuan penerbitan sertifikat sedang dalam proses, harap dapat menunggu 1x24 jam dalam dan kembali lagi untuk mencek status!"
                                     : "Pengajuan penerbitan sertifikat sudah diproses dan telah ditandangani oleh" +
-                                      pelatihan!.TtdSertifikat}
+                                    pelatihan!.TtdSertifikat}
                                 </AlertDialogDescription>
                               </div>
                             </AlertDialogTitle>
@@ -535,10 +533,10 @@ const TableDataPelatihan: React.FC = () => {
                                   </label>
                                   <p className="text-gray-600 text-sm -mt-1">
                                     {pelatihan?.PenerbitanSertifikatDiterima !=
-                                    ""
+                                      ""
                                       ? generateTanggalPelatihan(
-                                          pelatihan?.PenerbitanSertifikatDiterima
-                                        )
+                                        pelatihan?.PenerbitanSertifikatDiterima
+                                      )
                                       : "-"}
                                   </p>
                                 </div>
@@ -574,7 +572,7 @@ const TableDataPelatihan: React.FC = () => {
                               </span>
                             </span>
                             {pelatihan!.TanggalMulaiPendaftaran == "" ||
-                            pelatihan!.TanggalBerakhirPendaftaran == "" ? (
+                              pelatihan!.TanggalBerakhirPendaftaran == "" ? (
                               <></>
                             ) : (
                               <span className="flex items-center gap-1 leading-[105%]">
@@ -627,20 +625,18 @@ const TableDataPelatihan: React.FC = () => {
                         <div className="flex items-center justify-center gap-1 flex-wrap  -mt-2">
                           <Link
                             title="Detail Pelatihan"
-                            href={`/admin/lemdiklat/pelatihan/detail/${pelatihan.KodePelatihan}/${pelatihan.IdPelatihan}`}
+                            href={`/admin/balai/pelatihan/detail/${pelatihan.KodePelatihan}/${pelatihan.IdPelatihan}`}
                             className="border border-neutral-200  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-gray-400 hover:bg-gray-400 hover:text-white text-white rounded-md"
                           >
                             <RiInformationFill className="h-5 w-5" />
                           </Link>
                           <Link
                             title="Peserta Pelatihan"
-                            href={`/admin/${
-                              usePathname().includes("lemdiklat")
-                                ? "lemdiklat"
-                                : "pusat"
-                            }/pelatihan/${
-                              pelatihan.KodePelatihan
-                            }/peserta-pelatihan/${pelatihan.IdPelatihan}`}
+                            href={`/admin/${usePathname().includes("balai")
+                              ? "balai"
+                              : "pusat"
+                              }/pelatihan/${pelatihan.KodePelatihan
+                              }/peserta-pelatihan/${pelatihan.IdPelatihan}`}
                             className="  shadow-sm bg-green-500 hover:bg-green-500 text-neutral-100  hover:text-neutral-100 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2"
                           >
                             <HiUserGroup className="h-5 w-5 " />
@@ -695,14 +691,14 @@ const TableDataPelatihan: React.FC = () => {
                           )}
                           {new Date() >
                             new Date(pelatihan.TanggalBerakhirPendaftaran) && (
-                            <UploadSuratButton
-                              idPelatihan={pelatihan!.IdPelatihan.toString()}
-                              handleFetchingData={
-                                handleFetchingPublicTrainingData
-                              }
-                              suratPemberitahuan={pelatihan?.SuratPemberitahuan}
-                            />
-                          )}
+                              <UploadSuratButton
+                                idPelatihan={pelatihan!.IdPelatihan.toString()}
+                                handleFetchingData={
+                                  handleFetchingPublicTrainingData
+                                }
+                                suratPemberitahuan={pelatihan?.SuratPemberitahuan}
+                              />
+                            )}
 
                           <GenerateNoSertifikatButton
                             idPelatihan={pelatihan!.IdPelatihan.toString()}
@@ -759,15 +755,13 @@ const StatusButton = ({
 }) => (
   <button
     onClick={onClick}
-    className={`focus:outline-none p-2 border ${
-      isSelected ? "bg-blue-500 text-white" : "bg-white text-black"
-    }`}
+    className={`focus:outline-none p-2 border ${isSelected ? "bg-blue-500 text-white" : "bg-white text-black"
+      }`}
   >
     <p className="font-semibold text-lg">{count}</p>
     <p
-      className={`uppercase text-sm ${
-        isSelected ? "font-bold" : "text-gray-600"
-      }`}
+      className={`uppercase text-sm ${isSelected ? "font-bold" : "text-gray-600"
+        }`}
     >
       {label}
     </p>

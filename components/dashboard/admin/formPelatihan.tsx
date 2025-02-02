@@ -299,7 +299,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
       });
       setIsUploading(false);
       resetAllStateToEmptyString();
-      router.push("/admin/lemdiklat/pelatihan");
+      router.push("/admin/balai/pelatihan");
     } catch (error) {
       console.error("Error posting training data:", error);
       Toast.fire({
@@ -542,33 +542,29 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                   <p className="text-base">
                     {indexFormTab == 0 ? (
                       <span
-                        className={`font-bold  leading-[100%] my-6 ${
-                          edit ? "text-yellow-500" : "text-blue-500"
-                        } `}
+                        className={`font-bold  leading-[100%] my-6 ${edit ? "text-yellow-500" : "text-blue-500"
+                          } `}
                       >
                         1
                       </span>
                     ) : indexFormTab == 1 ? (
                       <span
-                        className={`font-bold  leading-[100%] my-6 ${
-                          edit ? "text-yellow-500" : "text-blue-500"
-                        } `}
+                        className={`font-bold  leading-[100%] my-6 ${edit ? "text-yellow-500" : "text-blue-500"
+                          } `}
                       >
                         2
                       </span>
                     ) : indexFormTab == 2 ? (
                       <span
-                        className={`font-bold  leading-[100%] my-6 ${
-                          edit ? "text-yellow-500" : "text-blue-500"
-                        } `}
+                        className={`font-bold  leading-[100%] my-6 ${edit ? "text-yellow-500" : "text-blue-500"
+                          } `}
                       >
                         3
                       </span>
                     ) : (
                       <span
-                        className={`font-bold  leading-[100%] my-6 ${
-                          edit ? "text-yellow-500" : "text-blue-500"
-                        } `}
+                        className={`font-bold  leading-[100%] my-6 ${edit ? "text-yellow-500" : "text-blue-500"
+                          } `}
                       >
                         4
                       </span>
@@ -1493,17 +1489,15 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                 )}
                 <div className="flex -mx-3 mt-5 gap-2 px-3">
                   <div
-                    className={`w-full ${
-                      indexFormTab == 0 || indexFormTab > 3 ? "hidden" : "block"
-                    }`}
+                    className={`w-full ${indexFormTab == 0 || indexFormTab > 3 ? "hidden" : "block"
+                      }`}
                   >
                     <button
                       type="button"
-                      className={`btn text-white ${
-                        edit
+                      className={`btn text-white ${edit
                           ? "bg-yellow-600 hover:bg-yellow-700"
                           : "bg-blue-500 hover:bg-blue-600"
-                      }  w-full`}
+                        }  w-full`}
                       onClick={(e) => {
                         setIndexFormTab(indexFormTab - 1);
                         scrollToTop();
@@ -1513,34 +1507,30 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                     </button>
                   </div>
                   <div
-                    className={`w-full ${
-                      indexFormTab == 3 ? "block" : "hidden"
-                    }`}
+                    className={`w-full ${indexFormTab == 3 ? "block" : "hidden"
+                      }`}
                   >
                     <button
                       type="submit"
                       onClick={(e: any) => handlePostingPublicTrainingData(e)}
-                      className={`btn text-white ${
-                        edit
+                      className={`btn text-white ${edit
                           ? "bg-yellow-600 hover:bg-yellow-700"
                           : "bg-blue-500 hover:bg-blue-600"
-                      } w-full`}
+                        } w-full`}
                     >
                       Upload Pelatihan
                     </button>
                   </div>
                   <div
-                    className={`w-full ${
-                      indexFormTab == 3 ? "hidden" : "block"
-                    }`}
+                    className={`w-full ${indexFormTab == 3 ? "hidden" : "block"
+                      }`}
                   >
                     <button
                       type="button"
-                      className={`btn text-white ${
-                        edit
+                      className={`btn text-white ${edit
                           ? "bg-yellow-600 hover:bg-yellow-700"
                           : "bg-blue-500 hover:bg-blue-600"
-                      } w-full`}
+                        } w-full`}
                       onClick={(e) => {
                         handleNext();
 
