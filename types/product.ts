@@ -49,7 +49,7 @@ export type PelatihanMasyarakat = {
   MemoPusat: string
   SilabusPelatihan: string
   LokasiPelatihan: string
-  JumlahPeserta?: number;
+  JumlahPeserta?: number
   PelaksanaanPelatihan: string
   UjiKompotensi: string
   KoutaPelatihan: string // type from be, should be KuotaPelatihan
@@ -73,8 +73,9 @@ export type PelatihanMasyarakat = {
   TanggalMulaiPendaftaran: string
   TanggalBerakhirPendaftaran: string
   PemberitahuanDiterima: string
-  Program: string;
-  JenisProgram: string;
+  Program: string
+  JenisProgram: string
+  IsSematkan: string
 }
 
 export type DetailPelatihanMasyarakat = {
@@ -120,8 +121,9 @@ export type DetailPelatihanMasyarakat = {
   TanggalMulaiPendaftaran: string
   TanggalAkhirPendaftaran: string
   PemberitahuanDiterima: string
-  Program: string;
-  JenisProgram: string;
+  Program: string
+  JenisProgram: string
+  IsSematkan: string
 }
 
 export type UjiKompetensi = {
@@ -281,35 +283,35 @@ export type Pelatihan = {
 }
 
 export type Sarpras = {
-  IdSarpras: number;
-  IdLemdik: number;
-  NamaSarpras: string;
-  Harga: number;
-  Deskripsi: string;
-  Jenis: string;
-  CreatedAt: string;
-  UpdatedAt: string;
-};
+  IdSarpras: number
+  IdLemdik: number
+  NamaSarpras: string
+  Harga: number
+  Deskripsi: string
+  Jenis: string
+  CreatedAt: string
+  UpdatedAt: string
+}
 
 export type BalaiPelatihanBank = {
-  id_lemdik: number;
-  lemdik: string;
-  virtual_account_bank: string;
-  nama_bank: string;
+  id_lemdik: number
+  lemdik: string
+  virtual_account_bank: string
+  nama_bank: string
   nama_virtual_account_bank: string
 }
 
 export type ManningAgent = {
   IdManingAgent: number
-  NamaManingAgent: string;
-  NoTelpon: number;
-  NamaPenanggungJawab: string;
-  Email: string;
-  Password: string;
-  Alamat: string;
-  Status: string;
-  CreateAt: string;
-  UpdateAt: string;
+  NamaManingAgent: string
+  NoTelpon: number
+  NamaPenanggungJawab: string
+  Email: string
+  Password: string
+  Alamat: string
+  Status: string
+  CreateAt: string
+  UpdateAt: string
   ManingAgentPelatihan: ManningAgentPelatihan[]
 }
 
@@ -356,8 +358,7 @@ export type ManningAgentUsers = {
   Ktp: string
   KusukaUsers: string
   Nama: string
-  NegaraTujuanBekerja:
-  string
+  NegaraTujuanBekerja: string
   Nik: string
   NoTelpon: string
   Password: string

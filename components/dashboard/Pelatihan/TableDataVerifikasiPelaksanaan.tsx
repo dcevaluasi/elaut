@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/card";
 
 import { HiUserGroup } from "react-icons/hi2";
-import { TbCalendarCheck, TbTargetArrow } from "react-icons/tb";
+import { TbCalendarCheck, TbDatabase, TbTargetArrow } from "react-icons/tb";
 
 import FormPelatihan from "../admin/formPelatihan";
 
@@ -83,6 +83,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
     const [countDone, setCountDone] = React.useState<number>(0);
     const [countNotPublished, setCountNotPublished] = React.useState<number>(0);
     const [countVerifying, setCountVerifying] = React.useState<number>(0);
+    const [countIsSematkan, setCountIsSematkan] = React.useState<number>(0)
 
     const handleFetchingPublicTrainingData = async () => {
         setIsFetching(true);
@@ -109,12 +110,16 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
             const verifyingCount = response?.data!.data!.filter(
                 (item: any) => item.StatusPenerbitan == "Verifikasi Pelaksanaan"
             ).length;
+            const sematkanCount = response?.data!.data!.filter(
+                (item: any) => item.IsSematkan == "yes"
+            ).length;
 
             // Update state with counts
             setCountOnProgress(onProgressCount);
             setCountDone(doneCount);
             setCountNotPublished(notPublished);
             setCountVerifying(verifyingCount)
+            setCountIsSematkan(sematkanCount)
 
             // Sort data in descending order by its index
             const sortedData = [...response.data.data].reverse();
@@ -220,6 +225,8 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
             matchesStatus = pelatihan.StatusPenerbitan === "Done";
         } else if (selectedStatusFilter === 'Verifikasi Pelaksanaan') {
             matchesStatus = pelatihan.StatusPenerbitan === "Verifikasi Pelaksanaan";
+        } else if (selectedStatusFilter === 'Bank Soal Disematkan') {
+            matchesStatus = pelatihan.IsSematkan != "yes";
         } else if (selectedStatusFilter !== "All") {
             matchesStatus = pelatihan.Status === selectedStatusFilter;
         }
@@ -327,18 +334,19 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
                             onClick={() => setSelectedStatusFilter("All")}
                         />
 
-                        <StatusButton
-                            label="Belum Dipublish"
-                            count={countNotPublished}
-                            isSelected={selectedStatusFilter === "Belum Dipublish"}
-                            onClick={() => setSelectedStatusFilter("Belum Dipublish")}
-                        />
 
                         <StatusButton
                             label="Proses Verifikasi Pelaksanaan"
                             count={countVerifying}
                             isSelected={selectedStatusFilter === "Verifikasi Pelaksanaan"}
                             onClick={() => setSelectedStatusFilter("Verifikasi Pelaksanaan")}
+                        />
+
+                        <StatusButton
+                            label="Bank Soal Perlu Disematkan"
+                            count={countVerifying}
+                            isSelected={selectedStatusFilter === "Bank Soal Perlu Disematkan"}
+                            onClick={() => setSelectedStatusFilter("Bank Soal Perlu Disematkan")}
                         />
 
                         <StatusButton
@@ -351,12 +359,12 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
                                 setSelectedStatusFilter("Proses Pengajuan Sertifikat")
                             }
                         />
-                        <StatusButton
+                        {/* <StatusButton
                             label="Sudah Terbit"
                             count={countDone}
                             isSelected={selectedStatusFilter === "Sudah Di TTD"}
                             onClick={() => setSelectedStatusFilter("Sudah Di TTD")}
-                        />
+                        /> */}
                     </ul>
                 </section>
             </nav>
@@ -648,6 +656,15 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
                                                         suratPemberitahuan={pelatihan?.SuratPemberitahuan}
                                                     />
 
+                                                    <Link
+                                                        title="Bank Soal"
+                                                        href={`/admin/pusat/pelatihan/${pelatihan!.KodePelatihan
+                                                            }/bank-soal/${pelatihan!.IdPelatihan}`}
+                                                        className="border border-blue-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-blue-900 hover:bg-blue-900 hover:text-white text-white rounded-md"
+                                                    >
+                                                        <TbDatabase className="h-5 w-5" /> Bank Soal
+                                                    </Link>
+
                                                     {pelatihan!.StatusPenerbitan == "Verifikasi Pelaksanaan" &&
                                                         <VerifikasiButton
                                                             title="Verifikasi"
@@ -669,6 +686,10 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
                                                             }
                                                         />
                                                     }
+
+
+
+
                                                 </div>
                                                 <p className="italic text-neutral-400 text-[0.6rem]">
                                                     Created at {pelatihan!.CreateAt} | Updated at{" "}

@@ -35,7 +35,7 @@ import { FiUploadCloud } from "react-icons/fi";
 
 import { usePathname, useRouter } from "next/navigation";
 
-import { SoalPelatihan, UserPelatihan } from "@/types/product";
+import { DetailPelatihanMasyarakat, PelatihanMasyarakat, SoalPelatihan, UserPelatihan } from "@/types/product";
 import axios, { AxiosResponse } from "axios";
 import { extractLastSegment } from "@/utils";
 
@@ -45,11 +45,28 @@ import { FaRegPaperPlane, FaRupiahSign } from "react-icons/fa6";
 import Toast from "@/components/toast";
 import Cookies from "js-cookie";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
+import { elautBaseUrl } from "@/constants/urls";
 
 const TableDataBankSoalPelatihan = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const pathname = usePathname();
   const id = extractLastSegment(pathname);
+
+  const [dataPelatihan, setDataPelatihan] = React.useState<DetailPelatihanMasyarakat | null>(null)
+
+  const handleFetchingPublicTrainingData = async () => {
+    try {
+      const response: AxiosResponse = await axios.get(
+        `${baseUrl}/getPelatihanUser?idPelatihan=${id}`
+      );
+      console.log({ response });
+      setDataPelatihan(response.data);
+    } catch (error) {
+      console.error("Error posting training data:", error);
+      throw error;
+    }
+  };
+
 
   const [data, setData] = React.useState<SoalPelatihan[] | []>([]);
   const handleFetchingPublicTrainingDataById = async () => {
@@ -63,6 +80,7 @@ const TableDataBankSoalPelatihan = () => {
         }
       );
       setData(response.data.data);
+      console.log({ response })
     } catch (error) {
       console.error("Error posting training data:", error);
       throw error;
@@ -71,30 +89,47 @@ const TableDataBankSoalPelatihan = () => {
 
   const handlingAddSoalUsers = async (e: any) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append("IsSematkan", 'yes');
     try {
-      const response = await axios.post(
-        `${baseUrl}/lemdik/AddSoalUsers`,
-        {
-          id_pelatihan: id,
-        },
+      const response = await axios.put(
+        `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${id}`,
+        formData,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get("XSRF091")}`,
           },
         }
       );
-      Toast.fire({
-        icon: "success",
-        title: `Berhasil menyematkan soal ke peserta pelatihan!`,
-      });
-      console.log("SOAL PELATIHAN: ", response);
+      console.log("UPDATE PELATIHAN: ", response);
+      try {
+        const response = await axios.post(
+          `${elautBaseUrl}/lemdik/AddSoalUsers`,
+          {
+            id_pelatihan: id,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+            },
+          }
+        );
+        Toast.fire({
+          icon: "success",
+          title: `Berhasil menyematkan soal ke peserta pelatihan!`,
+        });
+        console.log("SOAL PELATIHAN: ", response);
+      } catch (error) {
+        console.error("ERROR SOAL PELATIHAN: ", error);
+        Toast.fire({
+          icon: "success",
+          title: `Ups, belum ada bank soal yang kamu upload sobat lemdik!`,
+        });
+      }
     } catch (error) {
-      console.error("ERROR SOAL PELATIHAN: ", error);
-      Toast.fire({
-        icon: "success",
-        title: `Ups, belum ada bank soal yang kamu upload sobat lemdik!`,
-      });
+      console.error("ERROR UPDATE PELATIHAN: ", error);
     }
+
   };
 
   const [isOpenFormPeserta, setIsOpenFormPeserta] =
@@ -325,6 +360,7 @@ const TableDataBankSoalPelatihan = () => {
 
   React.useEffect(() => {
     handleFetchingPublicTrainingDataById();
+    handleFetchingPublicTrainingData()
   }, []);
 
   return (
@@ -413,13 +449,16 @@ const TableDataBankSoalPelatihan = () => {
 
         <div className="flex w-full items-center mb-2 -mt-3">
           <div className="w-full flex justify-end gap-2">
-            <div
-              onClick={(e) => handlingAddSoalUsers(e)}
-              className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
-            >
-              <FaRegPaperPlane />
-              Sematkan Soal
-            </div>
+            {
+              (data?.length > 0 && dataPelatihan!.IsSematkan != 'yes') && <div
+                onClick={(e) => handlingAddSoalUsers(e)}
+                className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
+              >
+                <FaRegPaperPlane />
+                Sematkan Soal
+              </div>
+            }
+
 
             {data.length == 0 && (
               <div

@@ -510,7 +510,7 @@ function DetailPelatihan() {
                     <Link
                       target="_blank"
                       className="text-blue-500 underline flex gap-2 items-center"
-                      href={`/admin/lemdiklat/pelatihan/${pelatihan!.KodePelatihan
+                      href={`/admin/${Cookies.get('XSRF093') == 'satdik' || Cookies.get('XSRF093') == 'balai' ? 'lemdiklat' : 'pusat'}/pelatihan/${pelatihan!.KodePelatihan
                         }/bank-soal/${pelatihan!.IdPelatihan}`}
                     >
                       <FiUploadCloud />
