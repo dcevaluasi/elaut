@@ -468,7 +468,7 @@ function FormLogin() {
   const [isInputErrorPassword, setIsInputErrorPassword] = React.useState<boolean>(true)
 
   return (
-    <section className="relative w-full h-screen md:h-full bg-none">
+    <section className="relative w-full h-full md:h-full bg-none">
       <Dialog open={isForgetPassword} onOpenChange={setIsForgetPassword}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>

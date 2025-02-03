@@ -42,8 +42,6 @@ import { Input } from "@/components/ui/input";
 import { generateTanggalPelatihan } from "@/utils/text";
 import DeleteButton from "../Dashboard/Actions/DeleteButton";
 import { Button } from "@/components/ui/button";
-import { FaEdit } from "react-icons/fa";
-import { BiEditAlt, BiFilter, BiFilterAlt } from "react-icons/bi";
 import { PublishButton } from "../Dashboard/Actions";
 import {
   PROGRAM_AKP,

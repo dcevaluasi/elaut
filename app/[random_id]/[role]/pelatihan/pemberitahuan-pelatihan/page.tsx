@@ -19,7 +19,7 @@ function page() {
                 <LucideFileSignature className="text-3xl" />
                 <div className="flex flex-col">
                   <h1 id="page-caption" className="font-semibold text-lg">
-                    Pemberitahuan Pelaksanaan Pelatihan
+                    Pelaksanaan Pelatihan
                   </h1>
                   <p className="font-medium text-gray-400 text-base">
                     Verifikasi pelaksanaan pelatihan untuk memberikan akses ke aplikasi E-LAUT kepada lembaga diklat penyelenggara kegiatan pelatihan!

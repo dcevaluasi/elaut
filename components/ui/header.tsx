@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Logo from "./logo";
 import MobileMenu from "./mobile-menu";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import {
   Popover,
@@ -22,6 +22,7 @@ import Cookies from "js-cookie";
 import DropdownUserPelatihan from "../dashboard/Header/DropdownUserPelatihan";
 import { IoMdSchool } from "react-icons/io";
 import Image from "next/image";
+import { Button } from "./button";
 
 export default function Header() {
   const [top, setTop] = React.useState<boolean>(true);
@@ -32,6 +33,8 @@ export default function Header() {
 
   const [openModal, setOpenModal] = React.useState(false);
   const [currentName, setCurrentName] = React.useState("");
+
+  const router = useRouter()
 
   const NavDropDown = ({
     href,
@@ -231,7 +234,7 @@ export default function Header() {
               : usePathname().includes("complete-profile") || usePathname().includes("cek-sertifikat")
                 ? "bg-white backdrop-blur-sm shadow-custom "
                 : ""
-        }  ${usePathname().includes("program") && "bg-transparent"} ${top && usePathname().includes('login') && 'bg-transparent !text-white'} max-w-6xl w-full mt-8   rounded-3xl  px-5`}
+        }  ${usePathname().includes("program") && "bg-transparent"} ${top && usePathname().includes('login') && 'bg-transparent !text-white'} max-w-6xl w-full mt-8    rounded-3xl  px-5`}
     >
       <div className="w-full mx-auto">
         <div className="flex items-center justify-between h-24 md:h-24 py-3 w-full mx-auto">
@@ -345,19 +348,18 @@ export default function Header() {
                   name="Cek Sertifikat"
                   top={top}
                 />
-                {/* <NavLinkDefault
-                  href="/#cek-sertifikat"
-                  name="Buku Petunjuk"
-                  top={top}
-                /> */}
+
                 {Cookies.get("XSRF081") ? (
                   <div className="flex items-center gap-3 2xsm:gap-7">
-                    {/* <!-- User Area --> */}
                     <DropdownUserPelatihan top={top} />
-                    {/* <!-- User Area --> */}
                   </div>
                 ) : (
-                  <></>
+                  <Button
+                    onClick={(e) => router.push('/login')}
+                    className="text-white w-fit text-base border bg-transparent border-blue-500 rounded-xl hover:bg-blue-500  py-3"
+                  >
+                    Login
+                  </Button>
                 )}
               </>
             </ul>

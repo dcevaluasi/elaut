@@ -46,6 +46,7 @@ import Toast from "@/components/toast";
 import Cookies from "js-cookie";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { elautBaseUrl } from "@/constants/urls";
+import { Badge } from "@/components/ui/badge";
 
 const TableDataBankSoalPelatihan = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -434,7 +435,7 @@ const TableDataBankSoalPelatihan = () => {
         {/* Header Tabel Data Pelatihan */}
         <div className="flex items-center mb-3 justify-between gap-3 ">
           {/* Statistik Pelatihan */}
-          <div className="flex w-full gap-3 sm:gap-5">
+          <div className="flex w-full items-center justify-between gap-3 sm:gap-5">
             <div className="flex min-w-47.5">
               <span className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-primary">
                 <span className="block h-2.5 w-full max-w-2.5 rounded-full bg-primary"></span>
@@ -444,6 +445,31 @@ const TableDataBankSoalPelatihan = () => {
                 <p className="text-sm font-medium">{data?.length} soal</p>
               </div>
             </div>
+            <div className="flex gap-2 absolute top-24 right-5">
+              {
+                data.length == 0 && <Badge
+                  variant="outline"
+                  className={`  cursor-pointer bg-rose-600 text-white hover:bg-rose-600`}
+                >
+                  Bank Soal Belum Diupload
+                </Badge>
+              }
+              {
+                dataPelatihan != null && <Badge
+                  variant="outline"
+                  className={`  cursor-pointer ${dataPelatihan!.IsSematkan != "yes"
+                    ? " bg-yellow-300 text-neutral-800 hover:bg-yellow-400"
+                    : " bg-green-500 text-white hover:bg-green-600"
+                    }`}
+                >
+                  {
+                    dataPelatihan!.IsSematkan != "yes" ? 'Soal Belum Disematkan ke Peserta' : 'Soal Sudah Disematkan'
+                  }
+                </Badge>
+              }
+            </div>
+
+
           </div>
         </div>
 

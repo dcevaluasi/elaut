@@ -141,10 +141,7 @@ export default function RootLayout({
         <div className="flex flex-col overflow-hidden supports-[overflow:clip]:overflow-clip relative">
 
           <Header />
-
-
           {children}
-          {/* <CallCenter /> */}
         </div>
       </body>
     </html>

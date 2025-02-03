@@ -1,11 +1,5 @@
 import React from "react";
 import {
-  Tooltip,
-  TooltipProvider,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/components/ui/tooltip";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -87,7 +81,8 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
       );
       Toast.fire({
         icon: "success",
-        title: `Berhasil mengupload file berita acara dan penandatangan, tunggu proses approval dari pusat!`,
+        title: 'Yeayyy!',
+        text: `Berhasil mengupload file berita acara dan penandatangan, tunggu proses approval dari pusat!`,
       });
       setIsUploading(!isUploading);
       handleFetchingData();
@@ -97,7 +92,8 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
       console.error("ERROR GENERATE SERTIFIKAT: ", error);
       Toast.fire({
         icon: "error",
-        title: `Gagal mengupload file berita acara dan penandatangan!`,
+        title: 'Oopsss!',
+        text: `Gagal mengupload file berita acara dan penandatangan!`,
       });
       setIsUploading(!isUploading);
       setOpenFormSertifikat(!openFormSertifikat);
@@ -207,7 +203,7 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
                   className="block text-gray-800 text-sm font-medium mb-1"
                   htmlFor="name"
                 >
-                  File Berita Acara <span className="text-red-600">*</span>
+                  File Berita Acara, Memo, Laporan Pelaksanaan<span className="text-red-600">*</span>
                 </label>
                 <div className="flex items-center justify-center w-full">
                   <label className="flex flex-col rounded-lg border-2 border-dashed w-full h-40 p-10 group text-center">
@@ -305,10 +301,10 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
               setOpenFormSertifikat(true);
             }}
             variant="outline"
-            title="Permohonan Penerbitan Sertifikat"
+            title="Pengajuan Penerbitan"
             className="ml-auto bg-blue-600 hover:bg-blue-600 duration-700 text-neutral-100 hover:text-neutral-100"
           >
-            <RiVerifiedBadgeFill className="h-5 w-5" />
+            <RiVerifiedBadgeFill className="h-5 w-5" /> Pengajuan Penerbitan
           </Button>
         ) : (
           <></>
