@@ -21,33 +21,7 @@ import "../app/css/navigation.css";
 // Import Swiper modules
 import { Pagination, Navigation, FreeMode } from "swiper/modules";
 
-import {
-  FaShip,
-  FaCertificate,
-  FaAnchor,
-  FaRegFileAlt,
-  FaMedal,
-  FaScrewdriver,
-  FaTachometerAlt,
-  FaStar,
-  FaShoppingCart,
-  FaTint,
-  FaSwimmer,
-  FaExclamationTriangle,
-  FaMapMarkerAlt,
-} from "react-icons/fa";
-import {
-  FaCapsules,
-  FaClipboardCheck,
-  FaFish,
-  FaIndustry,
-  FaLandmark,
-  FaLeaf,
-  FaRecycle,
-  FaSnowflake,
-  FaUsers,
-  FaWater,
-} from "react-icons/fa6";
+
 import { Bounce, Slide } from "react-awesome-reveal";
 import ListProgram from "./lists";
 import Logo from "./ui/logo";

@@ -23,6 +23,12 @@ import { HashLoader } from "react-spinners";
 import Image from "next/image";
 import { ALLOWED_EXTENSIONS, MAX_FILE_SIZE, MIN_FILE_SIZE } from "@/utils/file";
 import { SATUAN_PENDIDIKAN, SATUAN_PENDIDIKAN_KEAHLIAN } from "@/constants/pelatihan";
+import { wilayahIDUrl } from "@/constants/urls";
+
+type Region = {
+  code: string;
+  name: string;
+}
 
 function FormCompleteProfile() {
   const router = useRouter();
@@ -89,6 +95,50 @@ function FormCompleteProfile() {
     return true;
   };
 
+  const [provinces, setProvinces] = React.useState<Region[]>([])
+  const [regencies, setRegencies] = React.useState<Region[]>([])
+  const [districts, setDistricts] = React.useState<Region[]>([])
+
+
+  const handleFetchProvinces = async () => {
+    try {
+      const response: AxiosResponse = await axios.get(
+        `${wilayahIDUrl}/provinces.json`,
+      );
+      console.log({ response });
+      setProvinces(response.data)
+    } catch (error) {
+      console.error("Error fetching provinces:", error);
+      throw error;
+    }
+  }
+
+  const handleFetchRegencies = async (code: string) => {
+    try {
+      const response: AxiosResponse = await axios.get(
+        `${wilayahIDUrl}/regencies/${code}.json`,
+      );
+      console.log({ response });
+      setRegencies(response.data)
+    } catch (error) {
+      console.error("Error fetching regencies:", error);
+      throw error;
+    }
+  }
+
+  const handleFetchDistricts = async (code: string) => {
+    try {
+      const response: AxiosResponse = await axios.get(
+        `${wilayahIDUrl}/districts/${code}.json`,
+      );
+      console.log({ response });
+      setDistricts(response.data)
+    } catch (error) {
+      console.error("Error fetching districts:", error);
+      throw error;
+    }
+  }
+
   const handleFileChange = (setter: any, event: any) => {
     const file = event.target.files[0];
     if (file && validateFile(file)) {
@@ -117,6 +167,7 @@ function FormCompleteProfile() {
     React.useState<boolean>(false);
 
   const [userDetail, setUserDetail] = React.useState<User | null>(null);
+
 
   const handleFetchingUserDetail = async () => {
     try {
@@ -153,6 +204,7 @@ function FormCompleteProfile() {
   };
 
   React.useEffect(() => {
+    handleFetchProvinces()
     setTimeout(() => {
       handleFetchingUserDetail();
     }, 1000);
@@ -649,17 +701,21 @@ function FormCompleteProfile() {
                       >
                         Provinsi <span className="text-red-600">*</span>
                       </label>
-                      <Select>
-                        <SelectTrigger className="w-full text-base py-6">
-                          <SelectValue placeholder="Pilih provinsi" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Jakarta">DKI Jakarta</SelectItem>
-                          <SelectItem value="Jawa Tengah">
-                            Jawa Tengah
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                      {
+                        provinces.length != 0 && <Select>
+                          <SelectTrigger className="w-full text-base py-6">
+                            <SelectValue placeholder="Pilih provinsi" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {
+                              provinces.map((province, i) => (
+                                <SelectItem key={i} value={province.name} onSelect={() => { handleFetchDistricts(province.code) }}>{province.name}</SelectItem>
+                              ))
+                            }
+                          </SelectContent>
+                        </Select>
+                      }
+
                     </div>
                   </div>
                   <div className="flex flex-wrap -mx-3 mb-1">
@@ -670,28 +726,20 @@ function FormCompleteProfile() {
                       >
                         Kabupaten/Kota <span className="text-red-600">*</span>
                       </label>
-                      <Select>
-                        <SelectTrigger className="w-full text-base py-6">
-                          <SelectValue placeholder="Pilih kabupaten/kota" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Jakarta Utara">
-                            Jakarta Utara
-                          </SelectItem>
-                          <SelectItem value="Jakarta Timur">
-                            Jakarta Timur
-                          </SelectItem>
-                          <SelectItem value="Jakarta Selatan">
-                            Jakarta Selatan
-                          </SelectItem>
-                          <SelectItem value="Jakarta Barat">
-                            Jakarta Barat
-                          </SelectItem>
-                          <SelectItem value="Jakarta Pusat">
-                            Jakarta Pusat
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                      {
+                        regencies.length != 0 && <Select>
+                          <SelectTrigger className="w-full text-base py-6">
+                            <SelectValue placeholder="Pilih kabupaten/kota" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {
+                              regencies.map((regency, i) => (
+                                <SelectItem key={i} value={regency.name} onSelect={() => { handleFetchDistricts(regency.code) }}>{regency.name}</SelectItem>
+                              ))
+                            }
+                          </SelectContent>
+                        </Select>
+                      }
                     </div>
                   </div>
                   <div className="flex flex-wrap -mx-3 mb-1">
@@ -702,16 +750,20 @@ function FormCompleteProfile() {
                       >
                         Kecamatan <span className="text-red-600">*</span>
                       </label>
-                      <Select>
-                        <SelectTrigger className="w-full text-base py-6">
-                          <SelectValue placeholder="Pilih kecamatan" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Menteng">Menteng</SelectItem>
-                          <SelectItem value="Gambir">Gambir</SelectItem>
-                          <SelectItem value="Glodok">Glodok</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      {
+                        districts.length != 0 && <Select>
+                          <SelectTrigger className="w-full text-base py-6">
+                            <SelectValue placeholder="Pilih kecamatan" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {
+                              districts.map((district, i) => (
+                                <SelectItem key={i} value={district.name}>{district.name}</SelectItem>
+                              ))
+                            }
+                          </SelectContent>
+                        </Select>
+                      }
                     </div>
                   </div>
 
