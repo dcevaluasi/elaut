@@ -5,7 +5,11 @@ import React, { FormEvent } from "react";
 import Hero from "@/components/hero";
 import ListBPPP from "@/components/list-bppp";
 import Footer from "@/components/ui/footer";
-import { BALAI_PELATIHAN, BIDANG_PELATIHAN, SATUAN_PENDIDIKAN_KEAHLIAN } from "@/constants/pelatihan";
+import {
+  BALAI_PELATIHAN,
+  BIDANG_PELATIHAN,
+  SATUAN_PENDIDIKAN_KEAHLIAN,
+} from "@/constants/pelatihan";
 import { elautBaseUrl } from "@/constants/urls";
 import { PelatihanMasyarakat } from "@/types/product";
 import { convertDate, createSlug, truncateText } from "@/utils";
@@ -50,8 +54,8 @@ function PencarianPelatihan() {
     usePathname() == "/layanan/program/akp"
       ? "Awak Kapal Perikanan"
       : usePathname() == "/layanan/program/perikanan"
-        ? "Perikanan"
-        : "Kelautan";
+      ? "Perikanan"
+      : "Kelautan";
 
   const handleFetchingPublicTrainingData = async () => {
     setLoading(true);
@@ -221,7 +225,9 @@ function PencarianPelatihan() {
                         <SelectItem value={"Aspirasi"}>Aspirasi</SelectItem>
                         <SelectItem value={"PNBP/BLU"}>PNBP/BLU</SelectItem>
                         <SelectItem value={"Reguler"}>Reguler</SelectItem>
-                        <SelectItem value={"Satuan Pendidikan"}>Satuan Pendidikan</SelectItem>
+                        <SelectItem value={"Satuan Pendidikan"}>
+                          Satuan Pendidikan
+                        </SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -238,15 +244,22 @@ function PencarianPelatihan() {
                       </div>
                     </SelectTrigger>
                     <SelectContent className="z-[10000]">
-                      {
-                        selectedJenisPelatihan == 'Satuan Pendidikan' ? <SelectGroup>
+                      {selectedJenisPelatihan == "Satuan Pendidikan" ? (
+                        <SelectGroup>
                           <SelectLabel>Satuan Pendidikan KP</SelectLabel>
-                          {SATUAN_PENDIDIKAN_KEAHLIAN.map((balaiPelatihan, index) => (
-                            <SelectItem key={index} value={balaiPelatihan.FullName}>
-                              {balaiPelatihan.FullName}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup> : <SelectGroup>
+                          {SATUAN_PENDIDIKAN_KEAHLIAN.map(
+                            (balaiPelatihan, index) => (
+                              <SelectItem
+                                key={index}
+                                value={balaiPelatihan.FullName}
+                              >
+                                {balaiPelatihan.FullName}
+                              </SelectItem>
+                            )
+                          )}
+                        </SelectGroup>
+                      ) : (
+                        <SelectGroup>
                           <SelectLabel>Balai Pelatihan KP</SelectLabel>
                           {BALAI_PELATIHAN.map((balaiPelatihan, index) => (
                             <SelectItem key={index} value={balaiPelatihan.Name}>
@@ -254,8 +267,7 @@ function PencarianPelatihan() {
                             </SelectItem>
                           ))}
                         </SelectGroup>
-                      }
-
+                      )}
                     </SelectContent>
                   </Select>
 
@@ -309,8 +321,6 @@ function PencarianPelatihan() {
                     </SelectContent>
                   </Select>
 
-
-
                   <Select
                     value={selectedBulanPelatihan}
                     onValueChange={(value) => setSelectedBulanPelatihan(value)}
@@ -348,14 +358,14 @@ function PencarianPelatihan() {
                     selectedBidangPelatihan !== "" ||
                     selectedProgramPelatihan !== "" ||
                     selectedBulanPelatihan != "") && (
-                      <div
-                        onClick={() => handleClearFilter()}
-                        className="inline-flex gap-2 w-full px-3 text-sm items-center rounded-md bg-white p-1.5 cursor-pointer border border-gray-300"
-                      >
-                        <MdClear />
-                        Bersihkan Filter
-                      </div>
-                    )}
+                    <div
+                      onClick={() => handleClearFilter()}
+                      className="inline-flex gap-2 w-full px-3 text-sm items-center rounded-md bg-white p-1.5 cursor-pointer border border-gray-300"
+                    >
+                      <MdClear />
+                      Bersihkan Filter
+                    </div>
+                  )}
 
                   <div className="hidden md:flex w-full">
                     <Button
@@ -524,7 +534,6 @@ function PencarianPelatihan() {
 //   );
 // };
 
-
 const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
   return (
     <div className="shadow-custom flex flex-col relative w-[380px] h-fit rounded-3xl bg-white p-6">
@@ -536,14 +545,11 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
           width={0}
           height={0}
         />
-        {
-          pelatihan.PenyelenggaraPelatihan.includes('Politeknik') && <span
-            className="w-fit block text-center font-semibold px-4 py-2 bg-blue-600 rounded-3xl text-white absolute text-xs top-3 z-50 right-3"
-          >
+        {pelatihan.PenyelenggaraPelatihan.includes("Politeknik") && (
+          <span className="w-fit block text-center font-semibold px-4 py-2 bg-blue-600 rounded-3xl text-white absolute text-xs top-3 z-50 right-3">
             Khusus Taruna KP
           </span>
-        }
-
+        )}
       </div>
 
       {/* Header */}
@@ -565,25 +571,31 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
       {/* Description */}
       <p
         dangerouslySetInnerHTML={{
-          __html: pelatihan && truncateText(pelatihan?.DetailPelatihan, 150, "..."),
+          __html:
+            pelatihan && truncateText(pelatihan?.DetailPelatihan, 150, "..."),
         }}
         className="text-gray-600 text-sm leading-relaxed mb-4"
       />
 
       {/* Contact Info */}
-      {
-        pelatihan!.PenyelenggaraPelatihan.includes('Politeknik') ? <></> : <div className="flex justify-between text-sm text-blue-500 mb-4">
+      {pelatihan!.PenyelenggaraPelatihan.includes("Politeknik") ? (
+        <></>
+      ) : (
+        <div className="flex justify-between text-sm text-blue-500 mb-4">
           <div>
-            <p className="font-semibold">Layanan {pelatihan.PenyelenggaraPelatihan}</p>
+            <p className="font-semibold">
+              Layanan {pelatihan.PenyelenggaraPelatihan}
+            </p>
             <p>62887972983</p>
           </div>
           <div>
-            <p className="font-semibold">PTSP BLU</p>
+            <p className="font-semibold">
+              PTSP {pelatihan.PenyelenggaraPelatihan}
+            </p>
             <p>62889812833</p>
           </div>
         </div>
-      }
-
+      )}
 
       {/* Pricing */}
       <div className=" mb-4">
@@ -593,13 +605,19 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
             : `${formatToRupiah(pelatihan.HargaPelatihan)}`}
         </p>
         <p className="text-sm font-normal text-blue-500">
-          * {pelatihan!.PenyelenggaraPelatihan.includes('Politeknik') ? 'Diperuntukkan untuk taruna Poltek KP dan SUPM' : 'Tidak termasuk akomodasi & konsumsi'} <br />* Kuota Kelas {pelatihan!.KoutaPelatihan} Peserta
+          *{" "}
+          {pelatihan!.PenyelenggaraPelatihan.includes("Politeknik")
+            ? "Diperuntukkan untuk taruna Poltek KP dan SUPM"
+            : "Tidak termasuk akomodasi & konsumsi"}{" "}
+          <br />* Kuota Kelas {pelatihan!.KoutaPelatihan} Peserta
         </p>
       </div>
 
       {/* Button */}
       <Link
-        href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${pelatihan?.KodePelatihan}/${pelatihan?.IdPelatihan}`}
+        href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${
+          pelatihan?.KodePelatihan
+        }/${pelatihan?.IdPelatihan}`}
         className="w-full block text-center font-semibold px-6 py-3 bg-blue-600 rounded-3xl text-white"
       >
         Lihat Detail

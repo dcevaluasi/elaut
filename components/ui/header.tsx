@@ -367,7 +367,9 @@ export default function Header() {
                   <Button
                     onClick={(e) => router.push("/login")}
                     className={`${
-                      !top ? "text-white bg-blue-500" : "bg-transparent"
+                      !top || usePathname().includes("/layanan/pelatihan")
+                        ? "text-white bg-blue-500"
+                        : "bg-transparent"
                     } w-fit text-base border border-blue-500 rounded-xl hover:bg-blue-500  py-3`}
                   >
                     Login
