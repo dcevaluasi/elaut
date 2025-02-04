@@ -361,12 +361,6 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
                 setSelectedStatusFilter("Proses Pengajuan Sertifikat")
               }
             />
-            {/* <StatusButton
-                            label="Sudah Terbit"
-                            count={countDone}
-                            isSelected={selectedStatusFilter === "Sudah Di TTD"}
-                            onClick={() => setSelectedStatusFilter("Sudah Di TTD")}
-                        /> */}
           </ul>
         </section>
       </nav>
