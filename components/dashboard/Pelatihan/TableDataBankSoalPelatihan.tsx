@@ -31,6 +31,7 @@ import {
   TbCircleNumber3,
   TbCircleNumber4,
   TbDatabase,
+  TbInfoCircle,
 } from "react-icons/tb";
 import { FiUploadCloud } from "react-icons/fi";
 
@@ -446,7 +447,7 @@ const TableDataBankSoalPelatihan = () => {
 
       <>
         {/* Header Tabel Data Pelatihan */}
-        <div className="flex items-center mb-3 justify-between gap-3 ">
+        <div className="flex items-center mb-3 justify-between gap-3 border-b border-b-gray-200 pb-4">
           {/* Statistik Pelatihan */}
           <div className="flex w-full items-center justify-between gap-3 sm:gap-5">
             <div className="flex min-w-47.5">
@@ -458,42 +459,90 @@ const TableDataBankSoalPelatihan = () => {
                 <p className="text-sm font-medium">{data?.length} soal</p>
               </div>
             </div>
-            <div className="flex gap-2 absolute top-24 right-5">
-              {data.length == 0 && (
-                <Badge
-                  variant="outline"
-                  className={`  cursor-pointer bg-rose-600 text-white hover:bg-rose-600`}
-                >
-                  Bank Soal Belum Diupload
-                </Badge>
-              )}
-              {dataPelatihan != null && (
-                <Badge
-                  variant="outline"
-                  className={`  cursor-pointer ${
-                    dataPelatihan!.IsSematkan != "yes"
-                      ? " bg-yellow-300 text-neutral-800 hover:bg-yellow-400"
-                      : " bg-green-500 text-white hover:bg-green-600"
-                  }`}
-                >
-                  {dataPelatihan!.IsSematkan != "yes"
-                    ? "Soal Belum Disematkan ke Peserta"
-                    : "Soal Sudah Disematkan"}
-                </Badge>
-              )}
-            </div>
           </div>
         </div>
 
-        <div className="flex w-full items-center mb-2 -mt-3">
+        <div className="flex w-full items-center justify-between mb-2 mt-3">
+          <div className="flex gap-2 w-full">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Badge
+                  variant="outline"
+                  className={`  cursor-pointer bg-gray-500 text-gray-100`}
+                >
+                  <TbInfoCircle />
+                  Informasi
+                </Badge>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="max-w-sm">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Informasi Bank Soal</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    <p className="text-gray-600 text-justify">
+                      <span className="font-medium">1)</span> Soal diupload
+                      untuk satu kelas pelatihan, sehingga untuk kelas yang lain
+                      dapat menggunakan bank soal yang berbeda
+                      <br />
+                      <span className="font-medium">2)</span> Soal diupload
+                      menggunakan template yang telah disediakan
+                      <br />
+                      <span className="font-medium">3)</span> Setelah soal
+                      diupload, tidak langsung masuk ke akun peserta pelatihan
+                      yang akan mengikuti pre-test dan post-test
+                      <br />
+                      <span className="font-medium">4)</span> Untuk memulai
+                      pelaksanaan pre-test dan post-test, perlu dilakukan
+                      penyematan soal yang menandakan pelaksanaan pre-test atau
+                      post-test telah dimulai dengan kode akses yang tergenerate
+                      di masing-masing dashboard peserta
+                      <br />
+                      5) Soal akan dishuffle atau diacak, sehingga peserta tidak
+                      mendapatkan posisi soal serta posisi jawaban yang sama
+                    </p>
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Close</AlertDialogCancel>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            {data.length == 0 && (
+              <Badge
+                variant="outline"
+                className={`  cursor-pointer bg-rose-600 text-white hover:bg-rose-600`}
+              >
+                Bank Soal Belum Diupload
+              </Badge>
+            )}
+            {dataPelatihan != null && (
+              <Badge
+                variant="outline"
+                className={`  cursor-pointer ${
+                  dataPelatihan!.IsSematkan != "yes"
+                    ? " bg-yellow-300 text-neutral-800 hover:bg-yellow-400"
+                    : " bg-green-500 text-white hover:bg-green-600"
+                }`}
+              >
+                {dataPelatihan!.IsSematkan != "yes"
+                  ? "Soal Belum Disematkan ke Peserta"
+                  : "Soal Sudah Disematkan"}
+              </Badge>
+            )}
+          </div>
           <div className="w-full flex justify-end gap-2">
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                {data?.length > 0 && dataPelatihan!.IsSematkan != "yes" && (
-                  <div className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">
-                    <FaRegPaperPlane />
-                    Sematkan Soal
-                  </div>
+                {dataPelatihan! == null ? (
+                  <></>
+                ) : (
+                  dataPelatihan!.UserPelatihan!.length > 0 &&
+                  dataPelatihan!.IsSematkan != "yes" && (
+                    <div className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">
+                      <FaRegPaperPlane />
+                      Sematkan Soal
+                    </div>
+                  )
                 )}
               </AlertDialogTrigger>
               <AlertDialogContent>
@@ -549,6 +598,32 @@ const TableDataBankSoalPelatihan = () => {
             table={table}
             type={"short"}
           />
+          <div className="flex items-center justify-end space-x-2 py-4">
+            <div className="text-muted-foreground flex-1 text-sm">
+              {table.getFilteredSelectedRowModel().rows.length} of{" "}
+              {table.getFilteredRowModel().rows.length} row(s) selected.
+            </div>
+            <div className="space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="font-inter"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="font-inter"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
         </div>
       </>
     </div>

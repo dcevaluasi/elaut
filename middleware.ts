@@ -7,9 +7,9 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 export function middleware(request: any) {
-  if (request.headers.get("x-forwarded-proto") === "http") {
-    return NextResponse.redirect(`https://${request.headers.get("host")}${request.nextUrl.pathname}`, 301);
-  }
+  // if (request.headers.get("x-forwarded-proto") === "http") {
+  //   return NextResponse.redirect(`https://${request.headers.get("host")}${request.nextUrl.pathname}`, 301);
+  // }
 
   const XSRF091 = request.cookies.get('XSRF091')
   const XSRF081 = request.cookies.get('XSRF081')
