@@ -46,6 +46,7 @@ export type UserPelatihan = {
   NoSertifikat: string
   PostTest: number
   PreTest: number
+  JenisKelamin: string
   StatusPembayaran: string
   UpdateAt: string
   WaktuPembayaran: string
@@ -56,5 +57,5 @@ export type UserPelatihan = {
   Nama: string
   TotalBayar: string
   CodeAksess: string
-  TempatTanggalLahir: string;
+  TempatTanggalLahir: string
 }

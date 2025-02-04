@@ -11,6 +11,7 @@ import ChartSertifikasiKompetensiMonthly from "../../Charts/ChartSertifikasiKomp
 import { BALAI_PELATIHAN } from "@/constants/pelatihan";
 import { HashLoader } from "react-spinners";
 import Image from "next/image";
+import { User, UserPelatihan } from "@/types/user";
 
 const SummaryELAUT: React.FC = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -38,14 +39,34 @@ const SummaryELAUT: React.FC = () => {
 
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
 
+  const [dataUser, setDataUser] = React.useState<UserPelatihan[]>([])
+
+  const handleFetchingUserPelatihan = async () => {
+    setIsFetching(true);
+    try {
+      const response: AxiosResponse = await axios.get(
+        `${baseUrl}/getUsersPelatihan`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+      );
+      setDataUser(response.data.data);
+      console.log("User Pelatihan Data Response:", response);
+      setIsFetching(false);
+    } catch (error) {
+      console.error("Error fetching training data:", error);
+      setIsFetching(false);
+    }
+  };
+
   const handleFetchingPublicTrainingData = async (
     selectedBalaiPelatihan: string
   ) => {
     setIsFetching(true);
     try {
       const response: AxiosResponse = await axios.get(
-        `${baseUrl}/lemdik/getPelatihan?penyelenggara_pelatihan=${
-          selectedBalaiPelatihan === "All" ? "" : selectedBalaiPelatihan
+        `${baseUrl}/lemdik/getPelatihan?penyelenggara_pelatihan=${selectedBalaiPelatihan === "All" ? "" : selectedBalaiPelatihan
         }`
       );
       setData(response.data.data);
@@ -60,6 +81,7 @@ const SummaryELAUT: React.FC = () => {
   useEffect(() => {
     const fetchAllData = () => {
       fetchInformationLemdiklat();
+      handleFetchingUserPelatihan()
       handleFetchingPublicTrainingData("All");
     };
 
@@ -108,7 +130,7 @@ const SummaryELAUT: React.FC = () => {
               ) : data != null ? (
                 <>
                   <ChartMasyarakatDilatihMonthly data={data} />
-                  <ChartDetailMasyarakatDilatih data={data} />
+                  <ChartDetailMasyarakatDilatih data={data} dataUser={dataUser} />
                 </>
               ) : (
                 <div className="relative max-w-6xl w-full mx-auto px-4 sm:px-6 mt-20">
