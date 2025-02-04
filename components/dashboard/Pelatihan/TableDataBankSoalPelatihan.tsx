@@ -9,6 +9,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
 import {
@@ -35,7 +36,12 @@ import { FiUploadCloud } from "react-icons/fi";
 
 import { usePathname, useRouter } from "next/navigation";
 
-import { DetailPelatihanMasyarakat, PelatihanMasyarakat, SoalPelatihan, UserPelatihan } from "@/types/product";
+import {
+  DetailPelatihanMasyarakat,
+  PelatihanMasyarakat,
+  SoalPelatihan,
+  UserPelatihan,
+} from "@/types/product";
 import axios, { AxiosResponse } from "axios";
 import { extractLastSegment } from "@/utils";
 
@@ -53,7 +59,8 @@ const TableDataBankSoalPelatihan = () => {
   const pathname = usePathname();
   const id = extractLastSegment(pathname);
 
-  const [dataPelatihan, setDataPelatihan] = React.useState<DetailPelatihanMasyarakat | null>(null)
+  const [dataPelatihan, setDataPelatihan] =
+    React.useState<DetailPelatihanMasyarakat | null>(null);
 
   const handleFetchingPublicTrainingData = async () => {
     try {
@@ -68,7 +75,6 @@ const TableDataBankSoalPelatihan = () => {
     }
   };
 
-
   const [data, setData] = React.useState<SoalPelatihan[] | []>([]);
   const handleFetchingPublicTrainingDataById = async () => {
     try {
@@ -81,17 +87,21 @@ const TableDataBankSoalPelatihan = () => {
         }
       );
       setData(response.data.data);
-      console.log({ response })
+      console.log({ response });
     } catch (error) {
       console.error("Error posting training data:", error);
       throw error;
     }
   };
 
+  const [isLoadingSematkanSoal, setIsLoadingSematkanSoal] =
+    React.useState<boolean>(false);
+
   const handlingAddSoalUsers = async (e: any) => {
     e.preventDefault();
+    setIsLoadingSematkanSoal(true);
     const formData = new FormData();
-    formData.append("IsSematkan", 'yes');
+    formData.append("IsSematkan", "yes");
     try {
       const response = await axios.put(
         `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${id}`,
@@ -120,17 +130,20 @@ const TableDataBankSoalPelatihan = () => {
           title: `Berhasil menyematkan soal ke peserta pelatihan!`,
         });
         console.log("SOAL PELATIHAN: ", response);
+        setIsLoadingSematkanSoal(false);
       } catch (error) {
         console.error("ERROR SOAL PELATIHAN: ", error);
         Toast.fire({
           icon: "success",
           title: `Ups, belum ada bank soal yang kamu upload sobat lemdik!`,
         });
+        setIsLoadingSematkanSoal(false);
       }
+      setIsLoadingSematkanSoal(false);
     } catch (error) {
       console.error("ERROR UPDATE PELATIHAN: ", error);
+      setIsLoadingSematkanSoal(false);
     }
-
   };
 
   const [isOpenFormPeserta, setIsOpenFormPeserta] =
@@ -361,7 +374,7 @@ const TableDataBankSoalPelatihan = () => {
 
   React.useEffect(() => {
     handleFetchingPublicTrainingDataById();
-    handleFetchingPublicTrainingData()
+    handleFetchingPublicTrainingData();
   }, []);
 
   return (
@@ -446,45 +459,74 @@ const TableDataBankSoalPelatihan = () => {
               </div>
             </div>
             <div className="flex gap-2 absolute top-24 right-5">
-              {
-                data.length == 0 && <Badge
+              {data.length == 0 && (
+                <Badge
                   variant="outline"
                   className={`  cursor-pointer bg-rose-600 text-white hover:bg-rose-600`}
                 >
                   Bank Soal Belum Diupload
                 </Badge>
-              }
-              {
-                dataPelatihan != null && <Badge
+              )}
+              {dataPelatihan != null && (
+                <Badge
                   variant="outline"
-                  className={`  cursor-pointer ${dataPelatihan!.IsSematkan != "yes"
-                    ? " bg-yellow-300 text-neutral-800 hover:bg-yellow-400"
-                    : " bg-green-500 text-white hover:bg-green-600"
-                    }`}
+                  className={`  cursor-pointer ${
+                    dataPelatihan!.IsSematkan != "yes"
+                      ? " bg-yellow-300 text-neutral-800 hover:bg-yellow-400"
+                      : " bg-green-500 text-white hover:bg-green-600"
+                  }`}
                 >
-                  {
-                    dataPelatihan!.IsSematkan != "yes" ? 'Soal Belum Disematkan ke Peserta' : 'Soal Sudah Disematkan'
-                  }
+                  {dataPelatihan!.IsSematkan != "yes"
+                    ? "Soal Belum Disematkan ke Peserta"
+                    : "Soal Sudah Disematkan"}
                 </Badge>
-              }
+              )}
             </div>
-
-
           </div>
         </div>
 
         <div className="flex w-full items-center mb-2 -mt-3">
           <div className="w-full flex justify-end gap-2">
-            {
-              (data?.length > 0 && dataPelatihan!.IsSematkan != 'yes') && <div
-                onClick={(e) => handlingAddSoalUsers(e)}
-                className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
-              >
-                <FaRegPaperPlane />
-                Sematkan Soal
-              </div>
-            }
-
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                {data?.length > 0 && dataPelatihan!.IsSematkan != "yes" && (
+                  <div className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">
+                    <FaRegPaperPlane />
+                    Sematkan Soal
+                  </div>
+                )}
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Apakah anda yakin akan menyematkan soal pre-test dan
+                    post-test?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Pastikan soal yang sudah diupload sudah sesuai standar dan
+                    mutu pelaksanaan ujian pre-test dan post-test pada
+                    pelaksanaan sebagai evaluasi peserta!
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  {isLoadingSematkanSoal ? (
+                    <AlertDialogAction className="bg-gray-900">
+                      Loading ...
+                    </AlertDialogAction>
+                  ) : (
+                    <>
+                      <AlertDialogCancel>Batal</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={(e) => handlingAddSoalUsers(e)}
+                        className="bg-gray-900"
+                      >
+                        Sematkan
+                      </AlertDialogAction>
+                    </>
+                  )}
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
 
             {data.length == 0 && (
               <div

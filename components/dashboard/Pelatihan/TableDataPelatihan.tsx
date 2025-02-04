@@ -447,31 +447,43 @@ const TableDataPelatihan: React.FC = () => {
                     {pelatihan != null ? (
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          {pelatihan!.NoSertifikat != "" &&
-                          pelatihan!.StatusPenerbitan != "" ? (
-                            <Badge
-                              variant="outline"
-                              className={`top-4 right-4 absolute cursor-pointer ${
-                                pelatihan!.StatusPenerbitan == "On Progress"
-                                  ? " bg-yellow-300 text-neutral-800 hover:bg-yellow-400"
-                                  : " bg-green-500 text-white hover:bg-green-600"
-                              }`}
-                            >
-                              {pelatihan!.StatusPenerbitan!}{" "}
-                              {usePathname().includes("lemdiklat")
-                                ? "Pengajuan Sertifikat"
-                                : "Penerbitan"}
-                            </Badge>
-                          ) : pelatihan!.NoSertifikat != "" ? (
-                            <Badge
-                              variant="outline"
-                              className={`top-4 right-4 absolute cursor-pointer  bg-blue-500 text-white hover:bg-blue-600`}
-                            >
-                              Generate File Sertifikat
-                            </Badge>
-                          ) : (
-                            <></>
-                          )}
+                          <>
+                            {pelatihan!.NoSertifikat != "" &&
+                            pelatihan!.StatusPenerbitan != "" ? (
+                              <Badge
+                                variant="outline"
+                                className={`top-4 right-4 absolute cursor-pointer ${
+                                  pelatihan!.StatusPenerbitan == "On Progress"
+                                    ? " bg-yellow-300 text-neutral-800 hover:bg-yellow-400"
+                                    : " bg-green-500 text-white hover:bg-green-600"
+                                }`}
+                              >
+                                {pelatihan!.StatusPenerbitan!}{" "}
+                                {usePathname().includes("lemdiklat")
+                                  ? "Pengajuan Sertifikat"
+                                  : "Penerbitan"}
+                              </Badge>
+                            ) : pelatihan!.NoSertifikat != "" ? (
+                              <Badge
+                                variant="outline"
+                                className={`top-4 right-4 absolute cursor-pointer  bg-blue-500 text-white hover:bg-blue-600`}
+                              >
+                                Generate File Sertifikat
+                              </Badge>
+                            ) : (
+                              <></>
+                            )}
+
+                            {pelatihan!.StatusPenerbitan ==
+                              "Verifikasi Pelaksanaan" && (
+                              <Badge
+                                variant="outline"
+                                className={`top-4 right-4 absolute cursor-pointer bg-yellow-300 text-neutral-800 hover:bg-yellow-400`}
+                              >
+                                Sedang Diverifikasi
+                              </Badge>
+                            )}
+                          </>
                         </AlertDialogTrigger>
                         <AlertDialogContent className="flex flex-col items-center justify-center !w-[420px]">
                           <AlertDialogHeader>
@@ -650,7 +662,7 @@ const TableDataPelatihan: React.FC = () => {
                           </Link>
 
                           {pelatihan?.StatusPenerbitan !=
-                          "Verifikasi Pelaksanaan" ? (
+                          "Sudah Diverifikasi Pelaksanaan" ? (
                             <></>
                           ) : (
                             <>
