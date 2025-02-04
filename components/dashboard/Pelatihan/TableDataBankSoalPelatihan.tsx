@@ -100,50 +100,63 @@ const TableDataBankSoalPelatihan = () => {
 
   const handlingAddSoalUsers = async (e: any) => {
     e.preventDefault();
-    setIsLoadingSematkanSoal(true);
-    const formData = new FormData();
-    formData.append("IsSematkan", "yes");
-    try {
-      const response = await axios.put(
-        `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${id}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
-          },
-        }
-      );
-      console.log("UPDATE PELATIHAN: ", response);
-      try {
-        const response = await axios.post(
-          `${elautBaseUrl}/lemdik/AddSoalUsers`,
-          {
-            id_pelatihan: id,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${Cookies.get("XSRF091")}`,
-            },
+    if (dataPelatihan != null) {
+      if (dataPelatihan!.UserPelatihan.length == 0) {
+        Toast.fire({
+          icon: "error",
+          title: "Oopsss!",
+          text: `Belum ada peserta!`,
+        });
+        return
+      } else {
+        setIsLoadingSematkanSoal(true);
+        const formData = new FormData();
+        formData.append("IsSematkan", "yes");
+        try {
+          const response = await axios.put(
+            `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${id}`,
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+              },
+            }
+          );
+          console.log("UPDATE PELATIHAN: ", response);
+          try {
+            const response = await axios.post(
+              `${elautBaseUrl}/lemdik/AddSoalUsers`,
+              {
+                id_pelatihan: id,
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+                },
+              }
+            );
+            Toast.fire({
+              icon: "success",
+              title: "Yeayyy!",
+              text: `Berhasil menyematkan soal ke peserta pelatihan!`,
+            });
+            console.log("SOAL PELATIHAN: ", response);
+            setIsLoadingSematkanSoal(false);
+          } catch (error) {
+            console.error("ERROR SOAL PELATIHAN: ", error);
+            Toast.fire({
+              icon: "error",
+              title: "Oopsss!",
+              text: `Belum ada bank soal yang kamu upload sobat lemdik!`,
+            });
+            setIsLoadingSematkanSoal(false);
           }
-        );
-        Toast.fire({
-          icon: "success",
-          title: `Berhasil menyematkan soal ke peserta pelatihan!`,
-        });
-        console.log("SOAL PELATIHAN: ", response);
-        setIsLoadingSematkanSoal(false);
-      } catch (error) {
-        console.error("ERROR SOAL PELATIHAN: ", error);
-        Toast.fire({
-          icon: "success",
-          title: `Ups, belum ada bank soal yang kamu upload sobat lemdik!`,
-        });
-        setIsLoadingSematkanSoal(false);
+          setIsLoadingSematkanSoal(false);
+        } catch (error) {
+          console.error("ERROR UPDATE PELATIHAN: ", error);
+          setIsLoadingSematkanSoal(false);
+        }
       }
-      setIsLoadingSematkanSoal(false);
-    } catch (error) {
-      console.error("ERROR UPDATE PELATIHAN: ", error);
-      setIsLoadingSematkanSoal(false);
     }
   };
 
@@ -533,17 +546,13 @@ const TableDataBankSoalPelatihan = () => {
           <div className="w-full flex justify-end gap-2">
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                {dataPelatihan! == null ? (
-                  <></>
-                ) : (
-                  dataPelatihan!.UserPelatihan!.length > 0 &&
+                {dataPelatihan != null &&
                   dataPelatihan!.IsSematkan != "yes" && (
                     <div className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">
                       <FaRegPaperPlane />
                       Sematkan Soal
                     </div>
-                  )
-                )}
+                  )}
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
