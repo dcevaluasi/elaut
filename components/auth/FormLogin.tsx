@@ -591,7 +591,7 @@ function FormLogin() {
                 Login dan Ikuti
               </span>{" "}<br />
               <span className="z-0 bg-clip-text  w-[600px] leading-[110%]  text-transparent bg-gradient-to-r  from-blue-500  to-teal-400">
-                Pelatihan di ELAUT
+                Pelatihan di E-LAUT
               </span>{" "}
             </h1>
             <p className="text-base text-center mx-auto text-gray-200 mt-2  max-w-3xl">
