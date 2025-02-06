@@ -1,17 +1,18 @@
 "use client";
 import React from "react";
-import { HiCheckBadge } from "react-icons/hi2";
 import { GiBattery75, GiPapers } from "react-icons/gi";
 import { MdSchool } from "react-icons/md";
 import Cookies from "js-cookie";
 import axios, { AxiosResponse } from "axios";
 import { LemdiklatDetailInfo } from "@/types/lemdiklat";
-import { RiFileCloseFill, RiLogoutCircleRFill, RiShipFill } from "react-icons/ri";
+import {
+  RiFileCloseFill,
+  RiLogoutCircleRFill,
+  RiShipFill,
+} from "react-icons/ri";
 import { Blanko, BlankoKeluar, BlankoRusak } from "@/types/blanko";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-import { Button } from "flowbite-react";
 
 import {
   Popover,
@@ -26,9 +27,9 @@ import ChartPopover from "../../Charts/ChartPopover";
 import ChartCertificatesMonthly from "../../Charts/ChartCertificatesMonthly";
 import ChartPopoverKeahlian from "../../Charts/ChartPopoverKeahlian";
 import ChartPopoverKeterampilan from "../../Charts/ChartPopoverKeterampilan";
+import { blankoAkapiBaseUrl, elautBaseUrl } from "@/constants/urls";
 
 const SummaryAKP: React.FC = () => {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const token = Cookies.get("XSRF091");
 
   const [lemdikData, setLemdikData] =
@@ -36,7 +37,7 @@ const SummaryAKP: React.FC = () => {
 
   const fetchInformationLemdiklat = async () => {
     try {
-      const response = await axios.get(`${baseUrl}/lemdik/getLemdik`, {
+      const response = await axios.get(`${elautBaseUrl}/lemdik/getLemdik`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -53,7 +54,7 @@ const SummaryAKP: React.FC = () => {
   const handleFetchingBlanko = async () => {
     try {
       const response: AxiosResponse = await axios.get(
-        `${process.env.NEXT_PUBLIC_BLANKO_AKAPI_URL}/adminpusat/getBlankoKeluar`
+        `${blankoAkapiBaseUrl}/adminpusat/getBlankoKeluar`
       );
       setData(response.data.data);
     } catch (error) {
@@ -67,7 +68,7 @@ const SummaryAKP: React.FC = () => {
   const handleFetchingBlankoRusak = async () => {
     try {
       const response: AxiosResponse = await axios.get(
-        `${process.env.NEXT_PUBLIC_BLANKO_AKAPI_URL}/adminpusat/getBlankoRusak`
+        `${blankoAkapiBaseUrl}/adminpusat/getBlankoRusak`
       );
       setBlankoRusak(response.data.data);
     } catch (error) {
@@ -80,7 +81,7 @@ const SummaryAKP: React.FC = () => {
   const handleFetchingBlankoMaster = async () => {
     try {
       const response: AxiosResponse = await axios.get(
-        `${process.env.NEXT_PUBLIC_BLANKO_AKAPI_URL}/adminpusat/getBlanko`
+        `${blankoAkapiBaseUrl}/adminpusat/getBlanko`
       );
       setDataBlanko(response.data.data);
     } catch (error) {
@@ -104,8 +105,8 @@ const SummaryAKP: React.FC = () => {
     fetchAllData();
   }, []);
 
-  const [startDate, setStartDate] = React.useState('2024-05-31');
-  const [endDate, setEndDate] = React.useState('2025-12-31');
+  const [startDate, setStartDate] = React.useState("2024-05-31");
+  const [endDate, setEndDate] = React.useState("2025-12-31");
 
   const {
     data: dataSertifikatByTypeBlankoCoP,
@@ -127,10 +128,8 @@ const SummaryAKP: React.FC = () => {
     end_date: endDate,
   });
 
-
-
-  console.log({ dataSertifikatByTypeBlankoCoP })
-  console.log({ dataSertifikatByTypeBlankoCoC })
+  console.log({ dataSertifikatByTypeBlankoCoP });
+  console.log({ dataSertifikatByTypeBlankoCoC });
 
   return (
     <>
@@ -152,10 +151,13 @@ const SummaryAKP: React.FC = () => {
         </div>
       </div>
       <div className="grid grid-cols-1 gap-4 h-fit max-h-fit w-full md:grid-cols-3 md:gap-3 xl:grid-cols-3 2xl:gap-3">
-
-
-        {
-          isFetchingSertifikatByTypeBlankoCoC && isFetchingSertifikatByTypeBlankoCoP ? <></> : dataSertifikatByTypeBlankoCoC != null && dataSertifikatByTypeBlankoCoP != null ? dataSertifikatByTypeBlankoCoC.data != null && dataSertifikatByTypeBlankoCoP.data != null ?
+        {isFetchingSertifikatByTypeBlankoCoC &&
+        isFetchingSertifikatByTypeBlankoCoP ? (
+          <></>
+        ) : dataSertifikatByTypeBlankoCoC != null &&
+          dataSertifikatByTypeBlankoCoP != null ? (
+          dataSertifikatByTypeBlankoCoC.data != null &&
+          dataSertifikatByTypeBlankoCoP.data != null ? (
             <>
               <Popover>
                 <PopoverTrigger asChild>
@@ -163,7 +165,10 @@ const SummaryAKP: React.FC = () => {
                     <CardDataStats
                       title="Total Pengadaan"
                       total={dataBlanko
-                        .reduce((total, item) => total + item.JumlahPengadaan, 0)
+                        .reduce(
+                          (total, item) => total + item.JumlahPengadaan,
+                          0
+                        )
                         .toString()}
                       rate="0%"
                       levelUp
@@ -177,36 +182,65 @@ const SummaryAKP: React.FC = () => {
                 </PopoverContent>
               </Popover>
 
-
               <span onClick={(e) => setSelectedId(0)}>
                 <CardDataStats
                   title="Total Blanko Terpakai"
                   total={(
-                    (dataSertifikatByTypeBlankoCoC!.data.reduce((total, item) => total + item.jumlah_sertifikat, 0) + dataSertifikatByTypeBlankoCoP?.data.reduce((total, item) => total + item.jumlah_sertifikat, 0) + blankoRusak.length).toString()
-                  ).toString()}
+                    dataSertifikatByTypeBlankoCoC!.data.reduce(
+                      (total, item) => total + item.jumlah_sertifikat,
+                      0
+                    ) +
+                    dataSertifikatByTypeBlankoCoP?.data.reduce(
+                      (total, item) => total + item.jumlah_sertifikat,
+                      0
+                    ) +
+                    blankoRusak.length
+                  )
+                    .toString()
+                    .toString()}
                   rate="0%"
                   levelUp
                 >
                   <RiLogoutCircleRFill className="text-primary text-3xl" />
                 </CardDataStats>
-
               </span>
-
 
               <Popover>
                 <PopoverTrigger asChild>
                   <span onClick={(e) => setSelectedId(0)}>
                     <CardDataStats
                       title="Sisa Persediaan"
-                      total={
-                        (dataBlanko.reduce(
+                      total={(
+                        dataBlanko.reduce(
                           (total, item) => total + item.JumlahPengadaan,
                           0
-                        ) - (dataSertifikatByTypeBlankoCoC!.data.reduce((total, item) => total + item.jumlah_sertifikat, 0) + dataSertifikatByTypeBlankoCoP?.data
-                          .filter((item) => item.jenis_sertifikat === 'Rating Awak Kapal Perikanan')
-                          .reduce((total, item) => total + item.jumlah_sertifikat, 0)) - dataSertifikatByTypeBlankoCoP?.data
-                            .filter((item) => item.jenis_sertifikat !== 'Rating Awak Kapal Perikanan')
-                            .reduce((total, item) => total + item.jumlah_sertifikat, 0) - blankoRusak.length).toString()}
+                        ) -
+                        (dataSertifikatByTypeBlankoCoC!.data.reduce(
+                          (total, item) => total + item.jumlah_sertifikat,
+                          0
+                        ) +
+                          dataSertifikatByTypeBlankoCoP?.data
+                            .filter(
+                              (item) =>
+                                item.jenis_sertifikat ===
+                                "Rating Awak Kapal Perikanan"
+                            )
+                            .reduce(
+                              (total, item) => total + item.jumlah_sertifikat,
+                              0
+                            )) -
+                        dataSertifikatByTypeBlankoCoP?.data
+                          .filter(
+                            (item) =>
+                              item.jenis_sertifikat !==
+                              "Rating Awak Kapal Perikanan"
+                          )
+                          .reduce(
+                            (total, item) => total + item.jumlah_sertifikat,
+                            0
+                          ) -
+                        blankoRusak.length
+                      ).toString()}
                       rate=""
                       levelDown
                     >
@@ -218,11 +252,31 @@ const SummaryAKP: React.FC = () => {
                   <ChartPopover
                     data={dataBlanko}
                     dataSertifikat={{
-                      CoC: dataSertifikatByTypeBlankoCoC!.data.reduce((total, item) => total + item.jumlah_sertifikat, 0) + dataSertifikatByTypeBlankoCoP?.data
-                        .filter((item) => item.jenis_sertifikat === 'Rating Awak Kapal Perikanan')
-                        .reduce((total, item) => total + item.jumlah_sertifikat, 0), CoP: dataSertifikatByTypeBlankoCoP?.data
-                          .filter((item) => item.jenis_sertifikat !== 'Rating Awak Kapal Perikanan')
-                          .reduce((total, item) => total + item.jumlah_sertifikat, 0)
+                      CoC:
+                        dataSertifikatByTypeBlankoCoC!.data.reduce(
+                          (total, item) => total + item.jumlah_sertifikat,
+                          0
+                        ) +
+                        dataSertifikatByTypeBlankoCoP?.data
+                          .filter(
+                            (item) =>
+                              item.jenis_sertifikat ===
+                              "Rating Awak Kapal Perikanan"
+                          )
+                          .reduce(
+                            (total, item) => total + item.jumlah_sertifikat,
+                            0
+                          ),
+                      CoP: dataSertifikatByTypeBlankoCoP?.data
+                        .filter(
+                          (item) =>
+                            item.jenis_sertifikat !==
+                            "Rating Awak Kapal Perikanan"
+                        )
+                        .reduce(
+                          (total, item) => total + item.jumlah_sertifikat,
+                          0
+                        ),
                     }}
                     dataBlankoRusak={blankoRusak}
                   />
@@ -231,12 +285,18 @@ const SummaryAKP: React.FC = () => {
 
               <CardDataStats
                 title="Total Sertifikat CoC"
-                total={
-                  (dataSertifikatByTypeBlankoCoC!.data.reduce((total, item) => total + item.jumlah_sertifikat, 0) + dataSertifikatByTypeBlankoCoP?.data
-                    .filter((item) => item.jenis_sertifikat === 'Rating Awak Kapal Perikanan')
-                    .reduce((total, item) => total + item.jumlah_sertifikat, 0))
-                    .toString()
-                }
+                total={(
+                  dataSertifikatByTypeBlankoCoC!.data.reduce(
+                    (total, item) => total + item.jumlah_sertifikat,
+                    0
+                  ) +
+                  dataSertifikatByTypeBlankoCoP?.data
+                    .filter(
+                      (item) =>
+                        item.jenis_sertifikat === "Rating Awak Kapal Perikanan"
+                    )
+                    .reduce((total, item) => total + item.jumlah_sertifikat, 0)
+                ).toString()}
                 rate=""
                 levelDown
               >
@@ -245,12 +305,13 @@ const SummaryAKP: React.FC = () => {
 
               <CardDataStats
                 title="Total Sertifikat CoP"
-                total={
-                  (dataSertifikatByTypeBlankoCoP?.data
-                    .filter((item) => item.jenis_sertifikat !== 'Rating Awak Kapal Perikanan')
-                    .reduce((total, item) => total + item.jumlah_sertifikat, 0))
-                    .toString()
-                }
+                total={dataSertifikatByTypeBlankoCoP?.data
+                  .filter(
+                    (item) =>
+                      item.jenis_sertifikat !== "Rating Awak Kapal Perikanan"
+                  )
+                  .reduce((total, item) => total + item.jumlah_sertifikat, 0)
+                  .toString()}
                 rate=""
                 levelDown
               >
@@ -258,29 +319,42 @@ const SummaryAKP: React.FC = () => {
               </CardDataStats>
               <CardDataStats
                 title="Total Blanko Rusak"
-                total={blankoRusak
-                  .length
-                  .toString()}
+                total={blankoRusak.length.toString()}
                 rate="0%"
                 levelUp
               >
                 <RiFileCloseFill className="text-primary text-3xl group-hover:scale-110" />
               </CardDataStats>
-
-
             </>
-            : <></>
-            : <></>
-        }
-
+          ) : (
+            <></>
+          )
+        ) : (
+          <></>
+        )}
       </div>
 
-      {
-        isFetchingSertifikatByTypeBlankoCoC && isFetchingSertifikatByTypeBlankoCoP ? <></> : dataSertifikatByTypeBlankoCoC != null && dataSertifikatByTypeBlankoCoP != null ? dataSertifikatByTypeBlankoCoC.data != null && dataSertifikatByTypeBlankoCoP.data != null ?
+      {isFetchingSertifikatByTypeBlankoCoC &&
+      isFetchingSertifikatByTypeBlankoCoP ? (
+        <></>
+      ) : dataSertifikatByTypeBlankoCoC != null &&
+        dataSertifikatByTypeBlankoCoP != null ? (
+        dataSertifikatByTypeBlankoCoC.data != null &&
+        dataSertifikatByTypeBlankoCoP.data != null ? (
           <div className="w-full mt-8">
-            <ChartCertificatesMonthly data={data!} dataSertifikat={{
-              CoC: dataSertifikatByTypeBlankoCoC!.data.reduce((total, item) => total + item.jumlah_sertifikat, 0), CoP: dataSertifikatByTypeBlankoCoP?.data.reduce((total, item) => total + item.jumlah_sertifikat, 0)
-            }} />
+            <ChartCertificatesMonthly
+              data={data!}
+              dataSertifikat={{
+                CoC: dataSertifikatByTypeBlankoCoC!.data.reduce(
+                  (total, item) => total + item.jumlah_sertifikat,
+                  0
+                ),
+                CoP: dataSertifikatByTypeBlankoCoP?.data.reduce(
+                  (total, item) => total + item.jumlah_sertifikat,
+                  0
+                ),
+              }}
+            />
 
             <Tabs defaultValue={"CoP"} className="w-full mb-3 -mt-4">
               <TabsList className="flex gap-2 w-full">
@@ -292,22 +366,30 @@ const SummaryAKP: React.FC = () => {
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="CoC">
-                <ChartPopoverKeahlian data={data!} dataSertifikat={{
-                  CoC: dataSertifikatByTypeBlankoCoC?.data,
-                  CoP: dataSertifikatByTypeBlankoCoP?.data
-                }} />
+                <ChartPopoverKeahlian
+                  data={data!}
+                  dataSertifikat={{
+                    CoC: dataSertifikatByTypeBlankoCoC?.data,
+                    CoP: dataSertifikatByTypeBlankoCoP?.data,
+                  }}
+                />
               </TabsContent>
               <TabsContent value="CoP">
-                <ChartPopoverKeterampilan data={data!} dataSertifikat={{
-                  CoP: dataSertifikatByTypeBlankoCoP?.data
-                }} />
+                <ChartPopoverKeterampilan
+                  data={data!}
+                  dataSertifikat={{
+                    CoP: dataSertifikatByTypeBlankoCoP?.data,
+                  }}
+                />
               </TabsContent>
             </Tabs>
           </div>
-          : <></>
-          : <></>
-      }
-
+        ) : (
+          <></>
+        )
+      ) : (
+        <></>
+      )}
     </>
   );
 };

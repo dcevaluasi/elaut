@@ -219,14 +219,10 @@ interface ChartThreeState {
 
 const ChartDetailMasyarakatDilatih: React.FC<{
   data: PelatihanMasyarakat[];
-  dataUser: UserPelatihan[]
+  dataUser: UserPelatihan[];
 }> = ({ data, dataUser }) => {
   const [selectedLemdiklat, setSelectedLemdiklat] =
     React.useState<string>("All");
-
-  const [state, setState] = useState<ChartThreeState>({
-    series: [],
-  });
 
   const [
     stateMasyarakatDilatihByBidangPelatihan,
@@ -256,35 +252,26 @@ const ChartDetailMasyarakatDilatih: React.FC<{
     series: [],
   });
 
-  const [
-    stateMasyarakatByGender,
-    setStateMasyarakatByGender,
-  ] = useState<ChartThreeState>({
-    series: [],
-  });
+  const [stateMasyarakatByGender, setStateMasyarakatByGender] =
+    useState<ChartThreeState>({
+      series: [],
+    });
 
-  const [
-    stateMasyarakatBySertifikat,
-    setStateMasyarakatBySertifikat,
-  ] = useState<ChartThreeState>({
-    series: [],
-  });
+  const [stateMasyarakatBySertifikat, setStateMasyarakatBySertifikat] =
+    useState<ChartThreeState>({
+      series: [],
+    });
 
   React.useEffect(() => {
     const dataMasyarakatByGender = [
-      dataUser
-        .filter((item) => item.JenisKelamin == 'Laki - Laki').length,
-      dataUser
-        .filter((item) => item.JenisKelamin == 'Perempuan').length,
+      dataUser.filter((item) => item.JenisKelamin == "Laki - Laki").length,
+      dataUser.filter((item) => item.JenisKelamin == "Perempuan").length,
     ];
 
     const dataMasyarakatBySertifikat = [
-      dataUser
-        .filter((item) => item.NoSertifikat == '').length,
-      dataUser
-        .filter((item) => item.NoSertifikat != '').length,
+      dataUser.filter((item) => item.NoSertifikat == "").length,
+      dataUser.filter((item) => item.NoSertifikat != "").length,
     ];
-
 
     const dataMasyarakatDilatihByBidangPelatihan = [
       data
@@ -380,52 +367,60 @@ const ChartDetailMasyarakatDilatih: React.FC<{
     });
 
     setStateMasyarakatByGender({
-      series: dataMasyarakatByGender
-    })
+      series: dataMasyarakatByGender,
+    });
 
     setStateMasyarakatBySertifikat({
-      series: dataMasyarakatBySertifikat
-    })
+      series: dataMasyarakatBySertifikat,
+    });
   }, [selectedLemdiklat, data, dataUser]);
 
   const chartDataMasyarakatDilatihByBidangPelatihan = [
     {
       browser: "chrome",
+      name: "Pengolahan dan Pemasaran",
       visitors: stateMasyarakatDilatihByBidangPelatihan.series[1],
       fill: "#1487af",
     },
     {
       browser: "safari",
+      name: "Mesin Perikanan",
       visitors: stateMasyarakatDilatihByBidangPelatihan.series[2],
       fill: "#073f51",
     },
     {
       browser: "firefox",
+      name: "Konservasi",
       visitors: stateMasyarakatDilatihByBidangPelatihan.series[3],
       fill: "#47bdda",
     },
     {
       browser: "edge",
+      name: "Wisata Bahari",
       visitors: stateMasyarakatDilatihByBidangPelatihan.series[4],
       fill: "#97d7e2",
     },
     {
       browser: "other",
+      name: "Manajemen Perikanan",
       visitors: stateMasyarakatDilatihByBidangPelatihan.series[5],
       fill: "#f7fdfb",
     },
     {
       browser: "other2",
+      name: "Budidaya",
       visitors: stateMasyarakatDilatihByBidangPelatihan.series[6],
       fill: "#1487af",
     },
     {
       browser: "other3",
+      name: "Penangkapan",
       visitors: stateMasyarakatDilatihByBidangPelatihan.series[7],
       fill: "#47bdda",
     },
     {
       browser: "other4",
+      name: "Kepelautan",
       visitors: stateMasyarakatDilatihByBidangPelatihan.series[0],
       fill: "#073f51",
     },
@@ -704,7 +699,7 @@ const ChartDetailMasyarakatDilatih: React.FC<{
               Showing total visitors for the last 6 months
             </div>
 
-            <div className="mt-4 flex gap-2">
+            <div className="mt-4 flex gap-1 flex-wrap items-center justify-center">
               {chartDataMasyarakatDilatihByBidangPelatihan.map((entry: any) => (
                 <div key={entry.name} className="flex gap-2 items-center">
                   <div
@@ -860,7 +855,7 @@ const ChartDetailMasyarakatDilatih: React.FC<{
               Showing total visitors for the last 6 months
             </div>
 
-            <div className="mt-4 flex gap-1 flex-wrap">
+            <div className="mt-4 flex gap-1 items-center justify-center flex-wrap">
               {chartDataMasyarakatDilatihByProgramPrioritas.map(
                 (entry: any) => (
                   <div key={entry.name} className="flex gap-2 items-center">
