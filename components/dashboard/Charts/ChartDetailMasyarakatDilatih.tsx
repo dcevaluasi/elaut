@@ -38,6 +38,9 @@ import { PelatihanMasyarakat } from "@/types/product";
 import { TrendingUp } from "lucide-react";
 import TableDataPelatihanSummary from "../Pelatihan/TableDataPelatihanSummary";
 import { UserPelatihan } from "@/types/user";
+import TableDataPelatihanMasyarakat from "../Tables/TableDataPelatihanMasyarakat";
+import TableDataPelatihanMasyarakatByProvinsi from "../Tables/TableDataPelatihanMasyarakatByProvinsi";
+import TableDataPelatihanMasyrakatByProgramPrioritas from "../Tables/TableDataPelatihanMasyrakatByProgramPrioritas";
 
 export const description = "A bar chart with an active bar";
 
@@ -793,7 +796,6 @@ const ChartDetailMasyarakatDilatih: React.FC<{
         <Card className="flex flex-col w-full">
           <CardHeader className="items-center pb-0">
             <CardTitle>Mendukung Program Terobosan</CardTitle>
-            {/* <CardDescription>Pendidikan Tinggi</CardDescription> */}
           </CardHeader>
           <CardContent className="flex-1 pb-0">
             <ChartContainer
@@ -1038,6 +1040,9 @@ const ChartDetailMasyarakatDilatih: React.FC<{
             </CardDescription>
           </CardHeader>
           <CardContent>
+            <TableDataPelatihanMasyarakat />
+            <TableDataPelatihanMasyarakatByProvinsi />
+            <TableDataPelatihanMasyrakatByProgramPrioritas />
             <TableDataPelatihanSummary data={data} />
           </CardContent>
         </Card>
