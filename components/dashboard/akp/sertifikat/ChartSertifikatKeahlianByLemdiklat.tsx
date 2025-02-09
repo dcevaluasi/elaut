@@ -12,7 +12,9 @@ import {
   LabelList,
   Pie,
   PieChart,
+  Label,
   Cell,
+  Text,
 } from "recharts";
 import {
   Card,
@@ -34,13 +36,12 @@ export default function ChartSertifikatKeahlianByLemdiklat({
 
   // Define color palette
   const colors = [
-    "#2662D9", // Chrome
-    "#2EB88A", // Safari
-    "#e88c30", // Firefox
-    "#AF57DB", // Edge
-    "#E0366F", // Other
-    "#60432F", // Other2
-    "#274754", // Rating
+    "#C4B5FD", // Purple
+    "#312E81",
+    "#4338CA",
+    "#6366F1",
+    "#818CF8",
+    "#A5B4FC", // Dark shades
   ];
 
   // Function to format data
@@ -86,13 +87,7 @@ export default function ChartSertifikatKeahlianByLemdiklat({
     return (
       <Card className="p-4 mb-6 ">
         <CardHeader>
-          <div
-            className={`flex ${
-              title.includes("Satuan Pendidikan") || title.includes("Swasta")
-                ? "flex-col"
-                : "flex-row items-center justify-between"
-            } `}
-          >
+          <div className={`flex flex-row items-center justify-between`}>
             <div className="flex flex-row items-center gap-2">
               <div>
                 {(title.includes("Balai Pelatihan") ||
@@ -215,26 +210,12 @@ function PieChartPercentage({
 
   // Define color palette
   const colors = [
-    "#2563EB",
-    "#1E40AF",
-    "#3B82F6",
-    "#60A5FA",
-    "#93C5FD", // Blue
-    "#0D9488",
-    "#0F766E",
-    "#14B8A6",
-    "#2DD4BF",
-    "#5EEAD4", // Tosca
-    "#7C3AED",
-    "#6D28D9",
-    "#8B5CF6",
-    "#A78BFA",
     "#C4B5FD", // Purple
     "#312E81",
     "#4338CA",
     "#6366F1",
+    "#312E81",
     "#818CF8",
-    "#A5B4FC", // Dark shades
   ];
 
   // Function to format data for each category
@@ -272,7 +253,7 @@ function PieChartPercentage({
   // Function to render the donut chart
   const renderDonutChart = () => {
     return (
-      <Card className="p-4 mb-6">
+      <Card className="p-4 mb-6 ">
         <CardHeader>
           <div className="flex flex-row items-center justify-between">
             <div className="flex flex-row items-center gap-2">
@@ -285,9 +266,6 @@ function PieChartPercentage({
                 <CardDescription>27 May 2024 - Now 2025</CardDescription>
               </div>
             </div>
-            <p className="font-semibold text-sm">
-              Total Sertifikat: {totalCertificates}
-            </p>
           </div>
         </CardHeader>
         <CardContent>
@@ -304,7 +282,7 @@ function PieChartPercentage({
                 strokeWidth={2}
                 outerRadius={80}
                 innerRadius={60} // Make it a donut chart
-                labelLine={false}
+                labelLine={true}
                 label={({ name, value }: any) =>
                   `${name}: ${((value / totalCertificates) * 100).toFixed(2)}%`
                 }
@@ -312,6 +290,17 @@ function PieChartPercentage({
                 {chartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.fill} />
                 ))}
+
+                <Label
+                  value={totalCertificates!.toString()!}
+                  position="center"
+                  style={{
+                    fontSize: "25px",
+                    fontWeight: "bold",
+                    textAnchor: "middle",
+                    fill: "#333",
+                  }}
+                />
               </Pie>
               <Tooltip />
             </PieChart>

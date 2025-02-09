@@ -29,7 +29,7 @@ export type SummarySertifikatByLemdiklatKeahlianItem = {
 }
 
 export type SummarySertifikatByLemdiklatKeahlianSubItem = {
-  'Jenis Sertifikasi': string
+  'Jenis Sertifikat': string
   total: number
 }
 

@@ -13,6 +13,7 @@ import {
   Pie,
   PieChart,
   Cell,
+  Label,
 } from "recharts";
 import {
   Card,
@@ -328,9 +329,6 @@ function PieChartPercentage({
                 <CardDescription>27 May 2024 - Now 2025</CardDescription>
               </div>
             </div>
-            <p className="font-semibold text-sm">
-              Total Sertifikat: {totalCertificates}
-            </p>
           </div>
         </CardHeader>
         <CardContent>
@@ -347,14 +345,24 @@ function PieChartPercentage({
                 strokeWidth={2}
                 outerRadius={80}
                 innerRadius={60} // Make it a donut chart
-                labelLine={false}
+                labelLine={true}
                 label={({ name, value }: any) =>
                   `${name}: ${((value / totalCertificates) * 100).toFixed(2)}%`
                 }
               >
                 {chartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.fill} />
-                ))}
+                ))}{" "}
+                <Label
+                  value={totalCertificates!.toString()!}
+                  position="center"
+                  style={{
+                    fontSize: "25px",
+                    fontWeight: "bold",
+                    textAnchor: "middle",
+                    fill: "#333",
+                  }}
+                />
               </Pie>
               <Tooltip />
             </PieChart>
