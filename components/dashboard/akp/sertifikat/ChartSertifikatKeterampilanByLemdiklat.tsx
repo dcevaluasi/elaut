@@ -481,7 +481,7 @@ function PieChartPercentageProgram({
                 outerRadius={80}
                 innerRadius={60} // Make it a donut chart
                 labelLine={true}
-                width={150}
+                width={200}
                 label={({ name, value }: any) =>
                   `${name}: ${((value / totalCertificates) * 100).toFixed(2)}%`
                 }

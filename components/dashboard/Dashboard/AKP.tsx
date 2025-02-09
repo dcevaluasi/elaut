@@ -18,7 +18,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { Button } from "flowbite-react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 import {
   Popover,
@@ -38,6 +44,8 @@ import { ChartSertifikatByLemdiklat } from "../akp";
 import ChartSertifikatKeterampilanByLemdiklat from "../akp/sertifikat/ChartSertifikatKeterampilanByLemdiklat";
 import ChartSertifikatKeahlianByLemdiklat from "../akp/sertifikat/ChartSertifikatKeahlianByLemdiklat";
 import useFetchSertifikatByProgram from "@/hooks/blanko/useFetchSertifikatByProgram";
+import { FaGraduationCap } from "react-icons/fa6";
+import { HashLoader } from "react-spinners";
 
 const AKP: React.FC = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -156,7 +164,7 @@ const AKP: React.FC = () => {
 
   return (
     <>
-      {dataSertifikatByLemdiklat != null && dataSertifikatByProgram != null && (
+      {dataSertifikatByLemdiklat != null && dataSertifikatByProgram != null ? (
         <Card className="p-4 mb-6">
           <CardHeader>
             <div className="flex flex-col">
@@ -176,6 +184,214 @@ const AKP: React.FC = () => {
             </div>
           </CardHeader>
           <CardContent>
+            <div className="flex flex-row items-center justify-between mb-3">
+              <div className="flex flex-row items-center gap-2">
+                <GiPapers />
+                <div className="flex flex-col gap-0">
+                  <CardTitle>Data Pengadaan dan Penggunaan Blanko</CardTitle>
+                  <CardDescription>27 May 2024 - Now 2025</CardDescription>
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-4 h-fit max-h-fit w-full md:grid-cols-3 md:gap-3 xl:grid-cols-3 2xl:gap-3 mb-10">
+              {isFetchingSertifikatByTypeBlankoCoC &&
+              isFetchingSertifikatByTypeBlankoCoP ? (
+                <></>
+              ) : dataSertifikatByTypeBlankoCoC != null &&
+                dataSertifikatByTypeBlankoCoP != null ? (
+                dataSertifikatByTypeBlankoCoC.data != null &&
+                dataSertifikatByTypeBlankoCoP.data != null ? (
+                  <>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <span onClick={(e) => setSelectedId(0)}>
+                          <CardDataStats
+                            title="Total Pengadaan"
+                            total={dataBlanko
+                              .reduce(
+                                (total, item) => total + item.JumlahPengadaan,
+                                0
+                              )
+                              .toString()}
+                            rate="0%"
+                            levelUp
+                          >
+                            <GiPapers className="text-primary text-3xl group-hover:scale-110" />
+                          </CardDataStats>
+                        </span>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-150">
+                        <ChartBlankoAwal data={dataBlanko} />
+                      </PopoverContent>
+                    </Popover>
+
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <span onClick={(e) => setSelectedId(0)}>
+                          <CardDataStats
+                            title="Total Blanko Terpakai"
+                            total={(
+                              dataSertifikatByTypeBlankoCoC!.data.reduce(
+                                (total, item) => total + item.jumlah_sertifikat,
+                                0
+                              ) +
+                              dataSertifikatByTypeBlankoCoP?.data.reduce(
+                                (total, item) => total + item.jumlah_sertifikat,
+                                0
+                              ) +
+                              blankoRusak.length
+                            )
+                              .toString()
+                              .toString()}
+                            rate="0%"
+                            levelUp
+                          >
+                            <RiLogoutCircleRFill className="text-primary text-3xl" />
+                          </CardDataStats>
+                        </span>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full">
+                        <CardDataStats
+                          title="Total Sertifikat CoC"
+                          total={(
+                            dataSertifikatByTypeBlankoCoC!.data.reduce(
+                              (total, item) => total + item.jumlah_sertifikat,
+                              0
+                            ) +
+                            dataSertifikatByTypeBlankoCoP?.data
+                              .filter(
+                                (item) =>
+                                  item.jenis_sertifikat ===
+                                  "Rating Awak Kapal Perikanan"
+                              )
+                              .reduce(
+                                (total, item) => total + item.jumlah_sertifikat,
+                                0
+                              )
+                          ).toString()}
+                          rate=""
+                          levelDown
+                        >
+                          <MdSchool className="text-primary text-3xl" />
+                        </CardDataStats>
+
+                        <CardDataStats
+                          title="Total Sertifikat CoP"
+                          total={dataSertifikatByTypeBlankoCoP?.data
+                            .filter(
+                              (item) =>
+                                item.jenis_sertifikat !==
+                                "Rating Awak Kapal Perikanan"
+                            )
+                            .reduce(
+                              (total, item) => total + item.jumlah_sertifikat,
+                              0
+                            )
+                            .toString()}
+                          rate=""
+                          levelDown
+                        >
+                          <RiShipFill className="text-primary text-3xl" />
+                        </CardDataStats>
+                        <CardDataStats
+                          title="Total Blanko Rusak"
+                          total={blankoRusak.length.toString()}
+                          rate="0%"
+                          levelUp
+                        >
+                          <RiFileCloseFill className="text-primary text-3xl group-hover:scale-110" />
+                        </CardDataStats>
+                      </PopoverContent>
+                    </Popover>
+
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <span onClick={(e) => setSelectedId(0)}>
+                          <CardDataStats
+                            title="Sisa Persediaan"
+                            total={(
+                              dataBlanko.reduce(
+                                (total, item) => total + item.JumlahPengadaan,
+                                0
+                              ) -
+                              (dataSertifikatByTypeBlankoCoC!.data.reduce(
+                                (total, item) => total + item.jumlah_sertifikat,
+                                0
+                              ) +
+                                dataSertifikatByTypeBlankoCoP?.data
+                                  .filter(
+                                    (item) =>
+                                      item.jenis_sertifikat ===
+                                      "Rating Awak Kapal Perikanan"
+                                  )
+                                  .reduce(
+                                    (total, item) =>
+                                      total + item.jumlah_sertifikat,
+                                    0
+                                  )) -
+                              dataSertifikatByTypeBlankoCoP?.data
+                                .filter(
+                                  (item) =>
+                                    item.jenis_sertifikat !==
+                                    "Rating Awak Kapal Perikanan"
+                                )
+                                .reduce(
+                                  (total, item) =>
+                                    total + item.jumlah_sertifikat,
+                                  0
+                                ) -
+                              blankoRusak.length
+                            ).toString()}
+                            rate=""
+                            levelDown
+                          >
+                            <GiBattery75 className="text-primary text-3xl" />
+                          </CardDataStats>
+                        </span>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-150">
+                        <ChartPopover
+                          data={dataBlanko}
+                          dataSertifikat={{
+                            CoC:
+                              dataSertifikatByTypeBlankoCoC!.data.reduce(
+                                (total, item) => total + item.jumlah_sertifikat,
+                                0
+                              ) +
+                              dataSertifikatByTypeBlankoCoP?.data
+                                .filter(
+                                  (item) =>
+                                    item.jenis_sertifikat ===
+                                    "Rating Awak Kapal Perikanan"
+                                )
+                                .reduce(
+                                  (total, item) =>
+                                    total + item.jumlah_sertifikat,
+                                  0
+                                ),
+                            CoP: dataSertifikatByTypeBlankoCoP?.data
+                              .filter(
+                                (item) =>
+                                  item.jenis_sertifikat !==
+                                  "Rating Awak Kapal Perikanan"
+                              )
+                              .reduce(
+                                (total, item) => total + item.jumlah_sertifikat,
+                                0
+                              ),
+                          }}
+                          dataBlankoRusak={blankoRusak}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </>
+                ) : (
+                  <></>
+                )
+              ) : (
+                <></>
+              )}
+            </div>
             {isFetchingSertifikatByTypeBlankoCoC &&
             isFetchingSertifikatByTypeBlankoCoP ? (
               <></>
@@ -217,6 +433,10 @@ const AKP: React.FC = () => {
             )}
           </CardContent>
         </Card>
+      ) : (
+        <div className="w-full flex h-[50vh] items-center justify-center">
+          <HashLoader color="#338CF5" size={50} />
+        </div>
       )}
     </>
   );
