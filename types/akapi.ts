@@ -15,12 +15,22 @@ export type SummarySertifikatByLemdiklat = {
 
 export type DataSummary = {
   data_lembaga: SummarySertifikatByLemdiklatItem[]
-  data_unit_kerja: SummarySertifikatByLemdiklatItem[]
+  data_unit_kerja: SummarySertifikatByLemdiklatKeahlianItem[]
 }
 
 export type SummarySertifikatByLemdiklatItem = {
   Lembaga: string
   sertifikat: SummarySertifikatByLemdiklatSubItem[]
+}
+
+export type SummarySertifikatByLemdiklatKeahlianItem = {
+  UnitKerja: string
+  sertifikat: SummarySertifikatByLemdiklatKeahlianSubItem[]
+}
+
+export type SummarySertifikatByLemdiklatKeahlianSubItem = {
+  'Jenis Sertifikasi': string
+  total: number
 }
 
 export type SummarySertifikatByLemdiklatSubItem = {

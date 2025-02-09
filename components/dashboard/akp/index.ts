@@ -1,4 +1,4 @@
-import ChartSertifikatByLemdiklat from "./sertifikat/ChartSertifikatByLemdiklat";
+import ChartSertifikatByLemdiklat from "./sertifikat/ChartSertifikatKeterampilanByLemdiklat";
 
 export {
     ChartSertifikatByLemdiklat

@@ -25,45 +25,30 @@ import {
 import { SummarySertifikatByLemdiklat } from "@/types/akapi";
 import { FaBuilding, FaGraduationCap, FaShip } from "react-icons/fa6";
 import { TrendingUp } from "lucide-react";
-import { ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-
-export default function ChartSertifikatByLemdiklat({
+export default function ChartSertifikatKeahlianByLemdiklat({
   dataLembaga,
 }: {
   dataLembaga: SummarySertifikatByLemdiklat;
 }) {
-  const data = dataLembaga.data.data_lembaga;
+  const data = dataLembaga.data.data_unit_kerja;
 
   // Define color palette
   const colors = [
-    "#2563EB",
-    "#1E40AF",
-    "#3B82F6",
-    "#60A5FA",
-    "#93C5FD", // Blue
-    "#0D9488",
-    "#0F766E",
-    "#14B8A6",
-    "#2DD4BF",
-    "#5EEAD4", // Tosca
-    "#7C3AED",
-    "#6D28D9",
-    "#8B5CF6",
-    "#A78BFA",
-    "#C4B5FD", // Purple
-    "#312E81",
-    "#4338CA",
-    "#6366F1",
-    "#818CF8",
-    "#A5B4FC", // Dark shades
+    "#2662D9", // Chrome
+    "#2EB88A", // Safari
+    "#e88c30", // Firefox
+    "#AF57DB", // Edge
+    "#E0366F", // Other
+    "#60432F", // Other2
+    "#274754", // Rating
   ];
 
   // Function to format data
   const formatData = (filter: string) =>
     data
-      .filter((item) => item.Lembaga.includes(filter))
+      .filter((item) => item.UnitKerja.includes(filter))
       .map((item, index) => ({
-        name: item.Lembaga.toUpperCase(),
+        name: item.UnitKerja.toUpperCase(),
         total: item.sertifikat?.reduce((sum, s) => sum + s.total, 0) || 0,
         fill: colors[index % colors.length],
         diklatDetails: item.sertifikat || [], // Attach the complete sertifikat details
@@ -71,9 +56,7 @@ export default function ChartSertifikatByLemdiklat({
 
   // Filtered datasets
   const balaiPelatihanData = formatData("BALAI PELATIHAN DAN PENYULUHAN");
-  const pelabuhanData = formatData("Pelabuhan");
-  const liamTrainingData = formatData("LIAN");
-  const politeknikData = formatData("Politeknik Ahli Usaha Perikanan");
+  const politeknikData = formatData("Politeknik");
 
   const CustomTooltip = ({ payload, label }: any) => {
     if (payload && payload.length) {
@@ -84,7 +67,7 @@ export default function ChartSertifikatByLemdiklat({
           <div>Total Sertifikat: {payload[0].value}</div>
           {diklatDetails.map((detail: any, index: number) => (
             <div key={index}>
-              <strong>{detail["Nama Diklat"] || "Unknown"}</strong>:{" "}
+              <strong>{detail["Jenis Sertifikasi"] || "Unknown"}</strong>:{" "}
               {detail.total} sertifikat
             </div>
           ))}
@@ -101,7 +84,7 @@ export default function ChartSertifikatByLemdiklat({
       0
     );
     return (
-      <Card className="p-4 mb-6">
+      <Card className="p-4 mb-6 ">
         <CardHeader>
           <div
             className={`flex ${
@@ -130,15 +113,9 @@ export default function ChartSertifikatByLemdiklat({
         <CardContent>
           <ResponsiveContainer
             width="100%"
-            height={
-              title.includes("Pelabuhan")
-                ? 550
-                : title.includes("Swasta") || title.includes("Satuan")
-                ? 100
-                : 200
-            }
+            height={title.includes("Satuan") ? 400 : 300}
           >
-            {!title.includes("Pelabuhan") ? (
+            {title.includes("Pelatihan") ? (
               <BarChart
                 data={chartData}
                 layout="vertical"
@@ -213,25 +190,17 @@ export default function ChartSertifikatByLemdiklat({
 
   return (
     <>
-      <div className="flex flex-row gap-2">
-        <PieChartPercentage dataLembaga={dataLembaga} />{" "}
+      <div className="w-full gap-2">
+        {/* <PieChartPercentage dataLembaga={dataLembaga} />{" "} */}
         <PieChartPercentage dataLembaga={dataLembaga} />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="flex flex-col">
-          {balaiPelatihanData.length > 0 &&
-            renderChart("Sertifikat per Balai Pelatihan", balaiPelatihanData)}
-          <div className="flex gap-2">
-            {politeknikData.length > 0 &&
-              renderChart("Sertifikat per Satuan Pendidikan", politeknikData)}
-            {liamTrainingData.length > 0 &&
-              renderChart("Sertifikat per Lembaga Swasta", liamTrainingData)}
-          </div>
-        </div>
+        {balaiPelatihanData.length > 0 &&
+          renderChart("Sertifikat per Balai Pelatihan", balaiPelatihanData)}
 
-        {pelabuhanData.length > 0 &&
-          renderChart("Sertifikat per Pelabuhan Perikanan", pelabuhanData)}
+        {politeknikData.length > 0 &&
+          renderChart("Sertifikat per Satuan Pendidikan", politeknikData)}
       </div>
     </>
   );
@@ -242,7 +211,7 @@ function PieChartPercentage({
 }: {
   dataLembaga: SummarySertifikatByLemdiklat;
 }) {
-  const data = dataLembaga.data.data_lembaga;
+  const data = dataLembaga.data.data_unit_kerja;
 
   // Define color palette
   const colors = [
@@ -271,44 +240,32 @@ function PieChartPercentage({
   // Function to format data for each category
   const formatData = (filter: string) =>
     data
-      .filter((item) => item.Lembaga.includes(filter))
+      .filter((item) => item.UnitKerja.includes(filter))
       .map((item) => ({
         total: item.sertifikat?.reduce((sum, s) => sum + s.total, 0) || 0,
       }));
 
   // Filtered datasets
   const balaiPelatihanData = formatData("BALAI PELATIHAN DAN PENYULUHAN");
-  const pelabuhanData = formatData("Pelabuhan");
-  const liamTrainingData = formatData("LIAN");
-  const politeknikData = formatData("Politeknik Ahli Usaha Perikanan");
+  const politeknikData = formatData("Politeknik");
 
   // Calculate the total certificates for each category
   const totalBalaiPelatihan = balaiPelatihanData.reduce(
     (acc, item) => acc + item.total,
     0
   );
-  const totalPelabuhan = pelabuhanData.reduce(
-    (acc, item) => acc + item.total,
-    0
-  );
-  const totalLiamTraining = liamTrainingData.reduce(
-    (acc, item) => acc + item.total,
-    0
-  );
+
   const totalPoliteknik = politeknikData.reduce(
     (acc, item) => acc + item.total,
     0
   );
 
   // Total certificates for all categories
-  const totalCertificates =
-    totalBalaiPelatihan + totalPelabuhan + totalLiamTraining + totalPoliteknik;
+  const totalCertificates = totalBalaiPelatihan + totalPoliteknik;
 
   // Data for the donut chart
   const chartData = [
     { name: "Balai Pelatihan", value: totalBalaiPelatihan, fill: colors[0] },
-    { name: "Pelabuhan", value: totalPelabuhan, fill: colors[1] },
-    { name: "Liam Training", value: totalLiamTraining, fill: colors[2] },
     { name: "Politeknik", value: totalPoliteknik, fill: colors[3] },
   ];
 
@@ -322,8 +279,8 @@ function PieChartPercentage({
               <FaGraduationCap />
               <div className="flex flex-col gap-0">
                 <CardTitle>
-                  Persentase Sertifikat Berdasarkan Lembaga Diklat, Pelabuhan,
-                  dan Swasta
+                  Persentase Sertifikat Berdasarkan Balai Pelatihan dan Satuan
+                  Pendidikan
                 </CardTitle>
                 <CardDescription>27 May 2024 - Now 2025</CardDescription>
               </div>
