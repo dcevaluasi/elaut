@@ -37,6 +37,7 @@ import useFetchSertifikatByLemdiklat from "@/hooks/blanko/useFetchSertifikatByLe
 import { ChartSertifikatByLemdiklat } from "../akp";
 import ChartSertifikatKeterampilanByLemdiklat from "../akp/sertifikat/ChartSertifikatKeterampilanByLemdiklat";
 import ChartSertifikatKeahlianByLemdiklat from "../akp/sertifikat/ChartSertifikatKeahlianByLemdiklat";
+import useFetchSertifikatByProgram from "@/hooks/blanko/useFetchSertifikatByProgram";
 
 const AKP: React.FC = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -134,7 +135,14 @@ const AKP: React.FC = () => {
     refetch: refetchSertifikatByLemdiklat,
   } = useFetchSertifikatByLemdiklat();
 
+  const {
+    data: dataSertifikatByProgram,
+    isFetching: isFetchingSertifikatByProgram,
+    refetch: refetchSertifikatByProgram,
+  } = useFetchSertifikatByProgram();
+
   console.log({ dataSertifikatByLemdiklat });
+  console.log({ dataSertifikatByProgram });
 
   const {
     data: dataSertifikatByTypeBlankoCoC,
@@ -148,7 +156,7 @@ const AKP: React.FC = () => {
 
   return (
     <>
-      {dataSertifikatByLemdiklat != null && (
+      {dataSertifikatByLemdiklat != null && dataSertifikatByProgram != null && (
         <Card className="p-4 mb-6">
           <CardHeader>
             <div className="flex flex-col">
@@ -188,6 +196,7 @@ const AKP: React.FC = () => {
                     <>
                       <ChartSertifikatKeahlianByLemdiklat
                         dataLembaga={dataSertifikatByLemdiklat}
+                        dataProgram={dataSertifikatByProgram!}
                       />
                     </>
                   </TabsContent>
@@ -195,6 +204,7 @@ const AKP: React.FC = () => {
                     <>
                       <ChartSertifikatKeterampilanByLemdiklat
                         dataLembaga={dataSertifikatByLemdiklat}
+                        dataProgram={dataSertifikatByProgram!}
                       />
                     </>
                   </TabsContent>

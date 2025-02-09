@@ -37,3 +37,23 @@ export type SummarySertifikatByLemdiklatSubItem = {
   'Nama Diklat': string
   total: number
 }
+
+export type SummarySertifikatByProgram = {
+  Pesan: string
+  data: DataSertifikasiSummary
+}
+
+export type DataSertifikasiSummary = {
+  data: SummarySertifikatItem[]
+  DataCOC: SummarySertifikatItem[]
+}
+
+export type SummarySertifikatItem = {
+  sertifikat: string
+  Lembaga: SummarySertifikatLembagaItem[]
+}
+
+export type SummarySertifikatLembagaItem = {
+  nama_lembaga: string;
+  total: number
+}

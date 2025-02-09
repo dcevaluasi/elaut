@@ -23,15 +23,22 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { SummarySertifikatByLemdiklat } from "@/types/akapi";
+import {
+  DataSertifikasiSummary,
+  SummarySertifikatByLemdiklat,
+  SummarySertifikatByProgram,
+  SummarySertifikatItem,
+} from "@/types/akapi";
 import { FaBuilding, FaGraduationCap, FaShip } from "react-icons/fa6";
 import { TrendingUp } from "lucide-react";
 import { ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 export default function ChartSertifikatKeterampilanByLemdiklat({
   dataLembaga,
+  dataProgram,
 }: {
   dataLembaga: SummarySertifikatByLemdiklat;
+  dataProgram: SummarySertifikatByProgram;
 }) {
   const data = dataLembaga.data.data_lembaga;
 
@@ -214,9 +221,10 @@ export default function ChartSertifikatKeterampilanByLemdiklat({
 
   return (
     <>
-      <div className="w-full gap-2">
+      <div className="w-full gap-2 grid grid-cols-2">
         {/* <PieChartPercentage dataLembaga={dataLembaga} />{" "} */}
         <PieChartPercentage dataLembaga={dataLembaga} />
+        <PieChartPercentageProgram dataProgram={dataProgram} />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -316,7 +324,7 @@ function PieChartPercentage({
   // Function to render the donut chart
   const renderDonutChart = () => {
     return (
-      <Card className="p-4 mb-6">
+      <Card className="p-4 mb-6 w-full">
         <CardHeader>
           <div className="flex flex-row items-center justify-between">
             <div className="flex flex-row items-center gap-2">
@@ -343,6 +351,7 @@ function PieChartPercentage({
                 cx="50%"
                 cy="50%"
                 strokeWidth={2}
+                style={{ fontSize: 10 }}
                 outerRadius={80}
                 innerRadius={60} // Make it a donut chart
                 labelLine={true}
@@ -355,6 +364,133 @@ function PieChartPercentage({
                 ))}{" "}
                 <Label
                   value={totalCertificates!.toString()!}
+                  position="center"
+                  style={{
+                    fontSize: "25px",
+                    fontWeight: "bold",
+                    textAnchor: "middle",
+                    fill: "#333",
+                  }}
+                />
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+          <CardFooter className="flex-col items-start gap-1 text-sm mb-0 p-0">
+            <div className="flex gap-2 font-medium leading-none">
+              Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+            </div>
+            <div className="leading-none text-muted-foreground">
+              Showing total sertifikat for the since 27 May 2024
+            </div>
+          </CardFooter>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  return <div className="flex flex-col">{renderDonutChart()}</div>;
+}
+function PieChartPercentageProgram({
+  dataProgram,
+}: {
+  dataProgram: SummarySertifikatByProgram;
+}) {
+  const data = dataProgram.data.DataCOC;
+
+  // Define color palette
+  const colors = [
+    "#2563EB",
+    "#1E40AF",
+    "#3B82F6",
+    "#60A5FA",
+    "#93C5FD", // Blue
+    "#0D9488",
+    "#0F766E",
+    "#14B8A6",
+    "#2DD4BF",
+    "#5EEAD4", // Tosca
+    "#7C3AED",
+    "#6D28D9",
+    "#8B5CF6",
+    "#A78BFA",
+    "#C4B5FD", // Purple
+    "#312E81",
+    "#4338CA",
+    "#6366F1",
+    "#818CF8",
+    "#A5B4FC", // Dark shades
+  ];
+
+  // Function to format data for each certificate type
+  const formatData = (certificate: any) => {
+    // Sum all totals for each certificate type, ignore institutions
+    const totalForCertificate = certificate.Lembaga.reduce(
+      (acc: number, item: any) => acc + item.total,
+      0
+    );
+    return {
+      name: certificate.setifikat, // Set the name as the certificate type
+      value: totalForCertificate,
+    };
+  };
+
+  // Flatten all the data into chartData by summing the totals for each certificate type
+  const chartData = data.reduce((acc: any[], certificate: any) => {
+    const formattedData = formatData(certificate);
+    return [...acc, formattedData];
+  }, []);
+
+  // Calculate total certificates for the chart
+  const totalCertificates = chartData.reduce(
+    (acc: number, item: any) => acc + item.value,
+    0
+  );
+
+  // Assign colors to the chart data
+  chartData.forEach((entry, index) => {
+    entry.fill = colors[index % colors.length]; // Ensure color wraps around if more than the available colors
+  });
+
+  // Render Donut Chart
+  const renderDonutChart = () => {
+    return (
+      <Card className="p-4 mb-6 w-full">
+        <CardHeader>
+          <div className="flex flex-row items-center justify-between">
+            <div className="flex flex-row items-center gap-2">
+              <FaGraduationCap />
+              <div className="flex flex-col gap-0">
+                <CardTitle>Persentase Sertifikat Berdasarkan Program</CardTitle>
+                <CardDescription>27 May 2024 - Now 2025</CardDescription>
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={250}>
+            <PieChart width={1000} height={300}>
+              <Pie
+                data={chartData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                style={{ fontSize: 10 }}
+                cy="50%"
+                strokeWidth={2}
+                outerRadius={80}
+                innerRadius={60} // Make it a donut chart
+                labelLine={true}
+                width={150}
+                label={({ name, value }: any) =>
+                  `${name}: ${((value / totalCertificates) * 100).toFixed(2)}%`
+                }
+              >
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                ))}
+                <Label
+                  value={totalCertificates.toString()}
                   position="center"
                   style={{
                     fontSize: "25px",
