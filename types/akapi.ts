@@ -10,16 +10,17 @@ export type SummarySertifikatByTypeBlankoItem = {
 
 export type SummarySertifikatByLemdiklat = {
   Pesan: string
-  data: DataLembaga
+  data: DataSummary
 }
 
-export type DataLembaga = {
-  dataLembaga: any[]
+export type DataSummary = {
+  data_lembaga: SummarySertifikatByLemdiklatItem[]
+  data_unit_kerja: SummarySertifikatByLemdiklatItem[]
 }
 
 export type SummarySertifikatByLemdiklatItem = {
   Lembaga: string
-  sertifikat: SummarySertifikatByLemdiklatSubItem
+  sertifikat: SummarySertifikatByLemdiklatSubItem[]
 }
 
 export type SummarySertifikatByLemdiklatSubItem = {

@@ -19,7 +19,8 @@ const useFetchSertifikatyByLemdiklat = () => {
           },
         },
       )
-      setData(response.data.data)
+      console.log({ response })
+      setData(response.data)
       setIsFetching(false)
     } catch (error) {
       setIsFetching(false)
