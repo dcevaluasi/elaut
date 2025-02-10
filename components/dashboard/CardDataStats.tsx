@@ -57,11 +57,15 @@ const CardDataStats: React.FC<CardDataStatsProps> = ({
             <span className="text-xs leading-[110%] font-medium text-gray-800">
               {title}
             </span>
-            {title != "Jumlah Blanko Rusak" && (
-              <span className="flex items-center w-fit  !text-xs text-blue-600 leading-[110%]">
-                Lihat Detail <MdOutlineKeyboardArrowRight />
-              </span>
-            )}
+            {title !== "Jumlah Blanko Rusak" &&
+              title !== "Total Sertifikat CoP" &&
+              title !== "Blanko CoP Rusak" &&
+              title !== "Blanko CoC Rusak" &&
+              title !== "Total Sertifikat CoC" && (
+                <span className="flex items-center w-fit !text-xs text-blue-600 leading-[110%]">
+                  Lihat Detail <MdOutlineKeyboardArrowRight />
+                </span>
+              )}
           </div>
         </div>
 
