@@ -166,7 +166,7 @@ export default function ChartSertifikatKeterampilanByLemdiklat({
                   />
                   <Tooltip content={<CustomTooltip />} cursor={false} />
 
-                  <Bar dataKey="total" radius={4}>
+                  <Bar cursor={"pointer"} dataKey="total" radius={4}>
                     <LabelList
                       dataKey="total"
                       position="right"
@@ -195,7 +195,7 @@ export default function ChartSertifikatKeterampilanByLemdiklat({
                   />
                   <Tooltip content={<CustomTooltip />} cursor={false} />
 
-                  <Bar dataKey="total" radius={4}>
+                  <Bar cursor={"pointer"} dataKey="total" radius={4}>
                     <LabelList
                       dataKey="total"
                       position="right"
@@ -225,7 +225,7 @@ export default function ChartSertifikatKeterampilanByLemdiklat({
                 />
                 <Tooltip content={<CustomTooltip />} cursor={false} />
 
-                <Bar dataKey="total" radius={4}>
+                <Bar cursor={"pointer"} dataKey="total" radius={4}>
                   <LabelList
                     dataKey="total"
                     position="right"
