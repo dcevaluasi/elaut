@@ -46,8 +46,9 @@ import ChartSertifikatKeahlianByLemdiklat from "../akp/sertifikat/ChartSertifika
 import useFetchSertifikatByProgram from "@/hooks/blanko/useFetchSertifikatByProgram";
 import { FaGraduationCap } from "react-icons/fa6";
 import { HashLoader } from "react-spinners";
+import ChartSertifikatKeahlianByLemdiklatDark from "../akp/sertifikat/ChartSertifikatKeahlianByLemdiklatDark";
 
-const AKP: React.FC = () => {
+const AKPPublic: React.FC = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const token = Cookies.get("XSRF091");
 
@@ -165,13 +166,13 @@ const AKP: React.FC = () => {
   return (
     <>
       {dataSertifikatByLemdiklat != null && dataSertifikatByProgram != null ? (
-        <Card className="p-4 mb-6">
+        <Card className="p-4 mb-6 isolate aspect-video rounded-xl bg-white/10 shadow-lg ring-1 ring-black/5">
           <CardHeader>
             <div className="flex flex-col">
               <div className="flex flex-row gap-2 items-center">
-                <RiShipFill className="text-2xl" />
+                <RiShipFill className="text-2xl  text-gray-100" />
                 <div className="flex flex-col">
-                  <h1 className="text-2xl text-gray-900 font-medium leading-[100%] font-calsans capitalize">
+                  <h1 className="text-2xl text-gray-100 font-medium leading-[100%] font-calsans capitalize">
                     Dashboard Sertifikasi Awak Kapal Perikanan
                   </h1>
                   <p className="font-normal italic leading-[110%] text-gray-400 text-sm max-w-4xl">
@@ -184,15 +185,6 @@ const AKP: React.FC = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-row items-center justify-between mb-3">
-              <div className="flex flex-row items-center gap-2">
-                <GiPapers />
-                <div className="flex flex-col gap-0">
-                  <CardTitle>Data Pengadaan dan Penggunaan Blanko</CardTitle>
-                  <CardDescription>27 May 2024 - Now 2025</CardDescription>
-                </div>
-              </div>
-            </div>
             <div className="grid grid-cols-1 gap-4 h-fit max-h-fit w-full md:grid-cols-3 md:gap-3 xl:grid-cols-3 2xl:gap-3 mb-10">
               {isFetchingSertifikatByTypeBlankoCoC &&
               isFetchingSertifikatByTypeBlankoCoP ? (
@@ -231,18 +223,14 @@ const AKP: React.FC = () => {
                           <CardDataStats
                             title="Total Blanko Terpakai"
                             total={(
-                              dataSertifikatByLemdiklat.data.data_lembaga
-                                .flatMap((item: any) => item.sertifikat || []) // Extract all sertifikat arrays
-                                .reduce(
-                                  (sum: number, s: any) => sum + s.total,
-                                  0
-                                ) +
-                              dataSertifikatByLemdiklat.data.data_unit_kerja
-                                .flatMap((item: any) => item.sertifikat || []) // Extract all sertifikat arrays
-                                .reduce(
-                                  (sum: number, s: any) => sum + s.total,
-                                  0
-                                ) +
+                              dataSertifikatByTypeBlankoCoC!.data.reduce(
+                                (total, item) => total + item.jumlah_sertifikat,
+                                0
+                              ) +
+                              dataSertifikatByTypeBlankoCoP?.data.reduce(
+                                (total, item) => total + item.jumlah_sertifikat,
+                                0
+                              ) +
                               blankoRusak.length
                             )
                               .toString()
@@ -257,11 +245,22 @@ const AKP: React.FC = () => {
                       <PopoverContent className="w-full">
                         <CardDataStats
                           title="Total Sertifikat CoC"
-                          total={
-                            dataSertifikatByLemdiklat.data.data_unit_kerja
-                              .flatMap((item: any) => item.sertifikat || []) // Extract all sertifikat arrays
-                              .reduce((sum: number, s: any) => sum + s.total, 0) // Sum up all total values
-                          }
+                          total={(
+                            dataSertifikatByTypeBlankoCoC!.data.reduce(
+                              (total, item) => total + item.jumlah_sertifikat,
+                              0
+                            ) +
+                            dataSertifikatByTypeBlankoCoP?.data
+                              .filter(
+                                (item) =>
+                                  item.jenis_sertifikat ===
+                                  "Rating Awak Kapal Perikanan"
+                              )
+                              .reduce(
+                                (total, item) => total + item.jumlah_sertifikat,
+                                0
+                              )
+                          ).toString()}
                           rate=""
                           levelDown
                         >
@@ -270,11 +269,17 @@ const AKP: React.FC = () => {
 
                         <CardDataStats
                           title="Total Sertifikat CoP"
-                          total={
-                            dataSertifikatByLemdiklat.data.data_lembaga
-                              .flatMap((item: any) => item.sertifikat || []) // Extract all sertifikat arrays
-                              .reduce((sum: number, s: any) => sum + s.total, 0) // Sum up all total values
-                          }
+                          total={dataSertifikatByTypeBlankoCoP?.data
+                            .filter(
+                              (item) =>
+                                item.jenis_sertifikat !==
+                                "Rating Awak Kapal Perikanan"
+                            )
+                            .reduce(
+                              (total, item) => total + item.jumlah_sertifikat,
+                              0
+                            )
+                            .toString()}
                           rate=""
                           levelDown
                         >
@@ -339,16 +344,30 @@ const AKP: React.FC = () => {
                                 (total, item) => total + item.JumlahPengadaan,
                                 0
                               ) -
-                              dataSertifikatByLemdiklat.data.data_lembaga
-                                .flatMap((item: any) => item.sertifikat || []) // Extract all sertifikat arrays
+                              (dataSertifikatByTypeBlankoCoC!.data.reduce(
+                                (total, item) => total + item.jumlah_sertifikat,
+                                0
+                              ) +
+                                dataSertifikatByTypeBlankoCoP?.data
+                                  .filter(
+                                    (item) =>
+                                      item.jenis_sertifikat ===
+                                      "Rating Awak Kapal Perikanan"
+                                  )
+                                  .reduce(
+                                    (total, item) =>
+                                      total + item.jumlah_sertifikat,
+                                    0
+                                  )) -
+                              dataSertifikatByTypeBlankoCoP?.data
+                                .filter(
+                                  (item) =>
+                                    item.jenis_sertifikat !==
+                                    "Rating Awak Kapal Perikanan"
+                                )
                                 .reduce(
-                                  (sum: number, s: any) => sum + s.total,
-                                  0
-                                ) -
-                              dataSertifikatByLemdiklat.data.data_unit_kerja
-                                .flatMap((item: any) => item.sertifikat || []) // Extract all sertifikat arrays
-                                .reduce(
-                                  (sum: number, s: any) => sum + s.total,
+                                  (total, item) =>
+                                    total + item.jumlah_sertifikat,
                                   0
                                 ) -
                               blankoRusak.length
@@ -421,7 +440,7 @@ const AKP: React.FC = () => {
                   </TabsList>
                   <TabsContent value="CoC">
                     <>
-                      <ChartSertifikatKeahlianByLemdiklat
+                      <ChartSertifikatKeahlianByLemdiklatDark
                         dataLembaga={dataSertifikatByLemdiklat}
                         dataProgram={dataSertifikatByProgram!}
                       />
@@ -453,4 +472,4 @@ const AKP: React.FC = () => {
   );
 };
 
-export default AKP;
+export default AKPPublic;

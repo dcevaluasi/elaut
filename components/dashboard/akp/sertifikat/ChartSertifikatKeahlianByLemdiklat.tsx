@@ -226,6 +226,19 @@ function PieChartPercentage({
     "#818CF8",
   ];
 
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const { name, value } = payload[0].payload;
+      return (
+        <div className="p-2 bg-white border rounded shadow-md text-xs w-44 z-[99999]">
+          <strong className="text-sm text-gray-900">{name}</strong>
+          <div className="text-gray-700">Total Sertifikat: {value}</div>
+        </div>
+      );
+    }
+    return null;
+  };
+
   // Function to format data for each category
   const formatData = (filter: string) =>
     data
@@ -310,7 +323,7 @@ function PieChartPercentage({
                   }}
                 />
               </Pie>
-              <Tooltip />
+              <Tooltip content={<CustomTooltip />} />
             </PieChart>
           </ResponsiveContainer>
           <CardFooter className="flex-col items-start gap-1 text-sm mb-0 p-0">
@@ -345,6 +358,19 @@ function PieChartPercentageProgram({
     "#312E81",
     "#818CF8",
   ];
+
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const { name, value } = payload[0].payload;
+      return (
+        <div className="p-2 bg-white border rounded shadow-md text-xs w-44 z-[99999]">
+          <strong className="text-sm text-gray-900">{name}</strong>
+          <div className="text-gray-700">Total Sertifikat: {value}</div>
+        </div>
+      );
+    }
+    return null;
+  };
 
   // Function to format data for each certificate type
   const formatData = (certificate: any) => {
@@ -424,7 +450,7 @@ function PieChartPercentageProgram({
                   }}
                 />
               </Pie>
-              <Tooltip />
+              <Tooltip content={<CustomTooltip />} />
             </PieChart>
           </ResponsiveContainer>
           <CardFooter className="flex-col items-start gap-1 text-sm mb-0 p-0">

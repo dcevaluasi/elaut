@@ -38,37 +38,40 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { elautBaseUrl, manningAgentDevUrl } from "@/constants/urls";
-import { sanitizedDangerousChars, validateIsDangerousChars } from "@/utils/input";
+import {
+  sanitizedDangerousChars,
+  validateIsDangerousChars,
+} from "@/utils/input";
 
 function FormLogin() {
   const [formData, setFormData] = React.useState<{ [key: string]: string }>({
-    no_number: '',
-    password: '',
+    no_number: "",
+    password: "",
   });
 
   const [errors, setErrors] = React.useState<{ [key: string]: string | null }>({
     no_number: null,
-    password: null
-  })
+    password: null,
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
       ...prevFormData,
       [name]: value,
-    }))
+    }));
     if (validateIsDangerousChars(value)) {
       setErrors((prevErrors) => ({
         ...prevErrors,
-        [name]: "You are using dangerous characters!"
-      }))
+        [name]: "You are using dangerous characters!",
+      }));
     } else {
       setErrors((prevErrors) => ({
         ...prevErrors,
-        [name]: null
-      }))
+        [name]: null,
+      }));
     }
-  }
+  };
 
   /* state variable to store basic user information to register */
   // const [noNumber, setNoNumber] = React.useState<string>("");
@@ -126,7 +129,10 @@ function FormLogin() {
           text: `Tolong lengkapi data login untuk login kedalam ELAUT`,
         });
       } else {
-        if (validateIsDangerousChars(formData!.no_number) || validateIsDangerousChars(formData!.password)) {
+        if (
+          validateIsDangerousChars(formData!.no_number) ||
+          validateIsDangerousChars(formData!.password)
+        ) {
           Toast.fire({
             icon: "error",
             title: "Oopsss!",
@@ -207,7 +213,6 @@ function FormLogin() {
             }
           }
         }
-
       }
     } else {
       Toast.fire({
@@ -232,7 +237,10 @@ function FormLogin() {
           text: `Tolong lengkapi data login untuk login kedalam ELAUT`,
         });
       } else {
-        if (validateIsDangerousChars(email) || validateIsDangerousChars(passwordManningAgent)) {
+        if (
+          validateIsDangerousChars(email) ||
+          validateIsDangerousChars(passwordManningAgent)
+        ) {
           Toast.fire({
             icon: "error",
             title: "Oopsss!",
@@ -369,7 +377,7 @@ function FormLogin() {
           });
           setIsForgetPassword(false);
           setPhoneNumberInformation(response.data.no_telpon);
-          setFormData({ no_number: response.data.no_telpon, password: '' });
+          setFormData({ no_number: response.data.no_telpon, password: "" });
           setIsForgetPhoneNumber(false);
           setNik("");
         } else {
@@ -407,7 +415,6 @@ function FormLogin() {
         text: `Kamu memasukkan karakter berbahaya pada input password baru-mu, reset password tidak dapat diproses!`,
       });
     } else {
-
       if (handlePasswordCriteria(passwordReset)) {
         try {
           const response = await axios.post(
@@ -452,7 +459,6 @@ function FormLogin() {
         }
       }
     }
-
   };
 
   React.useEffect(() => {
@@ -463,9 +469,11 @@ function FormLogin() {
     return () => clearInterval(interval);
   }, []);
 
-  const [isInputErrorNoTelpon, setIsInputErrorNoTelpon] = React.useState<boolean>(false)
-  const [isInputErrorNIK, setIsInputErrorNIK] = React.useState<boolean>(true)
-  const [isInputErrorPassword, setIsInputErrorPassword] = React.useState<boolean>(true)
+  const [isInputErrorNoTelpon, setIsInputErrorNoTelpon] =
+    React.useState<boolean>(false);
+  const [isInputErrorNIK, setIsInputErrorNIK] = React.useState<boolean>(true);
+  const [isInputErrorPassword, setIsInputErrorPassword] =
+    React.useState<boolean>(true);
 
   return (
     <section className="relative w-full h-full md:h-full bg-none">
@@ -483,7 +491,6 @@ function FormLogin() {
           </DialogHeader>
           <div className="grid gap-4 py-2">
             <div className="flex flex-col items-start gap-1">
-
               <Label htmlFor="name" className="text-right">
                 NIK
               </Label>
@@ -497,19 +504,17 @@ function FormLogin() {
                     setIsInputErrorNIK(value.length > 0 && value.length < 16);
                   }}
                   maxLength={16}
-
                   placeholder="Masukkan NIK kamu"
                   className=" w-full"
                   readOnly={tokenResetPassword != ""}
                   autoComplete="off"
                 />
-                {isInputErrorNIK && nik != '' && (
+                {isInputErrorNIK && nik != "" && (
                   <span className="text-rose-500 font-medium text-xs">
                     *NIK harus 16 digit!
                   </span>
                 )}
               </div>
-
             </div>
             {tokenResetPassword != "" && (
               <div className="flex flex-col gap-1">
@@ -561,7 +566,7 @@ function FormLogin() {
                   setPasswordReset("");
                   setIsForgetPassword(false);
                   setTokenResetPassword("");
-                  setIsInputErrorNIK(true)
+                  setIsInputErrorNIK(true);
                 }}
                 className=" bg-gray-500 hover:bg-gray-600"
               >
@@ -587,17 +592,15 @@ function FormLogin() {
         <div className="pt-44 md:pb-20">
           <div className="w-full mx-auto text-center pb-0 md:pb-0">
             <h1 className="font-bold text-4xl leading-[110%] text-gray-200 font-calsans">
-              <span className="">
-                Login dan Ikuti
-              </span>{" "}<br />
+              <span className="">Login dan Ikuti</span> <br />
               <span className="z-0 bg-clip-text  w-[600px] leading-[110%]  text-transparent bg-gradient-to-r  from-blue-500  to-teal-400">
                 Pelatihan di E-LAUT
               </span>{" "}
             </h1>
             <p className="text-base text-center mx-auto text-gray-200 mt-2  max-w-3xl">
               login tersedia dalam dua opsi: Perseorangan untuk individu,
-              Corporate untuk grup untuk yang punya rekam
-              jejak atau sertifikasi. Fleksibel sesuai kebutuhan!
+              Corporate untuk grup untuk yang punya rekam jejak atau
+              sertifikasi. Fleksibel sesuai kebutuhan!
             </p>
           </div>
 
@@ -656,12 +659,14 @@ function FormLogin() {
                       onChange={(e) => {
                         const value = e.target.value;
                         handleInputChange(e);
-                        setIsInputErrorNoTelpon(value.length > 0 && value.length < 12);
+                        setIsInputErrorNoTelpon(
+                          value.length > 0 && value.length < 12
+                        );
                       }}
                       required
                     />
 
-                    {isInputErrorNoTelpon && formData.no_telpon != '' && (
+                    {isInputErrorNoTelpon && formData.no_telpon != "" && (
                       <span className="text-rose-500 font-medium text-xs">
                         *No Telpon minimal 12 digit!
                       </span>
@@ -750,10 +755,11 @@ function FormLogin() {
                   <div className="w-full px-3">
                     <button
                       type="submit"
-                      className={`btn text-white ${captcha
-                        ? "bg-blue-500 hover:bg-blue-600"
-                        : "bg-gray-500 hover:bg-gray-600"
-                        } w-full`}
+                      className={`btn text-white ${
+                        captcha
+                          ? "bg-blue-500 hover:bg-blue-600"
+                          : "bg-gray-500 hover:bg-gray-600"
+                      } w-full`}
                       disabled={captcha ? false : true}
                     >
                       Login
@@ -856,10 +862,11 @@ function FormLogin() {
                   <div className="w-full px-3">
                     <button
                       type="submit"
-                      className={`btn text-white ${captcha
-                        ? "bg-blue-500 hover:bg-blue-600"
-                        : "bg-gray-500 hover:bg-gray-600"
-                        } w-full`}
+                      className={`btn text-white ${
+                        captcha
+                          ? "bg-blue-500 hover:bg-blue-600"
+                          : "bg-gray-500 hover:bg-gray-600"
+                      } w-full`}
                       disabled={captcha ? false : true}
                     >
                       Login

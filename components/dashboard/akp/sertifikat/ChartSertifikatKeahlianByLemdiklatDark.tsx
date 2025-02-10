@@ -12,8 +12,9 @@ import {
   LabelList,
   Pie,
   PieChart,
-  Cell,
   Label,
+  Cell,
+  Text,
 } from "recharts";
 import {
   Card,
@@ -31,33 +32,17 @@ import {
 } from "@/types/akapi";
 import { FaBuilding, FaGraduationCap, FaShip } from "react-icons/fa6";
 import { TrendingUp } from "lucide-react";
-import { ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-
-export default function ChartSertifikatKeterampilanByLemdiklat({
+export default function ChartSertifikatKeahlianByLemdiklatDark({
   dataLembaga,
   dataProgram,
 }: {
   dataLembaga: SummarySertifikatByLemdiklat;
   dataProgram: SummarySertifikatByProgram;
 }) {
-  const data = dataLembaga.data.data_lembaga;
+  const data = dataLembaga.data.data_unit_kerja;
 
   // Define color palette
   const colors = [
-    "#2563EB",
-    "#1E40AF",
-    "#3B82F6",
-    "#60A5FA",
-    "#93C5FD", // Blue
-    "#0D9488",
-    "#0F766E",
-    "#14B8A6",
-    "#2DD4BF",
-    "#5EEAD4", // Tosca
-    "#7C3AED",
-    "#6D28D9",
-    "#8B5CF6",
-    "#A78BFA",
     "#C4B5FD", // Purple
     "#312E81",
     "#4338CA",
@@ -69,9 +54,9 @@ export default function ChartSertifikatKeterampilanByLemdiklat({
   // Function to format data
   const formatData = (filter: string) =>
     data
-      .filter((item) => item.Lembaga.includes(filter))
+      .filter((item) => item.UnitKerja.includes(filter))
       .map((item, index) => ({
-        name: item.Lembaga.toUpperCase(),
+        name: item.UnitKerja.toUpperCase(),
         total: item.sertifikat?.reduce((sum, s) => sum + s.total, 0) || 0,
         fill: colors[index % colors.length],
         diklatDetails: item.sertifikat || [], // Attach the complete sertifikat details
@@ -79,11 +64,7 @@ export default function ChartSertifikatKeterampilanByLemdiklat({
 
   // Filtered datasets
   const balaiPelatihanData = formatData("BALAI PELATIHAN DAN PENYULUHAN");
-  const pelabuhanData = formatData("Pelabuhan");
-  const liamTrainingData = formatData("LIAN");
   const politeknikData = formatData("Politeknik");
-  const supmData = formatData("SUPM");
-  const balaiBesarPenangkapanData = formatData("Balai Besar Penangkapan");
 
   const CustomTooltip = ({ payload, label }: any) => {
     if (payload && payload.length) {
@@ -94,7 +75,7 @@ export default function ChartSertifikatKeterampilanByLemdiklat({
           <div>Total Sertifikat: {payload[0].value}</div>
           {diklatDetails.map((detail: any, index: number) => (
             <div key={index}>
-              <strong>{detail["Nama Diklat"] || "Unknown"}</strong>:{" "}
+              <strong>{detail["Jenis Sertifikasi"] || "Unknown"}</strong>:{" "}
               {detail.total} sertifikat
             </div>
           ))}
@@ -111,28 +92,29 @@ export default function ChartSertifikatKeterampilanByLemdiklat({
       0
     );
     return (
-      <Card className="p-4 mb-6">
+      <Card className="p-4 mb-6 isolate aspect-video rounded-xl bg-white/10 shadow-lg ring-1 ring-black/5">
         <CardHeader>
-          <div
-            className={`flex ${
-              title.includes("Satuan Pendidikan") || title.includes("Swasta")
-                ? "flex-col"
-                : "flex-row items-center justify-between"
-            } `}
-          >
+          <div className={`flex flex-row items-center justify-between`}>
             <div className="flex flex-row items-center gap-2">
-              <div>
+              <div className="text-gray-100">
                 {(title.includes("Balai Pelatihan") ||
                   title.includes("Satuan Pendidikan")) && <FaGraduationCap />}
                 {title.includes("Pelabuhan") && <FaShip />}
                 {title.includes("Swasta") && <FaBuilding />}
               </div>
               <div className="flex flex-col gap-0">
-                <CardTitle>{title}</CardTitle>
-                <CardDescription>27 May 2024 - Now 2025</CardDescription>
+                <CardTitle
+                  className="
+                text-gray-100"
+                >
+                  {title}
+                </CardTitle>
+                <CardDescription className="text-gray-200">
+                  27 May 2024 - Now 2025
+                </CardDescription>
               </div>
             </div>
-            <p className="font-semibold text-sm">
+            <p className="font-semibold text-sm text-gray-200">
               Total Sertifikat : {totalSertifikat}
             </p>
           </div>
@@ -140,88 +122,26 @@ export default function ChartSertifikatKeterampilanByLemdiklat({
         <CardContent>
           <ResponsiveContainer
             width="100%"
-            height={
-              title.includes("Pelabuhan")
-                ? 900
-                : title.includes("Swasta") || title.includes("Satuan")
-                ? 150
-                : 300
-            }
+            height={title.includes("Satuan") ? 400 : 300}
           >
-            {!title.includes("Pelabuhan") ? (
-              title.includes("Satuan") || title.includes("Swasta") ? (
-                <BarChart
-                  data={chartData}
-                  layout="horizontal"
-                  margin={{ left: 0, right: 30 }}
-                >
-                  <YAxis type="number" style={{ fontSize: 12 }} />
-                  <XAxis
-                    dataKey="name"
-                    type="category"
-                    width={150}
-                    tick={{ fontSize: 12 }}
-                    interval={0}
-                    style={{ fontSize: 10 }}
-                  />
-                  <Tooltip content={<CustomTooltip />} cursor={false} />
-
-                  <Bar dataKey="total" radius={4}>
-                    <LabelList
-                      dataKey="total"
-                      position="right"
-                      offset={10}
-                      style={{ fill: "#000", fontSize: 12 }}
-                    />
-                    {chartData.map((entry: any, index: number) => (
-                      <Bar key={index} dataKey="total" fill={entry.fill} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              ) : (
-                <BarChart
-                  data={chartData}
-                  layout="vertical"
-                  margin={{ left: 0, right: 30 }}
-                >
-                  <XAxis type="number" style={{ fontSize: 12 }} />
-                  <YAxis
-                    dataKey="name"
-                    type="category"
-                    width={150}
-                    tick={{ fontSize: 12 }}
-                    interval={0}
-                    style={{ fontSize: 10 }}
-                  />
-                  <Tooltip content={<CustomTooltip />} cursor={false} />
-
-                  <Bar dataKey="total" radius={4}>
-                    <LabelList
-                      dataKey="total"
-                      position="right"
-                      offset={10}
-                      style={{ fill: "#000", fontSize: 12 }}
-                    />
-                    {chartData.map((entry: any, index: number) => (
-                      <Bar key={index} dataKey="total" fill={entry.fill} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              )
-            ) : (
+            {title.includes("Pelatihan") ? (
               <BarChart
                 data={chartData}
                 layout="vertical"
-                margin={{ left: 10, right: 30 }}
+                margin={{ left: 0, right: 30 }}
               >
-                <XAxis type="number" style={{ fontSize: 12 }} />
+                <XAxis
+                  type="number"
+                  style={{ fontSize: 12 }}
+                  tick={{ fill: "#fff" }} // Set X-axis label color to white
+                  axisLine={{ stroke: "#fff" }} // Set X-axis line color to white
+                />
                 <YAxis
                   dataKey="name"
                   type="category"
                   width={150}
-                  tick={{ fontSize: 12 }}
-                  interval={0}
-                  style={{ fontSize: 10 }}
+                  tick={{ fill: "#fff", fontSize: 12 }} // Set Y-axis label color to white
+                  axisLine={{ stroke: "#fff" }} // Set Y-axis line color to white
                 />
                 <Tooltip content={<CustomTooltip />} cursor={false} />
 
@@ -230,7 +150,40 @@ export default function ChartSertifikatKeterampilanByLemdiklat({
                     dataKey="total"
                     position="right"
                     offset={10}
-                    style={{ fill: "#000", fontSize: 12 }}
+                    style={{ fill: "#fff", fontSize: 12 }}
+                  />
+                  {chartData.map((entry: any, index: number) => (
+                    <Bar key={index} dataKey="total" fill={entry.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            ) : (
+              <BarChart
+                data={chartData}
+                layout="vertical"
+                margin={{ left: 10, right: 30 }}
+              >
+                <XAxis
+                  type="number"
+                  style={{ fontSize: 12 }}
+                  tick={{ fill: "#fff" }} // Set X-axis label color to white
+                  axisLine={{ stroke: "#fff" }} // Set X-axis line color to white
+                />
+                <YAxis
+                  dataKey="name"
+                  type="category"
+                  width={100}
+                  tick={{ fill: "#fff", fontSize: 12 }} // Set Y-axis label color to white
+                  axisLine={{ stroke: "#fff" }} // Set Y-axis line color to white
+                />
+                <Tooltip content={<CustomTooltip />} cursor={false} />
+
+                <Bar dataKey="total" radius={4}>
+                  <LabelList
+                    dataKey="total"
+                    position="right"
+                    offset={10}
+                    style={{ fill: "#fff", fontSize: 12 }}
                   />
                   {chartData.map((entry: any, index: number) => (
                     <Bar key={index} dataKey="total" fill={entry.fill} />
@@ -240,10 +193,10 @@ export default function ChartSertifikatKeterampilanByLemdiklat({
             )}
           </ResponsiveContainer>
           <CardFooter className="flex-col items-start gap-1 text-sm mb-0 p-0">
-            <div className="flex gap-2 font-medium leading-none">
+            <div className="flex gap-2 font-medium leading-none text-gray-100">
               Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
             </div>
-            <div className="leading-none text-muted-foreground">
+            <div className="leading-none text-gray-200">
               Showing total sertifikat for the since 27 May 2024
             </div>
           </CardFooter>
@@ -254,32 +207,18 @@ export default function ChartSertifikatKeterampilanByLemdiklat({
 
   return (
     <>
-      <div className="w-full gap-2 grid grid-cols-2 h-full">
+      <div className="w-full gap-2 grid grid-cols-2">
         {/* <PieChartPercentage dataLembaga={dataLembaga} />{" "} */}
         <PieChartPercentage dataLembaga={dataLembaga} />
         <PieChartPercentageProgram dataProgram={dataProgram} />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="flex flex-col">
-          {balaiPelatihanData.length > 0 &&
-            renderChart("Sertifikat per Balai Pelatihan", balaiPelatihanData)}
-          <div className="flex flex-col gap-2">
-            {politeknikData.length > 0 &&
-              renderChart("Sertifikat per Satuan Pendidikan", [
-                ...politeknikData,
-                ...supmData, // Spread if supmData is an array
-              ])}
-            {liamTrainingData.length > 0 &&
-              renderChart("Sertifikat per Lembaga Swasta", liamTrainingData)}
-          </div>
-        </div>
+        {balaiPelatihanData.length > 0 &&
+          renderChart("Sertifikat per Balai Pelatihan", balaiPelatihanData)}
 
-        {pelabuhanData.length > 0 &&
-          renderChart("Sertifikat per Pelabuhan Perikanan", [
-            ...pelabuhanData,
-            ...balaiBesarPenangkapanData,
-          ])}
+        {politeknikData.length > 0 &&
+          renderChart("Sertifikat per Satuan Pendidikan", politeknikData)}
       </div>
     </>
   );
@@ -290,120 +229,66 @@ function PieChartPercentage({
 }: {
   dataLembaga: SummarySertifikatByLemdiklat;
 }) {
-  const data = dataLembaga.data.data_lembaga;
+  const data = dataLembaga.data.data_unit_kerja;
 
   // Define color palette
   const colors = [
-    "#2563EB",
-    "#1E40AF",
-    "#3B82F6",
-    "#60A5FA",
-    "#93C5FD", // Blue
-    "#0D9488",
-    "#0F766E",
-    "#14B8A6",
-    "#2DD4BF",
-    "#5EEAD4", // Tosca
-    "#7C3AED",
-    "#6D28D9",
-    "#8B5CF6",
-    "#A78BFA",
     "#C4B5FD", // Purple
     "#312E81",
     "#4338CA",
     "#6366F1",
+    "#312E81",
     "#818CF8",
-    "#A5B4FC", // Dark shades
   ];
 
   // Function to format data for each category
   const formatData = (filter: string) =>
     data
-      .filter((item) => item.Lembaga.includes(filter))
+      .filter((item) => item.UnitKerja.includes(filter))
       .map((item) => ({
         total: item.sertifikat?.reduce((sum, s) => sum + s.total, 0) || 0,
       }));
 
   // Filtered datasets
   const balaiPelatihanData = formatData("BALAI PELATIHAN DAN PENYULUHAN");
-  const pelabuhanData = formatData("Pelabuhan");
-  const liamTrainingData = formatData("LIAN");
   const politeknikData = formatData("Politeknik");
-  const supmData = formatData("SUPM");
-  const balaiBesarPenangkapanData = formatData("Balai Besar Penangkapan");
 
   // Calculate the total certificates for each category
   const totalBalaiPelatihan = balaiPelatihanData.reduce(
     (acc, item) => acc + item.total,
     0
   );
-  const totalPelabuhan = pelabuhanData.reduce(
-    (acc, item) => acc + item.total,
-    0
-  );
-  const totalLiamTraining = liamTrainingData.reduce(
-    (acc, item) => acc + item.total,
-    0
-  );
+
   const totalPoliteknik = politeknikData.reduce(
     (acc, item) => acc + item.total,
     0
   );
-  const totalSupm = supmData.reduce((acc, item) => acc + item.total, 0);
-  const totalbalaiBesarPenangkapan = balaiBesarPenangkapanData.reduce(
-    (acc, item) => acc + item.total,
-    0
-  );
-
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const { name, value } = payload[0].payload;
-      return (
-        <div className="p-2 bg-white border rounded shadow-md text-xs w-44 z-[99999]">
-          <strong className="text-sm text-gray-900">{name}</strong>
-          <div className="text-gray-700">Total Sertifikat: {value}</div>
-        </div>
-      );
-    }
-    return null;
-  };
 
   // Total certificates for all categories
-  const totalCertificates =
-    totalBalaiPelatihan +
-    totalPelabuhan +
-    totalLiamTraining +
-    totalPoliteknik +
-    totalSupm +
-    totalbalaiBesarPenangkapan;
+  const totalCertificates = totalBalaiPelatihan + totalPoliteknik;
 
   // Data for the donut chart
   const chartData = [
-    { name: "Balai Pelatihan KP", value: totalBalaiPelatihan, fill: colors[0] },
-    {
-      name: "Pelabuhan  KP",
-      value: totalPelabuhan + totalbalaiBesarPenangkapan,
-      fill: colors[1],
-    },
-    { name: "Liam Training", value: totalLiamTraining, fill: colors[2] },
-    { name: "Politeknik KP", value: totalPoliteknik, fill: colors[3] },
-    { name: "SUPM", value: totalSupm, fill: colors[4] },
+    { name: "Balai Pelatihan", value: totalBalaiPelatihan, fill: colors[0] },
+    { name: "Politeknik", value: totalPoliteknik, fill: colors[3] },
   ];
 
   // Function to render the donut chart
   const renderDonutChart = () => {
     return (
-      <Card className="p-4 mb-6 w-full">
+      <Card className="p-4 mb-6 isolate aspect-video rounded-xl bg-white/10 shadow-lg ring-1 ring-black/5">
         <CardHeader>
           <div className="flex flex-row items-center justify-between">
             <div className="flex flex-row items-center gap-2">
-              <FaGraduationCap />
+              <FaGraduationCap className="text-gray-100" />
               <div className="flex flex-col gap-0">
-                <CardTitle>
-                  Persentase Sertifikat Berdasarkan Lembaga Diklat, Pelabuhan,
-                  dan Swasta
+                <CardTitle className="text-gray-100">
+                  Persentase Sertifikat Berdasarkan Balai Pelatihan dan Satuan
+                  Pendidikan
                 </CardTitle>
-                <CardDescription>27 May 2024 - Now 2025</CardDescription>
+                <CardDescription className="text-gray-200">
+                  27 May 2024 - Now 2025
+                </CardDescription>
               </div>
             </div>
           </div>
@@ -420,7 +305,6 @@ function PieChartPercentage({
                 cx="50%"
                 cy="50%"
                 strokeWidth={2}
-                style={{ fontSize: 10 }}
                 outerRadius={80}
                 innerRadius={60} // Make it a donut chart
                 labelLine={true}
@@ -430,7 +314,8 @@ function PieChartPercentage({
               >
                 {chartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.fill} />
-                ))}{" "}
+                ))}
+
                 <Label
                   value={totalCertificates!.toString()!}
                   position="center"
@@ -438,18 +323,18 @@ function PieChartPercentage({
                     fontSize: "25px",
                     fontWeight: "bold",
                     textAnchor: "middle",
-                    fill: "#333",
+                    fill: "#fff",
                   }}
                 />
               </Pie>
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip />
             </PieChart>
           </ResponsiveContainer>
           <CardFooter className="flex-col items-start gap-1 text-sm mb-0 p-0">
-            <div className="flex gap-2 font-medium leading-none">
+            <div className="flex gap-2 font-medium leading-none text-gray-100">
               Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
             </div>
-            <div className="leading-none text-muted-foreground">
+            <div className="leading-none text-muted-foreground text-gray-200">
               Showing total sertifikat for the since 27 May 2024
             </div>
           </CardFooter>
@@ -460,48 +345,22 @@ function PieChartPercentage({
 
   return <div className="flex flex-col">{renderDonutChart()}</div>;
 }
+
 function PieChartPercentageProgram({
   dataProgram,
 }: {
   dataProgram: SummarySertifikatByProgram;
 }) {
-  const data = dataProgram.data.DataCOC;
-
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const { name, value } = payload[0].payload;
-      return (
-        <div className="p-2 bg-white border rounded shadow-md text-xs w-44 z-[99999]">
-          <strong className="text-sm text-gray-900">{name}</strong>
-          <div className="text-gray-700">Total Sertifikat: {value}</div>
-        </div>
-      );
-    }
-    return null;
-  };
+  const data = dataProgram.data.data;
 
   // Define color palette
   const colors = [
-    "#2563EB",
-    "#1E40AF",
-    "#3B82F6",
-    "#60A5FA",
-    "#93C5FD", // Blue
-    "#0D9488",
-    "#0F766E",
-    "#14B8A6",
-    "#2DD4BF",
-    "#5EEAD4", // Tosca
-    "#7C3AED",
-    "#6D28D9",
-    "#8B5CF6",
-    "#A78BFA",
     "#C4B5FD", // Purple
     "#312E81",
     "#4338CA",
     "#6366F1",
+    "#312E81",
     "#818CF8",
-    "#A5B4FC", // Dark shades
   ];
 
   // Function to format data for each certificate type
@@ -537,14 +396,19 @@ function PieChartPercentageProgram({
   // Render Donut Chart
   const renderDonutChart = () => {
     return (
-      <Card className="p-4 mb-6 w-full">
+      <Card className="p-4 mb-6 w-full isolate aspect-video rounded-xl bg-white/10 shadow-lg ring-1 ring-black/5">
         <CardHeader>
           <div className="flex flex-row items-center justify-between">
             <div className="flex flex-row items-center gap-2">
-              <FaGraduationCap />
+              <FaGraduationCap className="text-gray-100" />
               <div className="flex flex-col gap-0">
-                <CardTitle>Persentase Sertifikat Berdasarkan Program</CardTitle>
-                <CardDescription>27 May 2024 - Now 2025</CardDescription>
+                <CardTitle className="text-gray-100">
+                  Persentase Sertifikat Berdasarkan Program
+                </CardTitle>
+                <CardDescription className="text-gray-200">
+                  {" "}
+                  27 May 2024 - Now 2025
+                </CardDescription>
               </div>
             </div>
           </div>
@@ -563,7 +427,7 @@ function PieChartPercentageProgram({
                 outerRadius={80}
                 innerRadius={60} // Make it a donut chart
                 labelLine={true}
-                width={200}
+                width={150}
                 label={({ name, value }: any) =>
                   `${name}: ${((value / totalCertificates) * 100).toFixed(2)}%`
                 }
@@ -582,14 +446,14 @@ function PieChartPercentageProgram({
                   }}
                 />
               </Pie>
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip />
             </PieChart>
           </ResponsiveContainer>
           <CardFooter className="flex-col items-start gap-1 text-sm mb-0 p-0">
-            <div className="flex gap-2 font-medium leading-none">
+            <div className="flex gap-2 font-medium leading-none text-gray-100">
               Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
             </div>
-            <div className="leading-none text-muted-foreground">
+            <div className="leading-none text-muted-foreground text-gray-200">
               Showing total sertifikat for the since 27 May 2024
             </div>
           </CardFooter>
