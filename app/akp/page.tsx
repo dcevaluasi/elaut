@@ -1,5 +1,4 @@
 import AKP from "@/components/dashboard/Dashboard/AKP";
-import AKPPublic from "@/components/dashboard/Dashboard/AKPPublic";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
