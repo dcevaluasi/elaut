@@ -300,6 +300,7 @@ function PieChartPercentage({
                 nameKey="name"
                 cx="50%"
                 cy="50%"
+                cursor={"pointer"}
                 strokeWidth={2}
                 outerRadius={80}
                 innerRadius={60} // Make it a donut chart
@@ -359,11 +360,23 @@ function PieChartPercentageProgram({
     "#818CF8",
   ];
 
+  const processDataForChart = (dataProgram: SummarySertifikatByProgram) => {
+    return dataProgram.data.data.flatMap((item: any) =>
+      item.Lembaga.map((lembaga: any, index: number) => ({
+        name: lembaga.nama_embaga, // Name of institution
+        value: lembaga.total || 0, // Total certificates (fallback to 0)
+        fill: colors[index % colors.length], // Assign colors in a loop
+      }))
+    );
+  };
+
+  const lembagaData = processDataForChart(dataProgram);
+
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const { name, value } = payload[0].payload;
       return (
-        <div className="p-2 bg-white border rounded shadow-md text-xs w-44 z-[99999]">
+        <div className="p-2 bg-white border rounded shadow-md text-xs z-[99999]">
           <strong className="text-sm text-gray-900">{name}</strong>
           <div className="text-gray-700">Total Sertifikat: {value}</div>
         </div>
@@ -405,7 +418,7 @@ function PieChartPercentageProgram({
   // Render Donut Chart
   const renderDonutChart = () => {
     return (
-      <Card className="p-4 mb-6 w-full">
+      <Card className="p-4 mb-6 w-full h-full">
         <CardHeader>
           <div className="flex flex-row items-center justify-between">
             <div className="flex flex-row items-center gap-2">
@@ -425,6 +438,7 @@ function PieChartPercentageProgram({
                 dataKey="value"
                 nameKey="name"
                 cx="50%"
+                cursor={"pointer"}
                 style={{ fontSize: 10 }}
                 cy="50%"
                 strokeWidth={2}

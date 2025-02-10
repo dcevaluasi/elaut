@@ -418,6 +418,7 @@ function PieChartPercentage({
                 dataKey="value"
                 nameKey="name"
                 cx="50%"
+                cursor={"pointer"}
                 cy="50%"
                 strokeWidth={2}
                 style={{ fontSize: 10 }}
@@ -559,6 +560,7 @@ function PieChartPercentageProgram({
                 cx="50%"
                 style={{ fontSize: 10 }}
                 cy="50%"
+                cursor={"pointer"}
                 strokeWidth={2}
                 outerRadius={80}
                 innerRadius={60} // Make it a donut chart

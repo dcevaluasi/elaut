@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import CardDataStats from "../CardDataStats";
-import { HiCheckBadge } from "react-icons/hi2";
 import { GiBattery75, GiPapers } from "react-icons/gi";
 import { MdSchool } from "react-icons/md";
 import Cookies from "js-cookie";
@@ -15,8 +14,6 @@ import {
 import { Blanko, BlankoKeluar, BlankoRusak } from "@/types/blanko";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-import { Button } from "flowbite-react";
 
 import {
   Card,
@@ -32,19 +29,15 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import ChartPopover from "../Charts/ChartPopover";
-import ChartPopoverKeluar from "../Charts/ChartPopoverKeluar";
 import { formatDateTime } from "@/utils";
-import ChartPopoverKeahlian from "../Charts/ChartPopoverKeahlian";
 import ChartBlankoAwal from "../Charts/ChartBlankoAwal";
-import ChartPopoverKeterampilan from "../Charts/ChartPopoverKeterampilan";
-import ChartCertificatesMonthly from "../Charts/ChartCertificatesMonthly";
 import useFetchSertifikatByTypeBlanko from "@/hooks/blanko/useFetchSertifikatByTypeBlanko";
 import useFetchSertifikatByLemdiklat from "@/hooks/blanko/useFetchSertifikatByLemdiklat";
-import { ChartSertifikatByLemdiklat } from "../akp";
+
 import ChartSertifikatKeterampilanByLemdiklat from "../akp/sertifikat/ChartSertifikatKeterampilanByLemdiklat";
 import ChartSertifikatKeahlianByLemdiklat from "../akp/sertifikat/ChartSertifikatKeahlianByLemdiklat";
 import useFetchSertifikatByProgram from "@/hooks/blanko/useFetchSertifikatByProgram";
-import { FaGraduationCap } from "react-icons/fa6";
+
 import { HashLoader } from "react-spinners";
 
 const AKP: React.FC = () => {
@@ -254,7 +247,7 @@ const AKP: React.FC = () => {
                           </CardDataStats>
                         </span>
                       </PopoverTrigger>
-                      <PopoverContent className="w-full">
+                      <PopoverContent className="w-full flex gap-2">
                         <CardDataStats
                           title="Total Sertifikat CoC"
                           total={
@@ -294,7 +287,10 @@ const AKP: React.FC = () => {
                               </CardDataStats>
                             </span>
                           </PopoverTrigger>
-                          <PopoverContent side="right" className="w-fit ml-10">
+                          <PopoverContent
+                            side="bottom"
+                            className="w-fit flex gap-2 mt-4"
+                          >
                             <CardDataStats
                               title="Blanko CoC Rusak"
                               total={blankoRusak!
@@ -410,7 +406,7 @@ const AKP: React.FC = () => {
               dataSertifikatByTypeBlankoCoP != null ? (
               dataSertifikatByTypeBlankoCoC.data != null &&
               dataSertifikatByTypeBlankoCoP.data != null ? (
-                <Tabs defaultValue={"CoP"} className="w-full mb-3 -mt-4">
+                <Tabs defaultValue={"CoC"} className="w-full mb-3 -mt-4">
                   <TabsList className="flex gap-2 w-full">
                     <TabsTrigger value="CoC" className="w-full">
                       CoC (Certificate of Competence)
