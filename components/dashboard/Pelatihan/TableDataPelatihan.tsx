@@ -677,7 +677,9 @@ const TableDataPelatihan: React.FC = () => {
                                     : "pusat"
                                 }/pelatihan/${
                                   pelatihan.KodePelatihan
-                                }/peserta-pelatihan/${pelatihan.IdPelatihan}`}
+                                }/peserta-pelatihan/${encryptValue(
+                                  pelatihan.IdPelatihan
+                                )}`}
                                 target="_blank"
                                 className="  shadow-sm bg-green-500 hover:bg-green-500 text-neutral-100  hover:text-neutral-100 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2"
                               >

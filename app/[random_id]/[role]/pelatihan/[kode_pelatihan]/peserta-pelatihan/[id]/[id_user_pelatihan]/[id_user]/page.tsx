@@ -10,7 +10,7 @@ import { elautBaseUrl, fileBaseUrl } from "@/constants/urls";
 import axios from "axios";
 import { UserPelatihan } from "@/types/product";
 import { generateTanggalPelatihan } from "@/utils/text";
-import { formatToRupiah } from "@/lib/utils";
+import { decryptValue, formatToRupiah } from "@/lib/utils";
 import DefaultLayout from "@/components/dashboard/Layouts/DefaultLayout";
 import { User } from "@/types/user";
 import ValidasiPesertaButton from "@/components/dashboard/Dashboard/Actions/ValidasiPesertaButton";
@@ -22,8 +22,8 @@ import { MdOutlineClose } from "react-icons/md";
 
 function DetailPeserta() {
   const paths = usePathname().split("/");
-  const idPeserta = paths[paths.length - 1];
-  const idPesertaPelatihan = paths[paths.length - 2];
+  const idPeserta = decryptValue(paths[paths.length - 1]);
+  const idPesertaPelatihan = decryptValue(paths[paths.length - 2]);
   const [peserta, setPeserta] = React.useState<User | null>(null);
   const [pesertaPelatihan, setPesertaPelatihan] =
     React.useState<UserPelatihan | null>(null);

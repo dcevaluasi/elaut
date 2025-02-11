@@ -70,6 +70,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import Toast from "@/components/toast";
 import VerifikasiButton from "../Dashboard/Actions/VerifikasiButton";
+import { encryptValue } from "@/lib/utils";
 
 const TableDataVerifikasiPelaksanaan: React.FC = () => {
   const [data, setData] = React.useState<PelatihanMasyarakat[]>([]);
@@ -641,7 +642,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
                         title="Bank Soal"
                         href={`/admin/pusat/pelatihan/${
                           pelatihan!.KodePelatihan
-                        }/bank-soal/${pelatihan!.IdPelatihan}`}
+                        }/bank-soal/${encryptValue(pelatihan!.IdPelatihan)}`}
                         className="border border-blue-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-blue-900 hover:bg-blue-900 hover:text-white text-white rounded-md"
                       >
                         <TbDatabase className="h-5 w-5" /> Bank Soal

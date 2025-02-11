@@ -109,6 +109,7 @@ import { GiBookmarklet } from "react-icons/gi";
 import { DialogSertifikatPelatihan } from "@/components/sertifikat/dialogSertifikatPelatihan";
 import { DialogTemplateSertifikatPelatihan } from "@/components/sertifikat/dialogTemplateSertifikatPelatihan";
 import Link from "next/link";
+import { decryptValue, encryptValue } from "@/lib/utils";
 
 const TableDataUjiKompetensi: React.FC = () => {
   const [showFormAjukanPelatihan, setShowFormAjukanPelatihan] =
@@ -489,9 +490,9 @@ const TableDataUjiKompetensi: React.FC = () => {
                     onClick={(e) =>
                       row.original.StatusApproval != "Selesai"
                         ? handleUpdateClosePelatihanELAUT(
-                          row.original.IdUjikom,
-                          statusPelatihan
-                        )
+                            row.original.IdUjikom,
+                            statusPelatihan
+                          )
                         : null
                     }
                   >
@@ -506,7 +507,9 @@ const TableDataUjiKompetensi: React.FC = () => {
                 router.push(
                   `/admin/lemdiklat/pelatihan/${row.getValue(
                     "KodePelatihan"
-                  )}/peserta-pelatihan/${row.getValue("IdPelatihan")}`
+                  )}/peserta-pelatihan/${encryptValue(
+                    row.getValue("IdPelatihan")
+                  )}`
                 )
               }
               variant="outline"
@@ -826,13 +829,13 @@ const TableDataUjiKompetensi: React.FC = () => {
                       onClick={(e) =>
                         row.original.Status == "Belum Publish"
                           ? handleUpdatePublishPelatihanToELAUT(
-                            row.original.IdUjikom,
-                            statusPelatihan
-                          )
+                              row.original.IdUjikom,
+                              statusPelatihan
+                            )
                           : handleUpdatePublishPelatihanToELAUT(
-                            row.original.IdUjikom,
-                            "Belum Publish"
-                          )
+                              row.original.IdUjikom,
+                              "Belum Publish"
+                            )
                       }
                     >
                       {row.original.Status == "Publish"

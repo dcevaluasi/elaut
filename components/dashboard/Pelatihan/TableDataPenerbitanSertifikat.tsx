@@ -39,6 +39,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { encryptValue } from "@/lib/utils";
 
 const TableDataPenerbitanSertifikat: React.FC = () => {
   const [showFormAjukanPelatihan, setShowFormAjukanPelatihan] =
@@ -518,7 +519,11 @@ const TableDataPenerbitanSertifikat: React.FC = () => {
                                 </Link>
 
                                 <Link
-                                  href={`/admin/pusat/pelatihan/${pengajuanPenerbitanSertifikat.KodePelatihan}/peserta-pelatihan/${pengajuanPenerbitanSertifikat.IdPelatihan}`}
+                                  href={`/admin/pusat/pelatihan/${
+                                    pengajuanPenerbitanSertifikat.KodePelatihan
+                                  }/peserta-pelatihan/${encryptValue(
+                                    pengajuanPenerbitanSertifikat.IdPelatihan
+                                  )}`}
                                   title="Data Peserta Pelatihan"
                                   className="border border-neutral-200  shadow-sm bg-teal-600 hover:bg-teal-600 text-neutral-100  hover:text-neutral-200 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2"
                                 >
@@ -874,7 +879,11 @@ const TableDataPenerbitanSertifikat: React.FC = () => {
                                 </Link>
 
                                 <Link
-                                  href={`/admin/pusat/pelatihan/${pengajuanPenerbitanSertifikat.KodePelatihan}/peserta-pelatihan/${pengajuanPenerbitanSertifikat.IdPelatihan}`}
+                                  href={`/admin/pusat/pelatihan/${
+                                    pengajuanPenerbitanSertifikat.KodePelatihan
+                                  }/peserta-pelatihan/${encryptValue(
+                                    pengajuanPenerbitanSertifikat.IdPelatihan
+                                  )}`}
                                   title="Data Peserta Pelatihan"
                                   className="border border-neutral-200  shadow-sm bg-teal-600 hover:bg-teal-600 text-neutral-100  hover:text-neutral-200 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2"
                                 >

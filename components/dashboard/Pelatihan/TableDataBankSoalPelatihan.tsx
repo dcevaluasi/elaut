@@ -54,11 +54,12 @@ import Cookies from "js-cookie";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { elautBaseUrl } from "@/constants/urls";
 import { Badge } from "@/components/ui/badge";
+import { decryptValue } from "@/lib/utils";
 
 const TableDataBankSoalPelatihan = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const pathname = usePathname();
-  const id = extractLastSegment(pathname);
+  const id = decryptValue(extractLastSegment(pathname));
 
   const [dataPelatihan, setDataPelatihan] =
     React.useState<DetailPelatihanMasyarakat | null>(null);
@@ -107,7 +108,7 @@ const TableDataBankSoalPelatihan = () => {
           title: "Oopsss!",
           text: `Belum ada peserta!`,
         });
-        return
+        return;
       } else {
         setIsLoadingSematkanSoal(true);
         const formData = new FormData();
