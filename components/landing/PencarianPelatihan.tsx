@@ -41,7 +41,12 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { HashLoader } from "react-spinners";
-import { formatToRupiah, getMonthName, replaceUrl } from "@/lib/utils";
+import {
+  encryptValue,
+  formatToRupiah,
+  getMonthName,
+  replaceUrl,
+} from "@/lib/utils";
 import { FiCalendar, FiSearch } from "react-icons/fi";
 import { generateTanggalPelatihan } from "@/utils/text";
 import { GrSend } from "react-icons/gr";
@@ -617,7 +622,7 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
       <Link
         href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${
           pelatihan?.KodePelatihan
-        }/${pelatihan?.IdPelatihan}`}
+        }/${encryptValue(pelatihan?.IdPelatihan)}`}
         className="w-full block text-center font-semibold px-6 py-3 bg-blue-600 rounded-3xl text-white"
       >
         Lihat Detail
