@@ -1,3 +1,4 @@
+import CryptoJS from 'crypto-js';
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -93,3 +94,19 @@ export function shuffleArray<T>(array: T[]): T[] {
   }
   return shuffledArray;
 }
+
+
+
+const SECRET_KEY = process.env.NEXT_PUBLIC_ENCRYPT_KEY || ''
+
+// Encrypt function
+export const encryptValue = (value: string | number): string => {
+  const ciphertext = CryptoJS.AES.encrypt(value.toString(), SECRET_KEY).toString();
+  return encodeURIComponent(ciphertext); // URL safe
+};
+
+// Decrypt function
+export const decryptValue = (encryptedValue: string): string => {
+  const bytes = CryptoJS.AES.decrypt(decodeURIComponent(encryptedValue), SECRET_KEY);
+  return bytes.toString(CryptoJS.enc.Utf8);
+};

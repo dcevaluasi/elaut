@@ -67,6 +67,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import Toast from "@/components/toast";
+import { encryptValue } from "@/lib/utils";
 
 const TableDataPelatihan: React.FC = () => {
   const [data, setData] = React.useState<PelatihanMasyarakat[]>([]);
@@ -655,7 +656,9 @@ const TableDataPelatihan: React.FC = () => {
                         <div className="flex items-center w-fit  gap-1   -mt-2">
                           <Link
                             title="Detail Pelatihan"
-                            href={`/admin/lemdiklat/pelatihan/detail/${pelatihan.KodePelatihan}/${pelatihan.IdPelatihan}`}
+                            href={`/admin/lemdiklat/pelatihan/detail/${
+                              pelatihan.KodePelatihan
+                            }/${encryptValue(pelatihan.IdPelatihan)}`}
                             className="border border-neutral-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-neutral-900 hover:bg-neutral-900 hover:text-white text-white rounded-md"
                           >
                             <RiInformationFill className="h-5 w-5" /> Detail

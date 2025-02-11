@@ -60,7 +60,11 @@ import { FaBookOpen } from "react-icons/fa6";
 import axios from "axios";
 import { PelatihanMasyarakat } from "@/types/product";
 import { generateFullNameBalai, generateTanggalPelatihan } from "@/utils/text";
-import { formatToRupiah, generateInstrukturName } from "@/lib/utils";
+import {
+  decryptValue,
+  formatToRupiah,
+  generateInstrukturName,
+} from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
 import Toast from "@/components/toast";
 import { MateriButton, PublishButton } from "./Actions";
@@ -74,7 +78,7 @@ import { Badge } from "@/components/ui/badge";
 
 function DetailPelatihan() {
   const paths = usePathname().split("/");
-  const idPelatihan = paths[paths.length - 1];
+  const idPelatihan = decryptValue(paths[paths.length - 1]);
   const kodePelatihan = paths[paths.length - 2];
   const [pelatihan, setPelatihan] = React.useState<PelatihanMasyarakat | null>(
     null
@@ -100,7 +104,7 @@ function DetailPelatihan() {
     handleFetchDetailPelatihan();
   }, []);
 
-  const typeRole = Cookies.get('XSRF093')
+  const typeRole = Cookies.get("XSRF093");
 
   return (
     <section className="">
@@ -177,7 +181,7 @@ function DetailPelatihan() {
                   </td>
                   <td className="p-4 w-2/3">
                     {pelatihan.TanggalMulaiPelatihan !== "" &&
-                      pelatihan.TanggalBerakhirPelatihan !== "" ? (
+                    pelatihan.TanggalBerakhirPelatihan !== "" ? (
                       <>
                         {generateTanggalPelatihan(
                           pelatihan.TanggalMulaiPelatihan
@@ -269,19 +273,20 @@ function DetailPelatihan() {
                         <AlertDialogTrigger asChild>
                           {pelatihan != null
                             ? pelatihan!.StatusPenerbitan != "" && (
-                              <Badge
-                                variant="outline"
-                                className={`w-fit flex items-center cursor-pointer justify-center ${pelatihan!.StatusPenerbitan == "On Progress"
-                                  ? " bg-yellow-300 text-neutral-800"
-                                  : " bg-green-500 text-white"
+                                <Badge
+                                  variant="outline"
+                                  className={`w-fit flex items-center cursor-pointer justify-center ${
+                                    pelatihan!.StatusPenerbitan == "On Progress"
+                                      ? " bg-yellow-300 text-neutral-800"
+                                      : " bg-green-500 text-white"
                                   }`}
-                              >
-                                {pelatihan!.StatusPenerbitan!}{" "}
-                                {usePathname().includes("lemdiklat")
-                                  ? "Pengajuan Sertifikat"
-                                  : "Penerbitan"}
-                              </Badge>
-                            )
+                                >
+                                  {pelatihan!.StatusPenerbitan!}{" "}
+                                  {usePathname().includes("lemdiklat")
+                                    ? "Pengajuan Sertifikat"
+                                    : "Penerbitan"}
+                                </Badge>
+                              )
                             : null}
                         </AlertDialogTrigger>
                         <AlertDialogContent className="flex flex-col items-center justify-center !w-[420px]">
@@ -290,7 +295,7 @@ function DetailPelatihan() {
                               <div className="w-24 h-24 rounded-full bg-gradient-to-b from-gray-200 via-whiter to-white flex items-center justify-center animate-pulse">
                                 <div className="w-16 h-16 rounded-full  bg-gradient-to-b from-gray-300 via-whiter to-white flex items-center justify-center animate-pulse">
                                   {pelatihan!.StatusPenerbitan ==
-                                    "On Progress" ? (
+                                  "On Progress" ? (
                                     <RiProgress3Line className="h-12 w-12 text-yellow-400" />
                                   ) : (
                                     <RiVerifiedBadgeFill className="h-12 w-12 text-green-500" />
@@ -306,7 +311,7 @@ function DetailPelatihan() {
                                   {pelatihan!.StatusPenerbitan == "On Progress"
                                     ? "Pengajuan penerbitan sertifikat telah masuk untuk diproses penandatanganan, harap tindak lanjut pengajuan berikut dalam kurun waktu 1x24 jam!"
                                     : "Pengajuan penerbitan telah berhasil dan sertifikat telah terbit dengan ditandatangani anda sebagai" +
-                                    pelatihan!.TtdSertifikat}
+                                      pelatihan!.TtdSertifikat}
                                 </AlertDialogDescription>
                               </div>
                             </AlertDialogTitle>
@@ -395,20 +400,22 @@ function DetailPelatihan() {
               </h2>
             </div>
             <table className="w-full">
-              {
-                pelatihan.TanggalMulaiPendaftaran != '' && <tr className="border-b border-b-gray-200 w-full">
+              {pelatihan.TanggalMulaiPendaftaran != "" && (
+                <tr className="border-b border-b-gray-200 w-full">
                   <td className="font-semibold p-4 w-[20%]">
                     Tanggal Pendaftaran
                   </td>
                   <td className="p-4 w-2/3">
-                    {generateTanggalPelatihan(pelatihan.TanggalMulaiPendaftaran)}{" "}
+                    {generateTanggalPelatihan(
+                      pelatihan.TanggalMulaiPendaftaran
+                    )}{" "}
                     s.d.{" "}
                     {generateTanggalPelatihan(
                       pelatihan!.TanggalBerakhirPendaftaran
                     )}
                   </td>
                 </tr>
-              }
+              )}
 
               <tr className="border-b border-b-gray-200 w-full">
                 <td className="font-semibold p-4 w-[20%]">Tarif Pelatihan</td>
@@ -492,33 +499,44 @@ function DetailPelatihan() {
                   <Link
                     target="_blank"
                     className="text-blue-500 underline"
-                    href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/silabus/pelatihan/${pelatihan!.SilabusPelatihan
-                      }`}
+                    href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/silabus/pelatihan/${
+                      pelatihan!.SilabusPelatihan
+                    }`}
                   >
                     {pelatihan!.SilabusPelatihan}
                   </Link>
                 </td>
               </tr>
-              {typeRole != 'satdik' ? pelatihan?.UjiKompotensi != "Ujian Pre-test dan Post-test" ? (
-                <></>
+              {typeRole != "satdik" ? (
+                pelatihan?.UjiKompotensi != "Ujian Pre-test dan Post-test" ? (
+                  <></>
+                ) : (
+                  <tr className="border-b border-b-gray-200 w-full">
+                    <td className="font-semibold p-4 w-[20%]">
+                      Bank Soal Pelatihan
+                    </td>
+                    <td className="p-4 w-2/3">
+                      <Link
+                        target="_blank"
+                        className="text-blue-500 underline flex gap-2 items-center"
+                        href={`/admin/${
+                          Cookies.get("XSRF093") == "satdik" ||
+                          Cookies.get("XSRF093") == "balai"
+                            ? "lemdiklat"
+                            : "pusat"
+                        }/pelatihan/${pelatihan!.KodePelatihan}/bank-soal/${
+                          pelatihan!.IdPelatihan
+                        }`}
+                      >
+                        <FiUploadCloud />
+                        Upload Bank Soal
+                      </Link>
+                    </td>
+                  </tr>
+                )
               ) : (
-                <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">
-                    Bank Soal Pelatihan
-                  </td>
-                  <td className="p-4 w-2/3">
-                    <Link
-                      target="_blank"
-                      className="text-blue-500 underline flex gap-2 items-center"
-                      href={`/admin/${Cookies.get('XSRF093') == 'satdik' || Cookies.get('XSRF093') == 'balai' ? 'lemdiklat' : 'pusat'}/pelatihan/${pelatihan!.KodePelatihan
-                        }/bank-soal/${pelatihan!.IdPelatihan}`}
-                    >
-                      <FiUploadCloud />
-                      Upload Bank Soal
-                    </Link>
-                  </td>
-                </tr>
-              ) : <></>}
+                <></>
+              )}
             </table>
           </div>
         </div>
