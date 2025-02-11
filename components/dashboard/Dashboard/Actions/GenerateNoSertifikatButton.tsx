@@ -39,11 +39,25 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
     React.useState<boolean>(false);
   const [ttdSertifikat, setTtdSertifikat] = React.useState<string>("");
   const [beritaAcara, setBeritaAcara] = React.useState<File | null>(null);
+
   const handleFileChange = (e: any) => {
-    setBeritaAcara(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file) {
+      const fileExtension = file.name.split(".").pop()?.toLowerCase();
+      if (fileExtension !== "pdf") {
+        setBeritaAcara(null);
+        Toast.fire({
+          icon: "error",
+          title: "Oopsss!",
+          text: `Gagal mengupload dokumen, harus mengupload dengan format pdf!`,
+        });
+      } else {
+        setBeritaAcara(file);
+      }
+    }
   };
   const [isUploading, setIsUploading] = React.useState<boolean>(false);
-  const typeRole = Cookies.get('XSRF093')
+  const typeRole = Cookies.get("XSRF093");
 
   const handleGenerateSertifikat = async () => {
     setIsUploading(!isUploading);
@@ -81,7 +95,7 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
       );
       Toast.fire({
         icon: "success",
-        title: 'Yeayyy!',
+        title: "Yeayyy!",
         text: `Berhasil mengupload file berita acara dan penandatangan, tunggu proses approval dari pusat!`,
       });
       setIsUploading(!isUploading);
@@ -92,7 +106,7 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
       console.error("ERROR GENERATE SERTIFIKAT: ", error);
       Toast.fire({
         icon: "error",
-        title: 'Oopsss!',
+        title: "Oopsss!",
         text: `Gagal mengupload file berita acara dan penandatangan!`,
       });
       setIsUploading(!isUploading);
@@ -169,15 +183,17 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
                     >
                       Kepala BPPSDM KP
                     </option>
-                    {
-                      typeRole == 'balai' && <>
+                    {typeRole == "balai" && (
+                      <>
                         <option
                           onClick={(e) =>
                             setTtdSertifikat(
                               "Kepala Pusat Pelatihan Kelautan dan Perikanan"
                             )
                           }
-                          value={"Kepala Pusat Pelatihan Kelautan dan Perikanan"}
+                          value={
+                            "Kepala Pusat Pelatihan Kelautan dan Perikanan"
+                          }
                         >
                           Kepala Pusat Pelatihan KP
                         </option>
@@ -187,13 +203,14 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
                               "Kepala Balai Pelatihan dan Penyuluhan Perikanan"
                             )
                           }
-                          value={"Kepala Balai Pelatihan dan Penyuluhan Perikanan"}
+                          value={
+                            "Kepala Balai Pelatihan dan Penyuluhan Perikanan"
+                          }
                         >
                           Kepala Balai Pelatihan
                         </option>
                       </>
-                    }
-
+                    )}
                   </select>
                 </div>
               </div>
@@ -203,7 +220,8 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
                   className="block text-gray-800 text-sm font-medium mb-1"
                   htmlFor="name"
                 >
-                  File Berita Acara, Memo, Laporan Pelaksanaan<span className="text-red-600">*</span>
+                  File Berita Acara, Memo, Laporan Pelaksanaan
+                  <span className="text-red-600">*</span>
                 </label>
                 <div className="flex items-center justify-center w-full">
                   <label className="flex flex-col rounded-lg border-2 border-dashed w-full h-40 p-10 group text-center">

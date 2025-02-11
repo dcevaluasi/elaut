@@ -44,9 +44,7 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
   const [suratPemberitahuanFile, setSuratPemberitahuanFile] =
     React.useState<File | null>(null);
   const [isUploading, setIsUploading] = React.useState<boolean>(false);
-  const handleSuratPemberitahuanChange = (e: any) => {
-    setSuratPemberitahuanFile(e.target.files[0]);
-  };
+
   const handleUploadSuratPemberitahuan = async (id: string) => {
     setIsUploading(true);
     const formData = new FormData();
@@ -69,7 +67,8 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
       );
       Toast.fire({
         icon: "success",
-        title: `Berhasil mengupload surat pemberitahuan ke Pusat Pelatihan Kelautan dan Perikanan!`,
+        title: "Yeayyy!",
+        text: `Berhasil mengupload surat pemberitahuan ke Pusat Pelatihan Kelautan dan Perikanan!`,
       });
       console.log("UPDATE PELATIHAN: ", response);
       handleFetchingData();
@@ -79,11 +78,29 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
       console.error("ERROR UPDATE PELATIHAN: ", error);
       Toast.fire({
         icon: "error",
-        title: `Gagal mengupload surat pemberitahuan ke Pusat Pelatihan Kelautan dan Perikanan!`,
+        title: "Oopsss!",
+        text: `Gagal mengupload surat pemberitahuan ke Pusat Pelatihan Kelautan dan Perikanan!`,
       });
       setIsOpenFormSuratPemberitahuan(!isOpenFormSuratPemberitahuan);
       setIsUploading(false);
       handleFetchingData();
+    }
+  };
+
+  const handleSuratPemberitahuanChange = (e: any) => {
+    const file = e.target.files[0];
+    if (file) {
+      const fileExtension = file.name.split(".").pop()?.toLowerCase();
+      if (fileExtension !== "pdf") {
+        setSuratPemberitahuanFile(null);
+        Toast.fire({
+          icon: "error",
+          title: "Oopsss!",
+          text: `Gagal mengupload surat pemberitahuan, harus mengupload dengan format pdf!`,
+        });
+      } else {
+        setSuratPemberitahuanFile(file);
+      }
     }
   };
 
