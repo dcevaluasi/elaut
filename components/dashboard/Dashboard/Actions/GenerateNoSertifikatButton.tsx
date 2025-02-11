@@ -43,32 +43,32 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
   const handleFileChange = (e: any) => {
     const file = e.target.files[0];
     if (file) {
-      const fileExtension = file.name.split(".").pop()?.toLowerCase();
+      setBeritaAcara(file); // Simpan file tanpa validasi
+    }
+  };
+
+  const handleGenerateSertifikat = async () => {
+    if (beritaAcara) {
+      const fileExtension = beritaAcara.name.split(".").pop()?.toLowerCase();
       if (fileExtension !== "pdf") {
-        setBeritaAcara(null);
         Toast.fire({
           icon: "error",
           title: "Oopsss!",
-          text: `Gagal mengupload dokumen, harus mengupload dengan format pdf!`,
+          text: "Gagal mengupload dokumen, harus mengupload dengan format PDF!",
         });
-      } else {
-        setBeritaAcara(file);
+        return; // Hentikan proses jika file bukan PDF
       }
     }
-  };
-  const [isUploading, setIsUploading] = React.useState<boolean>(false);
-  const typeRole = Cookies.get("XSRF093");
 
-  const handleGenerateSertifikat = async () => {
-    setIsUploading(!isUploading);
+    setIsUploading(true);
     console.log({ ttdSertifikat });
+
     const formData = new FormData();
     formData.append("TtdSertifikat", ttdSertifikat);
 
     const updateData = new FormData();
     updateData.append("PemberitahuanDiterima", "Sedang diproses pusat");
-    // updateData.append("StatusPenerbitan", "On Progress");
-    if (beritaAcara != null) {
+    if (beritaAcara) {
       updateData.append("BeritaAcara", beritaAcara);
     }
 
@@ -83,6 +83,7 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
           },
         }
       );
+
       const uploadBeritaAcaraResponse = await axios.put(
         `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${idPelatihan}`,
         updateData,
@@ -93,27 +94,33 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
           },
         }
       );
+
       Toast.fire({
         icon: "success",
         title: "Yeayyy!",
-        text: `Berhasil mengupload file berita acara dan penandatangan, tunggu proses approval dari pusat!`,
+        text: "Berhasil mengupload file berita acara dan penandatangan, tunggu proses approval dari pusat!",
       });
-      setIsUploading(!isUploading);
+
+      setIsUploading(false);
       handleFetchingData();
-      setOpenFormSertifikat(!openFormSertifikat);
+      setOpenFormSertifikat(false);
       console.log("UPLOAD BERITA ACARA: ", uploadBeritaAcaraResponse);
     } catch (error) {
       console.error("ERROR GENERATE SERTIFIKAT: ", error);
       Toast.fire({
         icon: "error",
         title: "Oopsss!",
-        text: `Gagal mengupload file berita acara dan penandatangan!`,
+        text: "Gagal mengupload file berita acara dan penandatangan!",
       });
-      setIsUploading(!isUploading);
-      setOpenFormSertifikat(!openFormSertifikat);
+
+      setIsUploading(false);
+      setOpenFormSertifikat(false);
       handleFetchingData();
     }
   };
+
+  const [isUploading, setIsUploading] = React.useState<boolean>(false);
+  const typeRole = Cookies.get("XSRF093");
 
   return (
     <>

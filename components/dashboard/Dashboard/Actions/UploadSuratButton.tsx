@@ -45,13 +45,37 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
     React.useState<File | null>(null);
   const [isUploading, setIsUploading] = React.useState<boolean>(false);
 
+  const handleSuratPemberitahuanChange = (e: any) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSuratPemberitahuanFile(file); // Simpan file tanpa validasi ekstensi
+    }
+  };
+
   const handleUploadSuratPemberitahuan = async (id: string) => {
+    if (suratPemberitahuanFile) {
+      const fileExtension = suratPemberitahuanFile.name
+        .split(".")
+        .pop()
+        ?.toLowerCase();
+      if (fileExtension !== "pdf") {
+        Toast.fire({
+          icon: "error",
+          title: "Oopsss!",
+          text: "Gagal mengupload surat pemberitahuan, harus mengupload dengan format PDF!",
+        });
+        return; // Hentikan proses jika file bukan PDF
+      }
+    }
+
     setIsUploading(true);
     const formData = new FormData();
     formData.append("StatusPenerbitan", "Verifikasi Pelaksanaan");
-    if (suratPemberitahuanFile != null) {
+
+    if (suratPemberitahuanFile) {
       formData.append("SuratPemberitahuan", suratPemberitahuanFile);
     }
+
     console.log("SURAT PEMBERITAHUAN", suratPemberitahuanFile);
 
     try {
@@ -65,42 +89,28 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
           },
         }
       );
+
       Toast.fire({
         icon: "success",
         title: "Yeayyy!",
-        text: `Berhasil mengupload surat pemberitahuan ke Pusat Pelatihan Kelautan dan Perikanan!`,
+        text: "Berhasil mengupload surat pemberitahuan ke Pusat Pelatihan Kelautan dan Perikanan!",
       });
+
       console.log("UPDATE PELATIHAN: ", response);
       handleFetchingData();
       setIsUploading(false);
-      setIsOpenFormSuratPemberitahuan(!isOpenFormSuratPemberitahuan);
+      setIsOpenFormSuratPemberitahuan(false);
     } catch (error) {
       console.error("ERROR UPDATE PELATIHAN: ", error);
       Toast.fire({
         icon: "error",
         title: "Oopsss!",
-        text: `Gagal mengupload surat pemberitahuan ke Pusat Pelatihan Kelautan dan Perikanan!`,
+        text: "Gagal mengupload surat pemberitahuan ke Pusat Pelatihan Kelautan dan Perikanan!",
       });
-      setIsOpenFormSuratPemberitahuan(!isOpenFormSuratPemberitahuan);
+
+      setIsOpenFormSuratPemberitahuan(false);
       setIsUploading(false);
       handleFetchingData();
-    }
-  };
-
-  const handleSuratPemberitahuanChange = (e: any) => {
-    const file = e.target.files[0];
-    if (file) {
-      const fileExtension = file.name.split(".").pop()?.toLowerCase();
-      if (fileExtension !== "pdf") {
-        setSuratPemberitahuanFile(null);
-        Toast.fire({
-          icon: "error",
-          title: "Oopsss!",
-          text: `Gagal mengupload surat pemberitahuan, harus mengupload dengan format pdf!`,
-        });
-      } else {
-        setSuratPemberitahuanFile(file);
-      }
     }
   };
 
