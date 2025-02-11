@@ -30,7 +30,7 @@ import {
 } from "@/utils";
 import Toast from "@/components/toast";
 import Features from "@/components/features";
-import { formatToRupiah, replaceUrl } from "@/lib/utils";
+import { decryptValue, formatToRupiah, replaceUrl } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { elautBaseUrl } from "@/constants/urls";
 import { generateTanggalPelatihan } from "@/utils/text";
@@ -39,7 +39,7 @@ import DetailPelatihan from "@/components/elaut/DetailPelatihan";
 function page() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const pathname = usePathname();
-  const id = extractLastSegment(pathname);
+  const id = decryptValue(extractLastSegment(pathname));
   const token = Cookies.get("XSRF081");
 
   const getJenisProgram = (program: string) => {
@@ -78,18 +78,23 @@ function page() {
     React.useState(false);
 
   const handleRegistration = () => {
-    if (Cookies.get('status')?.includes('Politeknik')) {
-      if (data!.PenyelenggaraPelatihan.includes('Politeknik') && Cookies.get('status') != data!.PenyelenggaraPelatihan) {
+    if (Cookies.get("status")?.includes("Politeknik")) {
+      if (
+        data!.PenyelenggaraPelatihan.includes("Politeknik") &&
+        Cookies.get("status") != data!.PenyelenggaraPelatihan
+      ) {
         Toast.fire({
           icon: "error",
-          title: 'Oopsss!',
-          text: `Sobat E-LAUT tidak dapat mendaftar pelatihan ini karena bukan dari ${data!.PenyelenggaraPelatihan}`,
+          title: "Oopsss!",
+          text: `Sobat E-LAUT tidak dapat mendaftar pelatihan ini karena bukan dari ${
+            data!.PenyelenggaraPelatihan
+          }`,
         });
       } else {
         if (data!.StatusApproval == "Selesai") {
           Toast.fire({
             icon: "error",
-            title: 'Oopsss!',
+            title: "Oopsss!",
             text: `Yah pelatihan ini sudah berakhir, cari pelatihan lainnya sobat ELAUT!`,
           });
         } else {
@@ -104,7 +109,7 @@ function page() {
       if (data!.StatusApproval == "Selesai") {
         Toast.fire({
           icon: "error",
-          title: 'Oopsss!',
+          title: "Oopsss!",
           text: `Yah pelatihan ini sudah berakhir, cari pelatihan lainnya sobat ELAUT!`,
         });
       } else {
@@ -115,8 +120,6 @@ function page() {
         }
       }
     }
-
-
   };
 
   const jenisProgram = Cookies.get("JenisProgram");
@@ -233,7 +236,12 @@ function page() {
           </div>
         </div>
       ) : data != null ? (
-        <DetailPelatihan data={data} handleRegistration={handleRegistration} isRegistrasi={isRegistrasi} />
+        <DetailPelatihan
+          data={data}
+          handleRegistration={handleRegistration}
+          isRegistrasi={isRegistrasi}
+        />
+      ) : (
         // <div className='bg-[#EEEAEB] h-full p-20 pt-56 w-full'>
         //   <div className="w-full flex items-end flex-col">
         //     <div className=" flex justify-end  relative w-full max-w-6xl">
@@ -270,8 +278,6 @@ function page() {
         //             <p className="text-blue-500">*Kuota kelas pelatihan <span className="font-bold">{data!.KoutaPelatihan} orang</span></p>
         //           </div>
 
-
-
         //           <Button className='bg-[#625BF9] text-white font-bold w-fit rounded-full text-xl px-7 py-7'>
         //             {generateTanggalPelatihan(
         //               data!.TanggalMulaiPelatihan
@@ -303,8 +309,6 @@ function page() {
         //               </Button>
         //             ))}
 
-
-
         //         </div>
 
         //         {isRegistrasi && <div className="flex flex-col gap-2 items-end w-full text-left bg-white rounded-3xl p-10 ">
@@ -334,13 +338,10 @@ function page() {
         //   }
 
         // </div>
-      ) : (
         <></>
-      )
-      }
-    </section >
+      )}
+    </section>
   );
 }
-
 
 export default page;

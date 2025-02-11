@@ -6,7 +6,7 @@ import Link from "next/link";
 import { createSlug, truncateText } from "@/utils";
 import { PelatihanMasyarakat } from "@/types/product";
 import { Bounce, Slide } from "react-awesome-reveal";
-import { formatToRupiah, replaceUrl } from "@/lib/utils";
+import { encryptValue, formatToRupiah, replaceUrl } from "@/lib/utils";
 
 function ListBPPP({
   pelatihan,
@@ -79,7 +79,7 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
           <Link
             href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${
               pelatihan?.KodePelatihan
-            }/${pelatihan?.IdPelatihan}`}
+            }/${encryptValue(pelatihan?.IdPelatihan)}`}
             className="w-full mt-4 block text-sm text-center font-medium px-6 py-2 bg-blue-500 rounded-3xl text-white"
           >
             Registrasi

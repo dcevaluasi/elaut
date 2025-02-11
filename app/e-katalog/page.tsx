@@ -1,7 +1,7 @@
 "use client";
 
 import { elautBaseUrl } from "@/constants/urls";
-import { formatToRupiah, replaceUrl } from "@/lib/utils";
+import { encryptValue, formatToRupiah, replaceUrl } from "@/lib/utils";
 import { PelatihanMasyarakat } from "@/types/product";
 import { createSlug, truncateText } from "@/utils";
 import axios, { AxiosResponse } from "axios";
@@ -137,7 +137,7 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
           <Link
             href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${
               pelatihan?.KodePelatihan
-            }/${pelatihan?.IdPelatihan}`}
+            }/${encryptValue(pelatihan?.IdPelatihan)}`}
             className="w-full mt-4 block text-sm text-center font-medium px-6 py-2 bg-[#6559f9] rounded-3xl text-white"
           >
             IKUTI
