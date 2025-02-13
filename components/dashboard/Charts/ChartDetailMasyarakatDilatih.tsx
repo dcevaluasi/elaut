@@ -41,46 +41,11 @@ import { UserPelatihan } from "@/types/user";
 import TableDataPelatihanMasyarakat from "../Tables/TableDataPelatihanMasyarakat";
 import TableDataPelatihanMasyarakatByProvinsi from "../Tables/TableDataPelatihanMasyarakatByProvinsi";
 import TableDataPelatihanMasyrakatByProgramPrioritas from "../Tables/TableDataPelatihanMasyrakatByProgramPrioritas";
+import TableDataPelatihanMasyrakatByGender from "../Tables/TableDataPelatihanMasyrakatByGender";
+import TableDataPelatihanMasyrakatByPendidikan from "../Tables/TableDataPelatihanMasyrakatByPendidikan";
+import TableDataPelatihanMasyarakatByWilker from "../Tables/TableDataPelatihanMasyarakatByWilker";
 
 export const description = "A bar chart with an active bar";
-
-// const chartConfigBidangPelatihan = {
-//   visitors: {
-//     label: "Masyarakat Dilatih",
-//   },
-//   other4: {
-//     label: "Budidaya",
-//     color: "#274754",
-//   },
-//   chrome: {
-//     label: "Penangkapan",
-//     color: "#2662D9",
-//   },
-//   safari: {
-//     label: "Kepelautan",
-//     color: "#2EB88A",
-//   },
-//   firefox: {
-//     label: "Pengolahan dan Pemasaran",
-//     color: "#e88c30",
-//   },
-//   edge: {
-//     label: "Mesin Perikanan",
-//     color: "#AF57DB",
-//   },
-//   other: {
-//     label: "Konservasi",
-//     color: "#E0366F",
-//   },
-//   other2: {
-//     label: "Wisata Bahari",
-//     color: "#60432F",
-//   },
-//   other3: {
-//     label: "Manajemen Perikanan",
-//     color: "#274754",
-//   },
-// } satisfies ChartConfig;
 
 const chartConfigJenisPelatihan = {
   visitors: {
@@ -546,509 +511,154 @@ const ChartDetailMasyarakatDilatih: React.FC<{
     },
   ];
 
-  return (
-    <div className="col-span-12 rounded-xl border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default sm:px-7.5 xl:col-span-5 w-full">
-      <div className="mb-3 justify-between gap-4 sm:flex w-full">
-        <div>
-          <h5 className="text-xl font-semibold text-black">
-            Total Masyarakat Dilatih
-          </h5>
-          <p className="italic text-sm">{formatDateTime()}</p>
+  const TrainingChartCard = ({
+    title,
+    chartConfig,
+    chartData,
+  }: {
+    title: string;
+    chartConfig: any;
+    chartData: any;
+  }) => {
+    return (
+      <Card className="flex flex-col w-full">
+        <CardHeader className="items-center pb-0">
+          <CardTitle>{title}</CardTitle>
+        </CardHeader>
+        <CardContent className="flex-1 pb-0">
+          <ChartContainer
+            config={chartConfig}
+            className="mx-auto aspect-square max-h-[250px]"
+          >
+            <PieChart>
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent hideLabel />}
+              />
+              <Pie
+                data={chartData}
+                dataKey="visitors"
+                nameKey="browser"
+                innerRadius={60}
+                strokeWidth={0}
+              >
+                <Label
+                  content={({ viewBox }) => {
+                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                      return (
+                        <text
+                          x={viewBox.cx}
+                          y={viewBox.cy}
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                        >
+                          <tspan
+                            x={viewBox.cx}
+                            y={viewBox.cy}
+                            className="fill-black text-3xl font-bold"
+                          >
+                            {chartData
+                              .reduce(
+                                (sum: any, item: any) => sum + item.visitors,
+                                0
+                              )
+                              .toLocaleString("ID")}
+                          </tspan>
+                          <tspan
+                            x={viewBox.cx}
+                            y={(viewBox.cy || 0) + 24}
+                            className="fill-gray-400"
+                          >
+                            Masyarakat Dilatih
+                          </tspan>
+                        </text>
+                      );
+                    }
+                  }}
+                />
+              </Pie>
+            </PieChart>
+          </ChartContainer>
+        </CardContent>
+        <CardFooter className="flex-col gap-1 text-sm items-center flex text-center">
+          <div className="flex items-center gap-2 font-medium leading-none">
+            Updated last minute <TrendingUp className="h-4 w-4" />
+          </div>
+          <div className="leading-none text-muted-foreground">
+            Showing total visitors for the last 6 months
+          </div>
+          <div className="mt-4 flex gap-2 flex-wrap items-center justify-center">
+            {chartData.map((entry: any) => (
+              <div key={entry.name} className="flex gap-2 items-center">
+                <div
+                  className="w-4 h-4"
+                  style={{ backgroundColor: entry.fill }}
+                ></div>
+                <span className="text-sm">{entry.name}</span>
+              </div>
+            ))}
+          </div>
+        </CardFooter>
+      </Card>
+    );
+  };
+
+  const TrainingDashboard = () => {
+    return (
+      <div className="col-span-12 rounded-xl border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default sm:px-7.5 xl:col-span-5 w-full">
+        <div className="mb-3 justify-between gap-4 sm:flex w-full">
+          <div>
+            <h5 className="text-xl font-semibold text-black">
+              Total Masyarakat Dilatih
+            </h5>
+            <p className="italic text-sm">{formatDateTime()}</p>
+          </div>
         </div>
+
+        <div className="grid grid-cols-3 gap-2 w-full">
+          <TrainingChartCard
+            title="Program Pelatihan"
+            chartConfig={chartConfigProgramPelatihan}
+            chartData={chartDataMasyarakatDilatihByProgramPelatihan}
+          />
+          <TrainingChartCard
+            title="Bidang Pelatihan"
+            chartConfig={chartConfigBidangPelatihan}
+            chartData={chartDataMasyarakatDilatihByBidangPelatihan}
+          />
+          <TrainingChartCard
+            title="Jenis Pelatihan"
+            chartConfig={chartConfigJenisPelatihan}
+            chartData={chartDataMasyarakatDilatihByJenisPelatihan}
+          />
+          <TrainingChartCard
+            title="Jenis Kelamin"
+            chartConfig={chartConfigGender}
+            chartData={chartDataMasyarakatByGender}
+          />
+          <TrainingChartCard
+            title="Jenis Kelamin"
+            chartConfig={chartConfigProgramPrioritas}
+            chartData={chartDataMasyarakatDilatihByProgramPrioritas}
+          />
+          <TrainingChartCard
+            title="Lulus Pelatihan"
+            chartConfig={chartConfigSertifikat}
+            chartData={chartDataMasyarakatBySertifikat}
+          />
+        </div>
+
+        <TableDataPelatihanMasyarakat dataPelatihan={data} />
+        <TableDataPelatihanMasyarakatByProvinsi dataPelatihan={data} />
+        <TableDataPelatihanMasyrakatByProgramPrioritas dataPelatihan={data} />
+        <TableDataPelatihanMasyarakatByWilker dataPelatihan={data} />
+        <TableDataPelatihanMasyrakatByGender dataPelatihan={data}  />
+        <TableDataPelatihanMasyrakatByPendidikan dataPelatihan={data} />
       </div>
+    );
+  };
 
-      <div className="grid grid-cols-3 gap-2 w-full">
-        <Card className="flex flex-col w-full">
-          <CardHeader className="items-center pb-0">
-            <CardTitle>Program Pelatihan</CardTitle>
-            {/* <CardDescription>Pendidikan Tinggi</CardDescription> */}
-          </CardHeader>
-          <CardContent className="flex-1 pb-0">
-            <ChartContainer
-              config={chartConfigProgramPelatihan}
-              className="mx-auto aspect-square max-h-[250px]"
-            >
-              <PieChart>
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                />
-                <Pie
-                  data={chartDataMasyarakatDilatihByProgramPelatihan}
-                  dataKey="visitors"
-                  nameKey="browser"
-                  innerRadius={60}
-                  strokeWidth={0}
-                >
-                  <Label
-                    content={({ viewBox }) => {
-                      if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                        return (
-                          <text
-                            x={viewBox.cx}
-                            y={viewBox.cy}
-                            textAnchor="middle"
-                            dominantBaseline="middle"
-                          >
-                            <tspan
-                              x={viewBox.cx}
-                              y={viewBox.cy}
-                              className="fill-black text-3xl font-bold"
-                            >
-                              {chartDataMasyarakatDilatihByProgramPelatihan
-                                .reduce((sum, item) => sum + item.visitors, 0)
-                                .toLocaleString("ID")}
-                            </tspan>
-                            <tspan
-                              x={viewBox.cx}
-                              y={(viewBox.cy || 0) + 24}
-                              className="fill-gray-400"
-                            >
-                              Masyarakat Dilatih
-                            </tspan>
-                          </text>
-                        );
-                      }
-                    }}
-                  />
-                </Pie>
-              </PieChart>
-            </ChartContainer>
-          </CardContent>
-          <CardFooter className="flex-col gap-1 text-sm items-center flex text-center">
-            <div className="flex items-center gap-2 font-medium leading-none">
-              Updated last minute <TrendingUp className="h-4 w-4" />
-            </div>
-            <div className="leading-none text-muted-foreground">
-              Showing total visitors for the last 6 months
-            </div>
-            <div className="mt-4 flex gap-2">
-              {chartDataMasyarakatDilatihByProgramPelatihan.map(
-                (entry: any) => (
-                  <div key={entry.name} className="flex gap-2 items-center">
-                    <div
-                      className="w-4 h-4"
-                      style={{ backgroundColor: entry.fill }}
-                    ></div>
-                    <span className="text-sm">{entry.name}</span>
-                  </div>
-                )
-              )}
-            </div>
-          </CardFooter>
-        </Card>
-        <Card className="flex flex-col w-full">
-          <CardHeader className="items-center pb-0">
-            <CardTitle>Bidang Pelatihan</CardTitle>
-            {/* <CardDescription>Pendidikan Tinggi</CardDescription> */}
-          </CardHeader>
-          <CardContent className="flex-1 pb-0">
-            <ChartContainer
-              config={chartConfigBidangPelatihan}
-              className="mx-auto aspect-square max-h-[250px]"
-            >
-              <PieChart>
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                />
-                <Pie
-                  data={chartDataMasyarakatDilatihByBidangPelatihan}
-                  dataKey="visitors"
-                  nameKey="browser"
-                  innerRadius={60}
-                  strokeWidth={0}
-                >
-                  <Label
-                    content={({ viewBox }) => {
-                      if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                        return (
-                          <text
-                            x={viewBox.cx}
-                            y={viewBox.cy}
-                            textAnchor="middle"
-                            dominantBaseline="middle"
-                          >
-                            <tspan
-                              x={viewBox.cx}
-                              y={viewBox.cy}
-                              className="fill-black text-3xl font-bold"
-                            >
-                              {chartDataMasyarakatDilatihByBidangPelatihan
-                                .reduce((sum, item) => sum + item.visitors, 0)
-                                .toLocaleString("ID")}
-                            </tspan>
-                            <tspan
-                              x={viewBox.cx}
-                              y={(viewBox.cy || 0) + 24}
-                              className="fill-gray-400"
-                            >
-                              Masyarakat Dilatih
-                            </tspan>
-                          </text>
-                        );
-                      }
-                    }}
-                  />
-                </Pie>
-              </PieChart>
-            </ChartContainer>
-          </CardContent>
-          <CardFooter className="flex-col gap-1 text-sm items-center flex text-center">
-            <div className="flex items-center gap-2 font-medium leading-none">
-              Updated last minute <TrendingUp className="h-4 w-4" />
-            </div>
-            <div className="leading-none text-muted-foreground">
-              Showing total visitors for the last 6 months
-            </div>
-
-            <div className="mt-4 flex gap-1 flex-wrap items-center justify-center">
-              {chartDataMasyarakatDilatihByBidangPelatihan.map((entry: any) => (
-                <div key={entry.name} className="flex gap-2 items-center">
-                  <div
-                    className="w-4 h-4"
-                    style={{ backgroundColor: entry.fill }}
-                  ></div>
-                  <span className="text-sm">{entry.name}</span>
-                </div>
-              ))}
-            </div>
-          </CardFooter>
-        </Card>
-        <Card className="flex flex-col w-full">
-          <CardHeader className="items-center pb-0">
-            <CardTitle>Jenis Pelatihan</CardTitle>
-            {/* <CardDescription>Pendidikan Tinggi</CardDescription> */}
-          </CardHeader>
-          <CardContent className="flex-1 pb-0">
-            <ChartContainer
-              config={chartConfigJenisPelatihan}
-              className="mx-auto aspect-square max-h-[250px]"
-            >
-              <PieChart>
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                />
-                <Pie
-                  data={chartDataMasyarakatDilatihByJenisPelatihan}
-                  dataKey="visitors"
-                  nameKey="browser"
-                  innerRadius={60}
-                  strokeWidth={0}
-                >
-                  <Label
-                    content={({ viewBox }) => {
-                      if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                        return (
-                          <text
-                            x={viewBox.cx}
-                            y={viewBox.cy}
-                            textAnchor="middle"
-                            dominantBaseline="middle"
-                          >
-                            <tspan
-                              x={viewBox.cx}
-                              y={viewBox.cy}
-                              className="fill-black text-3xl font-bold"
-                            >
-                              {chartDataMasyarakatDilatihByJenisPelatihan
-                                .reduce((sum, item) => sum + item.visitors, 0)
-                                .toLocaleString("ID")}
-                            </tspan>
-                            <tspan
-                              x={viewBox.cx}
-                              y={(viewBox.cy || 0) + 24}
-                              className="fill-gray-400"
-                            >
-                              Masyarakat Dilatih
-                            </tspan>
-                          </text>
-                        );
-                      }
-                    }}
-                  />
-                </Pie>
-              </PieChart>
-            </ChartContainer>
-          </CardContent>
-          <CardFooter className="flex-col gap-1 text-sm items-center flex text-center">
-            <div className="flex items-center gap-2 font-medium leading-none">
-              Updated last minute <TrendingUp className="h-4 w-4" />
-            </div>
-            <div className="leading-none text-muted-foreground">
-              Showing total visitors for the last 6 months
-            </div>
-
-            <div className="mt-4 flex gap-2">
-              {chartDataMasyarakatDilatihByJenisPelatihan.map((entry: any) => (
-                <div key={entry.name} className="flex gap-2 items-center">
-                  <div
-                    className="w-4 h-4"
-                    style={{ backgroundColor: entry.fill }}
-                  ></div>
-                  <span className="text-sm">{entry.name}</span>
-                </div>
-              ))}
-            </div>
-          </CardFooter>
-        </Card>
-        <Card className="flex flex-col w-full">
-          <CardHeader className="items-center pb-0">
-            <CardTitle>Mendukung Program Terobosan</CardTitle>
-          </CardHeader>
-          <CardContent className="flex-1 pb-0">
-            <ChartContainer
-              config={chartConfigProgramPrioritas}
-              className="mx-auto aspect-square max-h-[250px]"
-            >
-              <PieChart>
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                />
-                <Pie
-                  data={chartDataMasyarakatDilatihByProgramPrioritas}
-                  dataKey="visitors"
-                  nameKey="browser"
-                  innerRadius={60}
-                  strokeWidth={0}
-                >
-                  <Label
-                    content={({ viewBox }) => {
-                      if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                        return (
-                          <text
-                            x={viewBox.cx}
-                            y={viewBox.cy}
-                            textAnchor="middle"
-                            dominantBaseline="middle"
-                          >
-                            <tspan
-                              x={viewBox.cx}
-                              y={viewBox.cy}
-                              className="fill-black text-3xl font-bold"
-                            >
-                              {chartDataMasyarakatDilatihByProgramPrioritas
-                                .reduce((sum, item) => sum + item.visitors, 0)
-                                .toLocaleString("ID")}
-                            </tspan>
-                            <tspan
-                              x={viewBox.cx}
-                              y={(viewBox.cy || 0) + 24}
-                              className="fill-gray-400"
-                            >
-                              Masyarakat Dilatih
-                            </tspan>
-                          </text>
-                        );
-                      }
-                    }}
-                  />
-                </Pie>
-              </PieChart>
-            </ChartContainer>
-          </CardContent>
-          <CardFooter className="flex-col gap-1 text-sm items-center flex text-center">
-            <div className="flex items-center gap-2 font-medium leading-none">
-              Updated last minute <TrendingUp className="h-4 w-4" />
-            </div>
-            <div className="leading-none text-muted-foreground">
-              Showing total visitors for the last 6 months
-            </div>
-
-            <div className="mt-4 flex gap-1 items-center justify-center flex-wrap">
-              {chartDataMasyarakatDilatihByProgramPrioritas.map(
-                (entry: any) => (
-                  <div key={entry.name} className="flex gap-2 items-center">
-                    <div
-                      className="w-4 h-4"
-                      style={{ backgroundColor: entry.fill }}
-                    ></div>
-                    <span className="text-sm">{entry.name}</span>
-                  </div>
-                )
-              )}
-            </div>
-          </CardFooter>
-        </Card>
-        <Card className="flex flex-col w-full">
-          <CardHeader className="items-center pb-0">
-            <CardTitle>Jenis Kelamin</CardTitle>
-            {/* <CardDescription>Pendidikan Tinggi</CardDescription> */}
-          </CardHeader>
-          <CardContent className="flex-1 pb-0">
-            <ChartContainer
-              config={chartConfigGender}
-              className="mx-auto aspect-square max-h-[250px]"
-            >
-              <PieChart>
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                />
-                <Pie
-                  data={chartDataMasyarakatByGender}
-                  dataKey="visitors"
-                  nameKey="browser"
-                  innerRadius={60}
-                  strokeWidth={0}
-                >
-                  <Label
-                    content={({ viewBox }) => {
-                      if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                        return (
-                          <text
-                            x={viewBox.cx}
-                            y={viewBox.cy}
-                            textAnchor="middle"
-                            dominantBaseline="middle"
-                          >
-                            <tspan
-                              x={viewBox.cx}
-                              y={viewBox.cy}
-                              className="fill-black text-3xl font-bold"
-                            >
-                              {chartDataMasyarakatByGender
-                                .reduce((sum, item) => sum + item.visitors, 0)
-                                .toLocaleString("ID")}
-                            </tspan>
-                            <tspan
-                              x={viewBox.cx}
-                              y={(viewBox.cy || 0) + 24}
-                              className="fill-gray-400"
-                            >
-                              Masyarakat Dilatih
-                            </tspan>
-                          </text>
-                        );
-                      }
-                    }}
-                  />
-                </Pie>
-              </PieChart>
-            </ChartContainer>
-          </CardContent>
-          <CardFooter className="flex-col gap-1 text-sm items-center flex text-center">
-            <div className="flex items-center gap-2 font-medium leading-none">
-              Updated last minute <TrendingUp className="h-4 w-4" />
-            </div>
-            <div className="leading-none text-muted-foreground">
-              Showing total visitors for the last 6 months
-            </div>
-
-            <div className="mt-4 flex gap-2">
-              {chartDataMasyarakatByGender.map((entry: any) => (
-                <div key={entry.name} className="flex gap-2 items-center">
-                  <div
-                    className="w-4 h-4"
-                    style={{ backgroundColor: entry.fill }}
-                  ></div>
-                  <span className="text-sm">{entry.name}</span>
-                </div>
-              ))}
-            </div>
-          </CardFooter>
-        </Card>
-        <Card className="flex flex-col w-full">
-          <CardHeader className="items-center pb-0">
-            <CardTitle>Sertifikat</CardTitle>
-            {/* <CardDescription>Pendidikan Tinggi</CardDescription> */}
-          </CardHeader>
-          <CardContent className="flex-1 pb-0">
-            <ChartContainer
-              config={chartConfigSertifikat}
-              className="mx-auto aspect-square max-h-[250px]"
-            >
-              <PieChart>
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                />
-                <Pie
-                  data={chartDataMasyarakatBySertifikat}
-                  dataKey="visitors"
-                  nameKey="browser"
-                  innerRadius={60}
-                  strokeWidth={0}
-                >
-                  <Label
-                    content={({ viewBox }) => {
-                      if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                        return (
-                          <text
-                            x={viewBox.cx}
-                            y={viewBox.cy}
-                            textAnchor="middle"
-                            dominantBaseline="middle"
-                          >
-                            <tspan
-                              x={viewBox.cx}
-                              y={viewBox.cy}
-                              className="fill-black text-3xl font-bold"
-                            >
-                              {chartDataMasyarakatBySertifikat
-                                .reduce((sum, item) => sum + item.visitors, 0)
-                                .toLocaleString("ID")}
-                            </tspan>
-                            <tspan
-                              x={viewBox.cx}
-                              y={(viewBox.cy || 0) + 24}
-                              className="fill-gray-400"
-                            >
-                              Masyarakat Dilatih
-                            </tspan>
-                          </text>
-                        );
-                      }
-                    }}
-                  />
-                </Pie>
-              </PieChart>
-            </ChartContainer>
-          </CardContent>
-          <CardFooter className="flex-col gap-1 text-sm items-center flex text-center">
-            <div className="flex items-center gap-2 font-medium leading-none">
-              Updated last minute <TrendingUp className="h-4 w-4" />
-            </div>
-            <div className="leading-none text-muted-foreground">
-              Showing total visitors for the last 6 months
-            </div>
-
-            <div className="mt-4 flex gap-2">
-              {chartDataMasyarakatBySertifikat.map((entry: any) => (
-                <div key={entry.name} className="flex gap-2 items-center">
-                  <div
-                    className="w-4 h-4"
-                    style={{ backgroundColor: entry.fill }}
-                  ></div>
-                  <span className="text-sm">{entry.name}</span>
-                </div>
-              ))}
-            </div>
-          </CardFooter>
-        </Card>
-      </div>
-
-      <div className="flex gap-2 flex-col mt-10">
-        <Card className="w-full">
-          <CardHeader>
-            <CardTitle>Daftar Pelatihan</CardTitle>
-            <CardDescription>
-              {" "}
-              Yang Telah Dilaksanakan atau Akan Dilaksanakan
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <TableDataPelatihanMasyarakat />
-            <TableDataPelatihanMasyarakatByProvinsi />
-            <TableDataPelatihanMasyrakatByProgramPrioritas />
-            <TableDataPelatihanSummary data={data} />
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
+  return <TrainingDashboard />;
 };
 
 export default ChartDetailMasyarakatDilatih;

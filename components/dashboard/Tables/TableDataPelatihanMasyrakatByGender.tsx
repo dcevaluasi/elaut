@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+
 import {
   Table,
   TableBody,
@@ -19,59 +20,12 @@ import { TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { utils, writeFile } from "xlsx";
 
-const provinsiIndonesia = [
-  "Aceh",
-  "Sumatera Utara",
-  "Sumatera Barat",
-  "Riau",
-  "Jambi",
-  "Sumatera Selatan",
-  "Bengkulu",
-  "Lampung",
-  "Kepulauan Bangka Belitung",
-  "Kepulauan Riau",
-  "DKI Jakarta",
-  "Jawa Barat",
-  "Jawa Tengah",
-  "DI Yogyakarta",
-  "Jawa Timur",
-  "Banten",
-  "Bali",
-  "Nusa Tenggara Barat",
-  "Nusa Tenggara Timur",
-  "Kalimantan Barat",
-  "Kalimantan Tengah",
-  "Kalimantan Selatan",
-  "Kalimantan Timur",
-  "Kalimantan Utara",
-  "Sulawesi Utara",
-  "Sulawesi Tengah",
-  "Sulawesi Selatan",
-  "Sulawesi Tenggara",
-  "Gorontalo",
-  "Sulawesi Barat",
-  "Maluku",
-  "Maluku Utara",
-  "Papua",
-  "Papua Barat",
-  "Papua Selatan",
-  "Papua Tengah",
-  "Papua Pegunungan",
-  "Papua Barat Daya",
-];
-
 // Props untuk komponen
 type TableDataPelatihanMasyarakatProps = {
   dataPelatihan: PelatihanMasyarakat[];
 };
 
-// type GroupedData = {
-//   provinsi: string; // Explicitly define `provinsi` as a string
-//   [key: string]: number; // Dynamic keys for bidang pelatihan and total
-//   total: number; // Explicitly define `total` as a number
-// };
-
-const TableDataPelatihanMasyarakatByProvinsi = ({
+const TableDataPelatihanMasyrakatByGender = ({
   dataPelatihan,
 }: TableDataPelatihanMasyarakatProps) => {
   const [year, setYear] = useState("2024");
@@ -98,58 +52,60 @@ const TableDataPelatihanMasyarakatByProvinsi = ({
     });
   }, [dataPelatihan, year, quarter]);
 
-  // Extract unique bidang pelatihan
-  const bidangPelatihan = useMemo(() => {
-    const bidangSet = new Set<string>();
-    filteredData.forEach((item) => {
-      bidangSet.add(item.BidangPelatihan);
-    });
-    return Array.from(bidangSet);
-  }, [filteredData]);
-
-  // Group data by provinsi and bidang pelatihan
+  // Group data by program dan penyelenggara (BPPP)
   const groupedData = useMemo(() => {
-    const map = new Map<string, any>();
-
-    // Initialize the map with all provinsi from provinsiIndonesia
-    provinsiIndonesia.forEach((provinsi) => {
-      const initialData = bidangPelatihan.reduce((acc, bidang) => {
-        acc[bidang] = 0; // Initialize each bidang count to 0
-        return acc;
-      }, {} as { [key: string]: number });
-      initialData.total = 0; // Initialize total count to 0
-      map.set(provinsi, { provinsi, ...initialData });
-    });
-
-    // Populate the map with data from filteredData
-    filteredData.forEach((item) => {
-      const provinsi = item.PenyelenggaraPelatihan;
-      const bidang = item.BidangPelatihan;
-      const userCount = item.JumlahPeserta || 0;
-
-      if (map.has(provinsi)) {
-        const entry = map.get(provinsi)!;
-        entry[bidang] += userCount;
-        entry.total += userCount;
+    const map = new Map<
+      string,
+      {
+        l: number;
+        p: number;
+        total: number;
       }
+    >();
+
+    filteredData.forEach((item) => {
+      if (!map.has(item.PenyelenggaraPelatihan)) {
+        map.set(item.PenyelenggaraPelatihan, {
+          l: 0,
+          p: 0,
+          total: 0,
+        });
+      }
+      const entry = map.get(item.PenyelenggaraPelatihan)!;
+      const userCount =
+        item.UserPelatihan != null ? item.UserPelatihan.length : 0;
+
+      // Sesuaikan dengan nama BPPP yang sesuai
+      switch (item.PenyelenggaraPelatihan) {
+        case "BPPP Medan":
+          entry.l += userCount;
+          break;
+        case "BPPP Tegal":
+          entry.p += userCount;
+      
+          break;
+        default:
+          break;
+      }
+      entry.total += userCount;
     });
 
-    return Array.from(map.values());
-  }, [filteredData, bidangPelatihan]);
+    return Array.from(map.entries()).map(([program, data]) => ({
+      program,
+      ...data,
+    }));
+  }, [filteredData]);
 
   const exportToExcel = () => {
     const worksheet = utils.json_to_sheet(
       groupedData.map((item, index) => ({
         No: index + 1,
-        Provinsi: item.provinsi,
-        ...bidangPelatihan.reduce((acc, bidang) => {
-          acc[bidang] = item[bidang] || 0; // Add each bidang count
-          return acc;
-        }, {} as { [key: string]: number }),
+        "Unit Kerja": item.program,
+        "L": item.l,
+        "P": item.p,
         Total: item.total,
       }))
     );
-
     const workbook = utils.book_new();
     utils.book_append_sheet(workbook, worksheet, "Data Pelatihan");
     writeFile(workbook, "DataPelatihan.xlsx");
@@ -160,11 +116,11 @@ const TableDataPelatihanMasyarakatByProvinsi = ({
       <div className="flex justify-between items-center p-4">
         <div className="">
           <div className="flex items-center gap-2 font-medium leading-none">
-            Lulusan Pelatihan Masyarakat Menurut Provinsi dan Bidang Kompetensi{" "}
+          Jumlah Lulusan Pelatihan  Masyarakat Menurut Jenis Kelamin {" "}
             <TrendingUp className="h-4 w-4" />
           </div>
           <div className="leading-none text-muted-foreground">
-            Showing total masyarakat dilatih per provinsi per bidang kompetensi
+            Showing total masyarakat dilatih per gender
           </div>
         </div>
         <div className="flex gap-3">
@@ -203,10 +159,9 @@ const TableDataPelatihanMasyarakatByProvinsi = ({
           <TableHeader>
             <TableRow>
               <TableHead>No</TableHead>
-              <TableHead>Provinsi</TableHead>
-              {bidangPelatihan.map((bidang, index) => (
-                <TableHead key={index}>{bidang}</TableHead>
-              ))}
+              <TableHead>Unit Kerja</TableHead>
+              <TableHead>L</TableHead>
+              <TableHead>P</TableHead>
               <TableHead>Total</TableHead>
             </TableRow>
           </TableHeader>
@@ -214,10 +169,9 @@ const TableDataPelatihanMasyarakatByProvinsi = ({
             {groupedData.map((item, index) => (
               <TableRow key={index}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell>{item.provinsi}</TableCell>
-                {bidangPelatihan.map((bidang, idx) => (
-                  <TableCell key={idx}>{item[bidang] || 0}</TableCell>
-                ))}
+                <TableCell>{item.program}</TableCell>
+                <TableCell>{item.l}</TableCell>
+                <TableCell>{item.p}</TableCell>
                 <TableCell>{item.total}</TableCell>
               </TableRow>
             ))}
@@ -228,4 +182,4 @@ const TableDataPelatihanMasyarakatByProvinsi = ({
   );
 };
 
-export default TableDataPelatihanMasyarakatByProvinsi;
+export default TableDataPelatihanMasyrakatByGender;

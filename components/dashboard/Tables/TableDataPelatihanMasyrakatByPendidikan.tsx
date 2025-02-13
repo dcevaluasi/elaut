@@ -65,11 +65,21 @@ type TableDataPelatihanMasyarakatProps = {
   dataPelatihan: PelatihanMasyarakat[];
 };
 
-// type GroupedData = {
-//   provinsi: string; // Explicitly define `provinsi` as a string
-//   [key: string]: number; // Dynamic keys for bidang pelatihan and total
-//   total: number; // Explicitly define `total` as a number
-// };
+// Define a type for grouped data
+type GroupedData = {
+  program: string;
+  tidakTamatSD: number;
+  sd: number;
+  smp: number;
+  smuSmk: number;
+  diDii: number;
+  diii: number;
+  div: number;
+  s1: number;
+  s2: number;
+  s3: number;
+  total: number;
+};
 
 const TableDataPelatihanMasyarakatByProvinsi = ({
   dataPelatihan,
@@ -98,54 +108,89 @@ const TableDataPelatihanMasyarakatByProvinsi = ({
     });
   }, [dataPelatihan, year, quarter]);
 
-  // Extract unique bidang pelatihan
-  const bidangPelatihan = useMemo(() => {
-    const bidangSet = new Set<string>();
-    filteredData.forEach((item) => {
-      bidangSet.add(item.BidangPelatihan);
-    });
-    return Array.from(bidangSet);
-  }, [filteredData]);
-
-  // Group data by provinsi and bidang pelatihan
+  // Group data by program and pendidikan
   const groupedData = useMemo(() => {
-    const map = new Map<string, any>();
+    const map = new Map<string, GroupedData>();
 
-    // Initialize the map with all provinsi from provinsiIndonesia
-    provinsiIndonesia.forEach((provinsi) => {
-      const initialData = bidangPelatihan.reduce((acc, bidang) => {
-        acc[bidang] = 0; // Initialize each bidang count to 0
-        return acc;
-      }, {} as { [key: string]: number });
-      initialData.total = 0; // Initialize total count to 0
-      map.set(provinsi, { provinsi, ...initialData });
-    });
-
-    // Populate the map with data from filteredData
     filteredData.forEach((item) => {
-      const provinsi = item.PenyelenggaraPelatihan;
-      const bidang = item.BidangPelatihan;
-      const userCount = item.JumlahPeserta || 0;
+      const program = item.PenyelenggaraPelatihan;
+      const pendidikan = item.DukunganProgramTerobosan; // Assuming this field exists
+      const userCount = item.UserPelatihan?.length || 0;
 
-      if (map.has(provinsi)) {
-        const entry = map.get(provinsi)!;
-        entry[bidang] += userCount;
-        entry.total += userCount;
+      if (!map.has(program)) {
+        // Initialize the map entry with all pendidikan fields and total
+        map.set(program, {
+          program,
+          tidakTamatSD: 0,
+          sd: 0,
+          smp: 0,
+          smuSmk: 0,
+          diDii: 0,
+          diii: 0,
+          div: 0,
+          s1: 0,
+          s2: 0,
+          s3: 0,
+          total: 0,
+        });
       }
+
+      const entry = map.get(program)!;
+      switch (pendidikan) {
+        case "Tidak Tamat SD":
+          entry.tidakTamatSD += userCount;
+          break;
+        case "SD":
+          entry.sd += userCount;
+          break;
+        case "SMP":
+          entry.smp += userCount;
+          break;
+        case "SMU/SMK":
+          entry.smuSmk += userCount;
+          break;
+        case "DI/DII":
+          entry.diDii += userCount;
+          break;
+        case "DIII":
+          entry.diii += userCount;
+          break;
+        case "DIV":
+          entry.div += userCount;
+          break;
+        case "S1":
+          entry.s1 += userCount;
+          break;
+        case "S2":
+          entry.s2 += userCount;
+          break;
+        case "S3":
+          entry.s3 += userCount;
+          break;
+        default:
+          break;
+      }
+      entry.total += userCount;
     });
 
     return Array.from(map.values());
-  }, [filteredData, bidangPelatihan]);
+  }, [filteredData]);
 
   const exportToExcel = () => {
     const worksheet = utils.json_to_sheet(
       groupedData.map((item, index) => ({
         No: index + 1,
-        Provinsi: item.provinsi,
-        ...bidangPelatihan.reduce((acc, bidang) => {
-          acc[bidang] = item[bidang] || 0; // Add each bidang count
-          return acc;
-        }, {} as { [key: string]: number }),
+        "Unit Kerja": item.program,
+        "Tidak Tamat SD": item.tidakTamatSD,
+        SD: item.sd,
+        SMP: item.smp,
+        "SMU/SMK": item.smuSmk,
+        "DI/DII": item.diDii,
+        DIII: item.diii,
+        DIV: item.div,
+        S1: item.s1,
+        S2: item.s2,
+        S3: item.s3,
         Total: item.total,
       }))
     );
@@ -160,11 +205,11 @@ const TableDataPelatihanMasyarakatByProvinsi = ({
       <div className="flex justify-between items-center p-4">
         <div className="">
           <div className="flex items-center gap-2 font-medium leading-none">
-            Lulusan Pelatihan Masyarakat Menurut Provinsi dan Bidang Kompetensi{" "}
+            Lulusan Pelatihan Masyarakat Menurut Pendidikan dan Unit Kerja{" "}
             <TrendingUp className="h-4 w-4" />
           </div>
           <div className="leading-none text-muted-foreground">
-            Showing total masyarakat dilatih per provinsi per bidang kompetensi
+            Showing total masyarakat dilatih per pendidikan dan unit kerja
           </div>
         </div>
         <div className="flex gap-3">
@@ -203,10 +248,17 @@ const TableDataPelatihanMasyarakatByProvinsi = ({
           <TableHeader>
             <TableRow>
               <TableHead>No</TableHead>
-              <TableHead>Provinsi</TableHead>
-              {bidangPelatihan.map((bidang, index) => (
-                <TableHead key={index}>{bidang}</TableHead>
-              ))}
+              <TableHead>Unit Kerja</TableHead>
+              <TableHead>Tidak Tamat SD</TableHead>
+              <TableHead>SD</TableHead>
+              <TableHead>SMP</TableHead>
+              <TableHead>SMU/SMK</TableHead>
+              <TableHead>DI/DII</TableHead>
+              <TableHead>DIII</TableHead>
+              <TableHead>DIV</TableHead>
+              <TableHead>S1</TableHead>
+              <TableHead>S2</TableHead>
+              <TableHead>S3</TableHead>
               <TableHead>Total</TableHead>
             </TableRow>
           </TableHeader>
@@ -214,10 +266,17 @@ const TableDataPelatihanMasyarakatByProvinsi = ({
             {groupedData.map((item, index) => (
               <TableRow key={index}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell>{item.provinsi}</TableCell>
-                {bidangPelatihan.map((bidang, idx) => (
-                  <TableCell key={idx}>{item[bidang] || 0}</TableCell>
-                ))}
+                <TableCell>{item.program}</TableCell>
+                <TableCell>{item.tidakTamatSD}</TableCell>
+                <TableCell>{item.sd}</TableCell>
+                <TableCell>{item.smp}</TableCell>
+                <TableCell>{item.smuSmk}</TableCell>
+                <TableCell>{item.diDii}</TableCell>
+                <TableCell>{item.diii}</TableCell>
+                <TableCell>{item.div}</TableCell>
+                <TableCell>{item.s1}</TableCell>
+                <TableCell>{item.s2}</TableCell>
+                <TableCell>{item.s3}</TableCell>
                 <TableCell>{item.total}</TableCell>
               </TableRow>
             ))}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -7,75 +7,128 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { TrendingUp } from "lucide-react";
+import { utils, writeFile } from "xlsx";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PelatihanMasyarakat } from "@/types/product";
 
-const trainingData = [
-  { id: 1, name: "Pusat Pelatihan", 2017: 0, 2018: 1000, 2019: 0 },
-  { id: 2, name: "BPPP Medan", 2017: 1080, 2018: 2010, 2019: 3680 },
-  { id: 3, name: "BPPP Tegal", 2017: 1790, 2018: 6349, 2019: 8014 },
-  { id: 4, name: "BPPP Banyuwangi", 2017: 1590, 2018: 3630, 2019: 4120 },
-  { id: 5, name: "BPPP Bitung", 2017: 990, 2018: 1920, 2019: 3420 },
-  { id: 6, name: "BPPP Ambon", 2017: 840, 2018: 1592, 2019: 3436 },
-];
+type TableDataPelatihanMasyarakatProps = {
+  dataPelatihan: PelatihanMasyarakat[];
+};
 
-const TableDataPelatihanMasyarakat = () => {
-  const [year, setYear] = React.useState<"2017" | "2018" | "2019">("2018");
+const getTriwulan = (dateString: string) => {
+  const month = new Date(dateString).getMonth() + 1;
+  if (month >= 1 && month <= 3) return "Triwulan I";
+  if (month >= 1 && month <= 6) return "Triwulan II";
+  if (month >= 1 && month <= 9) return "Triwulan III";
+  if (month >= 1 && month <= 12) return "Triwulan IV";
+  return "Unknown";
+};
 
-  const [quarter, setQuarter] = React.useState<string>("Q1");
+const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> = ({ dataPelatihan }) => {
+  const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
+
+  const filteredData = useMemo(() => {
+    return dataPelatihan.filter(({ TanggalMulaiPelatihan }) => 
+      new Date(TanggalMulaiPelatihan).getFullYear().toString() === selectedYear
+    );
+  }, [dataPelatihan, selectedYear]);
+
+  const groupedData = useMemo(() => {
+    const map = new Map<string, { total: number; triwulan: Record<string, number> }>();
+    
+    filteredData.forEach(({ PenyelenggaraPelatihan, JumlahPeserta, TanggalMulaiPelatihan }) => {
+      const triwulan = getTriwulan(TanggalMulaiPelatihan);
+      if (!map.has(PenyelenggaraPelatihan)) {
+        map.set(PenyelenggaraPelatihan, {
+          total: 0,
+          triwulan: {
+            "Triwulan I": 0,
+            "Triwulan II": 0,
+            "Triwulan III": 0,
+            "Triwulan IV": 0,
+          },
+        });
+      }
+      const entry = map.get(PenyelenggaraPelatihan)!;
+      entry.total += JumlahPeserta || 0;
+      entry.triwulan[triwulan] += JumlahPeserta || 0;
+    });
+
+    return Array.from(map.entries()).map(([name, data]) => ({ name, ...data }));
+  }, [filteredData]);
+
+  const exportToExcel = () => {
+    const worksheet = utils.json_to_sheet(
+      groupedData.map((item, index) => ({
+        No: index + 1,
+        "Nama Balai": item.name,
+        "Triwulan I": item.triwulan["Triwulan I"],
+        "Triwulan II": item.triwulan["Triwulan II"],
+        "Triwulan III": item.triwulan["Triwulan III"],
+        "Triwulan IV": item.triwulan["Triwulan IV"],
+        Total: item.total,
+      }))
+    );
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, worksheet, "Data Pelatihan");
+    writeFile(workbook, `DataPelatihan_${selectedYear}.xlsx`);
+  };
 
   return (
-    <div className="col-span-12 rounded-xl  border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default  sm:px-7.5 xl:col-span-8 mb-3">
-      <div className="p-4">
-        <div className="flex gap-4 mb-4">
-          <Select
-            onValueChange={(value) =>
-              setYear(value as "2017" | "2018" | "2019")
-            }
-            defaultValue={year}
-          >
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Select Year" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="2017">2017</SelectItem>
-              <SelectItem value="2018">2018</SelectItem>
-              <SelectItem value="2019">2019</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select onValueChange={setQuarter} defaultValue={quarter}>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Select Quarter" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Q1">Q1</SelectItem>
-              <SelectItem value="Q2">Q2</SelectItem>
-              <SelectItem value="Q3">Q3</SelectItem>
-              <SelectItem value="Q4">Q4</SelectItem>
-            </SelectContent>
-          </Select>
+    <div className="col-span-12 rounded-xl border mt-6 border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default sm:px-7.5 xl:col-span-8 mb-3">
+      <div className="flex justify-between items-center p-4">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2 font-medium leading-none">
+            Total Masyarakat Dilatih per Balai Pelatihan <TrendingUp className="h-4 w-4" />
+          </div>
+          <div className="leading-none text-muted-foreground">Showing total masyarakat dilatih</div>
         </div>
 
+        <div className="flex gap-4">
+          <Select onValueChange={setSelectedYear} defaultValue={selectedYear}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Pilih Tahun" />
+            </SelectTrigger>
+            <SelectContent>
+              {Array.from(new Set(dataPelatihan.map(({ TanggalMulaiPelatihan }) => 
+                new Date(TanggalMulaiPelatihan).getFullYear().toString()
+              ))).sort().map(year => (
+                <SelectItem key={year} value={year}>{year}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          <Button onClick={exportToExcel} className="bg-blue-500 text-white hover:bg-blue-600">
+            Export to Excel
+          </Button>
+        </div>
+      </div>
+
+      <div className="p-4">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>No</TableHead>
               <TableHead>Nama Balai</TableHead>
-              <TableHead>Jumlah Pelatihan Masyarakat</TableHead>
+              <TableHead>Triwulan I</TableHead>
+              <TableHead>Triwulan II</TableHead>
+              <TableHead>Triwulan III</TableHead>
+              <TableHead>Triwulan IV</TableHead>
+              <TableHead>Total</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {trainingData.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>{item.id}</TableCell>
+            {groupedData.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell>{index + 1}</TableCell>
                 <TableCell>{item.name}</TableCell>
-                <TableCell>{item[year]!}</TableCell>
+                <TableCell>{item.triwulan["Triwulan I"]}</TableCell>
+                <TableCell>{item.triwulan["Triwulan II"]}</TableCell>
+                <TableCell>{item.triwulan["Triwulan III"]}</TableCell>
+                <TableCell>{item.triwulan["Triwulan IV"]}</TableCell>
+                <TableCell>{item.total}</TableCell>
               </TableRow>
             ))}
           </TableBody>
