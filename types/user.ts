@@ -38,6 +38,8 @@ export type UserPelatihan = {
   FileSertifikat?: string
   IdUsers: number
   IsActice: string
+  PenyelenggaraPelatihan: string;
+  PendidikanTerakhir: string
   IsKeterangan: string
   MetodoPembayaran: string
   NilaiPraktek: number

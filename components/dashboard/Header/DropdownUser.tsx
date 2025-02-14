@@ -34,7 +34,7 @@ const DropdownUser = ({
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const token = Cookies.get("XSRF091");
 
-  const typeRole = Cookies.get('XSRF093')
+  const typeRole = Cookies.get("XSRF093");
 
   type AdminPusat = {
     IdAdminPusat: number;
@@ -151,7 +151,7 @@ const DropdownUser = ({
     Toast.fire({
       icon: "success",
       title: `Yeayyy!`,
-      text: 'Berhasil logout dari dashboard Admin E-LAUT!'
+      text: "Berhasil logout dari dashboard Admin E-LAUT!",
     });
     router.replace("/admin/auth/login");
   };
@@ -159,7 +159,7 @@ const DropdownUser = ({
   // close on click outside
   useEffect(() => {
     if (pathname.includes("pusat")) {
-      handleGetAdminPusat();
+      // handleGetAdminPusat();
     }
     const clickHandler = ({ target }: MouseEvent) => {
       if (!dropdown.current) return;
@@ -525,15 +525,15 @@ const DropdownUser = ({
             {pathname.includes("lemdiklat")
               ? userLoggedInInfo?.data?.NamaLemdik
               : dataAdminPusat && pathname.includes("pusat")
-                ? dataAdminPusat!.Nama
-                : ""}
+              ? dataAdminPusat!.Nama
+              : ""}
           </span>
           <span className="block text-xs">
             {pathname.includes("lemdiklat")
               ? "Admin Lembaga Pendidikan dan Pelatihan"
               : dataAdminPusat && pathname.includes("pusat")
-                ? dataAdminPusat!.Nip
-                : ""}
+              ? dataAdminPusat!.Nip
+              : ""}
           </span>
         </span>
 
@@ -573,8 +573,9 @@ const DropdownUser = ({
         ref={dropdown}
         onFocus={() => setDropdownOpen(true)}
         onBlur={() => setDropdownOpen(false)}
-        className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default  ${dropdownOpen === true ? "block" : "hidden"
-          }`}
+        className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default  ${
+          dropdownOpen === true ? "block" : "hidden"
+        }`}
       >
         <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 ">
           <li>
@@ -603,8 +604,8 @@ const DropdownUser = ({
             </div>
           </li>
 
-          {
-            typeRole == 'balai' && <li>
+          {typeRole == "balai" && (
+            <li>
               <div
                 onClick={(e) =>
                   setOpenDialogLastSertifikat(!openDialogEditProfile)
@@ -631,8 +632,7 @@ const DropdownUser = ({
                 Last Sertifikat
               </div>
             </li>
-          }
-
+          )}
         </ul>
         <button
           onClick={(e) => handleLogOut()}

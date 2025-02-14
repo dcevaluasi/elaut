@@ -653,7 +653,7 @@ const ChartDetailMasyarakatDilatih: React.FC<{
         <TableDataPelatihanMasyrakatByProgramPrioritas dataPelatihan={data} />
         <TableDataPelatihanMasyarakatByWilker dataPelatihan={data} />
         <TableDataPelatihanMasyrakatByGender dataPelatihan={data}  />
-        <TableDataPelatihanMasyrakatByPendidikan dataPelatihan={data} />
+        <TableDataPelatihanMasyrakatByPendidikan dataUserPelatihan={dataUser} />
       </div>
     );
   };
