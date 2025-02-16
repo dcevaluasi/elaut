@@ -33,12 +33,14 @@ export type User = {
 
 export type UserPelatihan = {
   CreatedAt: string
+  CreteAt?: string
   IdUserPelatihan: number
   IdPelatihan: number
   FileSertifikat?: string
   IdUsers: number
   IsActice: string
-  PenyelenggaraPelatihan: string;
+  PenyelenggaraPelatihan: string
+  TanggalMulai: string
   PendidikanTerakhir: string
   IsKeterangan: string
   MetodoPembayaran: string
@@ -59,5 +61,6 @@ export type UserPelatihan = {
   Nama: string
   TotalBayar: string
   CodeAksess: string
+  Provinsi: string
   TempatTanggalLahir: string
 }

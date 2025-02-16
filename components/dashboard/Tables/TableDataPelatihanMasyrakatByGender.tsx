@@ -19,19 +19,19 @@ import { PelatihanMasyarakat } from "@/types/product";
 import { TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { utils, writeFile } from "xlsx";
+import { UserPelatihan } from "@/types/user";
 
 // Props untuk komponen
 type TableDataPelatihanMasyarakatProps = {
-  dataPelatihan: PelatihanMasyarakat[];
+  dataUserPelatihan: UserPelatihan[]
 };
 
 const TableDataPelatihanMasyrakatByGender = ({
-  dataPelatihan,
+  dataUserPelatihan
 }: TableDataPelatihanMasyarakatProps) => {
   const [year, setYear] = useState("2024");
-  const [quarter, setQuarter] = useState("TW II");
+  const [quarter, setQuarter] = useState("TW I");
 
-  // Fungsi untuk menentukan triwulan berdasarkan tanggal
   const getTriwulan = (dateString: string) => {
     const month = new Date(dateString).getMonth() + 1;
     if (month >= 1 && month <= 3) return "TW I";
@@ -41,18 +41,16 @@ const TableDataPelatihanMasyrakatByGender = ({
     return "Unknown";
   };
 
-  // Filter data berdasarkan tahun dan triwulan
   const filteredData = useMemo(() => {
-    return dataPelatihan.filter((item) => {
-      const itemYear = new Date(item.TanggalMulaiPelatihan)
+    return dataUserPelatihan.filter((item) => {
+      const itemYear = new Date(item.CreteAt!)
         .getFullYear()
         .toString();
-      const itemQuarter = getTriwulan(item.TanggalMulaiPelatihan);
+      const itemQuarter = getTriwulan(item.CreteAt!);
       return itemYear === year && itemQuarter === quarter;
     });
-  }, [dataPelatihan, year, quarter]);
+  }, [dataUserPelatihan, year, quarter])
 
-  // Group data by program dan penyelenggara (BPPP)
   const groupedData = useMemo(() => {
     const map = new Map<
       string,
@@ -63,7 +61,7 @@ const TableDataPelatihanMasyrakatByGender = ({
       }
     >();
 
-    filteredData.forEach((item) => {
+    filteredData.filter((item) => item.FileSertifikat && item.FileSertifikat.trim() !== "").forEach((item) => {
       if (!map.has(item.PenyelenggaraPelatihan)) {
         map.set(item.PenyelenggaraPelatihan, {
           l: 0,
@@ -72,22 +70,14 @@ const TableDataPelatihanMasyrakatByGender = ({
         });
       }
       const entry = map.get(item.PenyelenggaraPelatihan)!;
-      const userCount =
-        item.UserPelatihan != null ? item.UserPelatihan.length : 0;
 
-      // Sesuaikan dengan nama BPPP yang sesuai
-      switch (item.PenyelenggaraPelatihan) {
-        case "BPPP Medan":
-          entry.l += userCount;
-          break;
-        case "BPPP Tegal":
-          entry.p += userCount;
-      
-          break;
-        default:
-          break;
+      if (item.JenisKelamin === 'Laki - Laki' || item.JenisKelamin === 'L') {
+        entry.l += 1
+      } else if (item.JenisKelamin === 'Perempuan' || item.JenisKelamin === 'P') {
+        entry.p += 1
       }
-      entry.total += userCount;
+
+      entry.total += 1;
     });
 
     return Array.from(map.entries()).map(([program, data]) => ({
@@ -116,7 +106,7 @@ const TableDataPelatihanMasyrakatByGender = ({
       <div className="flex justify-between items-center p-4">
         <div className="">
           <div className="flex items-center gap-2 font-medium leading-none">
-          Jumlah Lulusan Pelatihan  Masyarakat Menurut Jenis Kelamin {" "}
+            Jumlah Lulusan Pelatihan  Masyarakat Menurut Jenis Kelamin {" "}
             <TrendingUp className="h-4 w-4" />
           </div>
           <div className="leading-none text-muted-foreground">

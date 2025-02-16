@@ -18,6 +18,7 @@ import { PelatihanMasyarakat } from "@/types/product";
 import { TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { utils, writeFile } from "xlsx";
+import { UserPelatihan } from "@/types/user";
 
 const provinsiIndonesia = [
   "Aceh",
@@ -60,25 +61,16 @@ const provinsiIndonesia = [
   "Papua Barat Daya",
 ];
 
-// Props untuk komponen
 type TableDataPelatihanMasyarakatProps = {
-  dataPelatihan: PelatihanMasyarakat[];
+  dataUserPelatihan: UserPelatihan[]
 };
 
-// // Define a type for grouped data
-// type GroupedData = {
-//   provinsi: string;
-//   [key: string]: number; // Dynamic keys for bidang pelatihan
-//   total: number;
-// };
-
 const TableDataPelatihanMasyarakatByWilker = ({
-  dataPelatihan,
+  dataUserPelatihan,
 }: TableDataPelatihanMasyarakatProps) => {
   const [year, setYear] = useState("2024");
   const [quarter, setQuarter] = useState("TW II");
 
-  // Fungsi untuk menentukan triwulan berdasarkan tanggal
   const getTriwulan = (dateString: string) => {
     const month = new Date(dateString).getMonth() + 1;
     if (month >= 1 && month <= 3) return "TW I";
@@ -88,18 +80,16 @@ const TableDataPelatihanMasyarakatByWilker = ({
     return "Unknown";
   };
 
-  // Filter data berdasarkan tahun dan triwulan
   const filteredData = useMemo(() => {
-    return dataPelatihan.filter((item) => {
-      const itemYear = new Date(item.TanggalMulaiPelatihan)
+    return dataUserPelatihan.filter((item) => {
+      const itemYear = new Date(item.CreteAt!)
         .getFullYear()
         .toString();
-      const itemQuarter = getTriwulan(item.TanggalMulaiPelatihan);
+      const itemQuarter = getTriwulan(item.CreteAt!);
       return itemYear === year && itemQuarter === quarter;
     });
-  }, [dataPelatihan, year, quarter]);
+  }, [dataUserPelatihan, year, quarter]);
 
-  // Extract unique bidang pelatihan
   const penyelenggaraPelatihan = useMemo(() => {
     const bidangSet = new Set<string>();
     filteredData.forEach((item) => {
@@ -108,7 +98,6 @@ const TableDataPelatihanMasyarakatByWilker = ({
     return Array.from(bidangSet);
   }, [filteredData]);
 
-  // Group data by provinsi and bidang pelatihan
   const groupedData = useMemo(() => {
     const map = new Map<string, any>();
 
@@ -123,15 +112,14 @@ const TableDataPelatihanMasyarakatByWilker = ({
     });
 
     // Populate the map with data from filteredData
-    filteredData.forEach((item) => {
+    filteredData.filter((item) => item.FileSertifikat && item.FileSertifikat.trim() !== "").forEach((item) => {
       const provinsi = item.PenyelenggaraPelatihan;
-      const bidang = item.PenyelenggaraPelatihan;
-      const userCount = item.JumlahPeserta || 0;
+      const penyelenggaraPelatihan = item.PenyelenggaraPelatihan;
 
       if (map.has(provinsi)) {
         const entry = map.get(provinsi)!;
-        entry[bidang] += userCount;
-        entry.total += userCount;
+        entry[penyelenggaraPelatihan] += 1;
+        entry.total += 1;
       }
     });
 

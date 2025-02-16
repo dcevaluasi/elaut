@@ -12,9 +12,10 @@ import { utils, writeFile } from "xlsx";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PelatihanMasyarakat } from "@/types/product";
+import { UserPelatihan } from "@/types/user";
 
 type TableDataPelatihanMasyarakatProps = {
-  dataPelatihan: PelatihanMasyarakat[];
+  dataUserPelatihan: UserPelatihan[];
 };
 
 const getTriwulan = (dateString: string) => {
@@ -26,20 +27,20 @@ const getTriwulan = (dateString: string) => {
   return "Unknown";
 };
 
-const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> = ({ dataPelatihan }) => {
+const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> = ({ dataUserPelatihan }) => {
   const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
 
   const filteredData = useMemo(() => {
-    return dataPelatihan.filter(({ TanggalMulaiPelatihan }) => 
-      new Date(TanggalMulaiPelatihan).getFullYear().toString() === selectedYear
+    return dataUserPelatihan.filter(({ CreteAt }) =>
+      new Date(CreteAt!).getFullYear().toString() === selectedYear
     );
-  }, [dataPelatihan, selectedYear]);
+  }, [dataUserPelatihan, selectedYear]);
 
   const groupedData = useMemo(() => {
     const map = new Map<string, { total: number; triwulan: Record<string, number> }>();
-    
-    filteredData.forEach(({ PenyelenggaraPelatihan, JumlahPeserta, TanggalMulaiPelatihan }) => {
-      const triwulan = getTriwulan(TanggalMulaiPelatihan);
+
+    filteredData.filter((item) => item.FileSertifikat && item.FileSertifikat.trim() !== "").forEach(({ PenyelenggaraPelatihan, CreteAt }) => {
+      const triwulan = getTriwulan(CreteAt!);
       if (!map.has(PenyelenggaraPelatihan)) {
         map.set(PenyelenggaraPelatihan, {
           total: 0,
@@ -52,8 +53,8 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
         });
       }
       const entry = map.get(PenyelenggaraPelatihan)!;
-      entry.total += JumlahPeserta || 0;
-      entry.triwulan[triwulan] += JumlahPeserta || 0;
+      entry.total += 1;
+      entry.triwulan[triwulan] += 1;
     });
 
     return Array.from(map.entries()).map(([name, data]) => ({ name, ...data }));
@@ -92,14 +93,14 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
               <SelectValue placeholder="Pilih Tahun" />
             </SelectTrigger>
             <SelectContent>
-              {Array.from(new Set(dataPelatihan.map(({ TanggalMulaiPelatihan }) => 
-                new Date(TanggalMulaiPelatihan).getFullYear().toString()
+              {Array.from(new Set(dataUserPelatihan.map(({ CreteAt }) =>
+                new Date(CreteAt!).getFullYear().toString()
               ))).sort().map(year => (
                 <SelectItem key={year} value={year}>{year}</SelectItem>
               ))}
             </SelectContent>
           </Select>
-          
+
           <Button onClick={exportToExcel} className="bg-blue-500 text-white hover:bg-blue-600">
             Export to Excel
           </Button>

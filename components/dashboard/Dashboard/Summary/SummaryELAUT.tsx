@@ -67,8 +67,7 @@ const SummaryELAUT: React.FC = () => {
     setIsFetching(true);
     try {
       const response: AxiosResponse = await axios.get(
-        `${baseUrl}/lemdik/getPelatihan?penyelenggara_pelatihan=${
-          selectedBalaiPelatihan === "All" ? "" : selectedBalaiPelatihan
+        `${baseUrl}/lemdik/getPelatihan?penyelenggara_pelatihan=${selectedBalaiPelatihan === "All" ? "" : selectedBalaiPelatihan
         }`
       );
       setData(response.data.data);
@@ -124,77 +123,6 @@ const SummaryELAUT: React.FC = () => {
           </div>
         </div>
       )}
-      {/* <Tabs defaultValue="CoC" className="w-full mb-3">
-        <TabsList className="flex gap-2 w-full">
-          <TabsTrigger value="CoC" className="w-full">
-            Masyarakat Dilatih
-          </TabsTrigger>
-          <TabsTrigger value="CoP" className="w-full">
-            SDM KP Berkompetensi
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="CoC">
-          <Tabs defaultValue={selectedBalaiPelatihan} className="w-full mb-3">
-            <TabsList className="w-full">
-              <TabsTrigger
-                onClick={() => setSelectedBalaiPelatihan("All")}
-                value="All"
-              >
-                All
-              </TabsTrigger>
-              {BALAI_PELATIHAN.map((balaiPelatihan) => (
-                <TabsTrigger
-                  key={balaiPelatihan.Name}
-                  onClick={() => {
-                    setSelectedBalaiPelatihan(balaiPelatihan.Name);
-                    handleFetchingPublicTrainingData(balaiPelatihan.Name);
-                  }}
-                  value={balaiPelatihan.Name}
-                >
-                  {balaiPelatihan.Name}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            <TabsContent value={selectedBalaiPelatihan}>
-              {isFetching ? (
-                <div className="w-full h-[60vh] flex items-center justify-center">
-                  <HashLoader color="#338CF5" size={60} />
-                </div>
-              ) : data != null ? (
-                <>
-                  <ChartMasyarakatDilatihMonthly data={data} />
-                  <ChartDetailMasyarakatDilatih data={data} dataUser={dataUser} />
-                </>
-              ) : (
-                <div className="relative max-w-6xl w-full mx-auto px-4 sm:px-6 mt-20">
-                  <div className="pt-7 md:pt-0 flex flex-col items-center">
-                    <Image
-                      src={"/illustrations/not-found.png"}
-                      alt="Not Found"
-                      width={0}
-                      height={0}
-                      className="w-[350px] md:w-[400px]"
-                    />
-                    <div className="max-w-3xl mx-auto text-center pb-5 md:pb-8 -mt-2">
-                      <h1 className="text-2xl md:text-3xl font-calsans leading-[110%] text-black">
-                        Belum Ada Pelatihan
-                      </h1>
-                      <div className="text-gray-600 text-center leading-[125%]  max-w-md">
-                        Capaian ataupun summary dari pelaksanaan pelatihan belum
-                        dapat dilihat, karena Balai Pelatihan belum memiliki
-                        peneyelenggaraan pelatihan!
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
-        </TabsContent>
-
-      
-      </Tabs> */}
     </div>
   );
 };

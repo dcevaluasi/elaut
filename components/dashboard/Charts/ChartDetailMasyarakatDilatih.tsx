@@ -648,11 +648,11 @@ const ChartDetailMasyarakatDilatih: React.FC<{
           />
         </div>
 
-        <TableDataPelatihanMasyarakat dataPelatihan={data} />
+        <TableDataPelatihanMasyarakat dataUserPelatihan={dataUser} />
         <TableDataPelatihanMasyarakatByProvinsi dataPelatihan={data} />
         <TableDataPelatihanMasyrakatByProgramPrioritas dataPelatihan={data} />
-        <TableDataPelatihanMasyarakatByWilker dataPelatihan={data} />
-        <TableDataPelatihanMasyrakatByGender dataPelatihan={data}  />
+        <TableDataPelatihanMasyarakatByWilker dataUserPelatihan={dataUser} />
+        <TableDataPelatihanMasyrakatByGender dataUserPelatihan={dataUser} />
         <TableDataPelatihanMasyrakatByPendidikan dataUserPelatihan={dataUser} />
       </div>
     );

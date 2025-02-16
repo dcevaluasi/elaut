@@ -11,25 +11,26 @@ type TableDataProps = {
 
 const TableDataPelatihanMasyarakatByPendidikan = ({ dataUserPelatihan }: TableDataProps) => {
   const [year, setYear] = useState("2024");
-  const [quarter, setQuarter] = useState("TW II");
+  const [quarter, setQuarter] = useState("TW I");
 
-  // Fungsi untuk mendapatkan triwulan dari tanggal
-  // const getTriwulan = (dateString: string) => {
-  //   const month = new Date(dateString).getMonth() + 1;
-  //   if (month <= 3) return "TW I";
-  //   if (month <= 6) return "TW II";
-  //   if (month <= 9) return "TW III";
-  //   return "TW IV";
-  // };
+  const getTriwulan = (dateString: string) => {
+    const month = new Date(dateString).getMonth() + 1;
+    if (month >= 1 && month <= 3) return "TW I";
+    if (month >= 1 && month <= 6) return "TW II";
+    if (month >= 1 && month <= 9) return "TW III";
+    if (month >= 1 && month <= 12) return "TW IV";
+    return "Unknown";
+  };
 
-  // // Filter data berdasarkan tahun dan triwulan
-  // const filteredData = useMemo(() => {
-  //   return dataUserPelatihan.filter((item) => {
-  //     const itemYear = new Date(item.CreatedAt).getFullYear().toString();
-  //     const itemQuarter = getTriwulan(item.CreatedAt);
-  //     return itemYear === year && itemQuarter === quarter;
-  //   });
-  // }, [dataUserPelatihan, year, quarter]);
+  const filteredData = useMemo(() => {
+    return dataUserPelatihan.filter((item) => {
+      const itemYear = new Date(item.CreteAt!)
+        .getFullYear()
+        .toString();
+      const itemQuarter = getTriwulan(item.CreteAt!);
+      return itemYear === year && itemQuarter === quarter;
+    });
+  }, [dataUserPelatihan, year, quarter])
 
   // Ambil daftar unik PenyelenggaraPelatihan sebagai baris
   const penyelenggaraList = useMemo(() => {
@@ -49,7 +50,7 @@ const TableDataPelatihanMasyarakatByPendidikan = ({ dataUserPelatihan }: TableDa
       map.set(penyelenggara, Object.fromEntries(pendidikanList.map((p) => [p, 0])));
     });
 
-    dataUserPelatihan.forEach((item) => {
+    filteredData.filter((item) => item.FileSertifikat && item.FileSertifikat.trim() !== "").forEach((item) => {
       const penyelenggara = item.PenyelenggaraPelatihan;
       const pendidikan = item.PendidikanTerakhir;
       if (map.has(penyelenggara)) {
@@ -61,7 +62,7 @@ const TableDataPelatihanMasyarakatByPendidikan = ({ dataUserPelatihan }: TableDa
       penyelenggara,
       ...data,
     }));
-  }, [dataUserPelatihan, penyelenggaraList, pendidikanList]);
+  }, [filteredData, penyelenggaraList, pendidikanList]);
 
   // Fungsi untuk export ke Excel
   const exportToExcel = () => {
@@ -69,7 +70,7 @@ const TableDataPelatihanMasyarakatByPendidikan = ({ dataUserPelatihan }: TableDa
     const workbook = utils.book_new();
     utils.book_append_sheet(workbook, worksheet, "Penyelenggara_Pendidikan");
     writeFile(workbook, "Penyelenggara_Pendidikan.xlsx");
-    
+
   };
 
   return (
