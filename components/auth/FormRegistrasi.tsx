@@ -503,6 +503,7 @@ function FormRegistrasi() {
           alt=""
           layout="fill"
           priority
+
         />
 
         <div className="absolute w-full h-full bg-black bg-opacity-70 -z-30"></div>
