@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/card";
 
 import { HiUserGroup } from "react-icons/hi2";
-import { TbCalendarCheck, TbTargetArrow } from "react-icons/tb";
+import { TbCalendarCheck, TbDatabase, TbTargetArrow } from "react-icons/tb";
 
 import FormPelatihan from "../admin/formPelatihan";
 
@@ -42,7 +42,7 @@ import { Input } from "@/components/ui/input";
 import { generateTanggalPelatihan } from "@/utils/text";
 import DeleteButton from "../Dashboard/Actions/DeleteButton";
 import { Button } from "@/components/ui/button";
-import { PublishButton } from "../Dashboard/Actions";
+import { MateriButton, PublishButton } from "../Dashboard/Actions";
 import {
   PROGRAM_AKP,
   PROGRAM_KELAUTAN,
@@ -453,8 +453,8 @@ const TableDataPelatihan: React.FC = () => {
                               <Badge
                                 variant="outline"
                                 className={`top-4 right-4 absolute cursor-pointer ${pelatihan!.StatusPenerbitan == "On Progress"
-                                    ? " bg-yellow-300 text-neutral-800 hover:bg-yellow-400"
-                                    : " bg-green-500 text-white hover:bg-green-600"
+                                  ? " bg-yellow-300 text-neutral-800 hover:bg-yellow-400"
+                                  : " bg-green-500 text-white hover:bg-green-600"
                                   }`}
                               >
                                 {pelatihan!.StatusPenerbitan!}{" "}
@@ -671,8 +671,8 @@ const TableDataPelatihan: React.FC = () => {
                               <Link
                                 title="Peserta Pelatihan"
                                 href={`/admin/${usePathname().includes("lemdiklat")
-                                    ? "lemdiklat"
-                                    : "pusat"
+                                  ? "lemdiklat"
+                                  : "pusat"
                                   }/pelatihan/${pelatihan.KodePelatihan
                                   }/peserta-pelatihan/${encryptValue(
                                     pelatihan.IdPelatihan
@@ -758,6 +758,27 @@ const TableDataPelatihan: React.FC = () => {
                             }
                             suratPemberitahuan={pelatihan?.SuratPemberitahuan}
                           />
+
+                          {
+                            pelatihan!.UjiKompotensi == "Ujian Pre-test dan Post-test" && <Link
+                              title="Bank Soal"
+                              href={`/admin/pusat/pelatihan/${pelatihan!.KodePelatihan
+                                }/bank-soal/${encryptValue(pelatihan!.IdPelatihan)}`}
+                              className="border border-blue-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-blue-900 hover:bg-blue-900 hover:text-white text-white rounded-md"
+                            >
+                              <TbDatabase className="h-5 w-5" /> Bank Soal
+                            </Link>
+                          }
+
+
+                          <MateriButton
+                            idPelatihan={pelatihan!.IdPelatihan.toString()}
+                            handleFetchingData={
+                              handleFetchingPublicTrainingData
+                            }
+                            data={pelatihan!}
+                          />
+
                         </div>
                         <p className="italic text-neutral-400 text-[0.6rem]">
                           Created at {pelatihan!.CreateAt} | Updated at{" "}

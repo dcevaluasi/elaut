@@ -152,6 +152,7 @@ const TableDataPesertaPelatihan = () => {
 
   React.useEffect(() => {
     handleFetchingPublicTrainingDataById();
+    handleFetchingPesertaPelatihanDataById(parseInt(id))
   }, []);
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -161,9 +162,7 @@ const TableDataPesertaPelatihan = () => {
 
   const router = useRouter();
 
-  const [pelatihan, setPelatihan] = React.useState<PelatihanMasyarakat | null>(
-    null
-  );
+
 
   const handleUpdatePublishPelatihanToELAUT = async (
     id: number,

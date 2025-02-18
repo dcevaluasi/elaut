@@ -25,15 +25,18 @@ import Toast from "@/components/toast";
 import Link from "next/link";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { urlTemplateMateriPelatihan } from "@/constants/templates";
+import { MateriPelatihan, PelatihanMasyarakat } from "@/types/product";
 
 interface MateriButtonProps {
   idPelatihan: string;
   handleFetchingData: any;
+  data: PelatihanMasyarakat
 }
 
 const MateriButton: React.FC<MateriButtonProps> = ({
   idPelatihan,
   handleFetchingData,
+  data
 }) => {
   const [isOpenFormMateri, setIsOpenFormMateri] =
     React.useState<boolean>(false);
@@ -43,6 +46,7 @@ const MateriButton: React.FC<MateriButtonProps> = ({
   const handleFileMateriChange = (e: any) => {
     setMateriPelatihan(e.target.files[0]);
   };
+
 
   const handleUploadMateriPelatihan = async (id: string) => {
     const data = new FormData();
@@ -82,7 +86,7 @@ const MateriButton: React.FC<MateriButtonProps> = ({
   return (
     <>
       <AlertDialog open={isOpenFormMateri}>
-        <AlertDialogContent>
+        <AlertDialogContent className={`${data!.MateriPelatihan.length == 0 ? '' : 'max-w-3xl'}`}>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               {" "}
@@ -96,36 +100,39 @@ const MateriButton: React.FC<MateriButtonProps> = ({
           </AlertDialogHeader>
           <fieldset>
             <form autoComplete="off">
-              <div className="flex flex-wrap -mx-3 mb-1">
-                <div className="w-full px-3">
-                  <label
-                    className="block text-gray-800 text-sm font-medium mb-1"
-                    htmlFor="email"
-                  >
-                    Upload File Excel Materi{" "}
-                  </label>
-                  <div className="flex gap-1">
-                    <input
-                      type="file"
-                      className=" text-black h-10 text-base flex items-center cursor-pointer w-full border border-neutral-200 rounded-md"
-                      required
-                      onChange={handleFileMateriChange}
-                    />
-                    <Link
-                      target="_blank"
-                      href={urlTemplateMateriPelatihan}
-                      className="btn text-white bg-green-600 hover:bg-green-700 py-0 w-[250px] px-0 text-sm"
+              {
+                data!.MateriPelatihan.length == 0 ? <div className="flex flex-wrap -mx-3 mb-1">
+                  <div className="w-full px-3">
+                    <label
+                      className="block text-gray-800 text-sm font-medium mb-1"
+                      htmlFor="email"
                     >
-                      <PiMicrosoftExcelLogoFill />
-                      Unduh Template
-                    </Link>
+                      Upload File Excel Materi{" "}
+                    </label>
+                    <div className="flex gap-1">
+                      <input
+                        type="file"
+                        className=" text-black h-10 text-base flex items-center cursor-pointer w-full border border-neutral-200 rounded-md"
+                        required
+                        onChange={handleFileMateriChange}
+                      />
+                      <Link
+                        target="_blank"
+                        href={urlTemplateMateriPelatihan}
+                        className="btn text-white bg-green-600 hover:bg-green-700 py-0 w-[250px] px-0 text-sm"
+                      >
+                        <PiMicrosoftExcelLogoFill />
+                        Unduh Template
+                      </Link>
+                    </div>
+                    <p className="text-gray-700 text-xs mt-1">
+                      *Download template, input data sesuai format template lalu
+                      upload
+                    </p>
                   </div>
-                  <p className="text-gray-700 text-xs mt-1">
-                    *Download template, input data sesuai format template lalu
-                    upload
-                  </p>
-                </div>
-              </div>
+                </div> : <MateriPelatihanTable data={data} />
+              }
+
 
               <AlertDialogFooter className="mt-3">
                 <AlertDialogCancel
@@ -133,11 +140,14 @@ const MateriButton: React.FC<MateriButtonProps> = ({
                 >
                   Cancel
                 </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={(e) => handleUploadMateriPelatihan(idPelatihan)}
-                >
-                  Upload
-                </AlertDialogAction>
+                {
+                  data!.MateriPelatihan.length == 0 && <AlertDialogAction
+                    onClick={(e) => handleUploadMateriPelatihan(idPelatihan)}
+                  >
+                    Upload
+                  </AlertDialogAction>
+                }
+
               </AlertDialogFooter>
             </form>
           </fieldset>
@@ -145,15 +155,47 @@ const MateriButton: React.FC<MateriButtonProps> = ({
       </AlertDialog>
 
       <Button
-        variant="outline"
         onClick={(e) => {
           setIsOpenFormMateri(!isOpenFormMateri);
         }}
-        className="ml-auto border rounded-full border-[#000000] hover:bg-[#000] hover:text-white duration-700"
+        variant="outline"
+        title="Upload Surat Pemberitahuan"
+        className="border border-orange-500  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-orange-500 hover:bg-orange-500 hover:text-white text-white rounded-md"
       >
-        <FaBookOpen className="h-4 w-4" />
+        <FaBookOpen className="h-4 w-4 mr-1" /> Materi Pelatihan
       </Button>
+
+
     </>
+  );
+};
+
+const MateriPelatihanTable = ({ data }: { data: PelatihanMasyarakat }) => {
+  return (
+    <div className="overflow-x-auto !text-sm">
+      <table className="min-w-full border border-gray-300">
+        <thead className="bg-gray-100">
+          <tr>
+            <th className="border p-1">ID</th>
+            <th className="border p-1">Nama Materi</th>
+            <th className="border p-1">Deskripsi</th>
+            <th className="border p-1">Jam Teori</th>
+            <th className="border p-1">Jam Praktek</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.MateriPelatihan!.map((item: MateriPelatihan) => (
+            <tr key={item.IdMateriPelatihan} className="odd:bg-white even:bg-gray-50">
+              <td className="border p-1 text-center">{item.IdMateriPelatihan}</td>
+              <td className="border p-1">{item.NamaMateri}</td>
+              <td className="border p-1 capitalize">{item.Deskripsi}</td>
+              <td className="border p-1 text-center">{item.JamTeory}</td>
+              <td className="border p-1 text-center">{item.JamPraktek}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
 
