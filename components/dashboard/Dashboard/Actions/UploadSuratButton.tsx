@@ -200,7 +200,7 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
       </AlertDialog>
 
       {suratPemberitahuan !=
-      "https://elaut-bppsdm.kkp.go.id/api-elaut//public/static/suratPemberitahuan/" ? (
+        "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/suratPemberitahuan/" ? (
         <Link
           href={suratPemberitahuan}
           title="Surat Pemberitahuan"

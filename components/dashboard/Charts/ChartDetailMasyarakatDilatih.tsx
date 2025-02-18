@@ -232,8 +232,8 @@ const ChartDetailMasyarakatDilatih: React.FC<{
 
   React.useEffect(() => {
     const dataMasyarakatByGender = [
-      dataUser.filter((item) => item.JenisKelamin == "Laki - Laki").length,
-      dataUser.filter((item) => item.JenisKelamin == "Perempuan").length,
+      dataUser.filter((item) => (item.JenisKelamin == "Laki - Laki" || item.JenisKelamin == 'L') && item.FileSertifikat != '').length,
+      dataUser.filter((item) => (item.JenisKelamin == "Perempuan" || item.JenisKelamin == 'P') && item.FileSertifikat != '').length,
     ];
 
     const dataMasyarakatBySertifikat = [
@@ -242,30 +242,30 @@ const ChartDetailMasyarakatDilatih: React.FC<{
     ];
 
     const dataMasyarakatDilatihByBidangPelatihan = [
-      data
-        .filter((item) => item.BidangPelatihan === "Budidaya")
-        .reduce((total, item) => total + item.JumlahPeserta!, 0),
-      data
-        .filter((item) => item.BidangPelatihan === "Penangkapan")
-        .reduce((total, item) => total + item.JumlahPeserta!, 0),
-      data
-        .filter((item) => item.BidangPelatihan === "Kepelautan")
-        .reduce((total, item) => total + item.JumlahPeserta!, 0),
-      data
-        .filter((item) => item.BidangPelatihan === "Pengolahan dan Pemasaran")
-        .reduce((total, item) => total + item.JumlahPeserta!, 0),
-      data
-        .filter((item) => item.BidangPelatihan === "Mesin Perikanan")
-        .reduce((total, item) => total + item.JumlahPeserta!, 0),
-      data
-        .filter((item) => item.BidangPelatihan === "Konservasi")
-        .reduce((total, item) => total + item.JumlahPeserta!, 0),
-      data
-        .filter((item) => item.BidangPelatihan === "Wisata Bahari")
-        .reduce((total, item) => total + item.JumlahPeserta!, 0),
-      data
-        .filter((item) => item.BidangPelatihan === "Manajemen Perikanan")
-        .reduce((total, item) => total + item.JumlahPeserta!, 0),
+      dataUser
+        .filter((item) => item.BidangPelatihan === "Budidaya" && item.FileSertifikat != '')
+        .length,
+      dataUser
+        .filter((item) => item.BidangPelatihan === "Penangkapan" && item.FileSertifikat != '')
+        .length,
+      dataUser
+        .filter((item) => item.BidangPelatihan === "Kepelautan" && item.FileSertifikat != '')
+        .length,
+      dataUser
+        .filter((item) => item.BidangPelatihan === "Pengolahan dan Pemasaran" && item.FileSertifikat != '')
+        .length,
+      dataUser
+        .filter((item) => item.BidangPelatihan === "Mesin Perikanan" && item.FileSertifikat != '')
+        .length,
+      dataUser
+        .filter((item) => item.BidangPelatihan === "Konservasi" && item.FileSertifikat != '')
+        .length,
+      dataUser
+        .filter((item) => item.BidangPelatihan === "Wisata Bahari" && item.FileSertifikat != '')
+        .length,
+      dataUser
+        .filter((item) => item.BidangPelatihan === "Manajemen Perikanan" && item.FileSertifikat != '')
+        .length,
     ];
 
     const dataMasyarakatDilatihByJenisPelatihan = [
@@ -637,7 +637,7 @@ const ChartDetailMasyarakatDilatih: React.FC<{
             chartData={chartDataMasyarakatByGender}
           />
           <TrainingChartCard
-            title="Jenis Kelamin"
+            title="Program Prioritas"
             chartConfig={chartConfigProgramPrioritas}
             chartData={chartDataMasyarakatDilatihByProgramPrioritas}
           />

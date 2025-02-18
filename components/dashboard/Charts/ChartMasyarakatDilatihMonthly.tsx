@@ -3,6 +3,7 @@
 import { elautBaseUrl } from "@/constants/urls";
 import { BlankoKeluar } from "@/types/blanko";
 import { PelatihanMasyarakat } from "@/types/product";
+import { UserPelatihan } from "@/types/user";
 import { formatDateTime, getMonthFromDateString } from "@/utils";
 import { ApexOptions } from "apexcharts";
 import axios, { AxiosResponse } from "axios";
@@ -86,7 +87,8 @@ const chartOptions: ApexOptions = {
 
 const ChartMasyarakatDilatihMonthly: React.FC<{
   data: PelatihanMasyarakat[];
-}> = ({ data }) => {
+  dataUser: UserPelatihan[];
+}> = ({ data, dataUser }) => {
   const [dataPelatihan, setDataPelatihan] = useState<PelatihanMasyarakat[]>([]);
   const [dataTotalMasyarakatDilatih, setDataTotalMasyarakatDilatih] =
     useState<number>(0);
@@ -106,8 +108,12 @@ const ChartMasyarakatDilatihMonthly: React.FC<{
         0
       );
 
+      const filteredDataUser = dataUser.filter(
+        (item: UserPelatihan) => item.FileSertifikat! != ''
+      ).length;
+
       setDataPelatihan(response.data.data);
-      setDataTotalMasyarakatDilatih(totalMasyarakatDilatih);
+      setDataTotalMasyarakatDilatih(filteredDataUser);
     } catch (error) {
       console.error(error);
     } finally {
@@ -169,7 +175,9 @@ const ChartMasyarakatDilatihMonthly: React.FC<{
                   Total Masyarakat Dilatih
                 </p>
                 <p className="text-sm font-medium">
-                  {dataTotalMasyarakatDilatih} Orang
+                  {dataUser.filter(
+                    (item: UserPelatihan) => item.FileSertifikat! != ''
+                  ).length} Orang
                 </p>
               </div>
             </div>

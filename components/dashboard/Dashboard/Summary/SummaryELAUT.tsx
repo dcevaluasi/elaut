@@ -4,11 +4,8 @@ import Cookies from "js-cookie";
 import axios, { AxiosResponse } from "axios";
 import { LemdiklatDetailInfo } from "@/types/lemdiklat";
 import { PelatihanMasyarakat } from "@/types/product";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ChartMasyarakatDilatihMonthly from "../../Charts/ChartMasyarakatDilatihMonthly";
 import ChartDetailMasyarakatDilatih from "../../Charts/ChartDetailMasyarakatDilatih";
-import ChartSertifikasiKompetensiMonthly from "../../Charts/ChartSertifikasiKompetensiMonthly";
-import { BALAI_PELATIHAN } from "@/constants/pelatihan";
 import { HashLoader } from "react-spinners";
 import Image from "next/image";
 import { User, UserPelatihan } from "@/types/user";
@@ -79,7 +76,7 @@ const SummaryELAUT: React.FC = () => {
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchAllData = () => {
       fetchInformationLemdiklat();
       handleFetchingUserPelatihan();
@@ -97,7 +94,7 @@ const SummaryELAUT: React.FC = () => {
         </div>
       ) : data != null ? (
         <>
-          <ChartMasyarakatDilatihMonthly data={data} />
+          <ChartMasyarakatDilatihMonthly data={data} dataUser={dataUser} />
           <ChartDetailMasyarakatDilatih data={data} dataUser={dataUser} />
         </>
       ) : (
