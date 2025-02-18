@@ -622,10 +622,10 @@ const TableDataPesertaPelatihan = () => {
       cell: ({ row }) => (
         <div
           className={` flex items-center justify-center w-full gap-1 font-semibold ${row.original.PreTest > 70
-              ? "text-green-500"
-              : row.original.PreTest > 50
-                ? "text-yellow-500"
-                : "text-rose-500"
+            ? "text-green-500"
+            : row.original.PreTest > 50
+              ? "text-yellow-500"
+              : "text-rose-500"
             }`}
         >
           {row.original.PreTest}
@@ -639,10 +639,10 @@ const TableDataPesertaPelatihan = () => {
           <Button
             variant="ghost"
             className={`${dataPelatihan != null
-                ? dataPelatihan!.UjiKompotensi == "Portfolio"
-                  ? "hidden"
-                  : "flex items-center justify-center"
-                : ""
+              ? dataPelatihan!.UjiKompotensi == "Portfolio"
+                ? "hidden"
+                : "flex items-center justify-center"
+              : ""
               }  p-0 leading-[105%] w-full text-gray-900 font-semibold`}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
@@ -654,10 +654,10 @@ const TableDataPesertaPelatihan = () => {
       cell: ({ row }) => (
         <div
           className={` ${dataPelatihan != null
-              ? dataPelatihan!.UjiKompotensi == "Portfolio"
-                ? "hidden"
-                : "flex items-center justify-center"
-              : ""
+            ? dataPelatihan!.UjiKompotensi == "Portfolio"
+              ? "hidden"
+              : "flex items-center justify-center"
+            : ""
             }  w-full gap-1 font-semibold ${row.original.PostTest > 70
               ? "text-green-500"
               : row.original.PostTest > 50
@@ -676,10 +676,10 @@ const TableDataPesertaPelatihan = () => {
           <Button
             variant="ghost"
             className={`text-black w-full font-semibold ${dataPelatihan != null
-                ? dataPelatihan!.UjiKompotensi == "Portfolio"
-                  ? "hidden"
-                  : "flex items-center justify-center"
-                : ""
+              ? dataPelatihan!.UjiKompotensi == "Portfolio"
+                ? "hidden"
+                : "flex items-center justify-center"
+              : ""
               } `}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
@@ -691,10 +691,10 @@ const TableDataPesertaPelatihan = () => {
       cell: ({ row }) => (
         <div
           className={`text-center uppercase w-full text-base font-semibold ${dataPelatihan != null
-              ? dataPelatihan!.UjiKompotensi == "Portfolio"
-                ? "hidden"
-                : "flex items-center justify-center"
-              : ""
+            ? dataPelatihan!.UjiKompotensi == "Portfolio"
+              ? "hidden"
+              : "flex items-center justify-center"
+            : ""
             }  ${row.original.PostTest > 65 ? "text-green-500" : "text-rose-500"
             }`}
         >
@@ -880,8 +880,8 @@ const TableDataPesertaPelatihan = () => {
                           <Badge
                             variant="outline"
                             className={`w-fit flex items-center cursor-pointer justify-center ${dataPelatihan!.StatusPenerbitan == "On Progress"
-                                ? " bg-yellow-300 text-neutral-800"
-                                : " bg-green-500 text-white"
+                              ? " bg-yellow-300 text-neutral-800"
+                              : " bg-green-500 text-white"
                               }`}
                           >
                             {dataPelatihan!.StatusPenerbitan!}{" "}
@@ -1149,13 +1149,12 @@ const TableDataPesertaPelatihan = () => {
           </fieldset>
         </AlertDialogContent>
       </AlertDialog>
-
-      {
-        dataPesertaPelatihan != null ? <Card className="mx-4 py-5">
-          <CardContent>
-            <div className="flex items-center mb-3 justify-between gap-3 ">
-              {/* Statistik Pelatihan */}
-              <div className="flex w-full gap-3 sm:gap-5">
+      <Card className="mx-4 py-5">
+        <CardContent>
+          <div className="flex items-center mb-3 justify-between gap-3 ">
+            {/* Statistik Pelatihan */}
+            {
+              dataPesertaPelatihan != null && <div className="flex w-full gap-3 sm:gap-5">
                 <div className="flex min-w-47.5">
                   <span className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-primary">
                     <span className="block h-2.5 w-full max-w-2.5 rounded-full bg-primary"></span>
@@ -1207,115 +1206,116 @@ const TableDataPesertaPelatihan = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            }
 
-            <div className="flex w-full items-center mb-2">
-              <div className="flex w-full gap-1 items-start">
-                {typeRole != "satdik" && (
-                  <Select>
-                    <SelectTrigger className="w-[200px] border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
-                      <div className="inline-flex gap-2 px-3 mr-2 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">
-                        <MdOutlinePayment />
-                        Status Pembayaran
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Status Pembayaran</SelectLabel>
-                        <SelectItem value="pendaftaran">Paid</SelectItem>
-                        <SelectItem value="pelaksanaan">Pending</SelectItem>
-                        <SelectItem value="selesai">Not Paid</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                )}
+          </div>
 
+          <div className="flex w-full items-center mb-2">
+            <div className="flex w-full gap-1 items-start">
+              {typeRole != "satdik" && (
                 <Select>
-                  <SelectTrigger className="w-[130px] border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
-                    <div className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">
-                      <TbSchool />
-                      Kelulusan
+                  <SelectTrigger className="w-[200px] border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
+                    <div className="inline-flex gap-2 px-3 mr-2 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">
+                      <MdOutlinePayment />
+                      Status Pembayaran
                     </div>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectLabel>Kelulusan</SelectLabel>
-                      <SelectItem value="pendaftaran">Lulus</SelectItem>
-                      <SelectItem value="pelaksanaan">Tidak Lulus</SelectItem>
+                      <SelectLabel>Status Pembayaran</SelectLabel>
+                      <SelectItem value="pendaftaran">Paid</SelectItem>
+                      <SelectItem value="pelaksanaan">Pending</SelectItem>
+                      <SelectItem value="selesai">Not Paid</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
-
-                <Select>
-                  <SelectTrigger className="w-[140px] border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
-                    <div className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">
-                      <HiOutlineDocument />
-                      Sertifikat
-                    </div>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Sertifikat</SelectLabel>
-                      <SelectItem value="apple">Sudah Diterbitkan</SelectItem>
-                      <SelectItem value="banana">Belum Diterbitkan</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {usePathname().includes("lemdiklat") &&
-                dataPelatihan?.StatusApproval != "Selesai" && (
-                  <div className="w-full flex justify-end gap-2">
-                    <div
-                      onClick={(e) => {
-                        if (dataPelatihan?.StatusApproval == "Selesai") {
-                          Toast.fire({
-                            icon: "error",
-                            title: `Ups, pelatihan sudah ditutup dan no sertifikat telah terbit, tidak dapat menambahkan lagi!`,
-                          });
-                        } else {
-                          setIsOpenFormPeserta(!isOpenFormPeserta);
-                        }
-                      }}
-                      className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
-                    >
-                      <FiUploadCloud />
-                      Tambah Peserta Pelatihan
-                    </div>
-                  </div>
-                )}
-            </div>
-
-            <div>
-              <div id="chartOne" className="-ml-5"></div>
-              <TableData
-                isLoading={false}
-                columns={columns}
-                table={table}
-                type={"short"}
-              />
-
-              {data != null && dataPelatihan != null ? (
-                emptyFileSertifikatCount > 0 &&
-                dataPelatihan.StatusPenerbitan == "" && (
-                  <Button
-                    variant="default"
-                    onClick={() => handleSendingPermohonanPenerbitan()}
-                    className="w-full  flex gap-2 text-left capitalize items-center justify-center mt-5"
-                  >
-                    <FiUploadCloud className="h-4 w-4" />
-                    <span className="text-sm">
-                      Kirim Pengajuan Permohonan Sertifikat
-                    </span>
-                  </Button>
-                )
-              ) : (
-                <></>
               )}
+
+              <Select>
+                <SelectTrigger className="w-[130px] border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
+                  <div className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">
+                    <TbSchool />
+                    Kelulusan
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Kelulusan</SelectLabel>
+                    <SelectItem value="pendaftaran">Lulus</SelectItem>
+                    <SelectItem value="pelaksanaan">Tidak Lulus</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+
+              <Select>
+                <SelectTrigger className="w-[140px] border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
+                  <div className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">
+                    <HiOutlineDocument />
+                    Sertifikat
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Sertifikat</SelectLabel>
+                    <SelectItem value="apple">Sudah Diterbitkan</SelectItem>
+                    <SelectItem value="banana">Belum Diterbitkan</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
-          </CardContent>
-        </Card> : <></>
-      }
+
+            {usePathname().includes("lemdiklat") &&
+              dataPelatihan?.StatusApproval != "Selesai" && (
+                <div className="w-full flex justify-end gap-2">
+                  <div
+                    onClick={(e) => {
+                      if (dataPelatihan?.StatusApproval == "Selesai") {
+                        Toast.fire({
+                          icon: "error",
+                          title: `Ups, pelatihan sudah ditutup dan no sertifikat telah terbit, tidak dapat menambahkan lagi!`,
+                        });
+                      } else {
+                        setIsOpenFormPeserta(!isOpenFormPeserta);
+                      }
+                    }}
+                    className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
+                  >
+                    <FiUploadCloud />
+                    Tambah Peserta Pelatihan
+                  </div>
+                </div>
+              )}
+          </div>
+
+          <div>
+            <div id="chartOne" className="-ml-5"></div>
+            <TableData
+              isLoading={false}
+              columns={columns}
+              table={table}
+              type={"short"}
+            />
+
+            {data != null && dataPelatihan != null ? (
+              emptyFileSertifikatCount > 0 &&
+              dataPelatihan.StatusPenerbitan == "" && (
+                <Button
+                  variant="default"
+                  onClick={() => handleSendingPermohonanPenerbitan()}
+                  className="w-full  flex gap-2 text-left capitalize items-center justify-center mt-5"
+                >
+                  <FiUploadCloud className="h-4 w-4" />
+                  <span className="text-sm">
+                    Kirim Pengajuan Permohonan Sertifikat
+                  </span>
+                </Button>
+              )
+            ) : (
+              <></>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
