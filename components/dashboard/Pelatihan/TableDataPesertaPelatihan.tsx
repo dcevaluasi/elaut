@@ -876,7 +876,7 @@ const TableDataPesertaPelatihan = () => {
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       {dataPelatihan != null
-                        ? dataPelatihan!.StatusPenerbitan != "" && (
+                        ? (dataPelatihan!.StatusPenerbitan != "" && dataPelatihan!.NoSertifikat != '') && (
                           <Badge
                             variant="outline"
                             className={`w-fit flex items-center cursor-pointer justify-center ${dataPelatihan!.StatusPenerbitan == "On Progress"
