@@ -14,7 +14,7 @@ import { TbClockHour2, TbMapPin } from "react-icons/tb";
 import Link from "next/link";
 import { createSlug, truncateText } from "@/utils";
 import { PelatihanMasyarakat } from "@/types/product";
-import { formatToRupiah, replaceUrl } from "@/lib/utils";
+import { encryptValue, formatToRupiah, replaceUrl } from "@/lib/utils";
 import { generateTanggalPelatihan } from "@/utils/text";
 import '../app/css/navigation.css'
 
