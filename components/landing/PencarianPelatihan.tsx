@@ -59,8 +59,8 @@ function PencarianPelatihan() {
     usePathname() == "/layanan/program/akp"
       ? "Awak Kapal Perikanan"
       : usePathname() == "/layanan/program/perikanan"
-      ? "Perikanan"
-      : "Kelautan";
+        ? "Perikanan"
+        : "Kelautan";
 
   const handleFetchingPublicTrainingData = async () => {
     setLoading(true);
@@ -363,14 +363,14 @@ function PencarianPelatihan() {
                     selectedBidangPelatihan !== "" ||
                     selectedProgramPelatihan !== "" ||
                     selectedBulanPelatihan != "") && (
-                    <div
-                      onClick={() => handleClearFilter()}
-                      className="inline-flex gap-2 w-full px-3 text-sm items-center rounded-md bg-white p-1.5 cursor-pointer border border-gray-300"
-                    >
-                      <MdClear />
-                      Bersihkan Filter
-                    </div>
-                  )}
+                      <div
+                        onClick={() => handleClearFilter()}
+                        className="inline-flex gap-2 w-full px-3 text-sm items-center rounded-md bg-white p-1.5 cursor-pointer border border-gray-300"
+                      >
+                        <MdClear />
+                        Bersihkan Filter
+                      </div>
+                    )}
 
                   <div className="hidden md:flex w-full">
                     <Button
@@ -521,14 +521,12 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
 
         <Link
           onClick={(e) => Cookies.set("JenisProgram", pelatihan?.JenisProgram)}
-          href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${
-            pelatihan?.KodePelatihan
-          }/${pelatihan?.IdPelatihan}`}
-          className={`${
-            pelatihan?.StatusApproval == "Selesai"
+          href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${pelatihan?.KodePelatihan
+            }/${encryptValue(pelatihan?.IdPelatihan)}`}
+          className={`${pelatihan?.StatusApproval == "Selesai"
               ? "bg-gray-500"
               : "bg-blue-500"
-          } text-white px-4 py-2 text-base rounded-md mb-1 mt-2 w-full md:w-fit block`}
+            } text-white px-4 py-2 text-base rounded-md mb-1 mt-2 w-full md:w-fit block`}
         >
           {pelatihan.StatusApproval == "Selesai"
             ? "Sudah Selesai"
@@ -620,9 +618,9 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
 
 //       {/* Button */}
 //       <Link
-//         href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${
-//           pelatihan?.KodePelatihan
-//         }/${encryptValue(pelatihan?.IdPelatihan)}`}
+// href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${
+//   pelatihan?.KodePelatihan
+// }/${encryptValue(pelatihan?.IdPelatihan)}`}
 //         className="w-full block text-center font-semibold px-6 py-3 bg-blue-600 rounded-3xl text-white"
 //       >
 //         Lihat Detail
