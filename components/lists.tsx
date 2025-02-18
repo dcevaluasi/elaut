@@ -164,7 +164,8 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
 
       {/* Button */}
       <Link
-        href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${pelatihan?.KodePelatihan}/${pelatihan?.IdPelatihan}`}
+        href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${pelatihan?.KodePelatihan
+          }/${encryptValue(pelatihan?.IdPelatihan)}`}
         className="w-full block text-center font-semibold px-6 py-3 bg-blue-600 rounded-3xl text-white"
       >
         Lihat Detail
