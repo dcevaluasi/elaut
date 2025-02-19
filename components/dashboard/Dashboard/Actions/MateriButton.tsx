@@ -176,7 +176,7 @@ const MateriPelatihanTable = ({ data }: { data: PelatihanMasyarakat }) => {
       <table className="min-w-full border border-gray-300">
         <thead className="bg-gray-100">
           <tr>
-            <th className="border p-1">ID</th>
+            <th className="border p-1">No</th>
             <th className="border p-1">Nama Materi</th>
             <th className="border p-1">Deskripsi</th>
             <th className="border p-1">Jam Teori</th>
@@ -184,9 +184,9 @@ const MateriPelatihanTable = ({ data }: { data: PelatihanMasyarakat }) => {
           </tr>
         </thead>
         <tbody>
-          {data.MateriPelatihan!.map((item: MateriPelatihan) => (
+          {data.MateriPelatihan!.map((item: MateriPelatihan, index: number) => (
             <tr key={item.IdMateriPelatihan} className="odd:bg-white even:bg-gray-50">
-              <td className="border p-1 text-center">{item.IdMateriPelatihan}</td>
+              <td className="border p-1 text-center">{index + 1}</td>
               <td className="border p-1">{item.NamaMateri}</td>
               <td className="border p-1 capitalize">{item.Deskripsi}</td>
               <td className="border p-1 text-center">{item.JamTeory}</td>
