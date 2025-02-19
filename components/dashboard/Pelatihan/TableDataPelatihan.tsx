@@ -448,33 +448,39 @@ const TableDataPelatihan: React.FC = () => {
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <>
-                            {pelatihan!.NoSertifikat != "" &&
-                              pelatihan!.StatusPenerbitan != "" ? (
-                              <Badge
-                                variant="outline"
-                                className={`top-4 right-4 absolute cursor-pointer ${pelatihan!.StatusPenerbitan == "On Progress"
-                                  ? " bg-yellow-300 text-neutral-800 hover:bg-yellow-400"
-                                  : " bg-green-500 text-white hover:bg-green-600"
-                                  }`}
-                              >
-                                {pelatihan!.StatusPenerbitan!}{" "}
-                                {usePathname().includes("lemdiklat")
-                                  ? "Pengajuan Sertifikat"
-                                  : "Penerbitan"}
-                              </Badge>
-                            ) : pelatihan!.NoSertifikat != "" ? (
-                              <Badge
+
+
+                            {pelatihan!.TtdSertifikat !=
+                              "" && (
+                                <Badge
+                                  variant="outline"
+                                  className={`top-4 right-4 absolute cursor-pointer  bg-yellow-300 text-neutral-800 hover:bg-yellow-400`}
+                                >
+                                  Pengajuan Penerbitan Sedang Diverifikasi
+                                </Badge>
+                              )}
+
+                            {
+                              pelatihan!.TtdSertifikat != '' && pelatihan!.StatusPenerbitan == 'Sudah Diverifikasi Penerbitan' && <Badge
                                 variant="outline"
                                 className={`top-4 right-4 absolute cursor-pointer  bg-blue-500 text-white hover:bg-blue-600`}
                               >
                                 Generate File Sertifikat
                               </Badge>
-                            ) : (
-                              <></>
-                            )}
+                            }
 
-                            {pelatihan!.StatusPenerbitan ==
-                              "Verifikasi Pelaksanaan" && (
+                            {(pelatihan!.StatusPenerbitan ==
+                              "Sudah Diverifikasi Pelaksanaan" && pelatihan!.TtdSertifikat == '') && (
+                                <Badge
+                                  variant="outline"
+                                  className={`top-4 right-4 absolute cursor-pointer  bg-green-500 text-white hover:bg-green-600`}
+                                >
+                                  Pelaksanaan Telah Diverifikasi
+                                </Badge>
+                              )}
+
+                            {(pelatihan!.StatusPenerbitan ==
+                              "Verifikasi Pelaksanaan" && pelatihan!.TtdSertifikat == '') && (
                                 <Badge
                                   variant="outline"
                                   className={`top-4 right-4 absolute cursor-pointer bg-yellow-300 text-neutral-800 hover:bg-yellow-400`}
@@ -760,9 +766,9 @@ const TableDataPelatihan: React.FC = () => {
                           />
 
                           {
-                            pelatihan!.UjiKompotensi == "Ujian Pre-test dan Post-test" && <Link
+                            (pelatihan!.UjiKompotensi == "Ujian Pre-test dan Post-test" && pelatihan!.StatusApproval != 'Selesai') && <Link
                               title="Bank Soal"
-                              href={`/admin/pusat/pelatihan/${pelatihan!.KodePelatihan
+                              href={`/admin/lemdiklat/pelatihan/${pelatihan!.KodePelatihan
                                 }/bank-soal/${encryptValue(pelatihan!.IdPelatihan)}`}
                               className="border border-blue-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-blue-900 hover:bg-blue-900 hover:text-white text-white rounded-md"
                             >
@@ -771,13 +777,16 @@ const TableDataPelatihan: React.FC = () => {
                           }
 
 
-                          <MateriButton
-                            idPelatihan={pelatihan!.IdPelatihan.toString()}
-                            handleFetchingData={
-                              handleFetchingPublicTrainingData
-                            }
-                            data={pelatihan!}
-                          />
+                          {
+                            pelatihan!.StatusApproval != 'Selesai' && <MateriButton
+                              idPelatihan={pelatihan!.IdPelatihan.toString()}
+                              handleFetchingData={
+                                handleFetchingPublicTrainingData
+                              }
+                              data={pelatihan!}
+                            />
+                          }
+
 
                         </div>
                         <p className="italic text-neutral-400 text-[0.6rem]">

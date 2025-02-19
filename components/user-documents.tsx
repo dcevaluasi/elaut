@@ -154,7 +154,7 @@ export default function UserDocuments({ user }: { user: User | null }) {
             <div className="flex flex-col items-center bg-white shadow-custom rounded-md py-6 px-12 max-w-4xl">
               <div className="relative -mt-28">
                 <Image
-                  src={user?.Foto! == 'https://elaut-bppsdm.kkp.go.id/api-elaut//public/static/profile/fotoProfile/' ? "/dummies/profile.jpg" : user?.Foto!}
+                  src={"/dummies/profile.jpg"}
                   alt={"profile picture"}
                   width={0}
                   height={0}
