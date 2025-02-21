@@ -566,41 +566,6 @@ const TableDataPesertaPelatihan = () => {
     },
 
     {
-      accessorKey: "IdUserPelatihan",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            className={`flex  ${usePathname().includes("puslat") && "hidden"
-              } items-center justify-center p-0 leading-[105%] w-full text-gray-900 font-semibold ${usePathname().includes("lemdiklat") ? "flex" : "hidden"
-              }`}
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Input <br />
-            Penilaian
-            <TbDatabaseEdit className="ml-1 h-4 w-4" />
-          </Button>
-        );
-      },
-      cell: ({ row }) => (
-        <div
-          className={` ${usePathname().includes("lemdiklat") ? "flex" : "hidden"
-            } items-center justify-center w-full gap-1`}
-        >
-          <Button
-            onClick={(e) => {
-              setIsOpenFormInputNilai(!isOpenFormInputNilai);
-              setSelectedIdPeserta(row.original?.IdUserPelatihan);
-            }}
-            variant="outline"
-            className=" border border-purple-600"
-          >
-            <LucideListChecks className="h-4 w-4 text-purple-600" />
-          </Button>
-        </div>
-      ),
-    },
-    {
       accessorKey: "PreTest",
       header: ({ column }) => {
         return (
@@ -669,39 +634,7 @@ const TableDataPesertaPelatihan = () => {
         </div>
       ),
     },
-    {
-      accessorKey: "Keterangan",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            className={`text-black w-full font-semibold ${dataPelatihan != null
-              ? dataPelatihan!.UjiKompotensi == "Portfolio"
-                ? "hidden"
-                : "flex items-center justify-center"
-              : ""
-              } `}
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Keterangan
-            <MdSchool className="ml-2 h-4 w-4" />
-          </Button>
-        );
-      },
-      cell: ({ row }) => (
-        <div
-          className={`text-center uppercase w-full text-base font-semibold ${dataPelatihan != null
-            ? dataPelatihan!.UjiKompotensi == "Portfolio"
-              ? "hidden"
-              : "flex items-center justify-center"
-            : ""
-            }  ${row.original.PostTest > 65 ? "text-green-500" : "text-rose-500"
-            }`}
-        >
-          {row.original.PostTest >= 65 ? "LULUS" : "TIDAK LULUS"}
-        </div>
-      ),
-    },
+
   ];
 
   const [showFormAjukanPelatihan, setShowFormAjukanPelatihan] =

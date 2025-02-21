@@ -69,6 +69,8 @@ import { encryptValue } from "@/lib/utils";
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import { IoRefreshSharp } from "react-icons/io5";
 import { HashLoader } from "react-spinners";
+import NoSertifikatButton from "../Dashboard/Actions/NoSertifikatButton";
+import { AiOutlineFieldNumber } from "react-icons/ai";
 
 const TableDataPelatihan: React.FC = () => {
   const [data, setData] = React.useState<PelatihanMasyarakat[]>([]);
@@ -467,12 +469,23 @@ const TableDataPelatihan: React.FC = () => {
                         <div className="ml-0 text-left capitalize -mt-6 w-full ">
                           <div className="ml-0 text-left mt-1 text-neutral-500 ">
                             <p className="text-sm ">
+                              {
+                                pelatihan!.PemberitahuanDiterima == 'No sertifikat telah diinput' && <span className="flex items-center gap-1 leading-[105%]">
+                                  <AiOutlineFieldNumber className="text-lg" />
+                                  <span>
+                                    No Sertifikat : {pelatihan!.NoSertifikat}
+                                  </span>
+                                </span>
+
+                              }
+
                               <span className="flex items-center gap-1 leading-[105%]">
                                 <TbTargetArrow className="text-lg" />
                                 <span>
                                   Lokasi Pelatihan : {pelatihan!.LokasiPelatihan}
                                 </span>
                               </span>
+
                               {pelatihan!.TanggalMulaiPendaftaran == "" ||
                                 pelatihan!.TanggalBerakhirPendaftaran == "" ? (
                                 <></>
@@ -491,6 +504,8 @@ const TableDataPelatihan: React.FC = () => {
                                   </span>
                                 </span>
                               )}
+
+
 
                               <span className="flex items-center gap-1 leading-[105%]">
                                 <TbCalendarCheck className="text-lg" />
@@ -540,6 +555,17 @@ const TableDataPelatihan: React.FC = () => {
                               }
                               suratPemberitahuan={pelatihan?.SuratPemberitahuan}
                             />
+
+                            {/* Button untuk input nomor sertifikat, akan aktif jika balai pelatihan sudah mengupload BA dan memilih penandatanganan */}
+                            <NoSertifikatButton
+                              idPelatihan={pelatihan!.IdPelatihan.toString()}
+                              pelatihan={pelatihan!}
+                              handleFetchingData={
+                                handleFetchingPublicTrainingData
+                              }
+                            />
+
+
                             <Popover>
                               <PopoverTrigger asChild>
                                 <Button variant="outline"><FiSettings />Actions</Button>
@@ -567,7 +593,7 @@ const TableDataPelatihan: React.FC = () => {
                                       <HiUserGroup className="h-5 w-5 " /> Peserta
                                       Pelatihan
                                     </Link>
-                                    {pelatihan!.TanggalMulaiPelatihan == "" && (
+                                    {(pelatihan!.TanggalMulaiPelatihan == "" && pelatihan!.StatusApproval != 'Selesai') && (
                                       <Button
                                         onClick={() => {
                                           setOpenFormEditPelatihan(true);

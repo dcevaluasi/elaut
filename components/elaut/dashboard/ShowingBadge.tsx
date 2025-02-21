@@ -19,17 +19,6 @@ const ShowingBadge = ({ data, isFlying }: { data: PelatihanMasyarakat, isFlying?
             )
         }
 
-
-        {data!.TtdSertifikat !=
-            "" && (
-                <Badge
-                    variant="outline"
-                    className={`${isFlying && 'top-4 right-4 absolute'} cursor-pointer  bg-yellow-300 text-neutral-800 hover:bg-yellow-400`}
-                >
-                    Pengajuan Penerbitan Sedang Diverifikasi
-                </Badge>
-            )}
-
         {data!.StatusPenerbitan ==
             "" && (
                 <Badge

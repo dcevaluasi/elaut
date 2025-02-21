@@ -67,7 +67,7 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
     formData.append("TtdSertifikat", ttdSertifikat);
 
     const updateData = new FormData();
-    updateData.append("PemberitahuanDiterima", "Sedang diproses pusat");
+    updateData.append("PemberitahuanDiterima", "Input no sertifikat");
     if (beritaAcara) {
       updateData.append("BeritaAcara", beritaAcara);
     }
@@ -327,7 +327,7 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
             }}
             variant="outline"
             title="Pengajuan Penerbitan"
-            className="ml-auto bg-blue-600 hover:bg-blue-600 duration-700 text-neutral-100 hover:text-neutral-100"
+            className="ml-auto w-full bg-blue-600 hover:bg-blue-600 duration-700 text-neutral-100 hover:text-neutral-100"
           >
             <RiVerifiedBadgeFill className="h-5 w-5" /> Pengajuan Penerbitan
           </Button>
