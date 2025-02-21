@@ -88,6 +88,7 @@ import { elautBaseUrl } from "@/constants/urls";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { generateTanggalPelatihan } from "@/utils/text";
+import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 
 const TableDataPesertaPelatihan = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -872,116 +873,7 @@ const TableDataPesertaPelatihan = () => {
               </div>
               <div className=" flex">
                 {dataPelatihan != null ? (
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      {dataPelatihan != null
-                        ? (dataPelatihan!.StatusPenerbitan != "" && dataPelatihan!.NoSertifikat != '') && (
-                          <Badge
-                            variant="outline"
-                            className={`w-fit flex items-center cursor-pointer justify-center ${dataPelatihan!.StatusPenerbitan == "On Progress"
-                              ? " bg-yellow-300 text-neutral-800"
-                              : " bg-green-500 text-white"
-                              }`}
-                          >
-                            {dataPelatihan!.StatusPenerbitan!}{" "}
-                            {usePathname().includes("lemdiklat")
-                              ? "Pengajuan Sertifikat"
-                              : "Penerbitan"}
-                          </Badge>
-                        )
-                        : null}
-                    </AlertDialogTrigger>
-                    <AlertDialogContent className="flex flex-col items-center justify-center !w-[420px]">
-                      <AlertDialogHeader>
-                        <AlertDialogTitle className="w-full flex gap-2 items-center justify-center flex-col">
-                          <div className="w-24 h-24 rounded-full bg-gradient-to-b from-gray-200 via-whiter to-white flex items-center justify-center animate-pulse">
-                            <div className="w-16 h-16 rounded-full  bg-gradient-to-b from-gray-300 via-whiter to-white flex items-center justify-center animate-pulse">
-                              {dataPelatihan!.StatusPenerbitan ==
-                                "On Progress" ? (
-                                <RiProgress3Line className="h-12 w-12 text-yellow-400" />
-                              ) : (
-                                <RiVerifiedBadgeFill className="h-12 w-12 text-green-500" />
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="flex flex-col gap-1 w-full justify-center items-center">
-                            <h1 className="font-bold text-xl">
-                              {dataPelatihan!.StatusPenerbitan}
-                            </h1>
-                            <AlertDialogDescription className="w-full text-center font-normal text-sm -mt-1">
-                              {dataPelatihan!.StatusPenerbitan == "On Progress"
-                                ? "Pengajuan penerbitan sertifikat telah masuk untuk diproses penandatanganan, harap tindak lanjut pengajuan berikut dalam kurun waktu 1x24 jam!"
-                                : "Pengajuan penerbitan telah berhasil dan sertifikat telah terbit dengan ditandatangani anda sebagai" +
-                                dataPelatihan!.TtdSertifikat}
-                            </AlertDialogDescription>
-                          </div>
-                        </AlertDialogTitle>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter className="w-full">
-                        <div className="flex-col flex w-full">
-                          <div className="flex flex-wrap  border-b py-2 border-b-gray-300 w-full">
-                            <div className="w-full">
-                              <label
-                                className="block text-sm text-gray-800  font-medium mb-1"
-                                htmlFor="name"
-                              >
-                                No Sertifikat{" "}
-                              </label>
-                              <p className="text-gray-600 text-sm -mt-1">
-                                {dataPelatihan?.NoSertifikat}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex flex-wrap border-b py-2 border-b-gray-300 w-full">
-                            <div className="w-full">
-                              <label
-                                className="block text-sm text-gray-800 font-medium mb-1"
-                                htmlFor="name"
-                              >
-                                Pelatihan{" "}
-                              </label>
-                              <p className="text-gray-600 text-sm -mt-1">
-                                {dataPelatihan?.NamaPelatihan}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex flex-wrap border-b py-2 border-b-gray-300 w-full">
-                            <div className="w-full">
-                              <label
-                                className="block text-sm text-gray-800 font-medium mb-1"
-                                htmlFor="name"
-                              >
-                                Bidang Pelatihan{" "}
-                              </label>
-                              <p className="text-gray-600 text-sm -mt-1">
-                                {dataPelatihan?.BidangPelatihan}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex flex-wrap border-b py-2 border-b-gray-300 w-full">
-                            <div className="w-full">
-                              <label
-                                className="block text-sm text-gray-800 font-medium mb-1"
-                                htmlFor="name"
-                              >
-                                Tanggal Penandatangan{" "}
-                              </label>
-                              <p className="text-gray-600 text-sm -mt-1">
-                                {generateTanggalPelatihan(
-                                  dataPelatihan?.PenerbitanSertifikatDiterima!
-                                )}
-                              </p>
-                            </div>
-                          </div>
-
-                          <AlertDialogAction className="py-5 mt-4">
-                            Close
-                          </AlertDialogAction>
-                        </div>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                  <ShowingBadge data={dataPelatihan} />
                 ) : (
                   <></>
                 )}

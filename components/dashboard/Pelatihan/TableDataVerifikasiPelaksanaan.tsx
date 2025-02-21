@@ -71,6 +71,7 @@ import {
 import Toast from "@/components/toast";
 import VerifikasiButton from "../Dashboard/Actions/VerifikasiButton";
 import { encryptValue } from "@/lib/utils";
+import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 
 const TableDataVerifikasiPelaksanaan: React.FC = () => {
   const [data, setData] = React.useState<PelatihanMasyarakat[]>([]);
@@ -159,8 +160,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
 
     try {
       const response = await axios.put(
-        `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${
-          selectedPelatihan!.IdPelatihan
+        `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${selectedPelatihan!.IdPelatihan
         }`,
         formData,
         {
@@ -436,124 +436,9 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
               </div>
             </div>
           ) : (
-            filteredData.map((pelatihan, index) => (
+            filteredData.map((pelatihan: PelatihanMasyarakat, index: number) => (
               <Card key={index} className="relative">
-                {pelatihan != null ? (
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      {pelatihan!.StatusPenerbitan ==
-                        "Verifikasi Pelaksanaan" && (
-                        <Badge
-                          variant="outline"
-                          className={`top-4 right-4 absolute cursor-pointer ${
-                            pelatihan!.StatusPenerbitan ==
-                            "Verifikasi Pelaksanaan"
-                              ? " bg-yellow-300 text-neutral-800 hover:bg-yellow-400"
-                              : " bg-green-500 text-white hover:bg-green-600"
-                          }`}
-                        >
-                          {pelatihan!.StatusPenerbitan ==
-                          "Verifikasi Pelaksanaan"
-                            ? "Perlu Diverifikasi"
-                            : "Sudah Diverifikasi"}
-                        </Badge>
-                      )}
-                    </AlertDialogTrigger>
-                    <AlertDialogContent className="flex flex-col items-center justify-center !w-[420px]">
-                      <AlertDialogHeader>
-                        <AlertDialogTitle className="w-full flex gap-2 items-center justify-center flex-col">
-                          <div className="w-24 h-24 rounded-full bg-gradient-to-b from-gray-200 via-whiter to-white flex items-center justify-center animate-pulse">
-                            <div className="w-16 h-16 rounded-full  bg-gradient-to-b from-gray-300 via-whiter to-white flex items-center justify-center animate-pulse">
-                              {pelatihan!.StatusPenerbitan == "On Progress" ? (
-                                <RiProgress3Line className="h-12 w-12 text-yellow-400" />
-                              ) : (
-                                <RiVerifiedBadgeFill className="h-12 w-12 text-green-500" />
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="flex flex-col gap-1 w-full justify-center items-center">
-                            <h1 className="font-bold text-xl">
-                              {pelatihan!.StatusPenerbitan}
-                            </h1>
-                            <AlertDialogDescription className="w-full text-center font-normal text-sm -mt-1">
-                              {pelatihan!.StatusPenerbitan == "On Progress"
-                                ? "Pengajuan penerbitan sertifikat sedang dalam proses, harap dapat menunggu 1x24 jam dalam dan kembali lagi untuk mencek status!"
-                                : "Pengajuan penerbitan sertifikat sudah diproses dan telah ditandangani oleh" +
-                                  pelatihan!.TtdSertifikat}
-                            </AlertDialogDescription>
-                          </div>
-                        </AlertDialogTitle>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter className="w-full">
-                        <div className="flex-col flex w-full">
-                          <div className="flex flex-wrap  border-b py-2 border-b-gray-300 w-full">
-                            <div className="w-full">
-                              <label
-                                className="block text-sm text-gray-800  font-medium mb-1"
-                                htmlFor="name"
-                              >
-                                No Sertifikat{" "}
-                              </label>
-                              <p className="text-gray-600 text-sm -mt-1">
-                                {pelatihan?.NoSertifikat}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex flex-wrap border-b py-2 border-b-gray-300 w-full">
-                            <div className="w-full">
-                              <label
-                                className="block text-sm text-gray-800 font-medium mb-1"
-                                htmlFor="name"
-                              >
-                                Pelatihan{" "}
-                              </label>
-                              <p className="text-gray-600 text-sm -mt-1">
-                                {pelatihan?.NamaPelatihan}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex flex-wrap border-b py-2 border-b-gray-300 w-full">
-                            <div className="w-full">
-                              <label
-                                className="block text-sm text-gray-800 font-medium mb-1"
-                                htmlFor="name"
-                              >
-                                Bidang Pelatihan{" "}
-                              </label>
-                              <p className="text-gray-600 text-sm -mt-1">
-                                {pelatihan?.BidangPelatihan}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex flex-wrap border-b py-2 border-b-gray-300 w-full">
-                            <div className="w-full">
-                              <label
-                                className="block text-sm text-gray-800 font-medium mb-1"
-                                htmlFor="name"
-                              >
-                                Tanggal Penandatangan{" "}
-                              </label>
-                              <p className="text-gray-600 text-sm -mt-1">
-                                {pelatihan?.PenerbitanSertifikatDiterima != ""
-                                  ? generateTanggalPelatihan(
-                                      pelatihan?.PenerbitanSertifikatDiterima
-                                    )
-                                  : "-"}
-                              </p>
-                            </div>
-                          </div>
-
-                          <AlertDialogAction className="py-5 mt-4">
-                            Close
-                          </AlertDialogAction>
-                        </div>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                ) : (
-                  <></>
-                )}
+                <ShowingBadge data={pelatihan} isFlying={true} />
 
                 <CardHeader>
                   <CardTitle>{pelatihan!.NamaPelatihan}</CardTitle>
@@ -573,7 +458,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
                           </span>
                         </span>
                         {pelatihan!.TanggalMulaiPendaftaran == "" ||
-                        pelatihan!.TanggalBerakhirPendaftaran == "" ? (
+                          pelatihan!.TanggalBerakhirPendaftaran == "" ? (
                           <></>
                         ) : (
                           <span className="flex items-center gap-1 leading-[105%]">
@@ -626,7 +511,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
                     <div className="flex items-center w-fit  gap-1   -mt-2">
                       <Link
                         title="Detail Pelatihan"
-                        href={`/admin/pusat/pelatihan/detail/${pelatihan.KodePelatihan}/${pelatihan.IdPelatihan}`}
+                        href={`/admin/pusat/pelatihan/detail/${pelatihan.KodePelatihan}/${encryptValue(pelatihan.IdPelatihan)}`}
                         className="border border-neutral-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-neutral-900 hover:bg-neutral-900 hover:text-white text-white rounded-md"
                       >
                         <RiInformationFill className="h-5 w-5" /> Detail
@@ -638,35 +523,27 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
                         suratPemberitahuan={pelatihan?.SuratPemberitahuan}
                       />
 
-                      <Link
-                        title="Bank Soal"
-                        href={`/admin/pusat/pelatihan/${
-                          pelatihan!.KodePelatihan
-                        }/bank-soal/${encryptValue(pelatihan!.IdPelatihan)}`}
-                        className="border border-blue-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-blue-900 hover:bg-blue-900 hover:text-white text-white rounded-md"
-                      >
-                        <TbDatabase className="h-5 w-5" /> Bank Soal
-                      </Link>
+                      {
+                        (pelatihan!.UjiKompotensi == "Ujian Pre-test dan Post-test" && pelatihan!.StatusApproval != 'Selesai' && pelatihan!.StatusPenerbitan == 'Sudah Diverifikasi Pelaksanaan' && pelatihan!.PenyelenggaraPelatihan == 'Pusat Pelatihan KP') && <Link
+                          title="Bank Soal"
+                          href={`/admin/pusat/pelatihan/${pelatihan!.KodePelatihan
+                            }/bank-soal/${encryptValue(pelatihan!.IdPelatihan)}`}
+                          className="border border-blue-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-blue-900 hover:bg-blue-900 hover:text-white text-white rounded-md"
+                        >
+                          <TbDatabase className="h-5 w-5" /> Bank Soal
+                        </Link>}
+
 
                       {pelatihan!.StatusPenerbitan ==
                         "Verifikasi Pelaksanaan" && (
-                        <VerifikasiButton
-                          title="Verifikasi"
-                          statusPelatihan={pelatihan?.StatusPenerbitan ?? ""}
-                          idPelatihan={pelatihan!.IdPelatihan.toString()}
-                          handleFetchingData={handleFetchingPublicTrainingData}
-                        />
-                      )}
+                          <VerifikasiButton
+                            title="Verifikasi"
+                            statusPelatihan={pelatihan?.StatusPenerbitan ?? ""}
+                            idPelatihan={pelatihan!.IdPelatihan.toString()}
+                            handleFetchingData={handleFetchingPublicTrainingData}
+                          />
+                        )}
 
-                      {pelatihan!.StatusPenerbitan ==
-                        "Sudah Diverifikasi Pelaksanaan" && (
-                        <VerifikasiButton
-                          title="Unverifikasi"
-                          statusPelatihan={pelatihan?.StatusPenerbitan ?? ""}
-                          idPelatihan={pelatihan!.IdPelatihan.toString()}
-                          handleFetchingData={handleFetchingPublicTrainingData}
-                        />
-                      )}
                     </div>
                     <p className="italic text-neutral-400 text-[0.6rem]">
                       Created at {pelatihan!.CreateAt} | Updated at{" "}
@@ -696,19 +573,18 @@ const StatusButton = ({
 }) => (
   <button
     onClick={onClick}
-    className={`focus:outline-none p-2 border ${
-      isSelected ? "bg-blue-500 text-white" : "bg-white text-black"
-    }`}
+    className={`focus:outline-none p-2 border ${isSelected ? "bg-blue-500 text-white" : "bg-white text-black"
+      }`}
   >
     <p className="font-semibold text-lg">{count}</p>
     <p
-      className={`uppercase text-sm ${
-        isSelected ? "font-bold" : "text-gray-600"
-      }`}
+      className={`uppercase text-sm ${isSelected ? "font-bold" : "text-gray-600"
+        }`}
     >
       {label}
     </p>
   </button>
 );
+
 
 export default TableDataVerifikasiPelaksanaan;

@@ -75,8 +75,10 @@ import GenerateNoSertifikatButton from "./Actions/GenerateNoSertifikatButton";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 
 function DetailPelatihan() {
+  const isAdminBalaiPelatihan: boolean = usePathname().includes('lemdiklat')
   const paths = usePathname().split("/");
   const idPelatihan = decryptValue(paths[paths.length - 1]);
   const kodePelatihan = paths[paths.length - 2];
@@ -107,7 +109,7 @@ function DetailPelatihan() {
   const typeRole = Cookies.get("XSRF093");
 
   return (
-    <section className="">
+    <section className="pb-20">
       <div className="flex flex-col w-full">
         <div className="flex flex-row gap-2 items-center">
           <header
@@ -140,7 +142,7 @@ function DetailPelatihan() {
           <div className="px-4 w-full">
             <div className="w-full border border-gray-200 rounded-xl">
               <div className="bg-gray-100 p-4 w-full ">
-                <h2 className="font-bold font-calsans text-xl">
+                <h2 className="font-calsans text-xl">
                   Informasi Pelatihan
                 </h2>
               </div>
@@ -181,7 +183,7 @@ function DetailPelatihan() {
                   </td>
                   <td className="p-4 w-2/3">
                     {pelatihan.TanggalMulaiPelatihan !== "" &&
-                    pelatihan.TanggalBerakhirPelatihan !== "" ? (
+                      pelatihan.TanggalBerakhirPelatihan !== "" ? (
                       <>
                         {generateTanggalPelatihan(
                           pelatihan.TanggalMulaiPelatihan
@@ -213,6 +215,14 @@ function DetailPelatihan() {
                   </td>
                 </tr>
                 <tr className="border-b border-b-gray-200 w-full">
+                  <td className="font-semibold p-4 w-[20%]">
+                    Program dan Jenis Program
+                  </td>
+                  <td className="p-4 w-2/3">
+                    {pelatihan!.JenisProgram || ""} &  {pelatihan!.Program || ""}
+                  </td>
+                </tr>
+                <tr className="border-b border-b-gray-200 w-full">
                   <td className="font-semibold p-4 w-[20%]">Jenis Pelatihan</td>
                   <td className="p-4 w-2/3">
                     {pelatihan!.JenisPelatihan || ""}
@@ -226,6 +236,14 @@ function DetailPelatihan() {
                     {pelatihan!.BidangPelatihan || ""}
                   </td>
                 </tr>
+                <tr className="border-b border-b-gray-200 w-full">
+                  <td className="font-semibold p-4 w-[20%]">
+                    Surat Pemberitahuan
+                  </td>
+                  <td className="p-4 w-2/3">
+                    {pelatihan!.SuratPemberitahuan || ""}
+                  </td>
+                </tr>
               </table>
             </div>
           </div>
@@ -234,7 +252,7 @@ function DetailPelatihan() {
           <div className="px-4 w-full">
             <div className=" w-full border border-gray-200 rounded-xl">
               <div className="bg-gray-100 p-4 w-full ">
-                <h2 className="font-bold font-calsans text-xl">
+                <h2 className="font-calsans text-xl">
                   Informasi Penerbitan Sertifikat
                 </h2>
               </div>
@@ -264,125 +282,24 @@ function DetailPelatihan() {
                   </td>
                 </tr>
                 <tr className="border-b border-b-gray-200 w-full">
+                  <td className="font-semibold p-4 w-[20%]">Dokumen Permohonan Penerbitan</td>
+                  <td className="p-4 w-2/3">
+                    <Link
+                      target="_blank"
+                      className="text-blue-500 underline"
+                      href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/beritaAcara/pelatihan/${pelatihan!.BeritaAcara
+                        }`}
+                    >
+                      {pelatihan!.BeritaAcara}
+                    </Link>
+                  </td>
+                </tr>
+                <tr className="border-b border-b-gray-200 w-full">
                   <td className="font-semibold p-4 w-[20%]">
                     Status Penerbitan
                   </td>
-                  <td className="p-4 w-2/3 flex items-center">
-                    {pelatihan != null ? (
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          {pelatihan != null
-                            ? pelatihan!.StatusPenerbitan != "" && (
-                                <Badge
-                                  variant="outline"
-                                  className={`w-fit flex items-center cursor-pointer justify-center ${
-                                    pelatihan!.StatusPenerbitan == "On Progress"
-                                      ? " bg-yellow-300 text-neutral-800"
-                                      : " bg-green-500 text-white"
-                                  }`}
-                                >
-                                  {pelatihan!.StatusPenerbitan!}{" "}
-                                  {usePathname().includes("lemdiklat")
-                                    ? "Pengajuan Sertifikat"
-                                    : "Penerbitan"}
-                                </Badge>
-                              )
-                            : null}
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="flex flex-col items-center justify-center !w-[420px]">
-                          <AlertDialogHeader>
-                            <AlertDialogTitle className="w-full flex gap-2 items-center justify-center flex-col">
-                              <div className="w-24 h-24 rounded-full bg-gradient-to-b from-gray-200 via-whiter to-white flex items-center justify-center animate-pulse">
-                                <div className="w-16 h-16 rounded-full  bg-gradient-to-b from-gray-300 via-whiter to-white flex items-center justify-center animate-pulse">
-                                  {pelatihan!.StatusPenerbitan ==
-                                  "On Progress" ? (
-                                    <RiProgress3Line className="h-12 w-12 text-yellow-400" />
-                                  ) : (
-                                    <RiVerifiedBadgeFill className="h-12 w-12 text-green-500" />
-                                  )}
-                                </div>
-                              </div>
-
-                              <div className="flex flex-col gap-1 w-full justify-center items-center">
-                                <h1 className="font-bold text-xl">
-                                  {pelatihan!.StatusPenerbitan}
-                                </h1>
-                                <AlertDialogDescription className="w-full text-center font-normal text-sm -mt-1">
-                                  {pelatihan!.StatusPenerbitan == "On Progress"
-                                    ? "Pengajuan penerbitan sertifikat telah masuk untuk diproses penandatanganan, harap tindak lanjut pengajuan berikut dalam kurun waktu 1x24 jam!"
-                                    : "Pengajuan penerbitan telah berhasil dan sertifikat telah terbit dengan ditandatangani anda sebagai" +
-                                      pelatihan!.TtdSertifikat}
-                                </AlertDialogDescription>
-                              </div>
-                            </AlertDialogTitle>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter className="w-full">
-                            <div className="flex-col flex w-full">
-                              <div className="flex flex-wrap  border-b py-2 border-b-gray-300 w-full">
-                                <div className="w-full">
-                                  <label
-                                    className="block text-sm text-gray-800  font-medium mb-1"
-                                    htmlFor="name"
-                                  >
-                                    No Sertifikat{" "}
-                                  </label>
-                                  <p className="text-gray-600 text-sm -mt-1">
-                                    {pelatihan?.NoSertifikat}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="flex flex-wrap border-b py-2 border-b-gray-300 w-full">
-                                <div className="w-full">
-                                  <label
-                                    className="block text-sm text-gray-800 font-medium mb-1"
-                                    htmlFor="name"
-                                  >
-                                    Pelatihan{" "}
-                                  </label>
-                                  <p className="text-gray-600 text-sm -mt-1">
-                                    {pelatihan?.NamaPelatihan}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="flex flex-wrap border-b py-2 border-b-gray-300 w-full">
-                                <div className="w-full">
-                                  <label
-                                    className="block text-sm text-gray-800 font-medium mb-1"
-                                    htmlFor="name"
-                                  >
-                                    Bidang Pelatihan{" "}
-                                  </label>
-                                  <p className="text-gray-600 text-sm -mt-1">
-                                    {pelatihan?.BidangPelatihan}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="flex flex-wrap border-b py-2 border-b-gray-300 w-full">
-                                <div className="w-full">
-                                  <label
-                                    className="block text-sm text-gray-800 font-medium mb-1"
-                                    htmlFor="name"
-                                  >
-                                    Tanggal Penandatangan{" "}
-                                  </label>
-                                  <p className="text-gray-600 text-sm -mt-1">
-                                    {generateTanggalPelatihan(
-                                      pelatihan?.PenerbitanSertifikatDiterima!
-                                    )}
-                                  </p>
-                                </div>
-                              </div>
-
-                              <AlertDialogAction className="py-5 mt-4">
-                                Close
-                              </AlertDialogAction>
-                            </div>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    ) : (
-                      <></>
-                    )}
+                  <td className="py-7 px-5 flex items-center">
+                    <ShowingBadge data={pelatihan} isFlying={false} />
                   </td>
                 </tr>
               </table>
@@ -395,7 +312,7 @@ function DetailPelatihan() {
         <div className="px-4 w-full mt-5">
           <div className="w-full border border-gray-200 rounded-xl">
             <div className="bg-gray-100 p-4 w-full ">
-              <h2 className="font-bold font-calsans text-xl">
+              <h2 className="font-calsans text-xl">
                 Informasi Pendaftaran
               </h2>
             </div>
@@ -448,7 +365,7 @@ function DetailPelatihan() {
         <div className="px-4 w-full mt-5">
           <div className="w-full border border-gray-200 rounded-xl">
             <div className="bg-gray-100 p-4 w-full ">
-              <h2 className="font-bold font-calsans text-xl">
+              <h2 className="font-calsans text-xl">
                 Informasi Teknis Pelatihan
               </h2>
             </div>
@@ -499,48 +416,41 @@ function DetailPelatihan() {
                   <Link
                     target="_blank"
                     className="text-blue-500 underline"
-                    href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/silabus/pelatihan/${
-                      pelatihan!.SilabusPelatihan
-                    }`}
+                    href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/silabus/pelatihan/${pelatihan!.SilabusPelatihan
+                      }`}
                   >
                     {pelatihan!.SilabusPelatihan}
                   </Link>
                 </td>
               </tr>
-              {typeRole != "satdik" ? (
-                pelatihan?.UjiKompotensi != "Ujian Pre-test dan Post-test" ? (
-                  <></>
-                ) : (
-                  <tr className="border-b border-b-gray-200 w-full">
-                    <td className="font-semibold p-4 w-[20%]">
-                      Bank Soal Pelatihan
-                    </td>
-                    <td className="p-4 w-2/3">
-                      <Link
-                        target="_blank"
-                        className="text-blue-500 underline flex gap-2 items-center"
-                        href={`/admin/${
-                          Cookies.get("XSRF093") == "satdik" ||
-                          Cookies.get("XSRF093") == "balai"
-                            ? "lemdiklat"
-                            : "pusat"
-                        }/pelatihan/${pelatihan!.KodePelatihan}/bank-soal/${
-                          pelatihan!.IdPelatihan
-                        }`}
-                      >
-                        <FiUploadCloud />
-                        Upload Bank Soal
-                      </Link>
-                    </td>
-                  </tr>
-                )
-              ) : (
-                <></>
-              )}
             </table>
           </div>
         </div>
       )}
+
+      {
+        isAdminBalaiPelatihan && <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <div className="px-4">
+              <Button variant="outline" className="w-full mt-5 py-5 text-base bg-neutral-900 hover:bg-neutral-950 text-white hover:text-white">Verifikasi Pengajuan Penerbitan</Button>
+            </div>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete your
+                account and remove your data from our servers.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction>Continue</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      }
+
     </section>
   );
 }
