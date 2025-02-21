@@ -153,7 +153,7 @@ const ChartMasyarakatDilatihMonthly: React.FC<{
       return dataUserPelatihan
         .filter(
           (item) =>
-            getMonthFromDateString(item.TanggalMulai!) === month
+            getMonthFromDateString(item.CreteAt!) === month
         )
         .length;
     });
