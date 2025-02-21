@@ -63,4 +63,7 @@ export type UserPelatihan = {
   CodeAksess: string
   Provinsi: string
   TempatTanggalLahir: string
+  JenisProgram: string
+  Program: string
+  DukunganProgramPrioritas: string
 }
