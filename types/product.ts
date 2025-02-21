@@ -76,6 +76,7 @@ export type PelatihanMasyarakat = {
   Program: string
   JenisProgram: string
   IsSematkan: string
+  IsMengajukanPenerbitan?: string
 }
 
 export type DetailPelatihanMasyarakat = {

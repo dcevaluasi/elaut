@@ -37,12 +37,13 @@ import Cookies from "js-cookie";
 import { AiFillSignature } from "react-icons/ai";
 import { MdOutlinePodcasts } from "react-icons/md";
 import { Badge } from "@/components/ui/badge";
+import { decryptValue } from "@/lib/utils";
 
 const DetailPelatihan: React.FC = () => {
   const [dataPelatihan, setDataPelatihan] =
     React.useState<PelatihanMasyarakat | null>(null);
 
-  const idPelatihan = getNumberFromURLDetailPelatihanAdmin(usePathname());
+  const idPelatihan = decryptValue(getNumberFromURLDetailPelatihanAdmin(usePathname())!.toString());
   const handleFetchPelatihanById = async () => {
     try {
       const response = await axios.get(
@@ -86,7 +87,7 @@ const DetailPelatihan: React.FC = () => {
           {
             idPelatihan: idPelatihan?.toString(),
             kodeParafrase: passphrase,
-            nik: "0803202100007062",
+            nik: Cookies.get('NIK'),
           },
           {
             headers: {
@@ -198,20 +199,19 @@ const DetailPelatihan: React.FC = () => {
             <div className="w-full flex justify-end">
               {dataPelatihan != null
                 ? dataPelatihan!.StatusPenerbitan != "" && (
-                    <Badge
-                      variant="outline"
-                      className={`w-fit flex items-center justify-center ${
-                        dataPelatihan!.StatusPenerbitan == "On Progress"
-                          ? " bg-yellow-300 text-neutral-800"
-                          : " bg-green-500 text-white text-base"
+                  <Badge
+                    variant="outline"
+                    className={`w-fit flex items-center justify-center ${dataPelatihan!.StatusPenerbitan == "On Progress"
+                      ? " bg-yellow-300 text-neutral-800"
+                      : " bg-green-500 text-white text-base"
                       }`}
-                    >
-                      {dataPelatihan!.StatusPenerbitan!}{" "}
-                      {usePathname().includes("lemdiklat")
-                        ? "Pengajuan Sertifikat"
-                        : "Penerbitan"}
-                    </Badge>
-                  )
+                  >
+                    {dataPelatihan!.StatusPenerbitan!}{" "}
+                    {usePathname().includes("lemdiklat")
+                      ? "Pengajuan Sertifikat"
+                      : "Penerbitan"}
+                  </Badge>
+                )
                 : null}
             </div>
           </header>
@@ -368,12 +368,12 @@ const DetailPelatihan: React.FC = () => {
                 placeholder={
                   dataPelatihan != null
                     ? generateTanggalPelatihan(
-                        dataPelatihan!.TanggalMulaiPelatihan
-                      ) +
-                      " - " +
-                      generateTanggalPelatihan(
-                        dataPelatihan!.TanggalBerakhirPelatihan
-                      )
+                      dataPelatihan!.TanggalMulaiPelatihan
+                    ) +
+                    " - " +
+                    generateTanggalPelatihan(
+                      dataPelatihan!.TanggalBerakhirPelatihan
+                    )
                     : "-"
                 }
               />
@@ -399,10 +399,10 @@ const DetailPelatihan: React.FC = () => {
                 placeholder={
                   dataPelatihan != null
                     ? dataPelatihan!.PenyelenggaraPelatihan +
-                      " - " +
-                      generateFullNameBalai(
-                        dataPelatihan!.PenyelenggaraPelatihan
-                      )
+                    " - " +
+                    generateFullNameBalai(
+                      dataPelatihan!.PenyelenggaraPelatihan
+                    )
                     : "-"
                 }
               />
@@ -487,8 +487,8 @@ const DetailPelatihan: React.FC = () => {
                 dataPelatihan != null
                   ? dataPelatihan!.SuratPemberitahuan != ""
                     ? fileBaseUrl +
-                      "/suratPemberitahuan/" +
-                      dataPelatihan!.SuratPemberitahuan
+                    "/suratPemberitahuan/" +
+                    dataPelatihan!.SuratPemberitahuan
                     : "-"
                   : "-"
               }
@@ -498,8 +498,8 @@ const DetailPelatihan: React.FC = () => {
               {dataPelatihan != null
                 ? dataPelatihan!.SuratPemberitahuan != ""
                   ? fileBaseUrl +
-                    "/suratPemberitahuan/" +
-                    dataPelatihan!.SuratPemberitahuan
+                  "/suratPemberitahuan/" +
+                  dataPelatihan!.SuratPemberitahuan
                   : "File tidak tersedia"
                 : "File tidak Tersesdia"}
             </Link>

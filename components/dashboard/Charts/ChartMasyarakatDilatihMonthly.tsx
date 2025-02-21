@@ -1,12 +1,13 @@
 "use client";
 
 import { elautBaseUrl } from "@/constants/urls";
-import { BlankoKeluar } from "@/types/blanko";
 import { PelatihanMasyarakat } from "@/types/product";
 import { UserPelatihan } from "@/types/user";
 import { formatDateTime, getMonthFromDateString } from "@/utils";
 import { ApexOptions } from "apexcharts";
 import axios, { AxiosResponse } from "axios";
+import Cookies from "js-cookie";
+import { usePathname } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import ReactApexChart from "react-apexcharts";
 
@@ -80,8 +81,6 @@ const chartOptions: ApexOptions = {
   },
   yaxis: {
     title: { style: { fontSize: "0px" } },
-    // min: 0,
-    // max: 100,
   },
 };
 
@@ -90,9 +89,13 @@ const ChartMasyarakatDilatihMonthly: React.FC<{
   dataUser: UserPelatihan[];
 }> = ({ data, dataUser }) => {
   const [dataPelatihan, setDataPelatihan] = useState<PelatihanMasyarakat[]>([]);
+  const [dataUserPelatihan, setDataUserPelatihan] = useState<UserPelatihan[]>([])
   const [dataTotalMasyarakatDilatih, setDataTotalMasyarakatDilatih] =
     useState<number>(0);
   const [isFetching, setIsFetching] = useState<boolean>(false);
+
+  const isAdminBalaiPelatihan = Cookies.get('XSRF093') == 'balai'
+  const nameBalaiPelatihan = Cookies.get('SATKER_BPPP')
 
   const fetchPublicTrainingData = async () => {
     setIsFetching(true);
@@ -100,19 +103,27 @@ const ChartMasyarakatDilatihMonthly: React.FC<{
       const response: AxiosResponse = await axios.get(
         `${elautBaseUrl}/lemdik/getPelatihan`
       );
-      const filteredData = response.data.data.filter(
-        (item: PelatihanMasyarakat) => item.JumlahPeserta! > 0
-      );
-      const totalMasyarakatDilatih = filteredData.reduce(
-        (sum: any, item: any) => sum + item.JumlahPeserta,
-        0
-      );
 
-      const filteredDataUser = dataUser.filter(
+      let filteredDataUser = dataUser.filter(
         (item: UserPelatihan) => item.FileSertifikat! != ''
       ).length;
 
-      setDataPelatihan(response.data.data);
+      let filteredDataPelatihan = response.data.data
+      let filteredDataUserPelatihan = dataUser.filter((item: UserPelatihan) => item.FileSertifikat != '')
+
+      if (isAdminBalaiPelatihan) {
+        filteredDataUser = dataUser.filter(
+          (item: UserPelatihan) => item.FileSertifikat! != '' && item.PenyelenggaraPelatihan == nameBalaiPelatihan
+        ).length;
+      }
+
+      if (isAdminBalaiPelatihan) {
+        filteredDataPelatihan = response.data.data.filter((item: PelatihanMasyarakat) => item.PenyelenggaraPelatihan == nameBalaiPelatihan)
+        filteredDataUserPelatihan = dataUser.filter((item: UserPelatihan) => item.PenyelenggaraPelatihan == nameBalaiPelatihan && item.FileSertifikat != '')
+      }
+
+      setDataPelatihan(filteredDataPelatihan);
+      setDataUserPelatihan(filteredDataUserPelatihan)
       setDataTotalMasyarakatDilatih(filteredDataUser);
     } catch (error) {
       console.error(error);
@@ -121,23 +132,30 @@ const ChartMasyarakatDilatihMonthly: React.FC<{
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetchPublicTrainingData();
-  }, []);
+  }, [dataPelatihan, dataUserPelatihan]);
 
-  const calculateMonthlyData = (key: keyof PelatihanMasyarakat) => {
+  const calculateMonthlyDataPelatihan = (key: keyof PelatihanMasyarakat) => {
     return Array.from({ length: 12 }, (_, i) => {
       const month = (i + 1).toString().padStart(2, "0");
-      return data
+      return dataPelatihan
         .filter(
           (item) =>
             getMonthFromDateString(item.TanggalMulaiPelatihan!) === month
+        ).length;
+    });
+  };
+
+  const calculateMonthlyDataUserPelatihan = (key: keyof UserPelatihan) => {
+    return Array.from({ length: 12 }, (_, i) => {
+      const month = (i + 1).toString().padStart(2, "0");
+      return dataUserPelatihan
+        .filter(
+          (item) =>
+            getMonthFromDateString(item.TanggalMulai!) === month
         )
-        .reduce(
-          (total, item) =>
-            total + (key === "JumlahPeserta" ? item.JumlahPeserta! : 1),
-          0
-        );
+        .length;
     });
   };
 
@@ -163,7 +181,7 @@ const ChartMasyarakatDilatihMonthly: React.FC<{
               </span>
               <div className="w-full">
                 <p className="font-semibold text-primary">Total Pelatihan</p>
-                <p className="text-sm font-medium">{data.length} Pelatihan</p>
+                <p className="text-sm font-medium">{dataPelatihan.length} Pelatihan</p>
               </div>
             </div>
             <div className="flex w-full">
@@ -175,9 +193,7 @@ const ChartMasyarakatDilatihMonthly: React.FC<{
                   Total Masyarakat Dilatih
                 </p>
                 <p className="text-sm font-medium">
-                  {dataUser.filter(
-                    (item: UserPelatihan) => item.FileSertifikat! != ''
-                  ).length} Orang
+                  {dataTotalMasyarakatDilatih} Orang
                 </p>
               </div>
             </div>
@@ -207,11 +223,11 @@ const ChartMasyarakatDilatihMonthly: React.FC<{
             series={[
               {
                 name: "Total Pelatihan",
-                data: calculateMonthlyData("TanggalMulaiPelatihan"),
+                data: calculateMonthlyDataPelatihan("TanggalMulaiPelatihan"),
               },
               {
                 name: "Total Masyarakat Dilatih",
-                data: calculateMonthlyData("JumlahPeserta"),
+                data: calculateMonthlyDataUserPelatihan("TanggalMulai"),
               },
             ]}
             type="area"

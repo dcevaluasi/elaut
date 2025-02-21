@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import React, { ReactElement, useRef } from "react";
+import React, { ChangeEvent, ReactElement, useRef } from "react";
 import { MdVerified } from "react-icons/md";
 import { Button } from "../ui/button";
 import {
@@ -56,6 +56,8 @@ const SertifikatNonKepelautan = React.forwardRef(
   ) => {
     const [peserta, setPeserta] = React.useState<User | null>(null);
 
+    const [tanggalSertifikat, setTanggalSertifikat] = React.useState<string>('')
+
     const handleFetchDetailPeserta = async () => {
       try {
         const response = await axios.get(
@@ -71,6 +73,8 @@ const SertifikatNonKepelautan = React.forwardRef(
     React.useEffect(() => {
       handleFetchDetailPeserta();
     }, []);
+
+
 
     return (
       <div className=" flex-col gap-8 font-bos">
@@ -182,8 +186,8 @@ const SertifikatNonKepelautan = React.forwardRef(
                       {", "}{" "}
                       {peserta != null
                         ? generateTanggalPelatihanWithoutDay(
-                            peserta?.TanggalLahir
-                          )
+                          peserta?.TanggalLahir
+                        )
                         : "-"}{" "}
                     </td>
                   </tr>
@@ -216,17 +220,31 @@ const SertifikatNonKepelautan = React.forwardRef(
               <div className="flex gap-2 items-center justify-center -mt-2">
                 <div className="flex flex-col font-bos text-center items-center justify-center">
                   <div className="flex w-full flex-col items-cennter mt-2 text-center">
-                    <p className="font-bos text-sm leading-[105%]">
+                    <p className="font-bos text-sm leading-[105%] w-full flex items-center gap-1">
                       Jakarta,{" "}
-                      {generateTanggalPelatihan(
-                        pelatihan?.PenerbitanSertifikatDiterima
-                      )}{" "}
+                      {
+                        pelatihan?.IsMengajukanPenerbitan != '' ? <>{
+                          generateTanggalPelatihan('')}</> : <input
+                          id="tanggalMulaiPelatihan"
+                          type="date"
+                          className="form-input w-full text-black border-gray-300 rounded-md"
+                          required
+                          min={new Date().toISOString().split("T")[0]}
+                          value={tanggalSertifikat}
+                          onChange={(
+                            e: ChangeEvent<HTMLInputElement>
+                          ) =>
+                            setTanggalSertifikat(e.target.value)
+                          }
+                        />
+                      }
+
                       <br /> {pelatihan?.TtdSertifikat}
                     </p>
 
                     <p className=" leading-none font-bosItalic text-[0.65rem]">
                       {pelatihan?.TtdSertifikat ==
-                      "Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan"
+                        "Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan"
                         ? "Chairman of the Agency for Marine and Fisheries Extension and Human Resources Development"
                         : "Director for Marine And Fisheries Training Center"}
                     </p>
@@ -245,7 +263,7 @@ const SertifikatNonKepelautan = React.forwardRef(
 
                   <p className=" font-bosBold text-base">
                     {pelatihan?.TtdSertifikat ==
-                    "Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan"
+                      "Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan"
                       ? "Dr. I Nyoman Radiarta, S.Pi, M.Sc"
                       : "Dr. Lilly Aprilya Pregiwati, S.Pi., M.Si"}
                   </p>
@@ -298,6 +316,7 @@ const SertifikatKepelautan = React.forwardRef(
       }
     };
 
+    const [tanggalSertifikat, setTanggalSertifikat] = React.useState<string>('')
     React.useEffect(() => {
       handleFetchDetailPeserta();
     }, []);
@@ -455,11 +474,25 @@ const SertifikatKepelautan = React.forwardRef(
                   </div>
 
                   <div className="col-span-5 flex items-center text-sm justify-center  p-4 mb-4 -mt-5">
-                    <p>
+                    <p className='w-full flex gap-1 items-center'>
                       Jakarta,{" "}
-                      {generateTanggalPelatihan(
-                        pelatihan?.PenerbitanSertifikatDiterima
-                      )}
+                      {
+                        pelatihan?.IsMengajukanPenerbitan != '' ? <>{
+                          generateTanggalPelatihan('')}</> : <input
+                          id="tanggalMulaiPelatihan"
+                          type="date"
+                          className="form-input w-full text-black border-gray-300 rounded-md"
+                          required
+                          min={new Date().toISOString().split("T")[0]}
+                          value={tanggalSertifikat}
+                          onChange={(
+                            e: ChangeEvent<HTMLInputElement>
+                          ) =>
+                            setTanggalSertifikat(e.target.value)
+                          }
+                        />
+                      }
+
                     </p>
                   </div>
 
@@ -718,9 +751,8 @@ export function DialogSertifikatPelatihan({
                     Print Sertifikat
                   </Button>
                   <Link
-                    href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${
-                      userPelatihan!.FileSertifikat
-                    }`}
+                    href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${userPelatihan!.FileSertifikat
+                      }`}
                     target="_blank"
                     type="submit"
                     className="bg-neutral-900 text-neutral-50 shadow hover:bg-neutral-900/90 h-9 px-4 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:pointer-events-none disabled:opacity-50"

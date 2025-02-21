@@ -84,17 +84,7 @@ const DropdownUser = ({
   const [alamat, setAlamat] = React.useState<string>("");
 
   const handleEditProfileUpdate = async () => {
-    // console.log(
-    //   "DATA UPDATE : ",
-    //   JSON.stringify({
-    //     email: email,
-    //     nama_lemdik: namaLemdiklat,
-    //     no_telpon: noTelpon,
-    //     deskripsi: deskripsi,
-    //     alamat: alamat,
-    //     last_no_sertif: LastNosertif,
-    //   })
-    // );
+
     try {
       const response = await axios.put(
         `${baseUrl}/${isLemdik ? "lemdik" : "pusat"}/update`,
@@ -159,7 +149,7 @@ const DropdownUser = ({
   // close on click outside
   useEffect(() => {
     if (pathname.includes("pusat")) {
-      // handleGetAdminPusat();
+      handleGetAdminPusat();
     }
     const clickHandler = ({ target }: MouseEvent) => {
       if (!dropdown.current) return;
@@ -525,15 +515,16 @@ const DropdownUser = ({
             {pathname.includes("lemdiklat")
               ? userLoggedInInfo?.data?.NamaLemdik
               : dataAdminPusat && pathname.includes("pusat")
-              ? dataAdminPusat!.Nama
-              : ""}
+                ? dataAdminPusat!.Nama
+                : ""}
           </span>
-          <span className="block text-xs">
+          <span className="flex gap-1 text-xs">
+
             {pathname.includes("lemdiklat")
               ? "Admin Lembaga Pendidikan dan Pelatihan"
               : dataAdminPusat && pathname.includes("pusat")
-              ? dataAdminPusat!.Nip
-              : ""}
+                ? dataAdminPusat!.NoTelpon
+                : ""}
           </span>
         </span>
 
@@ -573,9 +564,8 @@ const DropdownUser = ({
         ref={dropdown}
         onFocus={() => setDropdownOpen(true)}
         onBlur={() => setDropdownOpen(false)}
-        className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default  ${
-          dropdownOpen === true ? "block" : "hidden"
-        }`}
+        className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default  ${dropdownOpen === true ? "block" : "hidden"
+          }`}
       >
         <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 ">
           <li>

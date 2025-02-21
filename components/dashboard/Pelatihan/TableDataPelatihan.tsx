@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/card";
 
 import { HiUserGroup } from "react-icons/hi2";
-import { TbCalendarCheck, TbDatabase, TbTargetArrow } from "react-icons/tb";
+import { TbCalendarCheck, TbDatabase, TbSignature, TbTargetArrow } from "react-icons/tb";
 
 import FormPelatihan from "../admin/formPelatihan";
 
@@ -476,7 +476,16 @@ const TableDataPelatihan: React.FC = () => {
                                     No Sertifikat : {pelatihan!.NoSertifikat}
                                   </span>
                                 </span>
+                              }
 
+
+                              {
+                                pelatihan!.TtdSertifikat != '' && <span className="flex items-center gap-1 leading-[105%]">
+                                  <TbSignature className="text-lg" />
+                                  <span>
+                                    Penandatangan Sertifikat : {pelatihan!.TtdSertifikat}
+                                  </span>
+                                </span>
                               }
 
                               <span className="flex items-center gap-1 leading-[105%]">
@@ -542,7 +551,7 @@ const TableDataPelatihan: React.FC = () => {
                           <div className="flex items-center w-fit  gap-1   -mt-2">
                             <Link
                               title="Detail Pelatihan"
-                              href={`/admin/lemdiklat/pelatihan/detail/${pelatihan.KodePelatihan
+                              href={`/admin/lemdiklat/pelatihan/detail-pelatihan/${pelatihan.KodePelatihan
                                 }/${encryptValue(pelatihan.IdPelatihan)}`}
                               className="border border-neutral-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-neutral-900 hover:bg-neutral-900 hover:text-white text-white rounded-md"
                             >

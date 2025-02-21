@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/card";
 
 import { HiUserGroup } from "react-icons/hi2";
-import { TbCalendarCheck, TbDatabase, TbTargetArrow } from "react-icons/tb";
+import { TbCalendarCheck, TbDatabase, TbSignature, TbTargetArrow } from "react-icons/tb";
 
 import FormPelatihan from "../admin/formPelatihan";
 
@@ -72,6 +72,8 @@ import Toast from "@/components/toast";
 import VerifikasiButton from "../Dashboard/Actions/VerifikasiButton";
 import { encryptValue } from "@/lib/utils";
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
+import { AiOutlineFieldNumber } from "react-icons/ai";
+import { IoRefreshSharp } from "react-icons/io5";
 
 const TableDataVerifikasiPelaksanaan: React.FC = () => {
   const [data, setData] = React.useState<PelatihanMasyarakat[]>([]);
@@ -99,20 +101,24 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
         }
       );
 
+      const filteredData = response?.data!.data!.filter(
+        (item: any) => item.PenyelenggaraPelatihan === Cookies.get('Satker')
+      )
+
       // Count statuses
-      const onProgressCount = response?.data!.data!.filter(
+      const onProgressCount = filteredData!.filter(
         (item: any) => item.StatusPenerbitan === "On Progress"
       ).length;
-      const doneCount = response?.data!.data!.filter(
+      const doneCount = filteredData!.filter(
         (item: any) => item.StatusPenerbitan === "Done"
       ).length;
-      const notPublished = response?.data!.data!.filter(
+      const notPublished = filteredData!.filter(
         (item: any) => item.Status !== "Publish"
       ).length;
-      const verifyingCount = response?.data!.data!.filter(
+      const verifyingCount = filteredData!.filter(
         (item: any) => item.StatusPenerbitan == "Verifikasi Pelaksanaan"
       ).length;
-      const sematkanCount = response?.data!.data!.filter(
+      const sematkanCount = filteredData!.filter(
         (item: any) => item.IsSematkan == "yes"
       ).length;
 
@@ -124,7 +130,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
       setCountIsSematkan(sematkanCount);
 
       // Sort data in descending order by its index
-      const sortedData = [...response.data.data].reverse();
+      const sortedData = [...filteredData].reverse();
 
       console.log("PELATIHAN BY LEMDIK: ", response);
       setData(sortedData);
@@ -397,6 +403,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
                 ))}
               </optgroup>
             </select>
+            <Button variant="outline" className='py-5' onClick={() => handleFetchingPublicTrainingData()}><IoRefreshSharp />Refresh</Button>
             {filterCategory != "" && (
               <Button
                 onClick={(e) => setFilterCategory("")}
@@ -451,6 +458,24 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
                   <div className="ml-0 text-left capitalize -mt-6 w-full ">
                     <div className="ml-0 text-left mt-1 text-neutral-500 ">
                       <p className="text-sm ">
+                        {
+                          pelatihan!.PemberitahuanDiterima == 'No sertifikat telah diinput' && <span className="flex items-center gap-1 leading-[105%]">
+                            <AiOutlineFieldNumber className="text-lg" />
+                            <span>
+                              No Sertifikat : {pelatihan!.NoSertifikat}
+                            </span>
+                          </span>
+                        }
+
+                        {
+                          pelatihan!.TtdSertifikat != '' && <span className="flex items-center gap-1 leading-[105%]">
+                            <TbSignature className="text-lg" />
+                            <span>
+                              Penandatangan Sertifikat : {pelatihan!.TtdSertifikat}
+                            </span>
+                          </span>
+                        }
+
                         <span className="flex items-center gap-1 leading-[105%]">
                           <TbTargetArrow className="text-lg" />
                           <span>

@@ -28,7 +28,10 @@ export default function LayoutAdminElaut({
           },
         }
       );
-      Cookies.set("Eselon", response.data.data.Nip);
+      console.log({ response })
+      Cookies.set("NIK", response.data.data.Nip);
+      Cookies.set("Satker", response.data.data.Status);
+      Cookies.set("Jabatan", response.data.data.NoTelpon);
     } catch (error) {
       console.error({ error });
     }
@@ -46,7 +49,7 @@ export default function LayoutAdminElaut({
       });
       setLemdikData(response.data);
       Cookies.set("IDLemdik", response.data.data.IdLemdik);
-      console.log("LEMDIK INFO: ", response);
+      Cookies.set("SATKER_BPPP", response.data.data.NamaLemdik);
     } catch (error) {
       console.error("LEMDIK INFO: ", error);
     }
@@ -60,8 +63,12 @@ export default function LayoutAdminElaut({
     Cookies.remove("XSRF091");
     Cookies.remove("XSRF092");
     Cookies.remove("XSRF093");
+    Cookies.remove("SATKER_BPPP");
     Cookies.remove("IDLemdik");
     Cookies.remove("Eselon");
+    Cookies.remove("Status");
+    Cookies.remove("Jabatan");
+    Cookies.remove("NIK");
     Toast.fire({
       icon: "success",
       title: `Berhasil logout dari dashboard Admin!`,
