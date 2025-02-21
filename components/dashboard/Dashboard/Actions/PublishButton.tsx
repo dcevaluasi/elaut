@@ -144,7 +144,7 @@ const PublishButton: React.FC<PublishButtonProps> = ({
           setIsOpenFormPublishedPelatihan(!isOpenFormPublishedPelatihan);
         }}
         variant="outline"
-        className={`ml-auto hover:text-neutral-100  text-neutral-100  duration-700 ${title == "Publish"
+        className={`ml-auto hover:text-neutral-100 w-full  text-neutral-100  duration-700 ${title == "Publish"
           ? "bg-purple-600 hover:bg-purple-600"
           : "bg-teal-600 hover:bg-teal-600"
           }`}

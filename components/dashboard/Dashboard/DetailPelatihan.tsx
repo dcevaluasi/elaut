@@ -429,7 +429,7 @@ function DetailPelatihan() {
       )}
 
       {
-        isAdminBalaiPelatihan && <AlertDialog>
+        !isAdminBalaiPelatihan && <AlertDialog>
           <AlertDialogTrigger asChild>
             <div className="px-4">
               <Button variant="outline" className="w-full mt-5 py-5 text-base bg-neutral-900 hover:bg-neutral-950 text-white hover:text-white">Verifikasi Pengajuan Penerbitan</Button>

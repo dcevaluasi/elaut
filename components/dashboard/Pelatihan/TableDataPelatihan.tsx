@@ -5,15 +5,13 @@ import {
   RiVerifiedBadgeFill,
 } from "react-icons/ri";
 
-import { Badge } from "@/components/ui/badge";
-
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@/components/ui/popover"
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import {
   Card,
@@ -51,7 +49,7 @@ import {
 import { MdClear } from "react-icons/md";
 import UploadSuratButton from "../Dashboard/Actions/UploadSuratButton";
 import { GrSend } from "react-icons/gr";
-import { FiEdit2 } from "react-icons/fi";
+import { FiEdit2, FiSettings } from "react-icons/fi";
 import GenerateNoSertifikatButton from "../Dashboard/Actions/GenerateNoSertifikatButton";
 import CloseButton from "../Dashboard/Actions/CloseButton";
 import { usePathname } from "next/navigation";
@@ -69,6 +67,8 @@ import {
 import Toast from "@/components/toast";
 import { encryptValue } from "@/lib/utils";
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
+import { IoRefreshSharp } from "react-icons/io5";
+import { HashLoader } from "react-spinners";
 
 const TableDataPelatihan: React.FC = () => {
   const [data, setData] = React.useState<PelatihanMasyarakat[]>([]);
@@ -373,293 +373,307 @@ const TableDataPelatihan: React.FC = () => {
             <TabsTrigger value="password">Buat Pelatihan Baru</TabsTrigger>
           </TabsList>
           <TabsContent value="account">
-            <div className="flex flex-col gap-1">
-              <div className="mb-1 flex items-center w-full gap-2">
-                <select
-                  className="text-sm p-2 border border-neutral-200 bg-transparent rounded-md bg-white  w-1/4"
-                  onChange={(e) => setFilterCategory(e.target.value)}
-                >
-                  <option value="" selected={filterCategory == ""}>
-                    Program Pelatihan
-                  </option>
-                  <optgroup label="AKP">
-                    {PROGRAM_AKP.map((item) => (
-                      <option key={item} value={item}>
-                        {item}
-                      </option>
-                    ))}
-                  </optgroup>
-                  <optgroup label="Perikanan">
-                    {PROGRAM_PERIKANAN.map((item) => (
-                      <option key={item} value={item}>
-                        {item}
-                      </option>
-                    ))}
-                  </optgroup>
-                  <optgroup label="Kelautan">
-                    {PROGRAM_KELAUTAN.map((item) => (
-                      <option key={item} value={item}>
-                        {item}
-                      </option>
-                    ))}
-                  </optgroup>
-                </select>
-                {filterCategory != "" && (
-                  <Button
-                    onClick={(e) => setFilterCategory("")}
-                    className="border border-neutral-200  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-3 bg-neutral-800 hover:bg-neutral-800 hover:text-white text-white rounded-md"
+            {
+              isFetching ? <div className="py-32 w-full items-center flex justify-center">
+                <HashLoader color="#338CF5" size={50} />
+              </div> : <div className="flex flex-col gap-1">
+                <div className="mb-1 flex items-center w-full gap-2">
+                  <select
+                    className="text-sm p-2 border border-neutral-200 bg-transparent rounded-md bg-white  w-1/4"
+                    onChange={(e) => setFilterCategory(e.target.value)}
                   >
-                    <MdClear className="h-5 w-5 mr-1" />
-                    Bersihkan Filter
-                  </Button>
-                )}
+                    <option value="" selected={filterCategory == ""}>
+                      Program Pelatihan
+                    </option>
+                    <optgroup label="AKP">
+                      {PROGRAM_AKP.map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Perikanan">
+                      {PROGRAM_PERIKANAN.map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Kelautan">
+                      {PROGRAM_KELAUTAN.map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </optgroup>
+                  </select>
+                  <Button variant="outline" className='py-5' onClick={() => handleFetchingPublicTrainingData()}><IoRefreshSharp />Refresh</Button>
+                  {filterCategory != "" && (
+                    <Button
+                      onClick={(e) => setFilterCategory("")}
+                      className="border border-neutral-200  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-3 bg-neutral-800 hover:bg-neutral-800 hover:text-white text-white rounded-md"
+                    >
+                      <MdClear className="h-5 w-5 mr-1" />
+                      Bersihkan Filter
+                    </Button>
+                  )}
 
-                <Input
-                  type="text"
-                  placeholder="Cari berdasarkan Nama, Bidang, dan Penyelenggara Pelatihan"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full text-sm"
-                />
-              </div>
-
-              {filteredData.length == 0 ? (
-                <div className="pt-12 md:pt-20 flex flex-col items-center">
-                  <Image
-                    src={"/illustrations/not-found.png"}
-                    alt="Not Found"
-                    width={0}
-                    height={0}
-                    className="w-[400px]"
+                  <Input
+                    type="text"
+                    placeholder="Cari berdasarkan Nama, Bidang, dan Penyelenggara Pelatihan"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full text-sm"
                   />
-                  <div className="max-w-3xl mx-auto text-center pb-5 md:pb-8 -mt-2">
-                    <h1 className="text-3xl font-calsans leading-[110%] text-black">
-                      Belum Ada Pelatihan
-                    </h1>
-                    <div className="text-gray-600 text-sm text-center  max-w-md">
-                      Buka kelas pelatihan segera untuk dapat melihat berbagai
-                      macam pelatihan berdasarkan programnya!
+                </div>
+
+                {filteredData.length == 0 ? (
+                  <div className="pt-12 md:pt-20 flex flex-col items-center">
+                    <Image
+                      src={"/illustrations/not-found.png"}
+                      alt="Not Found"
+                      width={0}
+                      height={0}
+                      className="w-[400px]"
+                    />
+                    <div className="max-w-3xl mx-auto text-center pb-5 md:pb-8 -mt-2">
+                      <h1 className="text-3xl font-calsans leading-[110%] text-black">
+                        Belum Ada Pelatihan
+                      </h1>
+                      <div className="text-gray-600 text-sm text-center  max-w-md">
+                        Buka kelas pelatihan segera untuk dapat melihat berbagai
+                        macam pelatihan berdasarkan programnya!
+                      </div>
                     </div>
                   </div>
-                </div>
-              ) : (
-                filteredData.map((pelatihan, index) => (
-                  <Card key={index} className="relative">
-                    {pelatihan != null ? (
-                      <ShowingBadge data={pelatihan} isFlying={true} />
-                    ) : (
-                      <></>
-                    )}
+                ) : (
+                  filteredData.map((pelatihan, index) => (
+                    <Card key={index} className="relative">
+                      {pelatihan != null ? (
+                        <ShowingBadge data={pelatihan} isFlying={true} />
+                      ) : (
+                        <></>
+                      )}
 
-                    <CardHeader>
-                      <CardTitle>{pelatihan!.NamaPelatihan}</CardTitle>
-                      <CardDescription>
-                        {" "}
-                        {pelatihan!.Program} •{" "}
-                        {pelatihan!.PenyelenggaraPelatihan}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      <div className="ml-0 text-left capitalize -mt-6 w-full ">
-                        <div className="ml-0 text-left mt-1 text-neutral-500 ">
-                          <p className="text-sm ">
-                            <span className="flex items-center gap-1 leading-[105%]">
-                              <TbTargetArrow className="text-lg" />
-                              <span>
-                                Lokasi Pelatihan : {pelatihan!.LokasiPelatihan}
-                              </span>
-                            </span>
-                            {pelatihan!.TanggalMulaiPendaftaran == "" ||
-                              pelatihan!.TanggalBerakhirPendaftaran == "" ? (
-                              <></>
-                            ) : (
+                      <CardHeader>
+                        <CardTitle>{pelatihan!.NamaPelatihan}</CardTitle>
+                        <CardDescription>
+                          {" "}
+                          {pelatihan!.Program} •{" "}
+                          {pelatihan!.PenyelenggaraPelatihan}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        <div className="ml-0 text-left capitalize -mt-6 w-full ">
+                          <div className="ml-0 text-left mt-1 text-neutral-500 ">
+                            <p className="text-sm ">
                               <span className="flex items-center gap-1 leading-[105%]">
-                                <GrSend className="text-lg" />
+                                <TbTargetArrow className="text-lg" />
                                 <span>
-                                  Waktu Pendaftaran :{" "}
-                                  {generateTanggalPelatihan(
-                                    pelatihan!.TanggalMulaiPendaftaran
-                                  )}{" "}
-                                  <span className="lowercase">s.d</span>{" "}
-                                  {generateTanggalPelatihan(
-                                    pelatihan!.TanggalAkhirPendaftaran!
-                                  )}
+                                  Lokasi Pelatihan : {pelatihan!.LokasiPelatihan}
                                 </span>
                               </span>
-                            )}
-
-                            <span className="flex items-center gap-1 leading-[105%]">
-                              <TbCalendarCheck className="text-lg" />
-                              {pelatihan!.TanggalMulaiPelatihan != "" ? (
-                                <span>
-                                  Waktu Pelaksanaan :{" "}
-                                  {generateTanggalPelatihan(
-                                    pelatihan!.TanggalMulaiPelatihan
-                                  )}{" "}
-                                  <span className="lowercase">s.d</span>{" "}
-                                  {generateTanggalPelatihan(
-                                    pelatihan!.TanggalBerakhirPelatihan
-                                  )}
-                                </span>
+                              {pelatihan!.TanggalMulaiPendaftaran == "" ||
+                                pelatihan!.TanggalBerakhirPendaftaran == "" ? (
+                                <></>
                               ) : (
-                                <>-</>
-                              )}
-                            </span>
-
-                            <span className="flex items-center gap-1 leading-[105%]">
-                              <HiUserGroup className="text-base" />
-                              <span>
-                                Jumlah peserta pelatihan :{" "}
-                                {pelatihan!.UserPelatihan.length}/
-                                {pelatihan!.KoutaPelatihan}
-                              </span>
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                    <CardFooter>
-                      <div className="w-full flex-col flex center justify-between gap-2">
-                        <div className="flex items-center w-fit  gap-1   -mt-2">
-                          <Link
-                            title="Detail Pelatihan"
-                            href={`/admin/lemdiklat/pelatihan/detail/${pelatihan.KodePelatihan
-                              }/${encryptValue(pelatihan.IdPelatihan)}`}
-                            className="border border-neutral-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-neutral-900 hover:bg-neutral-900 hover:text-white text-white rounded-md"
-                          >
-                            <RiInformationFill className="h-5 w-5" /> Detail
-                          </Link>
-
-                          {pelatihan?.StatusPenerbitan !=
-                            "Sudah Diverifikasi Pelaksanaan" ? (
-                            <></>
-                          ) : (
-                            <>
-                              <Link
-                                title="Peserta Pelatihan"
-                                href={`/admin/${usePathname().includes("lemdiklat")
-                                  ? "lemdiklat"
-                                  : "pusat"
-                                  }/pelatihan/${pelatihan.KodePelatihan
-                                  }/peserta-pelatihan/${encryptValue(
-                                    pelatihan.IdPelatihan
-                                  )}`}
-                                target="_blank"
-                                className="  shadow-sm bg-green-500 hover:bg-green-500 text-neutral-100  hover:text-neutral-100 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2"
-                              >
-                                <HiUserGroup className="h-5 w-5 " /> Peserta
-                                Pelatihan
-                              </Link>
-                              {pelatihan!.TanggalMulaiPelatihan == "" && (
-                                <Button
-                                  onClick={() => {
-                                    setOpenFormEditPelatihan(true);
-                                    setSelectedPelatihan(pelatihan);
-                                  }}
-                                  title="Edit Pelatihan"
-                                  variant="outline"
-                                  className="ml-auto  hover:bg-yellow-300 bg-yellow-300 hover:text-neutral-700 text-neutral-700 duration-700"
-                                >
-                                  <FiEdit2 className="h-5 w-5" />
-                                </Button>
+                                <span className="flex items-center gap-1 leading-[105%]">
+                                  <GrSend className="text-lg" />
+                                  <span>
+                                    Waktu Pendaftaran :{" "}
+                                    {generateTanggalPelatihan(
+                                      pelatihan!.TanggalMulaiPendaftaran
+                                    )}{" "}
+                                    <span className="lowercase">s.d</span>{" "}
+                                    {generateTanggalPelatihan(
+                                      pelatihan!.TanggalAkhirPendaftaran!
+                                    )}
+                                  </span>
+                                </span>
                               )}
 
-                              {pelatihan!.Status != "Publish" && (
-                                <>
-                                  <DeleteButton
-                                    idPelatihan={pelatihan!.IdPelatihan.toString()}
-                                    pelatihan={pelatihan}
-                                    handleFetchingData={
-                                      handleFetchingPublicTrainingData
-                                    }
-                                  />
-                                </>
-                              )}
-                              {pelatihan!.Status == "Publish" ? (
-                                pelatihan!.UserPelatihan.length == 0 ? (
-                                  <PublishButton
-                                    title="Take Down"
-                                    statusPelatihan={pelatihan?.Status ?? ""}
-                                    idPelatihan={pelatihan!.IdPelatihan.toString()}
-                                    handleFetchingData={
-                                      handleFetchingPublicTrainingData
-                                    }
-                                  />
+                              <span className="flex items-center gap-1 leading-[105%]">
+                                <TbCalendarCheck className="text-lg" />
+                                {pelatihan!.TanggalMulaiPelatihan != "" ? (
+                                  <span>
+                                    Waktu Pelaksanaan :{" "}
+                                    {generateTanggalPelatihan(
+                                      pelatihan!.TanggalMulaiPelatihan
+                                    )}{" "}
+                                    <span className="lowercase">s.d</span>{" "}
+                                    {generateTanggalPelatihan(
+                                      pelatihan!.TanggalBerakhirPelatihan
+                                    )}
+                                  </span>
                                 ) : (
-                                  <></>
-                                )
-                              ) : (
-                                <PublishButton
-                                  title="Publish"
-                                  statusPelatihan={pelatihan?.Status ?? ""}
-                                  idPelatihan={pelatihan!.IdPelatihan.toString()}
-                                  handleFetchingData={
-                                    handleFetchingPublicTrainingData
-                                  }
-                                />
-                              )}
+                                  <>-</>
+                                )}
+                              </span>
 
-                              <GenerateNoSertifikatButton
-                                idPelatihan={pelatihan!.IdPelatihan.toString()}
-                                pelatihan={pelatihan!}
-                                handleFetchingData={
-                                  handleFetchingPublicTrainingData
-                                }
-                              />
-
-                              <CloseButton
-                                pelatihan={pelatihan!}
-                                statusPelatihan={pelatihan?.Status ?? ""}
-                                idPelatihan={pelatihan!.IdPelatihan.toString()}
-                                handleFetchingData={
-                                  handleFetchingPublicTrainingData
-                                }
-                              />
-                            </>
-                          )}
-
-                          <UploadSuratButton
-                            idPelatihan={pelatihan!.IdPelatihan.toString()}
-                            handleFetchingData={
-                              handleFetchingPublicTrainingData
-                            }
-                            suratPemberitahuan={pelatihan?.SuratPemberitahuan}
-                          />
-
-                          {
-                            (pelatihan!.UjiKompotensi == "Ujian Pre-test dan Post-test" && pelatihan!.StatusApproval != 'Selesai' && pelatihan!.StatusPenerbitan == 'Sudah Diverifikasi Pelaksanaan') && <Link
-                              title="Bank Soal"
-                              href={`/admin/lemdiklat/pelatihan/${pelatihan!.KodePelatihan
-                                }/bank-soal/${encryptValue(pelatihan!.IdPelatihan)}`}
-                              className="border border-blue-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-blue-900 hover:bg-blue-900 hover:text-white text-white rounded-md"
+                              <span className="flex items-center gap-1 leading-[105%]">
+                                <HiUserGroup className="text-base" />
+                                <span>
+                                  Jumlah peserta pelatihan :{" "}
+                                  {pelatihan!.UserPelatihan.length}/
+                                  {pelatihan!.KoutaPelatihan}
+                                </span>
+                              </span>
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                      <CardFooter>
+                        <div className="w-full flex-col flex center justify-between gap-2">
+                          <div className="flex items-center w-fit  gap-1   -mt-2">
+                            <Link
+                              title="Detail Pelatihan"
+                              href={`/admin/lemdiklat/pelatihan/detail/${pelatihan.KodePelatihan
+                                }/${encryptValue(pelatihan.IdPelatihan)}`}
+                              className="border border-neutral-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-neutral-900 hover:bg-neutral-900 hover:text-white text-white rounded-md"
                             >
-                              <TbDatabase className="h-5 w-5" /> Bank Soal
+                              <RiInformationFill className="h-5 w-5" /> Detail
                             </Link>
-                          }
-
-
-                          {
-                            (pelatihan!.StatusApproval != 'Selesai' && pelatihan!.StatusPenerbitan == 'Sudah Diverifikasi Pelaksanaan') && <MateriButton
+                            <UploadSuratButton
                               idPelatihan={pelatihan!.IdPelatihan.toString()}
                               handleFetchingData={
                                 handleFetchingPublicTrainingData
                               }
-                              data={pelatihan!}
+                              suratPemberitahuan={pelatihan?.SuratPemberitahuan}
                             />
-                          }
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button variant="outline"><FiSettings />Actions</Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-80 flex flex-col gap-1">
 
 
+                                {pelatihan?.StatusPenerbitan !=
+                                  "Sudah Diverifikasi Pelaksanaan" ? (
+                                  <></>
+                                ) : (
+                                  <>
+                                    <Link
+                                      title="Peserta Pelatihan"
+                                      href={`/admin/${usePathname().includes("lemdiklat")
+                                        ? "lemdiklat"
+                                        : "pusat"
+                                        }/pelatihan/${pelatihan.KodePelatihan
+                                        }/peserta-pelatihan/${encryptValue(
+                                          pelatihan.IdPelatihan
+                                        )}`}
+                                      target="_blank"
+                                      className="  shadow-sm bg-green-500 hover:bg-green-500 text-neutral-100  hover:text-neutral-100 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2"
+                                    >
+                                      <HiUserGroup className="h-5 w-5 " /> Peserta
+                                      Pelatihan
+                                    </Link>
+                                    {pelatihan!.TanggalMulaiPelatihan == "" && (
+                                      <Button
+                                        onClick={() => {
+                                          setOpenFormEditPelatihan(true);
+                                          setSelectedPelatihan(pelatihan);
+                                        }}
+                                        title="Edit Pelatihan"
+                                        variant="outline"
+                                        className="ml-auto w-full hover:bg-yellow-300 bg-yellow-300 hover:text-neutral-700 text-neutral-700 duration-700"
+                                      >
+                                        <FiEdit2 className="h-5 w-5" /> Edit Pelatihan
+                                      </Button>
+                                    )}
+
+                                    {pelatihan!.Status != "Publish" && (
+                                      <>
+                                        <DeleteButton
+                                          idPelatihan={pelatihan!.IdPelatihan.toString()}
+                                          pelatihan={pelatihan}
+                                          handleFetchingData={
+                                            handleFetchingPublicTrainingData
+                                          }
+                                        />
+                                      </>
+                                    )}
+                                    {pelatihan!.Status == "Publish" ? (
+                                      pelatihan!.UserPelatihan.length == 0 ? (
+                                        <PublishButton
+                                          title="Take Down"
+                                          statusPelatihan={pelatihan?.Status ?? ""}
+                                          idPelatihan={pelatihan!.IdPelatihan.toString()}
+                                          handleFetchingData={
+                                            handleFetchingPublicTrainingData
+                                          }
+                                        />
+                                      ) : (
+                                        <></>
+                                      )
+                                    ) : (
+                                      <PublishButton
+                                        title="Publish"
+                                        statusPelatihan={pelatihan?.Status ?? ""}
+                                        idPelatihan={pelatihan!.IdPelatihan.toString()}
+                                        handleFetchingData={
+                                          handleFetchingPublicTrainingData
+                                        }
+                                      />
+                                    )}
+
+                                    <GenerateNoSertifikatButton
+                                      idPelatihan={pelatihan!.IdPelatihan.toString()}
+                                      pelatihan={pelatihan!}
+                                      handleFetchingData={
+                                        handleFetchingPublicTrainingData
+                                      }
+                                    />
+
+                                    <CloseButton
+                                      pelatihan={pelatihan!}
+                                      statusPelatihan={pelatihan?.Status ?? ""}
+                                      idPelatihan={pelatihan!.IdPelatihan.toString()}
+                                      handleFetchingData={
+                                        handleFetchingPublicTrainingData
+                                      }
+                                    />
+                                  </>
+                                )}
+
+
+
+                                {
+                                  (pelatihan!.UjiKompotensi == "Ujian Pre-test dan Post-test" && pelatihan!.StatusApproval != 'Selesai' && pelatihan!.StatusPenerbitan == 'Sudah Diverifikasi Pelaksanaan') && <Link
+                                    title="Bank Soal"
+                                    href={`/admin/lemdiklat/pelatihan/${pelatihan!.KodePelatihan
+                                      }/bank-soal/${encryptValue(pelatihan!.IdPelatihan)}`}
+                                    className="border border-blue-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-blue-900 hover:bg-blue-900 hover:text-white text-white rounded-md"
+                                  >
+                                    <TbDatabase className="h-5 w-5" /> Bank Soal
+                                  </Link>
+                                }
+
+
+                                {
+                                  (pelatihan!.StatusApproval != 'Selesai' && pelatihan!.StatusPenerbitan == 'Sudah Diverifikasi Pelaksanaan') && <MateriButton
+                                    idPelatihan={pelatihan!.IdPelatihan.toString()}
+                                    handleFetchingData={
+                                      handleFetchingPublicTrainingData
+                                    }
+                                    data={pelatihan!}
+                                  />
+                                }
+
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+                          <p className="italic text-neutral-400 text-[0.6rem]">
+                            Created at {pelatihan!.CreateAt} | Updated at{" "}
+                            {pelatihan!.UpdateAt}
+                          </p>
                         </div>
-                        <p className="italic text-neutral-400 text-[0.6rem]">
-                          Created at {pelatihan!.CreateAt} | Updated at{" "}
-                          {pelatihan!.UpdateAt}
-                        </p>
-                      </div>
-                    </CardFooter>
-                  </Card>
-                ))
-              )}
-            </div>
+                      </CardFooter>
+                    </Card>
+                  ))
+                )}
+              </div>
+            }
+
           </TabsContent>
 
           <TabsContent value="password">

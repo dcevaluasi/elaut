@@ -117,7 +117,7 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({
         onClick={() => setIsOpenFormDelete(!isOpenFormDelete)}
         variant="outline"
         title="Hapus Pelatihan"
-        className="ml-auto text-neutral-100  bg-rose-600 hover:bg-rose-600 hover:text-neutral-100 duration-700"
+        className="ml-auto text-neutral-100  bg-rose-600 hover:bg-rose-600 hover:text-neutral-100 duration-700 w-full"
       >
         <Trash className="h-5 w-5" /> Hapus Pelatihan
       </Button>
