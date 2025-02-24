@@ -242,35 +242,51 @@ const ChartDetailMasyarakatDilatih: React.FC<{
 
   React.useEffect(() => {
     const dataMasyarakatByGender = [
-      dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && (item.JenisKelamin == "Laki - Laki" || item.JenisKelamin == 'L') && item.FileSertifikat != '').length,
-      dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && (item.JenisKelamin == "Perempuan" || item.JenisKelamin == 'P') && item.FileSertifikat != '').length,
+      isAdminBalaiPelatihan ? dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && (item.JenisKelamin == "Laki - Laki" || item.JenisKelamin == 'L') && item.FileSertifikat != '').length : dataUser.filter((item) => (item.JenisKelamin == "Laki - Laki" || item.JenisKelamin == 'L') && item.FileSertifikat != '').length,
+      isAdminBalaiPelatihan ? dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && (item.JenisKelamin == "Perempuan" || item.JenisKelamin == 'P') && item.FileSertifikat != '').length : dataUser.filter((item) => (item.JenisKelamin == "Perempuan" || item.JenisKelamin == 'P') && item.FileSertifikat != '').length,
     ];
 
     // Data Masyarakat Dilatih by Program Pelatihan
     const dataMasyarakatDilatihByBidangPelatihan = [
-      dataUser
+      isAdminBalaiPelatihan ? dataUser
         .filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.BidangPelatihan === "Budidaya" && item.FileSertifikat != '')
+        .length : dataUser
+          .filter((item) => item.BidangPelatihan === "Budidaya" && item.FileSertifikat != '')
         .length,
-      dataUser
+      isAdminBalaiPelatihan ? dataUser
         .filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.BidangPelatihan === "Penangkapan" && item.FileSertifikat != '')
+        .length : dataUser
+          .filter((item) => item.BidangPelatihan === "Penangkapan" && item.FileSertifikat != '')
         .length,
-      dataUser
+      isAdminBalaiPelatihan ? dataUser
         .filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.BidangPelatihan === "Kepelautan" && item.FileSertifikat != '')
+        .length : dataUser
+          .filter((item) => item.BidangPelatihan === "Kepelautan" && item.FileSertifikat != '')
         .length,
-      dataUser
+      isAdminBalaiPelatihan ? dataUser
         .filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.BidangPelatihan === "Pengolahan dan Pemasaran" && item.FileSertifikat != '')
+        .length : dataUser
+          .filter((item) => item.BidangPelatihan === "Pengolahan dan Pemasaran" && item.FileSertifikat != '')
         .length,
-      dataUser
+      isAdminBalaiPelatihan ? dataUser
         .filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.BidangPelatihan === "Mesin Perikanan" && item.FileSertifikat != '')
+        .length : dataUser
+          .filter((item) => item.BidangPelatihan === "Mesin Perikanan" && item.FileSertifikat != '')
         .length,
-      dataUser
+      isAdminBalaiPelatihan ? dataUser
         .filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.BidangPelatihan === "Konservasi" && item.FileSertifikat != '')
+        .length : dataUser
+          .filter((item) => item.BidangPelatihan === "Konservasi" && item.FileSertifikat != '')
         .length,
-      dataUser
+      isAdminBalaiPelatihan ? dataUser
         .filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.BidangPelatihan === "Wisata Bahari" && item.FileSertifikat != '')
+        .length : dataUser
+          .filter((item) => item.BidangPelatihan === "Wisata Bahari" && item.FileSertifikat != '')
         .length,
-      dataUser
+      isAdminBalaiPelatihan ? dataUser
         .filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.BidangPelatihan === "Manajemen Perikanan" && item.FileSertifikat != '')
+        .length : dataUser
+          .filter((item) => item.BidangPelatihan === "Manajemen Perikanan" && item.FileSertifikat != '')
         .length,
     ];
 
@@ -280,14 +296,20 @@ const ChartDetailMasyarakatDilatih: React.FC<{
 
     // Data Masyarakat Dilatih by Program Pelatihan
     const dataMasyarakatDilatihByProgramPelatihan = [
-      dataUser
+      isAdminBalaiPelatihan ? dataUser
         .filter((item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat != '' && item.JenisProgram === "Perikanan")
+        .length : dataUser
+          .filter((item: UserPelatihan) => item.FileSertifikat != '' && item.JenisProgram === "Perikanan")
         .length,
-      dataUser
+      isAdminBalaiPelatihan ? dataUser
         .filter((item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat != '' && item.JenisProgram === "Kelautan")
+        .length : dataUser
+          .filter((item: UserPelatihan) => item.FileSertifikat != '' && item.JenisProgram === "Kelautan")
         .length,
-      dataUser
+      isAdminBalaiPelatihan ? dataUser
         .filter((item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat != '' && item.JenisProgram === "Awak Kapal Perikanan")
+        .length : dataUser
+          .filter((item: UserPelatihan) => item.FileSertifikat != '' && item.JenisProgram === "Awak Kapal Perikanan")
         .length,
     ];
 
@@ -297,15 +319,21 @@ const ChartDetailMasyarakatDilatih: React.FC<{
 
     // Data Masyarakat Dilatih by Jenis Pelatihan
     const dataMasyarakatDilatihByJenisPelatihan = [
-      data
+      isAdminBalaiPelatihan ? data
         .filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.JenisPelatihan === "Aspirasi")
-        .reduce((total, item) => total + item.JumlahPeserta!, 0),
-      data
+        .reduce((total, item) => total + item.JumlahPeserta!, 0) : data
+          .filter((item) => item.JenisPelatihan === "Aspirasi")
+          .reduce((total, item) => total + item.JumlahPeserta!, 0),
+      isAdminBalaiPelatihan ? data
         .filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.JenisPelatihan === "PNBP/BLU")
-        .reduce((total, item) => total + item.JumlahPeserta!, 0),
-      data
+        .reduce((total, item) => total + item.JumlahPeserta!, 0) : data
+          .filter((item) => item.JenisPelatihan === "PNBP/BLU")
+          .reduce((total, item) => total + item.JumlahPeserta!, 0),
+      isAdminBalaiPelatihan ? data
         .filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.JenisPelatihan === "Reguler")
-        .reduce((total, item) => total + item.JumlahPeserta!, 0),
+        .reduce((total, item) => total + item.JumlahPeserta!, 0) : data
+          .filter((item) => item.JenisPelatihan === "Reguler")
+          .reduce((total, item) => total + item.JumlahPeserta!, 0),
     ];
 
     setStateMasyarakatDilatihByJenisPelatihan({
@@ -314,23 +342,33 @@ const ChartDetailMasyarakatDilatih: React.FC<{
 
     // Data Masyarakat Dilatih by Dukungan Program Prioritas
     const dataMasyarakatDilatihByProgramPrioritas = [
-      dataUser.filter((item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat != '' && item.DukunganProgramPrioritas === "Non Terobosan")
+      isAdminBalaiPelatihan ? dataUser.filter((item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat != '' && item.DukunganProgramPrioritas === "Non Terobosan")
+        .length : dataUser.filter((item: UserPelatihan) => item.FileSertifikat != '' && item.DukunganProgramPrioritas === "Non Terobosan")
         .length,
-      dataUser.filter((item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat != '' && item.DukunganProgramPrioritas === "Konservasi")
+      isAdminBalaiPelatihan ? dataUser.filter((item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat != '' && item.DukunganProgramPrioritas === "Konservasi")
+        .length : dataUser.filter((item: UserPelatihan) => item.FileSertifikat != '' && item.DukunganProgramPrioritas === "Konservasi")
         .length,
-      dataUser.filter((item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat != '' && item.DukunganProgramPrioritas === "PIT")
+      isAdminBalaiPelatihan ? dataUser.filter((item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat != '' && item.DukunganProgramPrioritas === "PIT")
+        .length : dataUser.filter((item: UserPelatihan) => item.FileSertifikat != '' && item.DukunganProgramPrioritas === "PIT")
         .length,
-      dataUser.filter((item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat != '' && item.DukunganProgramPrioritas === "Kalaju/Kalamo")
+      isAdminBalaiPelatihan ? dataUser.filter((item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat != '' && item.DukunganProgramPrioritas === "Kalaju/Kalamo")
+        .length : dataUser.filter((item: UserPelatihan) => item.FileSertifikat != '' && item.DukunganProgramPrioritas === "Kalaju/Kalamo")
         .length,
-      dataUser.filter((item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat != '' && item.DukunganProgramPrioritas === "KPB")
+      isAdminBalaiPelatihan ? dataUser.filter((item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat != '' && item.DukunganProgramPrioritas === "KPB")
+        .length : dataUser.filter((item: UserPelatihan) => item.FileSertifikat != '' && item.DukunganProgramPrioritas === "KPB")
         .length,
-      dataUser.filter((item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat != '' && item.DukunganProgramPrioritas === "Budidaya")
+      isAdminBalaiPelatihan ? dataUser.filter((item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat != '' && item.DukunganProgramPrioritas === "Budidaya")
+        .length : dataUser.filter((item: UserPelatihan) => item.FileSertifikat != '' && item.DukunganProgramPrioritas === "Budidaya")
         .length,
-      dataUser.filter(
+      isAdminBalaiPelatihan ? dataUser.filter(
         (item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat != '' && item.DukunganProgramPrioritas === "Pengawasan Pesisir"
       )
+        .length : dataUser.filter(
+          (item: UserPelatihan) => item.FileSertifikat != '' && item.DukunganProgramPrioritas === "Pengawasan Pesisir"
+        )
         .length,
-      dataUser.filter((item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat != '' && item.DukunganProgramPrioritas === "BCL")
+      isAdminBalaiPelatihan ? dataUser.filter((item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat != '' && item.DukunganProgramPrioritas === "BCL")
+        .length : dataUser.filter((item: UserPelatihan) => item.FileSertifikat != '' && item.DukunganProgramPrioritas === "BCL")
         .length,
     ];
 
@@ -344,8 +382,8 @@ const ChartDetailMasyarakatDilatih: React.FC<{
 
     // Data Masyarakat Dilatih by Sertifikat
     const dataMasyarakatBySertifikat = [
-      dataUser.filter((item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat == "").length,
-      dataUser.filter((item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat != "").length,
+      isAdminBalaiPelatihan ? dataUser.filter((item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat == "").length : dataUser.filter((item: UserPelatihan) => item.FileSertifikat == "").length,
+      isAdminBalaiPelatihan ? dataUser.filter((item: UserPelatihan) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan) && item.FileSertifikat != "").length : dataUser.filter((item: UserPelatihan) => item.FileSertifikat != "").length,
     ];
 
     setStateMasyarakatBySertifikat({
@@ -664,12 +702,12 @@ const ChartDetailMasyarakatDilatih: React.FC<{
           />
         </div>
 
-        <TableDataPelatihanMasyarakat dataUserPelatihan={dataUser} />
-        <TableDataPelatihanMasyarakatByProvinsi dataPelatihan={data} />
-        <TableDataPelatihanMasyrakatByProgramPrioritas dataPelatihan={data} />
-        <TableDataPelatihanMasyarakatByWilker dataUserPelatihan={dataUser} />
-        <TableDataPelatihanMasyrakatByGender dataUserPelatihan={dataUser} />
-        <TableDataPelatihanMasyrakatByPendidikan dataUserPelatihan={dataUser} />
+        <TableDataPelatihanMasyarakat dataUserPelatihan={isAdminBalaiPelatihan ? dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan)) : dataUser} />
+        <TableDataPelatihanMasyarakatByProvinsi dataPelatihan={isAdminBalaiPelatihan ? data.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan)) : data} />
+        <TableDataPelatihanMasyrakatByProgramPrioritas dataPelatihan={isAdminBalaiPelatihan ? data.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan)) : data} />
+        <TableDataPelatihanMasyarakatByWilker dataUserPelatihan={isAdminBalaiPelatihan ? dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan)) : dataUser} />
+        <TableDataPelatihanMasyrakatByGender dataUserPelatihan={isAdminBalaiPelatihan ? dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan)) : dataUser} />
+        <TableDataPelatihanMasyrakatByPendidikan dataUserPelatihan={isAdminBalaiPelatihan ? dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan == nameBalaiPelatihan)) : dataUser} />
       </div>
     );
   };
