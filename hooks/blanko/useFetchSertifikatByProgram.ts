@@ -1,8 +1,12 @@
 import axios, { AxiosResponse } from 'axios'
 import Cookies from 'js-cookie'
 import { useState, useEffect } from 'react'
-import { blankoAkapiBaseUrl } from '@/constants/urls'
-import { SummarySertifikatByLemdiklat, SummarySertifikatByProgram, SummarySertifikatItem } from '@/types/akapi'
+import { akapiBaseUrl, blankoAkapiBaseUrl } from '@/constants/urls'
+import {
+  SummarySertifikatByLemdiklat,
+  SummarySertifikatByProgram,
+  SummarySertifikatItem,
+} from '@/types/akapi'
 
 const useFetchSertifikatByProgram = () => {
   const [data, setData] = useState<SummarySertifikatByProgram | null>(null)
@@ -12,7 +16,7 @@ const useFetchSertifikatByProgram = () => {
     setIsFetching(true)
     try {
       const response: AxiosResponse = await axios.get(
-        `${blankoAkapiBaseUrl}/getSertfikatiBalai`,
+        `${akapiBaseUrl}/get-sertifikat-balai?waktu_awal=2024-06-01&waktu_berakhir=2025-12-31`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get('XSRF091')}`,

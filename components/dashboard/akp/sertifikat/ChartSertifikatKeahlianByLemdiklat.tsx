@@ -348,7 +348,7 @@ function PieChartPercentageProgram({
 }: {
   dataProgram: SummarySertifikatByProgram;
 }) {
-  const data = dataProgram.data.data;
+  const data = dataProgram.data.DataCOP;
 
   // Define color palette
   const colors = [
@@ -361,10 +361,10 @@ function PieChartPercentageProgram({
   ];
 
   const processDataForChart = (dataProgram: SummarySertifikatByProgram) => {
-    return dataProgram.data.data.flatMap((item: any) =>
+    return dataProgram.data.DataCOP.flatMap((item: any) =>
       item.Lembaga.map((lembaga: any, index: number) => ({
-        name: lembaga.nama_embaga, // Name of institution
-        value: lembaga.total || 0, // Total certificates (fallback to 0)
+        name: lembaga.NamaLembaga, // Name of institution
+        value: lembaga.Total || 0, // Total certificates (fallback to 0)
         fill: colors[index % colors.length], // Assign colors in a loop
       }))
     );
@@ -389,11 +389,11 @@ function PieChartPercentageProgram({
   const formatData = (certificate: any) => {
     // Sum all totals for each certificate type, ignore institutions
     const totalForCertificate = certificate.Lembaga.reduce(
-      (acc: number, item: any) => acc + item.total,
+      (acc: number, item: any) => acc + item.Total,
       0
     );
     return {
-      name: certificate.setifikat, // Set the name as the certificate type
+      name: certificate.Setifikat, // Set the name as the certificate type
       value: totalForCertificate,
     };
   };

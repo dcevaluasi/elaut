@@ -114,11 +114,10 @@ export default function ChartSertifikatKeterampilanByLemdiklat({
       <Card className="p-4 mb-6">
         <CardHeader>
           <div
-            className={`flex ${
-              title.includes("Satuan Pendidikan") || title.includes("Swasta")
-                ? "flex-col"
-                : "flex-row items-center justify-between"
-            } `}
+            className={`flex ${title.includes("Satuan Pendidikan") || title.includes("Swasta")
+              ? "flex-col"
+              : "flex-row items-center justify-between"
+              } `}
           >
             <div className="flex flex-row items-center gap-2">
               <div>
@@ -144,8 +143,8 @@ export default function ChartSertifikatKeterampilanByLemdiklat({
               title.includes("Pelabuhan")
                 ? 900
                 : title.includes("Swasta") || title.includes("Satuan")
-                ? 150
-                : 300
+                  ? 150
+                  : 300
             }
           >
             {!title.includes("Pelabuhan") ? (
@@ -509,11 +508,11 @@ function PieChartPercentageProgram({
   const formatData = (certificate: any) => {
     // Sum all totals for each certificate type, ignore institutions
     const totalForCertificate = certificate.Lembaga.reduce(
-      (acc: number, item: any) => acc + item.total,
+      (acc: number, item: any) => acc + item.Total,
       0
     );
     return {
-      name: certificate.setifikat, // Set the name as the certificate type
+      name: certificate.Setifikat, // Set the name as the certificate type
       value: totalForCertificate,
     };
   };
@@ -523,6 +522,8 @@ function PieChartPercentageProgram({
     const formattedData = formatData(certificate);
     return [...acc, formattedData];
   }, []);
+
+  console.log({ chartData })
 
   // Calculate total certificates for the chart
   const totalCertificates = chartData.reduce(

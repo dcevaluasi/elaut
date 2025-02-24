@@ -351,7 +351,7 @@ function PieChartPercentageProgram({
 }: {
   dataProgram: SummarySertifikatByProgram;
 }) {
-  const data = dataProgram.data.data;
+  const data = dataProgram.data.DataCOP;
 
   // Define color palette
   const colors = [

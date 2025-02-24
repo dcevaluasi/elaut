@@ -26,7 +26,7 @@ import {
 } from "react-icons/tb";
 import Cookies from "js-cookie";
 import { checkOperatorPusat } from "@/lib/role";
-import { generateRandomId } from "@/lib/utils";
+import { encryptValue, generateRandomId } from "@/lib/utils";
 import { GrSend } from "react-icons/gr";
 import { HiOutlineDownload } from "react-icons/hi";
 import { PiImageBroken } from "react-icons/pi";
@@ -1015,9 +1015,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-3">
                                 <li>
                                   <Link
-                                    href="/admin/pusat/pelatihan/pemberitahuan-pelatihan"
-                                    className={`group relative w-fit flex items-center gap-2 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${pathname ===
-                                      "/admin/pusat/pelatihan/pemberitahuan-pelatihan" &&
+                                    href={`/admin/${encryptValue('pusat')}/pelatihan/pelaksanaan`}
+                                    className={`group relative w-fit flex items-center gap-2 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${pathname.includes('pelatihan/pelaksanaan') &&
                                       "text-white"
                                       }`}
                                   >

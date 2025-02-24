@@ -44,16 +44,16 @@ export type SummarySertifikatByProgram = {
 }
 
 export type DataSertifikasiSummary = {
-  data: SummarySertifikatItem[]
+  DataCOP: SummarySertifikatItem[]
   DataCOC: SummarySertifikatItem[]
 }
 
 export type SummarySertifikatItem = {
-  sertifikat: string
+  Sertifikat: string
   Lembaga: SummarySertifikatLembagaItem[]
 }
 
 export type SummarySertifikatLembagaItem = {
-  nama_lembaga: string;
-  total: number
+  NamaLembaga: string
+  Total: number
 }
