@@ -555,11 +555,10 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
                               <RiInformationFill className="h-5 w-5" /> Detail
                             </Link>
 
-                            <UploadSuratButton
+                            {/* <UploadSuratButton
                               idPelatihan={pelatihan!.IdPelatihan.toString()}
-                              handleFetchingData={handleFetchingPublicTrainingData}
                               suratPemberitahuan={pelatihan?.SuratPemberitahuan}
-                            />
+                            /> */}
 
                             {
                               (pelatihan!.UjiKompotensi == "Ujian Pre-test dan Post-test" && pelatihan!.StatusApproval != 'Selesai' && pelatihan!.StatusPenerbitan == 'Sudah Diverifikasi Pelaksanaan' && pelatihan!.PenyelenggaraPelatihan == 'Pusat Pelatihan KP') && <Link

@@ -23,7 +23,7 @@ interface UploadSuratButtonProps {
   suratPemberitahuan: string;
   idPelatihan: string;
   pelatihan: PelatihanMasyarakat
-  handleFetchingData: any;
+  handleFetchingData?: any;
 }
 
 const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
