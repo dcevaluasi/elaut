@@ -996,41 +996,43 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                       </div>
 
                       {/* Input Cover/Foto Pelatihan: Will allowed if user logged in is Operator Balai Pelatihan */}
-                      <> <p className="text-base flex gap-2 border-b border-b-gray-300 pb-2 mb-2 items-center text-gray-900 font-semibold max-w-md mt-5">
-                        <IoIosImages /> <span>Cover atau Poster Pelatihan</span>
-                      </p>
+                      {
+                        isOperatorBalaiPelatihan && <> <p className="text-base flex gap-2 border-b border-b-gray-300 pb-2 mb-2 items-center text-gray-900 font-semibold max-w-md mt-5">
+                          <IoIosImages /> <span>Cover atau Poster Pelatihan</span>
+                        </p>
 
-                        <div className="flex flex-wrap  mb-1 w-full">
-                          <div className="w-full">
-                            <label
-                              className="block text-gray-800 text-sm font-medium mb-1"
-                              htmlFor="penyelenggaraPelatihan"
-                            >
-                              Cover Pelatihan{" "}
-                              <span className="text-red-600">*</span>
-                            </label>
-                            {edit && (
-                              <Image
-                                src={
-                                  "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" +
-                                  fotoPelatihanOld
-                                }
-                                alt={namaPelatihan}
-                                width={0}
-                                height={0}
-                                className="w-full h-80 mb-5 rounded-2xl object-cover"
+                          <div className="flex flex-wrap  mb-1 w-full">
+                            <div className="w-full">
+                              <label
+                                className="block text-gray-800 text-sm font-medium mb-1"
+                                htmlFor="penyelenggaraPelatihan"
+                              >
+                                Cover Pelatihan{" "}
+                                <span className="text-red-600">*</span>
+                              </label>
+                              {edit && (
+                                <Image
+                                  src={
+                                    "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" +
+                                    fotoPelatihanOld
+                                  }
+                                  alt={namaPelatihan}
+                                  width={0}
+                                  height={0}
+                                  className="w-full h-80 mb-5 rounded-2xl object-cover"
+                                />
+                              )}
+
+                              <input
+                                id="file_excel"
+                                type="file"
+                                className=" cursor-pointer w-full border border-neutral-200 rounded-md"
+                                onChange={handleFileChange}
                               />
-                            )}
-
-                            <input
-                              id="file_excel"
-                              type="file"
-                              className=" cursor-pointer w-full border border-neutral-200 rounded-md"
-                              onChange={handleFileChange}
-                            />
+                            </div>
                           </div>
-                        </div>
-                      </>
+                        </>
+                      }
 
 
                       <p className="text-base flex gap-2 border-b border-b-gray-300 pb-2 mb-2 items-center text-gray-900 font-semibold max-w-md mt-5">
