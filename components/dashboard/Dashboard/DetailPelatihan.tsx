@@ -156,7 +156,7 @@ function DetailPelatihan() {
                     {
                       !isOperatorBalaiPelatihan && <><Link
                         title={pelatihan!.UserPelatihan.length != 0 ? 'Peserta Pelatihan' : 'Upload Data Peserta'}
-                        href={`/admin/${isOperatorBalaiPelatihan
+                        href={`/admin/${usePathname().includes('lemdiklat')
                           ? "lemdiklat"
                           : "pusat"
                           }/pelatihan/${pelatihan.KodePelatihan
