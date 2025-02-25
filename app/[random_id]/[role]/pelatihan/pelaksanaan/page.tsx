@@ -1,5 +1,3 @@
-'use client'
-
 import React from "react";
 import { LucideFileSignature } from "lucide-react";
 import LayoutAdminElaut from "@/components/dashboard/Layouts/LayoutAdminElaut";

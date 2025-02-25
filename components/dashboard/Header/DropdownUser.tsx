@@ -487,7 +487,7 @@ const DropdownUser = ({
               <AlertDialogFooter>
                 <AlertDialogCancel
                   onClick={(e) =>
-                    setOpenDialogLastSertifikat(!openFormEditProfile)
+                    setOpenDialogLastSertifikat(false)
                   }
                 >
                   Cancel
@@ -510,7 +510,7 @@ const DropdownUser = ({
         className="flex items-center gap-4"
         href="#"
       >
-        <span className="hidden text-right lg:block">
+        <span className="hidden lg:flex lg:justify-end lg:flex-col">
           <span className="block text-sm font-medium text-black">
             {pathname.includes("lemdiklat")
               ? userLoggedInInfo?.data?.NamaLemdik
@@ -518,12 +518,12 @@ const DropdownUser = ({
                 ? dataAdminPusat!.Nama
                 : ""}
           </span>
-          <span className="flex gap-1 text-xs">
+          <span className=" gap-1 text-xs  text-right">
 
             {pathname.includes("lemdiklat")
-              ? "Admin Lembaga Pendidikan dan Pelatihan"
+              ? Cookies.get('Eselon')
               : dataAdminPusat && pathname.includes("pusat")
-                ? dataAdminPusat!.NoTelpon
+                ? Cookies.get('Eselon')
                 : ""}
           </span>
         </span>

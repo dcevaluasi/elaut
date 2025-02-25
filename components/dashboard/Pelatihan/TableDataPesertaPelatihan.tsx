@@ -91,6 +91,7 @@ import { generateTanggalPelatihan } from "@/utils/text";
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 
 const TableDataPesertaPelatihan = () => {
+  const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const pathname = usePathname();
   const id = decryptValue(extractLastSegment(pathname));
@@ -279,7 +280,7 @@ const TableDataPesertaPelatihan = () => {
             className={`flex items-center justify-center leading-[105%] p-0 w-full text-gray-900 font-semibold`}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            {usePathname().includes("puslat") ? (
+            {!isOperatorBalaiPelatihan ? (
               <span>Detail Peserta</span>
             ) : (
               <span>
@@ -293,7 +294,7 @@ const TableDataPesertaPelatihan = () => {
       },
       cell: ({ row }) => (
         <div className={` flex items-center justify-center w-full gap-1`}>
-          {usePathname().includes("lemdiklat") ? (
+          {isOperatorBalaiPelatihan ? (
             row.original.Keterangan == "Valid" ? (
               <Link
                 href={`/admin/${usePathname().includes("lemdiklat") ? "lemdiklat" : "pusat"
@@ -543,7 +544,7 @@ const TableDataPesertaPelatihan = () => {
         return (
           <Button
             variant="ghost"
-            className={`text-black font-semibold w-fit p-0 ${typeRole != "satdik" ? "flex" : "hidden"
+            className={`text-black font-semibold w-fit p-0 ${isOperatorBalaiPelatihan ? "flex" : "hidden"
               } justify-start items-center`}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
@@ -555,7 +556,7 @@ const TableDataPesertaPelatihan = () => {
       },
       cell: ({ row }) => (
         <div
-          className={`${"ml-0"} text-left capitalize ${typeRole != "satdik" ? "block" : "hidden"
+          className={`${"ml-0"} text-left capitalize ${isOperatorBalaiPelatihan ? "block" : "hidden"
             }`}
         >
           <p className="text-base font-semibold tracking-tight leading-none">
@@ -793,7 +794,10 @@ const TableDataPesertaPelatihan = () => {
                     {dataPelatihan != null
                       ? dataPelatihan!.KodePelatihan
                       : ""}{" "}
-                    •{" "}
+                    •{" "}{dataPelatihan != null
+                      ? dataPelatihan!.Program
+                      : ""}{" "}
+                    •
                     {dataPelatihan != null
                       ? dataPelatihan!.BidangPelatihan
                       : ""}{" "}
@@ -992,7 +996,7 @@ const TableDataPesertaPelatihan = () => {
                     </p>
                   </div>
                 </div>
-                {typeRole != "satdik" && (
+                {isOperatorBalaiPelatihan && (
                   <div className="flex min-w-47.5">
                     <span className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-secondary">
                       <span className="block h-2.5 w-full max-w-2.5 rounded-full bg-secondary"></span>
@@ -1036,7 +1040,7 @@ const TableDataPesertaPelatihan = () => {
 
           <div className="flex w-full items-center mb-2">
             <div className="flex w-full gap-1 items-start">
-              {typeRole != "satdik" && (
+              {isOperatorBalaiPelatihan && (
                 <Select>
                   <SelectTrigger className="w-[200px] border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
                     <div className="inline-flex gap-2 px-3 mr-2 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">

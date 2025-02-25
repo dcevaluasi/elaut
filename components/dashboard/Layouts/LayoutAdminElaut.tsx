@@ -32,6 +32,7 @@ export default function LayoutAdminElaut({
       console.log({ response })
       Cookies.set("NIK", response.data.data.Nip);
       Cookies.set("Satker", response.data.data.Status);
+      Cookies.set("Role", response.data.data.Nip);
       Cookies.set("Jabatan", response.data.data.NoTelpon);
     } catch (error) {
       console.error({ error });
@@ -51,6 +52,7 @@ export default function LayoutAdminElaut({
       setLemdikData(response.data);
       Cookies.set("IDLemdik", response.data.data.IdLemdik);
       Cookies.set("SATKER_BPPP", response.data.data.NamaLemdik);
+      Cookies.set("Eselon", response.data.data.Deskripsi);
     } catch (error) {
       console.error("LEMDIK INFO: ", error);
     }
@@ -86,7 +88,7 @@ export default function LayoutAdminElaut({
 
       {
         title: "Pelatihan",
-        href: `/admin/${encryptValue('pusat')}/pelatihan/pelaksanaan`,
+        href: `/admin/pusat/pelatihan/pelaksanaan`,
         iconPath:
           "M18.546 3h-13.069l-5.477 8.986v9.014h24v-9.014l-5.454-8.986zm-3.796 12h-5.5l-2.25-3h-4.666l4.266-7h10.82l4.249 7h-4.669l-2.25 3zm-9.75-4l.607-1h12.787l.606 1h-14zm12.18-3l.607 1h-11.573l.607-1h10.359zm-1.214-2l.606 1h-9.144l.607-1h7.931z",
       },

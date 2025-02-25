@@ -1,12 +1,8 @@
 import axios, { AxiosResponse } from 'axios'
 import Cookies from 'js-cookie'
 import { useState, useEffect } from 'react'
-import { akapiBaseUrl, blankoAkapiBaseUrl } from '@/constants/urls'
-import {
-  SummarySertifikatByLemdiklat,
-  SummarySertifikatByProgram,
-  SummarySertifikatItem,
-} from '@/types/akapi'
+import { akapiBaseUrl } from '@/constants/urls'
+import { SummarySertifikatByProgram } from '@/types/akapi'
 
 const useFetchSertifikatByProgram = () => {
   const [data, setData] = useState<SummarySertifikatByProgram | null>(null)

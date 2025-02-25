@@ -71,6 +71,7 @@ import { IoRefreshSharp } from "react-icons/io5";
 import { HashLoader } from "react-spinners";
 import NoSertifikatButton from "../Dashboard/Actions/NoSertifikatButton";
 import { AiOutlineFieldNumber } from "react-icons/ai";
+import { BiPaperPlane } from "react-icons/bi";
 
 const TableDataPelatihan: React.FC = () => {
   const [data, setData] = React.useState<PelatihanMasyarakat[]>([]);
@@ -231,6 +232,45 @@ const TableDataPelatihan: React.FC = () => {
     return matchesCategory && matchesSearchQuery && matchesStatus;
   });
 
+  const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
+
+  // Handling Send to SPV from Operator Pusat
+  const handleSendToSPVAboutCertificateIssueance = async (idPelatihan: string) => {
+    const updateData = new FormData()
+    updateData.append('PenerbitanSertifikatDiterima', 'Pengajuan Telah Dikirim Dari Operator Pusat')
+    updateData.append('PemberitahuanDiterima', 'Pengajuan Telah Dikirim ke SPV')
+
+    try {
+      const uploadBeritaAcaraResponse = await axios.put(
+        `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${idPelatihan}`,
+        updateData,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      Toast.fire({
+        icon: "success",
+        title: "Yeayyy!",
+        text: "Berhasil mengirimkan informasi pengajuan kepada SPV Pusat!",
+      });
+
+
+      handleFetchingPublicTrainingData();
+    } catch (error) {
+      console.error("ERROR GENERATE SERTIFIKAT: ", error);
+      Toast.fire({
+        icon: "error",
+        title: "Oopsss!",
+        text: "Gagal mengirimkan informasi pengajuan kepada SPV Pusat!",
+      });
+      handleFetchingPublicTrainingData();
+    }
+  }
+
   return (
     <div className="shadow-default -mt-10">
       <AlertDialog
@@ -330,12 +370,15 @@ const TableDataPelatihan: React.FC = () => {
               onClick={() => setSelectedStatusFilter("All")}
             />
 
-            <StatusButton
-              label="Belum Dipublish"
-              count={countNotPublished}
-              isSelected={selectedStatusFilter === "Belum Dipublish"}
-              onClick={() => setSelectedStatusFilter("Belum Dipublish")}
-            />
+            {
+              isOperatorBalaiPelatihan && <StatusButton
+                label="Belum Dipublish"
+                count={countNotPublished}
+                isSelected={selectedStatusFilter === "Belum Dipublish"}
+                onClick={() => setSelectedStatusFilter("Belum Dipublish")}
+              />
+            }
+
 
             <StatusButton
               label="Proses Verifikasi Pelaksanaan"
@@ -538,8 +581,9 @@ const TableDataPelatihan: React.FC = () => {
                                 <HiUserGroup className="text-base" />
                                 <span>
                                   Jumlah peserta pelatihan :{" "}
-                                  {pelatihan!.UserPelatihan.length}/
-                                  {pelatihan!.KoutaPelatihan}
+                                  {pelatihan!.UserPelatihan.length}
+                                  {isOperatorBalaiPelatihan && `/
+                                  ${pelatihan!.KoutaPelatihan}`}
                                 </span>
                               </span>
                             </p>
@@ -559,11 +603,33 @@ const TableDataPelatihan: React.FC = () => {
                             </Link>
                             <UploadSuratButton
                               idPelatihan={pelatihan!.IdPelatihan.toString()}
+                              pelatihan={pelatihan!}
                               handleFetchingData={
                                 handleFetchingPublicTrainingData
                               }
                               suratPemberitahuan={pelatihan?.SuratPemberitahuan}
                             />
+
+                            {
+                              (!isOperatorBalaiPelatihan && pelatihan!.PemberitahuanDiterima == 'Kirim ke SPV') && <Button
+                                onClick={() => handleSendToSPVAboutCertificateIssueance(pelatihan!.IdPelatihan.toString())}
+                                variant="outline"
+                                className="bg-indigo-600 text-neutral-100 hover:text-neutral-100 hover:bg-indigo-600"
+                              >
+                                <BiPaperPlane className="h-4 w-4 text-neutral-100" />{" "}
+                                Kirim ke SPV
+                              </Button>
+                            }
+
+                            <CloseButton
+                              pelatihan={pelatihan!}
+                              statusPelatihan={pelatihan?.Status ?? ""}
+                              idPelatihan={pelatihan!.IdPelatihan.toString()}
+                              handleFetchingData={
+                                handleFetchingPublicTrainingData
+                              }
+                            />
+
 
                             {/* Button untuk input nomor sertifikat, akan aktif jika balai pelatihan sudah mengupload BA dan memilih penandatanganan */}
                             <NoSertifikatButton
@@ -574,128 +640,162 @@ const TableDataPelatihan: React.FC = () => {
                               }
                             />
 
+                            {/* {
+                              !isOperatorBalaiPelatihan && <><Link
+                                title={pelatihan!.UserPelatihan.length != 0 ? 'Peserta Pelatihan' : 'Upload Data Peserta'}
+                                href={`/admin/${isOperatorBalaiPelatihan
+                                  ? "lemdiklat"
+                                  : "pusat"
+                                  }/pelatihan/${pelatihan.KodePelatihan
+                                  }/peserta-pelatihan/${encryptValue(
+                                    pelatihan.IdPelatihan
+                                  )}`}
+                                target="_blank"
+                                className="  shadow-sm bg-green-500 hover:bg-green-500 text-neutral-100  hover:text-neutral-100 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2"
+                              >
+                                <HiUserGroup className="h-5 w-5 " /> {pelatihan!.UserPelatihan.length != 0 ? 'Peserta Pelatihan' : 'Upload Data Peserta'}
+                              </Link>  <GenerateNoSertifikatButton
+                                  idPelatihan={pelatihan!.IdPelatihan.toString()}
+                                  pelatihan={pelatihan!}
+                                  handleFetchingData={
+                                    handleFetchingPublicTrainingData
+                                  }
+                                /></>
+                            } */}
 
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <Button variant="outline"><FiSettings />Actions</Button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-80 flex flex-col gap-1">
+
+                            {
+                              isOperatorBalaiPelatihan && <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button variant="outline"><FiSettings />Actions</Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-80 flex flex-col gap-1">
 
 
-                                {pelatihan?.StatusPenerbitan !=
-                                  "Sudah Diverifikasi Pelaksanaan" ? (
-                                  <></>
-                                ) : (
-                                  <>
-                                    <Link
-                                      title="Peserta Pelatihan"
-                                      href={`/admin/${usePathname().includes("lemdiklat")
-                                        ? "lemdiklat"
-                                        : "pusat"
-                                        }/pelatihan/${pelatihan.KodePelatihan
-                                        }/peserta-pelatihan/${encryptValue(
-                                          pelatihan.IdPelatihan
-                                        )}`}
-                                      target="_blank"
-                                      className="  shadow-sm bg-green-500 hover:bg-green-500 text-neutral-100  hover:text-neutral-100 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2"
-                                    >
-                                      <HiUserGroup className="h-5 w-5 " /> Peserta
-                                      Pelatihan
-                                    </Link>
-                                    {(pelatihan!.TanggalMulaiPelatihan == "" && pelatihan!.StatusApproval != 'Selesai') && (
-                                      <Button
-                                        onClick={() => {
-                                          setOpenFormEditPelatihan(true);
-                                          setSelectedPelatihan(pelatihan);
-                                        }}
-                                        title="Edit Pelatihan"
-                                        variant="outline"
-                                        className="ml-auto w-full hover:bg-yellow-300 bg-yellow-300 hover:text-neutral-700 text-neutral-700 duration-700"
-                                      >
-                                        <FiEdit2 className="h-5 w-5" /> Edit Pelatihan
-                                      </Button>
-                                    )}
-
-                                    {pelatihan!.Status != "Publish" && (
+                                  {
+                                    isOperatorBalaiPelatihan ? pelatihan?.StatusPenerbitan !=
+                                      "Sudah Diverifikasi Pelaksanaan" ? (
+                                      <></>
+                                    ) : (
                                       <>
-                                        <DeleteButton
+                                        <Link
+                                          title="Peserta Pelatihan"
+                                          href={`/admin/${usePathname().includes("lemdiklat")
+                                            ? "lemdiklat"
+                                            : "pusat"
+                                            }/pelatihan/${pelatihan.KodePelatihan
+                                            }/peserta-pelatihan/${encryptValue(
+                                              pelatihan.IdPelatihan
+                                            )}`}
+                                          target="_blank"
+                                          className="  shadow-sm bg-green-500 hover:bg-green-500 text-neutral-100  hover:text-neutral-100 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2"
+                                        >
+                                          <HiUserGroup className="h-5 w-5 " /> Peserta
+                                          Pelatihan
+                                        </Link>
+                                        {(pelatihan!.TanggalMulaiPelatihan == "" && pelatihan!.StatusApproval != 'Selesai') && (
+                                          <Button
+                                            onClick={() => {
+                                              setOpenFormEditPelatihan(true);
+                                              setSelectedPelatihan(pelatihan);
+                                            }}
+                                            title="Edit Pelatihan"
+                                            variant="outline"
+                                            className="ml-auto w-full hover:bg-yellow-300 bg-yellow-300 hover:text-neutral-700 text-neutral-700 duration-700"
+                                          >
+                                            <FiEdit2 className="h-5 w-5" /> Edit Pelatihan
+                                          </Button>
+                                        )}
+
+                                        {pelatihan!.Status != "Publish" && (
+                                          <>
+                                            <DeleteButton
+                                              idPelatihan={pelatihan!.IdPelatihan.toString()}
+                                              pelatihan={pelatihan}
+                                              handleFetchingData={
+                                                handleFetchingPublicTrainingData
+                                              }
+                                            />
+                                          </>
+                                        )}
+                                        {pelatihan!.Status == "Publish" ? (
+                                          pelatihan!.UserPelatihan.length == 0 ? (
+                                            <PublishButton
+                                              title="Take Down"
+                                              statusPelatihan={pelatihan?.Status ?? ""}
+                                              idPelatihan={pelatihan!.IdPelatihan.toString()}
+                                              handleFetchingData={
+                                                handleFetchingPublicTrainingData
+                                              }
+                                            />
+                                          ) : (
+                                            <></>
+                                          )
+                                        ) : (
+                                          <PublishButton
+                                            title="Publish"
+                                            statusPelatihan={pelatihan?.Status ?? ""}
+                                            idPelatihan={pelatihan!.IdPelatihan.toString()}
+                                            handleFetchingData={
+                                              handleFetchingPublicTrainingData
+                                            }
+                                          />
+                                        )}
+
+                                        <GenerateNoSertifikatButton
                                           idPelatihan={pelatihan!.IdPelatihan.toString()}
-                                          pelatihan={pelatihan}
+                                          pelatihan={pelatihan!}
                                           handleFetchingData={
                                             handleFetchingPublicTrainingData
                                           }
                                         />
-                                      </>
-                                    )}
-                                    {pelatihan!.Status == "Publish" ? (
-                                      pelatihan!.UserPelatihan.length == 0 ? (
-                                        <PublishButton
-                                          title="Take Down"
+
+                                        <CloseButton
+                                          pelatihan={pelatihan!}
                                           statusPelatihan={pelatihan?.Status ?? ""}
                                           idPelatihan={pelatihan!.IdPelatihan.toString()}
                                           handleFetchingData={
                                             handleFetchingPublicTrainingData
                                           }
                                         />
-                                      ) : (
-                                        <></>
-                                      )
-                                    ) : (
-                                      <PublishButton
-                                        title="Publish"
-                                        statusPelatihan={pelatihan?.Status ?? ""}
-                                        idPelatihan={pelatihan!.IdPelatihan.toString()}
-                                        handleFetchingData={
-                                          handleFetchingPublicTrainingData
-                                        }
-                                      />
-                                    )}
+                                      </>
+                                    ) : <Link
+                                      title="Bank Soal"
+                                      href={`/admin/lemdiklat/pelatihan/${pelatihan!.KodePelatihan
+                                        }/bank-soal/${encryptValue(pelatihan!.IdPelatihan)}`}
+                                      className="border border-blue-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-blue-900 hover:bg-blue-900 hover:text-white text-white rounded-md"
+                                    >
+                                      <TbDatabase className="h-5 w-5" /> Bank Soal Pre-Test & Post-Test
+                                    </Link>
+                                  }
 
-                                    <GenerateNoSertifikatButton
+
+
+                                  {
+                                    (pelatihan!.UjiKompotensi == "Ujian Pre-test dan Post-test" && pelatihan!.StatusApproval != 'Selesai' && pelatihan!.StatusPenerbitan == 'Sudah Diverifikasi Pelaksanaan') && <Link
+                                      title="Bank Soal"
+                                      href={`/admin/lemdiklat/pelatihan/${pelatihan!.KodePelatihan
+                                        }/bank-soal/${encryptValue(pelatihan!.IdPelatihan)}`}
+                                      className="border border-blue-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-blue-900 hover:bg-blue-900 hover:text-white text-white rounded-md"
+                                    >
+                                      <TbDatabase className="h-5 w-5" /> Bank Soal
+                                    </Link>
+                                  }
+
+
+                                  {
+                                    (pelatihan!.StatusApproval != 'Selesai' && pelatihan!.StatusPenerbitan == 'Sudah Diverifikasi Pelaksanaan') && <MateriButton
                                       idPelatihan={pelatihan!.IdPelatihan.toString()}
-                                      pelatihan={pelatihan!}
                                       handleFetchingData={
                                         handleFetchingPublicTrainingData
                                       }
+                                      data={pelatihan!}
                                     />
+                                  }
 
-                                    <CloseButton
-                                      pelatihan={pelatihan!}
-                                      statusPelatihan={pelatihan?.Status ?? ""}
-                                      idPelatihan={pelatihan!.IdPelatihan.toString()}
-                                      handleFetchingData={
-                                        handleFetchingPublicTrainingData
-                                      }
-                                    />
-                                  </>
-                                )}
-
-
-
-                                {
-                                  (pelatihan!.UjiKompotensi == "Ujian Pre-test dan Post-test" && pelatihan!.StatusApproval != 'Selesai' && pelatihan!.StatusPenerbitan == 'Sudah Diverifikasi Pelaksanaan') && <Link
-                                    title="Bank Soal"
-                                    href={`/admin/lemdiklat/pelatihan/${pelatihan!.KodePelatihan
-                                      }/bank-soal/${encryptValue(pelatihan!.IdPelatihan)}`}
-                                    className="border border-blue-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-blue-900 hover:bg-blue-900 hover:text-white text-white rounded-md"
-                                  >
-                                    <TbDatabase className="h-5 w-5" /> Bank Soal
-                                  </Link>
-                                }
-
-
-                                {
-                                  (pelatihan!.StatusApproval != 'Selesai' && pelatihan!.StatusPenerbitan == 'Sudah Diverifikasi Pelaksanaan') && <MateriButton
-                                    idPelatihan={pelatihan!.IdPelatihan.toString()}
-                                    handleFetchingData={
-                                      handleFetchingPublicTrainingData
-                                    }
-                                    data={pelatihan!}
-                                  />
-                                }
-
-                              </PopoverContent>
-                            </Popover>
+                                </PopoverContent>
+                              </Popover>
+                            }
                           </div>
                           <p className="italic text-neutral-400 text-[0.6rem]">
                             Created at {pelatihan!.CreateAt} | Updated at{" "}

@@ -1015,7 +1015,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-3">
                                 <li>
                                   <Link
-                                    href={`/admin/${encryptValue('pusat')}/pelatihan/pelaksanaan`}
+                                    href={`/admin/pusat/pelatihan/pelaksanaan`}
                                     className={`group relative w-fit flex items-center gap-2 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${pathname.includes('pelatihan/pelaksanaan') &&
                                       "text-white"
                                       }`}

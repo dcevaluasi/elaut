@@ -1,11 +1,5 @@
 import React from "react";
 import {
-  Tooltip,
-  TooltipProvider,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/components/ui/tooltip";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -18,7 +12,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { TbBroadcast } from "react-icons/tb";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { elautBaseUrl } from "@/constants/urls";
 import axios from "axios";
@@ -142,20 +135,20 @@ const CloseButton: React.FC<CloseButtonProps> = ({
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* {pelatihan.TanggalBerakhirPelatihan >= today &&
-        pelatihan.StatusApproval != "Selesai" && ( */}
-      <Button
-        title="Tutup Kelas Pelatihan"
-        onClick={() => {
-          setSelectedStatus(statusPelatihan);
-          setOpenFormTutupPelatihan(!openFormTutupPelatihan);
-        }}
-        variant="outline"
-        className="ml-auto hover:bg-primary bg-primary hover:text-neutral-100 text-neutral-100 duration-700 w-full"
-      >
-        <HiLockClosed className="h-5 w-5" /> Tutup Pelatihan
-      </Button>
-      {/* )} */}
+      {(pelatihan.TanggalBerakhirPelatihan <= today &&
+        pelatihan.StatusApproval != "Selesai") && (
+          <Button
+            title="Tutup Kelas Pelatihan"
+            onClick={() => {
+              setSelectedStatus(statusPelatihan);
+              setOpenFormTutupPelatihan(!openFormTutupPelatihan);
+            }}
+            variant="outline"
+            className="ml-auto hover:bg-primary bg-primary hover:text-neutral-100 text-neutral-100 duration-700 w-full"
+          >
+            <HiLockClosed className="h-5 w-5" /> Tutup Pelatihan
+          </Button>
+        )}
     </>
   );
 };

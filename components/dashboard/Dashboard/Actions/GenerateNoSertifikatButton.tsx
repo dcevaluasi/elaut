@@ -40,6 +40,7 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
   const [ttdSertifikat, setTtdSertifikat] = React.useState<string>("");
   const [beritaAcara, setBeritaAcara] = React.useState<File | null>(null);
 
+
   const handleFileChange = (e: any) => {
     const file = e.target.files[0];
     if (file) {
@@ -64,13 +65,17 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
     console.log({ ttdSertifikat });
 
     const formData = new FormData();
+
     formData.append("TtdSertifikat", ttdSertifikat);
 
     const updateData = new FormData();
+
     updateData.append("PemberitahuanDiterima", "Input no sertifikat");
+
     if (beritaAcara) {
-      updateData.append("BeritaAcara", beritaAcara);
+      updateData.append(isOperatorBalaiPelatihan ? 'BeritaAcara' : 'SuratPemberitahuan', beritaAcara);
     }
+
 
     try {
       const response = await axios.post(
@@ -121,6 +126,7 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
 
   const [isUploading, setIsUploading] = React.useState<boolean>(false);
   const typeRole = Cookies.get("XSRF093");
+  const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
 
   return (
     <>
@@ -190,20 +196,21 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
                     >
                       Kepala BPPSDM KP
                     </option>
-                    {typeRole == "balai" && (
+                    <option
+                      onClick={(e) =>
+                        setTtdSertifikat(
+                          "Kepala Pusat Pelatihan Kelautan dan Perikanan"
+                        )
+                      }
+                      value={
+                        "Kepala Pusat Pelatihan Kelautan dan Perikanan"
+                      }
+                    >
+                      Kepala Pusat Pelatihan KP
+                    </option>
+                    {isOperatorBalaiPelatihan && (
                       <>
-                        <option
-                          onClick={(e) =>
-                            setTtdSertifikat(
-                              "Kepala Pusat Pelatihan Kelautan dan Perikanan"
-                            )
-                          }
-                          value={
-                            "Kepala Pusat Pelatihan Kelautan dan Perikanan"
-                          }
-                        >
-                          Kepala Pusat Pelatihan KP
-                        </option>
+
                         <option
                           onClick={(e) =>
                             setTtdSertifikat(
@@ -319,7 +326,7 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
         </AlertDialogContent>
       </AlertDialog>
 
-      {pelatihan.StatusApproval == "Selesai" &&
+      {isOperatorBalaiPelatihan ? pelatihan.StatusApproval == "Selesai" &&
         (pelatihan.NoSertifikat == "" ? (
           <Button
             onClick={(e) => {
@@ -330,6 +337,20 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
             className="ml-auto w-full bg-blue-600 hover:bg-blue-600 duration-700 text-neutral-100 hover:text-neutral-100"
           >
             <RiVerifiedBadgeFill className="h-5 w-5" /> Pengajuan Penerbitan
+          </Button>
+        ) : (
+          <></>
+        )) :
+        (pelatihan.StatusApproval == "Selesai" && pelatihan!.SuratPemberitahuan == '' ? (
+          <Button
+            onClick={(e) => {
+              setOpenFormSertifikat(true);
+            }}
+            variant="outline"
+            title="Ajukan Penerbitan Sertifikat"
+            className="ml-auto w-fit bg-blue-600 border-blue-600 hover:bg-blue-600 duration-700 text-neutral-100 hover:text-neutral-100"
+          >
+            <RiVerifiedBadgeFill className="h-5 w-5" /> Ajukan Penerbitan Sertifikat
           </Button>
         ) : (
           <></>

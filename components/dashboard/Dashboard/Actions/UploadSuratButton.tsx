@@ -1,11 +1,5 @@
 import React from "react";
 import {
-  Tooltip,
-  TooltipProvider,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/components/ui/tooltip";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -14,12 +8,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { TbBroadcast } from "react-icons/tb";
-import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { elautBaseUrl } from "@/constants/urls";
 import axios from "axios";
 import Toast from "@/components/toast";
@@ -27,18 +17,22 @@ import Cookies from "js-cookie";
 import { LucideFileCheck2 } from "lucide-react";
 import Link from "next/link";
 import { FiUploadCloud } from "react-icons/fi";
+import { PelatihanMasyarakat } from "@/types/product";
 
 interface UploadSuratButtonProps {
   suratPemberitahuan: string;
   idPelatihan: string;
+  pelatihan: PelatihanMasyarakat
   handleFetchingData: any;
 }
 
 const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
   suratPemberitahuan,
   idPelatihan,
+  pelatihan,
   handleFetchingData,
 }) => {
+  const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
   const [isOpenFormSuratPemberitahuan, setIsOpenFormSuratPemberitahuan] =
     React.useState<boolean>(false);
   const [suratPemberitahuanFile, setSuratPemberitahuanFile] =
@@ -199,28 +193,40 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
         </AlertDialogContent>
       </AlertDialog>
 
-      {suratPemberitahuan !=
-        "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/suratPemberitahuan/" ? (
-        <Link
-          href={suratPemberitahuan}
+      {
+        isOperatorBalaiPelatihan ? suratPemberitahuan !=
+          "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/suratPemberitahuan/" ? (
+          <Link
+            href={suratPemberitahuan}
+            title="Surat Pemberitahuan"
+            target="_blank"
+            className="border border-neutral-200  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-gray-800 hover:bg-gray-800 hover:text-white text-white rounded-md"
+          >
+            <LucideFileCheck2 className="h-5 w-5" /> Surat Pemberitahuan
+          </Link>
+        ) : (
+          <Button
+            onClick={() => {
+              setIsOpenFormSuratPemberitahuan(!isOpenFormSuratPemberitahuan);
+            }}
+            variant="outline"
+            title="Upload Surat Pemberitahuan"
+            className="border border-neutral-200  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-gray-800 hover:bg-gray-800 hover:text-white text-white rounded-md"
+          >
+            <FiUploadCloud className="h-5 w-5" /> Upload Surat Pemberitahuan
+          </Button>
+        ) : <Link
+          href={`${pelatihan!.SilabusPelatihan
+            }`}
           title="Surat Pemberitahuan"
           target="_blank"
           className="border border-neutral-200  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-gray-800 hover:bg-gray-800 hover:text-white text-white rounded-md"
         >
           <LucideFileCheck2 className="h-5 w-5" /> Surat Pemberitahuan
         </Link>
-      ) : (
-        <Button
-          onClick={() => {
-            setIsOpenFormSuratPemberitahuan(!isOpenFormSuratPemberitahuan);
-          }}
-          variant="outline"
-          title="Upload Surat Pemberitahuan"
-          className="border border-neutral-200  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-gray-800 hover:bg-gray-800 hover:text-white text-white rounded-md"
-        >
-          <FiUploadCloud className="h-5 w-5" /> Upload Surat Pemberitahuan
-        </Button>
-      )}
+      }
+
+
     </>
   );
 };

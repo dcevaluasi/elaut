@@ -37,7 +37,7 @@ const NoSertifikatButton: React.FC<NoSertifikatButtonProps> = ({
         setIsUploading(true);
         const updateData = new FormData();
         updateData.append("NoSertifikat", noSertifikat);
-        updateData.append("PemberitahuanDiterima", "No sertifikat telah diinput");
+        updateData.append("PemberitahuanDiterima", "Kirim ke SPV");
         try {
             const uploadBeritaAcaraResponse = await axios.put(
                 `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${idPelatihan}`,

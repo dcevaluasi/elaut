@@ -62,6 +62,7 @@ import { PelatihanMasyarakat } from "@/types/product";
 import { generateFullNameBalai, generateTanggalPelatihan } from "@/utils/text";
 import {
   decryptValue,
+  encryptValue,
   formatToRupiah,
   generateInstrukturName,
 } from "@/lib/utils";
@@ -76,9 +77,11 @@ import GenerateNoSertifikatButton from "./Actions/GenerateNoSertifikatButton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
+import NoSertifikatButton from "./Actions/NoSertifikatButton";
 
 function DetailPelatihan() {
   const isAdminBalaiPelatihan: boolean = usePathname().includes('lemdiklat')
+  const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
   const paths = usePathname().split("/");
   const idPelatihan = decryptValue(paths[paths.length - 1]);
   const kodePelatihan = paths[paths.length - 2];
@@ -137,7 +140,54 @@ function DetailPelatihan() {
         </div>
       </div>
 
+      {pelatihan != null && (
+        <div className='grid grid-cols-2 w-full gap-0'>
+          <div className="px-4 w-full mb-4">
+            <div className="w-full border border-gray-200 rounded-xl">
+              <div className="bg-gray-100 p-4 w-full ">
+                <h2 className="font-calsans text-xl">
+                  Actions
+                </h2>
+              </div>
+              <table className="w-full">
+                <tr className="border-b border-b-gray-200 w-full">
+
+                  <td className="p-4 w-fit gap-1 flex justify-start ">
+                    {
+                      !isOperatorBalaiPelatihan && <><Link
+                        title={pelatihan!.UserPelatihan.length != 0 ? 'Peserta Pelatihan' : 'Upload Data Peserta'}
+                        href={`/admin/${isOperatorBalaiPelatihan
+                          ? "lemdiklat"
+                          : "pusat"
+                          }/pelatihan/${pelatihan.KodePelatihan
+                          }/peserta-pelatihan/${encryptValue(
+                            pelatihan.IdPelatihan
+                          )}`}
+                        target="_blank"
+                        className="  shadow-sm bg-green-500 hover:bg-green-500 text-neutral-100  hover:text-neutral-100 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2"
+                      >
+                        <HiUserGroup className="h-5 w-5 " /> {pelatihan!.UserPelatihan.length != 0 ? 'Peserta Pelatihan' : 'Upload Data Peserta'}
+                      </Link>  <GenerateNoSertifikatButton
+                          idPelatihan={pelatihan!.IdPelatihan.toString()}
+                          pelatihan={pelatihan!}
+                          handleFetchingData={
+                            handleFetchDetailPelatihan
+                          }
+                        /></>
+                    }
+
+
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+          <div className=" w-full mb-4"></div>
+        </div>
+
+      )}
       <div className="flex w-full gap-0">
+
         {pelatihan != null && (
           <div className="px-4 w-full">
             <div className="w-full border border-gray-200 rounded-xl">
@@ -241,7 +291,14 @@ function DetailPelatihan() {
                     Surat Pemberitahuan
                   </td>
                   <td className="p-4 w-2/3">
-                    {pelatihan!.SuratPemberitahuan || ""}
+                    <Link
+                      target="_blank"
+                      className="text-blue-500 underline"
+                      href={`${isOperatorBalaiPelatihan ? 'https://elaut-bppsdm.kkp.go.id/api-elaut/public/suratPemberitahuan/pelatihan/' + pelatihan!.SuratPemberitahuan || "" : 'https://elaut-bppsdm.kkp.go.id/api-elaut/public/silabus/pelatihan/' + pelatihan!.SilabusPelatihan || ""}`}
+                    >
+                      {isOperatorBalaiPelatihan ? pelatihan!.SuratPemberitahuan || "" : pelatihan!.SilabusPelatihan || ""}
+                    </Link>
+
                   </td>
                 </tr>
               </table>

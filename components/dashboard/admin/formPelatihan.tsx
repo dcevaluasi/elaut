@@ -287,7 +287,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
       Toast.fire({
         icon: "success",
         title: `Yeayyy!`,
-        text: 'Berhasil menambahkan pelatihan baru!'
+        text: 'Berhasil menambahkan pelatihan baru, silahkan membuka tab Daftar Pelatihan!'
       });
       setIsUploading(false);
       resetAllStateToEmptyString();
@@ -307,7 +307,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
   const elementRef = useRef<HTMLDivElement>(null);
 
   const handleNext = () => {
-    if (indexFormTab == 0 && typeRole == 'balai') {
+    if (indexFormTab == 0 && isOperatorBalaiPelatihan) {
       console.log({ fotoPelatihan });
       if (
         namaPelatihan == "" ||
@@ -489,6 +489,9 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
   const [waktuPelaksanaanPelatihan, setWaktuPelaksanaanPelatihan] =
     React.useState(false);
 
+
+  const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
+
   return (
     <section ref={elementRef} className="relative w-full py-10">
       <div className=" mx-auto px-4 sm:px-6 md:-mt-8">
@@ -532,42 +535,50 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                     </h2>
                   )}
 
-                  <p className="text-base">
-                    {indexFormTab == 0 ? (
-                      <span
-                        className={`font-bold  leading-[100%] my-6 ${edit ? "text-yellow-500" : "text-blue-500"
-                          } `}
-                      >
-                        1
-                      </span>
-                    ) : indexFormTab == 1 ? (
-                      <span
-                        className={`font-bold  leading-[100%] my-6 ${edit ? "text-yellow-500" : "text-blue-500"
-                          } `}
-                      >
-                        2
-                      </span>
-                    ) : indexFormTab == 2 && typeRole == 'balai' ? (
-                      <span
-                        className={`font-bold  leading-[100%] my-6 ${edit ? "text-yellow-500" : "text-blue-500"
-                          } `}
-                      >
-                        3
-                      </span>
-                    ) : typeRole == 'balai' ? (
-                      <span
-                        className={`font-bold  leading-[100%] my-6 ${edit ? "text-yellow-500" : "text-blue-500"
-                          } `}
-                      >
-                        4
-                      </span>
-                    ) : <></>}{" "}
-                    of {typeRole == 'balai' ? '4' : '2'}
-                  </p>
+
+                  {
+                    isOperatorBalaiPelatihan && <p className="text-base">
+                      {indexFormTab == 0 ? (
+                        <span
+                          className={`font-bold  leading-[100%] my-6 ${edit ? "text-yellow-500" : "text-blue-500"
+                            } `}
+                        >
+                          1
+                        </span>
+                      ) : indexFormTab == 1 ? (
+                        <span
+                          className={`font-bold  leading-[100%] my-6 ${edit ? "text-yellow-500" : "text-blue-500"
+                            } `}
+                        >
+                          2
+                        </span>
+                      ) : indexFormTab == 2 && isOperatorBalaiPelatihan ? (
+                        <span
+                          className={`font-bold  leading-[100%] my-6 ${edit ? "text-yellow-500" : "text-blue-500"
+                            } `}
+                        >
+                          3
+                        </span>
+                      ) : isOperatorBalaiPelatihan ? (
+                        <span
+                          className={`font-bold  leading-[100%] my-6 ${edit ? "text-yellow-500" : "text-blue-500"
+                            } `}
+                        >
+                          4
+                        </span>
+                      ) : <></>}{" "}
+                      of {isOperatorBalaiPelatihan ? '4' : '2'}
+                    </p>
+                  }
+
                 </div>
                 <div className="flex w-full -mt-2 mb-4">
+                  {/* {
+                    isOperatorBalaiPelatihan ? <Progress value={(indexFormTab + 1) * 25} max={100} /> : <Progress value={(indexFormTab + 1) * 50} max={100} />
+                  } */}
+
                   {
-                    typeRole == 'balai' ? <Progress value={(indexFormTab + 1) * 25} max={100} /> : <Progress value={(indexFormTab + 1) * 50} max={100} />
+                    isOperatorBalaiPelatihan && <Progress value={(indexFormTab + 1) * 25} max={100} />
                   }
 
                 </div>
@@ -627,7 +638,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                       </div>
 
                       {
-                        typeRole == 'balai' && <div className="flex flex-col gap-2 w-full">
+                        isOperatorBalaiPelatihan && <div className="flex flex-col gap-2 w-full">
                           <label
                             className="block text-gray-800 text-sm font-medium"
                             htmlFor="kodePelatihan"
@@ -822,7 +833,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                           </div>
                         </div>
                         {
-                          typeRole == 'balai' && <div className="flex flex-wrap -mx-3 mb-1 w-full">
+                          isOperatorBalaiPelatihan && <div className="flex flex-wrap -mx-3 mb-1 w-full">
                             <div className="w-full px-3">
                               <label
                                 className="block text-gray-800 text-sm font-medium mb-1"
@@ -928,43 +939,50 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                         </div>
                       </div>
 
-                      <p className="text-base flex gap-2 border-b border-b-gray-300 pb-2 mb-2 items-center text-gray-900 font-semibold max-w-md mt-2">
+                      <p className="text-base flex gap-2 border-b border-b-gray-300 pb-2 mb-2 items-center text-gray-900 font-semibold max-w-lg mt-5">
                         <FiBookOpen />{" "}
-                        <span>Instruktur dan Silabus atau Kurikulum Pembelajaran</span>
+                        {
+                          isOperatorBalaiPelatihan ? <span>Instruktur dan Silabus atau Kurikulum Pembelajaran</span> : <span>Surat/Memo/Dokumen Pemberitahuan Pelaksanaan Pelatihan</span>
+                        }
                       </p>
 
                       <div className="flex flex-col flex-wrap  mb-1 w-full">
-                        <div className="flex flex-wrap -mx-3 mb-1 w-full">
-                          <div className="w-full px-3">
-                            <label
-                              className="block text-gray-800 text-sm font-medium mb-1"
-                              htmlFor="instruktur"
-                            >
-                              Instruktur{" "}
-                              <span className="text-red-600">*</span>
-                            </label>
-                            <input
-                              id="instruktur"
-                              type="text"
-                              className="form-input w-full text-black border-gray-300 rounded-md"
-                              placeholder="Masukkan nama-nama instruktur"
-                              required
-                              value={instruktur}
-                              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                setInstruktur(e.target.value)
-                              }
-                            />
-                            <p className="text-xs text-gray-600">
-                              Isi list instruktur lengkap dengan gelarny dengan format 1) Nama, gelar 2) berikan spasi dan penomoran seperti format tersebut
-                            </p>
+                        {/* Input Instruktur : Will allowed when user logged in is Operator Balai Pelatihan */}
+                        {
+                          isOperatorBalaiPelatihan && <div className="flex flex-wrap -mx-3 mb-1 w-full">
+                            <div className="w-full px-3">
+                              <label
+                                className="block text-gray-800 text-sm font-medium mb-1"
+                                htmlFor="instruktur"
+                              >
+                                Instruktur{" "}
+                                <span className="text-red-600">*</span>
+                              </label>
+                              <input
+                                id="instruktur"
+                                type="text"
+                                className="form-input w-full text-black border-gray-300 rounded-md"
+                                placeholder="Masukkan nama-nama instruktur"
+                                required
+                                value={instruktur}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                  setInstruktur(e.target.value)
+                                }
+                              />
+                              <p className="text-xs text-gray-600">
+                                Isi list instruktur lengkap dengan gelarny dengan format 1) Nama, gelar 2) berikan spasi dan penomoran seperti format tersebut
+                              </p>
+                            </div>
                           </div>
-                        </div>
+                        }
+
+                        {/* Input Dokumen: If user logged in is Operator Balai Pelatihan it will be Silabus, else will be Dokumen Pemberitahuan  */}
                         <div className="w-full">
                           <label
                             className="block text-gray-800 text-sm font-medium mb-1"
                             htmlFor="penyelenggaraPelatihan"
                           >
-                            Silabus Pelatihan{" "}
+                            {isOperatorBalaiPelatihan ? 'Silabus Pelatihan' : 'Surat/Memo/Dokumen'}{" "}
                             <span className="text-red-600">*</span>
                           </label>
 
@@ -977,7 +995,8 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                         </div>
                       </div>
 
-                      <><p className="text-base flex gap-2 border-b border-b-gray-300 pb-2 mb-2 items-center text-gray-900 font-semibold max-w-md mt-2">
+                      {/* Input Cover/Foto Pelatihan: Will allowed if user logged in is Operator Balai Pelatihan */}
+                      <> <p className="text-base flex gap-2 border-b border-b-gray-300 pb-2 mb-2 items-center text-gray-900 font-semibold max-w-md mt-5">
                         <IoIosImages /> <span>Cover atau Poster Pelatihan</span>
                       </p>
 
@@ -1010,15 +1029,17 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                               onChange={handleFileChange}
                             />
                           </div>
-                        </div></>
+                        </div>
+                      </>
 
 
-                      <p className="text-base flex gap-2 border-b border-b-gray-300 pb-2 mb-2 items-center text-gray-900 font-semibold max-w-md mt-2">
+                      <p className="text-base flex gap-2 border-b border-b-gray-300 pb-2 mb-2 items-center text-gray-900 font-semibold max-w-md mt-5">
                         <TbListDetails />{" "}
                         <span>Detail Informasi Pelatihan</span>
                       </p>
 
                       <div className="flex gap-2 w-full">
+                        {/* Input Penyelenggara Pelatihan */}
                         <div className="flex flex-wrap -mx-3 mb-1 w-full">
                           <div className="w-full px-3">
                             <label
@@ -1028,21 +1049,35 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                               Penyelenggara Pelatihan{" "}
                               <span className="text-red-600">*</span>
                             </label>
-                            <input
-                              id="penyelenggaraPelatihan"
-                              type="text"
-                              className="form-input w-full text-black border-gray-300 rounded-md"
-                              placeholder={lemdikData?.data?.NamaLemdik!}
-                              required
-                              value={lemdikData?.data?.NamaLemdik!}
-                              onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                setPenyelenggaraPelatihan(e.target.value)
-                              }
-                              disabled
-                              readOnly
-                            />
+                            {
+                              isOperatorBalaiPelatihan ? <input
+                                id="penyelenggaraPelatihan"
+                                type="text"
+                                className="form-input w-full text-black border-gray-300 rounded-md"
+                                placeholder={lemdikData?.data?.NamaLemdik!}
+                                required
+                                value={lemdikData?.data?.NamaLemdik!}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                  setPenyelenggaraPelatihan(e.target.value)
+                                }
+                                disabled
+                                readOnly
+                              /> : <input
+                                id="penyelenggaraPelatihan"
+                                type="text"
+                                className="form-input w-full text-black border-gray-300 rounded-md"
+                                placeholder={'Masukkan nama lemdiklat'}
+                                required
+                                value={penyelenggaraPelatihan}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                  setPenyelenggaraPelatihan(e.target.value)
+                                }
+                              />
+                            }
                           </div>
                         </div>
+
+                        {/* Input Jenis Pelatihan */}
                         <div className="flex flex-wrap -mx-3 mb-1 w-full">
                           <div className="w-full px-3">
                             <label
@@ -1077,6 +1112,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                       </div>
 
                       <div className="flex gap-2 w-full">
+                        {/* Input Jenis Sertifikasi */}
                         <div className="flex flex-wrap -mx-3 mb-1 w-full">
                           <div className="w-full px-3">
                             <label
@@ -1107,6 +1143,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                           </div>
                         </div>
 
+                        {/* Input Dukungan Program Prioritas */}
                         <div className="flex flex-wrap -mx-3 mb-1 w-full">
                           <div className="w-full px-3">
                             <label
@@ -1151,6 +1188,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                       </div>
 
                       <div className="flex gap-2 w-full">
+                        {/* Input Jenis Program */}
                         <div className="flex flex-wrap -mx-3 mb-1 w-full">
                           <div className="w-full px-3">
                             <label
@@ -1184,6 +1222,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                           </div>
                         </div>
 
+                        {/* Input Program */}
                         <div className="flex flex-wrap -mx-3 mb-1 w-full">
                           <div className="w-full px-3">
                             <label
@@ -1240,11 +1279,12 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                         </div>
                       </div>
 
-                      <p className="text-base flex gap-2 border-b border-b-gray-300 pb-2 mb-2 items-center text-gray-900 font-semibold max-w-md mt-2">
+                      <p className="text-base flex gap-2 border-b border-b-gray-300 pb-2 mb-2 items-center text-gray-900 font-semibold max-w-md mt-5">
                         <RiVerifiedBadgeLine /> <span>Penilaian Pelatihan</span>
                       </p>
 
                       <div className="flex flex-wrap mb-1 w-full">
+                        {/* Input Jenis Penilaian */}
                         <div className="w-full">
                           <label
                             className="block text-gray-800 text-sm font-medium mb-1"
@@ -1277,38 +1317,41 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                         </div>
                       </div>
 
-                      <p className="text-base flex gap-2 border-b border-b-gray-300 pb-2 mb-2 items-center text-gray-900 font-semibold max-w-md mt-2">
-                        <FiFileText /> <span>Deskripsi Pelatihan</span>
-                      </p>
+                      {
+                        isOperatorBalaiPelatihan && <> <p className="text-base flex gap-2 border-b border-b-gray-300 pb-2 mb-2 items-center text-gray-900 font-semibold max-w-md mt-5">
+                          <FiFileText /> <span>Deskripsi Pelatihan</span>
+                        </p>
 
-                      <div className="flex flex-wrap -mx-3 mb-1">
-                        <div className="w-full px-3">
-                          <label
-                            className="block text-gray-800 text-sm font-medium mb-1"
-                            htmlFor="detailPelatithan"
-                          >
-                            Deksripsi dan Detail Pelatihan{" "}
-                            <span className="text-red-600">*</span>
-                          </label>
-                          <Editor
-                            apiKey={process.env.NEXT_PUBLIC_TINY_MCE_KEY}
-                            value={detailPelatihan}
-                            onEditorChange={(content: string, editor: any) =>
-                              setDetailPelatihan(content)
-                            }
-                            init={{
-                              height: 500,
-                              menubar: false,
-                              plugins:
-                                "anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount linkchecker",
-                              toolbar:
-                                "undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat",
-                              content_style:
-                                "body { font-family:Plus Jakarta Sans,Arial,sans-serif; font-size:14px }",
-                            }}
-                          />
-                        </div>
-                      </div>
+                          <div className="flex flex-wrap -mx-3 mb-1">
+                            <div className="w-full px-3">
+                              <label
+                                className="block text-gray-800 text-sm font-medium mb-1"
+                                htmlFor="detailPelatithan"
+                              >
+                                Deksripsi dan Detail Pelatihan{" "}
+                                <span className="text-red-600">*</span>
+                              </label>
+                              <Editor
+                                apiKey={process.env.NEXT_PUBLIC_TINY_MCE_KEY}
+                                value={detailPelatihan}
+                                onEditorChange={(content: string, editor: any) =>
+                                  setDetailPelatihan(content)
+                                }
+                                init={{
+                                  height: 500,
+                                  menubar: false,
+                                  plugins:
+                                    "anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount linkchecker",
+                                  toolbar:
+                                    "undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat",
+                                  content_style:
+                                    "body { font-family:Plus Jakarta Sans,Arial,sans-serif; font-size:14px }",
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </>
+                      }
                     </div>
                   </>
                 )}
@@ -1516,7 +1559,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                   </>
                 )}
                 {
-                  typeRole == 'balai' ? <div className="flex -mx-3 mt-5 gap-2 px-3">
+                  isOperatorBalaiPelatihan ? <div className="flex -mx-3 mt-5 gap-2 px-3">
                     <div
                       className={`w-full ${indexFormTab == 0 || indexFormTab > 3 ? "hidden" : "block"
                         }`}
@@ -1570,26 +1613,9 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                       </button>
                     </div>
                   </div> : <div className="flex -mx-3 mt-5 gap-2 px-3">
+
                     <div
-                      className={`w-full ${indexFormTab == 0 || indexFormTab > 2 ? "hidden" : "block"
-                        }`}
-                    >
-                      <button
-                        type="button"
-                        className={`btn text-white ${edit
-                          ? "bg-yellow-600 hover:bg-yellow-700"
-                          : "bg-blue-500 hover:bg-blue-600"
-                          }  w-full`}
-                        onClick={(e) => {
-                          setIndexFormTab(indexFormTab - 1);
-                          scrollToTop();
-                        }}
-                      >
-                        Sebelumnya
-                      </button>
-                    </div>
-                    <div
-                      className={`w-full ${indexFormTab == 1 ? "block" : "hidden"
+                      className={`w-full ${indexFormTab == 0 ? "block" : "hidden"
                         }`}
                     >
                       <button
@@ -1603,25 +1629,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                         Upload Pelatihan
                       </button>
                     </div>
-                    <div
-                      className={`w-full ${indexFormTab == 1 ? "hidden" : "block"
-                        }`}
-                    >
-                      <button
-                        type="button"
-                        className={`btn text-white ${edit
-                          ? "bg-yellow-600 hover:bg-yellow-700"
-                          : "bg-blue-500 hover:bg-blue-600"
-                          } w-full`}
-                        onClick={(e) => {
-                          handleNext();
 
-                          scrollToTop();
-                        }}
-                      >
-                        Selanjutnya
-                      </button>
-                    </div>
                   </div>
                 }
               </fieldset>
