@@ -58,11 +58,11 @@ export const LoginAdminELAUT = () => {
 
     setIsLoadingLogin(true);
 
-    if (!email || !password || !role) {
+    if (!email || !password) {
       Toast.fire({
         icon: "error",
         title: "Gagal mencoba login.",
-        text: "Harap lengkapi email, password, serta memilih role terlebih dahulu sebelum login!",
+        text: "Harap lengkapi email dan password terlebih dahulu sebelum login!",
       });
       handleClearStateLogin();
       setIsLoadingLogin(false);
@@ -79,23 +79,9 @@ export const LoginAdminELAUT = () => {
       return;
     }
 
-    if (
-      (email.includes("politeknik") || email.includes("supm")) &&
-      role !== "satdik"
-    ) {
-      Toast.fire({
-        icon: "error",
-        title: "Oops.",
-        text: "Role kamu bukan satuan pendidikan, harap memilih role yang tepat!",
-      });
-      setIsLoadingLogin(false);
-      return;
-    }
-
     try {
       const response: AxiosResponse = await axios.post(
-        `${baseUrl}/${
-          role === "balai" || role === "satdik" ? "lemdik" : "adminPusat"
+        `${baseUrl}/${email.includes('bppp') || email.includes('balai') || email.includes('puslatkp') ? "lemdik" : "adminPusat"
         }/login`,
         JSON.stringify({ email, password }),
         { headers: { "Content-Type": "application/json" } }
@@ -111,11 +97,9 @@ export const LoginAdminELAUT = () => {
       Cookies.set("XSRF092", "true", { expires: 1 });
       Cookies.set(
         "XSRF093",
-        role === "balai"
+        email.includes('bppp') || email.includes('balai') || email.includes('puslatkp')
           ? "balai"
-          : role == "adminPusat"
-          ? "adminPusat"
-          : "satdik",
+          : "adminPusat",
         { expires: 1 }
       );
 
@@ -123,11 +107,9 @@ export const LoginAdminELAUT = () => {
       setIsLoadingLogin(false);
 
       const dashboardPath =
-        role === "balai"
+        email.includes('bppp') || email.includes('balai') || email.includes('puslatkp')
           ? `/${generateRandomId()}/lemdiklat/dashboard`
-          : role == "adminPusat"
-          ? "/admin/pusat/dashboard"
-          : `/${generateRandomId()}/lemdiklat/dashboard`;
+          : "/admin/pusat/dashboard";
       router.push(dashboardPath);
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -135,8 +117,8 @@ export const LoginAdminELAUT = () => {
           error.response?.status === 401
             ? "Email atau password yang dimasukkan salah, harap periksa kembali!"
             : error.response?.status === 500
-            ? "Proses login gagal dikarenakan terjadi gangguan pada server, hubungi admin pusat melalui call center!"
-            : "Periksa jaringan internetmu, sistem tidak terhubung ke internet!";
+              ? "Proses login gagal dikarenakan terjadi gangguan pada server, hubungi admin pusat melalui call center!"
+              : "Periksa jaringan internetmu, sistem tidak terhubung ke internet!";
 
         Toast.fire({
           icon: "error",
@@ -215,7 +197,7 @@ export const LoginAdminELAUT = () => {
                 </span>
               </span>
             </div>
-            <div className="flex flex-col gap-1">
+            {/* <div className="flex flex-col gap-1">
               <p className="font-jakarta  leading-[100%] text-gray-300  sm:text-sm sm:leading-8 ">
                 Role Admin
               </p>
@@ -230,8 +212,8 @@ export const LoginAdminELAUT = () => {
                       ? role == "adminPusat"
                         ? "Admin Pusat"
                         : role == "balai"
-                        ? "Admin Balai Pelatihan"
-                        : "Admin Satuan Pendidikan"
+                          ? "Admin Balai Pelatihan"
+                          : "Admin Satuan Pendidikan"
                       : "Pilih Role"}
                   </p>
                 </SelectTrigger>
@@ -240,15 +222,12 @@ export const LoginAdminELAUT = () => {
                     <SelectLabel>Role</SelectLabel>
                     <SelectItem value="adminPusat">Admin Pusat</SelectItem>
                     <SelectItem value="balai">Admin Balai Pelatihan</SelectItem>
-                    {/* <SelectItem value="satdik">
-                                            Admin Satuan Pendidikan
-                                        </SelectItem> */}
                   </SelectGroup>
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
 
-            {role != "" && (
+            {password != "" && (
               <div
                 className="flex flex-wrap w-full -mx-3 mb-2"
                 style={{ width: "100% !important" }}
