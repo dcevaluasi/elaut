@@ -1,5 +1,4 @@
 "use client";
-import "jsvectormap/dist/css/jsvectormap.css";
 import "flatpickr/dist/flatpickr.min.css";
 import "@/components/styles/style.css";
 import React, { useEffect, useState } from "react";

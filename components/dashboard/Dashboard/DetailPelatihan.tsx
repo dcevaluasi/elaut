@@ -391,22 +391,29 @@ function DetailPelatihan() {
                 </tr>
               )}
 
-              <tr className="border-b border-b-gray-200 w-full">
-                <td className="font-semibold p-4 w-[20%]">Tarif Pelatihan</td>
-                <td className="p-4 w-2/3">
-                  {formatToRupiah(pelatihan!.HargaPelatihan) || ""}
-                </td>
-              </tr>
+              {
+                isOperatorBalaiPelatihan && <tr className="border-b border-b-gray-200 w-full">
+                  <td className="font-semibold p-4 w-[20%]">Tarif Pelatihan</td>
+                  <td className="p-4 w-2/3">
+                    {formatToRupiah(pelatihan!.HargaPelatihan) || ""}
+                  </td>
+                </tr>
+              }
+
               <tr className="border-b border-b-gray-200 w-full">
                 <td className="font-semibold p-4 w-[20%]">Asal Peserta</td>
                 <td className="p-4 w-2/3">{pelatihan!.AsalPelatihan}</td>
               </tr>
-              <tr className="border-b border-b-gray-200 w-full">
-                <td className="font-semibold p-4 w-[20%]">Kuota Peserta</td>
-                <td className="p-4 w-2/3">
-                  {pelatihan!.KoutaPelatihan} Peserta
-                </td>
-              </tr>
+
+              {
+                isOperatorBalaiPelatihan && <tr className="border-b border-b-gray-200 w-full">
+                  <td className="font-semibold p-4 w-[20%]">Kuota Peserta</td>
+                  <td className="p-4 w-2/3">
+                    {pelatihan!.KoutaPelatihan} Peserta
+                  </td>
+                </tr>
+              }
+
               <tr className="border-b border-b-gray-200 w-full">
                 <td className="font-semibold p-4 w-[20%]">Jumlah Terdaftar</td>
                 <td className="p-4 w-2/3">
@@ -427,26 +434,28 @@ function DetailPelatihan() {
               </h2>
             </div>
             <table className="w-full">
-              <tr className="border-b border-b-gray-200 w-full ">
-                <td className="font-semibold p-4 w-[20%] h-fit flex">
-                  Instruktur
-                </td>
-                <td className="p-4 w-2/3">
-                  {pelatihan.Instruktur != "" ? (
-                    <div className="flex flex-col gap-1">
-                      {generateInstrukturName(pelatihan.Instruktur).map(
-                        (instruktur, index) => (
-                          <span key={index}>
-                            {index + 1}. {instruktur}
-                          </span>
-                        )
-                      )}
-                    </div>
-                  ) : (
-                    <>-</>
-                  )}
-                </td>
-              </tr>
+              {
+                isOperatorBalaiPelatihan && <tr className="border-b border-b-gray-200 w-full ">
+                  <td className="font-semibold p-4 w-[20%] h-fit flex">
+                    Instruktur
+                  </td>
+                  <td className="p-4 w-2/3">
+                    {pelatihan.Instruktur != "" ? (
+                      <div className="flex flex-col gap-1">
+                        {generateInstrukturName(pelatihan.Instruktur).map(
+                          (instruktur, index) => (
+                            <span key={index}>
+                              {index + 1}. {instruktur}
+                            </span>
+                          )
+                        )}
+                      </div>
+                    ) : (
+                      <>-</>
+                    )}
+                  </td>
+                </tr>
+              }
               <tr className="border-b border-b-gray-200 w-full">
                 <td className="font-semibold p-4 w-[20%] flex">
                   Materi Pelatihan
@@ -465,21 +474,24 @@ function DetailPelatihan() {
                   )}
                 </td>
               </tr>
-              <tr className="border-b border-b-gray-200 w-full">
-                <td className="font-semibold p-4 w-[20%]">
-                  Silabus/Modul/Bahan Ajar Pelatihan
-                </td>
-                <td className="p-4 w-2/3">
-                  <Link
-                    target="_blank"
-                    className="text-blue-500 underline"
-                    href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/silabus/pelatihan/${pelatihan!.SilabusPelatihan
-                      }`}
-                  >
-                    {pelatihan!.SilabusPelatihan}
-                  </Link>
-                </td>
-              </tr>
+              {
+                isOperatorBalaiPelatihan && <tr className="border-b border-b-gray-200 w-full">
+                  <td className="font-semibold p-4 w-[20%]">
+                    Silabus/Modul/Bahan Ajar Pelatihan
+                  </td>
+                  <td className="p-4 w-2/3">
+                    <Link
+                      target="_blank"
+                      className="text-blue-500 underline"
+                      href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/silabus/pelatihan/${pelatihan!.SilabusPelatihan
+                        }`}
+                    >
+                      {pelatihan!.SilabusPelatihan}
+                    </Link>
+                  </td>
+                </tr>
+              }
+
             </table>
           </div>
         </div>

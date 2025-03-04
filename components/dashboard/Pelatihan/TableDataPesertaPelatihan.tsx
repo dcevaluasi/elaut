@@ -917,7 +917,7 @@ const TableDataPesertaPelatihan = () => {
                   </div>
                   <p className="text-gray-700 text-xs mt-1">
                     *Download terlebih dahulu template lalu isi file excel dan
-                    upload
+                    upload, perlu diingat mengimport data hanya dapat dilakukan sekali!
                   </p>
                 </div>
               </div>
@@ -1093,7 +1093,7 @@ const TableDataPesertaPelatihan = () => {
             </div>
 
             {usePathname().includes("lemdiklat") &&
-              dataPelatihan?.StatusApproval != "Selesai" && (
+              dataPelatihan?.StatusApproval != "Selesai" && dataPelatihan?.UserPelatihan.length == 0 && (
                 <div className="w-full flex justify-end gap-2">
                   <div
                     onClick={(e) => {

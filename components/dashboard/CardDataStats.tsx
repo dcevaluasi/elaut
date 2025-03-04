@@ -23,21 +23,18 @@ const CardDataStats: React.FC<CardDataStatsProps> = ({
   const pathname = usePathname();
   return (
     <div
-      className={`${
-        pathname.includes("akp") &&
+      className={`${pathname.includes("akp") &&
         "flex gap-2 items-center duration-1000 group"
-      } rounded-xl border border-stroke bg-white hover:cursor-pointer px-4 pb-6 pt-5 shadow-default relative`}
+        } rounded-xl border border-stroke bg-white hover:cursor-pointer px-4 pb-6 pt-5 shadow-default relative`}
     >
       <div
-        className={`flex h-11.5 w-11.5 items-center justify-center rounded-full bg-meta-2 ${
-          pathname.includes("akp") && "h-14 w-14"
-        }`}
+        className={`flex h-11.5 w-11.5 items-center justify-center rounded-full bg-meta-2 ${pathname.includes("akp") && "h-14 w-14"
+          }`}
       >
         <div
-          className={`${
-            pathname.includes("akp") &&
+          className={`${pathname.includes("akp") &&
             "h-14 w-14 flex items-center justify-center"
-          } group-hover:scale-110 duration-700 group-hover:-rotate-[30deg]`}
+            } group-hover:scale-110 duration-700 group-hover:-rotate-[30deg]`}
         >
           {" "}
           {children}
@@ -48,8 +45,8 @@ const CardDataStats: React.FC<CardDataStatsProps> = ({
         <div className="w-full">
           <h4
             className={`${pathname.includes(
-              "akp" && "text-xl"
-            )} text-title-md font-bold text-black`}
+              "akp"
+            ) ? "text-lg" : 'text-lg'} text-title-md font-bold text-black`}
           >
             <CountUp className="text-3xl" start={0} end={parseInt(total)} />
           </h4>
@@ -69,7 +66,7 @@ const CardDataStats: React.FC<CardDataStatsProps> = ({
           </div>
         </div>
 
-        {}
+        { }
       </div>
     </div>
   );
