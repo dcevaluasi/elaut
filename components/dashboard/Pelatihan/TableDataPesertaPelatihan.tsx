@@ -43,6 +43,7 @@ import {
   TbChartBubble,
   TbChartDonut,
   TbDatabaseEdit,
+  TbEditCircle,
   TbFileCertificate,
   TbFileStack,
   TbRubberStamp,
@@ -89,6 +90,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { generateTanggalPelatihan } from "@/utils/text";
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
+import { DIALOG_TEXTS } from "@/constants/texts";
 
 const TableDataPesertaPelatihan = () => {
   const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
@@ -200,39 +202,44 @@ const TableDataPesertaPelatihan = () => {
     }
   };
 
-  const handleValidDataPesertaPelatihan = async (
-    id: number,
-    status: string
-  ) => {
-    const formData = new FormData();
-    formData.append("Keterangan", status);
-    console.log({ status });
-    console.log({ selectedIdPeserta });
+  const [isIteratingProcess, setIsIteratingProcess] = React.useState<boolean>(false)
+  const handleValidDataPesertaPelatihan = async () => {
+    setIsIteratingProcess(true)
     try {
-      const response = await axios.put(
-        `${baseUrl}/lemdik/updatePelatihanUsers?id=${selectedIdPeserta}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
-          },
-        }
-      );
+      // Iterate through each user and update their status
+      for (const user of data) {
+        const formData = new FormData();
+        formData.append("Keterangan", 'Valid');
+
+        console.log(`Updating user: ${user.IdUserPelatihan}, Status: Valid`);
+
+        await axios.put(
+          `${baseUrl}/lemdik/updatePelatihanUsers?id=${user.IdUserPelatihan}`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+            },
+          }
+        );
+      }
+
       Toast.fire({
         icon: "success",
-        title: `Berhasil memvalidasi data pesereta pelatihan!`,
+        title: `Berhasil memvalidasi ${data.length} peserta pelatihan!`,
       });
-      console.log("VALIDASI PESERTA PELATIHAN: ", response);
+
+      setIsIteratingProcess(false)
       handleFetchingPublicTrainingDataById();
-      setOpenFormValidasiDataPesertaPelatihan(
-        !openFormValidasiDataPesertaPelatihan
-      );
+      setOpenFormValidasiDataPesertaPelatihan(false);
     } catch (error) {
-      console.error("ERROR UPDATE PELATIHAN: ", error);
+      console.error("ERROR UPDATE PELATIHAN:", error);
       Toast.fire({
-        icon: "success",
-        title: `Gagal menyisipkan no sertifikat ke akun pesereta pelatihan!`,
+        icon: "error",
+        title: `Gagal memvalidasi peserta, harap coba lagi!`,
       });
+
+      setIsIteratingProcess(false)
       handleFetchingPublicTrainingDataById();
     }
   };
@@ -943,35 +950,40 @@ const TableDataPesertaPelatihan = () => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              {" "}
-              <HiMiniUserGroup className="h-4 w-4" />
-              Validasi Data Peserta Pelatihan
+              {DIALOG_TEXTS['Validasi Grouping Peserta'].title}
             </AlertDialogTitle>
             <AlertDialogDescription className="-mt-2">
-              Validasi data peserta pelatihan, sebelum mereka mengikuti
-              pelatihan!
+              {DIALOG_TEXTS['Validasi Grouping Peserta'].desc}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <fieldset>
             <form autoComplete="off">
               <AlertDialogFooter className="mt-3">
-                <AlertDialogCancel
-                  onClick={(e) =>
-                    setOpenFormValidasiDataPesertaPelatihan(
-                      !openFormValidasiDataPesertaPelatihan
-                    )
-                  }
-                >
-                  Cancel
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  className="bg-green-500 hover:bg-green-600"
-                  onClick={(e) =>
-                    handleValidDataPesertaPelatihan(selectedIdPeserta, "Valid")
-                  }
-                >
-                  Validasi
-                </AlertDialogAction>
+                {
+                  isIteratingProcess ? <AlertDialogAction
+                    className="bg-green-500 hover:bg-green-600"
+                    disabled
+                  >
+                    Sedang diproses...
+                  </AlertDialogAction> : <>
+                    <AlertDialogCancel
+                      onClick={(e) =>
+                        setOpenFormValidasiDataPesertaPelatihan(
+                          !openFormValidasiDataPesertaPelatihan
+                        )
+                      }
+                    >
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-green-500 hover:bg-green-600"
+                      onClick={(e) =>
+                        handleValidDataPesertaPelatihan()
+                      }
+                    >
+                      Validasi
+                    </AlertDialogAction></>
+                }
               </AlertDialogFooter>
             </form>
           </fieldset>
@@ -1059,37 +1071,7 @@ const TableDataPesertaPelatihan = () => {
                 </Select>
               )}
 
-              <Select>
-                <SelectTrigger className="w-[130px] border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
-                  <div className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">
-                    <TbSchool />
-                    Kelulusan
-                  </div>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Kelulusan</SelectLabel>
-                    <SelectItem value="pendaftaran">Lulus</SelectItem>
-                    <SelectItem value="pelaksanaan">Tidak Lulus</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
 
-              <Select>
-                <SelectTrigger className="w-[140px] border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
-                  <div className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">
-                    <HiOutlineDocument />
-                    Sertifikat
-                  </div>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Sertifikat</SelectLabel>
-                    <SelectItem value="apple">Sudah Diterbitkan</SelectItem>
-                    <SelectItem value="banana">Belum Diterbitkan</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
             </div>
 
             {usePathname().includes("lemdiklat") &&
@@ -1113,6 +1095,21 @@ const TableDataPesertaPelatihan = () => {
                   </div>
                 </div>
               )}
+
+            {
+              usePathname().includes('lemdiklat') && data!.length != 0 && <div className="w-full flex justify-end gap-2">
+                <div
+                  onClick={(e) => {
+                    setOpenFormValidasiDataPesertaPelatihan(true)
+                  }}
+                  className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
+                >
+                  <TbEditCircle />
+
+                  Validasi Data Peserta
+                </div>
+              </div>
+            }
           </div>
 
           <div>
