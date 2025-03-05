@@ -77,8 +77,8 @@ import { IoRefreshSharp } from "react-icons/io5";
 
 const TableDataVerifikasiPelaksanaan: React.FC = () => {
   const [data, setData] = React.useState<PelatihanMasyarakat[]>([]);
-
-  const typeRole = Cookies.get("XSRF093");
+  const isLemdiklatLevel = usePathname().includes('lemdiklat')
+  const isSupervisor = Cookies.get('Status') === 'Supervisor'
 
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
 
@@ -101,9 +101,19 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
         }
       );
 
-      const filteredData = response?.data!.data!.filter(
-        (item: any) => item.PenyelenggaraPelatihan === Cookies.get('Satker')
-      )
+      let filteredData
+      if (!isLemdiklatLevel) {
+        if (isSupervisor) {
+          filteredData = response?.data!.data!.filter(
+            (item: any) => item.PemberitahuanDiterima === 'Pengajuan Telah Dikirim ke SPV'
+          )
+        }
+      } else {
+        filteredData = response?.data!.data!.filter(
+          (item: any) => item.PenyelenggaraPelatihan === Cookies.get('Satker')
+        )
+      }
+
 
       // Count statuses
       const onProgressCount = filteredData!.filter(
@@ -116,7 +126,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
         (item: any) => item.Status !== "Publish"
       ).length;
       const verifyingCount = filteredData!.filter(
-        (item: any) => item.StatusPenerbitan == "Verifikasi Pelaksanaan"
+        (item: any) => item.PemberitahuanDiterima == "Pengajuan Telah Dikirim ke SPV"
       ).length;
       const sematkanCount = filteredData!.filter(
         (item: any) => item.IsSematkan == "yes"

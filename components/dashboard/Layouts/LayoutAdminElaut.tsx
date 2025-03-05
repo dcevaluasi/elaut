@@ -19,7 +19,7 @@ export default function LayoutAdminElaut({
   const router = useRouter();
   const pathname = usePathname(); // Get the current path
 
-  const handleGetAdminPusat = async () => {
+  const fetchInformationPusat = async () => {
     try {
       const response = await axios.get(
         `${elautBaseUrl}/adminPusat/getAdminPusat`,
@@ -31,6 +31,7 @@ export default function LayoutAdminElaut({
       );
       console.log({ response })
       Cookies.set("NIK", response.data.data.Nip);
+      Cookies.set("Status", response.data.data.Status);
       Cookies.set("Satker", response.data.data.Status);
       Cookies.set("Role", response.data.data.Nip);
       Cookies.set("Jabatan", response.data.data.NoTelpon);
@@ -58,8 +59,14 @@ export default function LayoutAdminElaut({
     }
   };
 
+  const isLemdiklatLevel = usePathname().includes('lemdiklat')
+
   React.useEffect(() => {
-    fetchInformationLemdiklat();
+    if (isLemdiklatLevel) {
+      fetchInformationLemdiklat();
+    } else {
+      fetchInformationPusat();
+    }
   }, []);
 
   const handleLogOut = async () => {
@@ -79,9 +86,7 @@ export default function LayoutAdminElaut({
     router.replace("/admin/auth/login");
   };
 
-  useEffect(() => {
-    handleGetAdminPusat();
-  }, []);
+
 
   const navs = pathname.includes("pusat")
     ? [

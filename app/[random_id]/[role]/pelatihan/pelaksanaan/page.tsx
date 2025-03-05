@@ -1,8 +1,6 @@
 import React from "react";
 import { LucideFileSignature } from "lucide-react";
 import LayoutAdminElaut from "@/components/dashboard/Layouts/LayoutAdminElaut";
-import TableDataPenerbitanSertifikat from "@/components/dashboard/Pelatihan/TableDataPenerbitanSertifikat";
-import PenerbitanSertifikat from "@/components/dashboard/Dashboard/PenerbitanSertifikat";
 import PemberitahuanPelatihan from "@/components/dashboard/Dashboard/PemberitahuanPelatihan";
 
 function page() {

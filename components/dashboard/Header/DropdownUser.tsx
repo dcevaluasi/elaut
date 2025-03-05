@@ -523,7 +523,7 @@ const DropdownUser = ({
             {pathname.includes("lemdiklat")
               ? Cookies.get('Eselon')
               : dataAdminPusat && pathname.includes("pusat")
-                ? Cookies.get('Eselon')
+                ? `${Cookies.get('Eselon')!} ${Cookies.get('Status')!}`
                 : ""}
           </span>
         </span>
