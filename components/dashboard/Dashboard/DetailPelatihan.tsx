@@ -357,7 +357,7 @@ function DetailPelatihan() {
                     Status Penerbitan
                   </td>
                   <td className="py-7 px-5 flex items-center">
-                    <ShowingBadge data={pelatihan} isFlying={false} />
+                    <ShowingBadge data={pelatihan} isFlying={false} isSupervisor={isSupervisor} />
                   </td>
                 </tr>
               </table>

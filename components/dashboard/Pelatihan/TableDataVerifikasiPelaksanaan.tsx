@@ -47,6 +47,8 @@ import { AiOutlineFieldNumber } from "react-icons/ai";
 import { IoRefreshSharp } from "react-icons/io5";
 import { HashLoader } from "react-spinners";
 import { DIALOG_TEXTS } from "@/constants/texts";
+import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
+import Toast from "@/components/toast";
 
 const TableDataVerifikasiPelaksanaan: React.FC = () => {
   // APPROVAL PENERBITAN SUPERVISOR
@@ -162,7 +164,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
                 setTimeout(() => {
                   setSelectedStatusFilter("All");
                   setIsFetching(false);
-                }, 2000);
+                }, 800);
               }}
             />
 
@@ -176,7 +178,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
                   setTimeout(() => {
                     setSelectedStatusFilter("Approval");
                     setIsFetching(false);
-                  }, 2000);
+                  }, 800);
                 }}
               />
             )}
@@ -191,7 +193,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
                   setTimeout(() => {
                     setSelectedStatusFilter("Approved");
                     setIsFetching(false);
-                  }, 2000);
+                  }, 800);
                 }}
               />
             )}
@@ -337,8 +339,48 @@ const TrainingCard: React.FC<{
     pelatihan.StatusPenerbitan === "Sudah Diverifikasi Pelaksanaan" &&
     pelatihan.PenyelenggaraPelatihan === "Pusat Pelatihan KP";
 
+  const handleSendToKapuslatAboutCertificateIssueance = async (idPelatihan: string) => {
+    const updateData = new FormData()
+    updateData.append('PenerbitanSertifikatDiterima', 'Pengajuan Telah Dikirim Dari SPV')
+    updateData.append('IsMengajukanPenerbitan', 'Pengajuan Telah Diapprove SPV')
+    updateData.append('PemberitahuanDiterima', 'Pengajuan Telah Dikirim ke Kapuslat KP')
+
+    try {
+      const uploadBeritaAcaraResponse = await axios.put(
+        `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${idPelatihan}`,
+        updateData,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      Toast.fire({
+        icon: "success",
+        title: "Yeayyy!",
+        text: "Berhasil mengapprove pengajuan penerbitan sttpl/sertifikat pelatihan!",
+      });
+
+      console.log({ uploadBeritaAcaraResponse })
+      handleFetchingPublicTrainingData();
+    } catch (error) {
+      console.error("ERROR GENERATE SERTIFIKAT: ", error);
+      Toast.fire({
+        icon: "error",
+        title: "Oopsss!",
+        text: "Gagal mengapprove pengajuan penerbitan sttpl/sertifikat pelatihan!",
+      });
+      handleFetchingPublicTrainingData();
+    }
+  }
+
   return (
-    <Card>
+    <Card className="relative">
+      {pelatihan != null && (
+        <ShowingBadge isSupervisor={isSupervisor} data={pelatihan} isFlying={true} />
+      )}
       <CardHeader>
         <CardTitle>{pelatihan.NamaPelatihan}</CardTitle>
         <CardDescription>{pelatihan.Program} • {pelatihan.PenyelenggaraPelatihan}</CardDescription>
@@ -398,7 +440,7 @@ const TrainingCard: React.FC<{
                         <AlertDialogAction className="bg-rose-500 border-rose-500 hover:bg-rose-500">
                           Reject
                         </AlertDialogAction>
-                        <AlertDialogAction className="bg-green-500 border-green-500 hover:bg-green-500">
+                        <AlertDialogAction onClick={(e) => handleSendToKapuslatAboutCertificateIssueance(pelatihan?.IdPelatihan.toString())} className="bg-green-500 border-green-500 hover:bg-green-500">
                           Approve
                         </AlertDialogAction>
                       </div>
@@ -441,8 +483,6 @@ const TrainingCard: React.FC<{
   )
 };
 
-
-
 const TrainingDetails: React.FC<{ pelatihan: PelatihanMasyarakat }> = ({ pelatihan }) => (
   <div className="ml-0 text-left capitalize -mt-6 w-full">
     <div className="ml-0 text-left mt-1 text-neutral-500">
@@ -464,7 +504,6 @@ const DetailItem: React.FC<{ icon: React.ElementType; text: string }> = ({ icon:
     <Icon className="text-lg" /> <span>{text}</span>
   </span>
 );
-
 
 const StatusButton = ({
   label,
@@ -491,6 +530,5 @@ const StatusButton = ({
     </p>
   </button>
 );
-
 
 export default TableDataVerifikasiPelaksanaan;
