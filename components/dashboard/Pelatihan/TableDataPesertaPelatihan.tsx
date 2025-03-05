@@ -91,6 +91,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { generateTanggalPelatihan } from "@/utils/text";
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import { DIALOG_TEXTS } from "@/constants/texts";
+import { countValidKeterangan } from "@/utils/counter";
 
 const TableDataPesertaPelatihan = () => {
   const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
@@ -107,6 +108,9 @@ const TableDataPesertaPelatihan = () => {
     React.useState<number>(0);
 
   const [data, setData] = React.useState<UserPelatihan[] | []>([]);
+
+  const [countValid, setCountValid] = React.useState<number>(0)
+
   const handleFetchingPublicTrainingDataById = async () => {
     try {
       const response: AxiosResponse = await axios.get(
@@ -117,6 +121,7 @@ const TableDataPesertaPelatihan = () => {
 
       // Set data to state
       setDataPelatihan(response.data);
+      setCountValid(countValidKeterangan(response.data.UserPelatihan))
       setData(response.data.UserPelatihan);
 
       // Count entries with `FileSertifikat` as an empty string
@@ -1097,7 +1102,7 @@ const TableDataPesertaPelatihan = () => {
               )}
 
             {
-              usePathname().includes('lemdiklat') && data!.length != 0 && <div className="w-full flex justify-end gap-2">
+              usePathname().includes('lemdiklat') && data!.length > 0 && countValid != data!.length && <div className="w-full flex justify-end gap-2">
                 <div
                   onClick={(e) => {
                     setOpenFormValidasiDataPesertaPelatihan(true)
