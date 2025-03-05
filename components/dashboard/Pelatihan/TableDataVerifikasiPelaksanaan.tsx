@@ -5,8 +5,6 @@ import {
 
 import { TbEditCircle } from "react-icons/tb";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
 import {
   Card,
   CardContent,
@@ -29,15 +27,8 @@ import Link from "next/link";
 import { elautBaseUrl } from "@/constants/urls";
 
 import { Input } from "@/components/ui/input";
-import { generateTanggalPelatihan } from "@/utils/text";
 import { Button } from "@/components/ui/button";
-import {
-  PROGRAM_AKP,
-  PROGRAM_KELAUTAN,
-  PROGRAM_PERIKANAN,
-} from "@/constants/pelatihan";
 import { MdClear } from "react-icons/md";
-import { GrSend } from "react-icons/gr";
 import { usePathname } from "next/navigation";
 import {
   AlertDialog,
@@ -50,10 +41,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import Toast from "@/components/toast";
 import VerifikasiButton from "../Dashboard/Actions/VerifikasiButton";
 import { encryptValue } from "@/lib/utils";
-import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import { AiOutlineFieldNumber } from "react-icons/ai";
 import { IoRefreshSharp } from "react-icons/io5";
 import { HashLoader } from "react-spinners";
@@ -71,6 +60,8 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
 
   // COUNTER
   const [countVerifying, setCountVerifying] = React.useState<number>(0);
+  const [countApproval, setCountApproval] = React.useState<number>(0);
+  const [countApproved, setCountApproved] = React.useState<number>(0);
 
   const handleFetchingPublicTrainingData = async () => {
     setIsFetching(true);
@@ -88,24 +79,13 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
       const allData = response?.data?.data || [];
       let filteredData: any[] = allData;
 
-      // Apply filtering logic based on user level
-      if (!isLemdiklatLevel) {
-        if (isSupervisor) {
-          filteredData = allData.filter(
-            (item: PelatihanMasyarakat) => item.PemberitahuanDiterima === "Pengajuan Telah Dikirim ke SPV"
-          );
-        }
-      } else {
-        filteredData = allData.filter(
-          (item: PelatihanMasyarakat) => item.PenyelenggaraPelatihan === Cookies.get("Satker")
-        );
-      }
-
       // Count different statuses
       const countStatuses = (statusKey: keyof typeof filteredData[0], value: any) =>
         filteredData.filter((item) => item[statusKey] === value).length;
 
       setCountVerifying(countStatuses("PemberitahuanDiterima", "Pengajuan Telah Dikirim ke SPV"));
+      setCountApproval(countStatuses("PemberitahuanDiterima", "Pengajuan Telah Dikirim ke SPV"));
+      setCountApproved(countStatuses("IsMengajukanPenerbitan", "Pengajuan Telah Diapprove SPV"));
 
       // Reverse the order of filtered data
       setData([...filteredData].reverse());
@@ -145,8 +125,11 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
 
     // Define a mapping for status filters
     const statusMapping: Record<string, boolean> = {
+      "All": pelatihan.KodePelatihan != '',
       "Proses Pengajuan Sertifikat": pelatihan.StatusPenerbitan === "On Progress",
       "Belum Dipublish": pelatihan.Status !== "Publish",
+      "Approval": pelatihan.PemberitahuanDiterima == 'Pengajuan Telah Dikirim ke SPV',
+      "Approved": pelatihan.IsMengajukanPenerbitan == 'Pengajuan Telah Diapprove SPV',
       "Sudah Di TTD": pelatihan.StatusPenerbitan === "Done",
       "Verifikasi Pelaksanaan": pelatihan.StatusPenerbitan === "Verifikasi Pelaksanaan",
       "Bank Soal Disematkan": pelatihan.IsSematkan !== "yes",
@@ -174,8 +157,46 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
               label="Total Pelatihan"
               count={data.length}
               isSelected={selectedStatusFilter === "All"}
-              onClick={() => setSelectedStatusFilter("All")}
+              onClick={() => {
+                setIsFetching(true);
+                setTimeout(() => {
+                  setSelectedStatusFilter("All");
+                  setIsFetching(false);
+                }, 2000);
+              }}
             />
+
+            {isSupervisor && (
+              <StatusButton
+                label="Perlu DiApprove"
+                count={countApproval}
+                isSelected={selectedStatusFilter === "Approval"}
+                onClick={() => {
+                  setIsFetching(true);
+                  setTimeout(() => {
+                    setSelectedStatusFilter("Approval");
+                    setIsFetching(false);
+                  }, 2000);
+                }}
+              />
+            )}
+
+            {isSupervisor && (
+              <StatusButton
+                label="Sudah Diapprove"
+                count={countApproved}
+                isSelected={selectedStatusFilter === "Approved"}
+                onClick={() => {
+                  setIsFetching(true);
+                  setTimeout(() => {
+                    setSelectedStatusFilter("Approved");
+                    setIsFetching(false);
+                  }, 2000);
+                }}
+              />
+            )}
+
+
 
             {
               !isSupervisor && <>
@@ -336,7 +357,7 @@ const TrainingCard: React.FC<{
               <RiInformationFill className="h-5 w-5" /> Detail
             </Link>
 
-            {isSupervisor && (
+            {isSupervisor && pelatihan.PemberitahuanDiterima == 'Pengajuan Telah Dikirim ke SPV' && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button
