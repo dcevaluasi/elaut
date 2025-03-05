@@ -21,6 +21,7 @@ import { generateRandomId } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { HiOutlineEyeOff } from "react-icons/hi";
 import { sanitizedDangerousChars } from "@/utils/input";
+import { HashLoader } from "react-spinners";
 
 export const LoginAdminELAUT = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -31,6 +32,8 @@ export const LoginAdminELAUT = () => {
 
   // CAPTCHA VALIDATION
   const [captcha, setCaptcha] = React.useState<string | null>();
+
+  const [isRedirecting, setIsRedirecting] = React.useState<boolean>(false)
 
   /*
       state variables for login
@@ -57,6 +60,7 @@ export const LoginAdminELAUT = () => {
     e.preventDefault();
 
     setIsLoadingLogin(true);
+
 
     if (!email || !password) {
       Toast.fire({
@@ -110,6 +114,7 @@ export const LoginAdminELAUT = () => {
         email.includes('bppp') || email.includes('balai') || email.includes('puslatkp')
           ? `/${generateRandomId()}/lemdiklat/dashboard`
           : "/admin/pusat/dashboard";
+      setIsRedirecting(true)
       router.push(dashboardPath);
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -127,6 +132,7 @@ export const LoginAdminELAUT = () => {
         });
 
         setIsLoadingLogin(false);
+        setIsRedirecting(false)
       }
     }
   };
@@ -144,137 +150,113 @@ export const LoginAdminELAUT = () => {
         <div className="absolute w-full h-screen  bg-black opacity-70 inset-0 z-20"></div>
 
         <section className=" z-50 relative h-fit space-y-6 pb-8 pt-36 md:h-screen md:pb-12 md:pt-20 lg:py-44 w-full flex items-center justify-center flex-col">
-          <div className="container relative flex max-w-[64rem] flex-col items-center gap-2 text-center">
-            <div className="rounded-2xl bg-blue-500 px-4 py-1.5 text-sm text-gray-200 font-medium">
-              E-LAUT
-            </div>
-
-            <h1 className="font-bold font-calsans text-gray-200 text-4xl -mt-2">
-              Login Admin{" "}
-              <span className=" bg-clip-text text-transparent bg-gradient-to-r leading-none pt-0 from-blue-500 to-teal-400">
+          {
+            isRedirecting ? <div className="mt-32">
+              <HashLoader color="#338CF5" size={50} />
+            </div> : <> <div className="container relative flex max-w-[64rem] flex-col items-center gap-2 text-center">
+              <div className="rounded-2xl bg-blue-500 px-4 py-1.5 text-sm text-gray-200 font-medium">
                 E-LAUT
-              </span>
-            </h1>
-            <p className="font-jakarta max-w-[42rem] leading-[115%] text-gray-300  sm:text-base -mt-3">
-              Selamat datang kembali, silahkan login untuk mengakses dashboard
-              admin Elektronik Layanan Pelatihan Kelautan dan Perikanan Utama
-              Terpadu!
-            </p>
-          </div>
-          <div className="flex flex-col gap-2 w-full max-w-md mx-auto z-50">
-            <div className="flex flex-col gap-1">
-              <p className="font-jakarta  leading-[100%] text-gray-300  sm:text-sm sm:leading-8 -mt-4">
-                Email Address
-              </p>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="border rounded-xl text-white border-blue-500 bg-transparent w-full placeholder:text-gray-300"
-                placeholder="Enter your email address"
-                autoComplete="off"
-              />
-            </div>
-            <div className="flex flex-col gap-1">
-              <p className="font-jakarta  leading-[100%] text-gray-300  sm:text-sm sm:leading-8 ">
-                Password
-              </p>
-              <span className="w-full relative h-fit">
-                <input
-                  type={isShowPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="border rounded-xl text-white border-blue-500 bg-transparent w-full placeholder:text-gray-300"
-                  placeholder="Enter your password"
-                  autoComplete="off"
-                />
-                <span onClick={(e) => setIsShowPassword(!isShowPassword)}>
-                  {isShowPassword ? (
-                    <HiOutlineEyeOff className="text-gray-200 my-auto top-3 mr-5 absolute right-0 text-xl cursor-pointer" />
-                  ) : (
-                    <HiOutlineEye className="text-gray-200 my-auto top-3 mr-5 absolute right-0 text-xl cursor-pointer" />
-                  )}
-                </span>
-              </span>
-            </div>
-            {/* <div className="flex flex-col gap-1">
-              <p className="font-jakarta  leading-[100%] text-gray-300  sm:text-sm sm:leading-8 ">
-                Role Admin
-              </p>
-              <Select
-                value={role}
-                onValueChange={(value: string) => setRole(value)}
-              >
-                <SelectTrigger className="w-full rounded-xl p-4 h-[2.7rem] border border-blue-500">
-                  <p className="mr-3 flex items-center gap-1 text-base text-gray-300">
-                    <HiMiniUserGroup />
-                    {role != ""
-                      ? role == "adminPusat"
-                        ? "Admin Pusat"
-                        : role == "balai"
-                          ? "Admin Balai Pelatihan"
-                          : "Admin Satuan Pendidikan"
-                      : "Pilih Role"}
-                  </p>
-                </SelectTrigger>
-                <SelectContent side="top">
-                  <SelectGroup>
-                    <SelectLabel>Role</SelectLabel>
-                    <SelectItem value="adminPusat">Admin Pusat</SelectItem>
-                    <SelectItem value="balai">Admin Balai Pelatihan</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div> */}
+              </div>
 
-            {password != "" && (
-              <div
-                className="flex flex-wrap w-full -mx-3 mb-2"
-                style={{ width: "100% !important" }}
-              >
-                <div
-                  className="w-full px-3"
-                  style={{ width: "100% !important" }}
-                >
-                  <label
-                    className="block text-gray-200 text-sm font-medium mb-1"
-                    htmlFor="password"
-                  >
-                    Verify if you are not a robot{" "}
-                    <span className="text-red-600">*</span>
-                  </label>
-                  <ReCAPTCHA
-                    style={{ width: "100% !important" }}
-                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
-                    className="mx-auto w-full font-inter text-sm"
-                    onChange={setCaptcha}
+              <h1 className="font-bold font-calsans text-gray-200 text-4xl -mt-2">
+                Login Admin{" "}
+                <span className=" bg-clip-text text-transparent bg-gradient-to-r leading-none pt-0 from-blue-500 to-teal-400">
+                  E-LAUT
+                </span>
+              </h1>
+              <p className="font-jakarta max-w-[42rem] leading-[115%] text-gray-300  sm:text-base -mt-3">
+                Selamat datang kembali, silahkan login untuk mengakses dashboard
+                admin Elektronik Layanan Pelatihan Kelautan dan Perikanan Utama
+                Terpadu!
+              </p>
+            </div>
+              <div className="flex flex-col gap-2 w-full max-w-md mx-auto z-50">
+                <div className="flex flex-col gap-1">
+                  <p className="font-jakarta  leading-[100%] text-gray-300  sm:text-sm sm:leading-8 -mt-4">
+                    Email Address
+                  </p>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="border rounded-xl text-white border-blue-500 bg-transparent w-full placeholder:text-gray-300"
+                    placeholder="Enter your email address"
+                    autoComplete="off"
                   />
                 </div>
-              </div>
-            )}
+                <div className="flex flex-col gap-1">
+                  <p className="font-jakarta  leading-[100%] text-gray-300  sm:text-sm sm:leading-8 ">
+                    Password
+                  </p>
+                  <span className="w-full relative h-fit">
+                    <input
+                      type={isShowPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="border rounded-xl text-white border-blue-500 bg-transparent w-full placeholder:text-gray-300"
+                      placeholder="Enter your password"
+                      autoComplete="off"
+                    />
+                    <span onClick={(e) => setIsShowPassword(!isShowPassword)}>
+                      {isShowPassword ? (
+                        <HiOutlineEyeOff className="text-gray-200 my-auto top-3 mr-5 absolute right-0 text-xl cursor-pointer" />
+                      ) : (
+                        <HiOutlineEye className="text-gray-200 my-auto top-3 mr-5 absolute right-0 text-xl cursor-pointer" />
+                      )}
+                    </span>
+                  </span>
+                </div>
 
-            {isLoadingLogin ? (
-              <Button
-                type="button"
-                className="text-white w-full text-base bg-blue-500 bg-opacity-50 rounded-xl hover:bg-blue-600  py-3"
-              >
-                Loading...
-              </Button>
-            ) : (
-              <Button
-                disabled={captcha ? false : true}
-                onClick={(e) => handleLogin(e)}
-                className="text-white w-full text-base bg-blue-500 rounded-xl hover:bg-blue-600  py-3"
-              >
-                Login
-              </Button>
-            )}
-            <div className="text-sm text-gray-200 text-center mt-2">
-              By logging to the system, you agree to the{" "}
-              <span className="underline">terms & conditions</span>, and our{" "}
-              <span className="underline">privacy policy</span>.
-            </div>
-          </div>
+
+                {password != "" && (
+                  <div
+                    className="flex flex-wrap w-full -mx-3 mb-2"
+                    style={{ width: "100% !important" }}
+                  >
+                    <div
+                      className="w-full px-3"
+                      style={{ width: "100% !important" }}
+                    >
+                      <label
+                        className="block text-gray-200 text-sm font-medium mb-1"
+                        htmlFor="password"
+                      >
+                        Verify if you are not a robot{" "}
+                        <span className="text-red-600">*</span>
+                      </label>
+                      <ReCAPTCHA
+                        style={{ width: "100% !important" }}
+                        sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                        className="mx-auto w-full font-inter text-sm"
+                        onChange={setCaptcha}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {isLoadingLogin ? (
+                  <Button
+                    type="button"
+                    className="text-white w-full text-base bg-blue-500 bg-opacity-50 rounded-xl hover:bg-blue-600  py-3"
+                  >
+                    Loading...
+                  </Button>
+                ) : (
+                  <Button
+                    disabled={captcha ? false : true}
+                    onClick={(e) => handleLogin(e)}
+                    className="text-white w-full text-base bg-blue-500 rounded-xl hover:bg-blue-600  py-3"
+                  >
+                    Login
+                  </Button>
+                )}
+                <div className="text-sm text-gray-200 text-center mt-2">
+                  By logging to the system, you agree to the{" "}
+                  <span className="underline">terms & conditions</span>, and our{" "}
+                  <span className="underline">privacy policy</span>.
+                </div>
+              </div></>
+          }
         </section>
       </main>
     </section>

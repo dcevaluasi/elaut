@@ -81,7 +81,8 @@ import NoSertifikatButton from "./Actions/NoSertifikatButton";
 
 function DetailPelatihan() {
   const isAdminBalaiPelatihan: boolean = usePathname().includes('lemdiklat')
-  const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
+  const isLemdiklat = Cookies.get('Status') === 'Lemdiklat'
+  const isSupervisor = Cookies.get('Status') === 'Supervisor'
   const paths = usePathname().split("/");
   const idPelatihan = decryptValue(paths[paths.length - 1]);
   const kodePelatihan = paths[paths.length - 2];
@@ -141,7 +142,7 @@ function DetailPelatihan() {
       </div>
 
       {pelatihan != null && (
-        <div className='grid grid-cols-2 w-full gap-0'>
+        <div className=' mt-5 w-full gap-0'>
           <div className="px-4 w-full mb-4">
             <div className="w-full border border-gray-200 rounded-xl">
               <div className="bg-gray-100 p-4 w-full ">
@@ -153,28 +154,28 @@ function DetailPelatihan() {
                 <tr className="border-b border-b-gray-200 w-full">
 
                   <td className="p-4 w-fit gap-1 flex justify-start ">
-                    {
-                      !isOperatorBalaiPelatihan && <><Link
-                        title={pelatihan!.UserPelatihan.length != 0 ? 'Peserta Pelatihan' : 'Upload Data Peserta'}
-                        href={`/admin/${usePathname().includes('lemdiklat')
-                          ? "lemdiklat"
-                          : "pusat"
-                          }/pelatihan/${pelatihan.KodePelatihan
-                          }/peserta-pelatihan/${encryptValue(
-                            pelatihan.IdPelatihan
-                          )}`}
-                        target="_blank"
-                        className="  shadow-sm bg-green-500 hover:bg-green-500 text-neutral-100  hover:text-neutral-100 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2"
-                      >
-                        <HiUserGroup className="h-5 w-5 " /> {pelatihan!.UserPelatihan.length != 0 ? 'Peserta Pelatihan' : 'Upload Data Peserta'}
-                      </Link>  <GenerateNoSertifikatButton
-                          idPelatihan={pelatihan!.IdPelatihan.toString()}
-                          pelatihan={pelatihan!}
-                          handleFetchingData={
-                            handleFetchDetailPelatihan
-                          }
-                        /></>
-                    }
+
+                    <><Link
+                      title={pelatihan!.UserPelatihan.length != 0 ? 'Peserta Pelatihan' : 'Upload Data Peserta'}
+                      href={`/admin/${usePathname().includes('lemdiklat')
+                        ? "lemdiklat"
+                        : "pusat"
+                        }/pelatihan/${pelatihan.KodePelatihan
+                        }/peserta-pelatihan/${encryptValue(
+                          pelatihan.IdPelatihan
+                        )}`}
+                      target="_blank"
+                      className="  shadow-sm bg-green-500 hover:bg-green-500 text-neutral-100  hover:text-neutral-100 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2"
+                    >
+                      <HiUserGroup className="h-5 w-5 " /> Data Peserta Pelatihan
+                    </Link>  <GenerateNoSertifikatButton
+                        idPelatihan={pelatihan!.IdPelatihan.toString()}
+                        pelatihan={pelatihan!}
+                        handleFetchingData={
+                          handleFetchDetailPelatihan
+                        }
+                      /></>
+
 
 
                   </td>
@@ -294,9 +295,9 @@ function DetailPelatihan() {
                     <Link
                       target="_blank"
                       className="text-blue-500 underline"
-                      href={`${isOperatorBalaiPelatihan ? 'https://elaut-bppsdm.kkp.go.id/api-elaut/public/suratPemberitahuan/pelatihan/' + pelatihan!.SuratPemberitahuan || "" : 'https://elaut-bppsdm.kkp.go.id/api-elaut/public/silabus/pelatihan/' + pelatihan!.SilabusPelatihan || ""}`}
+                      href={`${isLemdiklat ? 'https://elaut-bppsdm.kkp.go.id/api-elaut/public/suratPemberitahuan/pelatihan/' + pelatihan!.SuratPemberitahuan || "" : 'https://elaut-bppsdm.kkp.go.id/api-elaut/public/silabus/' + pelatihan!.SilabusPelatihan || ""}`}
                     >
-                      {isOperatorBalaiPelatihan ? pelatihan!.SuratPemberitahuan || "" : pelatihan!.SilabusPelatihan || ""}
+                      {isLemdiklat ? pelatihan!.SuratPemberitahuan || "" : pelatihan!.SilabusPelatihan || ""}
                     </Link>
 
                   </td>
@@ -392,7 +393,7 @@ function DetailPelatihan() {
               )}
 
               {
-                isOperatorBalaiPelatihan && <tr className="border-b border-b-gray-200 w-full">
+                isLemdiklat && <tr className="border-b border-b-gray-200 w-full">
                   <td className="font-semibold p-4 w-[20%]">Tarif Pelatihan</td>
                   <td className="p-4 w-2/3">
                     {formatToRupiah(pelatihan!.HargaPelatihan) || ""}
@@ -406,7 +407,7 @@ function DetailPelatihan() {
               </tr>
 
               {
-                isOperatorBalaiPelatihan && <tr className="border-b border-b-gray-200 w-full">
+                isLemdiklat && <tr className="border-b border-b-gray-200 w-full">
                   <td className="font-semibold p-4 w-[20%]">Kuota Peserta</td>
                   <td className="p-4 w-2/3">
                     {pelatihan!.KoutaPelatihan} Peserta
@@ -435,7 +436,7 @@ function DetailPelatihan() {
             </div>
             <table className="w-full">
               {
-                isOperatorBalaiPelatihan && <tr className="border-b border-b-gray-200 w-full ">
+                isLemdiklat && <tr className="border-b border-b-gray-200 w-full ">
                   <td className="font-semibold p-4 w-[20%] h-fit flex">
                     Instruktur
                   </td>
@@ -475,7 +476,7 @@ function DetailPelatihan() {
                 </td>
               </tr>
               {
-                isOperatorBalaiPelatihan && <tr className="border-b border-b-gray-200 w-full">
+                isLemdiklat && <tr className="border-b border-b-gray-200 w-full">
                   <td className="font-semibold p-4 w-[20%]">
                     Silabus/Modul/Bahan Ajar Pelatihan
                   </td>
@@ -496,30 +497,6 @@ function DetailPelatihan() {
           </div>
         </div>
       )}
-
-      {
-        !isAdminBalaiPelatihan && <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <div className="px-4">
-              <Button variant="outline" className="w-full mt-5 py-5 text-base bg-neutral-900 hover:bg-neutral-950 text-white hover:text-white">Verifikasi Pengajuan Penerbitan</Button>
-            </div>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete your
-                account and remove your data from our servers.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction>Continue</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      }
-
     </section>
   );
 }
