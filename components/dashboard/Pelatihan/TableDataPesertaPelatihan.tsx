@@ -92,6 +92,8 @@ import { generateTanggalPelatihan } from "@/utils/text";
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import { DIALOG_TEXTS } from "@/constants/texts";
 import { countUserWithNoSertifikat, countValidKeterangan } from "@/utils/counter";
+import { getTodayInIndonesianFormat } from "@/utils/time";
+import { BiSolidCalendarAlt } from "react-icons/bi";
 
 const TableDataPesertaPelatihan = () => {
   const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
@@ -111,6 +113,7 @@ const TableDataPesertaPelatihan = () => {
 
   const [countValid, setCountValid] = React.useState<number>(0)
   const [countPinnedCertificateNumber, setCountPinnedCertificateNumber] = React.useState<number>(0)
+  const [countPinnedCertificateDate, setCountPinnedCertificateDate] = React.useState<number>(0)
 
   const handleFetchingPublicTrainingDataById = async () => {
     try {
@@ -125,6 +128,7 @@ const TableDataPesertaPelatihan = () => {
       setCountValid(countValidKeterangan(response.data.UserPelatihan))
       setCountPinnedCertificateNumber(countUserWithNoSertifikat(response.data.UserPelatihan))
       setData(response.data.UserPelatihan);
+      setCountPinnedCertificateDate(response.data.UserPelatihan)
 
       // Count entries with `FileSertifikat` as an empty string
       const count = response.data.UserPelatihan.filter(
@@ -298,12 +302,57 @@ const TableDataPesertaPelatihan = () => {
     }
   };
 
+  const handleTanggalSertifikatDataPesertaPelatihan = async () => {
+    setIsIteratingProcess(true)
+    try {
+      // Iterate through each user and update their status
+      for (const user of data) {
+        const formData = new FormData();
+        formData.append("TanggalSertifikat", getTodayInIndonesianFormat());
+
+        console.log(`Updating user: ${user.IdUserPelatihan}, Tanggal Sertifikat: ${getTodayInIndonesianFormat()}`);
+
+        await axios.put(
+          `${baseUrl}/lemdik/updatePelatihanUsers?id=${user.IdUserPelatihan}`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+            },
+          }
+        );
+      }
+
+      Toast.fire({
+        icon: "success",
+        title: 'Yeayyy!',
+        text: `Berhasil menyematkan tanggal penandatanganan untuk ${data.length} sertifikat!`,
+      });
+
+      setIsIteratingProcess(false)
+      handleFetchingPublicTrainingDataById();
+      setOpenFormSematkanTanggalSertifikat(false);
+    } catch (error) {
+      console.error("ERROR UPDATE PELATIHAN:", error);
+      Toast.fire({
+        icon: "error",
+        title: 'Oopsss!',
+        text: `Gagal menyematkan tanggal penandatanganan untuk ${data.length} sertifikat!`,
+      });
+
+      setOpenFormSematkanTanggalSertifikat(false);
+      setIsIteratingProcess(false)
+      handleFetchingPublicTrainingDataById();
+    }
+  };
+
   const [
     openFormValidasiDataPesertaPelatihan,
     setOpenFormValidasiDataPesertaPelatihan,
   ] = React.useState<boolean>(false);
 
   const [openFormSematkanNoSertifikat, setOpenFormSematkanNoSertifikat] = React.useState<boolean>(false)
+  const [openFormSematkanTanggalSertifikat, setOpenFormSematkanTanggalSertifikat] = React.useState<boolean>(false)
 
   const [validitasDataPeserta, setValiditasDataPeserta] =
     React.useState<string>("");
@@ -1077,6 +1126,53 @@ const TableDataPesertaPelatihan = () => {
           </AlertDialogContent>
         </AlertDialog>
 
+        <AlertDialog open={openFormSematkanTanggalSertifikat}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {DIALOG_TEXTS['Sematkan Tanggal Sertifikat Grouping Peserta'].title}
+              </AlertDialogTitle>
+              <AlertDialogDescription className="-mt-2">
+                {DIALOG_TEXTS['Sematkan Tanggal Sertifikat Grouping Peserta'].desc}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+
+
+            <div className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4 border-gray-300">
+              <BiSolidCalendarAlt className="h-7 w-7 text-blue-500 text-lg" />
+              <div className="space-y-1 leading-none">
+                <label>{getTodayInIndonesianFormat()}</label>
+                <p className="text-xs leading-[110%] text-gray-600">
+                  Tanggal sertifikat yang akan disematkan pada file sertifikat
+                </p>
+              </div>
+            </div>
+
+
+            <AlertDialogFooter>
+              {
+                isIteratingProcess ? <>
+                  <AlertDialogAction
+                    disabled
+                  >
+                    Sedang diproses...
+                  </AlertDialogAction>
+                </> : <>
+                  <AlertDialogCancel onClick={(e) => setOpenFormSematkanTanggalSertifikat(false)}>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={(e) =>
+                      handleTanggalSertifikatDataPesertaPelatihan()
+                    }
+                  >
+                    Sematkan
+                  </AlertDialogAction>
+                </>
+              }
+
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
         <AlertDialog open={openFormValidasiDataPesertaPelatihan}>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -1233,6 +1329,21 @@ const TableDataPesertaPelatihan = () => {
                   <TbEditCircle />
 
                   Sematkan No Sertifikat Peserta
+                </div>
+              </div>
+            }
+
+            {
+              usePathname().includes('lemdiklat') && countPinnedCertificateDate != data!.length && <div className="w-full flex justify-end gap-2">
+                <div
+                  onClick={(e) => {
+                    setOpenFormSematkanTanggalSertifikat(true)
+                  }}
+                  className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
+                >
+                  <TbEditCircle />
+
+                  Sematkan Tanggal Sertifikat Peserta
                 </div>
               </div>
             }

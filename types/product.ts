@@ -226,6 +226,7 @@ export type UserPelatihan = {
   BuktiBayar?: string
   NoRegistrasi: string
   NoSertifikat: string
+  TanggalSertifikat?: string
   PostTest: number
   PreTest: number
   StatusPembayaran: string

@@ -16,7 +16,7 @@ import {
   TbLink,
   TbWritingSign,
 } from "react-icons/tb";
-import { PelatihanMasyarakat, UserPelatihan } from "@/types/product";
+import { PelatihanMasyarakat } from "@/types/product";
 import { useReactToPrint } from "react-to-print";
 
 import { getCurrentDate } from "@/utils/sertifikat";
@@ -26,7 +26,7 @@ import { elautBaseUrl } from "@/constants/urls";
 import Cookies from "js-cookie";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { User } from "@/types/user";
+import { User, UserPelatihan } from "@/types/user";
 import {
   generateTanggalPelatihan,
   generateTanggalPelatihanWithoutDay,
@@ -36,6 +36,8 @@ import { BsFillPrinterFill } from "react-icons/bs";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Toast from "../toast";
+import { DESC_CERTIFICATE } from "@/constants/texts";
+import { formatDateRange, formatDateRangeEnglish } from "@/utils/time";
 
 const html2pdf = dynamic(() => import("html2pdf.js"), { ssr: false });
 
@@ -73,8 +75,6 @@ const SertifikatNonKepelautan = React.forwardRef(
     React.useEffect(() => {
       handleFetchDetailPeserta();
     }, []);
-
-
 
     return (
       <div className=" flex-col gap-8 font-bos">
@@ -129,7 +129,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                 <p className="text-base font-bosItalic">CERTIFICATE</p>
 
                 <p className="text-lg font-bosBold">
-                  Nomor : B.{userPelatihan?.NoSertifikat}
+                  Nomor : {userPelatihan?.NoSertifikat}
                 </p>
               </div>
 
@@ -141,7 +141,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                   Penyuluhan Perikanan, serta ketentuan pelaksanaannya
                   menyatakan bahwa :
                 </p>
-                <p className=" leading-none font-bosItalic text-[0.65rem]">
+                <p className=" leading-none font-bosItalic text-[0.75rem]">
                   The Agency for Marine and Fisheries Extension and Human
                   Resources Development based on Government Regulation Number 62
                   of 2014 concerning the Implementation of Fisheries Education,
@@ -155,16 +155,16 @@ const SertifikatNonKepelautan = React.forwardRef(
                   <tr className="w-full">
                     <td className="font-bos w-full flex flex-col">
                       <p className="font-bos text-sm">Nama</p>
-                      <p className="font-bos text-[0.65rem] -mt-2">Name</p>
+                      <p className="font-bos text-[0.75rem] -mt-2">Name</p>
                     </td>
-                    <td className=" w-2/3 text-sm">: {userPelatihan!.Nama}</td>
+                    <td className=" w-2/3 text-sm capitalize">: {userPelatihan!.Nama}</td>
                   </tr>
                   <tr className="w-full">
                     <td className="font-bos w-full flex flex-col">
                       <p className="font-bos text-sm">
                         Nomor Induk Kependudukan (NIK)
                       </p>
-                      <p className="font-bos text-[0.65rem] -mt-2">
+                      <p className="font-bos text-[0.75rem] -mt-2">
                         {" "}
                         Population Identification Number (PIN)
                       </p>
@@ -176,19 +176,15 @@ const SertifikatNonKepelautan = React.forwardRef(
                   <tr className="w-full">
                     <td className="font-bos w-full flex flex-col">
                       <p className="font-bos text-sm">Tempat Tanggal Lahir</p>
-                      <p className="font-bos text-[0.65rem] -mt-2">
+                      <p className="font-bos text-[0.75rem] -mt-2">
                         {" "}
                         Place and date of birth
                       </p>
                     </td>
-                    <td className=" w-2/3 text-sm">
+                    <td className=" w-2/3 text-sm capitalize">
                       : {peserta != null ? peserta?.TempatLahir : "-"}
                       {", "}{" "}
-                      {peserta != null
-                        ? generateTanggalPelatihanWithoutDay(
-                          peserta?.TanggalLahir
-                        )
-                        : "-"}{" "}
+                      {peserta?.TanggalLahir}{" "}
                     </td>
                   </tr>
                 </table>
@@ -196,24 +192,19 @@ const SertifikatNonKepelautan = React.forwardRef(
 
               <div className="flex flex-col w-full items-center justify-center -mt-3">
                 <h1 className="font-bosBold text-xl">
-                  {userPelatihan!.PostTest < 65
-                    ? "TELAH MENGIKUTI"
-                    : "TELAH LULUS"}
+                  TELAH LULUS
                 </h1>
                 <h3 className="font-bosBold text-base italic">
-                  {userPelatihan!.PostTest < 65 ? "HAS FOLLOWED" : "HAS PASSED"}
+                  Has Passed
                 </h3>
               </div>
 
               <div className="flex w-full flex-col items-start -mt-2 text-center">
                 <p className="text-sm leading-[115%]">
-                  {pelatihan?.DeskripsiSertifikat}
+                  {DESC_CERTIFICATE[pelatihan!.Program].desc_ind} {formatDateRange(generateTanggalPelatihan(pelatihan?.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan))}
                 </p>
-                <p className=" leading-none font-bosItalic text-[0.65rem]">
-                  In the Training on Good Aquaculture Practices held in
-                  collaboration between the Marine and Fisheries Training Center
-                  – the Agency for Marine and Fisheries Extension and Human
-                  Resources Development on 19 - 21 February 2024.
+                <p className="max-w-4xl leading-none font-bosItalic text-[0.75rem] mx-auto">
+                  {DESC_CERTIFICATE[pelatihan!.Program].desc_eng} {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan?.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan))}
                 </p>
               </div>
 
@@ -221,28 +212,12 @@ const SertifikatNonKepelautan = React.forwardRef(
                 <div className="flex flex-col font-bos text-center items-center justify-center">
                   <div className="flex w-full flex-col items-cennter mt-2 text-center">
                     <p className="font-bos text-sm leading-[105%] w-full flex items-center gap-1">
-                      Jakarta,{" "}
-                      {
-                        pelatihan?.IsMengajukanPenerbitan != '' ? <>{
-                          generateTanggalPelatihan('')}</> : <input
-                          id="tanggalMulaiPelatihan"
-                          type="date"
-                          className="form-input w-full text-black border-gray-300 rounded-md"
-                          required
-                          min={new Date().toISOString().split("T")[0]}
-                          value={tanggalSertifikat}
-                          onChange={(
-                            e: ChangeEvent<HTMLInputElement>
-                          ) =>
-                            setTanggalSertifikat(e.target.value)
-                          }
-                        />
-                      }
+                      Jakarta,{" "}{userPelatihan?.TanggalSertifikat}
 
                       <br /> {pelatihan?.TtdSertifikat}
                     </p>
 
-                    <p className=" leading-none font-bosItalic text-[0.65rem]">
+                    <p className=" leading-none font-bosItalic text-[0.75rem]">
                       {pelatihan?.TtdSertifikat ==
                         "Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan"
                         ? "Chairman of the Agency for Marine and Fisheries Extension and Human Resources Development"
@@ -255,7 +230,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                       width={0}
                       height={0}
                       src={"/ttd-elektronik.png"}
-                      className="w-fit h-[80px] relative -z-10"
+                      className="w-[200px] h-[80px] relative -z-10"
                     />
                   ) : (
                     <div className="h-[80px]"></div>
@@ -273,7 +248,7 @@ const SertifikatNonKepelautan = React.forwardRef(
 
             {!isPrinting && (
               <div className="flex flex-row  absolute -bottom-12">
-                <p className="text-[0.65rem] leading-[100%] text-center max-w-2xl">
+                <p className="text-[0.75rem] leading-[100%] text-center max-w-2xl">
                   Dokumen ini telah ditandatangani secara elektronik menggunakan
                   sertifikat elektronik yang telah diterbitkan oleh Balai
                   Sertifikasi Elektronik (BSrE), Badan Siber dan Sandi Negara
@@ -315,6 +290,7 @@ const SertifikatKepelautan = React.forwardRef(
         console.error("LEMDIK INFO: ", error);
       }
     };
+
 
     const [tanggalSertifikat, setTanggalSertifikat] = React.useState<string>('')
     React.useEffect(() => {
@@ -536,7 +512,7 @@ const SertifikatKepelautan = React.forwardRef(
 
             {!isPrinting && (
               <div className="flex flex-row  absolute -bottom-5">
-                <p className="text-[0.65rem] leading-[100%] text-center max-w-2xl">
+                <p className="text-[0.75rem] leading-[100%] text-center max-w-2xl">
                   Dokumen ini telah ditandatangani secara elektronik menggunakan
                   sertifikat elektronik yang telah diterbitkan oleh Balai
                   Sertifikasi Elektronik (BSrE), Badan Siber dan Sandi Negara
@@ -704,14 +680,14 @@ export function DialogSertifikatPelatihan({
             <div className="flex gap-2 items-center">
               <MdVerified className="text-3xl text-blue-500" />
               <div className="flex flex-col">
-                <DialogTitle>B.{pelatihan?.NoSertifikat}</DialogTitle>
+                <DialogTitle>{pelatihan?.NoSertifikat}</DialogTitle>
                 <DialogDescription>
                   Sertifikat Pelatihan {pelatihan?.NamaPelatihan}
                 </DialogDescription>
               </div>
             </div>
           </DialogHeader>
-          <div className="max-h-[600px] scale-95 flex flex-col gap-2 overflow-y-auto scroll-smooth">
+          <div className="max-h-[700px] scale-95 flex flex-col gap-2 overflow-y-auto scroll-smooth">
             {pelatihan?.JenisSertifikat == "Kepelautan" ? (
               <SertifikatKepelautan
                 ref={componentRef}

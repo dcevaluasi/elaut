@@ -7,3 +7,9 @@ export const countValidKeterangan = (data: UserPelatihan[]): number => {
 export const countUserWithNoSertifikat = (data: UserPelatihan[]): number => {
   return data.filter((item) => item.NoSertifikat !== '').length
 }
+
+export const countUserWithTanggalSertifikat = (
+  data: UserPelatihan[],
+): number => {
+  return data.filter((item) => item.TanggalSertifikat !== '').length
+}
