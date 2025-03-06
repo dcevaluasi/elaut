@@ -36,7 +36,7 @@ import { BsFillPrinterFill } from "react-icons/bs";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Toast from "../toast";
-import { capitalizeWords, DESC_CERTIFICATE } from "@/constants/texts";
+import { capitalizeWords, CURRICULLUM_CERTIFICATE, DESC_CERTIFICATE } from "@/constants/texts";
 import { formatDateRange, formatDateRangeEnglish } from "@/utils/time";
 
 const html2pdf = dynamic(() => import("html2pdf.js"), { ssr: false });
@@ -72,6 +72,22 @@ const SertifikatNonKepelautan = React.forwardRef(
       }
     };
 
+    const calculateTotalHours = (data: any) => {
+      let totalTheory = 0;
+      let totalPractice = 0;
+
+      Object.values(data).forEach((courses: any) => {
+        courses.forEach(({ theory, practice }: { theory: number, practice: number }) => {
+          totalTheory += theory;
+          totalPractice += practice;
+        });
+      });
+
+      return { totalTheory, totalPractice };
+    };
+
+    const totalHours = calculateTotalHours(CURRICULLUM_CERTIFICATE[pelatihan!.Program]);
+
     React.useEffect(() => {
       handleFetchDetailPeserta();
     }, []);
@@ -82,6 +98,7 @@ const SertifikatNonKepelautan = React.forwardRef(
           ref={ref}
           className="w-full h-full  flex flex-col gap-4 items-center justify-center  px-10 py-14 rounded-md font-bos leading-[120%]"
         >
+          {/* Page 1 */}
           <div className="w-full flex flex-col  gap-4 relative h-full items-center justify-center">
             <div className="flex flex-row  absolute top-0 right-0">
               <p className="text-base">
@@ -255,6 +272,141 @@ const SertifikatNonKepelautan = React.forwardRef(
                 </p>
               </div>
             )}
+          </div>
+
+          {/* Page 2 */}
+
+          <div className="w-full flex flex-col  gap-4 relative h-full items-center justify-center mt-32">
+            <div className="flex flex-row justify-center items-center">
+              <div className="flex flex-row gap-2 items-center">
+                <div className="flex flex-col text-center">
+                  <p className="font-bosBold max-w-md w-full ">
+                    {pelatihan?.NamaPelatihan}
+                  </p>
+                  <p className="font-bos text-sm max-w-3xl">{formatDateRange(generateTanggalPelatihan(pelatihan?.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan))}</p>
+                </div>
+              </div>
+            </div>
+
+            <table
+              border={1}
+              className="text-center border border-black-2 p-2 rounded-md w-full"
+            >
+              <tr>
+                <td
+                  rowSpan={3}
+                  className="border border-black-2 p-2 font-bosBold"
+                >
+                  NO
+                </td>
+                <td
+                  rowSpan={3}
+                  className="border border-black-2 p-2 font-bosBold"
+                >
+                  COURSES
+                </td>
+                <td
+                  colSpan={3}
+                  className="border border-black-2 p-2 font-bosBold"
+                >
+                  ALOKASI WAKTU
+                </td>
+              </tr>
+              <tr>
+                <td colSpan={2} className="border border-black-2 p-2 font-bosBold">
+                  (@45 Menit)
+                </td>
+
+              </tr>
+              <tr>
+                <td className="border border-black-2 p-2 font-bosBold">
+                  TEORI
+                </td>
+                <td className="border border-black-2 p-2 font-bosBold">
+                  PRAKTEK
+                </td>
+              </tr>
+              <tr>
+                <td className="border border-black-2 p-2 font-bosBold">
+                  I
+                </td>
+                <td className="border border-black-2 p-2 text-left font-bosBold">
+                  KOMPETENSI UMUM
+                </td>
+                <td className="border border-black-2 p-2 font-bosBold">
+
+                </td>
+                <td className="border border-black-2 p-2 font-bosBold">
+
+                </td>
+              </tr>
+              {CURRICULLUM_CERTIFICATE[pelatihan!.Program].UMUM.map((materi, index) => (
+                <tr key={index} className="text-xs">
+                  <td className="border border-black-2 p-2">{index + 1}.</td>
+                  <td className="border border-black-2 p-2 text-left">
+                    <div className="flex flex-col ">
+                      <span className='text-sm'>{materi.name_ind}</span>
+                      <span className='italic'>{materi.name_eng}</span>
+                    </div>
+                  </td>
+                  <td className="border border-black-2 text-sm p-2">{materi.theory}</td>
+                  <td className="border border-black-2 text-sm p-2">{materi.practice}</td>
+                </tr>
+              ))}
+              <tr>
+                <td className="border border-black-2 p-2 font-bosBold">
+                  II
+                </td>
+                <td className="border border-black-2 p-2 text-left font-bosBold">
+                  KOMPETENSI INTI
+                </td>
+                <td className="border border-black-2 p-2 font-bosBold">
+
+                </td>
+                <td className="border border-black-2 p-2 font-bosBold">
+
+                </td>
+              </tr>
+              {CURRICULLUM_CERTIFICATE[pelatihan!.Program].INTI.map((materi, index) => (
+                <tr key={index} className="text-xs">
+                  <td className="border border-black-2 p-2">{index + 1}.</td>
+                  <td className="border border-black-2 p-2 text-left">
+                    <div className="flex flex-col ">
+                      <span className='text-sm'>{materi.name_ind}</span>
+                      <span className='italic'>{materi.name_eng}</span>
+                    </div>
+                  </td>
+                  <td className="border border-black-2 text-sm p-2">{materi.theory}</td>
+                  <td className="border border-black-2 text-sm p-2">{materi.practice}</td>
+                </tr>
+              ))}
+              <tr>
+                <td
+                  colSpan={2}
+                  className="font-bosBold border border-black-2 p-2"
+                >
+                  JUMLAH JAM PELAJARAN
+                </td>
+                <td className="border border-black-2 p-2 font-bosBold">
+                  {totalHours.totalTheory}
+                </td>
+                <td className="border border-black-2 p-2 font-bosBold">
+                  {totalHours.totalPractice}
+                </td>
+              </tr>
+              <tr>
+                <td
+                  colSpan={2}
+                  className="font-bosBold border border-black-2 p-2"
+                >
+                  TOTAL JAM PELAJARAN
+                </td>
+                <td colSpan={2} className="border border-black-2 p-2 font-bosBold">
+                  {totalHours.totalTheory + totalHours.totalPractice}
+                </td>
+
+              </tr>
+            </table>
           </div>
         </div>
       </div>

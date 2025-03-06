@@ -581,9 +581,7 @@ const TableDataPelatihan: React.FC = () => {
                                 <HiUserGroup className="text-base" />
                                 <span>
                                   Jumlah peserta pelatihan :{" "}
-                                  {pelatihan!.UserPelatihan.length}
-                                  {isOperatorBalaiPelatihan && `/
-                                  ${pelatihan!.KoutaPelatihan}`}
+                                  {pelatihan!.UserPelatihan.length} Peserta
                                 </span>
                               </span>
                             </p>
