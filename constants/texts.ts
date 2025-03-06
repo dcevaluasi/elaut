@@ -41,3 +41,7 @@ export const DESC_CERTIFICATE: Record<string, CertificateDescription> = {
       'In the Hazard Analysis and Critical Control Points (HACCP) Training which was held in collaboration with the Maritime and Fisheries Training Center - Maritime and Fisheries Human Resource Development and Extension Agency with the Quality Control Center - Marine and Fisheries Products Quality Control and Supervision Agency on',
   },
 }
+
+export function capitalizeWords(text: string): string {
+  return text.replace(/\b\w/g, (char) => char.toUpperCase())
+}

@@ -36,7 +36,7 @@ import { BsFillPrinterFill } from "react-icons/bs";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Toast from "../toast";
-import { DESC_CERTIFICATE } from "@/constants/texts";
+import { capitalizeWords, DESC_CERTIFICATE } from "@/constants/texts";
 import { formatDateRange, formatDateRangeEnglish } from "@/utils/time";
 
 const html2pdf = dynamic(() => import("html2pdf.js"), { ssr: false });
@@ -157,7 +157,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                       <p className="font-bos text-sm">Nama</p>
                       <p className="font-bos text-[0.75rem] -mt-2">Name</p>
                     </td>
-                    <td className=" w-2/3 text-sm capitalize">: {userPelatihan!.Nama}</td>
+                    <td className=" w-2/3 text-sm capitalize">: {capitalizeWords(userPelatihan!.Nama)}</td>
                   </tr>
                   <tr className="w-full">
                     <td className="font-bos w-full flex flex-col">
@@ -182,7 +182,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                       </p>
                     </td>
                     <td className=" w-2/3 text-sm capitalize">
-                      : {peserta != null ? peserta?.TempatLahir : "-"}
+                      : {peserta != null ? capitalizeWords(peserta?.TempatLahir) : "-"}
                       {", "}{" "}
                       {peserta?.TanggalLahir}{" "}
                     </td>
