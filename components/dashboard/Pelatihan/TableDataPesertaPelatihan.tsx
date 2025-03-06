@@ -91,7 +91,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { generateTanggalPelatihan } from "@/utils/text";
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import { DIALOG_TEXTS } from "@/constants/texts";
-import { countUserWithNoSertifikat, countValidKeterangan } from "@/utils/counter";
+import { countUserWithNoSertifikat, countUserWithTanggalSertifikat, countValidKeterangan } from "@/utils/counter";
 import { getTodayInIndonesianFormat } from "@/utils/time";
 import { BiSolidCalendarAlt } from "react-icons/bi";
 
@@ -128,7 +128,7 @@ const TableDataPesertaPelatihan = () => {
       setCountValid(countValidKeterangan(response.data.UserPelatihan))
       setCountPinnedCertificateNumber(countUserWithNoSertifikat(response.data.UserPelatihan))
       setData(response.data.UserPelatihan);
-      setCountPinnedCertificateDate(response.data.UserPelatihan)
+      setCountPinnedCertificateDate(countUserWithTanggalSertifikat(response.data.UserPelatihan))
 
       // Count entries with `FileSertifikat` as an empty string
       const count = response.data.UserPelatihan.filter(
