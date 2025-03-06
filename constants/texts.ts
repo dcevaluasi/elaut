@@ -42,6 +42,51 @@ export const DESC_CERTIFICATE: Record<string, CertificateDescription> = {
   },
 }
 
+type CertificateCurricullum = {
+  name_ind: string
+  name_eng: string
+  theory: number
+  practice: number
+}
+
+export const CURRICULLUM_CERTIFICATE: Record<
+  string,
+  Record<string, CertificateCurricullum[]>
+> = {
+  HACCP: {
+    UMUM: [
+      {
+        name_ind: 'Kebijakan Sistem Jaminan Mutu dan Keamanan Hasil Perikanan',
+        name_eng: 'Fishery Product Quality and Safety Assurance System Policy',
+        theory: 2,
+        practice: 0,
+      },
+    ],
+    INTI: [
+      {
+        name_ind: 'Prinsip Kemunduran Mutu Ikan',
+        name_eng: 'Principle of Decline in Fish Quality',
+        theory: 2,
+        practice: 2,
+      },
+      {
+        name_ind:
+          'Penerapan Persyaratan Kelayakan Dasar/Pre Requisite HACCP di UPI',
+        name_eng:
+          'Implementation of HACCP Basic/Pre Requisite Eligibility Requirements at UPI',
+        theory: 2,
+        practice: 2,
+      },
+      {
+        name_ind: 'Pengembangan Penerapan Sistem HACCP',
+        name_eng: 'Development of HACCP System Implementation',
+        theory: 4,
+        practice: 18,
+      },
+    ],
+  },
+}
+
 export function capitalizeWords(text: string): string {
   return text.replace(/\b\w/g, (char) => char.toUpperCase())
 }
