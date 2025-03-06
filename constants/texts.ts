@@ -11,4 +11,10 @@ export const DIALOG_TEXTS = {
     desc:
       'Sebelum melakukan tindakan ini dipastikan anda sudah melihat detail data peserta pelatihan dan pastikan data yang masuk merupakan data yang valid serta perlu diingat tindakan ini bersifat permanen dan tidak dapat diubah!',
   },
+  'Sematkan No Sertifikat Grouping Peserta': {
+    title:
+      'Apakah anda yakin ingin menyematkan no sertifikat pada data peserta pelatihan secara grouping?',
+    desc:
+      'Sebelum melakukan tindakan ini dipastikan anda sudah membuat nomor di portal.kkp.go.id, nomor yang disematkan bukan berasal dari portal dianggap tidak valid!',
+  },
 }

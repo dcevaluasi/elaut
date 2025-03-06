@@ -91,7 +91,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { generateTanggalPelatihan } from "@/utils/text";
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import { DIALOG_TEXTS } from "@/constants/texts";
-import { countValidKeterangan } from "@/utils/counter";
+import { countUserWithNoSertifikat, countValidKeterangan } from "@/utils/counter";
 
 const TableDataPesertaPelatihan = () => {
   const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
@@ -110,6 +110,7 @@ const TableDataPesertaPelatihan = () => {
   const [data, setData] = React.useState<UserPelatihan[] | []>([]);
 
   const [countValid, setCountValid] = React.useState<number>(0)
+  const [countPinnedCertificateNumber, setCountPinnedCertificateNumber] = React.useState<number>(0)
 
   const handleFetchingPublicTrainingDataById = async () => {
     try {
@@ -122,6 +123,7 @@ const TableDataPesertaPelatihan = () => {
       // Set data to state
       setDataPelatihan(response.data);
       setCountValid(countValidKeterangan(response.data.UserPelatihan))
+      setCountPinnedCertificateNumber(countUserWithNoSertifikat(response.data.UserPelatihan))
       setData(response.data.UserPelatihan);
 
       // Count entries with `FileSertifikat` as an empty string
@@ -231,7 +233,8 @@ const TableDataPesertaPelatihan = () => {
 
       Toast.fire({
         icon: "success",
-        title: `Berhasil memvalidasi ${data.length} peserta pelatihan!`,
+        title: 'Yeayyy!',
+        text: `Berhasil memvalidasi ${data.length} peserta pelatihan!`,
       });
 
       setIsIteratingProcess(false)
@@ -241,11 +244,57 @@ const TableDataPesertaPelatihan = () => {
       console.error("ERROR UPDATE PELATIHAN:", error);
       Toast.fire({
         icon: "error",
-        title: `Gagal memvalidasi peserta, harap coba lagi!`,
+        title: 'Oopsss!',
+        text: `Gagal memvalidasi peserta, harap coba lagi!`,
+      });
+
+      setOpenFormValidasiDataPesertaPelatihan(false);
+      setIsIteratingProcess(false)
+      handleFetchingPublicTrainingDataById();
+    }
+  };
+
+  const handleSematkanNoSertifikatDataPesertaPelatihan = async (noSertifikat: string) => {
+    setIsIteratingProcess(true)
+    try {
+      // Iterate through each user and update their status
+      for (const user of data) {
+        const formData = new FormData();
+        formData.append("NoSertifikat", noSertifikat);
+
+        console.log(`Updating user: ${user.IdUserPelatihan}, No Sertifikat: ${noSertifikat}`);
+
+        await axios.put(
+          `${baseUrl}/lemdik/updatePelatihanUsers?id=${user.IdUserPelatihan}`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+            },
+          }
+        );
+      }
+
+      Toast.fire({
+        icon: "success",
+        title: 'Yeayyy!',
+        text: `Berhasil menyematkan no sertifikat ke ${data.length} peserta pelatihan!`,
       });
 
       setIsIteratingProcess(false)
       handleFetchingPublicTrainingDataById();
+      setOpenFormSematkanNoSertifikat(false);
+    } catch (error) {
+      console.error("ERROR UPDATE PELATIHAN:", error);
+      Toast.fire({
+        icon: "error",
+        title: 'Oopsss!',
+        text: `Gagal menyematkan no sertifikat ke peserta, harap coba lagi!`,
+      });
+
+      setIsIteratingProcess(false)
+      handleFetchingPublicTrainingDataById();
+      setOpenFormSematkanNoSertifikat(false);
     }
   };
 
@@ -253,6 +302,8 @@ const TableDataPesertaPelatihan = () => {
     openFormValidasiDataPesertaPelatihan,
     setOpenFormValidasiDataPesertaPelatihan,
   ] = React.useState<boolean>(false);
+
+  const [openFormSematkanNoSertifikat, setOpenFormSematkanNoSertifikat] = React.useState<boolean>(false)
 
   const [validitasDataPeserta, setValiditasDataPeserta] =
     React.useState<string>("");
@@ -387,7 +438,7 @@ const TableDataPesertaPelatihan = () => {
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogTitle>
-                          Sebarkan No Sertifikat
+                          Sematkan No Sertifikat
                         </AlertDialogTitle>
                         <AlertDialogDescription className="-mt-2">
                           Agar no sertifikat dapat diakses dan diunduh
@@ -832,168 +883,246 @@ const TableDataPesertaPelatihan = () => {
         </div>
       </div>
 
-      <AlertDialog open={isOpenFormInputNilai}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
-              {" "}
-              <HiMiniUserGroup className="h-4 w-4" />
-              Upload Nilai Peserta
-            </AlertDialogTitle>
-            <AlertDialogDescription className="-mt-2">
-              Upload nilai peserta pelatihan dari dokumen portfolio yang
-              dikirimkan sebagai bahan penilaian!
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <fieldset>
-            <form autoComplete="off">
-              <div className="flex gap-2 w-full">
-                <div className="flex gap-2 mb-1 w-full">
-                  <div className="w-full">
+      {dataPelatihan !== null && <>
+        <AlertDialog open={isOpenFormInputNilai}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                {" "}
+                <HiMiniUserGroup className="h-4 w-4" />
+                Upload Nilai Peserta
+              </AlertDialogTitle>
+              <AlertDialogDescription className="-mt-2">
+                Upload nilai peserta pelatihan dari dokumen portfolio yang
+                dikirimkan sebagai bahan penilaian!
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <fieldset>
+              <form autoComplete="off">
+                <div className="flex gap-2 w-full">
+                  <div className="flex gap-2 mb-1 w-full">
+                    <div className="w-full">
+                      <label
+                        className="block text-gray-800 text-sm font-medium mb-1"
+                        htmlFor="name"
+                      >
+                        Nilai Portfolio <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        id="name"
+                        type="text"
+                        className="form-input w-full text-black border-gray-300 rounded-md"
+                        required
+                        value={nilaiPretest}
+                        onChange={(e) => setNilaiPretest(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <AlertDialogFooter className="mt-3">
+                  <AlertDialogCancel
+                    onClick={(e) =>
+                      setIsOpenFormInputNilai(!isOpenFormInputNilai)
+                    }
+                  >
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={(e) => handleUploadNilaiPeserta(selectedIdPeserta)}
+                  >
+                    Upload
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </form>
+            </fieldset>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        <AlertDialog open={isOpenFormPeserta}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                {" "}
+                <HiMiniUserGroup className="h-4 w-4" />
+                Import Peserta Pelatihan
+              </AlertDialogTitle>
+              <AlertDialogDescription className="-mt-2">
+                Import peserta yang akan mengikuti pelatihan ini!
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <fieldset>
+              <form autoComplete="off">
+                <div className="flex flex-wrap -mx-3 mb-1">
+                  <div className="w-full px-3">
                     <label
                       className="block text-gray-800 text-sm font-medium mb-1"
-                      htmlFor="name"
+                      htmlFor="email"
                     >
-                      Nilai Portfolio <span className="text-red-600">*</span>
+                      Data By Name By Address <span>*</span>
                     </label>
-                    <input
-                      id="name"
-                      type="text"
-                      className="form-input w-full text-black border-gray-300 rounded-md"
-                      required
-                      value={nilaiPretest}
-                      onChange={(e) => setNilaiPretest(e.target.value)}
-                    />
+                    <div className="flex gap-1">
+                      <input
+                        type="file"
+                        className=" text-black h-10 text-base flex items-center cursor-pointer w-full border border-neutral-200 rounded-md"
+                        required
+                        onChange={handleFileChange}
+                      />
+                      <Link
+                        target="_blank"
+                        href={
+                          "https://docs.google.com/spreadsheets/d/12t7l4bBjPBcxXpCPPOqYeTDoZxBi5aS7/export?format=xlsx"
+                        }
+                        className="btn text-white bg-green-600 hover:bg-green-700 py-0 w-[250px] px-0 text-sm"
+                      >
+                        <PiMicrosoftExcelLogoFill />
+                        Unduh Template
+                      </Link>
+                    </div>
+                    <p className="text-gray-700 text-xs mt-1">
+                      *Download terlebih dahulu template lalu isi file excel dan
+                      upload, perlu diingat mengimport data hanya dapat dilakukan sekali!
+                    </p>
                   </div>
                 </div>
-              </div>
 
-              <AlertDialogFooter className="mt-3">
-                <AlertDialogCancel
-                  onClick={(e) =>
-                    setIsOpenFormInputNilai(!isOpenFormInputNilai)
-                  }
-                >
-                  Cancel
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={(e) => handleUploadNilaiPeserta(selectedIdPeserta)}
-                >
-                  Upload
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </form>
-          </fieldset>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog open={isOpenFormPeserta}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
-              {" "}
-              <HiMiniUserGroup className="h-4 w-4" />
-              Import Peserta Pelatihan
-            </AlertDialogTitle>
-            <AlertDialogDescription className="-mt-2">
-              Import peserta yang akan mengikuti pelatihan ini!
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <fieldset>
-            <form autoComplete="off">
-              <div className="flex flex-wrap -mx-3 mb-1">
-                <div className="w-full px-3">
-                  <label
-                    className="block text-gray-800 text-sm font-medium mb-1"
-                    htmlFor="email"
+                <AlertDialogFooter className="mt-3 pt-3 border-t border-t-gray-300">
+                  <AlertDialogCancel
+                    onClick={(e) => setIsOpenFormPeserta(!isOpenFormPeserta)}
                   >
-                    Data By Name By Address <span>*</span>
-                  </label>
-                  <div className="flex gap-1">
-                    <input
-                      type="file"
-                      className=" text-black h-10 text-base flex items-center cursor-pointer w-full border border-neutral-200 rounded-md"
-                      required
-                      onChange={handleFileChange}
-                    />
-                    <Link
-                      target="_blank"
-                      href={
-                        "https://docs.google.com/spreadsheets/d/12t7l4bBjPBcxXpCPPOqYeTDoZxBi5aS7/export?format=xlsx"
-                      }
-                      className="btn text-white bg-green-600 hover:bg-green-700 py-0 w-[250px] px-0 text-sm"
-                    >
-                      <PiMicrosoftExcelLogoFill />
-                      Unduh Template
-                    </Link>
-                  </div>
-                  <p className="text-gray-700 text-xs mt-1">
-                    *Download terlebih dahulu template lalu isi file excel dan
-                    upload, perlu diingat mengimport data hanya dapat dilakukan sekali!
-                  </p>
-                </div>
-              </div>
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={(e) => handleUploadImportPesertaPelatihan(e)}
+                  >
+                    Upload
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </form>
+            </fieldset>
+          </AlertDialogContent>
+        </AlertDialog>
 
-              <AlertDialogFooter className="mt-3 pt-3 border-t border-t-gray-300">
-                <AlertDialogCancel
-                  onClick={(e) => setIsOpenFormPeserta(!isOpenFormPeserta)}
-                >
-                  Cancel
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={(e) => handleUploadImportPesertaPelatihan(e)}
-                >
-                  Upload
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </form>
-          </fieldset>
-        </AlertDialogContent>
-      </AlertDialog>
 
-      <AlertDialog open={openFormValidasiDataPesertaPelatihan}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
-              {DIALOG_TEXTS['Validasi Grouping Peserta'].title}
-            </AlertDialogTitle>
-            <AlertDialogDescription className="-mt-2">
-              {DIALOG_TEXTS['Validasi Grouping Peserta'].desc}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <fieldset>
+        <AlertDialog open={openFormSematkanNoSertifikat}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {DIALOG_TEXTS['Sematkan No Sertifikat Grouping Peserta'].title}
+              </AlertDialogTitle>
+              <AlertDialogDescription className="-mt-2">
+                {DIALOG_TEXTS['Sematkan No Sertifikat Grouping Peserta'].desc}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
             <form autoComplete="off">
-              <AlertDialogFooter className="mt-3">
-                {
-                  isIteratingProcess ? <AlertDialogAction
-                    className="bg-green-500 hover:bg-green-600"
+              {countPinnedCertificateNumber !== data!.length ? (
+                <div className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 border-gray-300">
+                  <div>
+                    {dataPelatihan?.NoSertifikat !== "" && (
+                      <Checkbox
+                        id="publish"
+                        onCheckedChange={(e) =>
+                          setNoSertifikatTerbitkan(
+                            dataPelatihan?.NoSertifikat!
+                          )
+                        }
+                      />
+                    )}
+                  </div>
+                  <div className="space-y-1 leading-none">
+                    <label>
+                      {dataPelatihan?.NoSertifikat === ""
+                        ? "Generate Terlebih Dahulu"
+                        : dataPelatihan?.NoSertifikat}
+                    </label>
+                    <p className="text-xs leading-[110%] text-gray-600">
+                      Generate nomor sertifikat terlebih dahulu dan
+                      sebarkan nomor ke sertifikat peserta
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4 border-gray-300">
+                  <RiVerifiedBadgeFill className="h-7 w-7 text-green-500 text-lg" />
+                  <div className="space-y-1 leading-none">
+                    <label>{dataPelatihan?.NoSertifikat}</label>
+                    <p className="text-xs leading-[110%] text-gray-600">
+                      Nomor sertifikat telah disematkan ke peserta pelatihan
+                    </p>
+                  </div>
+                </div>
+              )}
+            </form>
+            <AlertDialogFooter>
+              {
+                isIteratingProcess ? <>
+                  <AlertDialogAction
                     disabled
                   >
                     Sedang diproses...
-                  </AlertDialogAction> : <>
-                    <AlertDialogCancel
-                      onClick={(e) =>
-                        setOpenFormValidasiDataPesertaPelatihan(
-                          !openFormValidasiDataPesertaPelatihan
-                        )
-                      }
-                    >
-                      Cancel
-                    </AlertDialogCancel>
-                    <AlertDialogAction
+                  </AlertDialogAction>
+                </> : <>
+                  <AlertDialogCancel onClick={(e) => setOpenFormSematkanNoSertifikat(false)}>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={(e) =>
+                      handleSematkanNoSertifikatDataPesertaPelatihan(dataPelatihan!.NoSertifikat)
+                    }
+                  >
+                    Sematkan
+                  </AlertDialogAction>
+                </>
+              }
+
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        <AlertDialog open={openFormValidasiDataPesertaPelatihan}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                {DIALOG_TEXTS['Validasi Grouping Peserta'].title}
+              </AlertDialogTitle>
+              <AlertDialogDescription className="-mt-2">
+                {DIALOG_TEXTS['Validasi Grouping Peserta'].desc}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <fieldset>
+              <form autoComplete="off">
+                <AlertDialogFooter className="mt-3">
+                  {
+                    isIteratingProcess ? <AlertDialogAction
                       className="bg-green-500 hover:bg-green-600"
-                      onClick={(e) =>
-                        handleValidDataPesertaPelatihan()
-                      }
+                      disabled
                     >
-                      Validasi
-                    </AlertDialogAction></>
-                }
-              </AlertDialogFooter>
-            </form>
-          </fieldset>
-        </AlertDialogContent>
-      </AlertDialog>
+                      Sedang diproses...
+                    </AlertDialogAction> : <>
+                      <AlertDialogCancel
+                        onClick={(e) =>
+                          setOpenFormValidasiDataPesertaPelatihan(
+                            !openFormValidasiDataPesertaPelatihan
+                          )
+                        }
+                      >
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-green-500 hover:bg-green-600"
+                        onClick={(e) =>
+                          handleValidDataPesertaPelatihan()
+                        }
+                      >
+                        Validasi
+                      </AlertDialogAction></>
+                  }
+                </AlertDialogFooter>
+              </form>
+            </fieldset>
+          </AlertDialogContent>
+        </AlertDialog>
+      </>}
+
+
       <Card className="mx-4 py-5">
         <CardContent>
           <div className="flex items-center mb-3 justify-between gap-3 ">
@@ -1055,30 +1184,7 @@ const TableDataPesertaPelatihan = () => {
 
           </div>
 
-          <div className="flex w-full items-center mb-2">
-            <div className="flex w-full gap-1 items-start">
-              {isOperatorBalaiPelatihan && (
-                <Select>
-                  <SelectTrigger className="w-[200px] border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
-                    <div className="inline-flex gap-2 px-3 mr-2 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">
-                      <MdOutlinePayment />
-                      Status Pembayaran
-                    </div>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Status Pembayaran</SelectLabel>
-                      <SelectItem value="pendaftaran">Paid</SelectItem>
-                      <SelectItem value="pelaksanaan">Pending</SelectItem>
-                      <SelectItem value="selesai">Not Paid</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              )}
-
-
-            </div>
-
+          {dataPelatihan !== null && data !== null ? <div className="flex w-full items-center mb-2">
             {usePathname().includes("lemdiklat") &&
               dataPelatihan?.StatusApproval != "Selesai" && dataPelatihan?.UserPelatihan.length == 0 && (
                 <div className="w-full flex justify-end gap-2">
@@ -1115,7 +1221,23 @@ const TableDataPesertaPelatihan = () => {
                 </div>
               </div>
             }
-          </div>
+
+            {
+              usePathname().includes('lemdiklat') && data!.length > 0 && countPinnedCertificateNumber != data!.length && <div className="w-full flex justify-end gap-2">
+                <div
+                  onClick={(e) => {
+                    setOpenFormSematkanNoSertifikat(true)
+                  }}
+                  className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
+                >
+                  <TbEditCircle />
+
+                  Sematkan No Sertifikat Peserta
+                </div>
+              </div>
+            }
+          </div> : <></>}
+
 
           <div>
             <div id="chartOne" className="-ml-5"></div>
