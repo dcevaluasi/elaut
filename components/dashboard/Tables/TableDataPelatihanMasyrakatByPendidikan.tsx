@@ -34,7 +34,7 @@ const TableDataPelatihanMasyarakatByPendidikan = ({ dataUserPelatihan }: TableDa
 
   // Ambil daftar unik PenyelenggaraPelatihan sebagai baris
   const penyelenggaraList = useMemo(() => {
-    return Array.from(new Set(dataUserPelatihan.map((item) => item.PenyelenggaraPelatihan)));
+    return Array.from(new Set(dataUserPelatihan.map((item) => item.PenyelenggaraPelatihan!)));
   }, [dataUserPelatihan]);
 
   // Ambil daftar unik PendidikanTerakhir sebagai kolom
@@ -51,8 +51,8 @@ const TableDataPelatihanMasyarakatByPendidikan = ({ dataUserPelatihan }: TableDa
     });
 
     filteredData.filter((item) => item.FileSertifikat && item.FileSertifikat.trim() !== "").forEach((item) => {
-      const penyelenggara = item.PenyelenggaraPelatihan;
-      const pendidikan = item.PendidikanTerakhir;
+      const penyelenggara = item.PenyelenggaraPelatihan!;
+      const pendidikan = item.PendidikanTerakhir!;
       if (map.has(penyelenggara)) {
         map.get(penyelenggara)![pendidikan] = (map.get(penyelenggara)![pendidikan] || 0) + 1;
       }

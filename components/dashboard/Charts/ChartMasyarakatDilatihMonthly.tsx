@@ -113,13 +113,13 @@ const ChartMasyarakatDilatihMonthly: React.FC<{
 
       if (isAdminBalaiPelatihan) {
         filteredDataUser = dataUser.filter(
-          (item: UserPelatihan) => item.FileSertifikat! != '' && item.PenyelenggaraPelatihan == nameBalaiPelatihan
+          (item: UserPelatihan) => item.FileSertifikat! != '' && item.PenyelenggaraPelatihan! == nameBalaiPelatihan
         ).length;
       }
 
       if (isAdminBalaiPelatihan) {
-        filteredDataPelatihan = response.data.data.filter((item: PelatihanMasyarakat) => item.PenyelenggaraPelatihan == nameBalaiPelatihan)
-        filteredDataUserPelatihan = dataUser.filter((item: UserPelatihan) => item.PenyelenggaraPelatihan == nameBalaiPelatihan && item.FileSertifikat != '')
+        filteredDataPelatihan = response.data.data.filter((item: PelatihanMasyarakat) => item.PenyelenggaraPelatihan! == nameBalaiPelatihan)
+        filteredDataUserPelatihan = dataUser.filter((item: UserPelatihan) => item.PenyelenggaraPelatihan! == nameBalaiPelatihan && item.FileSertifikat != '')
       }
 
       setDataPelatihan(filteredDataPelatihan);

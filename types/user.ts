@@ -33,38 +33,38 @@ export type User = {
 
 export type UserPelatihan = {
   CreatedAt: string
-  CreteAt?: string
+  CreteAt: string
   IdUserPelatihan: number
   IdPelatihan: number
-  FileSertifikat?: string
+  FileSertifikat: string
   IdUsers: number
   IsActice: string
-  PenyelenggaraPelatihan?: string
-  TanggalMulai?: string
-  PendidikanTerakhir?: string
+  PenyelenggaraPelatihan: string
+  TanggalMulai: string
+  PendidikanTerakhir: string
   IsKeterangan: string
   MetodoPembayaran: string
   NilaiPraktek: number
   NilaiTeory: number
   NoRegistrasi: string
   NoSertifikat: string
-  TanggalSertifikat?: string
+  TanggalSertifikat: string
   PostTest: number
   PreTest: number
-  JenisKelamin?: string
+  JenisKelamin: string
   StatusPembayaran: string
   UpdateAt: string
   WaktuPembayaran: string
   NamaPelatihan: string
   DetailPelatihan: string
-  BidangPelatihan?: string
+  BidangPelatihan: string
   Keterangan: string
   Nama: string
   TotalBayar: string
-  CodeAksess?: string
-  Provinsi?: string
-  TempatTanggalLahir?: string
-  JenisProgram?: string
-  Program?: string
-  DukunganProgramPrioritas?: string
+  CodeAksess: string
+  Provinsi: string
+  TempatTanggalLahir: string
+  JenisProgram: string
+  Program: string
+  DukunganProgramPrioritas: string
 }

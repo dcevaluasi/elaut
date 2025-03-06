@@ -41,8 +41,8 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
 
     filteredData.filter((item) => item.FileSertifikat && item.FileSertifikat.trim() !== "").forEach(({ PenyelenggaraPelatihan, CreteAt }) => {
       const triwulan = getTriwulan(CreteAt!);
-      if (!map.has(PenyelenggaraPelatihan)) {
-        map.set(PenyelenggaraPelatihan, {
+      if (!map.has(PenyelenggaraPelatihan!)) {
+        map.set(PenyelenggaraPelatihan!, {
           total: 0,
           triwulan: {
             "Triwulan I": 0,
@@ -52,7 +52,7 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
           },
         });
       }
-      const entry = map.get(PenyelenggaraPelatihan)!;
+      const entry = map.get(PenyelenggaraPelatihan!)!;
       entry.total += 1;
       entry.triwulan[triwulan] += 1;
     });

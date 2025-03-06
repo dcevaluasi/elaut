@@ -93,7 +93,7 @@ const TableDataPelatihanMasyarakatByWilker = ({
   const penyelenggaraPelatihan = useMemo(() => {
     const bidangSet = new Set<string>();
     filteredData.forEach((item) => {
-      bidangSet.add(item.PenyelenggaraPelatihan);
+      bidangSet.add(item.PenyelenggaraPelatihan!);
     });
     return Array.from(bidangSet);
   }, [filteredData]);
@@ -113,8 +113,8 @@ const TableDataPelatihanMasyarakatByWilker = ({
 
     // Populate the map with data from filteredData
     filteredData.filter((item) => item.FileSertifikat && item.FileSertifikat.trim() !== "").forEach((item) => {
-      const provinsi = item.PenyelenggaraPelatihan;
-      const penyelenggaraPelatihan = item.PenyelenggaraPelatihan;
+      const provinsi = item.PenyelenggaraPelatihan!;
+      const penyelenggaraPelatihan = item.PenyelenggaraPelatihan!;
 
       if (map.has(provinsi)) {
         const entry = map.get(provinsi)!;

@@ -123,7 +123,7 @@ const TableDataPelatihanMasyarakatByProvinsi = ({
 
     // Populate the map with data from filteredData
     filteredData.forEach((item) => {
-      const provinsi = item.PenyelenggaraPelatihan;
+      const provinsi = item.PenyelenggaraPelatihan!;
       const bidang = item.BidangPelatihan;
       const userCount = item.JumlahPeserta || 0;
 

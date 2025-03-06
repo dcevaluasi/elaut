@@ -62,14 +62,14 @@ const TableDataPelatihanMasyrakatByGender = ({
     >();
 
     filteredData.filter((item) => item.FileSertifikat && item.FileSertifikat.trim() !== "").forEach((item) => {
-      if (!map.has(item.PenyelenggaraPelatihan)) {
-        map.set(item.PenyelenggaraPelatihan, {
+      if (!map.has(item.PenyelenggaraPelatihan!)) {
+        map.set(item.PenyelenggaraPelatihan!, {
           l: 0,
           p: 0,
           total: 0,
         });
       }
-      const entry = map.get(item.PenyelenggaraPelatihan)!;
+      const entry = map.get(item.PenyelenggaraPelatihan!)!;
 
       if (item.JenisKelamin === 'Laki - Laki' || item.JenisKelamin === 'L') {
         entry.l += 1

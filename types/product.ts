@@ -215,23 +215,27 @@ export type UserUjikom = {
 
 export type UserPelatihan = {
   CreatedAt: string
+  CreteAt: string
   IdUserPelatihan: number
   IdPelatihan: number
+  FileSertifikat: string
   IdUsers: number
   IsActice: string
+  PenyelenggaraPelatihan: string
+  TanggalMulai: string
+  PendidikanTerakhir: string
   IsKeterangan: string
   MetodoPembayaran: string
   NilaiPraktek: number
   NilaiTeory: number
-  BuktiBayar?: string
   NoRegistrasi: string
   NoSertifikat: string
-  TanggalSertifikat?: string
+  TanggalSertifikat: string
   PostTest: number
   PreTest: number
+  JenisKelamin: string
   StatusPembayaran: string
   UpdateAt: string
-  FileSertifikat?: string
   WaktuPembayaran: string
   NamaPelatihan: string
   DetailPelatihan: string
@@ -239,7 +243,12 @@ export type UserPelatihan = {
   Keterangan: string
   Nama: string
   TotalBayar: string
+  CodeAksess: string
+  Provinsi: string
   TempatTanggalLahir: string
+  JenisProgram: string
+  Program: string
+  DukunganProgramPrioritas: string
 }
 
 export type Pelatihan = {
