@@ -576,6 +576,7 @@ const TableDataPesertaPelatihan = () => {
                       "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-raw/" +
                       row.original.FileSertifikat
                     }
+                    className='w-full'
                     target="_blank"
                   >
                     <Button
@@ -593,7 +594,7 @@ const TableDataPesertaPelatihan = () => {
                     className="w-full border flex gap-2 bg-blue-600 text-left capitalize items-center justify-center h-9 px-4 py-3 border-blue-600  whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 hover:bg-blue-600 text-white"
                   >
                     <RiVerifiedBadgeFill className="h-4 w-4  " />
-                    <span className="text-sm">Lihat Sertifikat</span>
+                    <span className="text-sm">Download Sertifikat</span>
                   </Link>
                 )}
               </div>
@@ -1386,23 +1387,7 @@ const TableDataPesertaPelatihan = () => {
               </div>
             </div>
 
-            {data != null && dataPelatihan != null ? (
-              emptyFileSertifikatCount > 0 &&
-              dataPelatihan.StatusPenerbitan == "" && (
-                <Button
-                  variant="default"
-                  onClick={() => handleSendingPermohonanPenerbitan()}
-                  className="w-full  flex gap-2 text-left capitalize items-center justify-center mt-5"
-                >
-                  <FiUploadCloud className="h-4 w-4" />
-                  <span className="text-sm">
-                    Kirim Pengajuan Permohonan Sertifikat
-                  </span>
-                </Button>
-              )
-            ) : (
-              <></>
-            )}
+
           </div>
         </CardContent>
       </Card>

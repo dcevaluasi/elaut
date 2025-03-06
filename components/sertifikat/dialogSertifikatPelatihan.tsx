@@ -58,8 +58,6 @@ const SertifikatNonKepelautan = React.forwardRef(
   ) => {
     const [peserta, setPeserta] = React.useState<User | null>(null);
 
-    const [tanggalSertifikat, setTanggalSertifikat] = React.useState<string>('')
-
     const handleFetchDetailPeserta = async () => {
       try {
         const response = await axios.get(
@@ -687,7 +685,8 @@ export function DialogSertifikatPelatihan({
   userPelatihan: UserPelatihan;
   pelatihan: PelatihanMasyarakat;
 }) {
-  const componentRef = useRef(null);
+  const componentRef = useRef<HTMLDivElement | null>(null);
+
   const [show, setShow] = React.useState<boolean>(false);
   const router = useRouter();
   const [isUploading, setIsUploading] = React.useState<boolean>(false);
@@ -696,34 +695,75 @@ export function DialogSertifikatPelatihan({
     setIsUploading(true);
     const html2pdf = (await import("html2pdf.js")).default;
 
+    if (!componentRef.current) {
+      console.error("Component reference is null");
+      setIsUploading(false);
+      return;
+    }
+
     const element = componentRef.current;
 
+    // Clone the element to preserve original styles
+    const clonedElement = element.cloneNode(true) as HTMLElement;
+    document.body.appendChild(clonedElement);
+
+    // Apply computed styles
+    const computedStyle = window.getComputedStyle(element);
+    clonedElement.style.cssText = computedStyle.cssText;
+
+    // Force one-page layout with scaling
+    clonedElement.style.width = "100%";
+    clonedElement.style.maxWidth = "1123px"; // A4 width in px
+    clonedElement.style.height = "auto";
+    clonedElement.style.overflow = "hidden";
+    clonedElement.style.pageBreakInside = "avoid";
+    clonedElement.style.backgroundColor = "#fff"; // Ensure white background
+
     const opt = {
-      margin: 0,
+      margin: [10, 10, 10, 10], // Adjust margins to fit one page
       filename: `${userPelatihan?.Nama}_${userPelatihan?.NoRegistrasi}.pdf`,
-      image: { type: "png", quality: 10 },
-      html2canvas: { scale: 1.9 },
-      jsPDF: { unit: "in", format: "a4", orientation: "landscape" },
+      image: { type: "png", quality: 2 },
+      html2canvas: {
+        scale: 2, // Increase scale for better resolution
+        useCORS: true, // Ensure external styles are applied
+        backgroundColor: "#fff",
+      },
+      jsPDF: {
+        unit: "px",
+        format: "a4",
+        orientation: "portrait",
+      },
     };
 
     html2pdf()
-      .from(element)
+      .from(clonedElement)
       .set(opt)
       .outputPdf("blob")
       .then(async (pdfBlob: Blob) => {
+        document.body.removeChild(clonedElement); // Remove cloned element after capture
+
+        const MAX_SIZE_MB = 5;
+        const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+
+        // if (pdfBlob.size > MAX_SIZE_BYTES) {
+        //   Toast.fire({
+        //     icon: "error",
+        //     title: `Ukuran file terlalu besar! Maksimum ${MAX_SIZE_MB} MB.`,
+        //   });
+        //   setIsUploading(false);
+        //   return;
+        // }
+
         const formData = new FormData();
         formData.append(
           "IdUserPelatihan",
           String(userPelatihan?.IdUserPelatihan ?? "")
         );
-
         formData.append(
           "fileSertifikat",
           pdfBlob,
           `${userPelatihan?.Nama}_${userPelatihan?.NoRegistrasi}.pdf`
         );
-
-        console.log("PDF Blob", pdfBlob);
 
         try {
           const response = await axios.post(
@@ -738,7 +778,6 @@ export function DialogSertifikatPelatihan({
           );
 
           if (response.status === 200) {
-            console.log("File uploaded successfully");
             Toast.fire({
               icon: "success",
               title: `Sertifikat sudah diupload ke server!`,
@@ -751,17 +790,20 @@ export function DialogSertifikatPelatihan({
             });
             console.error("Failed to upload the file");
           }
-          setIsUploading(false);
         } catch (error) {
           Toast.fire({
             icon: "error",
             title: `Sertifikat gagal diupload ke server! Terdapat masalah di server!`,
           });
           console.error("Error uploading the file:", error);
-          setIsUploading(false);
         }
+        setIsUploading(false);
       });
   };
+
+
+
+
 
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
