@@ -219,6 +219,7 @@ export type UserPelatihan = {
   IdUserPelatihan: number
   IdPelatihan: number
   FileSertifikat: string
+  BuktiBayar: string
   IdUsers: number
   IsActice: string
   PenyelenggaraPelatihan: string
@@ -256,7 +257,6 @@ export type Pelatihan = {
   IdLemdik: number
   KodePelatihan: string
   NamaPelatihan: string
-  BuktiBayar: string
   PenyelenggaraPelatihan: string
   DetailPelatihan: string
   FotoPelatihan: string
