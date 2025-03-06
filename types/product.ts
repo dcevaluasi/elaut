@@ -256,6 +256,7 @@ export type Pelatihan = {
   IdLemdik: number
   KodePelatihan: string
   NamaPelatihan: string
+  BuktiBayar: string
   PenyelenggaraPelatihan: string
   DetailPelatihan: string
   FotoPelatihan: string

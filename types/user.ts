@@ -36,6 +36,7 @@ export type UserPelatihan = {
   CreteAt: string
   IdUserPelatihan: number
   IdPelatihan: number
+  BuktiBayar: string
   FileSertifikat: string
   IdUsers: number
   IsActice: string
