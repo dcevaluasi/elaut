@@ -53,6 +53,8 @@ export const AKP_CERTIFICATIONS: string[] = [
   'SKPI',
   'SOPI',
   'Fishing Master',
+  'Mesin Perikanan',
+  'Penangkapan',
 ]
 
 export const AQUACULTURE_CERTIFICATIONS: string[] = [
@@ -65,8 +67,7 @@ export const AQUACULTURE_CERTIFICATIONS: string[] = [
   'API',
   'Budidaya',
   'Pengolahan dan Pemasaran',
-  'Mesin Perikanan',
-  'Penangkapan',
+  'Manajemen Perikanan',
   'SD Perikanan',
   'Wisata Bahari',
 ]

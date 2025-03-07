@@ -142,6 +142,7 @@ export default function RootLayout({
 
           <Header />
           {children}
+          <CallCenter />
         </div>
       </body>
     </html>

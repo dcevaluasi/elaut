@@ -29,6 +29,11 @@ export const DIALOG_TEXTS = {
     desc:
       'Sebelum melakukan tindakan ini dipastikan anda sudah berkoordinasi dengan tim terkait, karena pengaturan spesimen sertifikat hanya dapat dilakukan sekali!',
   },
+  'Layanan Call Center': {
+    title: 'Layanan Pengaduan dan Informasi Pelatihan',
+    desc:
+      'Jika kamu mengalami kendala, gangguan, atau hal lainnya yang terjadi dalam penggunaan aplikasi E-LAUT, hubungi call center Pusat Pelatihan Kelautan dan Perikanan untuk mendapatkan solusi dan hubungi PTSP atau layanan informasi Balai Pelatihan KP terkait informasi pelaksanaan pelatihan, dll.',
+  },
 }
 
 type CertificateCurricullum = {

@@ -20,6 +20,7 @@ function ProgramPelatihan() {
     <section className="h-full flex flex-col gap-0 bg-white">
       <HeroProgramPelatihan program={programPelatihanPath!} />
       <PencarianPelatihan />
+      <Footer />
     </section>
   );
 }

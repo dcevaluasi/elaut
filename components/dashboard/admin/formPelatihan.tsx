@@ -39,6 +39,7 @@ import { FiBookOpen, FiFileText } from "react-icons/fi";
 import { LemdiklatDetailInfo } from "@/types/lemdiklat";
 import { RiVerifiedBadgeLine } from "react-icons/ri";
 import { HashLoader } from "react-spinners";
+import { AKP_CERTIFICATIONS, AQUACULTURE_CERTIFICATIONS, OCEAN_CERTIFICATIONS } from "@/constants/serkom";
 
 type Checked = DropdownMenuCheckboxItemProps["checked"];
 
@@ -390,47 +391,6 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
 
   const [isFacility, setIsFacility] = React.useState("Tidak");
   const [isConsume, setIsConsume] = React.useState("Tidak");
-
-  const akpSelections = [
-    "ANKAPIN Tingkat I",
-    "ATKAPIN Tingkat I",
-    "ANKAPIN Tingkat II",
-    "ATKAPIN Tingkat II",
-    "ANKAPIN Tingkat III",
-    "ATKAPIN Tingkat III",
-    "BST",
-    "BST KLM",
-    "BSTF I",
-    "BSTF II",
-    "Rating",
-    "SKN",
-    "SKPI",
-    "SOPI",
-    "Fishing Master",
-    "Lainnya",
-  ];
-
-  const perikananSelection = [
-    "CPIB",
-    "CBIB",
-    "CPPIB",
-    "HACCP",
-    "SPI",
-    "API",
-    "Budidaya",
-    "Pengolahan dan Pemasaran",
-    "Mesin Perikanan",
-    "Penangkapan",
-    "SD Perikanan",
-    "Wisata Bahari",
-  ];
-
-  const kelautanSection = [
-    "BCL",
-    "Pengelolaan Sampah",
-    "Mitigasi Bencana",
-    "Konservasi",
-  ];
 
   const [sarpras, setSarpras] = React.useState<Sarpras[]>([]);
   const [konsumsi, setKonsumsi] = React.useState<Sarpras[]>([]);
@@ -1247,9 +1207,9 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                                   </SelectLabel>
                                   {jenisProgram == "Awak Kapal Perikanan" && (
                                     <>
-                                      {akpSelections.map((akp, index) => (
-                                        <SelectItem key={index} value={akp}>
-                                          {akp}
+                                      {AKP_CERTIFICATIONS.map((item: string, index: number) => (
+                                        <SelectItem key={index} value={item}>
+                                          {item}
                                         </SelectItem>
                                       ))}
                                     </>
@@ -1257,9 +1217,9 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
 
                                   {jenisProgram == "Perikanan" && (
                                     <>
-                                      {perikananSelection.map((akp, index) => (
-                                        <SelectItem key={index} value={akp}>
-                                          {akp}
+                                      {AQUACULTURE_CERTIFICATIONS.map((item: string, index: number) => (
+                                        <SelectItem key={index} value={item}>
+                                          {item}
                                         </SelectItem>
                                       ))}
                                     </>
@@ -1267,9 +1227,9 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
 
                                   {jenisProgram == "Kelautan" && (
                                     <>
-                                      {kelautanSection.map((akp, index) => (
-                                        <SelectItem key={index} value={akp}>
-                                          {akp}
+                                      {OCEAN_CERTIFICATIONS.map((item: string, index: number) => (
+                                        <SelectItem key={index} value={item}>
+                                          {item}
                                         </SelectItem>
                                       ))}
                                     </>

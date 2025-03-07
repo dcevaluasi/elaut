@@ -50,6 +50,7 @@ import {
 import { FiCalendar, FiSearch } from "react-icons/fi";
 import { generateTanggalPelatihan } from "@/utils/text";
 import { GrSend } from "react-icons/gr";
+import { AKP_CERTIFICATIONS, AQUACULTURE_CERTIFICATIONS, OCEAN_CERTIFICATIONS } from "@/constants/serkom";
 
 function PencarianPelatihan() {
   const [data, setData] = React.useState<PelatihanMasyarakat[] | null>(null);
@@ -114,44 +115,6 @@ function PencarianPelatihan() {
       throw error;
     }
   };
-
-  const akpSelections = [
-    "ANKAPIN Tingkat I",
-    "ATKAPIN Tingkat I",
-    "ANKAPIN Tingkat II",
-    "ATKAPIN Tingkat II",
-    "ANKAPIN Tingkat III",
-    "ATKAPIN Tingkat III",
-    "BSTF I",
-    "BSTF II",
-    "Rating",
-    "SKN",
-    "SKPI",
-    "SOPI",
-    "Fishing Master",
-  ];
-
-  const perikananSelection = [
-    "CPIB",
-    "CBIB",
-    "CPPIB",
-    "HACCP",
-    "SPI",
-    "API",
-    "Budidaya",
-    "Pengolahan dan Pemasaran",
-    "Mesin Perikanan",
-    "Penangkapan",
-    "SD Perikanan",
-    "Wisata Bahari",
-  ];
-
-  const kelautanSection = [
-    "BCL",
-    "Pengelolaan Sampah",
-    "Mitigasi Bencana",
-    "Konservasi",
-  ];
 
   const [selectedJenisPelatihan, setSelectedJenisPelatihan] =
     React.useState<string>("");
@@ -295,9 +258,9 @@ function PencarianPelatihan() {
                         <SelectLabel>Pilih Program Pelatihan</SelectLabel>
                         {usePathname().includes("akp") && (
                           <>
-                            {akpSelections.map((akp, index) => (
-                              <SelectItem key={index} value={akp}>
-                                {akp}
+                            {AKP_CERTIFICATIONS.map((item: string, index: number) => (
+                              <SelectItem key={index} value={item}>
+                                {item}
                               </SelectItem>
                             ))}
                           </>
@@ -305,9 +268,9 @@ function PencarianPelatihan() {
 
                         {usePathname().includes("perikanan") && (
                           <>
-                            {perikananSelection.map((akp, index) => (
-                              <SelectItem key={index} value={akp}>
-                                {akp}
+                            {AQUACULTURE_CERTIFICATIONS.map((item: string, index: number) => (
+                              <SelectItem key={index} value={item}>
+                                {item}
                               </SelectItem>
                             ))}
                           </>
@@ -315,9 +278,9 @@ function PencarianPelatihan() {
 
                         {usePathname().includes("kelautan") && (
                           <>
-                            {kelautanSection.map((akp, index) => (
-                              <SelectItem key={index} value={akp}>
-                                {akp}
+                            {OCEAN_CERTIFICATIONS.map((item: string, index: number) => (
+                              <SelectItem key={index} value={item}>
+                                {item}
                               </SelectItem>
                             ))}
                           </>
@@ -524,8 +487,8 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
           href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${pelatihan?.KodePelatihan
             }/${encryptValue(pelatihan?.IdPelatihan)}`}
           className={`${pelatihan?.StatusApproval == "Selesai"
-              ? "bg-gray-500"
-              : "bg-blue-500"
+            ? "bg-gray-500"
+            : "bg-blue-500"
             } text-white px-4 py-2 text-base rounded-md mb-1 mt-2 w-full md:w-fit block`}
         >
           {pelatihan.StatusApproval == "Selesai"
