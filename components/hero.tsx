@@ -177,7 +177,7 @@ export default function Hero() {
                 <div
                   onClick={(e) => setSelectedProgram(index)}
                   className={`flex  w-full mx-auto md:mx-0 md:w-full flex-col gap-1 items-center justify-center hover:scale-110 duration-700 cursor-pointer hover:opacity-100 border text-center rounded-3xl border-gray-200 py-7 ${selectedProgram == index
-                    ? "opacity-100 animate-pulse my-10 px-2 md:px-9  "
+                    ? "opacity-100 animate-pulse my-10 px md:px-9  "
                     : "opacity-40 md:px-9 px-12 "
                     }`}
                 >

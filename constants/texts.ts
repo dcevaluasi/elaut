@@ -34,6 +34,11 @@ export const DIALOG_TEXTS = {
     desc:
       'Jika kamu mengalami kendala, gangguan, atau hal lainnya yang terjadi dalam penggunaan aplikasi E-LAUT, hubungi call center Pusat Pelatihan Kelautan dan Perikanan untuk mendapatkan solusi dan hubungi PTSP atau layanan informasi Balai Pelatihan KP terkait informasi pelaksanaan pelatihan, dll.',
   },
+  'Cek Sertifikat': {
+    title: 'Cek STTPL/Sertifikat Pelatihan',
+    desc:
+      'Masukkan no registrasi atau no peserta sobat E-LAUT untuk mengecek kevalidan data sertifikat dan keikutsertaan dalam pelatihan yang telah diselenggarakan!',
+  },
 }
 
 type CertificateCurricullum = {
