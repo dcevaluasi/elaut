@@ -114,6 +114,10 @@ const CertificateCheckFeature = () => {
                 <p className="text-blue-500">
                     Ayo cek dan lihat kevalidan sertifikat-mu dan keikutsertaanmu dalam pelatihan yang diselenggarakan oleh Balai Pelatihan KP atau Pusat Pelatihan KP di layanan ini!
                 </p>
+
+                <p className="text-xs text-gray-600 mt-5">
+                    *Untuk sertifikat Awak Kapal Perikanan atau Kepelatuan dapat dicek melalui website <Link target="_blank" title={'Aplikasi Awak Kapal Perikanan'} href='https://akapi.kkp.go.id' className='underline'>akapi.kkp.go.id</Link>
+                </p>
             </div>
             <div className="flex md:space-x-2 space-y-2 md:space-y-0 flex-col md:flex-row">
                 {certificates.map(({ title, description, imageSrc, link }, index) => {
