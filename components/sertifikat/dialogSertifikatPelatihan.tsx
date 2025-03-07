@@ -49,13 +49,16 @@ const SertifikatNonKepelautan = React.forwardRef(
       userPelatihan,
       isPrinting,
       isSpesimen,
+      refPage
     }: {
       pelatihan: PelatihanMasyarakat;
       userPelatihan: UserPelatihan;
       isPrinting?: boolean;
       isSpesimen?: boolean;
+      refPage: any
     },
-    ref: any
+    ref: any,
+
   ) => {
     const [peserta, setPeserta] = React.useState<User | null>(null);
 
@@ -95,12 +98,12 @@ const SertifikatNonKepelautan = React.forwardRef(
       <div className=" flex-col gap-8 font-bos">
         <div
           ref={ref}
-          className="w-full h-full  flex flex-col gap-4 items-center justify-center  px-10 py-14 rounded-md font-bos leading-[120%]"
+          className="w-full h-full scale-95 flex flex-col gap-4 items-center justify-center  px-10  rounded-md font-bos leading-[120%]"
         >
           {/* Page 1 */}
-          <div className="w-full flex flex-col  gap-4 relative h-full items-center justify-center">
+          <div ref={refPage} className="w-full flex flex-col  gap-4 relative h-[49.63rem] items-center justify-center">
             <div className="flex flex-row  absolute top-0 right-0">
-              <p className="text-base">
+              <p className="text-lg">
                 No. Reg : {userPelatihan?.NoRegistrasi}
               </p>
             </div>
@@ -113,7 +116,7 @@ const SertifikatNonKepelautan = React.forwardRef(
               src="/qr-code/Cek_Sertifikat_ELAUT.png"
             />
 
-            <div className="w-full flex flex-col space-y-0 px-10 -mt-7 ">
+            <div className="w-full flex flex-col space-y-0 px-10 -mt-16 ">
               {!isPrinting && (
                 <Image
                   alt="Logo KKP"
@@ -125,31 +128,39 @@ const SertifikatNonKepelautan = React.forwardRef(
               )}
 
               <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-6">
-                <h1 className="text-sm font-bosBold">
-                  KEMENTERIAN KELAUTAN DAN PERIKANAN
-                </h1>
-                <p className="text-xs font-bosItalic">
-                  MINISTRY OF MARINE AFFAIRS AND FISHERIES
-                </p>
-                <h1 className="text-base font-bosBold">
-                  BADAN PENYULUHAN DAN PENGEMBANGAN SUMBER DAYA MANUSIA KELAUTAN
-                  DAN PERIKANAN
-                </h1>
-                <p className="text-xs font-bosItalic">
-                  THE AGENCY FOR MARINE AND FISHERIES EXTENSION AND HUMAN
-                  RESOURCES DEVELOPMENT
-                </p>
-                <h1 className="text-2xl font-black font-bosBold mt-1">
-                  SERTIFIKAT
-                </h1>
-                <p className="text-base font-bosItalic">CERTIFICATE</p>
+
+                <div className="flex flex-col h-fit items-center justify-center space-y-0">
+                  <h1 className="text-sm font-bosBold">
+                    KEMENTERIAN KELAUTAN DAN PERIKANAN
+                  </h1>
+                  <p className="text-xs font-bosItalic">
+                    MINISTRY OF MARINE AFFAIRS AND FISHERIES
+                  </p>
+                </div>
+                <div className="flex flex-col h-fit items-center justify-center space-y-0">
+                  <h1 className="text-base font-bosBold">
+                    BADAN PENYULUHAN DAN PENGEMBANGAN SUMBER DAYA MANUSIA KELAUTAN
+                    DAN PERIKANAN
+                  </h1>
+                  <p className="text-xs font-bosItalic">
+                    THE AGENCY FOR MARINE AND FISHERIES EXTENSION AND HUMAN
+                    RESOURCES DEVELOPMENT
+                  </p>
+                </div>
+
+                <div className="flex flex-col h-fit items-center justify-center space-y-1">
+                  <h1 className="text-2xl font-bosBold leading-none">
+                    SERTIFIKAT
+                  </h1>
+                  <p className="text-base font-bosItalic">CERTIFICATE</p>
+                </div>
 
                 <p className="text-lg font-bosBold">
                   Nomor : {userPelatihan?.NoSertifikat}
                 </p>
               </div>
 
-              <div className="flex w-full flex-col space-y-0 max-w-5xl mx-auto items-start text-sm -mt-3 text-center font-bos h-fit">
+              <div className="flex w-full flex-col space-y-0 max-w-7xl mx-auto items-start text-sm  text-center font-bos h-fit mt-2">
                 <span className="text-sm leading-[115%]">
                   Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan
                   dan Perikanan berdasarkan Peraturan Pemerintah Nomor.62 Tahun
@@ -173,7 +184,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                       <span className="font-bos text-sm">Nama</span>
                       <span className="font-bos text-[0.75rem] -mt-2">Name</span>
                     </td>
-                    <td className=" w-2/3 text-sm uppercase">: {capitalizeWords(userPelatihan!.Nama)}</td>
+                    <td className=" w-2/3 text-base uppercase">: {capitalizeWords(userPelatihan!.Nama)}</td>
                   </tr>
                   <tr className="w-full">
                     <td className="font-bos w-full flex flex-col  space-y-0">
@@ -215,18 +226,18 @@ const SertifikatNonKepelautan = React.forwardRef(
                 </h3>
               </div>
 
-              <div className="flex w-full flex-col space-y-0 max-w-5xl mx-auto items-start text-sm -mt-3 text-center font-bos h-fit">
+              <div className="flex w-full flex-col space-y-0 max-w-7xl mx-auto items-start text-sm -mt-3 text-center font-bos h-fit">
                 <span className="text-sm leading-[115%]">
                   {DESC_CERTIFICATE_COMPETENCE_FISHERIES[pelatihan!.Program].desc_ind} {formatDateRange(generateTanggalPelatihan(pelatihan?.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan))}
                 </span>
-                <span className="max-w-4xl leading-none font-bosItalic text-[0.75rem] mx-auto">
+                <span className="max-w-6xl leading-none font-bosItalic text-[0.75rem] mx-auto">
                   {DESC_CERTIFICATE_COMPETENCE_FISHERIES[pelatihan!.Program].desc_eng} {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan?.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan))}
                 </span>
               </div>
 
               <div className="flex gap-2 items-center justify-center -mt-2">
                 <div className="flex flex-col  space-y-0 font-bos text-center items-center justify-center">
-                  <div className="flex w-full flex-col  space-y-0 items-cennter mt-2 text-center">
+                  <div className="flex w-full flex-col  space-y-0 items-center mt-2 text-center justify-center">
                     <span className="font-bos text-sm leading-[105%] w-full flex items-center gap-1">
                       Jakarta,{" "}{userPelatihan?.TanggalSertifikat}
 
@@ -239,32 +250,34 @@ const SertifikatNonKepelautan = React.forwardRef(
                         ? "Chairman of the Agency for Marine and Fisheries Extension and Human Resources Development"
                         : "Director for Marine And Fisheries Training Center"}
                     </span>
-                  </div>
-                  {userPelatihan?.StatusPenandatangan == 'Spesimen' ? (
-                    <Image
-                      alt=""
-                      width={0}
-                      height={0}
-                      src={"/ttd-elektronik.png"}
-                      className="w-[200px] h-[80px] relative -z-10"
-                    />
-                  ) : (
-                    <div className="h-[80px]"></div>
-                  )}
 
-                  <span className=" font-bosBold text-base">
-                    {pelatihan?.TtdSertifikat ==
-                      "Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan"
-                      ? "Dr. I Nyoman Radiarta, S.Pi, M.Sc"
-                      : "Dr. Lilly Aprilya Pregiwati, S.Pi., M.Si"}
-                  </span>
+                    {userPelatihan?.StatusPenandatangan == 'Spesimen' ? (
+                      <Image
+                        alt=""
+                        width={0}
+                        height={0}
+                        src={"/ttd-elektronik.png"}
+                        className="w-[230px] h-[80px] relative -z-10 mt-2"
+                      />
+                    ) : (
+                      <div className="h-[80px]"></div>
+                    )}
+
+                    <span className=" font-bosBold text-base">
+                      {pelatihan?.TtdSertifikat ==
+                        "Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan"
+                        ? "Dr. I Nyoman Radiarta, S.Pi, M.Sc"
+                        : "Dr. Lilly Aprilya Pregiwati, S.Pi., M.Si"}
+                    </span>
+                  </div>
+
                 </div>
               </div>
             </div>
 
             {!isPrinting && (
-              <div className="flex flex-row  absolute -bottom-12">
-                <p className="text-[0.75rem] leading-[100%] text-center max-w-2xl">
+              <div className="flex flex-row  absolute -bottom-8">
+                <p className="text-[0.75rem] leading-[100%] text-center max-w-3xl">
                   Dokumen ini telah ditandatangani secara elektronik menggunakan
                   sertifikat elektronik yang telah diterbitkan oleh Balai
                   Sertifikasi Elektronik (BSrE), Badan Siber dan Sandi Negara
@@ -275,137 +288,132 @@ const SertifikatNonKepelautan = React.forwardRef(
 
           {/* Page 2 */}
 
-          <div className="w-full flex flex-col  gap-4 relative h-full items-center justify-center mt-32">
+          <div className="w-full flex flex-col  gap-4  h-full items-center justify-center mt-28 break-before-auto relative">
             <div className="flex flex-row justify-center items-center">
               <div className="flex flex-row gap-2 items-center">
                 <div className="flex flex-col text-center">
-                  <p className="font-bosBold max-w-md w-full ">
+                  <p className="font-bosBold text-lg max-w-md w-full uppercase">
                     {pelatihan?.NamaPelatihan}
                   </p>
-                  <p className="font-bos text-sm max-w-3xl">{formatDateRange(generateTanggalPelatihan(pelatihan?.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan))}</p>
+                  <p className="font-bos text-base max-w-3xl">{formatDateRange(generateTanggalPelatihan(pelatihan?.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan))}</p>
                 </div>
               </div>
             </div>
 
             <table
               border={1}
-              className="text-center border border-black-2 p-2 rounded-md w-full"
+              className="text-center border border-black-2 px-2 py-1 rounded-md w-full"
             >
               <tr>
                 <td
                   rowSpan={3}
-                  className="border border-black-2 p-2 font-bosBold"
+                  className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle"
                 >
                   NO
                 </td>
                 <td
                   rowSpan={3}
-                  className="border border-black-2 p-2 font-bosBold"
+                  className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle"
                 >
                   COURSES
                 </td>
                 <td
                   colSpan={3}
-                  className="border border-black-2 p-2 font-bosBold"
+                  className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle"
                 >
                   ALOKASI WAKTU
                 </td>
               </tr>
               <tr>
-                <td colSpan={2} className="border border-black-2 p-2 font-bosBold">
+                <td colSpan={2} className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle">
                   (@45 Menit)
                 </td>
-
               </tr>
               <tr>
-                <td className="border border-black-2 p-2 font-bosBold">
+                <td className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle">
                   TEORI
                 </td>
-                <td className="border border-black-2 p-2 font-bosBold">
+                <td className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle">
                   PRAKTEK
                 </td>
               </tr>
               <tr>
-                <td className="border border-black-2 p-2 font-bosBold">
+                <td className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle">
                   I
                 </td>
-                <td className="border border-black-2 p-2 text-left font-bosBold">
+                <td className="border text-lg border-black-2 px-2 py-1 text-left font-bosBold align-middle">
                   KOMPETENSI UMUM
                 </td>
-                <td className="border border-black-2 p-2 font-bosBold">
-
-                </td>
-                <td className="border border-black-2 p-2 font-bosBold">
-
-                </td>
+                <td className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle"></td>
+                <td className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle"></td>
               </tr>
               {CURRICULLUM_CERTIFICATE[pelatihan!.Program].UMUM.map((materi, index) => (
-                <tr key={index} className="text-xs">
-                  <td className="border border-black-2 p-2">{index + 1}.</td>
-                  <td className="border border-black-2 p-2 text-left">
-                    <div className="flex flex-col ">
-                      <span className='text-sm'>{materi.name_ind}</span>
-                      <span className='italic'>{materi.name_eng}</span>
+                <tr key={index} className="text-sm">
+                  <td className="border border-black-2 px-2 py-1 align-middle">{index + 1}.</td>
+                  <td className="border border-black-2 px-2 py-1 text-left align-middle">
+                    <div className="flex flex-col">
+                      <span className="text-base">{materi.name_ind}</span>
+                      <span className="italic">{materi.name_eng}</span>
                     </div>
                   </td>
-                  <td className="border border-black-2 text-sm p-2">{materi.theory}</td>
-                  <td className="border border-black-2 text-sm p-2">{materi.practice}</td>
+                  <td className="border border-black-2 text-base px-2 py-1 align-middle">{materi.theory}</td>
+                  <td className="border border-black-2 text-base px-2 py-1 align-middle">{materi.practice}</td>
                 </tr>
               ))}
               <tr>
-                <td className="border border-black-2 p-2 font-bosBold">
+                <td className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle">
                   II
                 </td>
-                <td className="border border-black-2 p-2 text-left font-bosBold">
+                <td className="border border-black-2 px-2 py-1 text-left font-bosBold align-middle">
                   KOMPETENSI INTI
                 </td>
-                <td className="border border-black-2 p-2 font-bosBold">
-
-                </td>
-                <td className="border border-black-2 p-2 font-bosBold">
-
-                </td>
+                <td className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle"></td>
+                <td className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle"></td>
               </tr>
               {CURRICULLUM_CERTIFICATE[pelatihan!.Program].INTI.map((materi, index) => (
-                <tr key={index} className="text-xs">
-                  <td className="border border-black-2 p-2">{index + 1}.</td>
-                  <td className="border border-black-2 p-2 text-left">
-                    <div className="flex flex-col ">
-                      <span className='text-sm'>{materi.name_ind}</span>
-                      <span className='italic'>{materi.name_eng}</span>
+                <tr key={index} className="text-sm">
+                  <td className="border border-black-2 px-2 py-1 align-middle">{index + 1}.</td>
+                  <td className="border border-black-2 px-2 py-1 text-left align-middle">
+                    <div className="flex flex-col">
+                      <span className="text-base">{materi.name_ind}</span>
+                      <span className="italic">{materi.name_eng}</span>
                     </div>
                   </td>
-                  <td className="border border-black-2 text-sm p-2">{materi.theory}</td>
-                  <td className="border border-black-2 text-sm p-2">{materi.practice}</td>
+                  <td className="border border-black-2 text-base px-2 py-1 align-middle">{materi.theory}</td>
+                  <td className="border border-black-2 text-base px-2 py-1 align-middle">{materi.practice}</td>
                 </tr>
               ))}
               <tr>
-                <td
-                  colSpan={2}
-                  className="font-bosBold border border-black-2 p-2"
-                >
+                <td colSpan={2} className="font-bosBold border border-black-2 px-2 py-1 text-lg align-middle">
                   JUMLAH JAM PELAJARAN
                 </td>
-                <td className="border border-black-2 p-2 font-bosBold">
+                <td className="border border-black-2 px-2 py-1 font-bosBold text-base align-middle">
                   {totalHours.totalTheory}
                 </td>
-                <td className="border border-black-2 p-2 font-bosBold">
+                <td className="border border-black-2 px-2 py-1 font-bosBold text-base align-middle">
                   {totalHours.totalPractice}
                 </td>
               </tr>
               <tr>
-                <td
-                  colSpan={2}
-                  className="font-bosBold border border-black-2 p-2"
-                >
+                <td colSpan={2} className="font-bosBold border border-black-2 px-2 py-1 text-lg align-middle">
                   TOTAL JAM PELAJARAN
                 </td>
-                <td colSpan={2} className="border border-black-2 p-2 font-bosBold">
+                <td colSpan={2} className="border border-black-2 px-2 py-1 font-bosBold align-middle">
                   {totalHours.totalTheory + totalHours.totalPractice}
                 </td>
-
               </tr>
             </table>
+
+
+            {!isPrinting && (
+              <div className="flex flex-row  absolute -bottom-8">
+                <p className="text-[0.75rem] leading-[100%] text-center max-w-3xl">
+                  Dokumen ini telah ditandatangani secara elektronik menggunakan
+                  sertifikat elektronik yang telah diterbitkan oleh Balai
+                  Sertifikasi Elektronik (BSrE), Badan Siber dan Sandi Negara
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -687,6 +695,7 @@ export function DialogSertifikatPelatihan({
   pelatihan: PelatihanMasyarakat;
 }) {
   const componentRef = useRef<HTMLDivElement | null>(null);
+  const componentRefPage = useRef<HTMLDivElement | null>(null);
 
   const [show, setShow] = React.useState<boolean>(false);
   const router = useRouter();
@@ -696,28 +705,29 @@ export function DialogSertifikatPelatihan({
     setIsUploading(true);
     const html2pdf = (await import("html2pdf.js")).default;
 
-    if (!componentRef.current) {
+    if (!componentRef.current || !componentRefPage.current) {
       console.error("Component reference is null");
       setIsUploading(false);
       return;
     }
 
     const element = componentRef.current;
+    const elementPage = componentRefPage.current;
 
     // Optimize for PDF generation (preserve text, avoid image rendering)
     const opt = {
-      margin: [10, 10, 10, 10], // Small margins for better fit
+      margin: [0, 10, 10, 10], // Small margins for better fit
       filename: `${userPelatihan?.Nama}_${userPelatihan?.NoRegistrasi}.pdf`,
       // pagebreak: { mode: "avoid-all" }, // Prevent splitting important elements
       html2canvas: {
-        scale: 2, // Higher scale for better quality
+        scale: 1.5, // Higher scale for better quality
         useCORS: true, // Load external styles correctly
         logging: false,
         backgroundColor: "#fff",
       },
       jsPDF: {
         unit: "px",
-        format: [element.offsetWidth, element.offsetHeight], // Dynamically adjust to content
+        format: [element.offsetWidth, elementPage.offsetHeight + 150], // Dynamically adjust to content
         orientation: "landscape",
       },
     };
@@ -728,7 +738,7 @@ export function DialogSertifikatPelatihan({
       .toPdf() // Use .toPdf() instead of image-based conversion
       .outputPdf("blob")
       .then(async (pdfBlob: Blob) => {
-        const MAX_SIZE_MB = 5;
+        const MAX_SIZE_MB = 3;
         const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 
         if (pdfBlob.size > MAX_SIZE_BYTES) {
@@ -855,7 +865,7 @@ export function DialogSertifikatPelatihan({
           <DialogTrigger asChild>{children}</DialogTrigger>
         )}
 
-        <DialogContent className="sm:max-w-[1225px]">
+        <DialogContent className="sm:max-w-[1425px]">
           <DialogHeader>
             <div className="flex gap-2 items-center">
               <MdVerified className="text-3xl text-blue-500" />
@@ -879,6 +889,7 @@ export function DialogSertifikatPelatihan({
             ) : (
               <SertifikatNonKepelautan
                 ref={componentRef}
+                refPage={componentRefPage}
                 pelatihan={pelatihan}
                 isSpesimen={isSpesimen}
                 userPelatihan={userPelatihan}
@@ -924,7 +935,7 @@ export function DialogSertifikatPelatihan({
                   <>
 
 
-                    {isSpesimen && (
+                    {userPelatihan.StatusPenandatangan == 'Spesimen' && (
                       <Button
                         onClick={(e) => handleUploadPDF()}
                         type="submit"
