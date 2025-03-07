@@ -53,10 +53,9 @@ export const metadata = {
   },
 };
 
-export default function SignUp() {
+export default function CekSertifikat() {
   return (
-    <>
-      <FormCekSertifikat />
-    </>
+    <FormCekSertifikat />
+
   );
 }

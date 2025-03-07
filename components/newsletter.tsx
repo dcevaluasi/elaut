@@ -20,6 +20,10 @@ import { Button } from "./ui/button";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { addFiveYears } from "@/utils/pelatihan";
 import { sanitizedDangerousChars, validateIsDangerousChars } from "@/utils/input";
+import Image from "next/image";
+import { verifyPDFBSrEUrl } from "@/constants/urls";
+import Link from "next/link";
+import CertificateCheckFeature from "./elaut/CertificateCheckFeature";
 
 export default function Newsletter() {
   const [noRegistrasi, setNoRegistrasi] = React.useState<string>("");
@@ -69,6 +73,8 @@ export default function Newsletter() {
         id="cek-sertifikat"
         className="scroll-smooth w-full max-w-7xl mx-auto mt-6"
       >
+        <CertificateCheckFeature />
+
         <AlertDialog open={isShowValidForm}>
           <AlertDialogContent className="flex flex-col items-center justify-center !w-[420px]">
             <AlertDialogHeader>
@@ -186,76 +192,6 @@ export default function Newsletter() {
           </AlertDialogContent>
         </AlertDialog>
       </section>
-      <div className="flex flex-col gap-4 w-full">
-        <div className="flex flex-col gap-2 items-start md:items-end w-full md:text-left bg-white rounded-3xl p-10 ">
-          <h2 className="text-blue-500 text-[3.6rem]  font-calsans leading-none">
-            Cek Sertifikat
-          </h2>
-          <div className="flex flex-col items-start md:items-end">
-            <p className="text-blue-500">*Hanya menampilkan <span className="font-bold">detail pelatihan</span> yang diikuti bukan <span className="font-bold">sertifikat</span></p>
-            <p className="text-blue-500">*Masukkan<span className="font-bold"> nomor registrasi</span> untuk mengecek validitas</p>
-          </div>
-
-
-
-
-          {/* <Button className='bg-[#625BF9] text-white font-bold w-fit rounded-full text-xl px-7 py-7'>
-                {generateTanggalPelatihan(
-                  data!.TanggalMulaiPelatihan
-                )} - {generateTanggalPelatihan(
-                  data!.TanggalBerakhirPelatihan
-                )}
-
-              </Button> */}
-          <div className="flex items-end">
-            <p
-              className="text-base font-normal text-[#979797] group-hover:duration-1000  md:text-right max-w-xl"
-            >Pastikan validitas sertifikatmu dengan mengecek berdasarkan <span className="font-semibold">nomor registrasi</span> terkait keikutsertaan serta kelulusan-mu mengikuti pelatihan dan sertifikasi kompetensi di ELAUT</p>
-          </div>
-
-          <div className="w-full lg:w-auto">
-            <div className="flex flex-col  justify-center ">
-              <input
-                type="text"
-                className="form-input w-full appearance-none bg-transparent border border-[#979797] focus:border-gray-600 px-4 py-3 mb-2 sm:mb-0 sm:mr-2 text-[#979797] placeholder:text-[#979797] rounded-full"
-                placeholder="No Registrasi"
-                aria-label="No Register"
-                maxLength={18}
-                required
-                value={noRegistrasi}
-                autoComplete="off"
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setNoRegistrasi(value);
-                  setIsInputErrorNoRegistrasi(value.length > 0 && value.length < 18);
-                }}
-              />
-              {isInputErrorNoRegistrasi && noRegistrasi != '' ? (
-                <p className="text-rose-500 font-medium text-sm ">
-                  *No Registrasi tidak sesuai format, harus terdiri dari 18 digit
-                </p>
-              ) : <p className="text-sm text-[#979797] ">
-                *Masukkan nomor registrasi kamu
-              </p>}
-              <Button onClick={() => handleCekValiditasSertifikat()} type="button" className='bg-blue-600 hover:bg-blue-700 text-white font-calsans w-full md:w-fit rounded-full text-2xl md:px-24 py-7  mt-2'>
-                CEK SERTIFIKAT
-
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {
-          isShowValidForm && <div className="flex flex-col gap-2 items-center justify-center text-center w-full bg-white rounded-3xl p-10 ">
-            <h2 className="text-blue-500 text-[3.6rem]  font-calsans leading-none">
-              Validitas Sertifikat
-            </h2>
-            <div className="flex flex-col ">
-              <p className="text-blue-500">*Hanya menampilkan <span className="font-bold">detail pelatihan</span> yang diikuti bukan <span className="font-bold">sertifikat</span></p>
-              <p className="text-blue-500">*Masukkan<span className="font-bold"> nomor registrasi</span> untuk mengecek validitas</p>
-            </div>
-          </div>
-        }
-      </div></>
+    </>
   );
 }

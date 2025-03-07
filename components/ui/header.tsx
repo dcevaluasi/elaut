@@ -58,29 +58,28 @@ export default function Header() {
             }}
           >
             <div
-              className={`font-medium ${
-                top &&
-                (usePathname() == "/" ||
-                  usePathname() == "/lembaga/p2mkp" ||
-                  usePathname().includes("bppp") ||
-                  usePathname() == "/lembaga/dpkakp" ||
-                  usePathname() == "/lembaga/komite-approval" ||
-                  usePathname() == "/lembaga/pukakp" ||
-                  usePathname() == "/dashboard" ||
-                  usePathname().includes("registrasi") ||
-                  usePathname().includes("login") ||
-                  usePathname().includes("forget-password"))
+              className={`font-medium ${top &&
+                  (usePathname() == "/" ||
+                    usePathname() == "/lembaga/p2mkp" ||
+                    usePathname().includes("bppp") ||
+                    usePathname() == "/lembaga/dpkakp" ||
+                    usePathname() == "/lembaga/komite-approval" ||
+                    usePathname() == "/lembaga/pukakp" ||
+                    usePathname() == "/dashboard" ||
+                    usePathname().includes("registrasi") ||
+                    usePathname().includes("login") ||
+                    usePathname().includes("forget-password"))
                   ? "hover:text-white hover:scale-105 text-white"
                   : top && usePathname().includes("program")
-                  ? "hover:text-white hover:scale-105 text-white"
-                  : (top && usePathname().includes("pelatihan")) ||
-                    usePathname().includes("sertifikasi") ||
-                    usePathname().includes("users")
-                  ? "text-[#979797] hover:text-gray-900 hover:scale-105"
-                  : usePathname().includes("complete-profile")
-                  ? "text-[#979797] hover:text-gray-900 hover:scale-105"
-                  : "text-[#979797] hover:text-gray-900 hover:scale-105"
-              }  px-2 py-3 flex items-center transition  duration-150 ease-in-out font-semibold text-[#979797] hover:!text-blue-500`}
+                    ? "hover:text-white hover:scale-105 text-white"
+                    : (top && usePathname().includes("pelatihan")) ||
+                      usePathname().includes("sertifikasi") ||
+                      usePathname().includes("users")
+                      ? "text-[#979797] hover:text-gray-900 hover:scale-105"
+                      : usePathname().includes("complete-profile")
+                        ? "text-[#979797] hover:text-gray-900 hover:scale-105"
+                        : "text-[#979797] hover:text-gray-900 hover:scale-105"
+                }  px-2 py-3 flex items-center transition  duration-150 ease-in-out font-semibold text-[#979797] hover:!text-blue-500`}
             >
               {name} <HiMiniChevronDown className="text-lg" />
             </div>
@@ -89,9 +88,8 @@ export default function Header() {
         {name == currentName && (
           <PopoverContent
             onMouseLeave={() => setOpenModal(false)}
-            className={`w-80 flex flex-col z-[1000000] gap-1 ${
-              top ? "-mt-3" : "mt-7"
-            }`}
+            className={`w-80 flex flex-col z-[1000000] gap-1 ${top ? "-mt-3" : "mt-7"
+              }`}
           >
             <ul>{children}</ul>
           </PopoverContent>
@@ -115,32 +113,30 @@ export default function Header() {
       <li>
         <Link
           href={href}
-          target={`${
-            name == "Balai Pelatihan dan Penyuluhan Perikanan Tegal" ||
-            name == "Balai Pelatihan dan Penyuluhan Perikanan Banyuwangi" ||
-            name == "Balai Pelatihan dan Penyuluhan Perikanan Ambon" ||
-            name == "Balai Pelatihan dan Penyuluhan Perikanan Medan" ||
-            name == "Balai Pelatihan dan Penyuluhan Perikanan Bitung" ||
-            name == "Balai Pendidikan dan Pelatihan Aparatur Sukamandi"
+          target={`${name == "Balai Pelatihan dan Penyuluhan Perikanan Tegal" ||
+              name == "Balai Pelatihan dan Penyuluhan Perikanan Banyuwangi" ||
+              name == "Balai Pelatihan dan Penyuluhan Perikanan Ambon" ||
+              name == "Balai Pelatihan dan Penyuluhan Perikanan Medan" ||
+              name == "Balai Pelatihan dan Penyuluhan Perikanan Bitung" ||
+              name == "Balai Pendidikan dan Pelatihan Aparatur Sukamandi"
               ? "_target"
               : "_self"
-          }`}
+            }`}
           onClick={(e) => setOpenModal(false)}
-          className={`font-semibold ${
-            top && usePathname().includes("layanan")
+          className={`font-semibold ${top && usePathname().includes("layanan")
               ? "text-[#979797] hover:text-gray-900 hover:scale-105"
               : (top && usePathname().includes("program")) ||
                 (top && usePathname().includes("dashboard"))
-              ? "hover:text-white hover:scale-105"
-              : (top && usePathname().includes("pelatihan")) ||
-                usePathname().includes("sertifikasi") ||
-                usePathname().includes("users")
-              ? "text-[#979797] hover:text-gray-900 hover:scale-105"
-              : usePathname().includes("complete-profile") ||
-                usePathname().includes("layanan")
-              ? "text-[#979797] hover:text-gray-900 hover:scale-105"
-              : "text-[#979797] hover:text-gray-900 hover:scale-105"
-          }  px-5 py-3 flex items-center transition duration-150 ease-in-out font-semibold text-[#979797] hover:!text-blue-500`}
+                ? "hover:text-white hover:scale-105"
+                : (top && usePathname().includes("pelatihan")) ||
+                  usePathname().includes("sertifikasi") ||
+                  usePathname().includes("users")
+                  ? "text-[#979797] hover:text-gray-900 hover:scale-105"
+                  : usePathname().includes("complete-profile") ||
+                    usePathname().includes("layanan")
+                    ? "text-[#979797] hover:text-gray-900 hover:scale-105"
+                    : "text-[#979797] hover:text-gray-900 hover:scale-105"
+            }  px-5 py-3 flex items-center transition duration-150 ease-in-out font-semibold text-[#979797] hover:!text-blue-500`}
         >
           {children}
         </Link>
@@ -161,30 +157,29 @@ export default function Header() {
       <li>
         <Link
           href={href}
-          className={`font-semibold ${
-            top &&
-            (usePathname() == "/" ||
-              usePathname() == "/lembaga/p2mkp" ||
-              usePathname().includes("bppp") ||
-              usePathname() == "/lembaga/dpkakp" ||
-              usePathname() == "/lembaga/komite-approval" ||
-              usePathname() == "/lembaga/pukakp" ||
-              usePathname() == "/dashboard" ||
-              usePathname().includes("registrasi") ||
-              usePathname().includes("login") ||
-              usePathname().includes("forget-password"))
+          className={`font-semibold ${top &&
+              (usePathname() == "/" ||
+                usePathname() == "/lembaga/p2mkp" ||
+                usePathname().includes("bppp") ||
+                usePathname() == "/lembaga/dpkakp" ||
+                usePathname() == "/lembaga/komite-approval" ||
+                usePathname() == "/lembaga/pukakp" ||
+                usePathname() == "/dashboard" ||
+                usePathname().includes("registrasi") ||
+                usePathname().includes("login") ||
+                usePathname().includes("forget-password"))
               ? "hover:text-white hover:scale-105 text-white"
               : top && usePathname().includes("program")
-              ? "hover:text-white hover:scale-105 text-white"
-              : (top && usePathname().includes("pelatihan")) ||
-                usePathname().includes("sertifikasi") ||
-                usePathname().includes("users")
-              ? "text-[#979797] hover:text-gray-900 hover:scale-105"
-              : usePathname().includes("complete-profile") ||
-                usePathname().includes("layanan")
-              ? "text-[#979797] hover:text-gray-900 hover:scale-105"
-              : "text-[#979797] hover:text-gray-900 hover:scale-105"
-          }  px-5 py-3 flex items-center transition duration-150 ease-in-out text-[#979797] hover:!text-blue-500`}
+                ? "hover:text-white hover:scale-105 text-white"
+                : (top && usePathname().includes("pelatihan")) ||
+                  usePathname().includes("sertifikasi") ||
+                  usePathname().includes("users")
+                  ? "text-[#979797] hover:text-gray-900 hover:scale-105"
+                  : usePathname().includes("complete-profile") ||
+                    usePathname().includes("layanan")
+                    ? "text-[#979797] hover:text-gray-900 hover:scale-105"
+                    : "text-[#979797] hover:text-gray-900 hover:scale-105"
+            }  px-5 py-3 flex items-center transition duration-150 ease-in-out text-[#979797] hover:!text-blue-500`}
         >
           {name}
         </Link>
@@ -208,44 +203,40 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed mx-auto left-0 right-0 ${
-        usePathname().includes("pre-test") ||
-        usePathname().includes("post-test") ||
-        usePathname().includes("/dpkakp/admin") ||
-        usePathname().includes("/dpkakp/user") ||
-        usePathname().includes("/e-katalog") ||
-        usePathname().includes("/dpkakp/public") ||
-        usePathname().includes("/dpkakp/penguji") ||
-        usePathname().includes("/pukakp/admin") ||
-        usePathname().includes("/pukakp/user") ||
-        usePathname().includes("/pukakp/penguji") ||
-        usePathname().includes("/dev-dashboard")
+      className={`fixed mx-auto left-0 right-0 ${usePathname().includes("pre-test") ||
+          usePathname().includes("post-test") ||
+          usePathname().includes("/dpkakp/admin") ||
+          usePathname().includes("/dpkakp/user") ||
+          usePathname().includes("/e-katalog") ||
+          usePathname().includes("/dpkakp/public") ||
+          usePathname().includes("/dpkakp/penguji") ||
+          usePathname().includes("/pukakp/admin") ||
+          usePathname().includes("/pukakp/user") ||
+          usePathname().includes("/pukakp/penguji") ||
+          usePathname().includes("/dev-dashboard")
           ? "hidden"
           : ""
-      }  z-[150] md:bg-opacity-90 transition duration-300 ease-in-out ${
-        (top && usePathname().includes("layanan")) ||
-        usePathname() == "/dashboard" ||
-        usePathname() == "/registrasi" ||
-        usePathname().includes("forget-password") ||
-        usePathname() == "/login"
+        }  z-[150] md:bg-opacity-90 transition duration-300 ease-in-out ${(top && usePathname().includes("layanan")) ||
+          usePathname() == "/dashboard" ||
+          usePathname() == "/registrasi" ||
+          usePathname().includes("forget-password") ||
+          usePathname() == "/login"
           ? "pt-0"
           : top && "pt-6"
-      }  ${
-        !top
+        }  ${!top
           ? `bg-white backdrop-blur-sm shadow-custom `
           : usePathname().includes("program")
-          ? "bg-none"
-          : usePathname().includes("pelatihan") ||
-            usePathname().includes("sertifikasi") ||
-            usePathname().includes("users")
-          ? `bg-white backdrop-blur-sm !pt-0 shadow-custom !text-[#979797] hover:!text-blue-500 `
-          : usePathname().includes("complete-profile") ||
-            usePathname().includes("cek-sertifikat")
-          ? "bg-white backdrop-blur-sm shadow-custom "
-          : ""
-      }  ${usePathname().includes("program") && "bg-transparent"} ${
-        top && usePathname().includes("login") && "bg-transparent !text-white"
-      } max-w-6xl w-full mt-8    rounded-3xl  px-5`}
+            ? "bg-none"
+            : usePathname().includes("pelatihan") ||
+              usePathname().includes("sertifikasi") ||
+              usePathname().includes("users")
+              ? `bg-white backdrop-blur-sm !pt-0 shadow-custom !text-[#979797] hover:!text-blue-500 `
+              : usePathname().includes("complete-profile") ||
+                usePathname().includes("cek-sertifikat")
+                ? "bg-white backdrop-blur-sm shadow-custom "
+                : ""
+        }  ${usePathname().includes("program") && "bg-transparent"} ${top && usePathname().includes("login") && "bg-transparent !text-white"
+        } max-w-6xl w-full mt-8    rounded-3xl  px-5`}
     >
       <div className="w-full mx-auto">
         <div className="flex items-center justify-between h-24 md:h-24 py-3 w-full mx-auto">
@@ -256,19 +247,19 @@ export default function Header() {
             usePathname().includes("cek-sertifikat") ||
             usePathname().includes("forget-password") ||
             usePathname().includes("login")) && (
-            <Link
-              href={"/"}
-              className="shrink-0 ml-6 md:mr-4 flex items-center gap-4"
-            >
-              <Image
-                className={getSizeLogoHeader()}
-                width={0}
-                height={0}
-                src={getLogoHeader()}
-                alt="Kementrian Kelautan dan Perikanan RI Logo"
-              />
-            </Link>
-          )}
+              <Link
+                href={"/"}
+                className="shrink-0 ml-6 md:mr-4 flex items-center gap-4"
+              >
+                <Image
+                  className={getSizeLogoHeader()}
+                  width={0}
+                  height={0}
+                  src={getLogoHeader()}
+                  alt="Kementrian Kelautan dan Perikanan RI Logo"
+                />
+              </Link>
+            )}
 
           <nav className="hidden md:flex md:grow">
             <ul className="flex grow gap-0 justify-end flex-wrap items-center w-fit">
@@ -366,11 +357,10 @@ export default function Header() {
                 ) : (
                   <Button
                     onClick={(e) => router.push("/login")}
-                    className={`${
-                      !top || usePathname().includes("/layanan/pelatihan")
+                    className={`${!top || usePathname().includes("/layanan/pelatihan")
                         ? "text-white bg-blue-500"
-                        : "bg-transparent"
-                    } w-fit text-base border border-blue-500 rounded-xl hover:bg-blue-500  py-3`}
+                        : "bg-transparent text-blue-500"
+                      } w-fit text-base border border-blue-500 rounded-xl hover:bg-blue-500  py-3`}
                   >
                     Login
                   </Button>

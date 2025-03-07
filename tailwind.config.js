@@ -18,6 +18,7 @@ module.exports = {
         '3xl': '2000px',
       },
       colors: {
+        grayUsual: '#979797',
         current: 'currentColor',
         darkDPKAKP: 'hsl(224 71% 4%)',
         mutedDPKAKP: 'hsl(223 47% 11%)',

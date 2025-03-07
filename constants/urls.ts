@@ -8,3 +8,4 @@ export const manningAgentDevUrl =
 export const akapiBaseUrl = process.env.NEXT_PUBLIC_AKAPI_URL
 
 export const wilayahIDUrl = process.env.NEXT_PUBLIC_WILAYAH_ID_URL
+export const verifyPDFBSrEUrl = 'https://tte.komdigi.go.id/verifyPDF'
