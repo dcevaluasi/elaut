@@ -24,16 +24,16 @@ function CallCenter() {
   const [open, setOpen] = React.useState(false);
 
   return (
-    <div className="flex flex-col gap-3 w-fit fixed right-10 bottom-10 z-[9999]">
+    <div className="flex flex-col gap-3 w-fit fixed right-3 md:right-10 bottom-24 md:bottom-10 z-[999999999]">
 
       <AlertDialog open={open}>
         <AlertDialogTrigger>
           <div onClick={(e) => setOpen(true)} className="gap-4 ">
             <Bounce duration={1000}>
               <div className="flex flex-col gap-2 cursor-pointer items-center duration-1000 hover:scale-105 text-center">
-                <div className="flex flex-col items-center justify-center  bg-white shadow-custom rounded-full w-12 h-12 md:w-16 md:h-16 p-2">
+                <div className="flex flex-col items-center justify-center  bg-white shadow-custom rounded-full w-16 h-16 p-2">
                   <Image
-                    className="w-8 md:w-10"
+                    className="w-10"
                     width={0}
                     height={0}
                     src={"/illustrations/call-center.png"}
@@ -81,7 +81,7 @@ function CallCenter() {
                     <AlertDialogAction className="hover:bg-blue-500 text-grayUsual border border-grayUsual hover:text-white hover:border-blue-500 bg-transparent flex gap-2 items-center group duration-700">
                       <Link
                         href={
-                          `https://api.whatsapp.com/send/?phone=${item.callcenter}&text=Hallo%2C+saya+adalah+masyarakat.+Saya+mohon+informasi+terkait+pelatihan+di+${item.name}.&type=phone_number&app_absent=0`
+                          `https://api.whatsapp.com/send/?phone=${item.callcenter}&text=Hallo%2C+saya+adalah+masyarakat+yang+mengunjungi+website+E-LAUT.+Saya+mohon+informasi+terkait+pelatihan+di+${item.name}.&type=phone_number&app_absent=0`
                         }
                         target="_blank"
                         title={item.fullName}

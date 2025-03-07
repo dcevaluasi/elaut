@@ -152,17 +152,15 @@ export default function Hero() {
 
               {selectedProgram != null && (
                 <Link
-                  href={`/layanan/program/${
-                    programPelatihan[selectedProgram]!.slug
-                  }`}
-                  className={`btn-sm ${
-                    top
-                      ? usePathname().includes("pelatihan") ||
-                        usePathname().includes("searching")
-                        ? "text-blue-500 hover:text-white"
-                        : "text-gray-200"
-                      : "text-blue-500 hover:text-white"
-                  } bg-transparent border border-blue-500 hover:bg-blue-500 w-fit`}
+                  href={`/layanan/program/${programPelatihan[selectedProgram]!.slug
+                    }`}
+                  className={`btn-sm ${top
+                    ? usePathname().includes("pelatihan") ||
+                      usePathname().includes("searching")
+                      ? "text-blue-500 hover:text-white"
+                      : "text-gray-200"
+                    : "text-blue-500 hover:text-white"
+                    } bg-transparent border border-blue-500 hover:bg-blue-500 w-fit`}
                 >
                   <span>Lihat Selengkapnya</span>
                 </Link>
@@ -171,19 +169,17 @@ export default function Hero() {
           </div>
 
           <div
-            className={`w-full flex flex-col md:flex-row gap-5 md:gap-14 items-center justify-center  z-[10000] pt-10 md:pt-0 ${
-              selectedProgram === null ? " md:mt-7" : "mt-0 px-10"
-            }`}
+            className={`w-full flex flex-col md:flex-row gap-5 md:gap-14 items-center justify-center  z-[10000] pt-10 md:pt-0 ${selectedProgram === null ? " md:mt-7 px-4" : "mt-0 px-10"
+              }`}
           >
             {programPelatihan.map((item, index) => (
               <Slide direction="up" duration={index * 1200}>
                 <div
                   onClick={(e) => setSelectedProgram(index)}
-                  className={`flex  w-full mx-auto md:mx-0 md:w-full flex-col gap-1 items-center justify-center hover:scale-110 duration-700 cursor-pointer hover:opacity-100 border text-center rounded-3xl border-gray-200 px-16  md:px-9 py-7 ${
-                    selectedProgram == index
-                      ? "opacity-100 animate-pulse my-10 "
-                      : "opacity-40  "
-                  }`}
+                  className={`flex  w-full mx-auto md:mx-0 md:w-full flex-col gap-1 items-center justify-center hover:scale-110 duration-700 cursor-pointer hover:opacity-100 border text-center rounded-3xl border-gray-200 py-7 ${selectedProgram == index
+                    ? "opacity-100 animate-pulse my-10 px-2 md:px-9  "
+                    : "opacity-40 md:px-9 px-12 "
+                    }`}
                 >
                   <Image
                     src={item.icon}
@@ -212,17 +208,15 @@ export default function Hero() {
 
                       {selectedProgram != null && (
                         <Link
-                          href={`/layanan/program/${
-                            programPelatihan[selectedProgram]!.slug
-                          }`}
-                          className={`btn-sm ${
-                            top
-                              ? usePathname().includes("pelatihan") ||
-                                usePathname().includes("searching")
-                                ? "text-blue-500 hover:text-white"
-                                : "text-gray-200"
-                              : "text-blue-500 hover:text-white"
-                          } bg-transparent border border-blue-500 text-center hover:bg-blue-500 w-fit`}
+                          href={`/layanan/program/${programPelatihan[selectedProgram]!.slug
+                            }`}
+                          className={`btn-sm ${top
+                            ? usePathname().includes("pelatihan") ||
+                              usePathname().includes("searching")
+                              ? "text-blue-500 hover:text-white"
+                              : "text-gray-200"
+                            : "text-blue-500 hover:text-white"
+                            } bg-transparent border border-blue-500 text-center hover:bg-blue-500 w-fit`}
                         >
                           <span>Lihat Selengkapnya</span>
                         </Link>

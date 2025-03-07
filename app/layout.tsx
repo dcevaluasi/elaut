@@ -7,6 +7,7 @@ import localFont from "next/font/local";
 import Header from "@/components/ui/header";
 import Banner from "@/components/banner";
 import CallCenter from "@/components/call-center";
+import BottomNavigation from "@/components/ui/bottom-nav";
 
 const myFont = localFont({
   src: "./font/calsans.ttf",
@@ -143,6 +144,7 @@ export default function RootLayout({
           <Header />
           {children}
           <CallCenter />
+          <BottomNavigation />
         </div>
       </body>
     </html>

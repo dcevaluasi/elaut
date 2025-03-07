@@ -236,7 +236,7 @@ export default function Header() {
                 ? "bg-white backdrop-blur-sm shadow-custom "
                 : ""
         }  ${usePathname().includes("program") && "bg-transparent"} ${top && usePathname().includes("login") && "bg-transparent !text-white"
-        } max-w-6xl w-full mt-8    rounded-3xl  px-5`}
+        } max-w-6xl w-full mt-8    rounded-3xl  px-5 hidden md:block`}
     >
       <div className="w-full mx-auto">
         <div className="flex items-center justify-between h-24 md:h-24 py-3 w-full mx-auto">

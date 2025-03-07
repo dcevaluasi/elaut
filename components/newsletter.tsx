@@ -71,7 +71,7 @@ export default function Newsletter() {
     <>
       <section
         id="cek-sertifikat"
-        className="scroll-smooth w-full max-w-7xl mx-auto mt-6"
+        className="scroll-smooth w-full max-w-7xl mx-auto -mt-16 md:mt-6"
       >
         <CertificateCheckFeature />
 
