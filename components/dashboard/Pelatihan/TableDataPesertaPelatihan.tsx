@@ -82,7 +82,7 @@ import Toast from "@/components/toast";
 import { GiTakeMyMoney } from "react-icons/gi";
 import { DialogSertifikatPelatihan } from "@/components/sertifikat/dialogSertifikatPelatihan";
 import Cookies from "js-cookie";
-import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
+import { PiMicrosoftExcelLogoFill, PiSignature } from "react-icons/pi";
 import { User } from "@/types/user";
 import { decryptValue, encryptValue, formatToRupiah } from "@/lib/utils";
 import { elautBaseUrl } from "@/constants/urls";
@@ -91,7 +91,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { generateTanggalPelatihan } from "@/utils/text";
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import { DIALOG_TEXTS } from "@/constants/texts";
-import { countUserWithNoSertifikat, countUserWithTanggalSertifikat, countValidKeterangan } from "@/utils/counter";
+import { countUserWithNoSertifikat, countUserWithSpesimenTTD, countUserWithTanggalSertifikat, countValidKeterangan } from "@/utils/counter";
 import { getTodayInIndonesianFormat } from "@/utils/time";
 import { BiSolidCalendarAlt } from "react-icons/bi";
 
@@ -114,6 +114,7 @@ const TableDataPesertaPelatihan = () => {
   const [countValid, setCountValid] = React.useState<number>(0)
   const [countPinnedCertificateNumber, setCountPinnedCertificateNumber] = React.useState<number>(0)
   const [countPinnedCertificateDate, setCountPinnedCertificateDate] = React.useState<number>(0)
+  const [countPinnedCertificateSpesimen, setCountPinnedCertificateSpesimen] = React.useState<number>(0)
 
   const handleFetchingPublicTrainingDataById = async () => {
     try {
@@ -129,6 +130,7 @@ const TableDataPesertaPelatihan = () => {
       setCountPinnedCertificateNumber(countUserWithNoSertifikat(response.data.UserPelatihan))
       setData(response.data.UserPelatihan);
       setCountPinnedCertificateDate(countUserWithTanggalSertifikat(response.data.UserPelatihan))
+      setCountPinnedCertificateSpesimen(countUserWithSpesimenTTD(response.data.UserPelatihan))
 
       // Count entries with `FileSertifikat` as an empty string
       const count = response.data.UserPelatihan.filter(
@@ -302,6 +304,50 @@ const TableDataPesertaPelatihan = () => {
     }
   };
 
+  const handleSematkanSpesimenSertifikatDataPesertaPelatihan = async () => {
+    setIsIteratingProcess(true)
+    try {
+      // Iterate through each user and update their status
+      for (const user of data) {
+        const formData = new FormData();
+        formData.append("StatusPenandatangan", 'Spesimen');
+
+        console.log(`Updating user: ${user.IdUserPelatihan}, StatusPenandatangan: Spesimen`);
+
+        await axios.put(
+          `${baseUrl}/lemdik/updatePelatihanUsers?id=${user.IdUserPelatihan}`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+            },
+          }
+        );
+      }
+
+      Toast.fire({
+        icon: "success",
+        title: 'Yeayyy!',
+        text: `Berhasil menyematkan spesimen TTD sertifikat ke ${data.length} peserta pelatihan!`,
+      });
+
+      setIsIteratingProcess(false)
+      handleFetchingPublicTrainingDataById();
+      setOpenFormSematkanSpesimenSertifikat(false);
+    } catch (error) {
+      console.error("ERROR UPDATE PELATIHAN:", error);
+      Toast.fire({
+        icon: "error",
+        title: 'Oopsss!',
+        text: `Gagal menyematkan spesimen TTD sertifikat ke peserta, harap coba lagi!`,
+      });
+
+      setIsIteratingProcess(false)
+      handleFetchingPublicTrainingDataById();
+      setOpenFormSematkanSpesimenSertifikat(false);
+    }
+  };
+
   const handleTanggalSertifikatDataPesertaPelatihan = async () => {
     setIsIteratingProcess(true)
     try {
@@ -353,6 +399,7 @@ const TableDataPesertaPelatihan = () => {
 
   const [openFormSematkanNoSertifikat, setOpenFormSematkanNoSertifikat] = React.useState<boolean>(false)
   const [openFormSematkanTanggalSertifikat, setOpenFormSematkanTanggalSertifikat] = React.useState<boolean>(false)
+  const [openFormSematkanSpesimenSertifikat, setOpenFormSematkanSpesimenSertifikat] = React.useState<boolean>(false)
 
   const [validitasDataPeserta, setValiditasDataPeserta] =
     React.useState<string>("");
@@ -564,9 +611,7 @@ const TableDataPesertaPelatihan = () => {
                       className="w-full border flex gap-2 border-blue-600 text-left capitalize items-center justify-center"
                     >
                       <RiVerifiedBadgeFill className="h-4 w-4 text-blue-600" />
-                      <span className="text-xs">
-                        {row.original?.NoSertifikat}
-                      </span>
+                      Preview Draft Sertifikat
                     </Button>
                   </DialogSertifikatPelatihan>
                 ) : dataPelatihan!.StatusPenerbitan == "On Progress" ||
@@ -1217,6 +1262,50 @@ const TableDataPesertaPelatihan = () => {
             </fieldset>
           </AlertDialogContent>
         </AlertDialog>
+
+        <AlertDialog open={openFormSematkanSpesimenSertifikat}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                {DIALOG_TEXTS['Sematkan Spesimen Sertifikat Grouping Peserta'].title}
+              </AlertDialogTitle>
+              <AlertDialogDescription className="-mt-2">
+                {DIALOG_TEXTS['Sematkan Spesimen Sertifikat Grouping Peserta'].desc}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <fieldset>
+              <form autoComplete="off">
+                <AlertDialogFooter className="mt-3">
+                  {
+                    isIteratingProcess ? <AlertDialogAction
+                      className="bg-green-500 hover:bg-green-600"
+                      disabled
+                    >
+                      Sedang diproses...
+                    </AlertDialogAction> : <>
+                      <AlertDialogCancel
+                        onClick={(e) =>
+                          setOpenFormSematkanSpesimenSertifikat(
+                            false
+                          )
+                        }
+                      >
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-green-500 hover:bg-green-600"
+                        onClick={(e) =>
+                          handleSematkanSpesimenSertifikatDataPesertaPelatihan()
+                        }
+                      >
+                        Tambah Spesimen TTD
+                      </AlertDialogAction></>
+                  }
+                </AlertDialogFooter>
+              </form>
+            </fieldset>
+          </AlertDialogContent>
+        </AlertDialog>
       </>}
 
 
@@ -1345,6 +1434,20 @@ const TableDataPesertaPelatihan = () => {
                   <TbEditCircle />
 
                   Sematkan Tanggal Sertifikat Peserta
+                </div>
+              </div>
+            }
+
+            {
+              usePathname().includes('lemdiklat') && countPinnedCertificateSpesimen != data!.length && <div className="w-full flex justify-end gap-2">
+                <div
+                  onClick={(e) => {
+                    setOpenFormSematkanSpesimenSertifikat(true)
+                  }}
+                  className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
+                >
+                  <PiSignature />
+                  Sematkan Spesimen TTD
                 </div>
               </div>
             }

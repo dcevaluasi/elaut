@@ -248,8 +248,10 @@ export type UserPelatihan = {
   Provinsi: string
   TempatTanggalLahir: string
   JenisProgram: string
+  StatusAproval: string
   Program: string
   DukunganProgramPrioritas: string
+  StatusPenandatangan: string
 }
 
 export type Pelatihan = {

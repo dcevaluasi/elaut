@@ -54,6 +54,8 @@ export type UserPelatihan = {
   PreTest: number
   JenisKelamin: string
   StatusPembayaran: string
+  StatusPenandatangan: string
+  StatusAproval: string
   UpdateAt: string
   WaktuPembayaran: string
   NamaPelatihan: string

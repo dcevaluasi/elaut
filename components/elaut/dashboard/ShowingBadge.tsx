@@ -20,6 +20,9 @@ const ShowingBadge = ({ data, isFlying, isSupervisor }: { data: PelatihanMasyara
                 {
                     data!.PemberitahuanDiterima == 'Pengajuan Telah Dikirim ke Kapuslat KP' && 'Sudah Dikirim ke Kapuslat KP'
                 }
+                {
+                    data!.PemberitahuanDiterima == 'Pengajuan Telah Dikirim ke Ka BPPPSDM KP' && 'Sudah Dikirim ke Ka BPPPSDM KP oleh Kapuslat KP'
+                }
             </Badge> : <Badge
                 variant="outline"
                 className={`${isFlying && 'top-4 right-4 absolute'} cursor-pointer  bg-gray-300 text-neutral-800 hover:bg-gray-400 animate-pulse duration-700`}
@@ -27,6 +30,12 @@ const ShowingBadge = ({ data, isFlying, isSupervisor }: { data: PelatihanMasyara
                 <PiRecordFill />
                 {
                     data!.PemberitahuanDiterima == 'Pengajuan Telah Dikirim ke SPV' ? 'Sudah Dikirim ke SPV' : ''
+                }
+                {
+                    data!.PemberitahuanDiterima == 'Pengajuan Telah Dikirim ke Kapuslat KP' && 'Sudah Dikirim ke Kapuslat KP oleh SPV'
+                }
+                {
+                    data!.PemberitahuanDiterima == 'Pengajuan Telah Dikirim ke Ka BPPPSDM KP' && 'Sudah Dikirim ke Ka BPPPSDM KP oleh Kapuslat KP'
                 }
             </Badge>
         }

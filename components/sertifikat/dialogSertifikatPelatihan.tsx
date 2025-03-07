@@ -36,8 +36,9 @@ import { BsFillPrinterFill } from "react-icons/bs";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import Toast from "../toast";
-import { capitalizeWords, CURRICULLUM_CERTIFICATE, DESC_CERTIFICATE } from "@/constants/texts";
+import { capitalizeWords, CURRICULLUM_CERTIFICATE } from "@/constants/texts";
 import { formatDateRange, formatDateRangeEnglish } from "@/utils/time";
+import { DESC_CERTIFICATE_COMPETENCE_FISHERIES } from "@/constants/serkom";
 
 const html2pdf = dynamic(() => import("html2pdf.js"), { ssr: false });
 
@@ -112,7 +113,7 @@ const SertifikatNonKepelautan = React.forwardRef(
               src="/qr-code/Cek_Sertifikat_ELAUT.png"
             />
 
-            <div className="w-full flex flex-col gap-4 px-10 -mt-7 ">
+            <div className="w-full flex flex-col space-y-0 px-10 -mt-7 ">
               {!isPrinting && (
                 <Image
                   alt="Logo KKP"
@@ -123,7 +124,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                 />
               )}
 
-              <div className="flex flex-col gap-0 w-full items-center justify-center -mt-6">
+              <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-6">
                 <h1 className="text-sm font-bosBold">
                   KEMENTERIAN KELAUTAN DAN PERIKANAN
                 </h1>
@@ -148,53 +149,53 @@ const SertifikatNonKepelautan = React.forwardRef(
                 </p>
               </div>
 
-              <div className="flex w-full flex-col leading-[115%] items-start text-sm -mt-3 text-center font-bos">
-                <p>
+              <div className="flex w-full flex-col space-y-0 max-w-5xl mx-auto items-start text-sm -mt-3 text-center font-bos h-fit">
+                <span className="text-sm leading-[115%]">
                   Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan
                   dan Perikanan berdasarkan Peraturan Pemerintah Nomor.62 Tahun
                   2014 tentang Penyelenggaraan Pendidikan, Pelatihan dan
                   Penyuluhan Perikanan, serta ketentuan pelaksanaannya
                   menyatakan bahwa :
-                </p>
-                <p className=" leading-none font-bosItalic text-[0.75rem]">
+                </span>
+                <span className="max-w-4xl leading-none font-bosItalic text-[0.75rem] mx-auto">
                   The Agency for Marine and Fisheries Extension and Human
                   Resources Development based on Government Regulation Number 62
                   of 2014 concerning the Implementation of Fisheries Education,
                   Training and Extension as well as its implementing provisions
                   States that :
-                </p>
+                </span>
               </div>
 
-              <div className="flex flex-col gap-2 w-full  -mt-2">
+              <div className="flex flex-col space-y-0 w-full h-fit -mt-2">
                 <table className="w-full h-fit" cellPadding={0} cellSpacing={0}>
                   <tr className="w-full">
-                    <td className="font-bos w-full flex flex-col">
-                      <p className="font-bos text-sm">Nama</p>
-                      <p className="font-bos text-[0.75rem] -mt-2">Name</p>
+                    <td className="font-bos w-full flex flex-col space-y-0">
+                      <span className="font-bos text-sm">Nama</span>
+                      <span className="font-bos text-[0.75rem] -mt-2">Name</span>
                     </td>
-                    <td className=" w-2/3 text-sm capitalize">: {capitalizeWords(userPelatihan!.Nama)}</td>
+                    <td className=" w-2/3 text-sm uppercase">: {capitalizeWords(userPelatihan!.Nama)}</td>
                   </tr>
                   <tr className="w-full">
-                    <td className="font-bos w-full flex flex-col">
-                      <p className="font-bos text-sm">
+                    <td className="font-bos w-full flex flex-col  space-y-0">
+                      <span className="font-bos text-sm">
                         Nomor Induk Kependudukan (NIK)
-                      </p>
-                      <p className="font-bos text-[0.75rem] -mt-2">
+                      </span>
+                      <span className="font-bos text-[0.75rem] -mt-2">
                         {" "}
                         Population Identification Number (PIN)
-                      </p>
+                      </span>
                     </td>
                     <td className=" w-2/3 text-sm font-bos">
                       : {peserta != null ? peserta!.Nik : "-"}
                     </td>
                   </tr>
                   <tr className="w-full">
-                    <td className="font-bos w-full flex flex-col">
-                      <p className="font-bos text-sm">Tempat Tanggal Lahir</p>
-                      <p className="font-bos text-[0.75rem] -mt-2">
+                    <td className="font-bos w-full flex flex-col space-y-0">
+                      <span className="font-bos text-sm">Tempat Tanggal Lahir</span>
+                      <span className="font-bos text-[0.75rem] -mt-2">
                         {" "}
                         Place and date of birth
-                      </p>
+                      </span>
                     </td>
                     <td className=" w-2/3 text-sm capitalize">
                       : {peserta != null ? capitalizeWords(peserta?.TempatLahir) : "-"}
@@ -205,7 +206,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                 </table>
               </div>
 
-              <div className="flex flex-col w-full items-center justify-center -mt-3">
+              <div className="flex flex-col space-y-0 w-full items-center justify-center -mt-3">
                 <h1 className="font-bosBold text-xl">
                   TELAH LULUS
                 </h1>
@@ -214,32 +215,32 @@ const SertifikatNonKepelautan = React.forwardRef(
                 </h3>
               </div>
 
-              <div className="flex w-full flex-col items-start -mt-2 text-center">
-                <p className="text-sm leading-[115%]">
-                  {DESC_CERTIFICATE[pelatihan!.Program].desc_ind} {formatDateRange(generateTanggalPelatihan(pelatihan?.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan))}
-                </p>
-                <p className="max-w-4xl leading-none font-bosItalic text-[0.75rem] mx-auto">
-                  {DESC_CERTIFICATE[pelatihan!.Program].desc_eng} {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan?.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan))}
-                </p>
+              <div className="flex w-full flex-col space-y-0 max-w-5xl mx-auto items-start text-sm -mt-3 text-center font-bos h-fit">
+                <span className="text-sm leading-[115%]">
+                  {DESC_CERTIFICATE_COMPETENCE_FISHERIES[pelatihan!.Program].desc_ind} {formatDateRange(generateTanggalPelatihan(pelatihan?.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan))}
+                </span>
+                <span className="max-w-4xl leading-none font-bosItalic text-[0.75rem] mx-auto">
+                  {DESC_CERTIFICATE_COMPETENCE_FISHERIES[pelatihan!.Program].desc_eng} {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan?.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan))}
+                </span>
               </div>
 
               <div className="flex gap-2 items-center justify-center -mt-2">
-                <div className="flex flex-col font-bos text-center items-center justify-center">
-                  <div className="flex w-full flex-col items-cennter mt-2 text-center">
-                    <p className="font-bos text-sm leading-[105%] w-full flex items-center gap-1">
+                <div className="flex flex-col  space-y-0 font-bos text-center items-center justify-center">
+                  <div className="flex w-full flex-col  space-y-0 items-cennter mt-2 text-center">
+                    <span className="font-bos text-sm leading-[105%] w-full flex items-center gap-1">
                       Jakarta,{" "}{userPelatihan?.TanggalSertifikat}
 
                       <br /> {pelatihan?.TtdSertifikat}
-                    </p>
+                    </span>
 
-                    <p className=" leading-none font-bosItalic text-[0.75rem]">
+                    <span className="leading-none font-bosItalic text-[0.75rem]">
                       {pelatihan?.TtdSertifikat ==
                         "Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan"
                         ? "Chairman of the Agency for Marine and Fisheries Extension and Human Resources Development"
                         : "Director for Marine And Fisheries Training Center"}
-                    </p>
+                    </span>
                   </div>
-                  {isSpesimen ? (
+                  {userPelatihan?.StatusPenandatangan == 'Spesimen' ? (
                     <Image
                       alt=""
                       width={0}
@@ -251,12 +252,12 @@ const SertifikatNonKepelautan = React.forwardRef(
                     <div className="h-[80px]"></div>
                   )}
 
-                  <p className=" font-bosBold text-base">
+                  <span className=" font-bosBold text-base">
                     {pelatihan?.TtdSertifikat ==
                       "Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan"
                       ? "Dr. I Nyoman Radiarta, S.Pi, M.Sc"
                       : "Dr. Lilly Aprilya Pregiwati, S.Pi., M.Si"}
-                  </p>
+                  </span>
                 </div>
               </div>
             </div>
@@ -703,56 +704,41 @@ export function DialogSertifikatPelatihan({
 
     const element = componentRef.current;
 
-    // Clone the element to preserve original styles
-    const clonedElement = element.cloneNode(true) as HTMLElement;
-    document.body.appendChild(clonedElement);
-
-    // Apply computed styles
-    const computedStyle = window.getComputedStyle(element);
-    clonedElement.style.cssText = computedStyle.cssText;
-
-    // Force one-page layout with scaling
-    clonedElement.style.width = "100%";
-    clonedElement.style.maxWidth = "1123px"; // A4 width in px
-    clonedElement.style.height = "auto";
-    clonedElement.style.overflow = "hidden";
-    clonedElement.style.pageBreakInside = "avoid";
-    clonedElement.style.backgroundColor = "#fff"; // Ensure white background
-
+    // Optimize for PDF generation (preserve text, avoid image rendering)
     const opt = {
-      margin: [10, 10, 10, 10], // Adjust margins to fit one page
+      margin: [10, 10, 10, 10], // Small margins for better fit
       filename: `${userPelatihan?.Nama}_${userPelatihan?.NoRegistrasi}.pdf`,
-      image: { type: "png", quality: 2 },
+      // pagebreak: { mode: "avoid-all" }, // Prevent splitting important elements
       html2canvas: {
-        scale: 2, // Increase scale for better resolution
-        useCORS: true, // Ensure external styles are applied
+        scale: 2, // Higher scale for better quality
+        useCORS: true, // Load external styles correctly
+        logging: false,
         backgroundColor: "#fff",
       },
       jsPDF: {
         unit: "px",
-        format: "a4",
-        orientation: "portrait",
+        format: [element.offsetWidth, element.offsetHeight], // Dynamically adjust to content
+        orientation: "landscape",
       },
     };
 
     html2pdf()
-      .from(clonedElement)
+      .from(element)
       .set(opt)
+      .toPdf() // Use .toPdf() instead of image-based conversion
       .outputPdf("blob")
       .then(async (pdfBlob: Blob) => {
-        document.body.removeChild(clonedElement); // Remove cloned element after capture
-
         const MAX_SIZE_MB = 5;
         const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 
-        // if (pdfBlob.size > MAX_SIZE_BYTES) {
-        //   Toast.fire({
-        //     icon: "error",
-        //     title: `Ukuran file terlalu besar! Maksimum ${MAX_SIZE_MB} MB.`,
-        //   });
-        //   setIsUploading(false);
-        //   return;
-        // }
+        if (pdfBlob.size > MAX_SIZE_BYTES) {
+          Toast.fire({
+            icon: "error",
+            title: `Ukuran file terlalu besar! Maksimum ${MAX_SIZE_MB} MB.`,
+          });
+          setIsUploading(false);
+          return;
+        }
 
         const formData = new FormData();
         formData.append(
@@ -801,10 +787,6 @@ export function DialogSertifikatPelatihan({
       });
   };
 
-
-
-
-
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
   });
@@ -813,47 +795,51 @@ export function DialogSertifikatPelatihan({
     uploadPdf();
   };
 
-  React.useEffect(() => {
-    if (typeof window !== "undefined" && show && componentRef.current) {
-      const generatePDF = async () => {
-        const html2pdf = (await import("html2pdf.js")).default;
+  // React.useEffect(() => {
+  //   if (typeof window !== "undefined" && show && componentRef.current) {
+  //     const generatePDF = async () => {
+  //       const html2pdf = (await import("html2pdf.js")).default;
 
-        const element = componentRef.current;
+  //       const element = componentRef.current;
 
-        const opt = {
-          margin: 0,
-          filename: `${userPelatihan?.Nama}_${userPelatihan?.NoRegistrasi}_${userPelatihan?.NoSertifikat}.pdf`,
-          image: { type: "jpg", quality: 10 }, // Lower quality for smaller size
-          html2canvas: { scale: 0.9 }, // Reduce scale for smaller file size
-          jsPDF: {
-            unit: "in",
-            format: "a4",
-            orientation: "landscape",
-            compression: true, // Compress PDF for smaller size
-          },
-        };
+  //       const opt = {
+  //         margin: [10, 10, 10, 10], // Small margins for better fit
+  //         filename: `${userPelatihan?.Nama}_${userPelatihan?.NoRegistrasi}.pdf`,
+  //         // pagebreak: { mode: "avoid-all" }, // Prevent splitting important elements
+  //         html2canvas: {
+  //           scale: 2, // Higher scale for better quality
+  //           useCORS: true, // Load external styles correctly
+  //           logging: false,
+  //           backgroundColor: "#fff",
+  //         },
+  //         jsPDF: {
+  //           unit: "px",
+  //           format: [element.offsetWidth, element.offsetHeight], // Dynamically adjust to content
+  //           orientation: "landscape",
+  //         },
+  //       };
 
-        html2pdf()
-          .from(element)
-          .set(opt)
-          .outputPdf("blob")
-          .then(async (pdfBlob: Blob) => {
-            // Optional: Check size of the PDF blob
-            const fileSize = pdfBlob.size / 1024 / 1024; // Convert to MB
-            console.log("PDF Blob Size:", fileSize, "MB");
+  //       html2pdf()
+  //         .from(element)
+  //         .set(opt)
+  //         .outputPdf("blob")
+  //         .then(async (pdfBlob: Blob) => {
+  //           // Optional: Check size of the PDF blob
+  //           const fileSize = pdfBlob.size / 1024 / 1024; // Convert to MB
+  //           console.log("PDF Blob Size:", fileSize, "MB");
 
-            if (fileSize > 1) {
-              // If file size is too large, you can notify the user or adjust settings further
-              console.warn(
-                "The file size exceeds 1MB. Consider further optimizations."
-              );
-            }
-          });
-      };
+  //           if (fileSize > 1) {
+  //             // If file size is too large, you can notify the user or adjust settings further
+  //             console.warn(
+  //               "The file size exceeds 1MB. Consider further optimizations."
+  //             );
+  //           }
+  //         });
+  //     };
 
-      generatePDF();
-    }
-  }, [show, userPelatihan]);
+  //     generatePDF();
+  //   }
+  // }, [show, userPelatihan]);
 
   const [isPrinting, setIsPrinting] = React.useState<boolean>(false);
   const [isSpesimen, setIsSpesimen] = React.useState<boolean>(false);
@@ -862,7 +848,7 @@ export function DialogSertifikatPelatihan({
     <div>
       <Dialog>
         {userPelatihan!.NoSertifikat == "" ? (
-          <DialogTrigger onClick={() => handleUploadPDF()}>
+          <DialogTrigger className="w-full" onClick={() => handleUploadPDF()}>
             {children}
           </DialogTrigger>
         ) : (
@@ -936,19 +922,7 @@ export function DialogSertifikatPelatihan({
               {usePathname().includes("lemdiklat") &&
                 userPelatihan!.FileSertifikat == "" && (
                   <>
-                    {!isUploading && (
-                      <Button
-                        onClick={(e) => setIsSpesimen(!isSpesimen)}
-                        className="flex items-center gap-1 bg-gray-600 hover:bg-gray-700 text-white hover:text-white"
-                      >
-                        <>
-                          <TbWritingSign />
-                          {isSpesimen
-                            ? "Undo Tambahkan Spesimen TTD"
-                            : "Tambahkan Spesimen TTD"}
-                        </>
-                      </Button>
-                    )}
+
 
                     {isSpesimen && (
                       <Button

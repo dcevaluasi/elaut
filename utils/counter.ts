@@ -13,3 +13,7 @@ export const countUserWithTanggalSertifikat = (
 ): number => {
   return data.filter((item) => item.TanggalSertifikat !== '').length
 }
+
+export const countUserWithSpesimenTTD = (data: UserPelatihan[]): number => {
+  return data.filter((item) => item.StatusPenandatangan !== '').length
+}
