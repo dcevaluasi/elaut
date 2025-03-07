@@ -38,3 +38,42 @@ export const DESC_CERTIFICATE_COMPETENCE_FISHERIES: Record<
       'In the Fish Processing Assistant Training which was held in  collaboration with the Maritime and Fisheries Training Center - Maritime and Fisheries Human Resource Development and Extension Agency with the Directorate of Processing and Quality Development - Directorate General of Strengthening and Competitiveness of Marine and Fishery Products on',
   },
 }
+
+export const AKP_CERTIFICATIONS: string[] = [
+  'ANKAPIN Tingkat I',
+  'ATKAPIN Tingkat I',
+  'ANKAPIN Tingkat II',
+  'ATKAPIN Tingkat II',
+  'ANKAPIN Tingkat III',
+  'ATKAPIN Tingkat III',
+  'BSTF I',
+  'BSTF II',
+  'Rating',
+  'SKN',
+  'SKPI',
+  'SOPI',
+  'Fishing Master',
+]
+
+export const AQUACULTURE_CERTIFICATIONS: string[] = [
+  'CPIB',
+  'CBIB',
+  'CPPIB',
+  'HACCP',
+  'MPM-CPIB',
+  'SPI',
+  'API',
+  'Budidaya',
+  'Pengolahan dan Pemasaran',
+  'Mesin Perikanan',
+  'Penangkapan',
+  'SD Perikanan',
+  'Wisata Bahari',
+]
+
+export const OCEAN_CERTIFICATIONS: string[] = [
+  'BCL',
+  'Pengelolaan Sampah',
+  'Mitigasi Bencana',
+  'Konservasi',
+]

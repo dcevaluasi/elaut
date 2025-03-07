@@ -48,6 +48,14 @@ export default function Footer() {
                   Sertifikasi atau Uji Kompetensi
                 </a>
               </li>
+              <li className="mb-2">
+                <a
+                  href="/layanan/cek-sertifikat"
+                  className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
+                >
+                  Cek Sertifikat
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -79,6 +87,7 @@ export default function Footer() {
                   Kelautan
                 </a>
               </li>
+
             </ul>
           </div>
 

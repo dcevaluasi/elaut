@@ -49,6 +49,8 @@ import { Pagination, Navigation, FreeMode } from "swiper/modules";
 import Link from "next/link";
 import Logo from "../ui/logo";
 import PencarianPelatihan from "../landing/PencarianPelatihan";
+import Marquee from "react-fast-marquee";
+import { AKP_CERTIFICATIONS, AQUACULTURE_CERTIFICATIONS, OCEAN_CERTIFICATIONS } from "@/constants/serkom";
 
 export default function HeroProgramPelatihan({ program }: { program: string }) {
   const programPelatihan =
@@ -57,6 +59,13 @@ export default function HeroProgramPelatihan({ program }: { program: string }) {
       : program == "perikanan"
         ? "Perikanan"
         : "Kelautan";
+
+  const certifications =
+    program == "akp"
+      ? AKP_CERTIFICATIONS
+      : program == "perikanan"
+        ? AQUACULTURE_CERTIFICATIONS
+        : OCEAN_CERTIFICATIONS;
 
   const detailProgramPelatihan: DetailProgramPelatihan = {
     akp: {
@@ -107,14 +116,6 @@ export default function HeroProgramPelatihan({ program }: { program: string }) {
     [];
 
   const [imageIndex, setImageIndex] = React.useState(0);
-
-  // React.useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-  //   }, 5000);
-
-  //   return () => clearInterval(interval);
-  // }, []);
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -210,6 +211,15 @@ export default function HeroProgramPelatihan({ program }: { program: string }) {
                   teknologi kelautan, serta keamanan dan keselamatan di laut.
                 </p>
               )}
+              <Marquee
+                className='max-w-4xl mt-5'
+              >
+                {certifications.map((text: string, index: number) => (
+                  <p key={index} className="text-base mx-2 text-white border border-white rounded-2xl px-4 py-2">
+                    {text}&nbsp;&nbsp;&nbsp;
+                  </p>
+                ))}
+              </Marquee>
             </div>
           </div>
         </div>
