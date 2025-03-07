@@ -61,7 +61,7 @@ const CertificateCheckFeature = () => {
             <div className="flex md:space-x-2 space-y-2 md:space-y-0 flex-col md:flex-row">
                 {certificates.map(({ title, description, imageSrc, link }, index) => {
                     const CardContent = (
-                        <div className="flex flex-col gap-2 hover:cursor-pointer hover:animate-pulse duration-700 items-center justify-center w-80 bg-white rounded-3xl p-10 relative">
+                        <div className="flex flex-col gap-2 hover:cursor-pointer duration-700 items-center justify-center w-80 bg-white rounded-3xl p-10 relative">
                             <span onClick={() => { setSelectedCertificateFeature(index); setOpenPopUpInfoCheckCertificateFeature(true) }} className='hover:cursor-pointer hover:scale-105 hover:border-blue-500 hover:text-blue-500 duration-700 absolute top-5 right-5 rounded-full w-7 h-7 p-1 text-grayUsual border border-grayUsual flex items-center justify-center text-lg z-[999999]' title={'Info ' + title}>
                                 <FaRegCircleQuestion />
                             </span>
@@ -70,16 +70,17 @@ const CertificateCheckFeature = () => {
                                 <h2 className="text-blue-500 font-semibold text-lg">{title}</h2>
                                 <p className="text-grayUsual leading-none text-sm">{description}</p>
                             </div>
+                            {
+                                link ? <Link className='text-blue-500 hover:text-white hover:bg-blue-500 border border-blue-500 rounded-2xl font-medium mt-2 flex items-center justify-center duration-700 w-full px-4 py-2 text-sm' href={link} target="_blank" title={title}>
+                                    Selengkapnya
+                                </Link> : <span className='text-blue-500 hover:text-white hover:bg-blue-500 border border-blue-500 rounded-2xl font-medium mt-2 flex items-center justify-center duration-700 w-full px-4 py-2 text-sm'>Selengkapnya</span>
+                            }
+
                         </div>
                     );
 
-                    return link ? (
-                        <Link key={index} href={link} target="_blank" title={title}>
-                            {CardContent}
-                        </Link>
-                    ) : (
-                        <div key={index} title={title}>{CardContent}</div>
-                    );
+                    return <div key={index} title={title}>{CardContent}</div>
+
                 })}
             </div>
 
@@ -98,7 +99,7 @@ const CertificateCheckFeature = () => {
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setOpenPopUpInfoCheckCertificateFeature(false)}>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel onClick={() => setOpenPopUpInfoCheckCertificateFeature(false)}>Close</AlertDialogCancel>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
