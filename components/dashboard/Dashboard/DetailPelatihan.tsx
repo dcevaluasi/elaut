@@ -231,7 +231,7 @@ function DetailPelatihan() {
               </div>
               <table className="w-full">
                 <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">Judul</td>
+                  <td className="font-semibold p-4 w-[20%]">Nama Pelatihan</td>
                   <td className="p-4 w-2/3">
                     {pelatihan!.NamaPelatihan || ""}
                   </td>
@@ -246,7 +246,7 @@ function DetailPelatihan() {
                   <td className="font-semibold p-4 w-[20%]">
                     Penyelenggara Pelatihan
                   </td>
-                  <td className="p-4 w-2/3 break-words">
+                  <td className="p-4 w-2/3 ">
                     {generateFullNameBalai(pelatihan!.PenyelenggaraPelatihan) ||
                       ""}{" "}
                     ({pelatihan!.PenyelenggaraPelatihan || ""})
@@ -326,7 +326,7 @@ function DetailPelatihan() {
                   <td className="p-4 w-2/3">
                     <Link
                       target="_blank"
-                      className="text-blue-500 underline break-words"
+                      className="text-blue-500 underline w-2/3"
                       href={`${isLemdiklat ? 'https://elaut-bppsdm.kkp.go.id/api-elaut/public/suratPemberitahuan/pelatihan/' + pelatihan!.SuratPemberitahuan || "" : 'https://elaut-bppsdm.kkp.go.id/api-elaut/public/silabus/' + pelatihan!.SilabusPelatihan || ""}`}
                     >
                       {isLemdiklat ? pelatihan!.SuratPemberitahuan || "" : pelatihan!.SilabusPelatihan || ""}

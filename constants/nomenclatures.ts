@@ -24,3 +24,27 @@ export const ESELON_2: ESELON = {
   abbrvEselon: 'Puslat KP',
   fullNameEselon: 'Pusat Pelatihan Kelautan dan Perikanan',
 }
+
+export const UPT: string[] = [
+  'BPPP Medan',
+  'BPPP Tegal',
+  'BPPP Banyuwangi',
+  'BPPP Bitung',
+  'BPPP Ambon',
+  'Politeknik KP Dumai',
+  'Politeknik AUP Jakarta',
+  'Politeknik KP Karawang',
+  'Politeknik KP Pangandaran',
+  'Politeknik KP Sidoarjo',
+  'Politeknik KP Jembrana',
+  'Politeknik KP Kurang',
+  'Politeknik KP Bitung',
+  'Politeknik KP Bone',
+  'Politeknik KP Sorong',
+  'AKP Wakatobi',
+  'SUPM Ladong',
+  'SUPM Pariaman',
+  'SUPM Kota Agung',
+  'SUPM Tegal',
+  'SUPM Waiheru',
+]

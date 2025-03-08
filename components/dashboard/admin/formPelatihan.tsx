@@ -44,6 +44,7 @@ import { doc, getFirestore } from "firebase/firestore";
 import firebaseApp from "@/firebase/config";
 import addData from "@/firebase/firestore/addData";
 import { generateTimestamp } from "@/utils/time";
+import { UPT } from "@/constants/nomenclatures";
 
 type Checked = DropdownMenuCheckboxItemProps["checked"];
 
@@ -1051,17 +1052,25 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                                 }
                                 disabled
                                 readOnly
-                              /> : <input
-                                id="penyelenggaraPelatihan"
-                                type="text"
-                                className="form-input w-full text-black border-gray-300 rounded-md"
-                                placeholder={'Masukkan nama lemdiklat'}
-                                required
+                              /> : <Select
                                 value={penyelenggaraPelatihan}
-                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                  setPenyelenggaraPelatihan(e.target.value)
+                                onValueChange={(value: string) =>
+                                  setPenyelenggaraPelatihan(value)
                                 }
-                              />
+                              >
+                                <SelectTrigger className="w-full text-base py-6">
+                                  <SelectValue placeholder="Pilih penyelenggara" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {
+                                    UPT.map((item: string, index: number) => (
+                                      <SelectItem key={index} value={item}>
+                                        {item}
+                                      </SelectItem>
+                                    ))
+                                  }
+                                </SelectContent>
+                              </Select>
                             }
                           </div>
                         </div>
@@ -1268,6 +1277,47 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                         </div>
                       </div>
 
+                      {
+                        !isOperatorBalaiPelatihan && <div className="flex w-full flex-wrap  mb-1">
+                          <div className="w-full">
+                            <label
+                              className="block text-gray-800 text-sm font-medium mb-1"
+                              htmlFor="asalPesertaPelatihan"
+                            >
+                              Asal Peserta Pelatihan{" "}
+                              <span className="text-red-600">*</span>
+                            </label>
+                            <Select
+                              value={asalPelatihan}
+                              onValueChange={(value: string) =>
+                                setAsalPelatihan(value)
+                              }
+                            >
+                              <SelectTrigger className="w-full text-base py-6">
+                                <SelectValue placeholder="Pilih asal peserta" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Masyarakat Umum">
+                                  Masyarakat Umum
+                                </SelectItem>
+                                {
+                                  jenisPelatihan == 'Satuan Pendidikan' && <>
+                                    <SelectItem value="Peserta Didik Sekolah Usaha Perikanan Menengah">
+                                      Peserta Didik Sekolah Usaha Perikanan Menengah
+                                    </SelectItem>
+                                    <SelectItem value="Peserta Didik Politeknik Kelautan dan Perikanan">
+                                      Peserta Didik Politeknik Kelautan dan Perikanan
+                                    </SelectItem></>
+                                }
+                                <SelectItem value="Karyawan/Pegawai/Mining Agent">
+                                  Karyawan/Pegawai/Mining Agent
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      }
+
                       <p className="text-base flex gap-2 border-b border-b-gray-300 pb-2 mb-2 items-center text-gray-900 font-semibold max-w-md mt-5">
                         <RiVerifiedBadgeLine /> <span>Penilaian Pelatihan</span>
                       </p>
@@ -1372,12 +1422,15 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                                 <SelectItem value="Masyarakat Umum">
                                   Masyarakat Umum
                                 </SelectItem>
-                                <SelectItem value="Sekolah Usaha Perikanan Menengah">
-                                  Sekolah Usaha Perikanan Menengah
-                                </SelectItem>
-                                <SelectItem value="Politeknik Kelautan dan Perikanan">
-                                  Politeknik Kelautan dan Perikanan
-                                </SelectItem>
+                                {
+                                  jenisPelatihan == 'Satuan Pendidikan' && <>
+                                    <SelectItem value="Peserta Didik Sekolah Usaha Perikanan Menengah">
+                                      Peserta Didik Sekolah Usaha Perikanan Menengah
+                                    </SelectItem>
+                                    <SelectItem value="Peserta Didik Politeknik Kelautan dan Perikanan">
+                                      Peserta Didik Politeknik Kelautan dan Perikanan
+                                    </SelectItem></>
+                                }
                                 <SelectItem value="Karyawan/Pegawai/Mining Agent">
                                   Karyawan/Pegawai/Mining Agent
                                 </SelectItem>
