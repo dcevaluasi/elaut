@@ -88,7 +88,7 @@ export default function UserService({ user }: { user: User | null }) {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full text-left">
       <div className="relative pb-20 " id="explore">
 
 

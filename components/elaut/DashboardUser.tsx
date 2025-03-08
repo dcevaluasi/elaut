@@ -29,7 +29,7 @@ import { sanitizedDangerousChars, validateIsDangerousChars } from '@/utils/input
 import Toast from '../toast';
 import { RiVerifiedBadgeFill } from 'react-icons/ri';
 import { addFiveYears } from '@/utils/pelatihan';
-import { DIALOG_TEXTS } from '@/constants/texts';
+import { capitalizeWords, DIALOG_TEXTS } from '@/constants/texts';
 import { HashLoader } from "react-spinners";
 
 export default function DashboardUser() {
@@ -112,8 +112,8 @@ export default function DashboardUser() {
                                 >
                                     <div className="flex flex-col  gap-2 w-full items-center justify-center p-5 md:p-0 text-center">
                                         <div className="flex flex-col space-y-1 text-center rounded-2xl bg-white shadow-custom w-full py-16">
-                                            <h1 className="text-blue-500 text-[3rem] md:text-[3.6rem] font-calsans leading-none">
-                                                Dashboard <br /> {userDetail!.Nama}
+                                            <h1 className="text-blue-500 text-[3rem] md:text-[3.6rem] font-calsans leading-none capitalize">
+                                                Dashboard <br /> {capitalizeWords(userDetail!.Nama)}
                                             </h1>
                                             <p className="text-blue-500 leading-none">
                                                 Ayo jelajahi aplikasi E-LAUT dan temukan pelatihan unggul di sektor Kelautan dan Perikanan menarik!

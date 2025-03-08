@@ -189,7 +189,7 @@ function UserTrainingService({ user }: { user: User | null }) {
 
   return (
     <>
-      <section className="relative h-fit pb-20" id="explore">
+      <section className="relative h-fit pb-20 " id="explore">
         <div
           className="absolute inset-0 pointer-events-none mb-16 pb-10 h-full"
           aria-hidden="true"
@@ -321,7 +321,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                     <div className="flex flex-col gap-1">
                                       <div className="sm:flex sm:justify-between sm:gap-4">
                                         <div>
-                                          <h3 className="text-lg hover:cursor-pointer font-bold text-gray-900 sm:text-xl leading-[100%]">
+                                          <h3 className="text-lg hover:cursor-pointer font-calsans  text-gray-900 sm:text-xl leading-[100%]">
                                             {pelatihan?.NamaPelatihan}
                                           </h3>
                                         </div>
@@ -413,7 +413,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                       <div className="flex flex-col gap-1">
                                         <div className="sm:flex sm:justify-between sm:gap-4">
                                           <div>
-                                            <h3 className="text-lg hover:cursor-pointer font-bold text-gray-900 sm:text-xl leading-[100%]">
+                                            <h3 className="text-lg hover:cursor-pointer  text-gray-900 sm:text-xl leading-[100%]">
                                               {pelatihan?.NamaPelatihan}
                                             </h3>
                                           </div>
@@ -473,7 +473,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                       <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:px-6 lg:py-0">
                         <div className="sm:flex justify-between sm:gap-4 items-center border-b-2 border-b-gray-200 pb-4">
                           <div className="">
-                            <h3 className="text-3xl font-bold text-gray-900 font-calsans sm:text-3xl leading-[105%]">
+                            <h3 className="text-3xl  text-gray-900 font-calsans sm:text-3xl leading-[105%]">
                               {
                                 userDetail?.Pelatihan[indexPelatihanSelected]
                                   ?.NamaPelatihan!
@@ -542,7 +542,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                               </div>
 
                               <div className="flex flex-col-reverse">
-                                <div className="text-sm font-bold text-gray-600">
+                                <div className="text-sm  text-gray-600">
                                   {userDetail?.Pelatihan[indexPelatihanSelected]
                                     .NoSertifikat! == ""
                                     ? "-"
@@ -555,7 +555,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                 </div>
                               </div>
                               <div className="flex flex-col-reverse">
-                                <div className="text-sm font-bold text-gray-600">
+                                <div className="text-sm  text-gray-600">
                                   {userDetail?.Pelatihan[indexPelatihanSelected]
                                     .NoRegistrasi! == ""
                                     ? "-"
@@ -591,7 +591,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                           indexPelatihanSelected
                                         ]?.DetailPelatihan!,
                                   }}
-                                  className="text-sm prose   text-justify group-hover:text-xs text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong:font-bold group-hover:duration-1000"
+                                  className="text-sm prose   text-justify group-hover:text-xs text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong: group-hover:duration-1000"
                                 />{" "}
                                 <p
                                   onClick={(e) => setSeeMore(!seeMore)}
@@ -638,7 +638,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                       }`}
                                     className="flex shadow-custom w-full rounded-md p-5 cursor-pointer flex-col gap-1 hover:scale-105 duration-700 hover:bg-blue-500 hover:text-white group"
                                   >
-                                    <h3 className="font-bold font-calsans leading-[105%]">
+                                    <h3 className=" font-calsans leading-[105%]">
                                       Materi {pelatihan}. <br />
                                       Kebijakan Pelatihan Sosial Kultural II
                                     </h3>
@@ -652,7 +652,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                           "..."
                                         ),
                                       }}
-                                      className="text-sm prose group-hover:text-white  text-justify  text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong:font-bold group-hover:duration-1000 prose-p:font-normal"
+                                      className="text-sm prose group-hover:text-white  text-justify  text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong: group-hover:duration-1000 prose-p:font-normal"
                                     />
                                   </Link>
                                 ))}
@@ -671,7 +671,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                       <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:px-6 lg:py-0">
                         <div className="sm:flex justify-between sm:gap-4 items-center border-b-2 border-b-gray-200 pb-4">
                           <div className="">
-                            <h3 className="text-3xl font-bold text-gray-900 font-calsans sm:text-3xl leading-[105%]">
+                            <h3 className="text-3xl  text-gray-900 font-calsans sm:text-3xl leading-[105%]">
                               {
                                 userDetail?.Pelatihan[indexPelatihanSelected]
                                   ?.NamaPelatihan!
@@ -740,7 +740,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                               </div>
 
                               <div className="flex flex-col-reverse">
-                                <div className="text-sm font-bold text-gray-600">
+                                <div className="text-sm  text-gray-600">
                                   {userDetail?.Pelatihan[indexPelatihanSelected]
                                     .NoSertifikat! == ""
                                     ? "-"
@@ -753,7 +753,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                 </div>
                               </div>
                               <div className="flex flex-col-reverse">
-                                <div className="text-sm font-bold text-gray-600">
+                                <div className="text-sm  text-gray-600">
                                   {userDetail?.Pelatihan[indexPelatihanSelected]
                                     .NoRegistrasi! == ""
                                     ? "-"
@@ -783,7 +783,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                           indexPelatihanSelected
                                         ]?.DetailPelatihan!,
                                     }}
-                                    className="text-sm prose   text-justify group-hover:text-xs text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong:font-bold group-hover:duration-1000"
+                                    className="text-sm prose   text-justify group-hover:text-xs text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong: group-hover:duration-1000"
                                   />{" "}
                                 </div>
                               </div>
@@ -817,7 +817,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                       }`}
                                     className="flex shadow-custom w-full rounded-md p-5 cursor-pointer flex-col gap-1 hover:scale-105 duration-700 hover:bg-blue-500 hover:text-white group"
                                   >
-                                    <h3 className="font-bold font-calsans leading-[105%]">
+                                    <h3 className=" font-calsans leading-[105%]">
                                       Materi {pelatihan}. <br />
                                       Kebijakan Pelatihan Sosial Kultural II
                                     </h3>
@@ -831,7 +831,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                           "..."
                                         ),
                                       }}
-                                      className="text-sm prose group-hover:text-white  text-justify  text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong:font-bold group-hover:duration-1000 prose-p:font-normal"
+                                      className="text-sm prose group-hover:text-white  text-justify  text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong: group-hover:duration-1000 prose-p:font-normal"
                                     />
                                   </Link>
                                 ))}
@@ -984,7 +984,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                     <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:px-6 lg:py-0">
                       <div className="sm:flex justify-between sm:gap-4 items-center border-b-2 border-b-gray-200 pb-4">
                         <div className="">
-                          <h3 className="text-3xl font-bold text-gray-900 font-calsans sm:text-3xl leading-[105%]">
+                          <h3 className="text-3xl  text-gray-900 font-calsans sm:text-3xl leading-[105%]">
                             {
                               userDetail?.Pelatihan[indexPelatihanSelected]
                                 ?.NamaPelatihan!
@@ -1051,7 +1051,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                             </div>
 
                             <div className="flex flex-col-reverse">
-                              <div className="text-sm font-bold text-gray-600">
+                              <div className="text-sm  text-gray-600">
                                 {userDetail?.Pelatihan[indexPelatihanSelected]
                                   .NoSertifikat! == ""
                                   ? "-"
@@ -1063,7 +1063,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                               </div>
                             </div>
                             <div className="flex flex-col-reverse">
-                              <div className="text-sm font-bold text-gray-600">
+                              <div className="text-sm  text-gray-600">
                                 {userDetail?.Pelatihan[indexPelatihanSelected]
                                   .NoRegistrasi! == ""
                                   ? "-"
@@ -1098,7 +1098,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                         indexPelatihanSelected
                                       ]?.DetailPelatihan!,
                                 }}
-                                className="text-sm prose   text-justify group-hover:text-xs text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong:font-bold group-hover:duration-1000"
+                                className="text-sm prose   text-justify group-hover:text-xs text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong: group-hover:duration-1000"
                               />{" "}
                               <p
                                 onClick={(e) => setSeeMore(!seeMore)}
@@ -1145,7 +1145,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                     }`}
                                   className="flex shadow-custom w-full rounded-md p-5 cursor-pointer flex-col gap-1 hover:scale-105 duration-700 hover:bg-blue-500 hover:text-white group"
                                 >
-                                  <h3 className="font-bold font-calsans leading-[105%]">
+                                  <h3 className=" font-calsans leading-[105%]">
                                     Materi {pelatihan}. <br />
                                     Kebijakan Pelatihan Sosial Kultural II
                                   </h3>
@@ -1159,7 +1159,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                         "..."
                                       ),
                                     }}
-                                    className="text-sm prose group-hover:text-white  text-justify  text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong:font-bold group-hover:duration-1000 prose-p:font-normal"
+                                    className="text-sm prose group-hover:text-white  text-justify  text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong: group-hover:duration-1000 prose-p:font-normal"
                                   />
                                 </Link>
                               ))}

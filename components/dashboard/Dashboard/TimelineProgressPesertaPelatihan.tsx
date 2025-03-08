@@ -197,7 +197,7 @@ export const TimelineProgressPesertaPelatihan = ({
         <div className="grid gap-4 sm:grid-cols-12">
           <div className="col-span-12 sm:col-span-3">
             <div className="text-center sm:text-left mb-14 before:block before:w-24 before:h-3 before:mb-2 before:rounded-md before:mx-auto sm:before:mx-0 before:bg-blue-500">
-              <h3 className="text-2xl font-semibold font-calsans leading-none">
+              <h3 className="text-2xl font-calsans leading-none">
                 Progress Pelatihan
               </h3>
               <p className="text-sm font-normal leading-[115%] text-gray-400">
@@ -208,24 +208,22 @@ export const TimelineProgressPesertaPelatihan = ({
           <div className="relative col-span-12 px-4 space-y-6 sm:col-span-9">
             <div className="col-span-12 space-y-12 relative px-4 sm:col-span-8 sm:space-y-8 sm:before:absolute sm:before:top-2 sm:before:bottom-0 sm:before:w-0.5 sm:before:-left-3 before:bg-gray-300">
               <div
-                className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${
-                  userDetail!.Keterangan == "Valid"
+                className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${userDetail!.Keterangan == "Valid"
                     ? "before:bg-green-400"
                     : userDetail!.Keterangan == "Tidak Valid"
-                    ? "before:bg-rose-500"
-                    : "before:bg-gray-700"
-                } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer`}
+                      ? "before:bg-rose-500"
+                      : "before:bg-gray-700"
+                  } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer`}
               >
                 <h3 className="text-lg font-semibold">Validasi Peserta </h3>
 
                 <time
-                  className={`text-sm font-medium text-gray-600 ${
-                    userDetail?.Keterangan! == "Tidak Valid"
+                  className={`text-sm font-medium text-gray-600 ${userDetail?.Keterangan! == "Tidak Valid"
                       ? "text-rose-500"
                       : userDetail?.Keterangan! == "Valid"
-                      ? "text-green-500"
-                      : "text-gray-700"
-                  }`}
+                        ? "text-green-500"
+                        : "text-gray-700"
+                    }`}
                 >
                   {userDetail?.Keterangan! == "Tidak Valid" ? (
                     <span className="flex items-start gap-1">
@@ -302,27 +300,25 @@ export const TimelineProgressPesertaPelatihan = ({
                   <></>
                 ) : (
                   <div
-                    className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${
-                      userDetail.PreTest < 65 && userDetail.PreTest > 0
+                    className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${userDetail.PreTest < 65 && userDetail.PreTest > 0
                         ? "before:bg-rose-500"
                         : userDetail.PreTest > 65
-                        ? "before:bg-green-400"
-                        : "before:bg-gray-700"
-                    } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer`}
+                          ? "before:bg-green-400"
+                          : "before:bg-gray-700"
+                      } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer`}
                   >
                     <h3 className="text-lg font-semibold">
                       Pelaksanaan Pre-Test
                     </h3>
                     <time
-                      className={`text-sm font-medium text-gray-600 ${
-                        userDetail?.PreTest! == 0 &&
-                        userDetail?.PostTest == 0 &&
-                        pelatihan!.StatusApproval != "Selesai"
+                      className={`text-sm font-medium text-gray-600 ${userDetail?.PreTest! == 0 &&
+                          userDetail?.PostTest == 0 &&
+                          pelatihan!.StatusApproval != "Selesai"
                           ? "text-gray-700"
                           : userDetail?.PreTest >= 65
-                          ? "text-green-500"
-                          : "text-rose-500"
-                      }`}
+                            ? "text-green-500"
+                            : "text-rose-500"
+                        }`}
                     >
                       {userDetail?.PreTest! == 0 ? (
                         <span className="flex items-start gap-1">
@@ -543,11 +539,10 @@ export const TimelineProgressPesertaPelatihan = ({
                 )}
 
                 <div
-                  className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${
-                    pelatihan!.StatusApproval == "Selesai"
+                  className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${pelatihan!.StatusApproval == "Selesai"
                       ? "before:bg-green-400"
                       : "before:bg-gray-700"
-                  } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer `}
+                    } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer `}
                 >
                   <h3 className="text-lg font-semibold">
                     Pelaksanaan Pelatihan {pelatihan!.NamaPelatihan}
@@ -588,27 +583,25 @@ export const TimelineProgressPesertaPelatihan = ({
                   <></>
                 ) : (
                   <div
-                    className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1]  ${
-                      pelatihan!.StatusApproval != "Selesai" &&
-                      userDetail?.PostTest == 0
+                    className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1]  ${pelatihan!.StatusApproval != "Selesai" &&
+                        userDetail?.PostTest == 0
                         ? "before:bg-gray-700"
                         : userDetail?.PostTest >= 65
-                        ? "before:bg-green-500"
-                        : "before:bg-rose-500"
-                    } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer `}
+                          ? "before:bg-green-500"
+                          : "before:bg-rose-500"
+                      } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer `}
                   >
                     <h3 className="text-lg font-semibold">
                       Pelaksanaan Post-Test
                     </h3>
                     <time
-                      className={`text-sm font-medium text-gray-600  ${
-                        pelatihan!.StatusApproval != "Selesai" &&
-                        userDetail?.PostTest == 0
+                      className={`text-sm font-medium text-gray-600  ${pelatihan!.StatusApproval != "Selesai" &&
+                          userDetail?.PostTest == 0
                           ? "text-gray-700"
                           : userDetail?.PostTest >= 65
-                          ? "text-green-500"
-                          : "text-rose-500"
-                      }`}
+                            ? "text-green-500"
+                            : "text-rose-500"
+                        }`}
                     >
                       {userDetail?.PostTest == 0 ? (
                         <span className="flex items-start gap-1">
@@ -642,7 +635,7 @@ export const TimelineProgressPesertaPelatihan = ({
                             link berikut{" "}
                           </p>
                           {userDetail!.Keterangan == "Valid" &&
-                          userDetail!.PreTest > 0 ? (
+                            userDetail!.PreTest > 0 ? (
                             <AlertDialog>
                               <AlertDialogTrigger>
                                 <div
@@ -677,23 +670,23 @@ export const TimelineProgressPesertaPelatihan = ({
                                           {" "}
                                           {pelatihan.StatusApproval ==
                                             "Selesai" && (
-                                            <AlertDialogDescription className="w-full text-center font-normal text-sm mt-2 border-b border-b-gray-300 pb-3">
-                                              Sebagai bagian dari pelaksanaan
-                                              pelatihan agar dapat mengetahui
-                                              kemampuan peserta diawal harap
-                                              untuk mengikuti{" "}
-                                              <span className="italic">
-                                                post-test
-                                              </span>{" "}
-                                              dan{" "}
-                                              {isOpenGuideline
-                                                ? "membaca petunjuk pengerjaan"
-                                                : "memasukkan kode akses"}{" "}
-                                              terlebih dahulu
-                                            </AlertDialogDescription>
-                                          )}
+                                              <AlertDialogDescription className="w-full text-center font-normal text-sm mt-2 border-b border-b-gray-300 pb-3">
+                                                Sebagai bagian dari pelaksanaan
+                                                pelatihan agar dapat mengetahui
+                                                kemampuan peserta diawal harap
+                                                untuk mengikuti{" "}
+                                                <span className="italic">
+                                                  post-test
+                                                </span>{" "}
+                                                dan{" "}
+                                                {isOpenGuideline
+                                                  ? "membaca petunjuk pengerjaan"
+                                                  : "memasukkan kode akses"}{" "}
+                                                terlebih dahulu
+                                              </AlertDialogDescription>
+                                            )}
                                           {pelatihan.StatusApproval !=
-                                          "Selesai" ? (
+                                            "Selesai" ? (
                                             <div className="mt-2">
                                               <p className="font-normal text-neutral-500 text-sm text-center ">
                                                 Pelaksanaan post-test
@@ -769,7 +762,7 @@ export const TimelineProgressPesertaPelatihan = ({
                                           className="py-5"
                                           disabled={
                                             pelatihan!.StatusApproval !=
-                                            "Selesai"
+                                              "Selesai"
                                               ? true
                                               : false
                                           }
@@ -871,22 +864,22 @@ export const TimelineProgressPesertaPelatihan = ({
                                           {" "}
                                           {pelatihan.StatusApproval ==
                                             "Selesai" && (
-                                            <AlertDialogDescription className="w-full text-center font-normal text-sm mt-2 border-b border-b-gray-300 pb-3">
-                                              Sebagai bagian dari pelaksanaan
-                                              pelatihan agar dapat memperbaiki
-                                              nilai remedial silahkan lakukan{" "}
-                                              <span className="italic">
-                                                remedial
-                                              </span>{" "}
-                                              dan{" "}
-                                              {isOpenGuideline
-                                                ? "membaca petunjuk pengerjaan"
-                                                : "memasukkan kode akses"}{" "}
-                                              terlebih dahulu
-                                            </AlertDialogDescription>
-                                          )}
+                                              <AlertDialogDescription className="w-full text-center font-normal text-sm mt-2 border-b border-b-gray-300 pb-3">
+                                                Sebagai bagian dari pelaksanaan
+                                                pelatihan agar dapat memperbaiki
+                                                nilai remedial silahkan lakukan{" "}
+                                                <span className="italic">
+                                                  remedial
+                                                </span>{" "}
+                                                dan{" "}
+                                                {isOpenGuideline
+                                                  ? "membaca petunjuk pengerjaan"
+                                                  : "memasukkan kode akses"}{" "}
+                                                terlebih dahulu
+                                              </AlertDialogDescription>
+                                            )}
                                           {pelatihan.StatusApproval !=
-                                          "Selesai" ? (
+                                            "Selesai" ? (
                                             <div className="mt-2">
                                               <p className="font-normal text-neutral-500 text-sm text-center ">
                                                 Pelaksanaan remedial dilaksanaan
@@ -961,7 +954,7 @@ export const TimelineProgressPesertaPelatihan = ({
                                           className="py-5"
                                           disabled={
                                             pelatihan!.StatusApproval !=
-                                            "Selesai"
+                                              "Selesai"
                                               ? true
                                               : false
                                           }
@@ -1003,15 +996,14 @@ export const TimelineProgressPesertaPelatihan = ({
                 )}
 
                 <div
-                  className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${
-                    pelatihan!.StatusApproval == "Selesai" &&
-                    userDetail.PostTest != 0 &&
-                    userDetail.PreTest != 0
+                  className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${pelatihan!.StatusApproval == "Selesai" &&
+                      userDetail.PostTest != 0 &&
+                      userDetail.PreTest != 0
                       ? "before:bg-gray-700"
                       : pelatihan?.StatusPenerbitan == "Done"
-                      ? "before:bg-green-500"
-                      : "before:bg-gray-700"
-                  } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer `}
+                        ? "before:bg-green-500"
+                        : "before:bg-gray-700"
+                    } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer `}
                 >
                   <h3 className="text-lg font-semibold">
                     Sertifikat Pelatihan {pelatihan!.NamaPelatihan}
@@ -1021,12 +1013,12 @@ export const TimelineProgressPesertaPelatihan = ({
                   </time>
                   <span className="text-xs">
                     {pelatihan!.StatusApproval != "Selesai" ||
-                    (userDetail.PostTest == 0 && userDetail.PreTest == 0)
+                      (userDetail.PostTest == 0 && userDetail.PreTest == 0)
                       ? "Harap mengikuti rangkaian pelaksanaan pelatihan untuk mendapatkan sertifikat."
                       : userDetail?.PostTest >= 65 &&
                         userDetail?.FileSertifikat != ""
-                      ? "Selamat, anda telah mengikuti dan menyelesaikan rangkaian pelatihan. Berikut sertifikat yang dapat kamu akses"
-                      : "Oops. Sertifikat kamu masih dalam proses penerbitan, harap ditunggu ya paling lambat 3x24 jam. Pantau terus dashboard-mu ya sobat E-LAUT!"}
+                        ? "Selamat, anda telah mengikuti dan menyelesaikan rangkaian pelatihan. Berikut sertifikat yang dapat kamu akses"
+                        : "Oops. Sertifikat kamu masih dalam proses penerbitan, harap ditunggu ya paling lambat 3x24 jam. Pantau terus dashboard-mu ya sobat E-LAUT!"}
                   </span>
                   {userDetail!.NoSertifikat != "" && (
                     <Button
@@ -1035,9 +1027,8 @@ export const TimelineProgressPesertaPelatihan = ({
                       className="w-full border mt-3 flex gap-2 border-blue-600 text-left capitalize items-center justify-center"
                     >
                       <Link
-                        href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${
-                          userDetail!.FileSertifikat
-                        }`}
+                        href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${userDetail!.FileSertifikat
+                          }`}
                         target="_blank"
                         className="flex w-full items-center justify-center"
                       >
