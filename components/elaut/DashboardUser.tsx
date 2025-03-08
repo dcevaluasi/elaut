@@ -123,12 +123,13 @@ export default function DashboardUser() {
                                                 *Ini merupakan laman dashboard pengguna E-LAUT, telusuri pelatihan yang kamu ikuti dan nikmati layanan tersedi lainnya!
                                             </p>
 
-                                            {isManningAgent == "true" ? (
-                                                <ManningAgentService manningAgent={manningAgentDetail} />
-                                            ) : (
-                                                <UserService user={userDetail} />
-                                            )}
+
                                         </div>
+                                        {isManningAgent == "true" ? (
+                                            <ManningAgentService manningAgent={manningAgentDetail} />
+                                        ) : (
+                                            <UserService user={userDetail} />
+                                        )}
                                     </div>
                                 </section>
                             </div>

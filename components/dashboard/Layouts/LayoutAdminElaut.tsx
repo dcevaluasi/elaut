@@ -54,6 +54,7 @@ export default function LayoutAdminElaut({
       Cookies.set("IDLemdik", response.data.data.IdLemdik);
       Cookies.set("SATKER_BPPP", response.data.data.NamaLemdik);
       Cookies.set("Eselon", response.data.data.Deskripsi);
+      Cookies.set("Status", response.data.data.Deskripsi);
     } catch (error) {
       console.error("LEMDIK INFO: ", error);
     }

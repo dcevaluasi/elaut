@@ -304,7 +304,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                       pelatihan?.IdPelatihan
                                     );
                                   }}
-                                  className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:p-8 shadow-custom hover:scale-105 duration-700 cursor-pointer"
+                                  className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:p-8 shadow-custom hover:scale-105 duration-700 cursor-pointer bg-white"
                                 >
                                   <span className="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-blue-500 via-blue-500 to-teal-400"></span>
 
@@ -394,7 +394,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                         pelatihan?.IdPelatihan
                                       );
                                     }}
-                                    className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:p-8 shadow-custom hover:scale-105 duration-700 cursor-pointer"
+                                    className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:p-8 shadow-custom hover:scale-105 duration-700 cursor-pointer bg-white"
                                   >
                                     <span className="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-blue-500 via-blue-500 to-teal-400"></span>
 
@@ -407,13 +407,13 @@ function UserTrainingService({ user }: { user: User | null }) {
                                           src={icons(
                                             pelatihan?.BidangPelatihan
                                           )}
-                                          className="w-14 rounded-lg object-cover shadow-sm"
+                                          className="w-10 rounded-lg object-cover shadow-sm"
                                         />
                                       </div>
                                       <div className="flex flex-col gap-1">
                                         <div className="sm:flex sm:justify-between sm:gap-4">
                                           <div>
-                                            <h3 className="text-lg hover:cursor-pointer  text-gray-900 sm:text-xl leading-[100%]">
+                                            <h3 className="text-lg hover:cursor-pointer   font-calsans text-gray-900 sm:text-xl leading-[100%]">
                                               {pelatihan?.NamaPelatihan}
                                             </h3>
                                           </div>
@@ -421,18 +421,11 @@ function UserTrainingService({ user }: { user: User | null }) {
 
                                         <div className="mt-1 mb-2">
                                           <div
-                                            dangerouslySetInnerHTML={{
-                                              __html: truncateText(
-                                                pelatihan?.DetailPelatihan,
-                                                150,
-                                                "..."
-                                              ),
-                                            }}
                                             className="text-sm font-normal group-hover:text-xs text-gray-500 group-hover:duration-1000 leading-[140%]"
-                                          />
+                                          >Pelatihan yang diselenggarakan oleh {pelatihan?.PenyelenggaraPelatihan} dan merupakan program pelatihan {pelatihan?.JenisProgram}</div>
                                         </div>
 
-                                        <dl className="mt2 flex gap-4 sm:gap-6">
+                                        <dl className="mt2 flex flex-col ">
                                           <div className="flex flex-col-reverse">
                                             <dt className="text-sm font-medium text-gray-600">
                                               {pelatihan?.BidangPelatihan!}
@@ -442,16 +435,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                             </dd>
                                           </div>
 
-                                          <div className="flex flex-col-reverse">
-                                            <dt className="text-sm font-medium text-gray-600">
-                                              {pelatihan?.NoRegistrasi == ""
-                                                ? "-"
-                                                : pelatihan?.NoRegistrasi!}
-                                            </dt>
-                                            <dd className="text-xs text-gray-500">
-                                              No Registrasi
-                                            </dd>
-                                          </div>
+
                                         </dl>
                                       </div>
                                     </div>
@@ -470,7 +454,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                       className={`hidden md:flex items-start justify-center ${isExpand ? "w-12/12" : "w-7/12 flex"
                         }`}
                     >
-                      <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:px-6 lg:py-0">
+                      <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:px-6 lg:py-0 bg-white py-9">
                         <div className="sm:flex justify-between sm:gap-4 items-center border-b-2 border-b-gray-200 pb-4">
                           <div className="">
                             <h3 className="text-3xl  text-gray-900 font-calsans sm:text-3xl leading-[105%]">
@@ -668,7 +652,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                     <div
                       className={` items-start justify-center w-full max-w-7xl mx-auto`}
                     >
-                      <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:px-6 lg:py-0">
+                      <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:px-6 lg:py-0 bg-white py-9">
                         <div className="sm:flex justify-between sm:gap-4 items-center border-b-2 border-b-gray-200 pb-4">
                           <div className="">
                             <h3 className="text-3xl  text-gray-900 font-calsans sm:text-3xl leading-[105%]">
@@ -981,7 +965,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                     className={`flex md:hidden items-start justify-center ${isExpand ? "w-12/12" : "w-full flex"
                       }`}
                   >
-                    <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:px-6 lg:py-0">
+                    <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:px-6 lg:py-0 bg-white py-9">
                       <div className="sm:flex justify-between sm:gap-4 items-center border-b-2 border-b-gray-200 pb-4">
                         <div className="">
                           <h3 className="text-3xl  text-gray-900 font-calsans sm:text-3xl leading-[105%]">

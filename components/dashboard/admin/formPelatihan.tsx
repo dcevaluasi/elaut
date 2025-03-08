@@ -40,6 +40,10 @@ import { LemdiklatDetailInfo } from "@/types/lemdiklat";
 import { RiVerifiedBadgeLine } from "react-icons/ri";
 import { HashLoader } from "react-spinners";
 import { AKP_CERTIFICATIONS, AQUACULTURE_CERTIFICATIONS, OCEAN_CERTIFICATIONS } from "@/constants/serkom";
+import { doc, getFirestore } from "firebase/firestore";
+import firebaseApp from "@/firebase/config";
+import addData from "@/firebase/firestore/addData";
+import { generateTimestamp } from "@/utils/time";
 
 type Checked = DropdownMenuCheckboxItemProps["checked"];
 
@@ -228,6 +232,28 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
   /*
     method for processing posting data public traning (POST)
   */
+
+  const handleAddHistoryPelatihan = async () => {
+    const db = getFirestore(firebaseApp)
+    try {
+      const { result, error } = await addData('historical-training-notes', kodePelatihan, {
+        historical: [
+          {
+            'created_at': generateTimestamp(),
+            id: kodePelatihan,
+            notes: `Telah membuka kelas pelatihan ${namaPelatihan}`,
+            role: Cookies.get('Eselon'),
+            upt: Cookies.get('SATKER_BPPP')
+          }
+        ],
+        status: 'On Progress'
+      })
+      console.log({ result })
+    } catch (error) {
+      console.log({ error })
+    }
+  }
+
   const handlePostingPublicTrainingData = async (e: any) => {
     e.preventDefault();
     setIsUploading(true);
@@ -263,6 +289,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
     }
     data.append("LokasiPelatihan", lokasiPelatihan);
     data.append("PelaksanaanPelatihan", pelaksanaanPelatihan);
+    data.append("PemberitahuanDiterima", 'Proses Buka Kelas');
     data.append("UjiKompotensi", ujiKompetensi);
     data.append("KoutaPelatihan", kuotaPelatihan);
     data.append("AsalPelatihan", asalPelatihan);
@@ -290,6 +317,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
         title: `Yeayyy!`,
         text: 'Berhasil menambahkan pelatihan baru, silahkan membuka tab Daftar Pelatihan!'
       });
+      handleAddHistoryPelatihan()
       setIsUploading(false);
       resetAllStateToEmptyString();
       router.push("/admin/lemdiklat/pelatihan");
@@ -726,10 +754,10 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                                   type="date"
                                   className="form-input w-full text-black border-gray-300 rounded-md"
                                   required
-                                  // min={
-                                  //   tanggalBerakhirPendaftaran ||
-                                  //   new Date().toISOString().split("T")[0]
-                                  // }
+                                  min={
+                                    tanggalBerakhirPendaftaran ||
+                                    new Date().toISOString().split("T")[0]
+                                  }
                                   value={tanggalMulaiPelatihan}
                                   onChange={(
                                     e: ChangeEvent<HTMLInputElement>
