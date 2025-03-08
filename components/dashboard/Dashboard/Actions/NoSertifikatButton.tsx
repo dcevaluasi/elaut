@@ -16,6 +16,7 @@ import Toast from "@/components/toast";
 import Cookies from "js-cookie";
 import { PelatihanMasyarakat } from "@/types/product";
 import { TbEditCircle } from "react-icons/tb";
+import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
 
 interface NoSertifikatButtonProps {
     idPelatihan: string;
@@ -55,6 +56,8 @@ const NoSertifikatButton: React.FC<NoSertifikatButtonProps> = ({
                 title: "Yeayyy!",
                 text: "Berhasil menginput nomor sertifikat!",
             });
+
+            handleAddHistoryTrainingInExisting(pelatihan!, 'Telah mengupload nomor sertfikat kelas pelatihan')
 
             setIsUploading(false);
             handleFetchingData();

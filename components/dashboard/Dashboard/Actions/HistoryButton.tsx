@@ -24,15 +24,16 @@ import firebaseApp from "@/firebase/config";
 import { generateTimestamp } from "@/utils/time";
 import addData from "@/firebase/firestore/addData";
 import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
+import { MdOutlineHistory } from "react-icons/md";
 
-interface CloseButtonProps {
+interface HistoryButtonProps {
   statusPelatihan: string;
   idPelatihan: string;
   pelatihan: PelatihanMasyarakat;
   handleFetchingData: any;
 }
 
-const CloseButton: React.FC<CloseButtonProps> = ({
+const HistoryButton: React.FC<HistoryButtonProps> = ({
   statusPelatihan,
   idPelatihan,
   pelatihan,
@@ -142,22 +143,19 @@ const CloseButton: React.FC<CloseButtonProps> = ({
         </AlertDialogContent>
       </AlertDialog>
 
-      {(
-        pelatihan.StatusApproval != "Selesai") && (
-          <Button
-            title="Tutup Kelas Pelatihan"
-            onClick={() => {
-              setSelectedStatus(statusPelatihan);
-              setOpenFormTutupPelatihan(!openFormTutupPelatihan);
-            }}
-            variant="outline"
-            className="ml-auto hover:bg-primary bg-primary hover:text-neutral-100 text-neutral-100 duration-700 w-full"
-          >
-            <HiLockClosed className="h-5 w-5" /> Tutup Pelatihan
-          </Button>
-        )}
+      <Button
+        title="History Administrasi Pelatihan"
+        onClick={() => {
+          setSelectedStatus(statusPelatihan);
+          setOpenFormTutupPelatihan(!openFormTutupPelatihan);
+        }}
+        variant="outline"
+        className="ml-auto hover:bg-neutral-500 bg-neutral-500 hover:text-white text-white duration-700 w-full"
+      >
+        <MdOutlineHistory className="h-5 w-5" /> History Pelatihan
+      </Button>
     </>
   );
 };
 
-export default CloseButton;
+export default HistoryButton;

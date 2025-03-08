@@ -23,6 +23,7 @@ import Link from "next/link";
 import { FiUploadCloud } from "react-icons/fi";
 import { PelatihanMasyarakat } from "@/types/product";
 import Image from "next/image";
+import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
 
 interface GenerateNoSertifikatButtonProps {
   idPelatihan: string;
@@ -105,6 +106,8 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
         title: "Yeayyy!",
         text: "Berhasil mengupload file berita acara dan penandatangan, tunggu proses approval dari pusat!",
       });
+
+      handleAddHistoryTrainingInExisting(pelatihan!, 'Dalam proses mengajukan penerbitan sertfikat kelas pelatihan')
 
       setIsUploading(false);
       handleFetchingData();

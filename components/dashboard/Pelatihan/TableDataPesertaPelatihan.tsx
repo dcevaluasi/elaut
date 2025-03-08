@@ -97,6 +97,7 @@ import { BiSolidCalendarAlt } from "react-icons/bi";
 import addData from "@/firebase/firestore/addData";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import firebaseApp from "@/firebase/config";
+import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
 
 const TableDataPesertaPelatihan = () => {
   const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
@@ -147,38 +148,6 @@ const TableDataPesertaPelatihan = () => {
       throw error;
     }
   };
-
-  const handleAddHistoryPelatihan = async () => {
-    const db = getFirestore(firebaseApp)
-    const docRef = doc(db, 'historical-training-notes', dataPelatihan!.KodePelatihan)
-    try {
-      const docSnap = await getDoc(docRef)
-      let existingHistory = []
-
-      if (docSnap.exists()) {
-        const data = docSnap.data()
-        existingHistory = data.historical || [] // Keep existing times if available
-      }
-
-      const newEntryData = {
-        'created_at': generateTimestamp(),
-        id: dataPelatihan!.KodePelatihan,
-        notes: `Telah mengupload data peserta kelas pelatihan ${dataPelatihan!.NamaPelatihan}`,
-        role: Cookies.get('Eselon'),
-        upt: Cookies.get('SATKER_BPPP')
-      }
-
-      existingHistory.push(newEntryData)
-
-      const { result, error } = await addData('historical-training-notes', dataPelatihan!.KodePelatihan, {
-        historical: existingHistory,
-        status: 'On Progress'
-      })
-      console.log({ result })
-    } catch (error) {
-      console.log({ error })
-    }
-  }
 
   console.log({ emptyFileSertifikatCount });
 
@@ -277,7 +246,7 @@ const TableDataPesertaPelatihan = () => {
         title: 'Yeayyy!',
         text: `Berhasil memvalidasi ${data.length} peserta pelatihan!`,
       });
-
+      handleAddHistoryTrainingInExisting(dataPelatihan!, 'Telah memvalidasi data peserta kelas pelatihan')
       setIsIteratingProcess(false)
       handleFetchingPublicTrainingDataById();
       setOpenFormValidasiDataPesertaPelatihan(false);
@@ -640,6 +609,7 @@ const TableDataPesertaPelatihan = () => {
                   <DialogSertifikatPelatihan
                     pelatihan={dataPelatihan!}
                     userPelatihan={data[row.index]}
+                    handleFetchingData={handleFetchingPublicTrainingDataById}
                   >
                     <Button
                       variant="outline"
@@ -916,7 +886,7 @@ const TableDataPesertaPelatihan = () => {
           },
         }
       );
-      handleAddHistoryPelatihan()
+      handleAddHistoryTrainingInExisting(dataPelatihan!, 'Telah mengupload data peserta kelas pelatihan')
       console.log("FILE UPLOADED PESERTA : ", response);
       Toast.fire({
         icon: "success",
@@ -1445,7 +1415,7 @@ const TableDataPesertaPelatihan = () => {
             }
 
             {
-              usePathname().includes('lemdiklat') && data!.length > 0 && countPinnedCertificateNumber != data!.length && <div className="w-full flex justify-end gap-2">
+              usePathname().includes('lemdiklat') && data!.length > 0 && countPinnedCertificateNumber != data!.length && dataPelatihan!.NoSertifikat != '' && <div className="w-full flex justify-end gap-2">
                 <div
                   onClick={(e) => {
                     setOpenFormSematkanNoSertifikat(true)
@@ -1460,7 +1430,7 @@ const TableDataPesertaPelatihan = () => {
             }
 
             {
-              usePathname().includes('lemdiklat') && countPinnedCertificateDate != data!.length && <div className="w-full flex justify-end gap-2">
+              usePathname().includes('lemdiklat') && countPinnedCertificateDate != data!.length && dataPelatihan!.NoSertifikat != '' && countPinnedCertificateNumber == data!.length && <div className="w-full flex justify-end gap-2">
                 <div
                   onClick={(e) => {
                     setOpenFormSematkanTanggalSertifikat(true)
@@ -1475,7 +1445,7 @@ const TableDataPesertaPelatihan = () => {
             }
 
             {
-              usePathname().includes('lemdiklat') && countPinnedCertificateSpesimen != data!.length && <div className="w-full flex justify-end gap-2">
+              usePathname().includes('lemdiklat') && countPinnedCertificateSpesimen != data!.length && dataPelatihan!.NoSertifikat != '' && countPinnedCertificateDate == data!.length && <div className="w-full flex justify-end gap-2">
                 <div
                   onClick={(e) => {
                     setOpenFormSematkanSpesimenSertifikat(true)

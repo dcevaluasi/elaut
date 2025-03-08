@@ -428,11 +428,13 @@ const SertifikatKepelautan = React.forwardRef(
       userPelatihan,
       isPrinting,
       isSpesimen,
+      refPage
     }: {
       pelatihan: PelatihanMasyarakat;
       userPelatihan: UserPelatihan;
       isPrinting?: boolean;
       isSpesimen?: boolean;
+      refPage: any
     },
     ref: any
   ) => {
@@ -460,9 +462,9 @@ const SertifikatKepelautan = React.forwardRef(
       <div className=" flex-col gap-8 font-bos">
         <div
           ref={ref}
-          className="w-full h-full  flex flex-col gap-4 items-center justify-center  px-10 py-14 rounded-md font-bos leading-[120%]"
+          className="w-full h-full  flex flex-col gap-4 items-center justify-center  px-10  rounded-md font-bos leading-[120%]"
         >
-          <div className="w-full flex flex-col  gap-4 relative h-full items-center justify-center">
+          <div ref={refPage} className="w-full flex flex-col  gap-4 relative h-full items-center justify-center py-14">
             <div className="flex flex-row  absolute top-0 right-0">
               <p className="text-sm leading-none not-italic">
                 CERTIFICATE NO:
@@ -470,17 +472,17 @@ const SertifikatKepelautan = React.forwardRef(
               </p>
             </div>
 
-            <div className="w-full flex flex-col gap-4 px-10 -mt-7 ">
+            <div className="w-full flex flex-col h-fit space-y-0 px-10 -mt-7 ">
               <div className="h-28 w-28"></div>
 
-              <div className="flex flex-col gap-0 w-full items-center justify-center -mt-6">
-                <div className="flex flex-col items-center justify-center leading-[.9rem] mb-1">
+              <div className="flex flex-col space-y-0 h-fit  w-full items-center justify-center -mt-6">
+                <div className="flex flex-col items-center h-fit   justify-center leading-[.9rem] space-y-0">
                   <h1 className="text-sm font-bosBold">REPUBLIK INDONESIA</h1>
                   <p className="text-sm font-bosItalic">
                     Republic of Indonesia
                   </p>
                 </div>
-                <div className="flex flex-col items-center justify-center leading-[.9rem] mb-1">
+                <div className="flex flex-col items-center h-fit  justify-center leading-[.9rem] space-y-0">
                   <h1 className="text-sm font-bosBold">
                     KEMENTERIAN KELAUTAN DAN PERIKANAN
                   </h1>
@@ -488,7 +490,7 @@ const SertifikatKepelautan = React.forwardRef(
                     Ministry of Marine Affairs and Fisheries
                   </p>
                 </div>
-                <div className="flex flex-col items-center justify-center leading-[.9rem] mb-1">
+                <div className="flex flex-col items-center h-fit  justify-center leading-[.9rem] space-y-0">
                   <h1 className="text-sm font-bosBold">
                     BADAN PENYULUHAN DAN PENGEMBANGAN SUMBER DAYA MANUSIA
                   </h1>
@@ -497,7 +499,7 @@ const SertifikatKepelautan = React.forwardRef(
                     Resources Development
                   </p>
                 </div>
-                <div className="flex flex-col items-center justify-center leading-[.9rem] mb-1">
+                <div className="flex flex-col items-center h-fit  justify-center leading-[.9rem] space-y-0">
                   <h1 className="text-sm font-bosBold">
                     MENURUT PERATURAN MENTERI KELAUTAN DAN PERIKANAN REPUBLIK
                     INDONESIA NOMOR 33 TAHUN 2021
@@ -509,7 +511,7 @@ const SertifikatKepelautan = React.forwardRef(
                   </p>
                 </div>
 
-                <div className="flex flex-col items-center justify-center text-center leading-[.9rem] mt-1">
+                <div className="flex flex-col items-center h-fit  justify-center text-center leading-[.9rem] space-y-0">
                   <h1 className="text-[12pt] font-bosBold">
                     SERTIFIKAT BASIC SAFETY TRAINING FISHERIES (BST-F) TINGKAT
                     II
@@ -521,17 +523,17 @@ const SertifikatKepelautan = React.forwardRef(
                 </div>
               </div>
 
-              <div className="flex w-full flex-col leading-[115%] items-start text-sm -mt-3 text-left font-bos">
+              <div className="flex w-full flex-col space-y-0 leading-[115%] items-start text-sm -mt-3 text-left font-bos">
                 <p>DENGAN INI MENERANGKAN BAHWA:</p>
                 <p className=" leading-none font-bosItalic text-sm">
                   This is to certify that:
                 </p>
               </div>
 
-              <div className="flex flex-col gap-2 w-full  -mt-2">
+              <div className="flex flex-col gap-2 w-full space-y-0  -mt-2">
                 <table className="w-full h-fit" cellPadding={0} cellSpacing={0}>
                   <tr className="w-full">
-                    <td className="font-bos w-full flex flex-col">
+                    <td className="font-bos w-full flex flex-col space-y-0">
                       <p className="font-bosBold text-sm">NAMA</p>
                       <p className="font-bos text-sm -mt-1">Name</p>
                     </td>
@@ -543,7 +545,7 @@ const SertifikatKepelautan = React.forwardRef(
                     </td>
                   </tr>
                   <tr className="w-full">
-                    <td className="font-bos w-full flex flex-col">
+                    <td className="font-bos w-full flex flex-col space-y-0">
                       <p className="font-bosBold text-sm">
                         TEMPAT DAN TANGGAL LAHIR
                       </p>
@@ -554,14 +556,16 @@ const SertifikatKepelautan = React.forwardRef(
                     <td className=" w-2/3  uppercase text-[12pt]">
                       :{" "}
                       <span className="font-bosBold ml-5">
-                        Jakarta, 04-08-2002
+                        {peserta != null ? capitalizeWords(peserta?.TempatLahir) : "-"}
+                        {", "}{" "}
+                        {peserta?.TanggalLahir}{" "}
                       </span>
                     </td>
                   </tr>
                 </table>
               </div>
 
-              <div className="flex w-full flex-col gap-3 leading-[115%] items-start text-sm -mt-3 text-left font-bos">
+              <div className="flex w-full flex-col leading-[115%] items-start text-sm -mt-3 text-left font-bos space-y-1 h-fit">
                 <p className="text-xs leading-none font-bos">
                   telah menyelesaikan pendidikan dan/atau pelatihan dan/atau
                   bimbingan teknis, dan lulus evaluasi berdasarkan Peraturan
@@ -609,29 +613,13 @@ const SertifikatKepelautan = React.forwardRef(
                   </div>
 
                   <div className="col-span-5 flex items-center text-sm justify-center  p-4 mb-4 -mt-5">
-                    <p className='w-full flex gap-1 items-center'>
-                      Jakarta,{" "}
-                      {
-                        pelatihan?.IsMengajukanPenerbitan != '' ? <>{
-                          generateTanggalPelatihan('')}</> : <input
-                          id="tanggalMulaiPelatihan"
-                          type="date"
-                          className="form-input w-full text-black border-gray-300 rounded-md"
-                          required
-                          min={new Date().toISOString().split("T")[0]}
-                          value={tanggalSertifikat}
-                          onChange={(
-                            e: ChangeEvent<HTMLInputElement>
-                          ) =>
-                            setTanggalSertifikat(e.target.value)
-                          }
-                        />
-                      }
+                    <p className='w-full flex gap-1 justify-center text-center items-center'>
+                      Jakarta,{" "}{userPelatihan?.TanggalSertifikat}
 
                     </p>
                   </div>
 
-                  <div className="col-span-5 flex flex-col items-center justify-center  px-4 text-center -mt-12">
+                  <div className="col-span-5 flex flex-col items-center justify-center  px-4 text-center -mt-12 space-y-0">
                     <p className="font-bosBold text-[12pt] leading-none">
                       a.n. KEPALA BADAN PENYULUHAN DAN
                       <br />
@@ -649,14 +637,14 @@ const SertifikatKepelautan = React.forwardRef(
                     </p>
                   </div>
 
-                  <div className="col-span-5 flex flex-col items-center justify-end  px-4 -mt-5">
-                    {isSpesimen ? (
+                  <div className="col-span-5 flex flex-col space-y-0 items-center justify-end  px-4 -mt-5">
+                    {userPelatihan?.StatusPenandatangan == 'Spesimen' ? (
                       <Image
                         alt=""
                         width={0}
                         height={0}
                         src={"/ttd-elektronik.png"}
-                        className="w-fit h-[80px] relative -z-10"
+                        className="w-[230px] h-[80px] relative -z-10"
                       />
                     ) : (
                       <div className="h-[80px]"></div>
@@ -689,10 +677,12 @@ export function DialogSertifikatPelatihan({
   children,
   userPelatihan,
   pelatihan,
+  handleFetchingData
 }: {
   children: ReactElement;
   userPelatihan: UserPelatihan;
   pelatihan: PelatihanMasyarakat;
+  handleFetchingData?: any
 }) {
   const componentRef = useRef<HTMLDivElement | null>(null);
   const componentRefPage = useRef<HTMLDivElement | null>(null);
@@ -778,6 +768,7 @@ export function DialogSertifikatPelatihan({
               icon: "success",
               title: `Sertifikat sudah diupload ke server!`,
             });
+            handleFetchingData()
             router.refresh();
           } else {
             Toast.fire({
@@ -881,6 +872,7 @@ export function DialogSertifikatPelatihan({
             {pelatihan?.JenisSertifikat == "Kepelautan" ? (
               <SertifikatKepelautan
                 ref={componentRef}
+                refPage={componentRefPage}
                 pelatihan={pelatihan}
                 isSpesimen={isSpesimen}
                 userPelatihan={userPelatihan}

@@ -1,4 +1,6 @@
-export const generateTimestamp = (): string => new Date().toISOString()
+export const generateTimestamp = (): string => {
+  return new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })
+}
 
 export const formatDateRange = (start: string, end: string): string => {
   const parseDate = (dateStr: string) => {

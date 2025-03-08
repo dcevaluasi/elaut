@@ -58,7 +58,7 @@ import { elautBaseUrl } from "@/constants/urls";
 
 import { FaBookOpen } from "react-icons/fa6";
 import axios from "axios";
-import { PelatihanMasyarakat } from "@/types/product";
+import { HistoryTraining, PelatihanMasyarakat } from "@/types/product";
 import { generateFullNameBalai, generateTanggalPelatihan } from "@/utils/text";
 import {
   decryptValue,
@@ -78,6 +78,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import NoSertifikatButton from "./Actions/NoSertifikatButton";
+import HistoryButton from "./Actions/HistoryButton";
+import getDocument from "@/firebase/firestore/getData";
+import { DocumentData } from "firebase/firestore";
 
 function DetailPelatihan() {
   const isAdminBalaiPelatihan: boolean = usePathname().includes('lemdiklat')
@@ -89,6 +92,16 @@ function DetailPelatihan() {
   const [pelatihan, setPelatihan] = React.useState<PelatihanMasyarakat | null>(
     null
   );
+
+  const [dataHistoryTraining, setDataHistoryTraining] = React.useState<DocumentData | null>(null)
+
+  const handleFetchDataHistoryTraining = async () => {
+    const doc = await getDocument('historical-training-notes', pelatihan!.KodePelatihan)
+    setDataHistoryTraining(doc.data)
+  }
+
+  console.log({ dataHistoryTraining })
+
   const handleFetchDetailPelatihan = async () => {
     try {
       const response = await axios.get(
@@ -108,6 +121,7 @@ function DetailPelatihan() {
 
   React.useEffect(() => {
     handleFetchDetailPelatihan();
+    handleFetchDataHistoryTraining()
   }, []);
 
   const typeRole = Cookies.get("XSRF093");
@@ -174,6 +188,31 @@ function DetailPelatihan() {
                         handleFetchingData={
                           handleFetchDetailPelatihan
                         }
+                      />
+                      <NoSertifikatButton
+                        idPelatihan={pelatihan!.IdPelatihan.toString()}
+                        pelatihan={pelatihan!}
+                        handleFetchingData={
+                          handleFetchDetailPelatihan
+                        }
+                      />
+                      <CloseButton
+                        pelatihan={pelatihan!}
+                        statusPelatihan={pelatihan?.Status ?? ""}
+                        idPelatihan={pelatihan!.IdPelatihan.toString()}
+                        handleFetchingData={
+                          handleFetchDetailPelatihan
+                        }
+                      />
+
+
+                      <HistoryButton
+                        pelatihan={pelatihan!}
+                        statusPelatihan={pelatihan?.Status ?? ""}
+                        idPelatihan={pelatihan!.IdPelatihan.toString()}
+                        handleFetchingData={
+                          handleFetchDetailPelatihan
+                        }
                       /></>
 
 
@@ -187,7 +226,7 @@ function DetailPelatihan() {
         </div>
 
       )}
-      <div className="flex w-full gap-0">
+      <div className="grid grid-cols-2 w-full gap-0">
 
         {pelatihan != null && (
           <div className="px-4 w-full">
@@ -214,7 +253,7 @@ function DetailPelatihan() {
                   <td className="font-semibold p-4 w-[20%]">
                     Penyelenggara Pelatihan
                   </td>
-                  <td className="p-4 w-2/3">
+                  <td className="p-4 w-2/3 break-words">
                     {generateFullNameBalai(pelatihan!.PenyelenggaraPelatihan) ||
                       ""}{" "}
                     ({pelatihan!.PenyelenggaraPelatihan || ""})
@@ -294,7 +333,7 @@ function DetailPelatihan() {
                   <td className="p-4 w-2/3">
                     <Link
                       target="_blank"
-                      className="text-blue-500 underline"
+                      className="text-blue-500 underline break-words"
                       href={`${isLemdiklat ? 'https://elaut-bppsdm.kkp.go.id/api-elaut/public/suratPemberitahuan/pelatihan/' + pelatihan!.SuratPemberitahuan || "" : 'https://elaut-bppsdm.kkp.go.id/api-elaut/public/silabus/' + pelatihan!.SilabusPelatihan || ""}`}
                     >
                       {isLemdiklat ? pelatihan!.SuratPemberitahuan || "" : pelatihan!.SilabusPelatihan || ""}

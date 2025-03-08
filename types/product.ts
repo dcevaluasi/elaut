@@ -386,3 +386,16 @@ export type ManningAgentUsers = {
   TempatLahir: string
   UpdateAt: string
 }
+
+export type HistoryTraining = {
+  historical: HistoryItem[]
+  status: string
+}
+
+export type HistoryItem = {
+  id: string
+  role: string
+  notes: string
+  upt: string
+  created_at: string
+}

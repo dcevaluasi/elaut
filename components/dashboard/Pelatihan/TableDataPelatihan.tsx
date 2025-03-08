@@ -72,6 +72,9 @@ import { HashLoader } from "react-spinners";
 import NoSertifikatButton from "../Dashboard/Actions/NoSertifikatButton";
 import { AiOutlineFieldNumber } from "react-icons/ai";
 import { BiPaperPlane } from "react-icons/bi";
+import { countUserWithDrafCertificate } from "@/utils/counter";
+import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
+import HistoryButton from "../Dashboard/Actions/HistoryButton";
 
 const TableDataPelatihan: React.FC = () => {
   const [data, setData] = React.useState<PelatihanMasyarakat[]>([]);
@@ -79,6 +82,9 @@ const TableDataPelatihan: React.FC = () => {
   const typeRole = Cookies.get("XSRF093");
 
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
+
+  const [countCertificateDone, setCountCertificateDone] = React.useState<number>(0)
+
 
   // COUNTER
   const [countOnProgress, setCountOnProgress] = React.useState<number>(0);
@@ -113,6 +119,7 @@ const TableDataPelatihan: React.FC = () => {
       const verifyingCount = response?.data!.data!.filter(
         (item: any) => item.StatusPenerbitan == "Verifikasi Pelaksanaan"
       ).length;
+
 
       // Update state with counts
       setCountOnProgress(onProgressCount);
@@ -235,7 +242,7 @@ const TableDataPelatihan: React.FC = () => {
   const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
 
   // Handling Send to SPV from Operator Pusat
-  const handleSendToSPVAboutCertificateIssueance = async (idPelatihan: string) => {
+  const handleSendToSPVAboutCertificateIssueance = async (idPelatihan: string, pelatihan: PelatihanMasyarakat) => {
     const updateData = new FormData()
     updateData.append('PenerbitanSertifikatDiterima', 'Pengajuan Telah Dikirim Dari Operator Pusat')
     updateData.append('PemberitahuanDiterima', 'Pengajuan Telah Dikirim ke SPV')
@@ -257,7 +264,7 @@ const TableDataPelatihan: React.FC = () => {
         title: "Yeayyy!",
         text: "Berhasil mengirimkan informasi pengajuan kepada SPV Pusat!",
       });
-
+      handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyelesaikan drafting sttpl/sertifikat peserta dan mengirimkan ke SPV untuk pelatihan')
 
       handleFetchingPublicTrainingData();
     } catch (error) {
@@ -610,7 +617,7 @@ const TableDataPelatihan: React.FC = () => {
 
                             {
                               (!isOperatorBalaiPelatihan && pelatihan!.PemberitahuanDiterima == 'Kirim ke SPV') && <Button
-                                onClick={() => handleSendToSPVAboutCertificateIssueance(pelatihan!.IdPelatihan.toString())}
+                                onClick={() => { countUserWithDrafCertificate(pelatihan!.UserPelatihan) == pelatihan.UserPelatihan.length ? handleSendToSPVAboutCertificateIssueance(pelatihan!.IdPelatihan.toString(), pelatihan) : alert('Oopsss, penyiapan draft sttpl/sertifikat peserta pelatihan belum selesai!') }}
                                 variant="outline"
                                 className="bg-indigo-600 text-neutral-100 hover:text-neutral-100 hover:bg-indigo-600"
                               >
@@ -619,24 +626,10 @@ const TableDataPelatihan: React.FC = () => {
                               </Button>
                             }
 
-                            <CloseButton
-                              pelatihan={pelatihan!}
-                              statusPelatihan={pelatihan?.Status ?? ""}
-                              idPelatihan={pelatihan!.IdPelatihan.toString()}
-                              handleFetchingData={
-                                handleFetchingPublicTrainingData
-                              }
-                            />
 
 
                             {/* Button untuk input nomor sertifikat, akan aktif jika balai pelatihan sudah mengupload BA dan memilih penandatanganan */}
-                            <NoSertifikatButton
-                              idPelatihan={pelatihan!.IdPelatihan.toString()}
-                              pelatihan={pelatihan!}
-                              handleFetchingData={
-                                handleFetchingPublicTrainingData
-                              }
-                            />
+
 
                             {/* {
                               !isOperatorBalaiPelatihan && <><Link
