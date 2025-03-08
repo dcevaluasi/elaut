@@ -189,7 +189,7 @@ function UserTrainingService({ user }: { user: User | null }) {
 
   return (
     <>
-      <section className="relative h-fit pb-20 bg-white" id="explore">
+      <section className="relative h-fit pb-20" id="explore">
         <div
           className="absolute inset-0 pointer-events-none mb-16 pb-10 h-full"
           aria-hidden="true"
@@ -235,18 +235,16 @@ function UserTrainingService({ user }: { user: User | null }) {
                 )}
 
                 <div
-                  className={`w-full ${
-                    isExpand ? "w-full" : "max-w-7xl"
-                  } mx-auto flex gap-5 mt-8`}
+                  className={`w-full ${isExpand ? "w-full" : "max-w-7xl"
+                    } mx-auto flex gap-5 mt-8`}
                 >
                   <div
-                    className={`gap-2  ${
-                      indexPelatihanSelected != 100000000
-                        ? isExpand
-                          ? "hidden"
-                          : "w-full md:w-5/12 flex flex-col "
-                        : "w-full flex flex-col "
-                    }`}
+                    className={`gap-2  ${indexPelatihanSelected != 100000000
+                      ? isExpand
+                        ? "hidden"
+                        : "w-full md:w-5/12 flex flex-col "
+                      : "w-full flex flex-col "
+                      }`}
                   >
                     <div className="relative w-full flex items-center border-gray-300 border px-2 rounded-xl">
                       <Button
@@ -469,9 +467,8 @@ function UserTrainingService({ user }: { user: User | null }) {
 
                   {indexPelatihanSelected != 100000000 && !isExpand && (
                     <div
-                      className={`hidden md:flex items-start justify-center ${
-                        isExpand ? "w-12/12" : "w-7/12 flex"
-                      }`}
+                      className={`hidden md:flex items-start justify-center ${isExpand ? "w-12/12" : "w-7/12 flex"
+                        }`}
                     >
                       <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:px-6 lg:py-0">
                         <div className="sm:flex justify-between sm:gap-4 items-center border-b-2 border-b-gray-200 pb-4">
@@ -492,14 +489,14 @@ function UserTrainingService({ user }: { user: User | null }) {
                                 ·{" "}
                                 {selectedPelatihan != null
                                   ? generateTanggalPelatihan(
-                                      selectedPelatihan?.TanggalMulaiPelatihan
-                                    )
+                                    selectedPelatihan?.TanggalMulaiPelatihan
+                                  )
                                   : "-"}{" "}
                                 s.d.{" "}
                                 {selectedPelatihan != null
                                   ? generateTanggalPelatihan(
-                                      selectedPelatihan?.TanggalBerakhirPelatihan
-                                    )
+                                    selectedPelatihan?.TanggalBerakhirPelatihan
+                                  )
                                   : "-"}
                               </p>
                               <div
@@ -531,82 +528,82 @@ function UserTrainingService({ user }: { user: User | null }) {
 
                         {userDetail?.Pelatihan[indexPelatihanSelected]
                           ?.Keterangan! == "Valid" && (
-                          <div className="mt-6 flex gap-4 sm:gap-6">
-                            <div className="flex flex-col-reverse">
-                              <div className="text-sm font-medium text-gray-600">
-                                {
-                                  userDetail?.Pelatihan[indexPelatihanSelected]
-                                    ?.BidangPelatihan!
-                                }
+                            <div className="mt-6 flex gap-4 sm:gap-6">
+                              <div className="flex flex-col-reverse">
+                                <div className="text-sm font-medium text-gray-600">
+                                  {
+                                    userDetail?.Pelatihan[indexPelatihanSelected]
+                                      ?.BidangPelatihan!
+                                  }
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  Bidang
+                                </div>
                               </div>
-                              <div className="text-xs text-gray-500">
-                                Bidang
-                              </div>
-                            </div>
 
-                            <div className="flex flex-col-reverse">
-                              <div className="text-sm font-bold text-gray-600">
-                                {userDetail?.Pelatihan[indexPelatihanSelected]
-                                  .NoSertifikat! == ""
-                                  ? "-"
-                                  : userDetail?.Pelatihan[
+                              <div className="flex flex-col-reverse">
+                                <div className="text-sm font-bold text-gray-600">
+                                  {userDetail?.Pelatihan[indexPelatihanSelected]
+                                    .NoSertifikat! == ""
+                                    ? "-"
+                                    : userDetail?.Pelatihan[
                                       indexPelatihanSelected
                                     ]?.NoSertifikat!}
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  No Sertifikat
+                                </div>
                               </div>
-                              <div className="text-xs text-gray-500">
-                                No Sertifikat
-                              </div>
-                            </div>
-                            <div className="flex flex-col-reverse">
-                              <div className="text-sm font-bold text-gray-600">
-                                {userDetail?.Pelatihan[indexPelatihanSelected]
-                                  .NoRegistrasi! == ""
-                                  ? "-"
-                                  : userDetail?.Pelatihan[
+                              <div className="flex flex-col-reverse">
+                                <div className="text-sm font-bold text-gray-600">
+                                  {userDetail?.Pelatihan[indexPelatihanSelected]
+                                    .NoRegistrasi! == ""
+                                    ? "-"
+                                    : userDetail?.Pelatihan[
                                       indexPelatihanSelected
                                     ]?.NoRegistrasi!}
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                No Registrasi
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  No Registrasi
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
                         {userDetail?.Pelatihan[indexPelatihanSelected]
                           ?.Keterangan! == "Valid" && (
-                          <div className="mt-4">
-                            <div className="flex gap-1 flex-col">
-                              <p
-                                dangerouslySetInnerHTML={{
-                                  __html:
-                                    userDetail?.Pelatihan[
-                                      indexPelatihanSelected
-                                    ]! && !seeMore
-                                      ? truncateText(
+                            <div className="mt-4">
+                              <div className="flex gap-1 flex-col">
+                                <p
+                                  dangerouslySetInnerHTML={{
+                                    __html:
+                                      userDetail?.Pelatihan[
+                                        indexPelatihanSelected
+                                      ]! && !seeMore
+                                        ? truncateText(
                                           userDetail?.Pelatihan[
                                             indexPelatihanSelected
                                           ]?.DetailPelatihan!,
                                           300,
                                           "..."
                                         )
-                                      : userDetail?.Pelatihan[
+                                        : userDetail?.Pelatihan[
                                           indexPelatihanSelected
                                         ]?.DetailPelatihan!,
-                                }}
-                                className="text-sm prose   text-justify group-hover:text-xs text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong:font-bold group-hover:duration-1000"
-                              />{" "}
-                              <p
-                                onClick={(e) => setSeeMore(!seeMore)}
-                                className="text-blue-500 text-sm cursor-pointer"
-                              >
-                                {seeMore
-                                  ? "Baca lebih sedikit"
-                                  : "Baca lebih lengkap"}
-                              </p>
+                                  }}
+                                  className="text-sm prose   text-justify group-hover:text-xs text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong:font-bold group-hover:duration-1000"
+                                />{" "}
+                                <p
+                                  onClick={(e) => setSeeMore(!seeMore)}
+                                  className="text-blue-500 text-sm cursor-pointer"
+                                >
+                                  {seeMore
+                                    ? "Baca lebih sedikit"
+                                    : "Baca lebih lengkap"}
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
                         {selectedPelatihan != null &&
                           (selectedPelatihan!.UjiKompotensi == "Portfolio" ? (
@@ -635,11 +632,10 @@ function UserTrainingService({ user }: { user: User | null }) {
                               <div className="grid grid-cols-2 w-full gap-2 mt-2">
                                 {[1, 2, 3, 4, 5, 6].map((pelatihan, index) => (
                                   <Link
-                                    href={`/dashboard/pelatihan/online/${
-                                      userDetail?.Pelatihan[
-                                        indexPelatihanSelected
-                                      ]!.IdPelatihan
-                                    }`}
+                                    href={`/dashboard/pelatihan/online/${userDetail?.Pelatihan[
+                                      indexPelatihanSelected
+                                    ]!.IdPelatihan
+                                      }`}
                                     className="flex shadow-custom w-full rounded-md p-5 cursor-pointer flex-col gap-1 hover:scale-105 duration-700 hover:bg-blue-500 hover:text-white group"
                                   >
                                     <h3 className="font-bold font-calsans leading-[105%]">
@@ -691,14 +687,14 @@ function UserTrainingService({ user }: { user: User | null }) {
                                 ·{" "}
                                 {selectedPelatihan != null
                                   ? generateTanggalPelatihan(
-                                      selectedPelatihan?.TanggalMulaiPelatihan
-                                    )
+                                    selectedPelatihan?.TanggalMulaiPelatihan
+                                  )
                                   : "-"}{" "}
                                 s.d.{" "}
                                 {selectedPelatihan != null
                                   ? generateTanggalPelatihan(
-                                      selectedPelatihan?.TanggalBerakhirPelatihan
-                                    )
+                                    selectedPelatihan?.TanggalBerakhirPelatihan
+                                  )
                                   : "-"}
                               </p>
                               <div
@@ -730,68 +726,68 @@ function UserTrainingService({ user }: { user: User | null }) {
 
                         {userDetail?.Pelatihan[indexPelatihanSelected]
                           ?.Keterangan! == "Valid" && (
-                          <div className="mt-6 flex gap-4 sm:gap-6">
-                            <div className="flex flex-col-reverse">
-                              <div className="text-sm font-medium text-gray-600">
-                                {
-                                  userDetail?.Pelatihan[indexPelatihanSelected]
-                                    ?.BidangPelatihan!
-                                }
+                            <div className="mt-6 flex gap-4 sm:gap-6">
+                              <div className="flex flex-col-reverse">
+                                <div className="text-sm font-medium text-gray-600">
+                                  {
+                                    userDetail?.Pelatihan[indexPelatihanSelected]
+                                      ?.BidangPelatihan!
+                                  }
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  Bidang
+                                </div>
                               </div>
-                              <div className="text-xs text-gray-500">
-                                Bidang
-                              </div>
-                            </div>
 
-                            <div className="flex flex-col-reverse">
-                              <div className="text-sm font-bold text-gray-600">
-                                {userDetail?.Pelatihan[indexPelatihanSelected]
-                                  .NoSertifikat! == ""
-                                  ? "-"
-                                  : userDetail?.Pelatihan[
+                              <div className="flex flex-col-reverse">
+                                <div className="text-sm font-bold text-gray-600">
+                                  {userDetail?.Pelatihan[indexPelatihanSelected]
+                                    .NoSertifikat! == ""
+                                    ? "-"
+                                    : userDetail?.Pelatihan[
                                       indexPelatihanSelected
                                     ]?.NoSertifikat!}
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  No Sertifikat
+                                </div>
                               </div>
-                              <div className="text-xs text-gray-500">
-                                No Sertifikat
-                              </div>
-                            </div>
-                            <div className="flex flex-col-reverse">
-                              <div className="text-sm font-bold text-gray-600">
-                                {userDetail?.Pelatihan[indexPelatihanSelected]
-                                  .NoRegistrasi! == ""
-                                  ? "-"
-                                  : userDetail?.Pelatihan[
+                              <div className="flex flex-col-reverse">
+                                <div className="text-sm font-bold text-gray-600">
+                                  {userDetail?.Pelatihan[indexPelatihanSelected]
+                                    .NoRegistrasi! == ""
+                                    ? "-"
+                                    : userDetail?.Pelatihan[
                                       indexPelatihanSelected
                                     ]?.NoRegistrasi!}
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                No Registrasi
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  No Registrasi
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
                         <div className="flex gap-6 w-full">
                           {userDetail?.Pelatihan[indexPelatihanSelected]
                             ?.Keterangan! == "Valid" && (
-                            <div className="mt-4 w-full">
-                              <div className="flex gap-1 flex-col">
-                                <p
-                                  dangerouslySetInnerHTML={{
-                                    __html:
-                                      userDetail?.Pelatihan[
+                              <div className="mt-4 w-full">
+                                <div className="flex gap-1 flex-col">
+                                  <p
+                                    dangerouslySetInnerHTML={{
+                                      __html:
+                                        userDetail?.Pelatihan[
                                         indexPelatihanSelected
-                                      ]! &&
-                                      userDetail?.Pelatihan[
-                                        indexPelatihanSelected
-                                      ]?.DetailPelatihan!,
-                                  }}
-                                  className="text-sm prose   text-justify group-hover:text-xs text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong:font-bold group-hover:duration-1000"
-                                />{" "}
+                                        ]! &&
+                                        userDetail?.Pelatihan[
+                                          indexPelatihanSelected
+                                        ]?.DetailPelatihan!,
+                                    }}
+                                    className="text-sm prose   text-justify group-hover:text-xs text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong:font-bold group-hover:duration-1000"
+                                  />{" "}
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            )}
 
                           <div className="-mt-6 w-[90%]">
                             {selectedPelatihan != null && (
@@ -815,11 +811,10 @@ function UserTrainingService({ user }: { user: User | null }) {
                               <div className="grid grid-cols-2 w-full gap-2 mt-2">
                                 {[1, 2, 3, 4, 5, 6].map((pelatihan, index) => (
                                   <Link
-                                    href={`/dashboard/pelatihan/online/${
-                                      userDetail?.Pelatihan[
-                                        indexPelatihanSelected
-                                      ]!.IdPelatihan
-                                    }`}
+                                    href={`/dashboard/pelatihan/online/${userDetail?.Pelatihan[
+                                      indexPelatihanSelected
+                                    ]!.IdPelatihan
+                                      }`}
                                     className="flex shadow-custom w-full rounded-md p-5 cursor-pointer flex-col gap-1 hover:scale-105 duration-700 hover:bg-blue-500 hover:text-white group"
                                   >
                                     <h3 className="font-bold font-calsans leading-[105%]">
@@ -847,135 +842,135 @@ function UserTrainingService({ user }: { user: User | null }) {
 
                         {userDetail?.Pelatihan[indexPelatihanSelected]
                           ?.PostTest != 0 && (
-                          <div className="flex flex-col mt-0">
-                            <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
-                              <div className="inline-block min-w-full py-2 sm:px-6 lg:px-8">
-                                <dd className="text-xs text-gray-500 mb-2">
-                                  Table Penilaian
-                                </dd>
-                                <div className="overflow-hidden">
-                                  <table className="min-w-full border border-neutral-200 rounded-md text-center text-sm font-light text-surface mb-5 ">
-                                    <thead className="border-b border-neutral-200 font-medium ">
-                                      <tr>
-                                        <th
-                                          scope="col"
-                                          className="border-e border-neutral-200 px-6 py-4 "
-                                        >
-                                          #
-                                        </th>
-                                        <th
-                                          scope="col"
-                                          className="border-e border-neutral-200 px-6 py-4 "
-                                        >
-                                          Pre-test
-                                        </th>
-                                        <th
-                                          scope="col"
-                                          className="border-e border-neutral-200 px-6 py-4 "
-                                        >
-                                          Post-test
-                                        </th>
-                                        {userDetail?.Pelatihan[
-                                          indexPelatihanSelected
-                                        ]?.PostTest! < 65 && (
+                            <div className="flex flex-col mt-0">
+                              <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
+                                <div className="inline-block min-w-full py-2 sm:px-6 lg:px-8">
+                                  <dd className="text-xs text-gray-500 mb-2">
+                                    Table Penilaian
+                                  </dd>
+                                  <div className="overflow-hidden">
+                                    <table className="min-w-full border border-neutral-200 rounded-md text-center text-sm font-light text-surface mb-5 ">
+                                      <thead className="border-b border-neutral-200 font-medium ">
+                                        <tr>
                                           <th
                                             scope="col"
                                             className="border-e border-neutral-200 px-6 py-4 "
                                           >
-                                            Remedial
+                                            #
                                           </th>
-                                        )}
-                                        <th scope="col" className="px-6 py-4">
-                                          Total
-                                        </th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      <tr className="border-b border-neutral-200 ">
-                                        <td className="whitespace-nowrap border-e border-neutral-200 px-6 py-4 font-medium ">
-                                          1
-                                        </td>
-                                        <td className="whitespace-nowrap border-e border-neutral-200 px-6 py-4 ">
-                                          {
-                                            userDetail?.Pelatihan[
-                                              indexPelatihanSelected
-                                            ]?.PreTest!
-                                          }
-                                        </td>
-                                        <td className="whitespace-nowrap border-e border-neutral-200 px-6 py-4 ">
-                                          {
-                                            userDetail?.Pelatihan[
-                                              indexPelatihanSelected
-                                            ]?.PostTest!
-                                          }
-                                        </td>
-                                        {userDetail?.Pelatihan[
-                                          indexPelatihanSelected
-                                        ]?.PostTest! < 65 && (
-                                          <td className="whitespace-nowrap border-e border-neutral-200 px-6 py-4 "></td>
-                                        )}
-
-                                        <td className="whitespace-nowrap px-6 py-4">
-                                          {" "}
-                                          {(userDetail?.Pelatihan[
-                                            indexPelatihanSelected
-                                          ]?.PreTest! +
-                                            userDetail?.Pelatihan[
-                                              indexPelatihanSelected
-                                            ]?.PostTest!) /
-                                            2}
-                                        </td>
-                                      </tr>
-
-                                      <tr className="border-b border-neutral-200 ">
-                                        <th
-                                          colSpan={3}
-                                          className="whitespace-nowrap border-e border-neutral-200 px-6 py-4 "
-                                        >
-                                          Keterangan
-                                        </th>
-                                        <th className="whitespace-nowrap px-6 py-4">
-                                          {" "}
+                                          <th
+                                            scope="col"
+                                            className="border-e border-neutral-200 px-6 py-4 "
+                                          >
+                                            Pre-test
+                                          </th>
+                                          <th
+                                            scope="col"
+                                            className="border-e border-neutral-200 px-6 py-4 "
+                                          >
+                                            Post-test
+                                          </th>
                                           {userDetail?.Pelatihan[
                                             indexPelatihanSelected
-                                          ]?.PostTest! > 60
-                                            ? "LULUS"
-                                            : "TIDAK LULUS"}
-                                        </th>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-
-                                  {userDetail?.Pelatihan[indexPelatihanSelected]
-                                    .NoSertifikat == "" ? null : (
-                                    <div>
-                                      <DialogSertifikatPelatihan
-                                        userPelatihan={
-                                          userDetail?.Pelatihan[
+                                          ]?.PostTest! < 65 && (
+                                              <th
+                                                scope="col"
+                                                className="border-e border-neutral-200 px-6 py-4 "
+                                              >
+                                                Remedial
+                                              </th>
+                                            )}
+                                          <th scope="col" className="px-6 py-4">
+                                            Total
+                                          </th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        <tr className="border-b border-neutral-200 ">
+                                          <td className="whitespace-nowrap border-e border-neutral-200 px-6 py-4 font-medium ">
+                                            1
+                                          </td>
+                                          <td className="whitespace-nowrap border-e border-neutral-200 px-6 py-4 ">
+                                            {
+                                              userDetail?.Pelatihan[
+                                                indexPelatihanSelected
+                                              ]?.PreTest!
+                                            }
+                                          </td>
+                                          <td className="whitespace-nowrap border-e border-neutral-200 px-6 py-4 ">
+                                            {
+                                              userDetail?.Pelatihan[
+                                                indexPelatihanSelected
+                                              ]?.PostTest!
+                                            }
+                                          </td>
+                                          {userDetail?.Pelatihan[
                                             indexPelatihanSelected
-                                          ]!
-                                        }
-                                        pelatihan={selectedPelatihan!}
-                                      >
-                                        <Button
-                                          type="button"
-                                          variant="outline"
-                                          className="w-full border flex gap-2 border-blue-600 text-left capitalize items-center justify-center"
-                                        >
-                                          <RiVerifiedBadgeFill className="h-4 w-4 text-blue-600" />{" "}
-                                          <span className="text-sm">
+                                          ]?.PostTest! < 65 && (
+                                              <td className="whitespace-nowrap border-e border-neutral-200 px-6 py-4 "></td>
+                                            )}
+
+                                          <td className="whitespace-nowrap px-6 py-4">
                                             {" "}
-                                            Lihat Sertifikat
-                                          </span>
-                                        </Button>
-                                      </DialogSertifikatPelatihan>
-                                    </div>
-                                  )}
+                                            {(userDetail?.Pelatihan[
+                                              indexPelatihanSelected
+                                            ]?.PreTest! +
+                                              userDetail?.Pelatihan[
+                                                indexPelatihanSelected
+                                              ]?.PostTest!) /
+                                              2}
+                                          </td>
+                                        </tr>
+
+                                        <tr className="border-b border-neutral-200 ">
+                                          <th
+                                            colSpan={3}
+                                            className="whitespace-nowrap border-e border-neutral-200 px-6 py-4 "
+                                          >
+                                            Keterangan
+                                          </th>
+                                          <th className="whitespace-nowrap px-6 py-4">
+                                            {" "}
+                                            {userDetail?.Pelatihan[
+                                              indexPelatihanSelected
+                                            ]?.PostTest! > 60
+                                              ? "LULUS"
+                                              : "TIDAK LULUS"}
+                                          </th>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+
+                                    {userDetail?.Pelatihan[indexPelatihanSelected]
+                                      .NoSertifikat == "" ? null : (
+                                      <div>
+                                        <DialogSertifikatPelatihan
+                                          userPelatihan={
+                                            userDetail?.Pelatihan[
+                                            indexPelatihanSelected
+                                            ]!
+                                          }
+                                          pelatihan={selectedPelatihan!}
+                                        >
+                                          <Button
+                                            type="button"
+                                            variant="outline"
+                                            className="w-full border flex gap-2 border-blue-600 text-left capitalize items-center justify-center"
+                                          >
+                                            <RiVerifiedBadgeFill className="h-4 w-4 text-blue-600" />{" "}
+                                            <span className="text-sm">
+                                              {" "}
+                                              Lihat Sertifikat
+                                            </span>
+                                          </Button>
+                                        </DialogSertifikatPelatihan>
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        )}
+                          )}
                       </div>
                     </div>
                   )}
@@ -983,9 +978,8 @@ function UserTrainingService({ user }: { user: User | null }) {
 
                 {indexPelatihanSelected != 100000000 && !isExpand && (
                   <div
-                    className={`flex md:hidden items-start justify-center ${
-                      isExpand ? "w-12/12" : "w-full flex"
-                    }`}
+                    className={`flex md:hidden items-start justify-center ${isExpand ? "w-12/12" : "w-full flex"
+                      }`}
                   >
                     <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:px-6 lg:py-0">
                       <div className="sm:flex justify-between sm:gap-4 items-center border-b-2 border-b-gray-200 pb-4">
@@ -1006,14 +1000,14 @@ function UserTrainingService({ user }: { user: User | null }) {
                               ·{" "}
                               {selectedPelatihan != null
                                 ? generateTanggalPelatihan(
-                                    selectedPelatihan?.TanggalMulaiPelatihan
-                                  )
+                                  selectedPelatihan?.TanggalMulaiPelatihan
+                                )
                                 : "-"}{" "}
                               s.d.{" "}
                               {selectedPelatihan != null
                                 ? generateTanggalPelatihan(
-                                    selectedPelatihan?.TanggalBerakhirPelatihan
-                                  )
+                                  selectedPelatihan?.TanggalBerakhirPelatihan
+                                )
                                 : "-"}
                             </p>
                             <div
@@ -1045,78 +1039,78 @@ function UserTrainingService({ user }: { user: User | null }) {
 
                       {userDetail?.Pelatihan[indexPelatihanSelected]
                         ?.Keterangan! == "Valid" && (
-                        <div className="mt-6 flex gap-4 sm:gap-6">
-                          <div className="flex flex-col-reverse">
-                            <div className="text-sm font-medium text-gray-600">
-                              {
-                                userDetail?.Pelatihan[indexPelatihanSelected]
-                                  ?.BidangPelatihan!
-                              }
+                          <div className="mt-6 flex gap-4 sm:gap-6">
+                            <div className="flex flex-col-reverse">
+                              <div className="text-sm font-medium text-gray-600">
+                                {
+                                  userDetail?.Pelatihan[indexPelatihanSelected]
+                                    ?.BidangPelatihan!
+                                }
+                              </div>
+                              <div className="text-xs text-gray-500">Bidang</div>
                             </div>
-                            <div className="text-xs text-gray-500">Bidang</div>
-                          </div>
 
-                          <div className="flex flex-col-reverse">
-                            <div className="text-sm font-bold text-gray-600">
-                              {userDetail?.Pelatihan[indexPelatihanSelected]
-                                .NoSertifikat! == ""
-                                ? "-"
-                                : userDetail?.Pelatihan[indexPelatihanSelected]
+                            <div className="flex flex-col-reverse">
+                              <div className="text-sm font-bold text-gray-600">
+                                {userDetail?.Pelatihan[indexPelatihanSelected]
+                                  .NoSertifikat! == ""
+                                  ? "-"
+                                  : userDetail?.Pelatihan[indexPelatihanSelected]
                                     ?.NoSertifikat!}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                No Sertifikat
+                              </div>
                             </div>
-                            <div className="text-xs text-gray-500">
-                              No Sertifikat
-                            </div>
-                          </div>
-                          <div className="flex flex-col-reverse">
-                            <div className="text-sm font-bold text-gray-600">
-                              {userDetail?.Pelatihan[indexPelatihanSelected]
-                                .NoRegistrasi! == ""
-                                ? "-"
-                                : userDetail?.Pelatihan[indexPelatihanSelected]
+                            <div className="flex flex-col-reverse">
+                              <div className="text-sm font-bold text-gray-600">
+                                {userDetail?.Pelatihan[indexPelatihanSelected]
+                                  .NoRegistrasi! == ""
+                                  ? "-"
+                                  : userDetail?.Pelatihan[indexPelatihanSelected]
                                     ?.NoRegistrasi!}
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              No Registrasi
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                No Registrasi
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      )}
+                        )}
 
                       {userDetail?.Pelatihan[indexPelatihanSelected]
                         ?.Keterangan! == "Valid" && (
-                        <div className="mt-4">
-                          <div className="flex gap-1 flex-col">
-                            <p
-                              dangerouslySetInnerHTML={{
-                                __html:
-                                  userDetail?.Pelatihan[
-                                    indexPelatihanSelected
-                                  ]! && !seeMore
-                                    ? truncateText(
+                          <div className="mt-4">
+                            <div className="flex gap-1 flex-col">
+                              <p
+                                dangerouslySetInnerHTML={{
+                                  __html:
+                                    userDetail?.Pelatihan[
+                                      indexPelatihanSelected
+                                    ]! && !seeMore
+                                      ? truncateText(
                                         userDetail?.Pelatihan[
                                           indexPelatihanSelected
                                         ]?.DetailPelatihan!,
                                         300,
                                         "..."
                                       )
-                                    : userDetail?.Pelatihan[
+                                      : userDetail?.Pelatihan[
                                         indexPelatihanSelected
                                       ]?.DetailPelatihan!,
-                              }}
-                              className="text-sm prose   text-justify group-hover:text-xs text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong:font-bold group-hover:duration-1000"
-                            />{" "}
-                            <p
-                              onClick={(e) => setSeeMore(!seeMore)}
-                              className="text-blue-500 text-sm cursor-pointer"
-                            >
-                              {seeMore
-                                ? "Baca lebih sedikit"
-                                : "Baca lebih lengkap"}
-                            </p>
+                                }}
+                                className="text-sm prose   text-justify group-hover:text-xs text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong:font-bold group-hover:duration-1000"
+                              />{" "}
+                              <p
+                                onClick={(e) => setSeeMore(!seeMore)}
+                                className="text-blue-500 text-sm cursor-pointer"
+                              >
+                                {seeMore
+                                  ? "Baca lebih sedikit"
+                                  : "Baca lebih lengkap"}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
 
                       {selectedPelatihan != null &&
                         (selectedPelatihan!.UjiKompotensi == "Portfolio" ? (
@@ -1145,11 +1139,10 @@ function UserTrainingService({ user }: { user: User | null }) {
                             <div className="grid grid-cols-2 w-full gap-2 mt-2">
                               {[1, 2, 3, 4, 5, 6].map((pelatihan, index) => (
                                 <Link
-                                  href={`/dashboard/pelatihan/online/${
-                                    userDetail?.Pelatihan[
-                                      indexPelatihanSelected
-                                    ]!.IdPelatihan
-                                  }`}
+                                  href={`/dashboard/pelatihan/online/${userDetail?.Pelatihan[
+                                    indexPelatihanSelected
+                                  ]!.IdPelatihan
+                                    }`}
                                   className="flex shadow-custom w-full rounded-md p-5 cursor-pointer flex-col gap-1 hover:scale-105 duration-700 hover:bg-blue-500 hover:text-white group"
                                 >
                                   <h3 className="font-bold font-calsans leading-[105%]">
@@ -1189,10 +1182,10 @@ function UserTrainingService({ user }: { user: User | null }) {
                     className="w-[400px]"
                   />
                   <div className="max-w-3xl mx-auto text-center pb-5 md:pb-8 -mt-2">
-                    <h1 className="text-3xl font-calsans leading-[110%] text-black">
+                    <h1 className="text-3xl font-calsans leading-[110%] text-blue-500">
                       Belum Ada Pelatihan
                     </h1>
-                    <div className="text-gray-600 text-center  max-w-md">
+                    <div className="text-gray-400 text-center leading-none text-base  max-w-md">
                       Kamu belum mengikuti pelatihan apapun, ayo cari pelatihan
                       menarik di E-LAUT dan jadilah SDM unggul untuk Indonesia!{" "}
                       <Link

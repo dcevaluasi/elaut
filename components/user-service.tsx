@@ -89,13 +89,10 @@ export default function UserService({ user }: { user: User | null }) {
 
   return (
     <div className="w-full">
-      <section className="relative pb-20 -mt-16" id="explore">
-        <div
-          className="absolute inset-0 pointer-events-none mb-16 pb-10 h-full"
-          aria-hidden="true"
-        ></div>
+      <div className="relative pb-20 " id="explore">
 
-        <div className="relative w-full mx-auto px-4 sm:px-6">
+
+        <div className="relative w-full">
           <div className="">
             <div className="flex flex-row flex-wrap md:flex-nowrap items-center justify-center gap-5 md:gap-9">
               {tabMenus.map((tabMenu, index) => (
@@ -106,7 +103,7 @@ export default function UserService({ user }: { user: User | null }) {
                       onClick={(e) => handleSelectedMenu(index)}
                       className="flex flex-col gap-2 cursor-pointer items-center duration-1000 hover:scale-105 text-center"
                     >
-                      <div className="flex items-center justify-center  bg-white shadow-custom rounded-full w-24 h-24 md:w-28 md:h-28 p-6">
+                      <div className="flex items-center justify-center  bg-white shadow-custom rounded-xl w-24 h-24 md:w-28 md:h-28 p-6">
                         <Image
                           className="w-16 md:w-16"
                           width={0}
@@ -115,7 +112,7 @@ export default function UserService({ user }: { user: User | null }) {
                           alt="Kementrian Kelautan dan Perikanan RI Logo"
                         />
                       </div>
-                      <p className="text-sm text-white font-semibold">
+                      <p className="text-sm text-gray-400 font-semibold">
                         {tabMenu.name}
                       </p>
                     </div>
@@ -126,7 +123,7 @@ export default function UserService({ user }: { user: User | null }) {
             {/* </Swiper> */}
           </div>
         </div>
-      </section>
+      </div>
 
       {indexMenuSelected == 0 && <UserTrainingService user={user} />}
       {/* {indexMenuSelected == 1 && <UserCertificateService user={user} />} */}

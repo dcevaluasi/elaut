@@ -142,11 +142,15 @@ function FormLogin() {
           if (captcha) {
             try {
               const response: AxiosResponse = await axios.post(
-                `${baseUrl}/users/loginNotelpon`,
-                JSON.stringify({
-                  no_number: sanitizedDangerousChars(formData!.no_number),
-                  password: sanitizedDangerousChars(formData!.password),
-                }),
+                selectedMethodLogin == 'NIK' ? `${baseUrl}/users/login` : `${baseUrl}/users/loginNotelpon`,
+                selectedMethodLogin == 'NIK' ?
+                  JSON.stringify({
+                    nik: sanitizedDangerousChars(formData!.no_number),
+                    password: sanitizedDangerousChars(formData!.password),
+                  }) : JSON.stringify({
+                    no_number: sanitizedDangerousChars(formData!.no_number),
+                    password: sanitizedDangerousChars(formData!.password),
+                  }),
                 {
                   headers: {
                     "Content-Type": "application/json",
@@ -185,6 +189,7 @@ function FormLogin() {
                     router.replace("layanan/program/akp");
                   }
                 }
+                router.replace('/dashboard')
               }
             } catch (error: any) {
               console.error({ error });
@@ -475,6 +480,8 @@ function FormLogin() {
   const [isInputErrorPassword, setIsInputErrorPassword] =
     React.useState<boolean>(true);
 
+  const [selectedMethodLogin, setSelectedMethodLogin] = React.useState<string>('Whatsapp/No Telpon')
+
   return (
     <section className="relative w-full h-full md:h-full bg-none">
       <Dialog open={isForgetPassword} onOpenChange={setIsForgetPassword}>
@@ -639,23 +646,52 @@ function FormLogin() {
               <></>
             ) : role == "Perseorangan" ? (
               <form onSubmit={(e) => handleLoginAkun(e)} autoComplete="off">
+                <div className="flex flex-col gap-1 mb-2">
+                  <label
+                    className="block text-gray-200 text-sm font-medium mb-1"
+                    htmlFor="name"
+                  >
+                    Login Menggunakan <span className="text-red-600">*</span>
+                  </label>
+                  <Select
+                    value={role}
+                    onValueChange={(value: string) => setSelectedMethodLogin(value)}
+                  >
+                    <SelectTrigger className="form-input w-full py-6 bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200">
+                      <p className="mr-3 flex items-center gap-1 text-base text-gray-300">
+                        <HiMiniUserGroup />
+                        {selectedMethodLogin != "" ? selectedMethodLogin : "Pilih Login Menggunakan"}
+                      </p>
+                    </SelectTrigger>
+                    <SelectContent side="bottom">
+                      <SelectGroup>
+                        <SelectLabel>Login Menggunakan</SelectLabel>
+                        <SelectItem value="Whatsapp/No Telpon">Whatsapp/No Telpon</SelectItem>
+                        <SelectItem value="NIK">
+                          NIK
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div className="flex flex-wrap -mx-3 mb-2">
                   <div className="w-full px-3">
                     <label
                       className="block text-gray-200 text-sm font-medium mb-1"
                       htmlFor="name"
                     >
-                      No Telepon/WA <span className="text-red-600">*</span>
+                      {selectedMethodLogin == 'NIK' ? 'NIK' : 'No Telepon/WA'}
+                      <span className="text-red-600">*</span>
                     </label>
                     <input
                       id="name"
                       type="text"
                       className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                      placeholder="Masukkan No Telepon/WA"
+                      placeholder={selectedMethodLogin == 'NIK' ? 'Masukkan NIK' : 'Masukkan No Telepon/WA'}
                       value={formData.no_number}
                       name="no_number"
-                      maxLength={13}
-                      minLength={12}
+                      minLength={selectedMethodLogin == 'NIK' ? 16 : 12}
+                      maxLength={selectedMethodLogin == 'NIK' ? 16 : 13}
                       onChange={(e) => {
                         const value = e.target.value;
                         handleInputChange(e);
@@ -755,11 +791,10 @@ function FormLogin() {
                   <div className="w-full px-3">
                     <button
                       type="submit"
-                      className={`btn text-white ${
-                        captcha
-                          ? "bg-blue-500 hover:bg-blue-600"
-                          : "bg-gray-500 hover:bg-gray-600"
-                      } w-full`}
+                      className={`btn text-white ${captcha
+                        ? "bg-blue-500 hover:bg-blue-600"
+                        : "bg-gray-500 hover:bg-gray-600"
+                        } w-full`}
                       disabled={captcha ? false : true}
                     >
                       Login
@@ -862,11 +897,10 @@ function FormLogin() {
                   <div className="w-full px-3">
                     <button
                       type="submit"
-                      className={`btn text-white ${
-                        captcha
-                          ? "bg-blue-500 hover:bg-blue-600"
-                          : "bg-gray-500 hover:bg-gray-600"
-                      } w-full`}
+                      className={`btn text-white ${captcha
+                        ? "bg-blue-500 hover:bg-blue-600"
+                        : "bg-gray-500 hover:bg-gray-600"
+                        } w-full`}
                       disabled={captcha ? false : true}
                     >
                       Login
@@ -908,7 +942,7 @@ function FormLogin() {
           </div>
         </div>
       </div>
-    </section>
+    </section >
   );
 }
 

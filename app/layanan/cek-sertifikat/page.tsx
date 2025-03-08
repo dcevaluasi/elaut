@@ -1,4 +1,5 @@
 import FormCekSertifikat from "@/components/auth/FormCekSertifikat";
+import Footer from "@/components/ui/footer";
 
 export const metadata = {
   title: "Cek Sertifikat E-LAUT - Elektronik Layanan Pelatihan Utama Terpadu",
@@ -55,7 +56,10 @@ export const metadata = {
 
 export default function CekSertifikat() {
   return (
-    <FormCekSertifikat />
+    <>
+      <FormCekSertifikat />
+      <Footer />
+    </>
 
   );
 }
