@@ -49,6 +49,8 @@ import { HashLoader } from "react-spinners";
 import { DIALOG_TEXTS } from "@/constants/texts";
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import Toast from "@/components/toast";
+import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
+import { ESELON_1 } from "@/constants/nomenclatures";
 
 const TableDataVerifikasiPelaksanaan: React.FC = () => {
   // APPROVAL PENERBITAN SUPERVISOR
@@ -362,6 +364,12 @@ const TrainingCard: React.FC<{
         title: "Yeayyy!",
         text: "Berhasil mengapprove pengajuan penerbitan sttpl/sertifikat pelatihan!",
       });
+
+      if (pelatihan!.TtdSertifikat === ESELON_1.fullName) {
+        handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyetujui permohonan penerbitan dan mengirimkan ke Kepala Pusat Pelatihan KP untuk pelatihan')
+      } else {
+        handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyetujui permohonan penerbitan dan mengupload memo permohonan penerbitan ke Kepala Pusat Pelatihan KP untuk pelatihan')
+      }
 
       console.log({ uploadBeritaAcaraResponse })
       handleFetchingPublicTrainingData();

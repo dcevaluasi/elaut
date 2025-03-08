@@ -39,6 +39,7 @@ import Toast from "../toast";
 import { capitalizeWords, CURRICULLUM_CERTIFICATE } from "@/constants/texts";
 import { formatDateRange, formatDateRangeEnglish } from "@/utils/time";
 import { DESC_CERTIFICATE_COMPETENCE_FISHERIES } from "@/constants/serkom";
+import { ESELON_1, ESELON_2 } from "@/constants/nomenclatures";
 
 const html2pdf = dynamic(() => import("html2pdf.js"), { ssr: false });
 
@@ -246,9 +247,9 @@ const SertifikatNonKepelautan = React.forwardRef(
 
                     <span className="leading-none font-bosItalic text-[0.75rem]">
                       {pelatihan?.TtdSertifikat ==
-                        "Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan"
-                        ? "Chairman of the Agency for Marine and Fisheries Extension and Human Resources Development"
-                        : "Director for Marine And Fisheries Training Center"}
+                        ESELON_1.fullName
+                        ? ESELON_1.fullNameEng
+                        : ESELON_2.fullNameEng}
                     </span>
 
                     {userPelatihan?.StatusPenandatangan == 'Spesimen' ? (
@@ -265,7 +266,7 @@ const SertifikatNonKepelautan = React.forwardRef(
 
                     <span className=" font-bosBold text-base">
                       {pelatihan?.TtdSertifikat ==
-                        "Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan"
+                        ESELON_1.fullName
                         ? "Dr. I Nyoman Radiarta, S.Pi, M.Sc"
                         : "Dr. Lilly Aprilya Pregiwati, S.Pi., M.Si"}
                     </span>
@@ -626,14 +627,13 @@ const SertifikatKepelautan = React.forwardRef(
                       PENGEMBANGAN SUMBER DAYA MANUSIA
                     </p>
                     <p className="font-bosItalic text-sm leading-none">
-                      o.b. Chairman of The Agency for Marine and Fisheries
-                      Extension and Human Resources Development
+                      o.b. {ESELON_1.fullNameEng}
                     </p>
                     <p className="font-bosBold mt-2 text-[12pt] leading-none">
                       KEPALA PUSAT PELATIHAN KELAUTAN DAN PERIKANAN
                     </p>
                     <p className="font-bosItalic text-sm leading-nonee">
-                      Director for Marine And Fisheries Training Center
+                      {ESELON_2.fullName}
                     </p>
                   </div>
 
