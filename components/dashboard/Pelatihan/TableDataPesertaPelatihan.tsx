@@ -92,8 +92,11 @@ import { generateTanggalPelatihan } from "@/utils/text";
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import { DIALOG_TEXTS } from "@/constants/texts";
 import { countUserWithNoSertifikat, countUserWithSpesimenTTD, countUserWithTanggalSertifikat, countValidKeterangan } from "@/utils/counter";
-import { getTodayInIndonesianFormat } from "@/utils/time";
+import { generateTimestamp, getTodayInIndonesianFormat } from "@/utils/time";
 import { BiSolidCalendarAlt } from "react-icons/bi";
+import addData from "@/firebase/firestore/addData";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
+import firebaseApp from "@/firebase/config";
 
 const TableDataPesertaPelatihan = () => {
   const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
@@ -144,6 +147,38 @@ const TableDataPesertaPelatihan = () => {
       throw error;
     }
   };
+
+  const handleAddHistoryPelatihan = async () => {
+    const db = getFirestore(firebaseApp)
+    const docRef = doc(db, 'historical-training-notes', dataPelatihan!.KodePelatihan)
+    try {
+      const docSnap = await getDoc(docRef)
+      let existingHistory = []
+
+      if (docSnap.exists()) {
+        const data = docSnap.data()
+        existingHistory = data.historical || [] // Keep existing times if available
+      }
+
+      const newEntryData = {
+        'created_at': generateTimestamp(),
+        id: dataPelatihan!.KodePelatihan,
+        notes: `Telah mengupload data peserta kelas pelatihan ${dataPelatihan!.NamaPelatihan}`,
+        role: Cookies.get('Eselon'),
+        upt: Cookies.get('SATKER_BPPP')
+      }
+
+      existingHistory.push(newEntryData)
+
+      const { result, error } = await addData('historical-training-notes', dataPelatihan!.KodePelatihan, {
+        historical: existingHistory,
+        status: 'On Progress'
+      })
+      console.log({ result })
+    } catch (error) {
+      console.log({ error })
+    }
+  }
 
   console.log({ emptyFileSertifikatCount });
 
@@ -881,6 +916,7 @@ const TableDataPesertaPelatihan = () => {
           },
         }
       );
+      handleAddHistoryPelatihan()
       console.log("FILE UPLOADED PESERTA : ", response);
       Toast.fire({
         icon: "success",

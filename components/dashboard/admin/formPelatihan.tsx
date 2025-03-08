@@ -234,7 +234,6 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
   */
 
   const handleAddHistoryPelatihan = async () => {
-    const db = getFirestore(firebaseApp)
     try {
       const { result, error } = await addData('historical-training-notes', kodePelatihan, {
         historical: [

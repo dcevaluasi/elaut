@@ -8,7 +8,7 @@ const firebaseConfig = {
   messagingSenderId: process.env
     .NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID as string,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID as string,
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID as string,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_IDs as string,
 }
 
 let firebaseApp: FirebaseApp =
