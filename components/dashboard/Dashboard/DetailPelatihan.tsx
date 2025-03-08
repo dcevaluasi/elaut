@@ -93,14 +93,7 @@ function DetailPelatihan() {
     null
   );
 
-  const [dataHistoryTraining, setDataHistoryTraining] = React.useState<DocumentData | null>(null)
 
-  const handleFetchDataHistoryTraining = async () => {
-    const doc = await getDocument('historical-training-notes', pelatihan!.KodePelatihan)
-    setDataHistoryTraining(doc.data)
-  }
-
-  console.log({ dataHistoryTraining })
 
   const handleFetchDetailPelatihan = async () => {
     try {
@@ -121,7 +114,7 @@ function DetailPelatihan() {
 
   React.useEffect(() => {
     handleFetchDetailPelatihan();
-    handleFetchDataHistoryTraining()
+
   }, []);
 
   const typeRole = Cookies.get("XSRF093");

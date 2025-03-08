@@ -5,6 +5,11 @@ export const DIALOG_TEXTS = {
     desc:
       'Sebelum melakukan tindakan ini dipastikan anda sudah melihat detail pelaksanaan pelatihan & data peserta pelatihan serta draft sertifikat yang diajukan penerbitannya!',
   },
+  'History Pelatihan': {
+    title: 'History Aktifitas Pelatihan',
+    desc:
+      'Lihat progress atau aktifitas dari pelaksanaan pelatihan yang diselenggarakan, scroll kebawah pada tabel untuk melihat lebih banyak',
+  },
   'Validasi Grouping Peserta': {
     title:
       'Apakah anda yakin ingin memvalidasi data peserta pelatihan secara grouping?',

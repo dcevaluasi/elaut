@@ -10,6 +10,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetTrigger } from "@/components/ui/sheet";
+
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
@@ -18,13 +20,15 @@ import axios from "axios";
 import Toast from "@/components/toast";
 import Cookies from "js-cookie";
 import { HiLockClosed } from "react-icons/hi2";
-import { PelatihanMasyarakat } from "@/types/product";
-import { doc, getDoc, getFirestore } from "firebase/firestore";
+import { HistoryItem, HistoryTraining, PelatihanMasyarakat } from "@/types/product";
+import { doc, DocumentData, getDoc, getFirestore } from "firebase/firestore";
 import firebaseApp from "@/firebase/config";
 import { generateTimestamp } from "@/utils/time";
 import addData from "@/firebase/firestore/addData";
 import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
 import { MdOutlineHistory } from "react-icons/md";
+import getDocument from "@/firebase/firestore/getData";
+import { DIALOG_TEXTS } from "@/constants/texts";
 
 interface HistoryButtonProps {
   statusPelatihan: string;
@@ -44,104 +48,62 @@ const HistoryButton: React.FC<HistoryButtonProps> = ({
   const [selectedStatus, setSelectedStatus] =
     React.useState<string>(statusPelatihan);
 
+  const [dataHistoryTraining, setDataHistoryTraining] = React.useState<HistoryTraining | null>(null)
 
-  const handleClosePelatihan = async (id: string, status: string) => {
-    const formData = new FormData();
-    formData.append("StatusApproval", selectedStatus);
-    try {
-      const response = await axios.put(
-        `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${id}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
-          },
-        }
-      );
-      Toast.fire({
-        icon: "success",
-        title: `Yeayyy!`,
-        text: 'Berhasil menutup pelatihan!',
-      });
-      console.log("UPDATE PELATIHAN: ", response);
-      handleAddHistoryTrainingInExisting(pelatihan, 'Telah menutup kelas pelatihan')
-      handleFetchingData();
-      setOpenFormTutupPelatihan(!openFormTutupPelatihan);
-    } catch (error) {
-      setOpenFormTutupPelatihan(!openFormTutupPelatihan);
-      console.error("ERROR UPDATE PELATIHAN: ", error);
-      Toast.fire({
-        icon: "error",
-        title: `Oopsss!`,
-        text: 'Gagal menutup pelatihan!',
-      });
-      handleFetchingData();
-    }
-  };
+  const handleFetchDataHistoryTraining = async () => {
+    const doc = await getDocument('historical-training-notes', pelatihan!.KodePelatihan)
+    setDataHistoryTraining(doc.data as HistoryTraining)
+  }
 
-  const today = new Date().toISOString().split("T")[0];
+
+  console.log({ dataHistoryTraining })
+
+  React.useEffect(() => { handleFetchDataHistoryTraining() }, [])
 
   return (
     <>
-      <AlertDialog
-        open={openFormTutupPelatihan}
-        onOpenChange={setOpenFormTutupPelatihan}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Pelatihan Telah Selesai?</AlertDialogTitle>
-            <AlertDialogDescription className="-mt-2">
-              Jika Pelatihan di Lembaga atau Balai Pelatihanmu telah selesai,
-              ubah status kelas-mu menjadi selesai, untuk dapat melanjutkan ke
-              proses penerbitan sertifikat.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <fieldset>
-            <form autoComplete="off" className="w-fit">
-              {statusPelatihan != "Selesai" ? (
-                <div className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 border-gray-300">
-                  <div>
-                    <Checkbox
-                      id="publish"
-                      onCheckedChange={(e) => setSelectedStatus("Selesai")}
-                    />
-                  </div>
-                  <div className="space-y-1 leading-none">
-                    <label>Tutup Pelatihan</label>
-                    <p className="text-xs leading-[110%] text-gray-600">
-                      Dengan ini sebagai pihak lemdiklat saya menyatakan bahwa
-                      pelatihan telah selesai dilaksanakan!
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4 border-gray-300">
-                  <RiVerifiedBadgeFill className="h-7 w-7 text-green-500 text-lg" />
-                  <div className="space-y-1 leading-none">
-                    <label>Pelatihan Selesai</label>
-                    <p className="text-xs leading-[110%] text-gray-600">
-                      Kelas pelatihanmu telah ditutup atau selesai, kamu dapat
-                      melanjutkan ke proses penerbitan sertifikat!
-                    </p>
-                  </div>
-                </div>
-              )}
-            </form>
-          </fieldset>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(e) =>
-                statusPelatihan != "Selesai"
-                  ? handleClosePelatihan(idPelatihan, selectedStatus)
-                  : null
-              }
-            >
-              {statusPelatihan == "Selesai" ? "OK" : "Tutup"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <Sheet open={openFormTutupPelatihan} onOpenChange={setOpenFormTutupPelatihan}>
+        <SheetContent className="!max-w-3xl z-[999999999]">
+          <SheetHeader>
+            <SheetTitle>{DIALOG_TEXTS['History Pelatihan'].title}</SheetTitle>
+            <SheetDescription>{DIALOG_TEXTS['History Pelatihan'].desc}</SheetDescription>
+          </SheetHeader>
+
+          {dataHistoryTraining && (
+            <div className="h-[700px] w-full  overflow-y-scroll rounded-lg mt-4 mb-10">
+              <table className="w-full   text-sm">
+                <thead className="bg-gray-100 font-bold">
+                  <tr>
+                    <th className="border p-2 text-center">No</th>
+                    <th className="border p-2">Riwayat</th>
+                    <th className="border p-2 text-center">Role</th>
+                    <th className="border p-2 text-center">Satuan Kerja</th>
+                    <th className="border p-2 text-center">Waktu</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {dataHistoryTraining.historical
+                    .slice()
+                    .reverse()
+                    .map((item: HistoryItem, index: number, arr) => (
+                      <tr key={index} className="odd:bg-white even:bg-gray-50">
+                        <td className="border p-2 text-center">{index + 1}</td>
+                        <td className="border p-2">{item.notes}</td>
+                        <td className="border p-2 text-center">{item.role}</td>
+                        <td className="border p-2 text-center">{item.upt}</td>
+                        <td className="border p-2 text-center">{item.created_at}</td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          <SheetFooter>
+            <Button variant="outline" onClick={() => setOpenFormTutupPelatihan(false)}>Tutup</Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
       <Button
         title="History Administrasi Pelatihan"
