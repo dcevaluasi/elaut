@@ -42,14 +42,6 @@ export default function Footer() {
               </li>
               <li className="mb-2">
                 <a
-                  href="#0"
-                  className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
-                >
-                  Sertifikasi atau Uji Kompetensi
-                </a>
-              </li>
-              <li className="mb-2">
-                <a
                   href="/layanan/cek-sertifikat"
                   className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                 >

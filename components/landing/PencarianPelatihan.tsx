@@ -338,7 +338,7 @@ function PencarianPelatihan() {
                   <div className="hidden md:flex w-full">
                     <Button
                       onClick={(e) => handleFetchingPublicTrainingData()}
-                      className="btn-sm text-sm w-full text-white bg-blue-600 cursor-pointer"
+                      className="btn-sm text-sm w-full text-white bg-blue-500 cursor-pointer"
                     >
                       <span className="mr-2">Cari</span>
                       <FiSearch />

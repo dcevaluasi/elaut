@@ -327,24 +327,13 @@ export default function Header() {
                       </span>
                     </div>
                   </NavLink>
-                  <NavLink
-                    href="https://sites.google.com/view/ppidbppakkp"
-                    name="Balai Pendidikan dan Pelatihan Aparatur Sukamandi"
-                    top={top}
-                  >
-                    <div className="flex gap-2 items-center">
-                      <IoMdSchool className="text-4xl" />{" "}
-                      <span>
-                        Balai Pendidikan dan Pelatihan Aparatur Sukamandi
-                      </span>
-                    </div>
-                  </NavLink>
+                  s
                 </NavDropDown>
-                <NavLinkDefault
+                {/* <NavLinkDefault
                   href="/lembaga/dpkakp"
                   name="Dewan Penguji dan Komite Approval"
                   top={top}
-                />
+                /> */}
                 <NavLinkDefault
                   href="/layanan/cek-sertifikat"
                   name="Cek Sertifikat"

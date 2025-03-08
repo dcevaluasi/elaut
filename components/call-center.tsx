@@ -25,10 +25,24 @@ function CallCenter() {
 
   return (
     <div className="flex flex-col gap-3 w-fit fixed right-3 md:right-10 bottom-24 md:bottom-10 z-[999999999]">
-
+      <Link href={''} title='Manual Book User E-LAUT' className="gap-4 ">
+        <Bounce duration={1000}>
+          <div className="flex flex-col gap-2 cursor-pointer items-center duration-1000 hover:scale-105 text-center">
+            <div className="flex flex-col items-center justify-center  bg-white shadow-custom rounded-full w-16 h-16 p-2">
+              <Image
+                className="w-10"
+                width={0}
+                height={0}
+                src={"/icons/icbsre.png"}
+                alt="Kementrian Kelautan dan Perikanan RI Logo"
+              />
+            </div>
+          </div>
+        </Bounce>
+      </Link>
       <AlertDialog open={open}>
         <AlertDialogTrigger>
-          <div onClick={(e) => setOpen(true)} className="gap-4 ">
+          <div onClick={(e) => setOpen(true)} title='Call Center E-LAUT' className="gap-4 ">
             <Bounce duration={1000}>
               <div className="flex flex-col gap-2 cursor-pointer items-center duration-1000 hover:scale-105 text-center">
                 <div className="flex flex-col items-center justify-center  bg-white shadow-custom rounded-full w-16 h-16 p-2">
