@@ -510,20 +510,20 @@ const DropdownUser = ({
         className="flex items-center gap-4"
         href="#"
       >
-        <span className="hidden lg:flex lg:justify-end lg:flex-col">
-          <span className="block text-sm font-medium text-black">
+        <span className="hidden md:flex md:justify-end md:flex-col">
+          <span className="block text-sm font-medium text-black text-right">
             {pathname.includes("lemdiklat")
               ? userLoggedInInfo?.data?.NamaLemdik
               : dataAdminPusat && pathname.includes("pusat")
                 ? dataAdminPusat!.Nama
                 : ""}
           </span>
-          <span className=" gap-1 text-xs  text-right">
+          <span className=" gap-1 text-xs text-right">
 
             {pathname.includes("lemdiklat")
               ? Cookies.get('Eselon')
               : dataAdminPusat && pathname.includes("pusat")
-                ? `${Cookies.get('Eselon')!}  |  ${Cookies.get('Status')!}`
+                ? `${Cookies.get('Status')!}`
                 : ""}
           </span>
         </span>

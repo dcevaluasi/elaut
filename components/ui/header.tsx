@@ -210,8 +210,7 @@ export default function Header() {
         usePathname().includes("/dpkakp/penguji") ||
         usePathname().includes("/pukakp/admin") ||
         usePathname().includes("/pukakp/user") ||
-        usePathname().includes("/pukakp/penguji") ||
-        usePathname().includes("/dev-dashboard")
+        usePathname().includes("/pukakp/penguji")
         ? "hidden"
         : ""
         }  z-[150] md:bg-opacity-90 transition duration-300 ease-in-out ${(top && usePathname().includes("layanan")) ||

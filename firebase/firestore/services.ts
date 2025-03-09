@@ -48,7 +48,12 @@ export const handleAddHistoryTrainingInExisting = async (
       },
     )
 
+    console.log({
+      historical: existingHistory,
+      status: role ? 'Done' : 'On Progress',
+    })
     console.log({ result })
+    console.log({ error })
   } catch (error) {
     console.error('Error adding history:', error)
   }

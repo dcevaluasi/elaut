@@ -156,7 +156,7 @@ const TTDSertifikat = ({ dataPelatihan, handleFetchData }: { dataPelatihan: Pela
   return (
     <>
       {dataPelatihan != null ? (
-        dataPelatihan!.StatusPenerbitan != "Done" && isPejabat ? (
+        dataPelatihan!.StatusPenerbitan != "Done" && isPejabat && Cookies.get('Jabatan') === dataPelatihan!.TtdSertifikat ? (
           <AlertDialog>
             <AlertDialogTrigger className="w-full">
               {" "}

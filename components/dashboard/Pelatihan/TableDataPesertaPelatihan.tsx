@@ -246,7 +246,7 @@ const TableDataPesertaPelatihan = () => {
         title: 'Yeayyy!',
         text: `Berhasil memvalidasi ${data.length} peserta pelatihan!`,
       });
-      handleAddHistoryTrainingInExisting(dataPelatihan!, 'Telah memvalidasi data peserta kelas pelatihan')
+      handleAddHistoryTrainingInExisting(dataPelatihan!, 'Telah memvalidasi data peserta kelas pelatihan', Cookies.get('Status'), Cookies.get('SATKER_BPPP'))
       setIsIteratingProcess(false)
       handleFetchingPublicTrainingDataById();
       setOpenFormValidasiDataPesertaPelatihan(false);
@@ -886,7 +886,7 @@ const TableDataPesertaPelatihan = () => {
           },
         }
       );
-      handleAddHistoryTrainingInExisting(dataPelatihan!, 'Telah mengupload data peserta kelas pelatihan')
+      handleAddHistoryTrainingInExisting(dataPelatihan!, 'Telah mengupload data peserta kelas pelatihan', Cookies.get('Status'), Cookies.get('SATKER_BPPP'))
       console.log("FILE UPLOADED PESERTA : ", response);
       Toast.fire({
         icon: "success",

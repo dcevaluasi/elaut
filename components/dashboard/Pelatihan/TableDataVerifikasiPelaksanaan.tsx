@@ -51,6 +51,7 @@ import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import Toast from "@/components/toast";
 import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
 import { ESELON_1, ESELON_2 } from "@/constants/nomenclatures";
+import { BiPaperPlane } from "react-icons/bi";
 
 const TableDataVerifikasiPelaksanaan: React.FC = () => {
   // APPROVAL PENERBITAN SUPERVISOR
@@ -93,8 +94,10 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
       setCountVerifying(countStatuses("PemberitahuanDiterima", "Pengajuan Telah Dikirim ke SPV"));
       setCountApproval(countStatuses("PemberitahuanDiterima", "Pengajuan Telah Dikirim ke SPV"));
       setCountApproved(countStatuses("IsMengajukanPenerbitan", "Pengajuan Telah Diapprove SPV"));
-      setCountSigning(countStatuses("IsMengajukanPenerbitan", "Pengajuan Telah Dikirim ke Kapuslat KP"));
-      setCountSigningByKaBPPSDMKP(countStatuses("IsMengajukanPenerbitan", "Pengajuan Telah Dikirim ke Kapuslat KP"))
+
+      // KAPUSLAT POV
+      setCountSigning(filteredData.filter((item) => item.PemberitahuanDiterima === "Pengajuan Telah Dikirim ke Kapuslat KP" && item.TtdSertifikat === ESELON_2.fullName).length);
+      setCountSigningByKaBPPSDMKP(filteredData.filter((item) => item.PemberitahuanDiterima === "Pengajuan Telah Dikirim ke Kapuslat KP" && item.TtdSertifikat === ESELON_1.fullName).length)
 
       // Reverse the order of filtered data
       setData([...filteredData].reverse());
@@ -191,6 +194,21 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
               />
             )}
 
+            {Cookies.get('Jabatan') === ESELON_2.fullName && (
+              <StatusButton
+                label="Perlu DiApprove"
+                count={countSigningByKaBPPSDMKP}
+                isSelected={selectedStatusFilter === "Signing by Ka BPPSDM KP"}
+                onClick={() => {
+                  setIsFetching(true);
+                  setTimeout(() => {
+                    setSelectedStatusFilter("Signing by Ka BPPSDM KP");
+                    setIsFetching(false);
+                  }, 800);
+                }}
+              />
+            )}
+
             {isPejabat && (
               <StatusButton
                 label="Perlu Ditandatangani"
@@ -205,23 +223,6 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
                 }}
               />
             )}
-
-
-            {Cookies.get('Jabatan') === ESELON_2.fullName && (
-              <StatusButton
-                label="Perlu Diteruskan ke Ka BPPSDM KP"
-                count={countSigning}
-                isSelected={selectedStatusFilter === "Signing by Ka BPPSDM KP"}
-                onClick={() => {
-                  setIsFetching(true);
-                  setTimeout(() => {
-                    setSelectedStatusFilter("Signing by Ka BPPSDM KP");
-                    setIsFetching(false);
-                  }, 800);
-                }}
-              />
-            )}
-
 
             {isSupervisor && (
               <StatusButton
@@ -348,20 +349,24 @@ const TrainingCard: React.FC<{
   setApprovalNotes: (notes: string) => void;
   handleFetchingPublicTrainingData: () => void;
 }> = ({ pelatihan, isSupervisor, approvalNotes, setApprovalNotes, handleFetchingPublicTrainingData }) => {
-  const trainingDetailUrl = `/admin/pusat/pelatihan/detail/${pelatihan.KodePelatihan}/${encryptValue(pelatihan.IdPelatihan)}`;
-  const bankSoalUrl = `/admin/pusat/pelatihan/${pelatihan.KodePelatihan}/bank-soal/${encryptValue(pelatihan.IdPelatihan)}`;
-
-  const isEligibleForBankSoal =
-    pelatihan.UjiKompotensi === "Ujian Pre-test dan Post-test" &&
-    pelatihan.StatusApproval !== "Selesai" &&
-    pelatihan.StatusPenerbitan === "Sudah Diverifikasi Pelaksanaan" &&
-    pelatihan.PenyelenggaraPelatihan === "Pusat Pelatihan KP";
+  const statusPejabat = Cookies.get('Status')
 
   const handleSendToKapuslatAboutCertificateIssueance = async (idPelatihan: string) => {
     const updateData = new FormData()
-    updateData.append('PenerbitanSertifikatDiterima', 'Pengajuan Telah Dikirim Dari SPV')
-    updateData.append('IsMengajukanPenerbitan', 'Pengajuan Telah Diapprove SPV')
-    updateData.append('PemberitahuanDiterima', 'Pengajuan Telah Dikirim ke Kapuslat KP')
+    if (statusPejabat === ESELON_1.fullName) {
+      updateData.append('PenerbitanSertifikatDiterima', 'Pengajuan Telah Dikirim Dari SPV')
+      updateData.append('IsMengajukanPenerbitan', 'Pengajuan Telah Diapprove Ka BPPSDM KP')
+      updateData.append('PemberitahuanDiterima', 'Pengajuan Telah Diterima Ka BPPSDM KP')
+    } else if (statusPejabat === ESELON_2.fullName) {
+      updateData.append('PenerbitanSertifikatDiterima', 'Pengajuan Telah Dikirim Dari SPV')
+      updateData.append('IsMengajukanPenerbitan', 'Pengajuan Telah Diapprove Kapuslat KP')
+      updateData.append('PemberitahuanDiterima', 'Pengajuan Telah Dikirim ke Ka BPPSDM KP')
+    } else {
+      updateData.append('PenerbitanSertifikatDiterima', 'Pengajuan Telah Dikirim Dari SPV')
+      updateData.append('IsMengajukanPenerbitan', 'Pengajuan Telah Diapprove SPV')
+      updateData.append('PemberitahuanDiterima', 'Pengajuan Telah Dikirim ke Kapuslat KP')
+    }
+
 
     try {
       const uploadBeritaAcaraResponse = await axios.put(
@@ -381,12 +386,22 @@ const TrainingCard: React.FC<{
         text: "Berhasil mengapprove pengajuan penerbitan sttpl/sertifikat pelatihan!",
       });
 
-      if (pelatihan!.TtdSertifikat === ESELON_1.fullName) {
-        handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyetujui permohonan penerbitan dan mengirimkan ke Kepala Pusat Pelatihan KP untuk pelatihan')
+      if (isSupervisor) {
+        if (pelatihan!.TtdSertifikat === ESELON_1.fullName) {
+          handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyetujui permohonan penerbitan dan mengirimkan ke Kepala Pusat Pelatihan KP untuk pelatihan', 'Supervisor', 'Pusat Pelatihan Kelautan dan Perikanan')
+        } else {
+          handleGenerateSertifikat()
+          handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyetujui permohonan penerbitan dan mengupload memo permohonan penandatanganan ke Kepala Pusat Pelatihan KP untuk pelatihan', 'Supervisor', 'Pusat Pelatihan Kelautan dan Perikanan')
+        }
       } else {
-        handleGenerateSertifikat()
-        handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyetujui permohonan penerbitan dan mengupload memo permohonan penandatanganan ke Kepala Pusat Pelatihan KP untuk pelatihan')
+        if (pelatihan!.TtdSertifikat === ESELON_1.fullName) {
+          handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyetujui permohonan penerbitan dan mengirimkan ke Kepala BPPSDM KP untuk pelatihan', 'Kepala Pusat Pelatihan Kelautan dan Perikanan', 'Pusat Pelatihan Kelautan dan Perikanan')
+        } else {
+          handleGenerateSertifikat()
+          handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyetujui permohonan penerbitan dan mengupload memo permohonan penandatanganan ke Kepala BPPSDM KP untuk pelatihan', 'Kepala Pusat Pelatihan Kelautan dan Perikanan', 'Pusat Pelatihan Kelautan dan Perikanan')
+        }
       }
+
 
       console.log({ uploadBeritaAcaraResponse })
       handleFetchingPublicTrainingData();
@@ -427,7 +442,6 @@ const TrainingCard: React.FC<{
 
     const updateData = new FormData();
 
-
     if (beritaAcara) {
       updateData.append('BeritaAcara', beritaAcara);
     }
@@ -449,8 +463,6 @@ const TrainingCard: React.FC<{
       console.error("ERROR GENERATE SERTIFIKAT: ", error);
     }
   };
-
-  const isPejabat = Cookies.get('Jabatan')
 
   return (
     <Card className="relative">
@@ -474,6 +486,94 @@ const TrainingCard: React.FC<{
             >
               <RiInformationFill className="h-5 w-5" /> Detail
             </Link>
+
+            {pelatihan?.PemberitahuanDiterima === "Pengajuan Telah Dikirim ke Kapuslat KP" && pelatihan?.TtdSertifikat === ESELON_1.fullName &&
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="border border-blue-500 shadow-sm inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-blue-500 hover:bg-border-blue-500 hover:text-white text-white rounded-md"
+                  >
+                    <TbEditCircle className="h-5 w-5" /> Approve Pengajuan Penerbitan
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      {DIALOG_TEXTS['Approval Penerbitan Supervisor'].title}
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {DIALOG_TEXTS['Approval Penerbitan Supervisor'].desc}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <div className="flex flex-col gap-1 w-full">
+
+                    {
+                      pelatihan!.TtdSertifikat === ESELON_1.fullName && <>
+                        <div className="grid grid-cols-1 space-y-2">
+                          <label
+                            className="block text-gray-800 text-sm font-medium mb-1"
+                            htmlFor="name"
+                          >
+                            Memo Permohonan Penandatangan Sertifikat
+                            <span className="text-red-600">*</span>
+                          </label>
+                          <div className="flex items-center justify-center w-full">
+                            <label className="flex flex-col rounded-lg border-2 border-dashed w-full h-40 p-10 group text-center">
+                              <div className="h-full w-full text-center flex flex-col items-center justify-center">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="w-10 h-10 text-blue-400 group-hover:text-blue-600"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                                  />
+                                </svg>
+                                {beritaAcara == null ? (
+                                  <p className="pointer-none text-gray-500 text-sm">
+                                    <span className="text-sm">Drag and drop</span> files
+                                    here <br /> or{" "}
+
+                                    select a file
+                                    from your computer
+                                  </p>
+                                ) : (
+                                  <p className="pointer-none text-gray-500 text-sm">
+                                    {beritaAcara.name}
+                                  </p>
+                                )}{" "}
+                              </div>
+                              <input
+                                type="file"
+                                className="flex h-20 w-full"
+                                onChange={handleFileChange}
+                              />
+                            </label>
+                          </div>
+                        </div>
+                      </>
+                    }
+                  </div>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+
+                    <div className="flex w-fit gap-2">
+
+                      <AlertDialogAction onClick={(e) => handleSendToKapuslatAboutCertificateIssueance(pelatihan?.IdPelatihan.toString())} className="bg-green-500 border-green-500 hover:bg-green-500">
+                        Approve dan Kirim ke Ka BPPSDM KP
+                      </AlertDialogAction>
+                    </div>
+
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            }
 
             {isSupervisor && pelatihan.PemberitahuanDiterima == 'Pengajuan Telah Dikirim ke SPV' && (
               <AlertDialog>
@@ -545,9 +645,7 @@ const TrainingCard: React.FC<{
                             </label>
                           </div>
                         </div>
-                        <p className="text-sm text-gray-800">
-                          <span>Tipe file: pdf</span>
-                        </p></>
+                      </>
                     }
                   </div>
                   <AlertDialogFooter>
@@ -556,7 +654,7 @@ const TrainingCard: React.FC<{
                     <div className="flex w-fit gap-2">
 
                       <AlertDialogAction onClick={(e) => handleSendToKapuslatAboutCertificateIssueance(pelatihan?.IdPelatihan.toString())} className="bg-green-500 border-green-500 hover:bg-green-500">
-                        Approve
+                        Approve dan Kirim ke Kapuslat KP
                       </AlertDialogAction>
                     </div>
 
@@ -594,7 +692,7 @@ const TrainingCard: React.FC<{
         </div>
       </CardFooter>
 
-    </Card>
+    </Card >
   )
 };
 

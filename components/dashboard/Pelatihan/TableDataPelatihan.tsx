@@ -264,7 +264,7 @@ const TableDataPelatihan: React.FC = () => {
         title: "Yeayyy!",
         text: "Berhasil mengirimkan informasi pengajuan kepada SPV Pusat!",
       });
-      handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyelesaikan drafting sttpl/sertifikat peserta dan mengirimkan ke SPV untuk pelatihan')
+      handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyelesaikan drafting sttpl/sertifikat peserta dan mengirimkan ke SPV untuk pelatihan', Cookies.get('Status'), Cookies.get('SATKER_BPPP'))
 
       handleFetchingPublicTrainingData();
     } catch (error) {
@@ -615,7 +615,7 @@ const TableDataPelatihan: React.FC = () => {
                               suratPemberitahuan={pelatihan?.SuratPemberitahuan}
                             />
 
-                            {
+                            z{
                               (!isOperatorBalaiPelatihan && pelatihan!.PemberitahuanDiterima == 'Kirim ke SPV') && <Button
                                 onClick={() => { countUserWithDrafCertificate(pelatihan!.UserPelatihan) == pelatihan.UserPelatihan.length ? handleSendToSPVAboutCertificateIssueance(pelatihan!.IdPelatihan.toString(), pelatihan) : alert('Oopsss, penyiapan draft sttpl/sertifikat peserta pelatihan belum selesai!') }}
                                 variant="outline"
