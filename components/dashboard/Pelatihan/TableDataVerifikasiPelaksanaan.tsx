@@ -59,7 +59,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
   const [data, setData] = React.useState<PelatihanMasyarakat[]>([]);
   const isLemdiklatLevel = usePathname().includes('lemdiklat')
   const isSupervisor = Cookies.get('Status') === 'Supervisor'
-  const isPejabat = Cookies.get('Jabatan')
+  const isPejabat = Cookies.get('Jabatan')?.includes('Kepala')
 
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
 
@@ -67,6 +67,8 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
   const [countVerifying, setCountVerifying] = React.useState<number>(0);
   const [countApproval, setCountApproval] = React.useState<number>(0);
   const [countApproved, setCountApproved] = React.useState<number>(0);
+  const [countSigning, setCountSigning] = React.useState<number>(0);
+  const [countSigningByKaBPPSDMKP, setCountSigningByKaBPPSDMKP] = React.useState<number>(0);
 
   const handleFetchingPublicTrainingData = async () => {
     setIsFetching(true);
@@ -91,6 +93,8 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
       setCountVerifying(countStatuses("PemberitahuanDiterima", "Pengajuan Telah Dikirim ke SPV"));
       setCountApproval(countStatuses("PemberitahuanDiterima", "Pengajuan Telah Dikirim ke SPV"));
       setCountApproved(countStatuses("IsMengajukanPenerbitan", "Pengajuan Telah Diapprove SPV"));
+      setCountSigning(countStatuses("IsMengajukanPenerbitan", "Pengajuan Telah Dikirim ke Kapuslat KP"));
+      setCountSigningByKaBPPSDMKP(countStatuses("IsMengajukanPenerbitan", "Pengajuan Telah Dikirim ke Kapuslat KP"))
 
       // Reverse the order of filtered data
       setData([...filteredData].reverse());
@@ -137,6 +141,8 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
       "Approved": pelatihan.IsMengajukanPenerbitan == 'Pengajuan Telah Diapprove SPV',
       "Sudah Di TTD": pelatihan.StatusPenerbitan === "Done",
       "Verifikasi Pelaksanaan": pelatihan.StatusPenerbitan === "Verifikasi Pelaksanaan",
+      "Signing": pelatihan.PemberitahuanDiterima === "Pengajuan Telah Dikirim ke Kapuslat KP" && pelatihan.TtdSertifikat === ESELON_2.fullName,
+      "Signing by Ka BPPSDM KP": pelatihan.PemberitahuanDiterima === "Pengajuan Telah Dikirim ke Kapuslat KP" && pelatihan.TtdSertifikat === ESELON_1.fullName,
     };
 
     // Check status filter
@@ -170,7 +176,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
               }}
             />
 
-            {isSupervisor && (
+            {isSupervisor && !isPejabat && (
               <StatusButton
                 label="Perlu DiApprove"
                 count={countApproval}
@@ -184,6 +190,38 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
                 }}
               />
             )}
+
+            {isPejabat && (
+              <StatusButton
+                label="Perlu Ditandatangani"
+                count={countSigning}
+                isSelected={selectedStatusFilter === "Signing"}
+                onClick={() => {
+                  setIsFetching(true);
+                  setTimeout(() => {
+                    setSelectedStatusFilter("Signing");
+                    setIsFetching(false);
+                  }, 800);
+                }}
+              />
+            )}
+
+
+            {Cookies.get('Jabatan') === ESELON_2.fullName && (
+              <StatusButton
+                label="Perlu Diteruskan ke Ka BPPSDM KP"
+                count={countSigning}
+                isSelected={selectedStatusFilter === "Signing by Ka BPPSDM KP"}
+                onClick={() => {
+                  setIsFetching(true);
+                  setTimeout(() => {
+                    setSelectedStatusFilter("Signing by Ka BPPSDM KP");
+                    setIsFetching(false);
+                  }, 800);
+                }}
+              />
+            )}
+
 
             {isSupervisor && (
               <StatusButton
@@ -199,19 +237,6 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
                 }}
               />
             )}
-
-
-
-            {
-              !isSupervisor && <>
-                <StatusButton
-                  label="Proses Verifikasi Pelaksanaan"
-                  count={countVerifying}
-                  isSelected={selectedStatusFilter === "Verifikasi Pelaksanaan"}
-                  onClick={() => setSelectedStatusFilter("Verifikasi Pelaksanaan")}
-                />
-              </>
-            }
           </ul>
         </section>
       </nav>

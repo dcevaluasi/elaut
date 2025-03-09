@@ -8,7 +8,7 @@ import { PiRecordFill } from "react-icons/pi"
 
 const ShowingBadge = ({ data, isFlying, isSupervisor }: { data: PelatihanMasyarakat, isFlying?: boolean, isSupervisor?: boolean }) => {
     const isAdminBalaiPelatihan: boolean = usePathname().includes('lemdiklat')
-    const isPejabat = Cookies.get('Jabatan')
+    const isPejabat = Cookies.get('Jabatan')?.includes('Kepala')
     return <>
         {
             isSupervisor ? <Badge

@@ -7,14 +7,6 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectLabel,
-} from "@/components/ui/select";
 import { HiMiniUserGroup, HiOutlineEye } from "react-icons/hi2";
 import ReCAPTCHA from "react-google-recaptcha";
 import { generateRandomId } from "@/lib/utils";
@@ -85,7 +77,7 @@ export const LoginAdminELAUT = () => {
 
     try {
       const response: AxiosResponse = await axios.post(
-        `${baseUrl}/${email.includes('bppp') || email.includes('balai') ? "lemdik" : "adminPusat"
+        `${baseUrl}/${email.includes('elaut.go.id') ? "lemdik" : "adminPusat"
         }/login`,
         JSON.stringify({ email, password }),
         { headers: { "Content-Type": "application/json" } }
@@ -101,7 +93,7 @@ export const LoginAdminELAUT = () => {
       Cookies.set("XSRF092", "true", { expires: 1 });
       Cookies.set(
         "XSRF093",
-        email.includes('bppp') || email.includes('balai')
+        email.includes('elaut.go.id')
           ? "balai"
           : "adminPusat",
         { expires: 1 }
@@ -111,7 +103,7 @@ export const LoginAdminELAUT = () => {
       setIsLoadingLogin(false);
 
       const dashboardPath =
-        email.includes('bppp') || email.includes('balai')
+        email.includes('elaut.go.id')
           ? `/${generateRandomId()}/lemdiklat/dashboard`
           : "/admin/pusat/dashboard";
       setIsRedirecting(true)
