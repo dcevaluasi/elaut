@@ -551,7 +551,7 @@ const TrainingCard: React.FC<{
                               </div>
                               <input
                                 type="file"
-                                className="flex h-20 w-full"
+                                className="hidden h-20 w-full"
                                 onChange={handleFileChange}
                               />
                             </label>
