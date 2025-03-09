@@ -2,11 +2,13 @@
 
 import { Badge } from "@/components/ui/badge"
 import { PelatihanMasyarakat } from "@/types/product"
+import Cookies from "js-cookie"
 import { usePathname } from "next/navigation"
 import { PiRecordFill } from "react-icons/pi"
 
 const ShowingBadge = ({ data, isFlying, isSupervisor }: { data: PelatihanMasyarakat, isFlying?: boolean, isSupervisor?: boolean }) => {
     const isAdminBalaiPelatihan: boolean = usePathname().includes('lemdiklat')
+    const isPejabat = Cookies.get('Jabatan')
     return <>
         {
             isSupervisor ? <Badge

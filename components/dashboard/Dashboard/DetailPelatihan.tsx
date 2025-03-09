@@ -1,54 +1,12 @@
 "use client";
 
 import React from "react";
-import {
-  RiProgress3Line,
-  RiRadioButtonLine,
-  RiShipLine,
-  RiVerifiedBadgeFill,
-} from "react-icons/ri";
 
-import { LucideFileCheck2, TrendingUp } from "lucide-react";
-
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-
-import {
-  ArrowUpDown,
-  Edit3Icon,
-  Fullscreen,
-  LucideClipboardEdit,
-  LucideNewspaper,
-  LucidePrinter,
-  Trash,
-  X,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { HiLockClosed, HiMiniUserGroup, HiUserGroup } from "react-icons/hi2";
 import { TbSchool } from "react-icons/tb";
-import {
-  IoIosBook,
-  IoIosInformationCircle,
-  IoMdBook,
-  IoMdClose,
-  IoMdGlobe,
-  IoMdInformationCircleOutline,
-} from "react-icons/io";
 import { FiUploadCloud } from "react-icons/fi";
 
 import { usePathname, useRouter } from "next/navigation";
-import { MdOutlineSaveAlt } from "react-icons/md";
-import FormPelatihan from "../admin/formPelatihan";
-
 import { convertDate } from "@/utils";
 import Cookies from "js-cookie";
 import { Progress } from "@/components/ui/progress";
@@ -66,21 +24,13 @@ import {
   formatToRupiah,
   generateInstrukturName,
 } from "@/lib/utils";
-import { Checkbox } from "@/components/ui/checkbox";
-import Toast from "@/components/toast";
-import { MateriButton, PublishButton } from "./Actions";
-import DeleteButton from "./Actions/DeleteButton";
 import CloseButton from "./Actions/CloseButton";
-import UploadSuratButton from "./Actions/UploadSuratButton";
 import GenerateNoSertifikatButton from "./Actions/GenerateNoSertifikatButton";
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import NoSertifikatButton from "./Actions/NoSertifikatButton";
 import HistoryButton from "./Actions/HistoryButton";
-import getDocument from "@/firebase/firestore/getData";
-import { DocumentData } from "firebase/firestore";
+import TTDSertifikat from "./pelatihan/TTDSertifikat";
 
 function DetailPelatihan() {
   const isAdminBalaiPelatihan: boolean = usePathname().includes('lemdiklat')
@@ -92,8 +42,6 @@ function DetailPelatihan() {
   const [pelatihan, setPelatihan] = React.useState<PelatihanMasyarakat | null>(
     null
   );
-
-
 
   const handleFetchDetailPelatihan = async () => {
     try {
@@ -206,7 +154,10 @@ function DetailPelatihan() {
                         handleFetchingData={
                           handleFetchDetailPelatihan
                         }
-                      /></>
+                      />
+
+                      <TTDSertifikat dataPelatihan={pelatihan!} handleFetchData={handleFetchDetailPelatihan} />
+                    </>
 
 
 
@@ -246,7 +197,7 @@ function DetailPelatihan() {
                   <td className="font-semibold p-4 w-[20%]">
                     Penyelenggara Pelatihan
                   </td>
-                  <td className="p-4 w-2/3 ">
+                  <td className="p-4 w-[80%] ">
                     {generateFullNameBalai(pelatihan!.PenyelenggaraPelatihan) ||
                       ""}{" "}
                     ({pelatihan!.PenyelenggaraPelatihan || ""})

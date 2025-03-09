@@ -10,6 +10,8 @@ const db = getFirestore(firebaseApp)
 export const handleAddHistoryTrainingInExisting = async (
   pelatihan: PelatihanMasyarakat,
   msg: string,
+  role?: string,
+  upt?: string,
 ) => {
   if (!pelatihan?.KodePelatihan) {
     console.error('Pelatihan data is missing!')
@@ -31,8 +33,8 @@ export const handleAddHistoryTrainingInExisting = async (
       created_at: generateTimestamp(),
       id: pelatihan.KodePelatihan,
       notes: `${msg} ${pelatihan.NamaPelatihan}`,
-      role: Cookies.get('Eselon'),
-      upt: Cookies.get('SATKER_BPPP'),
+      role: role ? Cookies.get('Jabatan') : Cookies.get('Eselon'),
+      upt: upt ? upt : Cookies.get('SATKER_BPPP'),
     }
 
     existingHistory.push(newEntryData)
@@ -42,7 +44,7 @@ export const handleAddHistoryTrainingInExisting = async (
       pelatihan.KodePelatihan,
       {
         historical: existingHistory,
-        status: 'On Progress',
+        status: role ? 'Done' : 'On Progress',
       },
     )
 

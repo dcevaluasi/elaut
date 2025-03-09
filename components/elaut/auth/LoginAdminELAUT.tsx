@@ -85,7 +85,7 @@ export const LoginAdminELAUT = () => {
 
     try {
       const response: AxiosResponse = await axios.post(
-        `${baseUrl}/${email.includes('bppp') || email.includes('balai') || email.includes('puslatkp') ? "lemdik" : "adminPusat"
+        `${baseUrl}/${email.includes('bppp') || email.includes('balai') ? "lemdik" : "adminPusat"
         }/login`,
         JSON.stringify({ email, password }),
         { headers: { "Content-Type": "application/json" } }
@@ -101,7 +101,7 @@ export const LoginAdminELAUT = () => {
       Cookies.set("XSRF092", "true", { expires: 1 });
       Cookies.set(
         "XSRF093",
-        email.includes('bppp') || email.includes('balai') || email.includes('puslatkp')
+        email.includes('bppp') || email.includes('balai')
           ? "balai"
           : "adminPusat",
         { expires: 1 }
@@ -111,12 +111,13 @@ export const LoginAdminELAUT = () => {
       setIsLoadingLogin(false);
 
       const dashboardPath =
-        email.includes('bppp') || email.includes('balai') || email.includes('puslatkp')
+        email.includes('bppp') || email.includes('balai')
           ? `/${generateRandomId()}/lemdiklat/dashboard`
           : "/admin/pusat/dashboard";
       setIsRedirecting(true)
       router.push(dashboardPath);
     } catch (error) {
+      console.error({ error })
       if (error instanceof AxiosError) {
         const errorMessage =
           error.response?.status === 401

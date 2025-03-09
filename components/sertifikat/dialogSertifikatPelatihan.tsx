@@ -658,7 +658,7 @@ const SertifikatKepelautan = React.forwardRef(
             </div>
 
             {!isPrinting && (
-              <div className="flex flex-row  absolute -bottom-5">
+              <div className="flex flex-row  absolute bottom-5">
                 <p className="text-[0.75rem] leading-[100%] text-center max-w-2xl">
                   Dokumen ini telah ditandatangani secara elektronik menggunakan
                   sertifikat elektronik yang telah diterbitkan oleh Balai

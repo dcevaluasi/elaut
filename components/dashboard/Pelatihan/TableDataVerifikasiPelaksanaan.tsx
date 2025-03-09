@@ -50,7 +50,7 @@ import { DIALOG_TEXTS } from "@/constants/texts";
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import Toast from "@/components/toast";
 import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
-import { ESELON_1 } from "@/constants/nomenclatures";
+import { ESELON_1, ESELON_2 } from "@/constants/nomenclatures";
 
 const TableDataVerifikasiPelaksanaan: React.FC = () => {
   // APPROVAL PENERBITAN SUPERVISOR
@@ -59,6 +59,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
   const [data, setData] = React.useState<PelatihanMasyarakat[]>([]);
   const isLemdiklatLevel = usePathname().includes('lemdiklat')
   const isSupervisor = Cookies.get('Status') === 'Supervisor'
+  const isPejabat = Cookies.get('Jabatan')
 
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
 
@@ -136,7 +137,6 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
       "Approved": pelatihan.IsMengajukanPenerbitan == 'Pengajuan Telah Diapprove SPV',
       "Sudah Di TTD": pelatihan.StatusPenerbitan === "Done",
       "Verifikasi Pelaksanaan": pelatihan.StatusPenerbitan === "Verifikasi Pelaksanaan",
-      "Bank Soal Disematkan": pelatihan.IsSematkan !== "yes",
     };
 
     // Check status filter
@@ -209,15 +209,6 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
                   count={countVerifying}
                   isSelected={selectedStatusFilter === "Verifikasi Pelaksanaan"}
                   onClick={() => setSelectedStatusFilter("Verifikasi Pelaksanaan")}
-                />
-
-                <StatusButton
-                  label="Bank Soal Perlu Disematkan"
-                  count={countVerifying}
-                  isSelected={selectedStatusFilter === "Bank Soal Perlu Disematkan"}
-                  onClick={() =>
-                    setSelectedStatusFilter("Bank Soal Perlu Disematkan")
-                  }
                 />
               </>
             }
@@ -368,7 +359,8 @@ const TrainingCard: React.FC<{
       if (pelatihan!.TtdSertifikat === ESELON_1.fullName) {
         handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyetujui permohonan penerbitan dan mengirimkan ke Kepala Pusat Pelatihan KP untuk pelatihan')
       } else {
-        handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyetujui permohonan penerbitan dan mengupload memo permohonan penerbitan ke Kepala Pusat Pelatihan KP untuk pelatihan')
+        handleGenerateSertifikat()
+        handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyetujui permohonan penerbitan dan mengupload memo permohonan penandatanganan ke Kepala Pusat Pelatihan KP untuk pelatihan')
       }
 
       console.log({ uploadBeritaAcaraResponse })
@@ -383,6 +375,57 @@ const TrainingCard: React.FC<{
       handleFetchingPublicTrainingData();
     }
   }
+
+  const [beritaAcara, setBeritaAcara] = React.useState<File | null>(null);
+
+
+  const handleFileChange = (e: any) => {
+    const file = e.target.files[0];
+    if (file) {
+      setBeritaAcara(file); // Simpan file tanpa validasi
+    }
+  };
+
+  const handleGenerateSertifikat = async () => {
+    if (beritaAcara) {
+      const fileExtension = beritaAcara.name.split(".").pop()?.toLowerCase();
+      if (fileExtension !== "pdf") {
+        Toast.fire({
+          icon: "error",
+          title: "Oopsss!",
+          text: "Gagal mengupload dokumen, harus mengupload dengan format PDF!",
+        });
+        return; // Hentikan proses jika file bukan PDF
+      }
+    }
+
+
+    const updateData = new FormData();
+
+
+    if (beritaAcara) {
+      updateData.append('BeritaAcara', beritaAcara);
+    }
+
+
+    try {
+      const uploadBeritaAcaraResponse = await axios.put(
+        `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${pelatihan!.IdPelatihan}`,
+        updateData,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log("UPLOAD BERITA ACARA: ", uploadBeritaAcaraResponse);
+    } catch (error) {
+      console.error("ERROR GENERATE SERTIFIKAT: ", error);
+    }
+  };
+
+  const isPejabat = Cookies.get('Jabatan')
 
   return (
     <Card className="relative">
@@ -427,32 +470,71 @@ const TrainingCard: React.FC<{
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <div className="flex flex-col gap-1 w-full">
-                    <div className="w-full">
-                      <label className="block text-gray-800 text-sm font-medium mb-1" htmlFor="approvalNotes">
-                        Catatan Approval <span className="text-red-600">*</span>
-                      </label>
-                      <input
-                        id="approvalNotes"
-                        type="text"
-                        value={approvalNotes}
-                        onChange={(e) => setApprovalNotes(e.target.value)}
-                        className="form-input w-full text-black border-gray-300 rounded-md"
-                        placeholder="Masukkan catatan..."
-                      />
-                    </div>
+
+                    {
+                      pelatihan!.TtdSertifikat === ESELON_2.fullName && <>
+                        <div className="grid grid-cols-1 space-y-2">
+                          <label
+                            className="block text-gray-800 text-sm font-medium mb-1"
+                            htmlFor="name"
+                          >
+                            Memo Permohonan Penandatangan Sertifikat
+                            <span className="text-red-600">*</span>
+                          </label>
+                          <div className="flex items-center justify-center w-full">
+                            <label className="flex flex-col rounded-lg border-2 border-dashed w-full h-40 p-10 group text-center">
+                              <div className="h-full w-full text-center flex flex-col items-center justify-center">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="w-10 h-10 text-blue-400 group-hover:text-blue-600"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                                  />
+                                </svg>
+                                {beritaAcara == null ? (
+                                  <p className="pointer-none text-gray-500 text-sm">
+                                    <span className="text-sm">Drag and drop</span> files
+                                    here <br /> or{" "}
+
+                                    select a file
+                                    from your computer
+                                  </p>
+                                ) : (
+                                  <p className="pointer-none text-gray-500 text-sm">
+                                    {beritaAcara.name}
+                                  </p>
+                                )}{" "}
+                              </div>
+                              <input
+                                type="file"
+                                className="hidden h-20 w-full"
+                                onChange={handleFileChange}
+                              />
+                            </label>
+                          </div>
+                        </div>
+                        <p className="text-sm text-gray-800">
+                          <span>Tipe file: pdf</span>
+                        </p></>
+                    }
                   </div>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    {approvalNotes !== '' && (
-                      <div className="flex w-fit gap-2">
-                        <AlertDialogAction className="bg-rose-500 border-rose-500 hover:bg-rose-500">
-                          Reject
-                        </AlertDialogAction>
-                        <AlertDialogAction onClick={(e) => handleSendToKapuslatAboutCertificateIssueance(pelatihan?.IdPelatihan.toString())} className="bg-green-500 border-green-500 hover:bg-green-500">
-                          Approve
-                        </AlertDialogAction>
-                      </div>
-                    )}
+
+                    <div className="flex w-fit gap-2">
+
+                      <AlertDialogAction onClick={(e) => handleSendToKapuslatAboutCertificateIssueance(pelatihan?.IdPelatihan.toString())} className="bg-green-500 border-green-500 hover:bg-green-500">
+                        Approve
+                      </AlertDialogAction>
+                    </div>
+
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>

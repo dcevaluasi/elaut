@@ -261,13 +261,8 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
                         <p className="pointer-none text-gray-500 text-sm">
                           <span className="text-sm">Drag and drop</span> files
                           here <br /> or{" "}
-                          <a
-                            href=""
-                            id=""
-                            className="text-blue-600 hover:underline"
-                          >
-                            select a file
-                          </a>{" "}
+
+                          select a file
                           from your computer
                         </p>
                       ) : (
@@ -278,7 +273,7 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
                     </div>
                     <input
                       type="file"
-                      className="hidden"
+                      className="hidden h-20 w-full"
                       onChange={handleFileChange}
                     />
                   </label>
