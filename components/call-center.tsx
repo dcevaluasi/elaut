@@ -89,7 +89,7 @@ function CallCenter() {
             </div>
             <div className="flex flex-col space-y-2">
               <h4 className="text-sm font-semibold">Layanan PTSP Balai Pelatihan dan Penyuluhan Perikanan (BPPP)</h4>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 {
                   CALL_CENTER_CONTACTS.map((item: Record<string, string>, index: number) => (
                     <AlertDialogAction className="hover:bg-blue-500 text-grayUsual border border-grayUsual hover:text-white hover:border-blue-500 bg-transparent flex gap-2 items-center group duration-700">

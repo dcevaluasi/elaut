@@ -345,10 +345,10 @@ function PencarianPelatihan() {
                     </Button>
                   </div>
                 </div>
-                <div className="flex md:hidden w-fit mb-5 -mt-2">
+                <div className="flex md:hidden w-full md:w-fit mb-5 -mt-2">
                   <Button
                     onClick={(e) => handleFetchingPublicTrainingData()}
-                    className="btn-sm text-sm w-fit px-3 text-white bg-blue-500 hover:bg-blue-600 cursor-pointer"
+                    className="btn-sm text-sm w-full md:w-fit px-3 text-white bg-blue-500 hover:bg-blue-600 cursor-pointer"
                   >
                     <span className="mr-2">Cari</span>
                     <FiSearch />
