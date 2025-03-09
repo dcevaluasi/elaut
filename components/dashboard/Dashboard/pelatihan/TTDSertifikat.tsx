@@ -44,6 +44,8 @@ import { HiOutlineEyeOff } from "react-icons/hi";
 const TTDSertifikat = ({ dataPelatihan, handleFetchData }: { dataPelatihan: PelatihanMasyarakat, handleFetchData: any }) => {
   const router = useRouter();
   const isPejabat = Cookies.get('Jabatan')?.includes('Kepala')
+  const isEselonI = Cookies.get('Jabatan')?.includes('Badan')
+  const isEselonII = Cookies.get('Jabatan')?.includes('Pusat')
 
   function generateDate(): string {
     const today = new Date();
@@ -126,7 +128,14 @@ const TTDSertifikat = ({ dataPelatihan, handleFetchData }: { dataPelatihan: Pela
     const formData = new FormData();
     formData.append("StatusPenerbitan", "Done");
     formData.append("PenerbitanSertifikatDiterima", generateDate());
-    formData.append('PemberitahuanDiterima', 'Telah Ditandatangani Ka Puslat KP')
+    if (isEselonI) {
+      formData.append('PemberitahuanDiterima', 'Telah Ditandatangani Ka BPPSDM KP')
+    } else if (isEselonII) {
+      formData.append('PemberitahuanDiterima', 'Telah Ditandatangani Ka Puslat KP')
+    } else {
+      formData.append('PemberitahuanDiterima', 'Telah Ditandatangani Ka Balai Pelatihan')
+    }
+
 
     try {
       const response = await axios.put(

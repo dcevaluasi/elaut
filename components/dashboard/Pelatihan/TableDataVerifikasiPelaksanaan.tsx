@@ -61,6 +61,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
   const isLemdiklatLevel = usePathname().includes('lemdiklat')
   const isSupervisor = Cookies.get('Status') === 'Supervisor'
   const isPejabat = Cookies.get('Jabatan')?.includes('Kepala')
+  const isEselonI = Cookies.get('Jabatan')?.includes('Badan')
 
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
 
@@ -69,6 +70,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
   const [countApproval, setCountApproval] = React.useState<number>(0);
   const [countApproved, setCountApproved] = React.useState<number>(0);
   const [countSigning, setCountSigning] = React.useState<number>(0);
+  const [countSigningEselon1, setCountSigningEselon1] = React.useState<number>(0);
   const [countSigningByKaBPPSDMKP, setCountSigningByKaBPPSDMKP] = React.useState<number>(0);
 
   const handleFetchingPublicTrainingData = async () => {
@@ -97,6 +99,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
 
       // KAPUSLAT POV
       setCountSigning(filteredData.filter((item) => item.PemberitahuanDiterima === "Pengajuan Telah Dikirim ke Kapuslat KP" && item.TtdSertifikat === ESELON_2.fullName).length);
+      setCountSigningEselon1(filteredData.filter((item) => item.PemberitahuanDiterima === "Pengajuan Telah Dikirim ke Ka BPPSDM KP" && item.TtdSertifikat === ESELON_1.fullName).length);
       setCountSigningByKaBPPSDMKP(filteredData.filter((item) => item.PemberitahuanDiterima === "Pengajuan Telah Dikirim ke Kapuslat KP" && item.TtdSertifikat === ESELON_1.fullName).length)
 
       // Reverse the order of filtered data
@@ -144,7 +147,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
       "Approved": pelatihan.IsMengajukanPenerbitan == 'Pengajuan Telah Diapprove SPV',
       "Sudah Di TTD": pelatihan.StatusPenerbitan === "Done",
       "Verifikasi Pelaksanaan": pelatihan.StatusPenerbitan === "Verifikasi Pelaksanaan",
-      "Signing": pelatihan.PemberitahuanDiterima === "Pengajuan Telah Dikirim ke Kapuslat KP" && pelatihan.TtdSertifikat === ESELON_2.fullName,
+      "Signing": isEselonI ? pelatihan.PemberitahuanDiterima === "Pengajuan Telah Dikirim ke Ka BPPSDM KP" && pelatihan.TtdSertifikat === ESELON_1.fullName : pelatihan.PemberitahuanDiterima === "Pengajuan Telah Dikirim ke Kapuslat KP" && pelatihan.TtdSertifikat === ESELON_2.fullName,
       "Signing by Ka BPPSDM KP": pelatihan.PemberitahuanDiterima === "Pengajuan Telah Dikirim ke Kapuslat KP" && pelatihan.TtdSertifikat === ESELON_1.fullName,
     };
 
@@ -212,7 +215,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
             {isPejabat && (
               <StatusButton
                 label="Perlu Ditandatangani"
-                count={countSigning}
+                count={isEselonI ? countSigningEselon1 : countSigning}
                 isSelected={selectedStatusFilter === "Signing"}
                 onClick={() => {
                   setIsFetching(true);
