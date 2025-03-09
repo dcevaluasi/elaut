@@ -391,17 +391,17 @@ const TrainingCard: React.FC<{
 
       if (isSupervisor) {
         if (pelatihan!.TtdSertifikat === ESELON_1.fullName) {
-          handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyetujui permohonan penerbitan dan mengirimkan ke Kepala Pusat Pelatihan KP untuk pelatihan', 'Supervisor', 'Pusat Pelatihan Kelautan dan Perikanan')
+          handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyetujui permohonan penerbitan dan mengirimkan ke Kepala Pusat Pelatihan KP untuk', 'Supervisor', 'Pusat Pelatihan Kelautan dan Perikanan')
         } else {
           handleGenerateSertifikat()
-          handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyetujui permohonan penerbitan dan mengupload memo permohonan penandatanganan ke Kepala Pusat Pelatihan KP untuk pelatihan', 'Supervisor', 'Pusat Pelatihan Kelautan dan Perikanan')
+          handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyetujui permohonan penerbitan dan mengupload memo permohonan penandatanganan ke Kepala Pusat Pelatihan KP untuk', 'Supervisor', 'Pusat Pelatihan Kelautan dan Perikanan')
         }
       } else {
         if (pelatihan!.TtdSertifikat === ESELON_1.fullName) {
-          handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyetujui permohonan penerbitan dan mengirimkan ke Kepala BPPSDM KP untuk pelatihan', 'Kepala Pusat Pelatihan Kelautan dan Perikanan', 'Pusat Pelatihan Kelautan dan Perikanan')
+          handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyetujui permohonan penerbitan dan mengirimkan ke Kepala BPPSDM KP untuk', 'Kepala Pusat Pelatihan Kelautan dan Perikanan', 'Pusat Pelatihan Kelautan dan Perikanan')
         } else {
           handleGenerateSertifikat()
-          handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyetujui permohonan penerbitan dan mengupload memo permohonan penandatanganan ke Kepala BPPSDM KP untuk pelatihan', 'Kepala Pusat Pelatihan Kelautan dan Perikanan', 'Pusat Pelatihan Kelautan dan Perikanan')
+          handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyetujui permohonan penerbitan dan mengupload memo permohonan penandatanganan ke Kepala BPPSDM KP untuk', 'Kepala Pusat Pelatihan Kelautan dan Perikanan', 'Pusat Pelatihan Kelautan dan Perikanan')
         }
       }
 

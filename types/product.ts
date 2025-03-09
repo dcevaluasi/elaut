@@ -224,6 +224,7 @@ export type UserPelatihan = {
   IsActice: string
   PenyelenggaraPelatihan: string
   TanggalMulai: string
+  TanggalBerakhir: string
   PendidikanTerakhir: string
   IsKeterangan: string
   MetodoPembayaran: string

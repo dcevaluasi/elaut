@@ -264,7 +264,7 @@ const TableDataPelatihan: React.FC = () => {
         title: "Yeayyy!",
         text: "Berhasil mengirimkan informasi pengajuan kepada SPV Pusat!",
       });
-      handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyelesaikan drafting sttpl/sertifikat peserta dan mengirimkan ke SPV untuk pelatihan', Cookies.get('Status'), Cookies.get('SATKER_BPPP'))
+      handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyelesaikan drafting sttpl/sertifikat peserta dan mengirimkan ke SPV untuk', Cookies.get('Status'), Cookies.get('SATKER_BPPP'))
 
       handleFetchingPublicTrainingData();
     } catch (error) {

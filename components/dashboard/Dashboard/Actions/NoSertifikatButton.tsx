@@ -57,7 +57,7 @@ const NoSertifikatButton: React.FC<NoSertifikatButtonProps> = ({
                 text: "Berhasil menginput nomor sertifikat!",
             });
 
-            handleAddHistoryTrainingInExisting(pelatihan!, 'Telah mengupload nomor sertfikat kelas pelatihan', Cookies.get('Status'), Cookies.get('SATKER_BPPP'))
+            handleAddHistoryTrainingInExisting(pelatihan!, 'Telah mengupload nomor sertfikat kelas', Cookies.get('Status'), Cookies.get('SATKER_BPPP'))
 
             setIsUploading(false);
             handleFetchingData();

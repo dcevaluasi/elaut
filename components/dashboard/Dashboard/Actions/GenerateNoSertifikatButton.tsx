@@ -107,7 +107,7 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
         text: "Berhasil mengupload file berita acara dan penandatangan, tunggu proses approval dari pusat!",
       });
 
-      handleAddHistoryTrainingInExisting(pelatihan!, 'Dalam proses mengajukan penerbitan sertfikat kelas pelatihan', Cookies.get('Status'), Cookies.get('SATKER_BPPP'))
+      handleAddHistoryTrainingInExisting(pelatihan!, 'Dalam proses mengajukan penerbitan sertfikat kelas', Cookies.get('Status'), Cookies.get('SATKER_BPPP'))
 
       setIsUploading(false);
       handleFetchingData();

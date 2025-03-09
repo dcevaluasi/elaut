@@ -23,6 +23,7 @@ import axios, { isAxiosError } from 'axios';
 import { RiVerifiedBadgeFill } from 'react-icons/ri';
 import { addFiveYears } from '@/utils/pelatihan';
 import { DIALOG_TEXTS } from '@/constants/texts';
+import { generateTanggalPelatihan } from '@/utils/text';
 
 const CertificateCheckFeature = () => {
     const certificates: Record<string, any>[] = [
@@ -244,10 +245,24 @@ const CertificateCheckFeature = () => {
                                         Tanggal Pelaksanaan{" "}
                                     </label>
                                     <p className="text-gray-600 text-base -mt-1">
-                                        {"10 Juni 2024 - 19 Juni 2024"}
+                                        {generateTanggalPelatihan(validSertifikat?.TanggalMulai)}- {generateTanggalPelatihan(validSertifikat?.TanggalBerakhir)}
                                     </p>
                                 </div>
                             </div>
+
+                            {/* <div className="flex flex-wrap border-b py-2 border-b-gray-300 w-full">
+                                <div className="w-full">
+                                    <label
+                                        className="block text-sm text-gray-800 font-medium mb-1"
+                                        htmlFor="name"
+                                    >
+                                        Ditandatangai Oleh{" "}
+                                    </label>
+                                    <p className="text-gray-600 text-base -mt-1">
+                                        {"10 Juni 2024 - 19 Juni 2024"}
+                                    </p>
+                                </div>
+                            </div> */}
 
                             <div className="flex flex-wrap  py-2  mb-6 w-full">
                                 <div className="w-full">
