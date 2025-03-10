@@ -6,6 +6,9 @@ export type ESELON = {
   fullNameEselon: string
 }
 
+export const KA_BPPSDM = 'Dr. I Nyoman Radiarta, S.Pi, M.Sc'
+export const KA_PUSLAT_KP = 'Dr. Lilly Aprilya Pregiwati, S.Pi., M.Si'
+
 export const ESELON_1: ESELON = {
   abbrv: 'Kepala BPPSDM KP',
   fullName:
