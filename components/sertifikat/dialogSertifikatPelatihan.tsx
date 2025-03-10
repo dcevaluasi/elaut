@@ -294,7 +294,7 @@ const SertifikatNonKepelautan = React.forwardRef(
               <div className="flex flex-row gap-2 items-center">
                 <div className="flex flex-col text-center">
                   <p className="font-bosBold text-lg max-w-md w-full uppercase">
-                    {pelatihan?.NamaPelatihan}
+                    Materi {pelatihan?.NamaPelatihan}
                   </p>
                   <p className="font-bos text-base max-w-3xl">{formatDateRange(generateTanggalPelatihan(pelatihan?.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan))}</p>
                 </div>
