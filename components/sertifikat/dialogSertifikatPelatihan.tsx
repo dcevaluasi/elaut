@@ -292,7 +292,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                 </div>
               </div>
             </div>
-            <div>
+            <div className='w-full'>
               <style>
                 {`
             .table-pdf {
@@ -334,98 +334,98 @@ const SertifikatNonKepelautan = React.forwardRef(
                 <tr>
                   <th
                     rowSpan={3}
-                    className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle"
+                    className="border border-black-2 mb-2 px-2 py-1 font-bosBold text-lg align-middle"
                   >
                     NO
                   </th>
                   <th
                     rowSpan={3}
-                    className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle"
+                    className="border border-black-2 mb-2 px-2 py-1 font-bosBold text-lg align-middle"
                   >
                     COURSES
                   </th>
                   <th
                     colSpan={3}
-                    className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle"
+                    className="border border-black-2 mb-2 px-2 py-1 font-bosBold text-lg align-middle"
                   >
                     ALOKASI WAKTU
                   </th>
                 </tr>
                 <tr>
-                  <th colSpan={2} className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle">
+                  <th colSpan={2} className="border border-black-2 mb-2 px-2 py-1 font-bosBold text-lg align-middle">
                     (@45 Menit)
                   </th>
                 </tr>
                 <tr>
-                  <th className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle">
+                  <th className="border border-black-2 mb-2 px-2 py-1 font-bosBold text-lg align-middle">
                     TEORI
                   </th>
-                  <th className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle">
+                  <th className="border border-black-2 mb-2 px-2 py-1 font-bosBold text-lg align-middle">
                     PRAKTEK
                   </th>
                 </tr>
                 <tr>
-                  <td className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle">
+                  <td className="border border-black-2 mb-2 px-2 py-1 font-bosBold text-lg align-middle">
                     I
                   </td>
-                  <td className="border text-lg border-black-2 px-2 py-1 text-left font-bosBold align-middle">
+                  <td className="border text-lg border-black-2 mb-2 px-2 py-1 text-left font-bosBold align-middle">
                     KOMPETENSI UMUM
                   </td>
-                  <td className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle"></td>
-                  <td className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle"></td>
+                  <td className="border border-black-2 mb-2 px-2 py-1 font-bosBold text-lg align-middle"></td>
+                  <td className="border border-black-2 mb-2 px-2 py-1 font-bosBold text-lg align-middle"></td>
                 </tr>
                 {CURRICULLUM_CERTIFICATE[pelatihan!.Program].UMUM.map((materi, index) => (
                   <tr key={index} className="text-sm">
-                    <td className="border border-black-2 px-2 py-1 align-middle">{index + 1}.</td>
-                    <td className="border border-black-2 px-2 py-1 text-left align-middle">
+                    <td className="border border-black-2 mb-2 px-2 py-1 align-middle">{index + 1}.</td>
+                    <td className="border border-black-2 mb-2 px-2 py-1 text-left align-middle">
                       <div className="flex flex-col">
                         <span className="text-base">{materi.name_ind}</span>
                         <span className="italic">{materi.name_eng}</span>
                       </div>
                     </td>
-                    <td className="border tdCenter  border-black-2 text-base px-2 py-1 align-middle">{materi.theory}</td>
-                    <td className="border tdCenter border-black-2 text-base px-2 py-1 align-middle">{materi.practice}</td>
+                    <td className="border tdCenter  border-black-2 mb-2 text-base px-2 py-1 align-middle">{materi.theory}</td>
+                    <td className="border tdCenter border-black-2 mb-2 text-base px-2 py-1 align-middle">{materi.practice}</td>
                   </tr>
                 ))}
                 <tr>
-                  <td className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle">
+                  <td className="border border-black-2 mb-2 px-2 py-1 font-bosBold text-lg align-middle">
                     II
                   </td>
-                  <td className="border text-lg border-black-2 px-2 py-1 text-left font-bosBold align-middle">
+                  <td className="border text-lg border-black-2 mb-2 px-2 py-1 text-left font-bosBold align-middle">
                     KOMPETENSI INTI
                   </td>
-                  <td className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle"></td>
-                  <td className="border border-black-2 px-2 py-1 font-bosBold text-lg align-middle"></td>
+                  <td className="border border-black-2 mb-2 px-2 py-1 font-bosBold text-lg align-middle"></td>
+                  <td className="border border-black-2 mb-2 px-2 py-1 font-bosBold text-lg align-middle"></td>
                 </tr>
                 {CURRICULLUM_CERTIFICATE[pelatihan!.Program].INTI.map((materi, index) => (
                   <tr key={index} className="text-sm">
-                    <td className="border border-black-2 px-2 py-1 align-middle">{index + 1}.</td>
-                    <td className="border border-black-2 px-2 py-1 text-left align-middle">
+                    <td className="border border-black-2 mb-2 px-2 py-1 align-middle">{index + 1}.</td>
+                    <td className="border border-black-2 mb-2 px-2 py-1 text-left align-middle">
                       <div className="flex flex-col">
                         <span className="text-base">{materi.name_ind}</span>
                         <span className="italic">{materi.name_eng}</span>
                       </div>
                     </td>
-                    <td className="border tdCenter border-black-2 text-base px-2 py-1 align-middle">{materi.theory}</td>
-                    <td className="border tdCenter border-black-2 text-base px-2 py-1 align-middle">{materi.practice}</td>
+                    <td className="border tdCenter border-black-2 mb-2 text-base px-2 py-1 align-middle">{materi.theory}</td>
+                    <td className="border tdCenter border-black-2 mb-2 text-base px-2 py-1 align-middle">{materi.practice}</td>
                   </tr>
                 ))}
                 <tr>
-                  <th colSpan={2} className="font-bosBold border border-black-2 px-2 py-1 text-lg align-middle">
+                  <th colSpan={2} className="font-bosBold border border-black-2 mb-2 px-2 py-1 text-lg align-middle">
                     JUMLAH JAM PELAJARAN
                   </th>
-                  <td className="border tdCenter border-black-2 px-2 py-1 font-bosBold text-base align-middle">
+                  <td className="border tdCenter border-black-2 mb-2 px-2 py-1 font-bosBold text-base align-middle">
                     {totalHours.totalTheory}
                   </td>
-                  <td className="border tdCenter border-black-2 px-2 py-1 font-bosBold text-base align-middle">
+                  <td className="border tdCenter border-black-2 mb-2 px-2 py-1 font-bosBold text-base align-middle">
                     {totalHours.totalPractice}
                   </td>
                 </tr>
                 <tr>
-                  <th colSpan={2} className="font-bosBold border border-black-2 px-2 py-1 text-lg tdCenter align-middle">
+                  <th colSpan={2} className="font-bosBold border border-black-2 mb-2 px-2 py-1 text-lg tdCenter align-middle">
                     TOTAL JAM PELAJARAN
                   </th>
-                  <th colSpan={2} className="border tdCenter border-black-2 px-2 py-1 font-bosBold align-middle">
+                  <th colSpan={2} className="border tdCenter border-black-2 mb-2 px-2 py-1 font-bosBold align-middle">
                     {totalHours.totalTheory + totalHours.totalPractice}
                   </th>
                 </tr>
