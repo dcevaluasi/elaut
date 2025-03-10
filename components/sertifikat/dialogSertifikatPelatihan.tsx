@@ -398,15 +398,7 @@ const SertifikatNonKepelautan = React.forwardRef(
             </table>
 
 
-            {!isPrinting && (
-              <div className="flex flex-row  absolute -bottom-8">
-                <p className="text-[0.75rem] leading-[100%] text-center max-w-3xl">
-                  Dokumen ini telah ditandatangani secara elektronik menggunakan
-                  sertifikat elektronik yang telah diterbitkan oleh Balai
-                  Sertifikasi Elektronik (BSrE), Badan Siber dan Sandi Negara
-                </p>
-              </div>
-            )}
+
           </div>
         </div>
       </div>
