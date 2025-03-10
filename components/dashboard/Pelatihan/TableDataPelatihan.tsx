@@ -615,7 +615,7 @@ const TableDataPelatihan: React.FC = () => {
                               suratPemberitahuan={pelatihan?.SuratPemberitahuan}
                             />
 
-                            z{
+                            {
                               (!isOperatorBalaiPelatihan && pelatihan!.PemberitahuanDiterima == 'Kirim ke SPV') && <Button
                                 onClick={() => { countUserWithDrafCertificate(pelatihan!.UserPelatihan) == pelatihan.UserPelatihan.length ? handleSendToSPVAboutCertificateIssueance(pelatihan!.IdPelatihan.toString(), pelatihan) : alert('Oopsss, penyiapan draft sttpl/sertifikat peserta pelatihan belum selesai!') }}
                                 variant="outline"
