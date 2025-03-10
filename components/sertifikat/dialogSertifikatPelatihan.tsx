@@ -111,7 +111,7 @@ const SertifikatNonKepelautan = React.forwardRef(
 
             <Image
               alt="Logo KKP"
-              className="mx-auto w-20 absolute bottom-6 left-28"
+              className="mx-auto w-20 absolute bottom-10 left-28"
               width={0}
               height={0}
               src="/qr-code/Cek_Sertifikat_ELAUT.png"
@@ -276,15 +276,7 @@ const SertifikatNonKepelautan = React.forwardRef(
               </div>
             </div>
 
-            {!isPrinting && (
-              <div className="flex flex-row  absolute -bottom-8">
-                <p className="text-[0.75rem] leading-[100%] text-center max-w-3xl">
-                  Dokumen ini telah ditandatangani secara elektronik menggunakan
-                  sertifikat elektronik yang telah diterbitkan oleh Balai
-                  Sertifikasi Elektronik (BSrE), Badan Siber dan Sandi Negara
-                </p>
-              </div>
-            )}
+
           </div>
 
           {/* Page 2 */}
@@ -717,7 +709,7 @@ export function DialogSertifikatPelatihan({
       },
       jsPDF: {
         unit: "px",
-        format: [element.offsetWidth, elementPage.offsetHeight + 150], // Dynamically adjust to content
+        format: [element.offsetWidth, elementPage.offsetHeight + 250], // Dynamically adjust to content
         orientation: "landscape",
       },
     };
