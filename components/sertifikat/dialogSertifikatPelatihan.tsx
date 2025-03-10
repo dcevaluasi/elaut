@@ -556,8 +556,8 @@ const SertifikatKepelautan = React.forwardRef(
                     </td>
                     <td className=" w-2/3  uppercase text-[12pt]">
                       :{" "}
-                      <span className="font-bosBold ml-5">
-                        {peserta != null ? capitalizeWords(peserta?.TempatLahir) : "-"}
+                      <span className="font-bosBold ml-5 uppercase">
+                        {peserta != null ? peserta?.TempatLahir.toUpperCase() : "-"}
                         {", "}{" "}
                         {peserta?.TanggalLahir}{" "}
                       </span>
