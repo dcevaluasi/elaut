@@ -396,6 +396,84 @@ const TableDataPesertaPelatihan = () => {
     }
   };
 
+  const handleLulusAllDataPeserta = async () => {
+    setIsIteratingProcess(true)
+    try {
+      // Iterate through each user and update their status
+      for (const user of data) {
+        const formData = new FormData();
+        formData.append("IsActice", 'LULUS');
+
+        console.log(`Updating user: ${user.IdUserPelatihan}, LULUS/TIDAK LULUS: LULUS`);
+
+        await axios.put(
+          `${baseUrl}/lemdik/updatePelatihanUsers?id=${user.IdUserPelatihan}`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+            },
+          }
+        );
+      }
+
+      Toast.fire({
+        icon: "success",
+        title: 'Yeayyy!',
+        text: `Berhasil meluluskan ${data.length} peserta pelatihan!`,
+      });
+
+      setIsIteratingProcess(false)
+      handleFetchingPublicTrainingDataById();
+      setOpenFormSematkanTanggalSertifikat(false);
+    } catch (error) {
+      console.error("ERROR UPDATE PELATIHAN:", error);
+      Toast.fire({
+        icon: "error",
+        title: 'Oopsss!',
+        text: `Gagal meluluskan ${data.length} peserta pelatihan!`,
+      });
+
+      setOpenFormSematkanTanggalSertifikat(false);
+      setIsIteratingProcess(false)
+      handleFetchingPublicTrainingDataById();
+    }
+  };
+
+  const handleLulusDataPeserta = async (user: UserPelatihan) => {
+    try {
+      const formData = new FormData();
+      formData.append("IsActice", user.IsActice == '' ? 'LULUS' : '');
+      console.log(`Updating user: ${user.IdUserPelatihan}, LULUS/TIDAK LULUS: ${user.IsActice == '' ? 'LULUS' : ''}`);
+      await axios.put(
+        `${baseUrl}/lemdik/updatePelatihanUsers?id=${user.IdUserPelatihan}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+          },
+        }
+      );
+
+      Toast.fire({
+        icon: "success",
+        title: 'Yeayyy!',
+        text: `Berhasil meluluskan peserta pelatihan!`,
+      });
+
+      handleFetchingPublicTrainingDataById();
+    } catch (error) {
+      console.error("ERROR UPDATE PELATIHAN:", error);
+      Toast.fire({
+        icon: "error",
+        title: 'Oopsss!',
+        text: `Gagal meluluskan  peserta pelatihan!`,
+      });
+
+      handleFetchingPublicTrainingDataById();
+    }
+  };
+
   const [
     openFormValidasiDataPesertaPelatihan,
     setOpenFormValidasiDataPesertaPelatihan,
@@ -702,102 +780,125 @@ const TableDataPesertaPelatihan = () => {
       ),
     },
     {
-      accessorKey: "IdUsers",
+      accessorKey: "IsActice",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
-            className={`text-black font-semibold w-fit p-0 ${isOperatorBalaiPelatihan ? "flex" : "hidden"
-              } justify-start items-center`}
+            className={`text-black font-semibold w-full p-0 flex justify-start items-centee`}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            <p className="leading-[105%]"> Pembayaran</p>
+            <p className="leading-[105%]">LULUS/TIDAK LULUS</p>
 
-            <GiTakeMyMoney className="ml-2 h-4 w-4" />
+            <HiMiniUserGroup className="ml-2 h-4 w-4" />
           </Button>
         );
       },
       cell: ({ row }) => (
-        <div
-          className={`${"ml-0"} text-left capitalize ${isOperatorBalaiPelatihan ? "block" : "hidden"
-            }`}
-        >
-          <p className="text-base font-semibold tracking-tight leading-none">
-            {formatToRupiah(parseInt(row.original.TotalBayar))}
-          </p>
+        <div className={`${"-ml-7"} text-left capitalize w-full items-center justify-center flex`}>
+          <span className='text-semibold flex gap-1'><Checkbox id="isActice" onCheckedChange={() => {
+            handleLulusDataPeserta(row.original)
+          }} checked={row.original.IsActice != '' ? true : false} /> {row.original.IsActice != '' ? 'LULUS' : 'TIDAK LULUS'}</span>
         </div>
       ),
     },
+    // {
+    //   accessorKey: "IdUsers",
+    //   header: ({ column }) => {
+    //     return (
+    //       <Button
+    //         variant="ghost"
+    //         className={`text-black font-semibold w-fit p-0 ${isOperatorBalaiPelatihan ? "flex" : "hidden"
+    //           } justify-start items-center`}
+    //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+    //       >
+    //         <p className="leading-[105%]"> Pembayaran</p>
 
-    {
-      accessorKey: "PreTest",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            className={`flex items-center justify-center p-0 leading-[105%] w-full text-gray-900 font-semibold`}
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            {dataPelatihan != null
-              ? dataPelatihan!.UjiKompotensi == "Portfolio"
-                ? "Portfolio"
-                : "Pre Test"
-              : ""}
+    //         <GiTakeMyMoney className="ml-2 h-4 w-4" />
+    //       </Button>
+    //     );
+    //   },
+    //   cell: ({ row }) => (
+    //     <div
+    //       className={`${"ml-0"} text-left capitalize ${isOperatorBalaiPelatihan ? "block" : "hidden"
+    //         }`}
+    //     >
+    //       <p className="text-base font-semibold tracking-tight leading-none">
+    //         {formatToRupiah(parseInt(row.original.TotalBayar))}
+    //       </p>
+    //     </div>
+    //   ),
+    // },
 
-            <MdOutlineNumbers className="ml-1 h-4 w-4" />
-          </Button>
-        );
-      },
-      cell: ({ row }) => (
-        <div
-          className={` flex items-center justify-center w-full gap-1 font-semibold ${row.original.PreTest > 70
-            ? "text-green-500"
-            : row.original.PreTest > 50
-              ? "text-yellow-500"
-              : "text-rose-500"
-            }`}
-        >
-          {row.original.PreTest}
-        </div>
-      ),
-    },
-    {
-      accessorKey: "PostTest",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            className={`${dataPelatihan != null
-              ? dataPelatihan!.UjiKompotensi == "Portfolio"
-                ? "hidden"
-                : "flex items-center justify-center"
-              : ""
-              }  p-0 leading-[105%] w-full text-gray-900 font-semibold`}
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Post Test
-            <MdOutlineNumbers className="ml-1 h-4 w-4" />
-          </Button>
-        );
-      },
-      cell: ({ row }) => (
-        <div
-          className={` ${dataPelatihan != null
-            ? dataPelatihan!.UjiKompotensi == "Portfolio"
-              ? "hidden"
-              : "flex items-center justify-center"
-            : ""
-            }  w-full gap-1 font-semibold ${row.original.PostTest > 70
-              ? "text-green-500"
-              : row.original.PostTest > 50
-                ? "text-yellow-500"
-                : "text-rose-500"
-            }`}
-        >
-          {row.original.PostTest}
-        </div>
-      ),
-    },
+    // {
+    //   accessorKey: "PreTest",
+    //   header: ({ column }) => {
+    //     return (
+    //       <Button
+    //         variant="ghost"
+    //         className={`flex items-center justify-center p-0 leading-[105%] w-full text-gray-900 font-semibold`}
+    //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+    //       >
+    //         {dataPelatihan != null
+    //           ? dataPelatihan!.UjiKompotensi == "Portfolio"
+    //             ? "Portfolio"
+    //             : "Pre Test"
+    //           : ""}
+
+    //         <MdOutlineNumbers className="ml-1 h-4 w-4" />
+    //       </Button>
+    //     );
+    //   },
+    //   cell: ({ row }) => (
+    //     <div
+    //       className={` flex items-center justify-center w-full gap-1 font-semibold ${row.original.PreTest > 70
+    //         ? "text-green-500"
+    //         : row.original.PreTest > 50
+    //           ? "text-yellow-500"
+    //           : "text-rose-500"
+    //         }`}
+    //     >
+    //       {row.original.PreTest}
+    //     </div>
+    //   ),
+    // },
+    // {
+    //   accessorKey: "PostTest",
+    //   header: ({ column }) => {
+    //     return (
+    //       <Button
+    //         variant="ghost"
+    //         className={`${dataPelatihan != null
+    //           ? dataPelatihan!.UjiKompotensi == "Portfolio"
+    //             ? "hidden"
+    //             : "flex items-center justify-center"
+    //           : ""
+    //           }  p-0 leading-[105%] w-full text-gray-900 font-semibold`}
+    //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+    //       >
+    //         Post Test
+    //         <MdOutlineNumbers className="ml-1 h-4 w-4" />
+    //       </Button>
+    //     );
+    //   },
+    //   cell: ({ row }) => (
+    //     <div
+    //       className={` ${dataPelatihan != null
+    //         ? dataPelatihan!.UjiKompotensi == "Portfolio"
+    //           ? "hidden"
+    //           : "flex items-center justify-center"
+    //         : ""
+    //         }  w-full gap-1 font-semibold ${row.original.PostTest > 70
+    //           ? "text-green-500"
+    //           : row.original.PostTest > 50
+    //             ? "text-yellow-500"
+    //             : "text-rose-500"
+    //         }`}
+    //     >
+    //       {row.original.PostTest}
+    //     </div>
+    //   ),
+    // },
 
   ];
 
