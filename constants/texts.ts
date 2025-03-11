@@ -89,6 +89,62 @@ export const CURRICULLUM_CERTIFICATE: Record<
       },
     ],
   },
+  CBIB: {
+    UMUM: [
+      {
+        name_ind: 'Policy on the Implementation of SJMHKP in Aquaculture',
+        name_eng: 'Fishery Product Quality and Safety Assurance System Policy',
+        theory: 2,
+        practice: 0,
+      },
+      {
+        name_ind: 'Kebijakan Pembinaan Penerapan CBIB',
+        name_eng: 'CBIB Implementation Guidance Policy',
+        theory: 2,
+        practice: 0,
+      },
+    ],
+    INTI: [
+      {
+        name_ind: 'Bahaya Pangan, Persyaratan Internasional dan Nasional',
+        name_eng: 'Food Hazards, International and National Requirements',
+        theory: 1,
+        practice: 2,
+      },
+      {
+        name_ind: 'Persyaratan SNI CBIB Keamanan Pangan',
+        name_eng: 'SNI CBIB Food Safety Requirements',
+        theory: 3,
+        practice: 6,
+      },
+      {
+        name_ind:
+          'Mekanisme Sistem Jaminan Mutu dan Keamanan Hasil perikanan Budidaya',
+        name_eng:
+          'Mechanism of Quality Assurance System and Safety of Aquaculture Products',
+        theory: 1,
+        practice: 3,
+      },
+      {
+        name_ind: 'Pengelolaan Resiko Unit Budidaya',
+        name_eng: 'Cultivation Unit Risk Management',
+        theory: 2,
+        practice: 4,
+      },
+      {
+        name_ind: 'Pengelolaan Kesehatan Ikan dan Biosecurity',
+        name_eng: 'Fish Health and Biosecurity Management',
+        theory: 2,
+        practice: 3,
+      },
+      {
+        name_ind: 'Prosedur Pengendalian Proses Budidaya',
+        name_eng: 'Cultivation Process Control Procedure',
+        theory: 2,
+        practice: 4,
+      },
+    ],
+  },
 }
 
 export function capitalizeWords(text: string): string {
