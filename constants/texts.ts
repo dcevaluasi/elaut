@@ -145,6 +145,55 @@ export const CURRICULLUM_CERTIFICATE: Record<
       },
     ],
   },
+  CPIB: {
+    UMUM: [
+      {
+        name_ind: 'Kebijakan Penerapan SJMHKP dalam Perikanan Budidaya',
+        name_eng: 'Policy on the Implementation of SJMHKP in Aquaculture',
+        theory: 2,
+        practice: 0,
+      },
+      {
+        name_ind: 'Kebijakan Sistem Perbenihan Ikan Nasional',
+        name_eng: 'National Fish Seed System Policy',
+        theory: 2,
+        practice: 0,
+      },
+    ],
+    INTI: [
+      {
+        name_ind: 'Standarisasi dan Pembinaan Penerapan CPIB',
+        name_eng: 'Standardization and Guidance on CPIB Implementation',
+        theory: 1,
+        practice: 2,
+      },
+      {
+        name_ind: 'Persyaratan SNI CBIB Keamanan Pangan',
+        name_eng: 'SNI CBIB Food Safety Requirements',
+        theory: 3,
+        practice: 6,
+      },
+      {
+        name_ind: 'SNI CPIB',
+        name_eng: 'Indonesian National Standard of CPIB',
+        theory: 1,
+        practice: 3,
+      },
+      {
+        name_ind: 'Dokumentasi CPIB - Penilaian Mandiri Penerapan CPIB',
+        name_eng: 'CPIB Documentation - CPIB Implementation Self-Assessment',
+        theory: 2,
+        practice: 4,
+      },
+      {
+        name_ind:
+          'Perizinan Berusaha Unit Pembenihan Terintegrasi Secara Elektronik',
+        name_eng: 'Electronic Integrated Hatchery Unit Business License',
+        theory: 2,
+        practice: 3,
+      },
+    ],
+  },
 }
 
 export function capitalizeWords(text: string): string {
