@@ -91,7 +91,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { generateTanggalPelatihan } from "@/utils/text";
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import { DIALOG_TEXTS } from "@/constants/texts";
-import { countUserWithNoSertifikat, countUserWithSpesimenTTD, countUserWithTanggalSertifikat, countValidKeterangan } from "@/utils/counter";
+import { countUserWithNoSertifikat, countUserWithPassed, countUserWithSpesimenTTD, countUserWithTanggalSertifikat, countValidKeterangan } from "@/utils/counter";
 import { generateTimestamp, getTodayInIndonesianFormat } from "@/utils/time";
 import { BiSolidCalendarAlt } from "react-icons/bi";
 import addData from "@/firebase/firestore/addData";
@@ -119,6 +119,7 @@ const TableDataPesertaPelatihan = () => {
   const [countPinnedCertificateNumber, setCountPinnedCertificateNumber] = React.useState<number>(0)
   const [countPinnedCertificateDate, setCountPinnedCertificateDate] = React.useState<number>(0)
   const [countPinnedCertificateSpesimen, setCountPinnedCertificateSpesimen] = React.useState<number>(0)
+  const [countPassed, setCountPassed] = React.useState<number>(0)
 
   const handleFetchingPublicTrainingDataById = async () => {
     try {
@@ -135,6 +136,7 @@ const TableDataPesertaPelatihan = () => {
       setData(response.data.UserPelatihan);
       setCountPinnedCertificateDate(countUserWithTanggalSertifikat(response.data.UserPelatihan))
       setCountPinnedCertificateSpesimen(countUserWithSpesimenTTD(response.data.UserPelatihan))
+      setCountPassed(countUserWithPassed(response.data.UserPelatihan))
 
       // Count entries with `FileSertifikat` as an empty string
       const count = response.data.UserPelatihan.filter(
@@ -425,7 +427,7 @@ const TableDataPesertaPelatihan = () => {
 
       setIsIteratingProcess(false)
       handleFetchingPublicTrainingDataById();
-      setOpenFormSematkanTanggalSertifikat(false);
+      setOpenFormKelulusanDataPesertaPelatihan(false);
     } catch (error) {
       console.error("ERROR UPDATE PELATIHAN:", error);
       Toast.fire({
@@ -434,7 +436,7 @@ const TableDataPesertaPelatihan = () => {
         text: `Gagal meluluskan ${data.length} peserta pelatihan!`,
       });
 
-      setOpenFormSematkanTanggalSertifikat(false);
+      setOpenFormKelulusanDataPesertaPelatihan(false);
       setIsIteratingProcess(false)
       handleFetchingPublicTrainingDataById();
     }
@@ -443,8 +445,8 @@ const TableDataPesertaPelatihan = () => {
   const handleLulusDataPeserta = async (user: UserPelatihan) => {
     try {
       const formData = new FormData();
-      formData.append("IsActice", user.IsActice == '' ? 'LULUS' : '');
-      console.log(`Updating user: ${user.IdUserPelatihan}, LULUS/TIDAK LULUS: ${user.IsActice == '' ? 'LULUS' : ''}`);
+      formData.append("IsActice", user.IsActice == 'LULUS' ? 'TIDAK LULUS' : 'LULUS');
+      console.log(`Updating user: ${user.IdUserPelatihan}, LULUS/TIDAK LULUS: ${user.IsActice == 'LULUS' ? 'TIDAK LULUS' : 'LULUS'}`);
       await axios.put(
         `${baseUrl}/lemdik/updatePelatihanUsers?id=${user.IdUserPelatihan}`,
         formData,
@@ -477,6 +479,11 @@ const TableDataPesertaPelatihan = () => {
   const [
     openFormValidasiDataPesertaPelatihan,
     setOpenFormValidasiDataPesertaPelatihan,
+  ] = React.useState<boolean>(false);
+
+  const [
+    openFormKelulusanDataPesertaPelatihan,
+    setOpenFormKelulusanDataPesertaPelatihan,
   ] = React.useState<boolean>(false);
 
   const [openFormSematkanNoSertifikat, setOpenFormSematkanNoSertifikat] = React.useState<boolean>(false)
@@ -749,7 +756,7 @@ const TableDataPesertaPelatihan = () => {
         );
       },
       cell: ({ row }) => (
-        <div className={`${"ml-0"} text-left capitalize`}>
+        <div className={`${"ml-0"} text-left capitalize `}>
           <p className="text-base font-semibold tracking-tight leading-none">
             {row.original.NoRegistrasi}
           </p>
@@ -762,7 +769,7 @@ const TableDataPesertaPelatihan = () => {
         return (
           <Button
             variant="ghost"
-            className={`text-black font-semibold w-full p-0 flex justify-start items-centee`}
+            className={`text-black font-semibold w-full p-0 flex justify-start items-center`}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             <p className="leading-[105%]"> Nama Peserta</p>
@@ -795,10 +802,10 @@ const TableDataPesertaPelatihan = () => {
         );
       },
       cell: ({ row }) => (
-        <div className={`${"-ml-7"} text-left capitalize w-full items-center justify-center flex`}>
-          <span className='text-semibold flex gap-1'><Checkbox id="isActice" onCheckedChange={() => {
+        <div className={`${"-ml-7"} text-left capitalize w-full ${row.original.IsActice === '' ? 'hidden' : 'flex'} items-center justify-center  flex`}>
+          <div className='text-black font-semibold w-full p-0 justify-center flex gap-1'><Checkbox id="isActice" onCheckedChange={() => {
             handleLulusDataPeserta(row.original)
-          }} checked={row.original.IsActice != '' ? true : false} /> {row.original.IsActice != '' ? 'LULUS' : 'TIDAK LULUS'}</span>
+          }} checked={row.original.IsActice != 'TIDAK LULUS' ? true : false} /><p> {row.original.IsActice != 'TIDAK LULUS' ? 'LULUS' : 'TIDAK LULUS'}</p></div>
         </div>
       ),
     },
@@ -1370,6 +1377,50 @@ const TableDataPesertaPelatihan = () => {
           </AlertDialogContent>
         </AlertDialog>
 
+        <AlertDialog open={openFormKelulusanDataPesertaPelatihan}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                {DIALOG_TEXTS['Kelulusan Grouping Peserta'].title}
+              </AlertDialogTitle>
+              <AlertDialogDescription className="-mt-2">
+                {DIALOG_TEXTS['Kelulusan Grouping Peserta'].desc}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <fieldset>
+              <form autoComplete="off">
+                <AlertDialogFooter className="mt-3">
+                  {
+                    isIteratingProcess ? <AlertDialogAction
+                      className="bg-green-500 hover:bg-green-600"
+                      disabled
+                    >
+                      Sedang diproses...
+                    </AlertDialogAction> : <>
+                      <AlertDialogCancel
+                        onClick={(e) =>
+                          setOpenFormKelulusanDataPesertaPelatihan(
+                            !openFormKelulusanDataPesertaPelatihan
+                          )
+                        }
+                      >
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-green-500 hover:bg-green-600"
+                        onClick={(e) =>
+                          handleLulusAllDataPeserta()
+                        }
+                      >
+                        Lulus
+                      </AlertDialogAction></>
+                  }
+                </AlertDialogFooter>
+              </form>
+            </fieldset>
+          </AlertDialogContent>
+        </AlertDialog>
+
         <AlertDialog open={openFormSematkanSpesimenSertifikat}>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -1511,6 +1562,21 @@ const TableDataPesertaPelatihan = () => {
                   <TbEditCircle />
 
                   Validasi Data Peserta
+                </div>
+              </div>
+            }
+
+            {
+              usePathname().includes('lemdiklat') && data!.length > 0 && countValid == data!.length && countPassed == 0 && <div className="w-full flex justify-end gap-2">
+                <div
+                  onClick={(e) => {
+                    setOpenFormKelulusanDataPesertaPelatihan(true)
+                  }}
+                  className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
+                >
+                  <TbEditCircle />
+
+                  Kelulusan Peserta
                 </div>
               </div>
             }

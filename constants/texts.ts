@@ -16,6 +16,12 @@ export const DIALOG_TEXTS = {
     desc:
       'Sebelum melakukan tindakan ini dipastikan anda sudah melihat detail data peserta pelatihan dan pastikan data yang masuk merupakan data yang valid serta perlu diingat tindakan ini bersifat permanen dan tidak dapat diubah!',
   },
+  'Kelulusan Grouping Peserta': {
+    title:
+      'Apakah anda yakin ingin meluluskan peserta pelatihan secara keseluruhan?',
+    desc:
+      'Sebelum melakukan tindakan ini dipastikan anda sudah berkoordinasi dengan Supervisor/Pengawas/Penguji/Pelatih/Pembina untuk meluluskan seluruh peserta, jika terdapat peserta yang tidak lulus ketika telah diluluskan semua, anda dapat men-uncheck pada kolom LULUS/TIDAK LULUS di data peserta.',
+  },
   'Sematkan No Sertifikat Grouping Peserta': {
     title:
       'Apakah anda yakin ingin menyematkan no sertifikat pada data peserta pelatihan secara grouping?',
