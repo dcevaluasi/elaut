@@ -24,7 +24,7 @@ function CallCenter() {
   const [open, setOpen] = React.useState(false);
 
   return (
-    <div className="flex flex-col gap-3 w-fit fixed right-3 md:right-10 bottom-24 md:bottom-10 z-[999999999]">
+    <div className={`${usePathname().includes('lemdiklat') || usePathname().includes('pusat') ? 'hidden' : 'flex'} flex-col gap-3 w-fit fixed right-3 md:right-10 bottom-24 md:bottom-10 z-[999999999]`}>
       <Link href={''} title='Manual Book User E-LAUT' className="gap-4 ">
         <Bounce duration={1000}>
           <div className="flex flex-col gap-2 cursor-pointer items-center duration-1000 hover:scale-105 text-center">
