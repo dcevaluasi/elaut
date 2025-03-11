@@ -220,10 +220,14 @@ const SertifikatNonKepelautan = React.forwardRef(
 
               <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-1 mb-2">
                 <h1 className="font-bosBold text-2xl leading-none">
-                  TELAH LULUS
+                  {
+                    userPelatihan?.IsActice === 'LULUS' ? ' TELAH LULUS' : 'TELAH MENGIKUTI'
+                  }
                 </h1>
                 <h3 className="font-bosBold text-lg italic">
-                  Has Passed
+                  {
+                    userPelatihan?.IsActice === 'LULUS' ? ' Has Passed' : 'Has Attended'
+                  }
                 </h3>
               </div>
 
