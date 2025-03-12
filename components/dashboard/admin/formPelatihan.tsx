@@ -754,10 +754,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                                   type="date"
                                   className="form-input w-full text-black border-gray-300 rounded-md"
                                   required
-                                  min={
-                                    tanggalBerakhirPendaftaran ||
-                                    new Date().toISOString().split("T")[0]
-                                  }
+
                                   value={tanggalMulaiPelatihan}
                                   onChange={(
                                     e: ChangeEvent<HTMLInputElement>
@@ -779,10 +776,10 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                                   type="date"
                                   className="form-input w-full text-black border-gray-300 rounded-md"
                                   required
-                                  // min={
-                                  //   tanggalMulaiPelatihan ||
-                                  //   new Date().toISOString().split("T")[0]
-                                  // }
+                                  min={
+                                    tanggalMulaiPelatihan ||
+                                    new Date().toISOString().split("T")[0]
+                                  }
                                   value={tanggalBerakhirPelatihan}
                                   onChange={(
                                     e: ChangeEvent<HTMLInputElement>
