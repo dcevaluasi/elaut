@@ -96,7 +96,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
       if (isEselonI) {
         filteredData = allData.filter((item: PelatihanMasyarakat) => item.TtdSertifikat === ESELON_1.fullName)
       } else if (isEselonII) {
-        filteredData = allData.filter((item: PelatihanMasyarakat) => item.TtdSertifikat === ESELON_2.fullName)
+        filteredData = allData.filter((item: PelatihanMasyarakat) => item.TtdSertifikat === ESELON_1.fullName || item.TtdSertifikat === ESELON_2.fullName)
       } else {
         filteredData = allData
       }
