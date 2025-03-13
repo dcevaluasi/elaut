@@ -61,7 +61,8 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
   const isLemdiklatLevel = usePathname().includes('lemdiklat')
   const isSupervisor = Cookies.get('Status') === 'Supervisor'
   const isPejabat = Cookies.get('Jabatan')?.includes('Kepala')
-  const isEselonI = Cookies.get('Jabatan')?.includes('Badan')
+  const isEselonI = Cookies.get('Jabatan')?.includes(ESELON_1.fullName)
+  const isEselonII = Cookies.get('Jabatan')?.includes(ESELON_2.fullName)
 
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
 
@@ -72,6 +73,9 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
   const [countSigning, setCountSigning] = React.useState<number>(0);
   const [countSigningEselon1, setCountSigningEselon1] = React.useState<number>(0);
   const [countSigningByKaBPPSDMKP, setCountSigningByKaBPPSDMKP] = React.useState<number>(0);
+
+  const [countSignedEselon1, setCountSignedEselon1] = React.useState<number>(0)
+  const [countSignedEselon2, setCountSignedEselon2] = React.useState<number>(0)
 
   const handleFetchingPublicTrainingData = async () => {
     setIsFetching(true);
@@ -87,7 +91,15 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
       );
 
       const allData = response?.data?.data || [];
-      let filteredData: any[] = allData;
+      var filteredData: PelatihanMasyarakat[] = []
+
+      if (isEselonI) {
+        filteredData = allData.filter((item: PelatihanMasyarakat) => item.TtdSertifikat === ESELON_1.fullName)
+      } else if (isEselonII) {
+        filteredData = allData.filter((item: PelatihanMasyarakat) => item.TtdSertifikat === ESELON_2.fullName)
+      } else {
+        filteredData = allData
+      }
 
       // Count different statuses
       const countStatuses = (statusKey: keyof typeof filteredData[0], value: any) =>
@@ -101,6 +113,8 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
       setCountSigning(filteredData.filter((item) => item.PemberitahuanDiterima === "Pengajuan Telah Dikirim ke Kapuslat KP" && item.TtdSertifikat === ESELON_2.fullName).length);
       setCountSigningEselon1(filteredData.filter((item) => item.PemberitahuanDiterima === "Pengajuan Telah Dikirim ke Ka BPPSDM KP" && item.TtdSertifikat === ESELON_1.fullName).length);
       setCountSigningByKaBPPSDMKP(filteredData.filter((item) => item.PemberitahuanDiterima === "Pengajuan Telah Dikirim ke Kapuslat KP" && item.TtdSertifikat === ESELON_1.fullName).length)
+      setCountSignedEselon1(filteredData.filter((item) => item.StatusPenerbitan === 'Done' && item.TtdSertifikat === ESELON_1.fullName).length)
+      setCountSignedEselon2(filteredData.filter((item) => item.StatusPenerbitan === 'Done' && item.TtdSertifikat === ESELON_2.fullName).length)
 
       // Reverse the order of filtered data
       setData([...filteredData].reverse());
@@ -148,6 +162,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
       "Sudah Di TTD": pelatihan.StatusPenerbitan === "Done",
       "Verifikasi Pelaksanaan": pelatihan.StatusPenerbitan === "Verifikasi Pelaksanaan",
       "Signing": isEselonI ? pelatihan.PemberitahuanDiterima === "Pengajuan Telah Dikirim ke Ka BPPSDM KP" && pelatihan.TtdSertifikat === ESELON_1.fullName : pelatihan.PemberitahuanDiterima === "Pengajuan Telah Dikirim ke Kapuslat KP" && pelatihan.TtdSertifikat === ESELON_2.fullName,
+      "Signed": isEselonI ? pelatihan.PemberitahuanDiterima === "Telah Ditandatangani Ka BPPSDM KP" && pelatihan.TtdSertifikat === ESELON_1.fullName : pelatihan.PemberitahuanDiterima === "Telah Ditandatangani Ka Puslat KP" && pelatihan.TtdSertifikat === ESELON_2.fullName,
       "Signing by Ka BPPSDM KP": pelatihan.PemberitahuanDiterima === "Pengajuan Telah Dikirim ke Kapuslat KP" && pelatihan.TtdSertifikat === ESELON_1.fullName,
     };
 
@@ -221,6 +236,21 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
                   setIsFetching(true);
                   setTimeout(() => {
                     setSelectedStatusFilter("Signing");
+                    setIsFetching(false);
+                  }, 800);
+                }}
+              />
+            )}
+
+            {isPejabat && (
+              <StatusButton
+                label="Sudah Ditandatangani"
+                count={isEselonI ? countSignedEselon1 : countSignedEselon2}
+                isSelected={selectedStatusFilter === "Signed"}
+                onClick={() => {
+                  setIsFetching(true);
+                  setTimeout(() => {
+                    setSelectedStatusFilter("Signed");
                     setIsFetching(false);
                   }, 800);
                 }}
