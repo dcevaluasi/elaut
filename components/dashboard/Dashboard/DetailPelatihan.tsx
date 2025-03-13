@@ -4,13 +4,10 @@ import React from "react";
 
 import { HiLockClosed, HiMiniUserGroup, HiUserGroup } from "react-icons/hi2";
 import { TbSchool } from "react-icons/tb";
-import { FiUploadCloud } from "react-icons/fi";
+import { FiEdit2, FiUploadCloud } from "react-icons/fi";
 
 import { usePathname, useRouter } from "next/navigation";
-import { convertDate } from "@/utils";
 import Cookies from "js-cookie";
-import { Progress } from "@/components/ui/progress";
-import { DialogTemplateSertifikatPelatihan } from "@/components/sertifikat/dialogTemplateSertifikatPelatihan";
 import Link from "next/link";
 import { elautBaseUrl } from "@/constants/urls";
 
@@ -31,9 +28,13 @@ import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import NoSertifikatButton from "./Actions/NoSertifikatButton";
 import HistoryButton from "./Actions/HistoryButton";
 import TTDSertifikat from "./pelatihan/TTDSertifikat";
+import { Button } from "@/components/ui/button";
+import DeleteButton from "./Actions/DeleteButton";
+import { PublishButton } from "./Actions";
 
 function DetailPelatihan() {
   const isAdminBalaiPelatihan: boolean = usePathname().includes('lemdiklat')
+  const isOperatorBalaiPelatihan = Cookies.get('SATKER_BPPP')?.includes('BPPP') || false
   const isLemdiklat = Cookies.get('Status') === 'Lemdiklat'
   const isSupervisor = Cookies.get('Status') === 'Supervisor'
   const paths = usePathname().split("/");
@@ -137,14 +138,15 @@ function DetailPelatihan() {
                           handleFetchDetailPelatihan
                         }
                       />
-                      <CloseButton
-                        pelatihan={pelatihan!}
-                        statusPelatihan={pelatihan?.Status ?? ""}
-                        idPelatihan={pelatihan!.IdPelatihan.toString()}
-                        handleFetchingData={
-                          handleFetchDetailPelatihan
-                        }
-                      />
+                      {new Date() >= new Date(pelatihan!.TanggalMulaiPelatihan) && (
+                        <CloseButton
+                          pelatihan={pelatihan!}
+                          statusPelatihan={pelatihan?.Status ?? ""}
+                          idPelatihan={pelatihan!.IdPelatihan.toString()}
+                          handleFetchingData={handleFetchDetailPelatihan}
+                        />
+                      )}
+
 
 
                       <HistoryButton
@@ -156,11 +158,71 @@ function DetailPelatihan() {
                         }
                       />
 
+                      {
+                        isOperatorBalaiPelatihan && <>
+
+                          {(pelatihan!.TanggalMulaiPelatihan == "" && pelatihan!.StatusApproval != 'Selesai') && (
+                            <Button
+                              onClick={() => {
+
+                              }}
+                              title="Edit Pelatihan"
+                              variant="outline"
+                              className="ml-auto w-full hover:bg-yellow-300 bg-yellow-300 hover:text-neutral-700 text-neutral-700 duration-700"
+                            >
+                              <FiEdit2 className="h-5 w-5" /> Edit Pelatihan
+                            </Button>
+                          )}
+
+                          {new Date() <= new Date(pelatihan!.TanggalMulaiPelatihan) &&
+                            (pelatihan!.Status == "Publish" ? (
+                              pelatihan!.UserPelatihan.length == 0 ? (
+                                <PublishButton
+                                  title="Take Down"
+                                  statusPelatihan={pelatihan?.Status ?? ""}
+                                  idPelatihan={pelatihan!.IdPelatihan.toString()}
+                                  handleFetchingData={
+                                    handleFetchDetailPelatihan
+                                  }
+                                />
+                              ) : (
+                                <></>
+                              )
+                            ) : (
+                              <PublishButton
+                                title="Publish"
+                                statusPelatihan={pelatihan?.Status ?? ""}
+                                idPelatihan={pelatihan!.IdPelatihan.toString()}
+                                handleFetchingData={
+                                  handleFetchDetailPelatihan
+                                }
+                              />
+                            ))
+                          }
+
+                          {pelatihan!.UserPelatihan.length == 0 && pelatihan!.MateriPelatihan.length == 0 && pelatihan!.SarprasPelatihan.length == 0 && (
+                            <>
+                              <DeleteButton
+                                idPelatihan={pelatihan!.IdPelatihan.toString()}
+                                pelatihan={pelatihan}
+                                handleFetchingData={
+                                  handleFetchDetailPelatihan
+                                }
+                              />
+                            </>
+                          )}
+
+                          <GenerateNoSertifikatButton
+                            idPelatihan={pelatihan!.IdPelatihan.toString()}
+                            pelatihan={pelatihan!}
+                            handleFetchingData={
+                              handleFetchDetailPelatihan
+                            }
+                          />
+                        </>
+                      }
                       <TTDSertifikat dataPelatihan={pelatihan!} handleFetchData={handleFetchDetailPelatihan} />
                     </>
-
-
-
                   </td>
                 </tr>
               </table>

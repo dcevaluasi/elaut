@@ -28,6 +28,14 @@ export const ESELON_2: ESELON = {
   fullNameEselon: 'Pusat Pelatihan Kelautan dan Perikanan',
 }
 
+export const ESELON_3: ESELON = {
+  abbrv: 'Kepala BPPP',
+  fullName: 'Kepala Balai Pelatihan dan Penyuluhan Perikanan',
+  fullNameEng: 'Head of the Fisheries Training and Extension Center',
+  abbrvEselon: 'BPPP',
+  fullNameEselon: 'Balai Pelatihan dan Penyuluhan Perikanan',
+}
+
 export const UPT: string[] = [
   'BPPP Medan',
   'BPPP Tegal',

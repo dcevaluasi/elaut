@@ -25,6 +25,12 @@ export const DESC_CERTIFICATE_COMPETENCE_FISHERIES: Record<
     desc_eng:
       'In the Quality Control Manager Training on Good Fish Hatchery Methods which was held in collaboration with the Maritime and Fisheries Training Center - Maritime and Fisheries Human Resource Development and Extension Agency with the Directorate of Seeds - Directorate General of Aquaculture on',
   },
+  CPIB: {
+    desc_ind:
+      'Dalam Pelatihan Cara Pembenihan Ikan yang Baik (CPIB) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Pembenihan - Direktorat Jenderal Perikanan Budidaya pada tanggal',
+    desc_eng:
+      'In the Training on Good Fish Hatchery Methods which was held in collaboration with the Maritime and Fisheries Training Center - Maritime and Fisheries Human Resource Development and Extension Agency with the Directorate of Seeds - Directorate General of Aquaculture on',
+  },
   CPPIB: {
     desc_ind:
       'Dalam Pelatihan Cara Pembuatan Pakan Ikan yang Baik (CPPIB) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Pakan dan Obat Ikan - Direktorat Jenderal Perikanan Budidaya pada tanggal',

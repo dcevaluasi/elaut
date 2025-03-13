@@ -41,6 +41,7 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
   const [ttdSertifikat, setTtdSertifikat] = React.useState<string>("");
   const [beritaAcara, setBeritaAcara] = React.useState<File | null>(null);
 
+  const isOperatorPusat = Cookies.get('Eselon') === 'Operator Pusat'
 
   const handleFileChange = (e: any) => {
     const file = e.target.files[0];
@@ -172,65 +173,7 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
                   />
                 </div>
               </div>
-              <div className="flex flex-wrap  mb-1 w-full">
-                <div className="w-full">
-                  <label
-                    className="block text-gray-800 text-sm font-medium mb-1"
-                    htmlFor="noSertifikat"
-                  >
-                    TTD Sertifikat <span className="text-red-600">*</span>
-                  </label>
-                  <select
-                    name=""
-                    id=""
-                    onChange={(e) => setTtdSertifikat(e.target.value)}
-                    className="w-full overflow-hidden rounded-lg border border-gray-300"
-                  >
-                    <option value={""}>Pilih Penandatangan</option>
-                    <option
-                      onClick={(e) =>
-                        setTtdSertifikat(
-                          "Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan"
-                        )
-                      }
-                      value={
-                        "Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan"
-                      }
-                    >
-                      Kepala BPPSDM KP
-                    </option>
-                    <option
-                      onClick={(e) =>
-                        setTtdSertifikat(
-                          "Kepala Pusat Pelatihan Kelautan dan Perikanan"
-                        )
-                      }
-                      value={
-                        "Kepala Pusat Pelatihan Kelautan dan Perikanan"
-                      }
-                    >
-                      Kepala Pusat Pelatihan KP
-                    </option>
-                    {isOperatorBalaiPelatihan && (
-                      <>
 
-                        <option
-                          onClick={(e) =>
-                            setTtdSertifikat(
-                              "Kepala Balai Pelatihan dan Penyuluhan Perikanan"
-                            )
-                          }
-                          value={
-                            "Kepala Balai Pelatihan dan Penyuluhan Perikanan"
-                          }
-                        >
-                          Kepala Balai Pelatihan
-                        </option>
-                      </>
-                    )}
-                  </select>
-                </div>
-              </div>
 
               <div className="grid grid-cols-1 space-y-2">
                 <label

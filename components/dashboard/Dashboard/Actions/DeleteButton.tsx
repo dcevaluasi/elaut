@@ -1,11 +1,5 @@
 import React from "react";
 import {
-  Tooltip,
-  TooltipProvider,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/components/ui/tooltip";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -23,6 +17,7 @@ import Cookies from "js-cookie";
 import { elautBaseUrl } from "@/constants/urls";
 import axios from "axios";
 import { PelatihanMasyarakat } from "@/types/product";
+import { useRouter } from "next/navigation";
 
 interface DeleteButtonProps {
   idPelatihan: string;
@@ -37,6 +32,7 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({
 }) => {
   const [isOpenFormDelete, setIsOpenFormDelete] =
     React.useState<boolean>(false);
+  const route = useRouter()
   const handleDelete = async (pesertaPelatihan: number, sertifikat: string) => {
     if (pesertaPelatihan > 0) {
       Toast.fire({
@@ -65,7 +61,7 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({
           icon: "success",
           title: "Berhasil menghapus pelatihan dari database, sobat elaut!",
         });
-        handleFetchingData();
+        route.push('/admin/lemdik/pelatihan')
         setIsOpenFormDelete(!isOpenFormDelete);
       } catch (error) {
         setIsOpenFormDelete(!isOpenFormDelete);

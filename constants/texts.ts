@@ -200,6 +200,127 @@ export const CURRICULLUM_CERTIFICATE: Record<
       },
     ],
   },
+  CPPIB: {
+    UMUM: [
+      {
+        name_ind: 'Kebijakan Penerapan SJMHKP dalam Perikanan Budidaya',
+        name_eng: 'Policy on the Implementation of SJMHKP in Aquaculture',
+        theory: 2,
+        practice: 0,
+      },
+      {
+        name_ind: 'Kebijakan Pemerintah Dalam Penerapan CPPIB',
+        name_eng: 'Government Policy on CPPIB Implementation',
+        theory: 2,
+        practice: 0,
+      },
+    ],
+    INTI: [
+      {
+        name_ind: 'Prinsip Penerapan CPPIB (Sistem Jaminan Mutu)',
+        name_eng:
+          'Principles of CPPIB Implementation (Quality Assurance System)',
+        theory: 2,
+        practice: 6,
+      },
+      {
+        name_ind: 'SNI Bahan Baku dan Pakan Ikan',
+        name_eng: 'SNI for raw materials and fish feed',
+        theory: 4,
+        practice: 4,
+      },
+      {
+        name_ind: 'Penyusunan Dokumen Penerapan CPPIB',
+        name_eng: 'Preparation of CPPIB implementation document',
+        theory: 2,
+        practice: 9,
+      },
+      {
+        name_ind:
+          'Perizinan berusaha terintegrasi terkait penerbitan  sertifikat  CPPIB',
+        name_eng:
+          'Integrated business licensing related to the issuance of CPPIB certificates',
+        theory: 1,
+        practice: 2,
+      },
+    ],
+  },
+  API: {
+    UMUM: [
+      {
+        name_ind: 'Kebijakan Sistem Jaminan Mutu dan Keamanan Hasil Perikanan',
+        name_eng:
+          'Policy on Quality Assurance System and Safety of Fishery Products',
+        theory: 1,
+        practice: 0,
+      },
+    ],
+    INTI: [
+      {
+        name_ind:
+          'Sertifikasi dalam Sistem Jaminan Mutu dan Keamanan Hasil Perikanan',
+        name_eng:
+          'Certification in Quality Assurance System and Safety of Fishery Products',
+        theory: 1,
+        practice: 1,
+      },
+      {
+        name_ind: 'Kemunduran Mutu Hasil Perikanan',
+        name_eng: 'Quality Deterioration of Fishery Products',
+        theory: 1,
+        practice: 3,
+      },
+      {
+        name_ind: 'Teknologi Penanganan Hasil Perikanan',
+        name_eng: 'Fishery Product Handling Technology',
+        theory: 1,
+        practice: 3,
+      },
+      {
+        name_ind: 'Teknologi Pengolahan Hasil Perikanan',
+        name_eng: 'Fishery Product Processing Technology',
+        theory: 1,
+        practice: 3,
+      },
+      {
+        name_ind: 'Teknologi Pengemasan dan Pelabelan',
+        name_eng: 'Packaging and Labeling Technology',
+        theory: 1,
+        practice: 2,
+      },
+      {
+        name_ind: 'Penerapan Good Manufacturing Practices (GMP)',
+        name_eng:
+          'Penerapan Praktik Produksi yang Baik (Good Manufacturing Practices/GMP)',
+        theory: 2,
+        practice: 0,
+      },
+      {
+        name_ind: 'Penyusunan Program Penerapan GMP',
+        name_eng: 'Preparation of GMP Implementation Program',
+        theory: 1,
+        practice: 3,
+      },
+      {
+        name_ind: 'Penerapan Standard Sanitation Operating Procedure (SSOP)',
+        name_eng: 'Penerapan Standar Prosedur Operasional Sanitasi (SSOP)',
+        theory: 2,
+        practice: 0,
+      },
+      {
+        name_ind: 'Penyusunan Program Pemenuhan Persyaratan SSOP',
+        name_eng: 'Formulation of SSOP Requirements Fulfillment Program',
+        theory: 1,
+        practice: 3,
+      },
+      {
+        name_ind: 'Penyusunan Panduan Mutu GMP dan SSOP',
+        name_eng: 'Preparation of GMP and SSOP Quality Guidelines',
+        theory: 2,
+        practice: 8,
+      },
+    ],
+  },
 }
 
 export function capitalizeWords(text: string): string {

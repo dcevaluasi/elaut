@@ -75,6 +75,7 @@ import { BiPaperPlane } from "react-icons/bi";
 import { countUserWithDrafCertificate } from "@/utils/counter";
 import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
 import HistoryButton from "../Dashboard/Actions/HistoryButton";
+import { ESELON_2, ESELON_3 } from "@/constants/nomenclatures";
 
 const TableDataPelatihan: React.FC = () => {
   const [data, setData] = React.useState<PelatihanMasyarakat[]>([]);
@@ -564,8 +565,6 @@ const TableDataPelatihan: React.FC = () => {
                                 </span>
                               )}
 
-
-
                               <span className="flex items-center gap-1 leading-[105%]">
                                 <TbCalendarCheck className="text-lg" />
                                 {pelatihan!.TanggalMulaiPelatihan != "" ? (
@@ -598,22 +597,52 @@ const TableDataPelatihan: React.FC = () => {
                       <CardFooter>
                         <div className="w-full flex-col flex center justify-between gap-2">
                           <div className="flex items-center w-fit  gap-1   -mt-2">
-                            <Link
-                              title="Detail Pelatihan"
-                              href={`/admin/lemdiklat/pelatihan/detail-pelatihan/${pelatihan.KodePelatihan
-                                }/${encryptValue(pelatihan.IdPelatihan)}`}
-                              className="border border-neutral-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-neutral-900 hover:bg-neutral-900 hover:text-white text-white rounded-md"
-                            >
-                              <RiInformationFill className="h-5 w-5" /> Detail
-                            </Link>
-                            <UploadSuratButton
-                              idPelatihan={pelatihan!.IdPelatihan.toString()}
-                              pelatihan={pelatihan!}
-                              handleFetchingData={
-                                handleFetchingPublicTrainingData
-                              }
-                              suratPemberitahuan={pelatihan?.SuratPemberitahuan}
-                            />
+                            {/* FOR ADMIN BALAI WHO TTD IS NOT KABALAI */}
+                            {
+                              isOperatorBalaiPelatihan && pelatihan!.SuratPemberitahuan != 'https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/suratPemberitahuan/' && pelatihan!.TtdSertifikat !== ESELON_3.fullName && <Link
+                                title="Detail Pelatihan"
+                                href={`/admin/lemdiklat/pelatihan/detail-pelatihan/${pelatihan.KodePelatihan
+                                  }/${encryptValue(pelatihan.IdPelatihan)}`}
+                                className="border border-neutral-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-neutral-900 hover:bg-neutral-900 hover:text-white text-white rounded-md"
+                              >
+                                <RiInformationFill className="h-5 w-5" /> Detail
+                              </Link>
+                            }
+
+                            {/* FOR ADMIN BALAI WHO TTD IS KABALAI */}
+                            {
+                              isOperatorBalaiPelatihan && pelatihan!.TtdSertifikat === ESELON_3.fullName && <Link
+                                title="Detail Pelatihan"
+                                href={`/admin/lemdiklat/pelatihan/detail-pelatihan/${pelatihan.KodePelatihan
+                                  }/${encryptValue(pelatihan.IdPelatihan)}`}
+                                className="border border-neutral-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-neutral-900 hover:bg-neutral-900 hover:text-white text-white rounded-md"
+                              >
+                                <RiInformationFill className="h-5 w-5" /> Detail
+                              </Link>
+                            }
+
+                            {/* FOR ADMIN PUSAT */}
+                            {
+                              !isOperatorBalaiPelatihan && <Link
+                                title="Detail Pelatihan"
+                                href={`/admin/lemdiklat/pelatihan/detail-pelatihan/${pelatihan.KodePelatihan
+                                  }/${encryptValue(pelatihan.IdPelatihan)}`}
+                                className="border border-neutral-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-neutral-900 hover:bg-neutral-900 hover:text-white text-white rounded-md"
+                              >
+                                <RiInformationFill className="h-5 w-5" /> Detail
+                              </Link>
+                            }
+
+                            {
+                              isOperatorBalaiPelatihan && pelatihan!.TtdSertifikat != 'Kepala Balai Pelatihan dan Penyuluhan Perikanan' && <UploadSuratButton
+                                idPelatihan={pelatihan!.IdPelatihan.toString()}
+                                pelatihan={pelatihan!}
+                                handleFetchingData={
+                                  handleFetchingPublicTrainingData
+                                }
+                                suratPemberitahuan={pelatihan?.SuratPemberitahuan}
+                              />
+                            }
 
                             {
                               (!isOperatorBalaiPelatihan && pelatihan!.PemberitahuanDiterima == 'Kirim ke SPV') && <Button
@@ -626,40 +655,9 @@ const TableDataPelatihan: React.FC = () => {
                               </Button>
                             }
 
-
-
-                            {/* Button untuk input nomor sertifikat, akan aktif jika balai pelatihan sudah mengupload BA dan memilih penandatanganan */}
-
-
-                            {/* {
-                              !isOperatorBalaiPelatihan && <><Link
-                                title={pelatihan!.UserPelatihan.length != 0 ? 'Peserta Pelatihan' : 'Upload Data Peserta'}
-                                href={`/admin/${isOperatorBalaiPelatihan
-                                  ? "lemdiklat"
-                                  : "pusat"
-                                  }/pelatihan/${pelatihan.KodePelatihan
-                                  }/peserta-pelatihan/${encryptValue(
-                                    pelatihan.IdPelatihan
-                                  )}`}
-                                target="_blank"
-                                className="  shadow-sm bg-green-500 hover:bg-green-500 text-neutral-100  hover:text-neutral-100 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2"
-                              >
-                                <HiUserGroup className="h-5 w-5 " /> {pelatihan!.UserPelatihan.length != 0 ? 'Peserta Pelatihan' : 'Upload Data Peserta'}
-                              </Link>  <GenerateNoSertifikatButton
-                                  idPelatihan={pelatihan!.IdPelatihan.toString()}
-                                  pelatihan={pelatihan!}
-                                  handleFetchingData={
-                                    handleFetchingPublicTrainingData
-                                  }
-                                /></>
-                            } */}
-
-
                             {
                               isOperatorBalaiPelatihan && <Popover>
-                                <PopoverTrigger asChild>
-                                  <Button variant="outline"><FiSettings />Actions</Button>
-                                </PopoverTrigger>
+
                                 <PopoverContent className="w-80 flex flex-col gap-1">
 
 

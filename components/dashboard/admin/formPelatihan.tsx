@@ -44,7 +44,7 @@ import { doc, getFirestore } from "firebase/firestore";
 import firebaseApp from "@/firebase/config";
 import addData from "@/firebase/firestore/addData";
 import { generateTimestamp } from "@/utils/time";
-import { UPT } from "@/constants/nomenclatures";
+import { ESELON_1, ESELON_2, ESELON_3, UPT } from "@/constants/nomenclatures";
 
 type Checked = DropdownMenuCheckboxItemProps["checked"];
 
@@ -1271,6 +1271,40 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                               </SelectContent>
                             </Select>
                           </div>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap mb-1 w-full">
+                        {/* Input Jenis Penilaian */}
+                        <div className="w-full">
+                          <label
+                            className="block text-gray-800 text-sm font-medium mb-1"
+                            htmlFor="ttdSertifikat"
+                          >
+                            Penandatangan Sertifikat{" "}
+                            <span className="text-red-600">*</span>
+                          </label>
+                          <Select
+                            value={ttdSertifikat}
+                            onValueChange={(value: string) =>
+                              setTtdSertifikat(value)
+                            }
+                          >
+                            <SelectTrigger className="w-full text-base py-5">
+                              <SelectValue placeholder="Pilih Penandatangan" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value={ESELON_1.fullName}>
+                                {ESELON_1.fullName}
+                              </SelectItem>
+                              <SelectItem value={ESELON_2.fullName}>
+                                {ESELON_2.fullName}
+                              </SelectItem>
+                              <SelectItem value={ESELON_3.fullName}>
+                                {ESELON_3.fullName}
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
 
