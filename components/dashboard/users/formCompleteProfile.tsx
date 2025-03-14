@@ -310,28 +310,28 @@ function FormCompleteProfile() {
           <form className="max-w-6xl w-full mx-auto">
             <div className="flex items-center justify-between">
               {indexFormTab == 0 ? (
-                <h2 className=" text-2xl leading-[100%] my-6 md:text-2xl text-black font-calsans flex items-center gap-1">
+                <h2 className=" text-2xl leading-[100%] my-6 md:text-2xl text-blue-500 font-calsans flex items-center gap-1">
                   <TbUserEdit />
                   <span className="mt-2">Data Pribadi</span>
                 </h2>
               ) : indexFormTab == 1 ? (
-                <h2 className=" text-2xl leading-[100%] my-6 md:text-2xl text-black font-calsans flex items-center gap-1">
+                <h2 className=" text-2xl leading-[100%] my-6 md:text-2xl text-blue-500 font-calsans flex items-center gap-1">
                   <TbMapPinSearch />
                   <span className="mt-2">Alamat Domisili</span>
                 </h2>
               ) : indexFormTab == 2 ? (
-                <h2 className=" text-2xl leading-[100%] my-6 md:text-2xl text-black font-calsans flex items-center gap-1">
+                <h2 className=" text-2xl leading-[100%] my-6 md:text-2xl text-blue-500 font-calsans flex items-center gap-1">
                   <MdWorkOutline />
                   <span className="mt-1">Riwayat Pendidikan/Pekerjaan</span>
                 </h2>
               ) : (
-                <h2 className=" text-2xl leading-[100%] my-6 md:text-2xl text-black font-calsans flex items-center gap-1">
+                <h2 className=" text-2xl leading-[100%] my-6 md:text-2xl text-blue-500 font-calsans flex items-center gap-1">
                   <TbFileStack />
                   <span className="mt-2">Berkas dan Dokumen</span>
                 </h2>
               )}
 
-              <p className="text-base">
+              <p className="text-base text-grayUsual">
                 {indexFormTab == 0 ? (
                   <span className="font-bold  leading-[100%] my-6 text-blue-500 ">
                     1
@@ -1029,7 +1029,7 @@ function FormCompleteProfile() {
                 <div className={`w-full ${indexFormTab == 0 && "hidden"}`}>
                   <button
                     type="submit"
-                    className="btn text-white bg-blue-600 hover:bg-blue-700 w-full"
+                    className="btn text-white bg-blue-500 hover:bg-blue-600 w-full"
                     onClick={(e) => {
                       setIndexFormTab(indexFormTab - 1);
                       scrollToTop();
@@ -1045,7 +1045,7 @@ function FormCompleteProfile() {
                   <button
                     type="submit"
                     onClick={(e) => setIndexFormTab(indexFormTab + 1)}
-                    className="btn text-white bg-blue-600 hover:bg-blue-700 w-full"
+                    className="btn text-white bg-blue-500 hover:bg-blue-600 w-full"
                   >
                     Selanjutnya
                   </button>
@@ -1059,7 +1059,7 @@ function FormCompleteProfile() {
                       handleCompleteProfileUser();
                     }}
                     type="submit"
-                    className="btn text-white flex items-center justify-center bg-blue-600 hover:bg-blue-700 w-full"
+                    className="btn text-white flex items-center justify-center bg-blue-500 hover:bg-blue-600 w-full"
                   >
                     {isLoadingCompleteProfile ? (
                       <HashLoader color="#FFFFFF" size={20} />
