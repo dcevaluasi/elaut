@@ -197,7 +197,7 @@ function UserTrainingService({ user }: { user: User | null }) {
         <div className="absolute left-0 right-0 m-auto w-px p-px h-28 bg-gray-200 transform -translate-y-1/2"></div>
 
         <div className="relative w-full mx-auto px-4 sm:px-6">
-          <div className="pt-12 md:pt-20">
+          <div className="">
             {/* Section header */}
 
             {isManningAgent == "true" ? (

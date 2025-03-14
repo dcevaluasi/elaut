@@ -24,10 +24,20 @@ export default function UserService({ user }: { user: User | null }) {
   const tabMenus = [
     {
       id: 1,
-      name: "Pelatihan",
+      name: "Pelatihan Yang Diikuti",
       description:
         "Pelatihan yang diselenggaran BPPSDM KP untuk menjaring masyarakat kelautan perikanan yang ingin mengasah skill nya dibidang kelautan dan perikanan",
       image: "/illustrations/bppp-training.png",
+      icon: (
+        <HiUserGroup className="absolute right-5 bottom-5 text-5xl text-gray-200 duration-1000" />
+      ),
+    },
+    {
+      id: 1,
+      name: "Sertifikat Pelatihan",
+      description:
+        "Pelatihan yang diselenggaran BPPSDM KP untuk menjaring masyarakat kelautan perikanan yang ingin mengasah skill nya dibidang kelautan dan perikanan",
+      image: "/illustrations/bppp-certificate.png",
       icon: (
         <HiUserGroup className="absolute right-5 bottom-5 text-5xl text-gray-200 duration-1000" />
       ),
@@ -44,7 +54,7 @@ export default function UserService({ user }: { user: User | null }) {
     // },
     {
       id: 4,
-      name: "Profile",
+      name: "Profile Pengguna",
       description:
         "Pelatihan yang diselenggaran BPPSDM KP untuk menjaring masyarakat kelautan perikanan yang ingin mengasah skill nya dibidang kelautan dan perikanan",
       image: "/illustrations/user-profile.png",
@@ -88,46 +98,46 @@ export default function UserService({ user }: { user: User | null }) {
   };
 
   return (
-    <div className="w-full text-left">
-      <div className="relative pb-20 " id="explore">
-
-
-        <div className="relative w-full">
-          <div className="">
-            <div className="flex flex-row flex-wrap md:flex-nowrap items-center justify-center gap-5 md:gap-9">
-              {tabMenus.map((tabMenu, index) => (
-                <div key={index} className="gap-4 w-fit">
-                  <Slide direction="up" duration={500 * index}>
-                    <div
-                      key={index}
-                      onClick={(e) => handleSelectedMenu(index)}
-                      className="flex flex-col gap-2 cursor-pointer items-center duration-1000 hover:scale-105 text-center"
-                    >
-                      <div className="flex items-center justify-center  bg-white shadow-custom rounded-xl w-24 h-24 md:w-28 md:h-28 p-6">
-                        <Image
-                          className="w-16 md:w-16"
-                          width={0}
-                          height={0}
-                          src={tabMenu.image}
-                          alt="Kementrian Kelautan dan Perikanan RI Logo"
-                        />
-                      </div>
-                      <p className="text-sm text-gray-400 font-semibold">
+    <div className="w-full text-left flex flex-col space-y-5">
+      <div className="relative w-full" id="explore">
+        <div className={`grid grid-cols-${tabMenus.length} md:flex md:flex-row  md:flex-nowrap md:items-center justify-center gap-5 w-full`}>
+          {tabMenus.map((tabMenu, index) => (
+            <div key={index} className="gap-2 w-full">
+              <Slide direction="up" duration={500 * index}>
+                <div
+                  key={index}
+                  onClick={(e) => handleSelectedMenu(index)}
+                  className="flex flex-col gap-2 cursor-pointer items-center duration-1000 hover:scale-105 text-center w-full"
+                >
+                  <div className="flex items-center justify-center !py-8 bg-white shadow-custom rounded-xl flex-col space-y-2  w-full px-6">
+                    <Image
+                      className="w-16 md:w-16"
+                      width={0}
+                      height={0}
+                      src={tabMenu.image}
+                      alt="Kementrian Kelautan dan Perikanan RI Logo"
+                    />
+                    <div className="space-y-1 hidden md:flex flex-col leading-none">
+                      <p className="text-blue-500 font-semibold">
                         {tabMenu.name}
                       </p>
+
+                      <p className="text-xs text-gray-400 ">
+                        {tabMenu.description}
+                      </p>
                     </div>
-                  </Slide>
+                  </div>
+
                 </div>
-              ))}
+              </Slide>
             </div>
-            {/* </Swiper> */}
-          </div>
+          ))}
         </div>
       </div>
 
       {indexMenuSelected == 0 && <UserTrainingService user={user} />}
       {/* {indexMenuSelected == 1 && <UserCertificateService user={user} />} */}
-      {indexMenuSelected == 1 && <UserDocuments user={user} />}
+      {indexMenuSelected == 2 && <UserDocuments user={user} />}
     </div>
   );
 }

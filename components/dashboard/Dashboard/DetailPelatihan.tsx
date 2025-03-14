@@ -31,6 +31,7 @@ import TTDSertifikat from "./pelatihan/TTDSertifikat";
 import { Button } from "@/components/ui/button";
 import DeleteButton from "./Actions/DeleteButton";
 import { PublishButton } from "./Actions";
+import { ESELON_1, ESELON_2 } from "@/constants/nomenclatures";
 
 function DetailPelatihan() {
   const isAdminBalaiPelatihan: boolean = usePathname().includes('lemdiklat')
@@ -38,6 +39,10 @@ function DetailPelatihan() {
   const isLemdiklat = Cookies.get('Status') === 'Lemdiklat'
   const isSupervisor = Cookies.get('Status') === 'Supervisor'
   const paths = usePathname().split("/");
+
+  const isEselonI = Cookies.get('Jabatan')?.includes(ESELON_1.fullName)
+  const isEselonII = Cookies.get('Jabatan')?.includes(ESELON_2.fullName)
+
   const idPelatihan = decryptValue(paths[paths.length - 1]);
   const kodePelatihan = paths[paths.length - 2];
   const [pelatihan, setPelatihan] = React.useState<PelatihanMasyarakat | null>(
@@ -221,7 +226,15 @@ function DetailPelatihan() {
                           />
                         </>
                       }
-                      <TTDSertifikat dataPelatihan={pelatihan!} handleFetchData={handleFetchDetailPelatihan} />
+
+                      {
+                        pelatihan!.PemberitahuanDiterima === 'Pengajuan Telah Dikirim ke Ka BPPSDM KP' && isEselonI && <TTDSertifikat dataPelatihan={pelatihan!} handleFetchData={handleFetchDetailPelatihan} />
+                      }
+
+                      {
+                        pelatihan!.PemberitahuanDiterima === 'Pengajuan Telah Dikirim ke Kapuslat KP' && isEselonII && <TTDSertifikat dataPelatihan={pelatihan!} handleFetchData={handleFetchDetailPelatihan} />
+                      }
+
                     </>
                   </td>
                 </tr>

@@ -110,18 +110,21 @@ export default function DashboardUser() {
                                     id="cek-sertifikat"
                                     className="scroll-smooth w-full  -mt-16 md:mt-6"
                                 >
-                                    <div className="flex flex-col  gap-2 w-full items-center justify-center p-5 md:p-0 text-center">
-                                        <div className="flex flex-col space-y-1 text-center rounded-2xl bg-white shadow-custom w-full py-16">
+                                    <div className="flex flex-col  space-y-5 w-full items-center justify-center  text-center">
+                                        <div className="flex flex-col space-y-2 text-center rounded-2xl bg-white shadow-custom w-full py-16 px-5 md:px-0">
                                             <h1 className="text-blue-500 text-[3rem] md:text-[3.6rem] font-calsans leading-none capitalize">
-                                                Dashboard <br /> {capitalizeWords(userDetail!.Nama)}
+                                                Dashboard <br /> {(userDetail!.Nama.toLowerCase())}
                                             </h1>
-                                            <p className="text-blue-500 leading-none">
-                                                Ayo jelajahi aplikasi E-LAUT dan temukan pelatihan unggul di sektor Kelautan dan Perikanan menarik!
-                                            </p>
+                                            <div className="space-y-1 flex flex-col leading-none">
+                                                <p className="text-blue-500 ">
+                                                    Ayo jelajahi aplikasi E-LAUT dan temukan pelatihan unggul di sektor Kelautan dan Perikanan menarik!
+                                                </p>
 
-                                            <p className="text-xs text-gray-400 mt-5 mb-16">
-                                                *Ini merupakan laman dashboard pengguna E-LAUT, telusuri pelatihan yang kamu ikuti dan nikmati layanan tersedi lainnya!
-                                            </p>
+                                                <p className="text-xs text-gray-400 ">
+                                                    *Ini merupakan laman dashboard pengguna E-LAUT, telusuri pelatihan yang kamu ikuti dan nikmati layanan tersedi lainnya!
+                                                </p>
+                                            </div>
+
 
 
                                         </div>

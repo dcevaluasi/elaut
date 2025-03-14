@@ -228,8 +228,8 @@ export default function Header() {
               usePathname().includes("sertifikasi") ||
               usePathname().includes("users")
               ? `bg-white backdrop-blur-sm !pt-0 shadow-custom !text-[#979797] hover:!text-blue-500 `
-              : usePathname().includes("complete-profile") ||
-                usePathname().includes("cek-sertifikat") || usePathname() == "/dashboard"
+              :
+              usePathname().includes("cek-sertifikat") || usePathname() == "/dashboard"
                 ? "bg-white backdrop-blur-sm shadow-custom "
                 : ""
         }  ${usePathname().includes("program") && "bg-transparent"} ${top && usePathname().includes("login") && "bg-transparent !text-white"

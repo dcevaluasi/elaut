@@ -497,6 +497,8 @@ const TrainingCard: React.FC<{
     }
   };
 
+  const isEselonII = Cookies.get('Jabatan')?.includes(ESELON_2.fullName)
+
   return (
     <Card className="relative">
       {pelatihan != null && (
@@ -520,7 +522,7 @@ const TrainingCard: React.FC<{
               <RiInformationFill className="h-5 w-5" /> Detail
             </Link>
 
-            {pelatihan?.PemberitahuanDiterima === "Pengajuan Telah Dikirim ke Kapuslat KP" && pelatihan?.TtdSertifikat === ESELON_1.fullName &&
+            {pelatihan?.PemberitahuanDiterima === "Pengajuan Telah Dikirim ke Kapuslat KP" && pelatihan?.TtdSertifikat === ESELON_1.fullName && isEselonII &&
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button
