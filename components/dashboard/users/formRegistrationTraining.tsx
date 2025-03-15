@@ -421,7 +421,7 @@ function FormRegistrationTraining({
                   </p>
                 </div>
 
-                <p className="font-medium text-2xl w-fit  font-calsans text-[#979797] ">
+                <p className="font-medium text-2xl w-fit hidden md:block  font-calsans text-[#979797] ">
                   {formatToRupiah(
                     pelatihan.HargaPelatihan *
                     (isManningAgent == "true" ? jumlahPeserta : 1)
@@ -452,7 +452,7 @@ function FormRegistrationTraining({
                     </p>
                   </div>
 
-                  <p className="font-medium text-2xl w-fit font-calsans">
+                  <p className="font-medium text-2xl w-fit hidden md:block font-calsans">
                     {formatToRupiah(
                       selectedPenginapan?.Harga! *
                       (hitungHariPelatihan(
@@ -489,7 +489,7 @@ function FormRegistrationTraining({
                     </p>
                   </div>
 
-                  <p className="font-medium text-2xl w-fit font-calsans">
+                  <p className="font-medium text-2xl w-fit hidden md:block font-calsans">
                     {formatToRupiah(
                       selectedKonsumsi?.Harga! *
                       hitungHariPelatihan(
@@ -504,7 +504,7 @@ function FormRegistrationTraining({
             )}
 
             <div className="h-1 w-full rounded-full my-2 bg-blue-500"></div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center flex-col md:flex-row justify-between">
               <p className="font-bold text-lg text-[#979797]">Total</p>
               <p className=" text-blue-500 font-calsans text-3xl">
                 {selectedKonsumsi != null && selectedPenginapan != null
@@ -588,7 +588,7 @@ function FormRegistrationTraining({
   }, []);
 
   return (
-    <section className="relative w-full -mt-5">
+    <section className="relative w-full -mt-5 mb-16">
       <div className="max-w-6xl md:max-w-[81rem]  md:-mt-8">
         <div className="">
           {/* Form */}
@@ -712,7 +712,7 @@ function FormRegistrationTraining({
               <div className={`w-full ${indexFormTab == 1 && "hidden"}`}>
                 <button
                   type="submit"
-                  className="btn text-white bg-blue-600 hover:bg-blue-700 w-full"
+                  className="btn text-white bg-blue-500 hover:bg-blue-700 w-full"
                   onClick={(e) => {
                     setIndexFormTab(indexFormTab - 1);
                     scrollToTop();
@@ -730,7 +730,7 @@ function FormRegistrationTraining({
                 >
                   <button
                     type="submit"
-                    className={`btn text-white bg-blue-600 hover:bg-blue-700 w-full`}
+                    className={`btn text-white bg-blue-500 hover:bg-blue-700 w-full`}
                     onClick={(e) => {
                       setIndexFormTab(indexFormTab + 1);
                       scrollToTop();
@@ -745,7 +745,7 @@ function FormRegistrationTraining({
                 >
                   <button
                     type="submit"
-                    className="btn text-white bg-blue-600 hover:bg-blue-700 w-full"
+                    className="btn text-white bg-blue-500 hover:bg-blue-700 w-full"
                     onClick={(e) => {
                       setIndexFormTab(indexFormTab + 1);
                       scrollToTop();
@@ -775,7 +775,7 @@ function FormRegistrationTraining({
                       <AlertDialogTrigger className="w-full">
                         <Button onClick={(e) =>
                           setIsOpenFormPembayaran(!isOpenFormPembayaran)
-                        } className='bg-blue-600 hover:bg-blue-700 text-white font-calsans w-full rounded-full text-2xl px-24 py-7 -mt-8'>
+                        } className='bg-blue-500 hover:bg-blue-700 text-white font-calsans w-full rounded-full text-2xl px-24 py-7 -mt-8'>
                           Daftar Pelatihan
 
                         </Button>
@@ -833,11 +833,11 @@ function FormRegistrationTraining({
                                     Informasi Pembayaran{" "}
                                     <span className="text-red-600">*</span>
                                   </label>
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex items-center flex-col w-full md:flex-row gap-2">
                                     <input
                                       name=""
                                       id=""
-                                      className="w-[30%] overflow-hidden rounded-lg border border-gray-300"
+                                      className="w-full md:w-[30%] overflow-hidden rounded-lg border border-gray-300"
                                       value={pelatihan?.PenyelenggaraPelatihan}
                                       disabled
                                       readOnly
@@ -846,7 +846,7 @@ function FormRegistrationTraining({
                                       name=""
                                       id=""
                                       value={"028023012840 (BNI)"}
-                                      className="w-[70%] overflow-hidden rounded-lg border border-gray-300"
+                                      className="w-full md:w-[70%] overflow-hidden rounded-lg border border-gray-300"
                                       disabled
                                       readOnly
                                     />
@@ -865,7 +865,7 @@ function FormRegistrationTraining({
                                       <div className="h-full w-full text-center flex flex-col items-center justify-center">
                                         <svg
                                           xmlns="http://www.w3.org/2000/svg"
-                                          className="w-10 h-10 text-blue-400 group-hover:text-blue-600"
+                                          className="w-10 h-10 text-blue-400 group-hover:text-blue-500"
                                           fill="none"
                                           viewBox="0 0 24 24"
                                           stroke="currentColor"
@@ -886,7 +886,7 @@ function FormRegistrationTraining({
                                             <a
                                               href=""
                                               id=""
-                                              className="text-blue-600 hover:underline"
+                                              className="text-blue-500 hover:underline"
                                             >
                                               select a file
                                             </a>{" "}
@@ -941,7 +941,7 @@ function FormRegistrationTraining({
                                     handleRegistrationTrainingForManningAgent(e)
                                   }
                                   disabled={fileBuktiBayar == null}
-                                  className="btn text-white bg-blue-600 hover:bg-blue-700 w-full"
+                                  className="btn text-white bg-blue-500 hover:bg-blue-700 w-full"
                                 >
                                   Daftar
                                 </Button>
@@ -951,7 +951,7 @@ function FormRegistrationTraining({
                                     handleRegistrationTrainingForPeople(e)
                                   }
                                   disabled={fileBuktiBayar == null}
-                                  className="btn text-white bg-blue-600 hover:bg-blue-700 w-full"
+                                  className="btn text-white bg-blue-500 hover:bg-blue-700 w-full"
                                 >
                                   Daftar
                                 </Button>
@@ -965,7 +965,7 @@ function FormRegistrationTraining({
                               onClick={(e) =>
                                 setIsOpenFormPembayaran(!isOpenFormPembayaran)
                               }
-                              className="btn bg-transparent hover:!bg-white text-blue-600 border border-blue-600 w-full"
+                              className="btn bg-transparent hover:!bg-white text-blue-500 border border-blue-500 w-full"
                             >
                               Tutup
                             </Button>
@@ -975,7 +975,7 @@ function FormRegistrationTraining({
                     </AlertDialog>
                   ) : (
                     <Button onClick={(e) => handleRegistrationTrainingForPeople(e)
-                    } className='bg-blue-600 text-white font-calsans w-full mt-8 rounded-full text-2xl px-24 py-7 '>
+                    } className='bg-blue-500 text-white font-calsans w-full mt-8 rounded-full text-2xl px-24 py-7 '>
                       Daftar Pelatihan
 
                     </Button>

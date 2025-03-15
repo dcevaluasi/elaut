@@ -24,8 +24,11 @@ import { RiVerifiedBadgeFill } from 'react-icons/ri';
 import { addFiveYears } from '@/utils/pelatihan';
 import { DIALOG_TEXTS } from '@/constants/texts';
 import { generateTanggalPelatihan } from '@/utils/text';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 const CertificateCheckFeature = () => {
+    const [captcha, setCaptcha] = React.useState<string | null>();
+
     const certificates: Record<string, any>[] = [
         {
             title: 'Cek Sertifikat di E-LAUT',
@@ -64,13 +67,15 @@ const CertificateCheckFeature = () => {
         React.useState<UserPelatihan | null>(null);
     const [isShowValidForm, setIsShowValidForm] = React.useState<boolean>(false);
     const handleCekValiditasSertifikat = async () => {
+
         if (validateIsDangerousChars(noRegistrasi)) {
             Toast.fire({
                 icon: "error",
                 title: "Oopsss!",
-                text: `Kamu memasukkan karakter berbahaya pada input NIK-mu, cek akun tidak dapat diproses!`,
+                text: `Kamu memasukkan karakter berbahaya pada input nomor registrasi, cek akun tidak dapat diproses!`,
             });
-            setOpenPopUpVerifyCertificateFeature(false)
+            setNoRegistrasi("");
+            setOpenPopUpVerifyCertificateFeature(true)
         } else {
             try {
                 const response = await axios.post(
@@ -322,7 +327,9 @@ const CertificateCheckFeature = () => {
                                 placeholder="Masukkan nomor peserta..."
                             />
                         </div>
+
                     </div>
+
                     <AlertDialogFooter>
                         <AlertDialogCancel onClick={() => setOpenPopUpVerifyCertificateFeature(false)}>Tutup</AlertDialogCancel>
                         {noRegistrasi !== '' && (

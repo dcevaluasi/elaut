@@ -42,6 +42,7 @@ import {
   sanitizedDangerousChars,
   validateIsDangerousChars,
 } from "@/utils/input";
+import { handlePasswordCriteria } from "@/utils/security";
 
 function FormLogin() {
   const [formData, setFormData] = React.useState<{ [key: string]: string }>({
@@ -84,40 +85,6 @@ function FormLogin() {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const router = useRouter();
 
-  const handlePasswordCriteria = (password: string) => {
-    const criteria = [
-      {
-        regex: /.{8,}/,
-        message: `Password must be at least 8 characters long.`,
-      },
-      {
-        regex: /[A-Z]/,
-        message: "Password must contain at least one uppercase letter.",
-      },
-      {
-        regex: /[a-z]/,
-        message: "Password must contain at least one lowercase letter.",
-      },
-      { regex: /[0-9]/, message: "Password must contain at least one number." },
-      {
-        regex: /[!@#$%^&*(),.?":{}|<>]/,
-        message:
-          "Password must contain at least one special character (symbol).",
-      },
-    ];
-
-    for (const { regex, message } of criteria) {
-      if (!regex.test(password)) {
-        Toast.fire({
-          icon: "error",
-          title: message,
-        });
-        return false;
-      }
-    }
-
-    return true;
-  };
 
   const handleLoginAkun = async (e: FormEvent) => {
     e.preventDefault();
@@ -176,11 +143,8 @@ function FormLogin() {
                   text: `Berhasil melakukan login kedalam ELAUT!`,
                 });
                 if (Cookies.get("XSRF083")) {
-                  // router.replace("/dashboard/complete-profile");
-                  if (Cookies.get("LastPath")) {
-                    const path = Cookies.get("LastPath");
-                    router.replace(path!);
-                  }
+                  router.replace("/dashboard/edit-profile");
+
                 } else {
                   if (Cookies.get("LastPath")) {
                     const path = Cookies.get("LastPath");

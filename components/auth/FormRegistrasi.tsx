@@ -44,6 +44,7 @@ import { HiMiniUserGroup, HiOutlineEye } from "react-icons/hi2";
 import { elautBaseUrl, manningAgentDevUrl } from "@/constants/urls";
 import { sanitizedDangerousChars, validateIsDangerousChars } from "@/utils/input";
 import { HiOutlineEyeOff } from "react-icons/hi";
+import { handlePasswordCriteria } from "@/utils/security";
 
 function FormRegistrasi() {
   const router = useRouter();
@@ -54,42 +55,6 @@ function FormRegistrasi() {
   const [captcha, setCaptcha] = React.useState<string | null>();
 
   const [noKusuka, setNoKusuka] = React.useState("");
-
-  const handlePasswordCriteria = (password: string) => {
-    const criteria = [
-      {
-        regex: /.{8,}/,
-        message: `Password must be at least 8 characters long.`,
-      },
-      {
-        regex: /[A-Z]/,
-        message: "Password must contain at least one uppercase letter.",
-      },
-      {
-        regex: /[a-z]/,
-        message: "Password must contain at least one lowercase letter.",
-      },
-      { regex: /[0-9]/, message: "Password must contain at least one number." },
-      {
-        regex: /[!@#$%^&*(),.?":{}|<>]/,
-        message:
-          "Password must contain at least one special character (symbol).",
-      },
-    ];
-
-    for (const { regex, message } of criteria) {
-      if (!regex.test(password)) {
-        Toast.fire({
-          icon: "error",
-          title: 'Oopsss!',
-          text: message,
-        });
-        return false;
-      }
-    }
-
-    return true;
-  };
 
   const [isHandlingCekKUSUKA, setIsHandlingCekKUSUKA] = React.useState<boolean>(false)
   const handleCheckingNoKusuka = async (e: any) => {
@@ -120,7 +85,7 @@ function FormRegistrasi() {
           const data = response.data.data[0];
           console.log({ response });
           setIsKusukaUser(true);
-          setName(data.NamaPelakuUtama);
+          setName(data.NamaPelakuUtama?.toUpperCase());
           setEmail("");
           setNik(data.NomorKUSUKA);
           setPhoneNumber("");
@@ -210,7 +175,7 @@ function FormRegistrasi() {
                   `${baseUrl}/users/registerUser`,
                   JSON.stringify({
                     nik: sanitizedDangerousChars(nik),
-                    nama: sanitizedDangerousChars(name),
+                    nama: sanitizedDangerousChars(name.toUpperCase()),
                     password: sanitizedDangerousChars(password),
                     no_number: sanitizedDangerousChars(phoneNumber.toString()),
                     kusuka_users: sanitizedDangerousChars(isKUSUKA),
@@ -393,8 +358,8 @@ function FormRegistrasi() {
 
   const [isInputErrorNoTelpon, setIsInputErrorNoTelpon] = React.useState<boolean>(true)
 
-  const [isMatch, setIsMatch] = React.useState<boolean>(true); // Untuk mengecek apakah password sesuai
-  const [isMatchManning, setIsMatchManning] = React.useState<boolean>(true); // Untuk mengecek apakah password sesuai
+  const [isMatch, setIsMatch] = React.useState<boolean>(true);
+  const [isMatchManning, setIsMatchManning] = React.useState<boolean>(true);
 
   const handlePasswordChange = (e: any) => {
     const value = e.target.value;
@@ -1147,217 +1112,6 @@ function FormRegistrasi() {
                 </div>
               )}
 
-              {/* {role == "Portfolio" && (
-                <>
-                  <div className="flex items-center my-6">
-                    <div
-                      className="border-t border-gray-300 grow mr-3"
-                      aria-hidden="true"
-                    ></div>
-                    <div
-                      className="border-t border-gray-300 grow ml-3"
-                      aria-hidden="true"
-                    ></div>
-                  </div>
-                  <form
-                    onSubmit={(e) => handleRegistrasiAkun(e)}
-                    autoComplete="off"
-                  >
-                    <div className="flex flex-wrap -mx-3 mb-1">
-                      <div className="w-full px-3">
-                        <label
-                          className="block text-gray-200 text-sm font-medium mb-1"
-                          htmlFor="name"
-                        >
-                          Nama Lengkap <span className="text-red-600">*</span>
-                        </label>
-                        <input
-                          id="name"
-                          type="text"
-                          className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                          placeholder="Masukkan nama lengkap tanpa gelar"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          required
-                        />
-                        {isInputError && (
-                          <span className="text-rose-500 font-medium">
-                            *Masukkan nama lengkap!
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap -mx-3 mb-1">
-                      <div className="w-full px-3">
-                        <label
-                          className="block text-gray-200 text-sm font-medium mb-1"
-                          htmlFor="nik"
-                        >
-                          NIK <span className="text-red-600">*</span>
-                        </label>
-                        <input
-                          id="nik"
-                          type="text"
-                          className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                          placeholder="Masukkan NIK"
-                          value={nik}
-                          onChange={(e) => setNik(e.target.value)}
-                          required
-                        />
-                        {isInputError && (
-                          <span className="text-rose-500 font-medium">
-                            *Masukkan NIK!
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap -mx-3 mb-1">
-                      <div className="w-full px-3">
-                        <label
-                          className="block text-gray-200 text-sm font-medium mb-1"
-                          htmlFor="email"
-                        >
-                          No Telpon <span className="text-red-600">*</span>
-                        </label>
-                        <input
-                          id="phone number"
-                          type="text"
-                          className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                          placeholder="Masukkan no telpon/WA"
-                          value={phoneNumber}
-                          onChange={(e) => setPhoneNumber(e.target.value)}
-                          required
-                        />
-                        {isInputError && (
-                          <span className="text-rose-500 font-medium">
-                            *Masukkan no telpon!
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap -mx-3 mb-1">
-                      <div className="w-full px-3">
-                        <label
-                          className="block text-gray-200 text-sm font-medium mb-1"
-                          htmlFor="email"
-                        >
-                          File Portfolio <span className="text-red-600">*</span>
-                        </label>
-                        <input
-                          id="phone number"
-                          type="file"
-                          className="border rounded-md w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                          placeholder="Masukkan no telpon/WA"
-                          value={phoneNumber}
-                          onChange={(e) => setPhoneNumber(e.target.value)}
-                          required
-                        />
-                        {isInputError && (
-                          <span className="text-rose-500 font-medium">
-                            *Masukkan no telpon!
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap -mx-3 mb-1">
-                      <div className="w-full px-3">
-                        <label
-                          className="block text-gray-200 text-sm font-medium mb-1"
-                          htmlFor="password"
-                        >
-                          Password <span className="text-red-600">*</span>
-                        </label>
-                        <input
-                          id="password"
-                          type="password"
-                          className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                          placeholder="Buat password"
-                          required
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                        />
-                        {isInputError ? (
-                          <span className="text-rose-500 font-medium">
-                            *Masukkan password!
-                          </span>
-                        ) : (
-                          <p className="text-gray-300 leading-[100%] text-xs font-medium mt-2">
-                            *Password minimal 8 karakter, harus terdiri dari
-                            satu angka, huruf kapital dan kecil, serta karakter
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    {password != "" && (
-                      <div
-                        className="flex flex-wrap w-full mb-1"
-                        style={{ width: "100% !important" }}
-                      >
-                        <div
-                          className="w-full"
-                          style={{ width: "100% !important" }}
-                        >
-                          <label
-                            className="block text-gray-200 text-sm font-medium mb-1"
-                            htmlFor="password"
-                          >
-                            Verify if you are not a robot{" "}
-                            <span className="text-red-600">*</span>
-                          </label>
-                          <ReCAPTCHA
-                            style={{ width: "100% !important" }}
-                            sitekey={
-                              process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!
-                            }
-                            className=" w-[600px] font-inter text-sm"
-                            onChange={setCaptcha}
-                          />
-                        </div>
-                      </div>
-                    )}
-                    <div className="flex flex-wrap -mx-3 mt-3">
-                      <div className="w-full px-3 flex flex-col gap-2">
-                        <button
-                          type="submit"
-                          className="btn text-white bg-blue-500 hover:bg-blue-600 w-full"
-                        >
-                          Registrasi
-                        </button>
-                        {!useKUSUKA && role == "Portfolio" && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              setUseKUSUKA(!useKUSUKA);
-                              window.scrollTo(0, 0);
-                            }}
-                            className="btn text-white bg-transparent border border-blue-500 hover:bg-blue-500 flex w-full gap-2"
-                          >
-                            <Image
-                              src={"/logo-kkp-full-white.png"}
-                              className="w-6"
-                              alt=""
-                              width={0}
-                              height={0}
-                            />
-                            <span>Daftar Dengan KUSUKA</span>
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                    <div className="text-sm text-gray-200 text-center mt-3">
-                      Dengan membuat akun, anda menyetujui{" "}
-                      <a className="underline" href="#0">
-                        Ketentuan & Kondisi
-                      </a>
-                      , serta{" "}
-                      <a className="underline" href="#0">
-                        Keamanan Privasi
-                      </a>{" "}
-                      kami .
-                    </div>
-                  </form>
-                </>
-              )} */}
               <div className="flex items-center my-6">
                 <div
                   className="border-t border-gray-300 grow mr-3"

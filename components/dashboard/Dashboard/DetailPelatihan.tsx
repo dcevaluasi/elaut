@@ -205,7 +205,7 @@ function DetailPelatihan() {
                             ))
                           }
 
-                          {pelatihan!.UserPelatihan.length == 0 && pelatihan!.MateriPelatihan.length == 0 && pelatihan!.SarprasPelatihan.length == 0 && (
+                          {pelatihan!.UserPelatihan.length == 0 && pelatihan!.MateriPelatihan.length == 0 && pelatihan!.SarprasPelatihan == null && pelatihan!.Status != "Publish" && (
                             <>
                               <DeleteButton
                                 idPelatihan={pelatihan!.IdPelatihan.toString()}

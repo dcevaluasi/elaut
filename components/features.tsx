@@ -66,10 +66,10 @@ export default function Features() {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
         <div className="pt-12 md:pt-20">
           <div className="max-w-3xl w-full mx-auto text-center flex gap-2 flex-col items-center justify-center pb-5 md:pb-8">
-            <h1 className="text-4xl text-blue-500 font-calsans leading-[100%]">
+            <h1 className="text-2xl md:text-4xl text-blue-500 font-calsans leading-[100%]">
               Pelatihan Lainnya
             </h1>
-            <p className="text-base text-[#979797]">
+            <p className="text-[#979797] text-sm md:text-base">
               Pelatihan  serupa lainnya yang berfokus pada <br />{" "}
               peningkatan SDM KP yang berkompetensi dan cari pelatihan yang ingin kamu ikuti.
             </p>

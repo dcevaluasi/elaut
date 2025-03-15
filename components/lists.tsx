@@ -92,7 +92,7 @@ function ListProgram({
 
 const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
   return (
-    <div className="shadow-custom flex flex-col relative w-[380px] h-fit rounded-3xl bg-white p-6">
+    <div className="shadow-custom flex flex-col relative w-full md:w-[380px] h-fit rounded-3xl bg-white p-6">
       <div className="w-full h-[200px] relative">
         <Image
           className="w-full !h-[200px] rounded-2xl object-cover shadow-custom mb-2"
@@ -103,7 +103,7 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
         />
         {
           pelatihan.PenyelenggaraPelatihan.includes('Politeknik') && <span
-            className="w-fit block text-center font-semibold px-4 py-2 bg-blue-600 rounded-3xl text-white absolute text-xs top-3 z-50 right-3"
+            className="w-fit block text-center font-semibold px-4 py-2 bg-blue-500 rounded-3xl text-white absolute text-xs top-3 z-50 right-3"
           >
             Khusus Taruna KP
           </span>
@@ -166,7 +166,7 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
       <Link
         href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${pelatihan?.KodePelatihan
           }/${encryptValue(pelatihan?.IdPelatihan)}`}
-        className="w-full block text-center font-semibold px-6 py-3 bg-blue-600 rounded-3xl text-white"
+        className="w-full block text-center font-semibold px-6 py-3 bg-blue-500 rounded-3xl text-white"
       >
         Lihat Detail
       </Link>

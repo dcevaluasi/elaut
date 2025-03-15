@@ -275,7 +275,12 @@ function FormCompleteProfile() {
         text: `Berhasil mengupdate data profile-mu!`,
       });
       setIsLoadingCompleteProfile(false);
-      router.push("/dashboard");
+      if (Cookies.get("LastPath")) {
+        const path = Cookies.get("LastPath");
+        router.replace(path!);
+      } else {
+        router.push("/dashboard");
+      }
     } catch (error) {
       console.error({ error });
       Toast.fire({
