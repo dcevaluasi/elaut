@@ -192,7 +192,7 @@ export const TimelineProgressPesertaPelatihan = ({
   console.log({ codeAccess });
 
   return (
-    <section className=" text-gray-800">
+    <section className=" text-blue-500">
       <div className=" max-w-5xl py-12 mx-auto">
         <div className="grid md:gap-4 sm:grid-cols-12">
           <div className="col-span-12 sm:col-span-3">
@@ -212,17 +212,17 @@ export const TimelineProgressPesertaPelatihan = ({
                   ? "before:bg-green-400"
                   : userDetail!.Keterangan == "Tidak Valid"
                     ? "before:bg-rose-500"
-                    : "before:bg-gray-700"
+                    : "before:bg-grayUsual"
                   } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer`}
               >
                 <h3 className="text-lg font-semibold">Validasi Peserta </h3>
 
                 <time
-                  className={`text-sm font-medium text-gray-600 ${userDetail?.Keterangan! == "Tidak Valid"
+                  className={`text-sm font-medium text-grayUsual ${userDetail?.Keterangan! == "Tidak Valid"
                     ? "text-rose-500"
                     : userDetail?.Keterangan! == "Valid"
                       ? "text-green-500"
-                      : "text-gray-700"
+                      : "text-grayUsual"
                     }`}
                 >
                   {userDetail?.Keterangan! == "Tidak Valid" ? (
@@ -246,7 +246,7 @@ export const TimelineProgressPesertaPelatihan = ({
                     </span>
                   )}
                 </time>
-                <p className="text-gray-700">
+                <p className="text-grayUsual leading-none">
                   {userDetail?.Keterangan! == "Tidak Valid" ? (
                     <span className="flex items-start gap-1">
                       <span className="flex flex-col">
@@ -255,10 +255,10 @@ export const TimelineProgressPesertaPelatihan = ({
                             dangerouslySetInnerHTML={{
                               __html: userDetail?.StatusPembayaran!,
                             }}
-                            className="text-xs  prose  text-justify group-hover:text-xs text-gray-700 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong:font-bold group-hover:duration-1000 w-full"
+                            className="text-xs  prose  text-justify group-hover:text-xs text-grayUsual prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong:font-bold group-hover:duration-1000 w-full"
                           />{" "}
                           <span className="flex gap-1 w-full">
-                            <span className="text-xs text-gray-700">
+                            <span className="text-xs text-grayUsual">
                               Lakukan perbaikan pada link
                             </span>{" "}
                             <Link
@@ -304,17 +304,17 @@ export const TimelineProgressPesertaPelatihan = ({
                       ? "before:bg-rose-500"
                       : userDetail.PreTest > 65
                         ? "before:bg-green-400"
-                        : "before:bg-gray-700"
+                        : "before:bg-grayUsual"
                       } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer`}
                   >
                     <h3 className="text-lg font-semibold">
                       Pelaksanaan Pre-Test
                     </h3>
                     <time
-                      className={`text-sm font-medium text-gray-600 ${userDetail?.PreTest! == 0 &&
+                      className={`text-sm font-medium text-grayUsual ${userDetail?.PreTest! == 0 &&
                         userDetail?.PostTest == 0 &&
                         pelatihan!.StatusApproval != "Selesai"
-                        ? "text-gray-700"
+                        ? "text-grayUsual"
                         : userDetail?.PreTest >= 65
                           ? "text-green-500"
                           : "text-rose-500"
@@ -343,10 +343,10 @@ export const TimelineProgressPesertaPelatihan = ({
                         </span>
                       )}
                     </time>
-                    <p className="">
+                    <p className="text-grayUsual leading-none">
                       {userDetail?.PreTest! == 0 ? (
                         <div className="flex flex-col items-start justify-start text-xs">
-                          <p className="">
+                          <p className="text-grayUsual leading-none">
                             Lakukan pelaksanaan pre-test sebagai syarat
                             mengikuti pelatihan {userDetail?.NamaPelatihan}{" "}
                             untuk melihat kemampuan/pengetahuan awal mu terkait
@@ -514,7 +514,7 @@ export const TimelineProgressPesertaPelatihan = ({
                             userDetail={userDetail}
                             type="Pre-Test"
                           />
-                          <span className="text-xs">
+                          <span className="text-xs text-grayUsual leading-none">
                             Selamat, nilai pre-testmu cukup baik, ikuti
                             pelatihan dengan semangat dan dapatkan pengetahuan
                             serta wawasan baru dari pelatihan ini!
@@ -526,7 +526,7 @@ export const TimelineProgressPesertaPelatihan = ({
                             userDetail={userDetail}
                             type="Pre-Test"
                           />
-                          <span className="text-xs">
+                          <span className="text-xs text-grayUsual leading-none">
                             Nilai pre-testmu kurang bagus, jangan menyerah,
                             ikuti pelatihan dengan cermat dan semangat untuk
                             bisa meningkatkan pengetahuan mu pada post-test
@@ -541,13 +541,14 @@ export const TimelineProgressPesertaPelatihan = ({
                 <div
                   className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${pelatihan!.StatusApproval == "Selesai"
                     ? "before:bg-green-400"
-                    : "before:bg-gray-700"
+                    : "before:bg-grayUsual"
                     } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer `}
                 >
                   <h3 className="text-lg font-semibold">
                     Pelaksanaan Pelatihan {pelatihan!.NamaPelatihan}
                   </h3>
-                  <time className="text-sm text-gray-600">
+                  <time className="text-sm text-grayUsual flex items-start gap-1">
+                    <PiQuestionFill className="mt-[0.134rem]" />
                     {generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan)}{" "}
                     -{" "}
                     {generateTanggalPelatihan(
@@ -555,7 +556,7 @@ export const TimelineProgressPesertaPelatihan = ({
                     )}
                   </time>
                   {pelatihan!.StatusApproval == "Selesai" ? (
-                    <span className="text-xs">
+                    <span className="text-xs text-grayUsual leading-none">
                       Pelatihan{" "}
                       <span className="font-bold">
                         {pelatihan!.NamaPelatihan}
@@ -564,7 +565,7 @@ export const TimelineProgressPesertaPelatihan = ({
                       selanjutnya oleh panitia atau instruktur pelatihan!
                     </span>
                   ) : (
-                    <span className="text-xs">
+                    <span className="text-xs text-grayUsual leading-none">
                       Pelatihan{" "}
                       <span className="font-bold">
                         {pelatihan!.NamaPelatihan}
@@ -585,7 +586,7 @@ export const TimelineProgressPesertaPelatihan = ({
                   <div
                     className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1]  ${pelatihan!.StatusApproval != "Selesai" &&
                       userDetail?.PostTest == 0
-                      ? "before:bg-gray-700"
+                      ? "before:bg-grayUsual"
                       : userDetail?.PostTest >= 65
                         ? "before:bg-green-500"
                         : "before:bg-rose-500"
@@ -595,9 +596,9 @@ export const TimelineProgressPesertaPelatihan = ({
                       Pelaksanaan Post-Test
                     </h3>
                     <time
-                      className={`text-sm font-medium text-gray-600  ${pelatihan!.StatusApproval != "Selesai" &&
+                      className={`text-sm font-medium text-grayUsual  ${pelatihan!.StatusApproval != "Selesai" &&
                         userDetail?.PostTest == 0
-                        ? "text-gray-700"
+                        ? "text-grayUsual"
                         : userDetail?.PostTest >= 65
                           ? "text-green-500"
                           : "text-rose-500"
@@ -626,7 +627,7 @@ export const TimelineProgressPesertaPelatihan = ({
                         </span>
                       )}
                     </time>
-                    <p className="">
+                    <p className="text-grayUsual leading-none">
                       {userDetail?.PostTest == 0 ? (
                         <div className="flex flex-col items-start justify-start text-xs">
                           <p className="">
@@ -835,7 +836,7 @@ export const TimelineProgressPesertaPelatihan = ({
                                   variant="outline"
                                   className="w-full border mt-3 flex gap-2 border-gray-600 text-left capitalize items-center justify-center"
                                 >
-                                  <IoReloadCircle className="h-4 w-4 text-gray-600" />{" "}
+                                  <IoReloadCircle className="h-4 w-4 text-grayUsual" />{" "}
                                   <span className="text-sm">
                                     {" "}
                                     Lakukan Remedial
@@ -999,19 +1000,20 @@ export const TimelineProgressPesertaPelatihan = ({
                   className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${pelatihan!.StatusApproval == "Selesai" &&
                     userDetail.PostTest != 0 &&
                     userDetail.PreTest != 0
-                    ? "before:bg-gray-700"
+                    ? "before:bg-grayUsual"
                     : pelatihan?.StatusPenerbitan == "Done"
                       ? "before:bg-green-500"
-                      : "before:bg-gray-700"
+                      : "before:bg-grayUsual"
                     } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer `}
                 >
                   <h3 className="text-lg font-semibold">
                     Sertifikat Pelatihan {pelatihan!.NamaPelatihan}
                   </h3>
-                  <time className="text-sm text-gray-600">
+                  <time className="text-sm text-grayUsual flex items-start gap-1">
+                    <PiQuestionFill className="mt-[0.134rem]" />
                     Bidang {pelatihan!.BidangPelatihan}
                   </time>
-                  <span className="text-xs">
+                  <span className="text-xs text-grayUsual leading-none">
                     {pelatihan!.StatusApproval != "Selesai" ||
                       (userDetail.PostTest == 0 && userDetail.PreTest == 0)
                       ? "Harap mengikuti rangkaian pelaksanaan pelatihan untuk mendapatkan sertifikat."

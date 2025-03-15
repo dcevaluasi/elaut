@@ -321,7 +321,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                     <div className="flex flex-col gap-1">
                                       <div className="sm:flex sm:justify-between sm:gap-4">
                                         <div>
-                                          <h3 className="text-lg hover:cursor-pointer font-calsans  text-gray-900 sm:text-xl leading-[100%]">
+                                          <h3 className="text-lg hover:cursor-pointer font-calsans  text-blue-500 sm:text-xl leading-[100%]">
                                             {pelatihan?.NamaPelatihan}
                                           </h3>
                                         </div>
@@ -336,27 +336,27 @@ function UserTrainingService({ user }: { user: User | null }) {
                                               "..."
                                             ),
                                           }}
-                                          className="text-sm font-normal group-hover:text-xs text-gray-500 group-hover:duration-1000 leading-[140%]"
+                                          className="text-sm font-normal group-hover:text-xs text-grayUsual group-hover:duration-1000 leading-[140%]"
                                         />
                                       </div>
 
                                       <dl className="mt2 flex gap-4 sm:gap-6">
                                         <div className="flex flex-col-reverse">
-                                          <dt className="text-sm font-medium text-gray-600">
+                                          <dt className="text-sm font-medium text-grayUsual">
                                             {pelatihan?.BidangPelatihan!}
                                           </dt>
-                                          <dd className="text-xs text-gray-500">
+                                          <dd className="text-xs text-grayUsual">
                                             Bidang
                                           </dd>
                                         </div>
 
                                         <div className="flex flex-col-reverse">
-                                          <dt className="text-sm font-medium text-gray-600">
+                                          <dt className="text-sm font-medium text-grayUsual">
                                             {pelatihan?.NoRegistrasi == ""
                                               ? "-"
                                               : pelatihan?.NoRegistrasi!}
                                           </dt>
-                                          <dd className="text-xs text-gray-500">
+                                          <dd className="text-xs text-grayUsual">
                                             No Registrasi
                                           </dd>
                                         </div>
@@ -413,7 +413,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                       <div className="flex flex-col gap-1">
                                         <div className="sm:flex sm:justify-between sm:gap-4">
                                           <div>
-                                            <h3 className="text-lg hover:cursor-pointer   font-calsans text-gray-900 sm:text-xl leading-[100%]">
+                                            <h3 className="text-lg hover:cursor-pointer   font-calsans text-blue-500 sm:text-xl leading-[100%]">
                                               {pelatihan?.NamaPelatihan}
                                             </h3>
                                           </div>
@@ -421,16 +421,16 @@ function UserTrainingService({ user }: { user: User | null }) {
 
                                         <div className="mt-1 mb-2">
                                           <div
-                                            className="text-sm font-normal group-hover:text-xs text-gray-500 group-hover:duration-1000 leading-[140%]"
+                                            className="text-sm font-normal group-hover:text-xs text-grayUsual group-hover:duration-1000 leading-[140%]"
                                           >Pelatihan yang diselenggarakan oleh {pelatihan?.PenyelenggaraPelatihan} dan merupakan program pelatihan {pelatihan?.JenisProgram}</div>
                                         </div>
 
                                         <dl className="mt2 flex flex-col ">
                                           <div className="flex flex-col-reverse">
-                                            <dt className="text-sm font-medium text-gray-600">
+                                            <dt className="text-sm font-medium text-grayUsual">
                                               {pelatihan?.BidangPelatihan!}
                                             </dt>
-                                            <dd className="text-xs text-gray-500">
+                                            <dd className="text-xs text-grayUsual">
                                               Bidang
                                             </dd>
                                           </div>
@@ -457,7 +457,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                       <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:px-6 lg:py-8 bg-white py-9">
                         <div className="sm:flex justify-between sm:gap-4 items-center border-b-2 border-b-gray-200 pb-4">
                           <div className="">
-                            <h3 className="text-3xl  text-gray-900 font-calsans sm:text-3xl leading-[105%]">
+                            <h3 className="text-3xl  text-blue-500 font-calsans sm:text-3xl leading-[105%]">
                               {
                                 userDetail?.Pelatihan[indexPelatihanSelected]
                                   ?.NamaPelatihan!
@@ -465,7 +465,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                             </h3>
 
                             <div className="flex items-center gap-3">
-                              <p className=" text-sm font-medium text-gray-600">
+                              <p className=" text-sm font-medium text-grayUsual">
                                 By{" "}
                                 {selectedPelatihan != null
                                   ? selectedPelatihan.PenyelenggaraPelatihan
@@ -514,19 +514,19 @@ function UserTrainingService({ user }: { user: User | null }) {
                           ?.Keterangan! == "Valid" && (
                             <div className="mt-6 flex gap-4 sm:gap-6">
                               <div className="flex flex-col-reverse">
-                                <div className="text-sm font-medium text-gray-600">
+                                <div className="text-sm font-medium text-grayUsual">
                                   {
                                     userDetail?.Pelatihan[indexPelatihanSelected]
                                       ?.BidangPelatihan!
                                   }
                                 </div>
-                                <div className="text-xs text-gray-500">
+                                <div className="text-xs text-grayUsual">
                                   Bidang
                                 </div>
                               </div>
 
                               <div className="flex flex-col-reverse">
-                                <div className="text-sm  text-gray-600">
+                                <div className="text-sm  text-grayUsual">
                                   {userDetail?.Pelatihan[indexPelatihanSelected]
                                     .NoSertifikat! == ""
                                     ? "-"
@@ -534,12 +534,12 @@ function UserTrainingService({ user }: { user: User | null }) {
                                       indexPelatihanSelected
                                     ]?.NoSertifikat!}
                                 </div>
-                                <div className="text-xs text-gray-500">
+                                <div className="text-xs text-grayUsual">
                                   No Sertifikat
                                 </div>
                               </div>
                               <div className="flex flex-col-reverse">
-                                <div className="text-sm  text-gray-600">
+                                <div className="text-sm  text-grayUsual">
                                   {userDetail?.Pelatihan[indexPelatihanSelected]
                                     .NoRegistrasi! == ""
                                     ? "-"
@@ -547,7 +547,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                       indexPelatihanSelected
                                     ]?.NoRegistrasi!}
                                 </div>
-                                <div className="text-xs text-gray-500">
+                                <div className="text-xs text-grayUsual">
                                   No Registrasi
                                 </div>
                               </div>
@@ -575,7 +575,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                           indexPelatihanSelected
                                         ]?.DetailPelatihan!,
                                   }}
-                                  className="text-sm prose   text-justify group-hover:text-xs text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong: group-hover:duration-1000"
+                                  className="text-sm prose   text-justify group-hover:text-xs text-grayUsual prose-strong:text-grayUsual prose-p:leading-[140%] prose-strong: group-hover:duration-1000"
                                 />{" "}
                                 <p
                                   onClick={(e) => setSeeMore(!seeMore)}
@@ -609,7 +609,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                         {typePelatihanSelected == "Online" && (
                           <div className="mt-3">
                             <div className="flex flex-col">
-                              <div className="text-xs text-gray-500">
+                              <div className="text-xs text-grayUsual">
                                 Materi Pelatihan
                               </div>
 
@@ -636,7 +636,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                           "..."
                                         ),
                                       }}
-                                      className="text-sm prose group-hover:text-white  text-justify  text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong: group-hover:duration-1000 prose-p:font-normal"
+                                      className="text-sm prose group-hover:text-white  text-justify  text-grayUsual prose-strong:text-grayUsual prose-p:leading-[140%] prose-strong: group-hover:duration-1000 prose-p:font-normal"
                                     />
                                   </Link>
                                 ))}
@@ -655,7 +655,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                       <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6  lg:py-0 bg-white py-9">
                         <div className="sm:flex justify-between sm:gap-4 items-center border-b-2 border-b-gray-200 pb-4 py-9">
                           <div className="">
-                            <h3 className="text-3xl  text-gray-900 font-calsans sm:text-3xl leading-[105%]">
+                            <h3 className="text-3xl  text-blue-500 font-calsans sm:text-3xl leading-[105%]">
                               {
                                 userDetail?.Pelatihan[indexPelatihanSelected]
                                   ?.NamaPelatihan!
@@ -663,7 +663,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                             </h3>
 
                             <div className="flex items-center gap-3">
-                              <p className=" text-sm font-medium text-gray-600">
+                              <p className=" text-sm font-medium text-grayUsual">
                                 By{" "}
                                 {selectedPelatihan != null
                                   ? selectedPelatihan.PenyelenggaraPelatihan
@@ -712,19 +712,19 @@ function UserTrainingService({ user }: { user: User | null }) {
                           ?.Keterangan! == "Valid" && (
                             <div className="mt-6 flex gap-4 sm:gap-6">
                               <div className="flex flex-col-reverse">
-                                <div className="text-sm font-medium text-gray-600">
+                                <div className="text-sm font-medium text-grayUsual">
                                   {
                                     userDetail?.Pelatihan[indexPelatihanSelected]
                                       ?.BidangPelatihan!
                                   }
                                 </div>
-                                <div className="text-xs text-gray-500">
+                                <div className="text-xs text-grayUsual">
                                   Bidang
                                 </div>
                               </div>
 
                               <div className="flex flex-col-reverse">
-                                <div className="text-sm  text-gray-600">
+                                <div className="text-sm  text-grayUsual">
                                   {userDetail?.Pelatihan[indexPelatihanSelected]
                                     .NoSertifikat! == ""
                                     ? "-"
@@ -732,12 +732,12 @@ function UserTrainingService({ user }: { user: User | null }) {
                                       indexPelatihanSelected
                                     ]?.NoSertifikat!}
                                 </div>
-                                <div className="text-xs text-gray-500">
+                                <div className="text-xs text-grayUsual">
                                   No Sertifikat
                                 </div>
                               </div>
                               <div className="flex flex-col-reverse">
-                                <div className="text-sm  text-gray-600">
+                                <div className="text-sm  text-grayUsual">
                                   {userDetail?.Pelatihan[indexPelatihanSelected]
                                     .NoRegistrasi! == ""
                                     ? "-"
@@ -745,7 +745,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                       indexPelatihanSelected
                                     ]?.NoRegistrasi!}
                                 </div>
-                                <div className="text-xs text-gray-500">
+                                <div className="text-xs text-grayUsual">
                                   No Registrasi
                                 </div>
                               </div>
@@ -767,7 +767,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                           indexPelatihanSelected
                                         ]?.DetailPelatihan!,
                                     }}
-                                    className="text-sm prose   text-justify group-hover:text-xs text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong: group-hover:duration-1000"
+                                    className="text-sm prose   text-justify group-hover:text-xs text-grayUsual prose-strong:text-grayUsual prose-p:leading-[140%] prose-strong: group-hover:duration-1000"
                                   />{" "}
                                 </div>
                               </div>
@@ -788,7 +788,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                         {typePelatihanSelected == "Online" && (
                           <div className="mt-3">
                             <div className="flex flex-col">
-                              <div className="text-xs text-gray-500">
+                              <div className="text-xs text-grayUsual">
                                 Materi Pelatihan
                               </div>
 
@@ -815,7 +815,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                           "..."
                                         ),
                                       }}
-                                      className="text-sm prose group-hover:text-white  text-justify  text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong: group-hover:duration-1000 prose-p:font-normal"
+                                      className="text-sm prose group-hover:text-white  text-justify  text-grayUsual prose-strong:text-grayUsual prose-p:leading-[140%] prose-strong: group-hover:duration-1000 prose-p:font-normal"
                                     />
                                   </Link>
                                 ))}
@@ -829,7 +829,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                             <div className="flex flex-col mt-0">
                               <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
                                 <div className="inline-block min-w-full py-2 sm:px-6 lg:px-8">
-                                  <dd className="text-xs text-gray-500 mb-2">
+                                  <dd className="text-xs text-grayUsual mb-2">
                                     Table Penilaian
                                   </dd>
                                   <div className="overflow-hidden">
@@ -980,7 +980,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                               className="w-16 rounded-lg object-cover shadow-sm"
                             />
                           </div>
-                          <h3 className="text-3xl  text-gray-900 font-calsans sm:text-3xl leading-[105%]">
+                          <h3 className="text-3xl  text-blue-500 font-calsans sm:text-3xl leading-[105%]">
                             {
                               userDetail?.Pelatihan[indexPelatihanSelected]
                                 ?.NamaPelatihan!
@@ -988,7 +988,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                           </h3>
 
                           <div className="flex items-center gap-3">
-                            <p className=" text-sm font-medium text-gray-600">
+                            <p className=" text-sm font-medium text-grayUsual">
                               By{" "}
                               {selectedPelatihan != null
                                 ? selectedPelatihan.PenyelenggaraPelatihan
@@ -1037,36 +1037,36 @@ function UserTrainingService({ user }: { user: User | null }) {
                         ?.Keterangan! == "Valid" && (
                           <div className="mt-6 flex gap-4 sm:gap-6">
                             <div className="flex flex-col-reverse">
-                              <div className="text-sm font-medium text-gray-600">
+                              <div className="text-sm font-medium text-grayUsual">
                                 {
                                   userDetail?.Pelatihan[indexPelatihanSelected]
                                     ?.BidangPelatihan!
                                 }
                               </div>
-                              <div className="text-xs text-gray-500">Bidang</div>
+                              <div className="text-xs text-grayUsual">Bidang</div>
                             </div>
 
                             <div className="flex flex-col-reverse">
-                              <div className="text-sm  text-gray-600">
+                              <div className="text-sm  text-grayUsual">
                                 {userDetail?.Pelatihan[indexPelatihanSelected]
                                   .NoSertifikat! == ""
                                   ? "-"
                                   : userDetail?.Pelatihan[indexPelatihanSelected]
                                     ?.NoSertifikat!}
                               </div>
-                              <div className="text-xs text-gray-500">
+                              <div className="text-xs text-grayUsual">
                                 No Sertifikat
                               </div>
                             </div>
                             <div className="flex flex-col-reverse">
-                              <div className="text-sm  text-gray-600">
+                              <div className="text-sm  text-grayUsual">
                                 {userDetail?.Pelatihan[indexPelatihanSelected]
                                   .NoRegistrasi! == ""
                                   ? "-"
                                   : userDetail?.Pelatihan[indexPelatihanSelected]
                                     ?.NoRegistrasi!}
                               </div>
-                              <div className="text-xs text-gray-500">
+                              <div className="text-xs text-grayUsual">
                                 No Registrasi
                               </div>
                             </div>
@@ -1094,7 +1094,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                         indexPelatihanSelected
                                       ]?.DetailPelatihan!,
                                 }}
-                                className="text-sm prose   text-justify group-hover:text-xs text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong: group-hover:duration-1000"
+                                className="text-sm prose   text-justify group-hover:text-xs text-grayUsual prose-strong:text-grayUsual prose-p:leading-[140%] prose-strong: group-hover:duration-1000"
                               />{" "}
                               <p
                                 onClick={(e) => setSeeMore(!seeMore)}
@@ -1128,7 +1128,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                       {typePelatihanSelected == "Online" && (
                         <div className="mt-3">
                           <div className="flex flex-col">
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-grayUsual">
                               Materi Pelatihan
                             </div>
 
@@ -1155,7 +1155,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                         "..."
                                       ),
                                     }}
-                                    className="text-sm prose group-hover:text-white  text-justify  text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong: group-hover:duration-1000 prose-p:font-normal"
+                                    className="text-sm prose group-hover:text-white  text-justify  text-grayUsual prose-strong:text-grayUsual prose-p:leading-[140%] prose-strong: group-hover:duration-1000 prose-p:font-normal"
                                   />
                                 </Link>
                               ))}
