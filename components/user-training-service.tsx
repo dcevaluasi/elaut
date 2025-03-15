@@ -965,7 +965,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                     className={`flex md:hidden items-start  justify-center ${isExpand ? "w-12/12" : "w-full flex"
                       }`}
                   >
-                    <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:px-6 lg:py-10 bg-red">
+                    <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:px-6 lg:py-10 bg-white">
                       <div className="sm:flex justify-between sm:gap-4 items-center border-b-2 border-b-gray-200 pb-4 md:py-10 md:mt-28">
                         <div className="justify-center flex flex-col md:flex-row md:justify-start text-center md:text-left items-center pt-10 mt-10 ">
                           <div className="block md:hidden sm:shrink-0">
