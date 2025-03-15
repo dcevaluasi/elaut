@@ -204,16 +204,16 @@ function UserTrainingService({ user }: { user: User | null }) {
               <>
                 {!isExpand && (
                   <div className="max-w-3xl mx-auto text-center flex items-center justify-center flex-col pb-5 md:pb-8">
-                    <h1 className="text-2xl md:text-3xl font-calsans leading-[110%] text-black">
+                    <h1 className="text-2xl md:text-3xl font-calsans leading-[110%] text-blue-500">
                       Pelatihan Masyarakat, Teknis, <br /> dan Kepelautan yang
                       Diikuti
                     </h1>
-                    <p className="text-base text-gray-600">
+                    <p className="text-sm md:text-base text-grayUsual leading-none">
                       Jelajahi layanan serta informasi yang ada pada Balai
                       Pelatihan Kelautan dan Perikanan dan jadilah SDM kompeten
                       bidang kelautan dan perikanan!
                     </p>
-                    <div className="rounded-full bg-gray-300 h-1 w-20 mt-3"></div>
+                    <div className="rounded-full bg-blue-500 h-1 w-20 mt-3"></div>
                   </div>
                 )}
               </>
@@ -221,22 +221,22 @@ function UserTrainingService({ user }: { user: User | null }) {
               <>
                 {!isExpand && (
                   <div className="max-w-3xl mx-auto text-center flex items-center justify-center flex-col pb-5 md:pb-8">
-                    <h1 className="text-2xl md:text-3xl font-calsans leading-[110%] text-black">
+                    <h1 className="text-2xl md:text-3xl font-calsans leading-[110%] text-blue-500">
                       Pelatihan Masyarakat, Teknis, <br /> dan Kepelautan yang
                       Diikuti
                     </h1>
-                    <p className="text-base text-gray-600">
+                    <p className="text-sm md:text-base text-grayUsual leading-none">
                       Jelajahi layanan serta informasi yang ada pada Balai
                       Pelatihan Kelautan dan Perikanan dan jadilah SDM kompeten
                       bidang kelautan dan perikanan!
                     </p>
-                    <div className="rounded-full bg-gray-300 h-1 w-20 mt-3"></div>
+                    <div className="rounded-full bg-blue-500 h-1 w-20 mt-3"></div>
                   </div>
                 )}
 
                 <div
                   className={`w-full ${isExpand ? "w-full" : "max-w-7xl"
-                    } mx-auto flex gap-5 mt-8`}
+                    } mx-auto flex gap-5 `}
                 >
                   <div
                     className={`gap-2  ${indexPelatihanSelected != 100000000
@@ -454,7 +454,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                       className={`hidden md:flex items-start justify-center ${isExpand ? "w-12/12" : "w-7/12 flex"
                         }`}
                     >
-                      <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:px-6 lg:py-0 bg-white py-9">
+                      <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:px-6 lg:py-8 bg-white py-9">
                         <div className="sm:flex justify-between sm:gap-4 items-center border-b-2 border-b-gray-200 pb-4">
                           <div className="">
                             <h3 className="text-3xl  text-gray-900 font-calsans sm:text-3xl leading-[105%]">
@@ -652,8 +652,8 @@ function UserTrainingService({ user }: { user: User | null }) {
                     <div
                       className={` items-start justify-center w-full max-w-7xl mx-auto`}
                     >
-                      <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:px-6 lg:py-0 bg-white py-9">
-                        <div className="sm:flex justify-between sm:gap-4 items-center border-b-2 border-b-gray-200 pb-4">
+                      <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6  lg:py-0 bg-white py-9">
+                        <div className="sm:flex justify-between sm:gap-4 items-center border-b-2 border-b-gray-200 pb-4 py-9">
                           <div className="">
                             <h3 className="text-3xl  text-gray-900 font-calsans sm:text-3xl leading-[105%]">
                               {
@@ -962,12 +962,24 @@ function UserTrainingService({ user }: { user: User | null }) {
 
                 {indexPelatihanSelected != 100000000 && !isExpand && (
                   <div
-                    className={`flex md:hidden items-start justify-center ${isExpand ? "w-12/12" : "w-full flex"
+                    className={`flex md:hidden items-start  justify-center ${isExpand ? "w-12/12" : "w-full flex"
                       }`}
                   >
-                    <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:px-6 lg:py-0 bg-white py-9">
-                      <div className="sm:flex justify-between sm:gap-4 items-center border-b-2 border-b-gray-200 pb-4">
-                        <div className="">
+                    <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:px-6 lg:py-10 bg-red">
+                      <div className="sm:flex justify-between sm:gap-4 items-center border-b-2 border-b-gray-200 pb-4 md:py-10 md:mt-28">
+                        <div className="justify-center flex flex-col md:flex-row md:justify-start text-center md:text-left items-center pt-10 mt-10 ">
+                          <div className="block md:hidden sm:shrink-0">
+                            <Image
+                              width={0}
+                              height={0}
+                              alt=""
+                              src={icons(
+                                userDetail?.Pelatihan[indexPelatihanSelected]
+                                  ?.BidangPelatihan!
+                              )}
+                              className="w-16 rounded-lg object-cover shadow-sm"
+                            />
+                          </div>
                           <h3 className="text-3xl  text-gray-900 font-calsans sm:text-3xl leading-[105%]">
                             {
                               userDetail?.Pelatihan[indexPelatihanSelected]
@@ -995,7 +1007,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                                 : "-"}
                             </p>
                             <div
-                              className="cursor-pointer"
+                              className="cursor-pointer hidden md:block"
                               onClick={(e) => setIsExpand(!isExpand)}
                             >
                               {isExpand ? (
@@ -1007,7 +1019,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                           </div>
                         </div>
 
-                        <div className="hidden sm:block sm:shrink-0">
+                        <div className="hidden lg:block sm:shrink-0">
                           <Image
                             width={0}
                             height={0}

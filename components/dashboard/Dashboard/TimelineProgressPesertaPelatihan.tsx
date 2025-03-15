@@ -194,7 +194,7 @@ export const TimelineProgressPesertaPelatihan = ({
   return (
     <section className=" text-gray-800">
       <div className=" max-w-5xl py-12 mx-auto">
-        <div className="grid gap-4 sm:grid-cols-12">
+        <div className="grid md:gap-4 sm:grid-cols-12">
           <div className="col-span-12 sm:col-span-3">
             <div className="text-center sm:text-left mb-14 before:block before:w-24 before:h-3 before:mb-2 before:rounded-md before:mx-auto sm:before:mx-0 before:bg-blue-500">
               <h3 className="text-2xl font-calsans leading-none">
@@ -205,24 +205,24 @@ export const TimelineProgressPesertaPelatihan = ({
               </p>
             </div>
           </div>
-          <div className="relative col-span-12 px-4 space-y-6 sm:col-span-9">
-            <div className="col-span-12 space-y-12 relative px-4 sm:col-span-8 sm:space-y-8 sm:before:absolute sm:before:top-2 sm:before:bottom-0 sm:before:w-0.5 sm:before:-left-3 before:bg-gray-300">
+          <div className="relative col-span-12 space-y-6 sm:col-span-9">
+            <div className="col-span-12 space-y-5 md:space-y-12 relative px-4 sm:col-span-8 sm:space-y-8 sm:before:absolute sm:before:top-2 sm:before:bottom-0 sm:before:w-0.5 sm:before:-left-3 before:bg-gray-300">
               <div
                 className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${userDetail!.Keterangan == "Valid"
-                    ? "before:bg-green-400"
-                    : userDetail!.Keterangan == "Tidak Valid"
-                      ? "before:bg-rose-500"
-                      : "before:bg-gray-700"
+                  ? "before:bg-green-400"
+                  : userDetail!.Keterangan == "Tidak Valid"
+                    ? "before:bg-rose-500"
+                    : "before:bg-gray-700"
                   } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer`}
               >
                 <h3 className="text-lg font-semibold">Validasi Peserta </h3>
 
                 <time
                   className={`text-sm font-medium text-gray-600 ${userDetail?.Keterangan! == "Tidak Valid"
-                      ? "text-rose-500"
-                      : userDetail?.Keterangan! == "Valid"
-                        ? "text-green-500"
-                        : "text-gray-700"
+                    ? "text-rose-500"
+                    : userDetail?.Keterangan! == "Valid"
+                      ? "text-green-500"
+                      : "text-gray-700"
                     }`}
                 >
                   {userDetail?.Keterangan! == "Tidak Valid" ? (
@@ -301,10 +301,10 @@ export const TimelineProgressPesertaPelatihan = ({
                 ) : (
                   <div
                     className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${userDetail.PreTest < 65 && userDetail.PreTest > 0
-                        ? "before:bg-rose-500"
-                        : userDetail.PreTest > 65
-                          ? "before:bg-green-400"
-                          : "before:bg-gray-700"
+                      ? "before:bg-rose-500"
+                      : userDetail.PreTest > 65
+                        ? "before:bg-green-400"
+                        : "before:bg-gray-700"
                       } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer`}
                   >
                     <h3 className="text-lg font-semibold">
@@ -312,12 +312,12 @@ export const TimelineProgressPesertaPelatihan = ({
                     </h3>
                     <time
                       className={`text-sm font-medium text-gray-600 ${userDetail?.PreTest! == 0 &&
-                          userDetail?.PostTest == 0 &&
-                          pelatihan!.StatusApproval != "Selesai"
-                          ? "text-gray-700"
-                          : userDetail?.PreTest >= 65
-                            ? "text-green-500"
-                            : "text-rose-500"
+                        userDetail?.PostTest == 0 &&
+                        pelatihan!.StatusApproval != "Selesai"
+                        ? "text-gray-700"
+                        : userDetail?.PreTest >= 65
+                          ? "text-green-500"
+                          : "text-rose-500"
                         }`}
                     >
                       {userDetail?.PreTest! == 0 ? (
@@ -540,8 +540,8 @@ export const TimelineProgressPesertaPelatihan = ({
 
                 <div
                   className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${pelatihan!.StatusApproval == "Selesai"
-                      ? "before:bg-green-400"
-                      : "before:bg-gray-700"
+                    ? "before:bg-green-400"
+                    : "before:bg-gray-700"
                     } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer `}
                 >
                   <h3 className="text-lg font-semibold">
@@ -584,11 +584,11 @@ export const TimelineProgressPesertaPelatihan = ({
                 ) : (
                   <div
                     className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1]  ${pelatihan!.StatusApproval != "Selesai" &&
-                        userDetail?.PostTest == 0
-                        ? "before:bg-gray-700"
-                        : userDetail?.PostTest >= 65
-                          ? "before:bg-green-500"
-                          : "before:bg-rose-500"
+                      userDetail?.PostTest == 0
+                      ? "before:bg-gray-700"
+                      : userDetail?.PostTest >= 65
+                        ? "before:bg-green-500"
+                        : "before:bg-rose-500"
                       } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer `}
                   >
                     <h3 className="text-lg font-semibold">
@@ -596,11 +596,11 @@ export const TimelineProgressPesertaPelatihan = ({
                     </h3>
                     <time
                       className={`text-sm font-medium text-gray-600  ${pelatihan!.StatusApproval != "Selesai" &&
-                          userDetail?.PostTest == 0
-                          ? "text-gray-700"
-                          : userDetail?.PostTest >= 65
-                            ? "text-green-500"
-                            : "text-rose-500"
+                        userDetail?.PostTest == 0
+                        ? "text-gray-700"
+                        : userDetail?.PostTest >= 65
+                          ? "text-green-500"
+                          : "text-rose-500"
                         }`}
                     >
                       {userDetail?.PostTest == 0 ? (
@@ -824,7 +824,7 @@ export const TimelineProgressPesertaPelatihan = ({
                             bisa meningkatkan pengetahuan mu pada post-test
                             nanti!
                           </span>
-                          {userDetail.FileSertifikat == "" && (
+                          {!userDetail.FileSertifikat.includes('Signed') && (
                             <AlertDialog>
                               <AlertDialogTrigger className="w-full">
                                 <Button
@@ -997,12 +997,12 @@ export const TimelineProgressPesertaPelatihan = ({
 
                 <div
                   className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${pelatihan!.StatusApproval == "Selesai" &&
-                      userDetail.PostTest != 0 &&
-                      userDetail.PreTest != 0
-                      ? "before:bg-gray-700"
-                      : pelatihan?.StatusPenerbitan == "Done"
-                        ? "before:bg-green-500"
-                        : "before:bg-gray-700"
+                    userDetail.PostTest != 0 &&
+                    userDetail.PreTest != 0
+                    ? "before:bg-gray-700"
+                    : pelatihan?.StatusPenerbitan == "Done"
+                      ? "before:bg-green-500"
+                      : "before:bg-gray-700"
                     } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer `}
                 >
                   <h3 className="text-lg font-semibold">
@@ -1016,11 +1016,11 @@ export const TimelineProgressPesertaPelatihan = ({
                       (userDetail.PostTest == 0 && userDetail.PreTest == 0)
                       ? "Harap mengikuti rangkaian pelaksanaan pelatihan untuk mendapatkan sertifikat."
                       : userDetail?.PostTest >= 65 &&
-                        userDetail?.FileSertifikat != ""
+                        userDetail?.FileSertifikat.includes('Signed')
                         ? "Selamat, anda telah mengikuti dan menyelesaikan rangkaian pelatihan. Berikut sertifikat yang dapat kamu akses"
                         : "Oops. Sertifikat kamu masih dalam proses penerbitan, harap ditunggu ya paling lambat 3x24 jam. Pantau terus dashboard-mu ya sobat E-LAUT!"}
                   </span>
-                  {userDetail!.NoSertifikat != "" && (
+                  {userDetail!.FileSertifikat.includes('Signed') && (
                     <Button
                       type="button"
                       variant="outline"
