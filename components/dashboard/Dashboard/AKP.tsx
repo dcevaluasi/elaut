@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import CardDataStats from "../CardDataStats";
 import { GiBattery75, GiPapers } from "react-icons/gi";
@@ -6,6 +7,7 @@ import { MdSchool } from "react-icons/md";
 import Cookies from "js-cookie";
 import axios, { AxiosResponse } from "axios";
 import { LemdiklatDetailInfo } from "@/types/lemdiklat";
+
 import {
   RiFileCloseFill,
   RiLogoutCircleRFill,
@@ -117,8 +119,8 @@ const AKP: React.FC = () => {
     fetchAllData();
   }, []);
 
-  const [startDate, setStartDate] = React.useState("2024-05-31");
-  const [endDate, setEndDate] = React.useState("2025-12-31");
+  const [startDate, setStartDate] = React.useState("2024-01-01");
+  const [endDate, setEndDate] = React.useState("2024-12-31");
 
   const {
     data: dataSertifikatByTypeBlankoCoP,
@@ -188,12 +190,12 @@ const AKP: React.FC = () => {
             </div>
             <div className="grid grid-cols-1 gap-4 h-fit max-h-fit w-full md:grid-cols-3 md:gap-3 xl:grid-cols-3 2xl:gap-3 mb-10">
               {isFetchingSertifikatByTypeBlankoCoC &&
-              isFetchingSertifikatByTypeBlankoCoP ? (
+                isFetchingSertifikatByTypeBlankoCoP ? (
                 <></>
               ) : dataSertifikatByTypeBlankoCoC != null &&
                 dataSertifikatByTypeBlankoCoP != null ? (
                 dataSertifikatByTypeBlankoCoC.data != null &&
-                dataSertifikatByTypeBlankoCoP.data != null ? (
+                  dataSertifikatByTypeBlankoCoP.data != null ? (
                   <>
                     <Popover>
                       <PopoverTrigger asChild>
@@ -400,12 +402,12 @@ const AKP: React.FC = () => {
               )}
             </div>
             {isFetchingSertifikatByTypeBlankoCoC &&
-            isFetchingSertifikatByTypeBlankoCoP ? (
+              isFetchingSertifikatByTypeBlankoCoP ? (
               <></>
             ) : dataSertifikatByTypeBlankoCoC != null &&
               dataSertifikatByTypeBlankoCoP != null ? (
               dataSertifikatByTypeBlankoCoC.data != null &&
-              dataSertifikatByTypeBlankoCoP.data != null ? (
+                dataSertifikatByTypeBlankoCoP.data != null ? (
                 <Tabs defaultValue={"CoC"} className="w-full mb-3 -mt-4">
                   <TabsList className="flex gap-2 w-full">
                     <TabsTrigger value="CoC" className="w-full">

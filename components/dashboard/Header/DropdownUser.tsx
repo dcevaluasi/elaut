@@ -24,15 +24,20 @@ import { BiSolidPhone } from "react-icons/bi";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { HiMiniUserGroup } from "react-icons/hi2";
 import { elautBaseUrl } from "@/constants/urls";
+import { PusatDetailInfo } from "@/types/pusat";
 const DropdownUser = ({
-  userLoggedInInfo,
+  lemdiklatLoggedInInfo,
+  pusatLoggedInInfo
 }: {
-  userLoggedInInfo: LemdiklatDetailInfo | null;
+  lemdiklatLoggedInInfo: LemdiklatDetailInfo | null;
+  pusatLoggedInInfo?: PusatDetailInfo | null
 }) => {
   const pathname = usePathname();
   const isLemdik = pathname.includes("lemdiklat");
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const token = Cookies.get("XSRF091");
+
+  const isPusat = Cookies.get('XSRF093') === 'adminPusat'
 
   const typeRole = Cookies.get("XSRF093");
 
@@ -75,6 +80,8 @@ const DropdownUser = ({
   const [openFormEditProfile, setOpenFormEditProfile] =
     React.useState<boolean>(false);
 
+  const [isUpdating, setIsUpdating] = React.useState<boolean>(false)
+
   const [email, setEmail] = React.useState<string>("");
   const [namaLemdiklat, setNamaLemdiklat] = React.useState<string>("");
   const [noTelpon, setNoTelpon] = React.useState<string>("");
@@ -82,6 +89,62 @@ const DropdownUser = ({
   const [deskripsi, setDeskripsi] = React.useState<string>("");
   const [LastNosertif, setLastNosertif] = React.useState<string>("");
   const [alamat, setAlamat] = React.useState<string>("");
+
+  // VARIABLES UPDATE ADMIN PUSAT
+  const [namaPusat, setNamaPusat] = React.useState<string>('')
+  const [emailPusat, setEmailPusat] = React.useState<string>('')
+  const [passwordPusat, setPasswordPusat] = React.useState<string>('')
+  const [jabatanPusat, setJabatanPusat] = React.useState<string>('')
+  const [nikPusat, setNikPusat] = React.useState<string>('')
+  const [statusPusat, setStatusPusat] = React.useState<string>('')
+
+  const setClearStatePusat = () => {
+    setNamaPusat(''); setEmailPusat(''); setPasswordPusat(''); setJabatanPusat(''); setNikPusat(''); setStatusPusat('');
+  }
+
+  const handleUpdatePusat = async () => {
+    setIsUpdating(true)
+
+    const formData = new FormData()
+    formData.append('Nama', namaPusat)
+    formData.append('Email', emailPusat)
+    formData.append('Password', passwordPusat)
+    formData.append('NoTelpon', jabatanPusat)
+    formData.append('Nip', nikPusat)
+    formData.append('Status', statusPusat)
+
+    try {
+      const response = await axios.put(
+        `${baseUrl}/adminPusat/updateAdminPusat`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+      );
+
+      Toast.fire({
+        icon: `success`,
+        title: `Yeayyy!`,
+        text: `Data profile mu telah berhasil diupdate!`,
+      });
+
+      console.log("SUCCESSFULLY UPDATE PROFILE: ", response)
+
+      setOpenDialogEditProfile(!openFormEditProfile);
+      setOpenFormEditProfile(!openFormEditProfile);
+      setClearStatePusat()
+
+      router.replace(`/admin/${isPusat ? 'pusat' : 'lemdiklat'}/pelatihan`);
+    } catch (error) {
+      Toast.fire({
+        icon: "error",
+        title: `Yeayyy!`,
+        text: `Data profile mu gagal diupdate!`,
+      });
+
+      console.error("ERROR UPDATE PROFILE: ", error);
+    }
+  };
 
   const handleEditProfileUpdate = async () => {
 
@@ -220,8 +283,8 @@ const DropdownUser = ({
                 <div className="flex w-fit gap-1 items-center font-semibold tracking-tighter">
                   <AiFillBank className="text-2xl text-blue-500" />
                   {openFormEditProfile ? "Edit" : "Detail"} Profile{" "}
-                  {userLoggedInInfo != null &&
-                    userLoggedInInfo!.data!.NamaLemdik}
+                  {lemdiklatLoggedInInfo != null &&
+                    lemdiklatLoggedInInfo!.data!.NamaLemdik}
                 </div>
                 {!openFormEditProfile && (
                   <div
@@ -239,152 +302,232 @@ const DropdownUser = ({
             {openFormEditProfile ? (
               <form autoComplete="off">
                 <AlertDialogDescription className=" mb-2 mt-1 text-justify text-gray-500">
-                  Edit profile lemdiklatmu sekarang, isi format inputan sesuai
-                  dengan datamu!
+                  {isPusat ? 'Edit profile-mu sekarang, isi format inputan sesuai  dengan datamu!' : 'Edit profile lemdiklatmu sekarang, isi format inputan sesuai dengan datamu!'}
+
                 </AlertDialogDescription>
-                <div className="grid grid-cols-2 gap-x-3 gap-y-2  mb-1 w-full">
-                  <div className="w-full">
-                    <label
-                      className="block text-gray-800 text-sm font-medium"
-                      htmlFor="namaLemdiklat"
-                    >
-                      Nama Lemdiklat <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                      id="namaLemdiklat"
-                      type="text"
-                      className="form-input w-full text-sm text-black border-gray-300 rounded-md"
-                      required
-                      placeholder={
-                        userLoggedInInfo != null
-                          ? userLoggedInInfo!.data!.NamaLemdik!
-                          : ""
-                      }
-                      value={namaLemdiklat!}
-                      onChange={(e) => setNamaLemdiklat(e.target.value)}
-                    />
+                {
+                  isPusat ? <> <div className="grid grid-cols-2 gap-x-3 gap-y-2  mb-1 w-full">
+                    <div className="w-full">
+                      <label
+                        className="block text-gray-800 text-sm font-medium"
+                        htmlFor="nama"
+                      >
+                        Nama  <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        id="nama"
+                        type="text"
+                        className="form-input w-full text-sm text-black border-gray-300 rounded-md"
+                        required
+                        placeholder={pusatLoggedInInfo != null
+                          ? pusatLoggedInInfo!.data!.Nama!.toString()
+                          : ""}
+                        onChange={(e) => setNamaPusat(e.target.value)}
+                      />
+                    </div>
+                    <div className="w-full">
+                      <label
+                        className="block text-gray-800 text-sm font-medium"
+                        htmlFor="email"
+                      >
+                        Email <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        id="email"
+                        type="email"
+                        className="form-input w-full text-sm text-black border-gray-300 rounded-md"
+                        required
+                        placeholder={pusatLoggedInInfo != null
+                          ? pusatLoggedInInfo!.data!.Email!.toString()
+                          : ""}
+                        onChange={(e) => setEmailPusat(e.target.value)}
+                      />
+                    </div>
+                    <div className="w-full">
+                      <label
+                        className="block text-gray-800 text-sm font-medium"
+                        htmlFor="jabatanPusat"
+                      >
+                        Jabatan <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        id="jabatanPusat"
+                        type="text"
+                        className="form-input w-full text-sm text-black border-gray-300 rounded-md"
+                        required
+                        value={jabatanPusat!}
+                        placeholder={pusatLoggedInInfo != null
+                          ? pusatLoggedInInfo!.data!.NoTelpon!.toString()
+                          : ""}
+                        onChange={(e) => setJabatanPusat(e.target.value)}
+                      />
+                    </div>
+                    <div className="w-full">
+                      <label
+                        className="block text-gray-800 text-sm font-medium"
+                        htmlFor="nik"
+                      >
+                        NIK <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        id="nik"
+                        type="text"
+                        className="form-input w-full text-sm text-black border-gray-300 rounded-md"
+                        required
+                        value={nikPusat!}
+                        placeholder={pusatLoggedInInfo != null
+                          ? pusatLoggedInInfo!.data!.Nip!.toString()
+                          : ""}
+                        onChange={(e) => setNikPusat(e.target.value)}
+                      />
+                    </div>
                   </div>
-                  <div className="w-full">
-                    <label
-                      className="block text-gray-800 text-sm font-medium"
-                      htmlFor="email"
-                    >
-                      Email <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                      id="email"
-                      type="email"
-                      className="form-input w-full text-sm text-black border-gray-300 rounded-md"
-                      required
-                      placeholder={
-                        userLoggedInInfo != null
-                          ? userLoggedInInfo!.data!.Email!
-                          : ""
-                      }
-                      value={email!}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
+                  </> : <> <div className="grid grid-cols-2 gap-x-3 gap-y-2  mb-1 w-full">
+                    <div className="w-full">
+                      <label
+                        className="block text-gray-800 text-sm font-medium"
+                        htmlFor="namaLemdiklat"
+                      >
+                        Nama Lemdiklat <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        id="namaLemdiklat"
+                        type="text"
+                        className="form-input w-full text-sm text-black border-gray-300 rounded-md"
+                        required
+                        placeholder={
+                          lemdiklatLoggedInInfo != null
+                            ? lemdiklatLoggedInInfo!.data!.NamaLemdik!
+                            : ""
+                        }
+                        value={namaLemdiklat!}
+                        onChange={(e) => setNamaLemdiklat(e.target.value)}
+                      />
+                    </div>
+                    <div className="w-full">
+                      <label
+                        className="block text-gray-800 text-sm font-medium"
+                        htmlFor="email"
+                      >
+                        Email <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        id="email"
+                        type="email"
+                        className="form-input w-full text-sm text-black border-gray-300 rounded-md"
+                        required
+                        placeholder={
+                          lemdiklatLoggedInInfo != null
+                            ? lemdiklatLoggedInInfo!.data!.Email!
+                            : ""
+                        }
+                        value={email!}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                    </div>
+                    <div className="w-full">
+                      <label
+                        className="block text-gray-800 text-sm font-medium"
+                        htmlFor="noTelpon"
+                      >
+                        No Telpon <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        id="noTelpon"
+                        type="text"
+                        className="form-input w-full text-sm text-black border-gray-300 rounded-md"
+                        required
+                        value={noTelpon!}
+                        placeholder={
+                          lemdiklatLoggedInInfo != null
+                            ? lemdiklatLoggedInInfo!.data!.NoTelpon!.toString()
+                            : ""
+                        }
+                        onChange={(e) => setNoTelpon(e.target.value)}
+                      />
+                    </div>
+                    <div className="w-full">
+                      <label
+                        className="block text-gray-800 text-sm font-medium"
+                        htmlFor="alamat"
+                      >
+                        Alamat <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        id="alamat"
+                        type="text"
+                        className="form-input w-full text-sm text-black border-gray-300 rounded-md"
+                        required
+                        value={alamat!}
+                        placeholder={
+                          lemdiklatLoggedInInfo != null
+                            ? lemdiklatLoggedInInfo!.data!.Alamat!
+                            : ""
+                        }
+                        onChange={(e) => setAlamat(e.target.value)}
+                      />
+                    </div>
                   </div>
-                  <div className="w-full">
-                    <label
-                      className="block text-gray-800 text-sm font-medium"
-                      htmlFor="noTelpon"
-                    >
-                      No Telpon <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                      id="noTelpon"
-                      type="text"
-                      className="form-input w-full text-sm text-black border-gray-300 rounded-md"
-                      required
-                      value={noTelpon!}
-                      placeholder={
-                        userLoggedInInfo != null
-                          ? userLoggedInInfo!.data!.NoTelpon!.toString()
-                          : ""
-                      }
-                      onChange={(e) => setNoTelpon(e.target.value)}
-                    />
-                  </div>
-                  <div className="w-full">
-                    <label
-                      className="block text-gray-800 text-sm font-medium"
-                      htmlFor="alamat"
-                    >
-                      Alamat <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                      id="alamat"
-                      type="text"
-                      className="form-input w-full text-sm text-black border-gray-300 rounded-md"
-                      required
-                      value={alamat!}
-                      placeholder={
-                        userLoggedInInfo != null
-                          ? userLoggedInInfo!.data!.Alamat!
-                          : ""
-                      }
-                      onChange={(e) => setAlamat(e.target.value)}
-                    />
-                  </div>
-                </div>
-                <div className="w-full">
-                  <label
-                    className="block text-gray-800 text-sm font-medium"
-                    htmlFor="alamat"
-                  >
-                    No Terakhir Sertifikat{" "}
-                    <span className="text-red-600">*</span>
-                  </label>
-                  <input
-                    id="alamat"
-                    type="text"
-                    className="form-input w-full text-sm text-black border-gray-300 rounded-md"
-                    required
-                    value={LastNosertif!}
-                    placeholder={
-                      userLoggedInInfo != null
-                        ? userLoggedInInfo!.data!.LastNosertif!
-                        : ""
-                    }
-                    onChange={(e) => setLastNosertif(e.target.value)}
-                  />
-                </div>
-                <div className="w-full">
-                  <label
-                    className="block text-gray-800 text-sm font-medium"
-                    htmlFor="deskripsi"
-                  >
-                    Deskripsi <span className="text-red-600">*</span>
-                  </label>
-                  <textarea
-                    id="deskripsi"
-                    className="form-input w-full text-sm text-black border-gray-300 rounded-md"
-                    required
-                    value={deskripsi!}
-                    rows={7}
-                    placeholder={
-                      userLoggedInInfo != null
-                        ? userLoggedInInfo!.data!.Deskripsi!
-                        : ""
-                    }
-                    onChange={(e) => setDeskripsi(e.target.value)}
-                  ></textarea>
-                </div>
+                    <div className="w-full">
+                      <label
+                        className="block text-gray-800 text-sm font-medium"
+                        htmlFor="alamat"
+                      >
+                        No Terakhir Sertifikat{" "}
+                        <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        id="alamat"
+                        type="text"
+                        className="form-input w-full text-sm text-black border-gray-300 rounded-md"
+                        required
+                        value={LastNosertif!}
+                        placeholder={
+                          lemdiklatLoggedInInfo != null
+                            ? lemdiklatLoggedInInfo!.data!.LastNosertif!
+                            : ""
+                        }
+                        onChange={(e) => setLastNosertif(e.target.value)}
+                      />
+                    </div>
+                    <div className="w-full">
+                      <label
+                        className="block text-gray-800 text-sm font-medium"
+                        htmlFor="deskripsi"
+                      >
+                        Deskripsi <span className="text-red-600">*</span>
+                      </label>
+                      <textarea
+                        id="deskripsi"
+                        className="form-input w-full text-sm text-black border-gray-300 rounded-md"
+                        required
+                        value={deskripsi!}
+                        rows={7}
+                        placeholder={
+                          lemdiklatLoggedInInfo != null
+                            ? lemdiklatLoggedInInfo!.data!.Deskripsi!
+                            : ""
+                        }
+                        onChange={(e) => setDeskripsi(e.target.value)}
+                      ></textarea>
+                    </div></>
+                }
                 <AlertDialogFooter>
-                  <AlertDialogCancel
-                    onClick={(e) =>
-                      setOpenFormEditProfile(!openFormEditProfile)
-                    }
-                  >
-                    Cancel
-                  </AlertDialogCancel>
-                  <AlertDialogAction
-                    className="bg-blue-500 hover:bg-blue-600"
-                    onClick={(e) => handleEditProfileUpdate()}
-                  >
-                    Edit
-                  </AlertDialogAction>
+                  <div className="w-full flex flex-col gap-1 mt-3">
+                    <AlertDialogAction
+                      className="bg-blue-500 hover:bg-blue-600"
+                      onClick={(e) => { isPusat ? handleUpdatePusat() : handleEditProfileUpdate() }}
+                    >
+                      Edit
+                    </AlertDialogAction>
+                    <AlertDialogCancel
+                      onClick={(e) =>
+                        setOpenFormEditProfile(!openFormEditProfile)
+                      }
+                    >
+                      Cancel
+                    </AlertDialogCancel>
+                  </div>
                 </AlertDialogFooter>
               </form>
             ) : (
@@ -396,24 +539,24 @@ const DropdownUser = ({
                       <AiFillBank className="text-lg text-blue-500" />
                       <span className="font-semibold text-sm tracking-tighter">
                         {" "}
-                        {userLoggedInInfo != null &&
-                          userLoggedInInfo!.data!.NamaLemdik}
+                        {lemdiklatLoggedInInfo != null &&
+                          lemdiklatLoggedInInfo!.data!.NamaLemdik}
                       </span>
                     </div>
                     <div className="flex w-fit gap-1 items-center">
                       <MdAlternateEmail className="text-lg text-blue-500" />
                       <span className="font-semibold text-sm tracking-tighter">
                         {" "}
-                        {userLoggedInInfo != null &&
-                          userLoggedInInfo!.data!.Email}
+                        {lemdiklatLoggedInInfo != null &&
+                          lemdiklatLoggedInInfo!.data!.Email}
                       </span>
                     </div>
                     <div className="flex w-fit gap-1 items-center">
                       <BiSolidPhone className="text-lg text-blue-500" />
                       <span className="font-semibold text-sm tracking-tighter">
                         {" "}
-                        {userLoggedInInfo != null &&
-                          userLoggedInInfo!.data!.NoTelpon}
+                        {lemdiklatLoggedInInfo != null &&
+                          lemdiklatLoggedInInfo!.data!.NoTelpon}
                       </span>
                     </div>
                   </div>
@@ -422,9 +565,9 @@ const DropdownUser = ({
                     <RiVerifiedBadgeFill className="text-lg text-blue-500" />
                     <span className="font-semibold text-sm tracking-tighter">
                       {" "}
-                      {/* {userLoggedInInfo != null && userLoggedInInfo!.data!.Email} */}
-                      {userLoggedInInfo != null &&
-                        userLoggedInInfo!.data!.LastNosertif}{" "}
+                      {/* {lemdiklatLoggedInInfo != null && lemdiklatLoggedInInfo!.data!.Email} */}
+                      {lemdiklatLoggedInInfo != null &&
+                        lemdiklatLoggedInInfo!.data!.LastNosertif}{" "}
                     </span>
                   </div>
                   <div className="flex w-fit gap-1 items-center">
@@ -432,15 +575,15 @@ const DropdownUser = ({
                     <span className="font-semibold text-sm tracking-tighter">
                       {" "}
                       {pathname.includes("lemdik") &&
-                        userLoggedInInfo != null &&
-                        userLoggedInInfo!.data!.Pelatihan.length}
+                        lemdiklatLoggedInInfo != null &&
+                        lemdiklatLoggedInInfo!.data!.Pelatihan.length}
                       Pelatihan
                     </span>
                   </div>
                 </div>
                 <AlertDialogDescription className="-mt-2 text-justify text-gray-600">
-                  {userLoggedInInfo != null &&
-                    userLoggedInInfo!.data!.Deskripsi}
+                  {lemdiklatLoggedInInfo != null &&
+                    lemdiklatLoggedInInfo!.data!.Deskripsi}
                 </AlertDialogDescription>
                 <AlertDialogFooter>
                   <AlertDialogCancel
@@ -513,7 +656,7 @@ const DropdownUser = ({
         <span className="hidden md:flex md:justify-end md:flex-col">
           <span className="block text-sm font-medium text-black text-right">
             {pathname.includes("lemdiklat")
-              ? userLoggedInInfo?.data?.NamaLemdik
+              ? lemdiklatLoggedInInfo?.data?.NamaLemdik
               : dataAdminPusat && pathname.includes("pusat")
                 ? dataAdminPusat!.Nama
                 : ""}

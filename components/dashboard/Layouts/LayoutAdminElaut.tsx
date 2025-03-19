@@ -9,7 +9,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import DropdownUser from "../Header/DropdownUser";
-import { encryptValue } from "@/lib/utils";
+import { PusatDetailInfo } from "@/types/pusat";
 
 export default function LayoutAdminElaut({
   children,
@@ -18,6 +18,10 @@ export default function LayoutAdminElaut({
 }) {
   const router = useRouter();
   const pathname = usePathname(); // Get the current path
+
+  const [pusatData, setPusatData] =
+    React.useState<PusatDetailInfo | null>(null);
+
 
   const fetchInformationPusat = async () => {
     try {
@@ -30,6 +34,7 @@ export default function LayoutAdminElaut({
         }
       );
       console.log({ response })
+      setPusatData(response.data)
       Cookies.set("NIK", response.data.data.Nip);
       Cookies.set("Status", response.data.data.Status);
       Cookies.set("Satker", response.data.data.Status);
@@ -193,7 +198,7 @@ export default function LayoutAdminElaut({
             className="px-8 flex items-center"
           >
             <li className="h-10  ml-3">
-              <DropdownUser userLoggedInInfo={lemdikData!} />
+              <DropdownUser lemdiklatLoggedInInfo={lemdikData!} pusatLoggedInInfo={pusatData!} />
             </li>
           </ul>
         </nav>
