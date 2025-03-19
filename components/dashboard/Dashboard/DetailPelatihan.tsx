@@ -3,7 +3,7 @@
 import React from "react";
 
 import { HiLockClosed, HiMiniUserGroup, HiUserGroup } from "react-icons/hi2";
-import { TbSchool } from "react-icons/tb";
+import { TbDatabase, TbSchool } from "react-icons/tb";
 import { FiEdit2, FiUploadCloud } from "react-icons/fi";
 
 import { usePathname, useRouter } from "next/navigation";
@@ -30,12 +30,13 @@ import HistoryButton from "./Actions/HistoryButton";
 import TTDSertifikat from "./pelatihan/TTDSertifikat";
 import { Button } from "@/components/ui/button";
 import DeleteButton from "./Actions/DeleteButton";
-import { PublishButton } from "./Actions";
+import { MateriButton, PublishButton } from "./Actions";
 import { ESELON_1, ESELON_2 } from "@/constants/nomenclatures";
 
 function DetailPelatihan() {
   const isAdminBalaiPelatihan: boolean = usePathname().includes('lemdiklat')
   const isOperatorBalaiPelatihan = Cookies.get('SATKER_BPPP')?.includes('BPPP') || false
+  const isOperatorPusatPelatihan = Cookies.get('Status')?.includes('Operator Pusat') || false
   const isLemdiklat = Cookies.get('Status') === 'Lemdiklat'
   const isSupervisor = Cookies.get('Status') === 'Supervisor'
   const paths = usePathname().split("/");
@@ -129,30 +130,33 @@ function DetailPelatihan() {
                       className="  shadow-sm bg-green-500 hover:bg-green-500 text-neutral-100  hover:text-neutral-100 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2"
                     >
                       <HiUserGroup className="h-5 w-5 " /> Data Peserta Pelatihan
-                    </Link>  <GenerateNoSertifikatButton
-                        idPelatihan={pelatihan!.IdPelatihan.toString()}
-                        pelatihan={pelatihan!}
-                        handleFetchingData={
-                          handleFetchDetailPelatihan
-                        }
-                      />
-                      <NoSertifikatButton
-                        idPelatihan={pelatihan!.IdPelatihan.toString()}
-                        pelatihan={pelatihan!}
-                        handleFetchingData={
-                          handleFetchDetailPelatihan
-                        }
-                      />
-                      {new Date() >= new Date(pelatihan!.TanggalMulaiPelatihan) && (
-                        <CloseButton
-                          pelatihan={pelatihan!}
-                          statusPelatihan={pelatihan?.Status ?? ""}
-                          idPelatihan={pelatihan!.IdPelatihan.toString()}
-                          handleFetchingData={handleFetchDetailPelatihan}
-                        />
-                      )}
+                    </Link>
 
-
+                      {
+                        isOperatorPusatPelatihan || isOperatorBalaiPelatihan ? <>
+                          <GenerateNoSertifikatButton
+                            idPelatihan={pelatihan!.IdPelatihan.toString()}
+                            pelatihan={pelatihan!}
+                            handleFetchingData={
+                              handleFetchDetailPelatihan
+                            }
+                          />
+                          <NoSertifikatButton
+                            idPelatihan={pelatihan!.IdPelatihan.toString()}
+                            pelatihan={pelatihan!}
+                            handleFetchingData={
+                              handleFetchDetailPelatihan
+                            }
+                          />
+                          {new Date() >= new Date(pelatihan!.TanggalMulaiPelatihan) && (
+                            <CloseButton
+                              pelatihan={pelatihan!}
+                              statusPelatihan={pelatihan?.Status ?? ""}
+                              idPelatihan={pelatihan!.IdPelatihan.toString()}
+                              handleFetchingData={handleFetchDetailPelatihan}
+                            />
+                          )}</> : <></>
+                      }
 
                       <HistoryButton
                         pelatihan={pelatihan!}
@@ -165,7 +169,6 @@ function DetailPelatihan() {
 
                       {
                         isOperatorBalaiPelatihan && <>
-
                           {(pelatihan!.TanggalMulaiPelatihan == "" && pelatihan!.StatusApproval != 'Selesai') && (
                             <Button
                               onClick={() => {
@@ -235,6 +238,48 @@ function DetailPelatihan() {
                         pelatihan!.PemberitahuanDiterima === 'Pengajuan Telah Dikirim ke Kapuslat KP' && isEselonII && <TTDSertifikat dataPelatihan={pelatihan!} handleFetchData={handleFetchDetailPelatihan} />
                       }
 
+                    </>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+          <div className=" w-full mb-4"></div>
+        </div>
+
+      )}
+
+      {pelatihan != null && (
+        <div className=' mt-5 w-full gap-0'>
+          <div className="px-4 w-full mb-4">
+            <div className="w-full border border-gray-200 rounded-xl">
+              <div className="bg-gray-100 p-4 w-full ">
+                <h2 className="font-calsans text-xl">
+                  Materi, Kurikulum, dan Bank Soal Pre-Test & Post-Test
+                </h2>
+              </div>
+              <table className="w-full">
+                <tr className="border-b border-b-gray-200 w-full">
+                  <td className="p-4 w-fit gap-1 flex justify-start ">
+                    <>
+                      {
+                        isOperatorPusatPelatihan || isOperatorBalaiPelatihan ? <>
+                          <MateriButton
+                            idPelatihan={pelatihan!.IdPelatihan.toString()}
+                            handleFetchingData={
+                              handleFetchDetailPelatihan
+                            }
+                            data={pelatihan!}
+                          />
+                          <Link
+                            title="Bank Soal"
+                            href={`/admin/lemdiklat/pelatihan/${pelatihan!.KodePelatihan
+                              }/bank-soal/${encryptValue(pelatihan!.IdPelatihan)}`}
+                            className="border border-blue-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-blue-900 hover:bg-blue-900 hover:text-white text-white rounded-md"
+                          >
+                            <TbDatabase className="h-5 w-5" /> Bank Soal Pre-Test & Post-Test
+                          </Link></> : <></>
+                      }
                     </>
                   </td>
                 </tr>
@@ -515,24 +560,6 @@ function DetailPelatihan() {
                   </td>
                 </tr>
               }
-              <tr className="border-b border-b-gray-200 w-full">
-                <td className="font-semibold p-4 w-[20%] flex">
-                  Materi Pelatihan
-                </td>
-                <td className="p-4 w-2/3">
-                  {pelatihan!.MateriPelatihan.length > 0 ? (
-                    <div className="flex flex-col gap-1">
-                      {pelatihan!.MateriPelatihan.map((materi, index) => (
-                        <span key={index}>
-                          {index + 1}. {materi.NamaMateri}
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    <>-</>
-                  )}
-                </td>
-              </tr>
               {
                 isLemdiklat && <tr className="border-b border-b-gray-200 w-full">
                   <td className="font-semibold p-4 w-[20%]">

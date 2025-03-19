@@ -266,7 +266,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
     data.append("IdLemdik", idLemdik);
     data.append("KodePelatihan", kodePelatihan);
     data.append("NamaPelatihan", namaPelatihan);
-    data.append("PenyelenggaraPelatihan", lemdikData?.data?.NamaLemdik!);
+    data.append("PenyelenggaraPelatihan", penyelenggaraPelatihan!);
     data.append("DetailPelatihan", detailPelatihan);
     data.append("JenisPelatihan", jenisPelatihan);
     data.append("BidangPelatihan", bidangPelatihan);

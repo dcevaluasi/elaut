@@ -772,15 +772,7 @@ const TableDataPelatihan: React.FC = () => {
                                   }
 
 
-                                  {
-                                    (pelatihan!.StatusApproval != 'Selesai' && pelatihan!.StatusPenerbitan == 'Sudah Diverifikasi Pelaksanaan') && <MateriButton
-                                      idPelatihan={pelatihan!.IdPelatihan.toString()}
-                                      handleFetchingData={
-                                        handleFetchingPublicTrainingData
-                                      }
-                                      data={pelatihan!}
-                                    />
-                                  }
+
 
                                 </PopoverContent>
                               </Popover>

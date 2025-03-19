@@ -159,8 +159,8 @@ const MateriButton: React.FC<MateriButtonProps> = ({
           setIsOpenFormMateri(!isOpenFormMateri);
         }}
         variant="outline"
-        title="Upload Surat Pemberitahuan"
-        className="border border-orange-500  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-orange-500 hover:bg-orange-500 hover:text-white text-white rounded-md"
+        title="Materi Pelatihan"
+        className="border border-teal-600 shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-teal-600 hover:bg-teal-600  hover:text-white text-white rounded-md"
       >
         <FaBookOpen className="h-4 w-4 mr-1" /> Materi Pelatihan
       </Button>

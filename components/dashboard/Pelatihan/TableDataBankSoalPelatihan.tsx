@@ -532,11 +532,10 @@ const TableDataBankSoalPelatihan = () => {
             {dataPelatihan != null && (
               <Badge
                 variant="outline"
-                className={`  cursor-pointer ${
-                  dataPelatihan!.IsSematkan != "yes"
-                    ? " bg-yellow-300 text-neutral-800 hover:bg-yellow-400"
-                    : " bg-green-500 text-white hover:bg-green-600"
-                }`}
+                className={`  cursor-pointer ${dataPelatihan!.IsSematkan != "yes"
+                  ? " bg-yellow-300 text-neutral-800 hover:bg-yellow-400"
+                  : " bg-green-500 text-white hover:bg-green-600"
+                  }`}
               >
                 {dataPelatihan!.IsSematkan != "yes"
                   ? "Soal Belum Disematkan ke Peserta"
@@ -548,7 +547,7 @@ const TableDataBankSoalPelatihan = () => {
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 {dataPelatihan != null &&
-                  dataPelatihan!.IsSematkan != "yes" && (
+                  dataPelatihan!.IsSematkan != "yes" && dataPelatihan?.UserPelatihan.length == 0 && (
                     <div className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">
                       <FaRegPaperPlane />
                       Sematkan Soal
