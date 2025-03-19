@@ -318,8 +318,7 @@ function DetailPelatihan() {
                     Penyelenggara Pelatihan
                   </td>
                   <td className="p-4 w-[80%] ">
-                    {generateFullNameBalai(pelatihan!.PenyelenggaraPelatihan) ||
-                      ""}{" "}
+
                     ({pelatihan!.PenyelenggaraPelatihan || ""})
                   </td>
                 </tr>
