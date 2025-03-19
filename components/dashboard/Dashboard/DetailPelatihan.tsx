@@ -249,7 +249,7 @@ function DetailPelatihan() {
 
       )}
 
-      {pelatihan != null && (
+      {pelatihan != null && (isOperatorBalaiPelatihan || isOperatorPusatPelatihan) && (
         <div className=' mt-5 w-full gap-0'>
           <div className="px-4 w-full mb-4">
             <div className="w-full border border-gray-200 rounded-xl">
