@@ -2,38 +2,19 @@
 
 import Toast from "@/components/toast";
 import axios, { AxiosResponse } from "axios";
-import { request } from "https";
 import Cookies from "js-cookie";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectLabel,
-} from "@/components/ui/select";
-import { FiSlack } from "react-icons/fi";
-import { HiMiniUserGroup } from "react-icons/hi2";
-import ReCAPTCHA from "react-google-recaptcha";
-
 function page() {
   const baseUrl = process.env.NEXT_PUBLIC_BLANKO_AKAPI_URL;
   const router = useRouter();
-
-  const [captcha, setCaptcha] = React.useState<string | null>();
-
   /*
     state variables for login
     */
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [role, setRole] = React.useState("");
-
   /*
     method for resting all state data login (LOG)
 */

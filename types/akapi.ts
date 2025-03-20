@@ -57,3 +57,23 @@ export type SummarySertifikatLembagaItem = {
   NamaLembaga: string
   Total: number
 }
+
+// DATA BLANKO
+export type SummaryDataBlankoByNameByAddress = {
+  message: string
+  total_data: number
+  data: DataBlankoByNameByAddress[]
+}
+
+export type DataBlankoByNameByAddress = {
+  s_id: string
+  s_nomor_sertifikat: string
+  s_serial_no: string
+  s_jenis_sertifikat: string
+  s_nama: string
+  s_tempat_lahir: string
+  s_tanggal_lahir: string
+  created_on: string
+  is_pembaruan: string
+  isPrint: string
+}
