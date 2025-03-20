@@ -262,7 +262,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                         width={0}
                         height={0}
                         src={"/ttd-elektronik.png"}
-                        className="w-[230px] h-[80px] relative -z-10 pt-4 block"
+                        className="w-[230px] h-[100px] relative -z-10 pt-4 block"
                       />
                     ) : (
                       <div className="h-[80px]"></div>

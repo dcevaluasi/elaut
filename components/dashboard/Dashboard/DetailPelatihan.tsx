@@ -318,8 +318,7 @@ function DetailPelatihan() {
                     Penyelenggara Pelatihan
                   </td>
                   <td className="p-4 w-[80%] ">
-
-                    ({pelatihan!.PenyelenggaraPelatihan || ""})
+                    {pelatihan!.PenyelenggaraPelatihan || ""}
                   </td>
                 </tr>
                 <tr className="border-b border-b-gray-200 w-full">
@@ -397,7 +396,7 @@ function DetailPelatihan() {
                     <Link
                       target="_blank"
                       className="text-blue-500 underline w-2/3"
-                      href={`${isLemdiklat ? 'https://elaut-bppsdm.kkp.go.id/api-elaut/public/suratPemberitahuan/pelatihan/' + pelatihan!.SuratPemberitahuan || "" : 'https://elaut-bppsdm.kkp.go.id/api-elaut/public/silabus/' + pelatihan!.SilabusPelatihan || ""}`}
+                      href={`${isLemdiklat ? pelatihan!.SuratPemberitahuan || "" : pelatihan!.SilabusPelatihan || ""}`}
                     >
                       {isLemdiklat ? pelatihan!.SuratPemberitahuan || "" : pelatihan!.SilabusPelatihan || ""}
                     </Link>
