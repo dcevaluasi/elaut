@@ -352,134 +352,135 @@ const TableDataBlankoKeluar: React.FC = () => {
           <div>
             <div id="chartOne" className="-ml-5"></div>
             {
-              isFetching && dataFull == null ? <></> : <div className="flex w-full items-end mb-2">
+              isFetching && dataFull == null ? <></> :
+                <div className="flex w-full items-end mb-2">
 
-                <div className="flex flex-col gap-1 w-full">
-                  <p className="font-medium text-dark text-sm">
-                    Filter Data Blanko
-                  </p>
-                  <div className="flex w-full gap-1 items-start">
+                  <div className="flex flex-col gap-1 w-full">
+                    <p className="font-medium text-dark text-sm">
+                      Filter Data Blanko
+                    </p>
+                    <div className="flex w-full gap-1 items-start">
 
-                    <Select
-                      value={typeBlanko}
-                      onValueChange={(value) => {
-                        setTypeBlanko(value); if (value != 'CoC') {
-                          setIsPembaruan(' ')
-                        }
-                      }}
-                    >
-                      <SelectTrigger className="w-fit border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
-                        <div className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">
-                          <TbChartBubble />{" "}
-                          {typeBlanko == " "
-                            ? "All"
-                            : typeBlanko != ""
-                              ? typeBlanko
-                              : "Tipe Blanko"}
-                        </div>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Tipe Blanko</SelectLabel>
-                          <SelectItem value=" ">All</SelectItem>
-                          <SelectItem value="CoC">
-                            CoC
-                          </SelectItem>
-                          <SelectItem value="CoP">
-                            CoP
-                          </SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-
-                    {
-                      typeBlanko == 'CoC' && <Select
-                        value={isPembaruan}
+                      <Select
+                        value={typeBlanko}
                         onValueChange={(value) => {
-                          setIsPembaruan(value);
+                          setTypeBlanko(value); if (value != 'CoC') {
+                            setIsPembaruan(' ')
+                          }
                         }}
                       >
                         <SelectTrigger className="w-fit border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
                           <div className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">
                             <TbChartBubble />{" "}
-                            {isPembaruan == " "
+                            {typeBlanko == " "
                               ? "All"
-                              : isPembaruan != " "
-                                ? isPembaruan == '0' ? 'Biasa' : 'Pembaruan'
-                                : "Jenis Sertifikat"}
+                              : typeBlanko != ""
+                                ? typeBlanko
+                                : "Tipe Blanko"}
                           </div>
                         </SelectTrigger>
                         <SelectContent>
                           <SelectGroup>
-                            <SelectLabel>Jenis Sertifikat</SelectLabel>
+                            <SelectLabel>Tipe Blanko</SelectLabel>
                             <SelectItem value=" ">All</SelectItem>
-                            <SelectItem value="0">
-                              Biasa
+                            <SelectItem value="CoC">
+                              CoC
                             </SelectItem>
-                            <SelectItem value="1">
-                              Pembaruan
+                            <SelectItem value="CoP">
+                              CoP
                             </SelectItem>
                           </SelectGroup>
                         </SelectContent>
                       </Select>
-                    }
-                    {
-                      dataFull != null ? <Select
 
-                      >
-                        <SelectTrigger className="w-fit border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
-                          <div className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">
-                            <TbChartBubble />{" "}
-                            Jumlah Sertifikat : {dataFull!.total_data}
-                          </div>
-                        </SelectTrigger>
+                      {
+                        typeBlanko == 'CoC' && <Select
+                          value={isPembaruan}
+                          onValueChange={(value) => {
+                            setIsPembaruan(value);
+                          }}
+                        >
+                          <SelectTrigger className="w-fit border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
+                            <div className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">
+                              <TbChartBubble />{" "}
+                              {isPembaruan == " "
+                                ? "All"
+                                : isPembaruan != " "
+                                  ? isPembaruan == '0' ? 'Biasa' : 'Pembaruan'
+                                  : "Jenis Sertifikat"}
+                            </div>
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectLabel>Jenis Sertifikat</SelectLabel>
+                              <SelectItem value=" ">All</SelectItem>
+                              <SelectItem value="0">
+                                Biasa
+                              </SelectItem>
+                              <SelectItem value="1">
+                                Pembaruan
+                              </SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      }
+                      {
+                        dataFull != null ? <Select
 
-                      </Select> : <></>
-                    }
+                        >
+                          <SelectTrigger className="w-fit border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
+                            <div className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer">
+                              <TbChartBubble />{" "}
+                              Jumlah Sertifikat : {dataFull!.total_data}
+                            </div>
+                          </SelectTrigger>
 
-                  </div>
-                </div>
+                        </Select> : <></>
+                      }
 
-
-                <div className="w-fit flex flex-col items-end justify-end gap-2">
-                  <div className="flex flex-col gap-1">
-                    <p className="font-medium text-dark text-sm">
-                      Pilih Range Waktu & Cari No Serial
-                    </p>
-                    <div className="flex flex-row gap-1 w-fit justify-end">
-                      <input
-                        type="date"
-                        value={startDate}
-                        onChange={(e) => handleDateChange(e, setStartDate)}
-                        className="flex h-9 w-fit items-center justify-between whitespace-nowrap rounded-md border border-neutral-200 bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-white placeholder:text-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 "
-                      />
-
-                      {/* End Date Input */}
-                      <input
-                        type="date"
-                        value={endDate}
-                        onChange={(e) => handleDateChange(e, setEndDate)}
-                        className="flex h-9 w-fit items-center justify-between whitespace-nowrap rounded-md border border-neutral-200 bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-white placeholder:text-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 "
-                      />
                     </div>
                   </div>
-                  <Input
-                    placeholder="Cari berdasarkan no serial blanko..."
-                    value={
-                      (table
-                        .getColumn("s_serial_no")
-                        ?.getFilterValue() as string) ?? ""
-                    }
-                    onChange={(event: any) =>
-                      table
-                        .getColumn("s_serial_no")
-                        ?.setFilterValue(event.target.value)
-                    }
-                    className="max-w-sm text-sm"
-                  />
 
+
+                  <div className="w-fit flex flex-col items-end justify-end gap-2">
+                    <div className="flex flex-col gap-1">
+                      <p className="font-medium text-dark text-sm">
+                        Pilih Range Waktu & Cari No Serial
+                      </p>
+                      <div className="flex flex-row gap-1 w-fit justify-end">
+                        <input
+                          type="date"
+                          value={startDate}
+                          onChange={(e) => handleDateChange(e, setStartDate)}
+                          className="flex h-9 w-fit items-center justify-between whitespace-nowrap rounded-md border border-neutral-200 bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-white placeholder:text-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 "
+                        />
+
+                        {/* End Date Input */}
+                        <input
+                          type="date"
+                          value={endDate}
+                          onChange={(e) => handleDateChange(e, setEndDate)}
+                          className="flex h-9 w-fit items-center justify-between whitespace-nowrap rounded-md border border-neutral-200 bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-white placeholder:text-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 "
+                        />
+                      </div>
+                    </div>
+                    <Input
+                      placeholder="Cari berdasarkan no serial blanko..."
+                      value={
+                        (table
+                          .getColumn("s_serial_no")
+                          ?.getFilterValue() as string) ?? ""
+                      }
+                      onChange={(event: any) =>
+                        table
+                          .getColumn("s_serial_no")
+                          ?.setFilterValue(event.target.value)
+                      }
+                      className="max-w-sm text-sm"
+                    />
+
+                  </div>
                 </div>
-              </div>
             }
             {isFetching ? <div className="my-32 w-full flex items-center justify-center">
               <HashLoader color="#338CF5" size={50} />

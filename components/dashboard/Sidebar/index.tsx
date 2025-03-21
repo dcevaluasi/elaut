@@ -331,13 +331,13 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           <ul className="mb-5.5 mt-0 flex flex-col gap-1 pl-6">
                             <li>
                               <SidebarLinkGroup
-                                activeCondition={pathname == "akp/pusat/blanko"}
+                                activeCondition={pathname == "akp/pusat/layanan/pengesahan-program"}
                               >
                                 {(handleClick, open) => {
                                   return (
                                     <React.Fragment>
                                       <Link
-                                        href="/akp/pusat/blanko"
+                                        href="/akp/pusat/layanan/pengesahan-program"
                                         className={`group relative flex items-center gap-2.5 rounded-sm px-2  py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark  ${pathname == "akp/pusat/blanko" &&
                                           "bg-graydark "
                                           }`}
@@ -374,7 +374,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 }}
                               </SidebarLinkGroup>
                             </li>
-                            <li>
+                            {/* <li>
                               <SidebarLinkGroup
                                 activeCondition={pathname.includes(
                                   "akp/pusat/blanko/penggunaan"
@@ -397,8 +397,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                   );
                                 }}
                               </SidebarLinkGroup>
-                            </li>
-                            <li>
+                            </li> */}
+                            {/* <li>
                               <SidebarLinkGroup
                                 activeCondition={pathname.includes(
                                   "akp/pusat/blanko/blanko-rusak"
@@ -421,7 +421,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                   );
                                 }}
                               </SidebarLinkGroup>
-                            </li>
+                            </li> */}
                           </ul>
                         </div>
                         {/* <!-- Dropdown Menu End --> */}
