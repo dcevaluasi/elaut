@@ -252,7 +252,7 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
                 Cancel
               </AlertDialogCancel>
             )}
-            {beritaAcara != null && ttdSertifikat != "" ? (
+            {beritaAcara != null ? (
               <AlertDialogAction
                 onClick={(e) => handleGenerateSertifikat()}
                 disabled={isUploading}
