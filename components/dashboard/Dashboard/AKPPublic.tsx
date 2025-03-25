@@ -112,6 +112,12 @@ const AKPPublic: React.FC = () => {
 
   const [selectedId, setSelectedId] = React.useState<number>(0);
 
+  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>, setDate: React.Dispatch<React.SetStateAction<string>>) => {
+    const value = event.target.value;
+    const formattedDate = new Date(value).toISOString().split("T")[0]; // Converts to YYYY-MM-DD
+    setDate(formattedDate);
+  };
+
   React.useEffect(() => {
     // Fungsi untuk fetch data
     const fetchAllData = () => {
@@ -142,13 +148,19 @@ const AKPPublic: React.FC = () => {
     data: dataSertifikatByLemdiklat,
     isFetching: isFetchingSertifikatByLemdiklat,
     refetch: refetchSertifikatByLemdiklat,
-  } = useFetchSertifikatByLemdiklat();
+  } = useFetchSertifikatByLemdiklat({
+    waktu_awal: startDate,
+    waktu_berakhir: endDate
+  });
 
   const {
     data: dataSertifikatByProgram,
     isFetching: isFetchingSertifikatByProgram,
     refetch: refetchSertifikatByProgram,
-  } = useFetchSertifikatByProgram();
+  } = useFetchSertifikatByProgram({
+    waktu_awal: startDate,
+    waktu_berakhir: endDate
+  });
 
   console.log({ dataSertifikatByLemdiklat });
   console.log({ dataSertifikatByProgram });
@@ -187,12 +199,12 @@ const AKPPublic: React.FC = () => {
           <CardContent>
             <div className="grid grid-cols-1 gap-4 h-fit max-h-fit w-full md:grid-cols-3 md:gap-3 xl:grid-cols-3 2xl:gap-3 mb-10">
               {isFetchingSertifikatByTypeBlankoCoC &&
-              isFetchingSertifikatByTypeBlankoCoP ? (
+                isFetchingSertifikatByTypeBlankoCoP ? (
                 <></>
               ) : dataSertifikatByTypeBlankoCoC != null &&
                 dataSertifikatByTypeBlankoCoP != null ? (
                 dataSertifikatByTypeBlankoCoC.data != null &&
-                dataSertifikatByTypeBlankoCoP.data != null ? (
+                  dataSertifikatByTypeBlankoCoP.data != null ? (
                   <>
                     <Popover>
                       <PopoverTrigger asChild>
@@ -423,12 +435,12 @@ const AKPPublic: React.FC = () => {
               )}
             </div>
             {isFetchingSertifikatByTypeBlankoCoC &&
-            isFetchingSertifikatByTypeBlankoCoP ? (
+              isFetchingSertifikatByTypeBlankoCoP ? (
               <></>
             ) : dataSertifikatByTypeBlankoCoC != null &&
               dataSertifikatByTypeBlankoCoP != null ? (
               dataSertifikatByTypeBlankoCoC.data != null &&
-              dataSertifikatByTypeBlankoCoP.data != null ? (
+                dataSertifikatByTypeBlankoCoP.data != null ? (
                 <Tabs defaultValue={"CoP"} className="w-full mb-3 -mt-4">
                   <TabsList className="flex gap-2 w-full">
                     <TabsTrigger value="CoC" className="w-full">
