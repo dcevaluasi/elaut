@@ -290,8 +290,7 @@ export const CURRICULLUM_CERTIFICATE: Record<
       },
       {
         name_ind: 'Penerapan Good Manufacturing Practices (GMP)',
-        name_eng:
-          'Penerapan Praktik Produksi yang Baik (Good Manufacturing Practices/GMP)',
+        name_eng: 'Good Manufacturing Practices (GMP) Implementation',
         theory: 2,
         practice: 0,
       },
@@ -303,13 +302,14 @@ export const CURRICULLUM_CERTIFICATE: Record<
       },
       {
         name_ind: 'Penerapan Standard Sanitation Operating Procedure (SSOP)',
-        name_eng: 'Penerapan Standar Prosedur Operasional Sanitasi (SSOP)',
+        name_eng:
+          'Standard Sanitation Operating Procedure (SSOP) Implementation',
         theory: 2,
         practice: 0,
       },
       {
         name_ind: 'Penyusunan Program Pemenuhan Persyaratan SSOP',
-        name_eng: 'Formulation of SSOP Requirements Fulfillment Program',
+        name_eng: 'Preparation of Program to Fulfill SSOP Requirements',
         theory: 1,
         practice: 3,
       },

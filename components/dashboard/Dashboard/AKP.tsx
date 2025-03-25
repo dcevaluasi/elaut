@@ -46,6 +46,15 @@ const AKP: React.FC = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const token = Cookies.get("XSRF091");
 
+  const [startDate, setStartDate] = React.useState<string>('2024-06-01')
+  const [endDate, setEndDate] = React.useState<string>('2025-12-31')
+
+  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>, setDate: React.Dispatch<React.SetStateAction<string>>) => {
+    const value = event.target.value;
+    const formattedDate = new Date(value).toISOString().split("T")[0]; // Converts to YYYY-MM-DD
+    setDate(formattedDate);
+  };
+
   const [lemdikData, setLemdikData] =
     React.useState<LemdiklatDetailInfo | null>(null);
 
@@ -119,9 +128,6 @@ const AKP: React.FC = () => {
     fetchAllData();
   }, []);
 
-  const [startDate, setStartDate] = React.useState("2024-01-01");
-  const [endDate, setEndDate] = React.useState("2024-12-31");
-
   const {
     data: dataSertifikatByTypeBlankoCoP,
     isFetching: isFetchingSertifikatByTypeBlankoCoP,
@@ -136,13 +142,19 @@ const AKP: React.FC = () => {
     data: dataSertifikatByLemdiklat,
     isFetching: isFetchingSertifikatByLemdiklat,
     refetch: refetchSertifikatByLemdiklat,
-  } = useFetchSertifikatByLemdiklat();
+  } = useFetchSertifikatByLemdiklat({
+    waktu_awal: startDate,
+    waktu_berakhir: endDate,
+  });
 
   const {
     data: dataSertifikatByProgram,
     isFetching: isFetchingSertifikatByProgram,
     refetch: refetchSertifikatByProgram,
-  } = useFetchSertifikatByProgram();
+  } = useFetchSertifikatByProgram({
+    waktu_awal: startDate,
+    waktu_berakhir: endDate
+  });
 
   console.log({ dataSertifikatByLemdiklat });
   console.log({ dataSertifikatByProgram });
@@ -157,13 +169,34 @@ const AKP: React.FC = () => {
     end_date: endDate,
   });
 
+  React.useEffect(() => {
+    refetchSertifikatByTypeBlankoCoP({
+      type_blanko: "COP",
+      start_date: startDate,
+      end_date: endDate,
+    })
+    refetchSertifikatByTypeBlankoCoC({
+      type_blanko: "COC",
+      start_date: startDate,
+      end_date: endDate,
+    });
+    refetchSertifikatByLemdiklat({
+      waktu_awal: startDate,
+      waktu_berakhir: endDate,
+    })
+    refetchSertifikatByProgram({
+      waktu_awal: startDate,
+      waktu_berakhir: endDate,
+    })
+  }, [startDate, endDate]);
+
   return (
     <>
       {dataSertifikatByLemdiklat != null && dataSertifikatByProgram != null ? (
         <Card className="p-4 mb-6">
           <CardHeader>
-            <div className="flex flex-col">
-              <div className="flex flex-row gap-2 items-center">
+            <div className="flex gap-10">
+              <div className="flex flex-row gap-2 items-center max-w-4xl">
                 <RiShipFill className="text-2xl" />
                 <div className="flex flex-col">
                   <h1 className="text-2xl text-gray-900 font-medium leading-[100%] font-calsans capitalize">
@@ -174,6 +207,27 @@ const AKP: React.FC = () => {
                     and processed by the Maritime and Fisheries Training Center
                     operator, and is valid to {formatDateTime()}
                   </p>
+                </div>
+              </div>
+              <div className="flex flex-col gap-1">
+                <p className="font-medium text-dark text-sm">
+                  Pilih Range Waktu
+                </p>
+                <div className="flex flex-row gap-1 w-fit justify-end">
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => handleDateChange(e, setStartDate)}
+                    className="flex h-9 w-fit items-center justify-between whitespace-nowrap rounded-md border border-neutral-200 bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-white placeholder:text-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 "
+                  />
+
+                  {/* End Date Input */}
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => handleDateChange(e, setEndDate)}
+                    className="flex h-9 w-fit items-center justify-between whitespace-nowrap rounded-md border border-neutral-200 bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-white placeholder:text-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-950 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1 "
+                  />
                 </div>
               </div>
             </div>

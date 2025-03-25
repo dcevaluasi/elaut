@@ -40,6 +40,7 @@ import { capitalizeWords, CURRICULLUM_CERTIFICATE } from "@/constants/texts";
 import { formatDateRange, formatDateRangeEnglish } from "@/utils/time";
 import { DESC_CERTIFICATE_COMPETENCE_FISHERIES } from "@/constants/serkom";
 import { ESELON_1, ESELON_2, KA_BPPSDM, KA_PUSLAT_KP } from "@/constants/nomenclatures";
+import html2canvas from "html2canvas";
 
 const html2pdf = dynamic(() => import("html2pdf.js"), { ssr: false });
 
@@ -102,7 +103,7 @@ const SertifikatNonKepelautan = React.forwardRef(
           className="w-full h-full scale-95 flex flex-col gap-4 items-center justify-center  px-10  rounded-md font-bos leading-[120%]"
         >
           {/* Page 1 */}
-          <div ref={refPage} className="w-full flex flex-col  gap-4 relative h-[49.63rem] items-center justify-center">
+          <div ref={refPage} className="pdf-page w-full flex flex-col  gap-4 relative h-[49.63rem] items-center justify-center">
             <div className="flex flex-row  absolute top-0 right-0">
               <p className="text-lg">
                 No. Reg : {userPelatihan?.NoRegistrasi}
@@ -285,14 +286,15 @@ const SertifikatNonKepelautan = React.forwardRef(
 
           {/* Page 2 */}
 
-          <div className="w-full flex flex-col  gap-4  h-full items-center justify-center mt-36 break-before-auto relative">
+          <div className="pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center mt-36 break-before-auto relative">
             <div className="flex flex-row justify-center items-center">
-              <div className="flex flex-row gap-2 items-center">
-                <div className="flex flex-col text-center">
-                  <p className="font-bosBold text-lg max-w-md w-full uppercase">
-                    Materi {pelatihan?.NamaPelatihan}
+              <div className="flex flex-row gap-2 items-center h-fit">
+                <div className="flex flex-col text-center space-y-0 h-fit items-center justify-center w-full">
+                  <p className="font-bosBold text-lg max-w-2xl w-full uppercase leading-none">
+                    Materi {pelatihan?.NamaPelatihan} tanggal {formatDateRange(generateTanggalPelatihan(pelatihan?.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan))}
                   </p>
-                  <p className="font-bos text-base max-w-3xl">{formatDateRange(generateTanggalPelatihan(pelatihan?.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan))}</p>
+                  <p className="font-bos text-base max-w-2xl leading-none -mt-2">Assistant Training for Students in the Marine and Fisheries Education UnitFish Processing {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan?.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan))}</p>
+
                 </div>
               </div>
             </div>
@@ -310,10 +312,12 @@ const SertifikatNonKepelautan = React.forwardRef(
               </div>
               <div className="flex border border-black  text-center font-bosBold">
                 <div className="w-6/12 border border-black"></div>
-                <div className="w-3/12 p-2 border-black border"><div className="flex flex-col justify-center">
-                  <span className="text-base">TEORI</span>
-                  <span className="italic font-bos">Theory</span>
-                </div></div>
+                <div className="w-3/12 p-2 border-black border">
+                  <div className="flex flex-col justify-center">
+                    <span className="text-base">TEORI</span>
+                    <span className="italic font-bos">Theory</span>
+                  </div>
+                </div>
                 <div className="w-3/12 p-2 border-black border"><div className="flex flex-col justify-center">
                   <span className="text-base">PRAKTEK</span>
                   <span className="italic font-bos">Practice</span>
@@ -321,7 +325,12 @@ const SertifikatNonKepelautan = React.forwardRef(
               </div>
               <div className="flex border border-black ">
                 <div className="w-1/12 p-2 font-bosBold text-center border-black border">I</div>
-                <div className="w-5/12 p-2 font-bosBold border-black border">KOMPETENSI UMUM</div>
+                <div className="w-5/12 p-2 font-bosBold border-black border">
+                  <div className="flex flex-col justify-start">
+                    <span className="text-base">KOMPETENSI UMUM</span>
+                    <span className="italic font-bos">General Competency</span>
+                  </div>
+                </div>
                 <div className="w-3/12 p-2 border-black border"></div>
                 <div className="w-3/12 p-2 border-black border"></div>
               </div>
@@ -330,7 +339,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                   <div className="w-1/12 p-2 text-center border-black border">{index + 1}.</div>
                   <div className="w-5/12 p-2 border-black border">
                     <div className="flex flex-col justify-center">
-                      <span className="text-base">{materi.name_ind}</span>
+                      <span className="text-base font-bos">{materi.name_ind}</span>
                       <span className="italic">{materi.name_eng}</span>
                     </div>
                   </div>
@@ -340,16 +349,21 @@ const SertifikatNonKepelautan = React.forwardRef(
               ))}
               <div className="flex border border-black ">
                 <div className="w-1/12 p-2 font-bosBold text-center border-black border">II</div>
-                <div className="w-5/12 p-2 font-bosBold border-black border">KOMPETENSI INTI</div>
+                <div className="w-5/12 p-2 font-bosBold border-black border">
+                  <div className="flex flex-col justify-start">
+                    <span className="text-base">KOMPETENSI INTI</span>
+                    <span className="italic font-bos">Core Competency</span>
+                  </div>
+                </div>
                 <div className="w-3/12 p-2 border-black border"></div>
                 <div className="w-3/12 p-2 border-black border"></div>
               </div>
-              {CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.map((materi, index) => (
-                <div key={index} className="flex  border-black border text-sm">
+              {CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.slice(0, 5).map((materi, index) => (
+                <div key={index} className={`flex border-black border text-sm`}>
                   <div className="w-1/12 p-2 text-center border-black border">{index + 1}.</div>
                   <div className="w-5/12 p-2 border-black border">
                     <div className="flex flex-col justify-center">
-                      <span className="text-base">{materi.name_ind}</span>
+                      <span className="text-base font-bos">{materi.name_ind}</span>
                       <span className="italic">{materi.name_eng}</span>
                     </div>
                   </div>
@@ -357,17 +371,75 @@ const SertifikatNonKepelautan = React.forwardRef(
                   <div className="w-3/12 p-2 text-center border-black border">{materi.practice}</div>
                 </div>
               ))}
-              <div className="flex  border-black border font-bosBold">
-                <div className="w-6/12 p-2 text-center border-black border">JUMLAH JAM PELAJARAN</div>
-                <div className="w-3/12 p-2 text-center border-black border">{totalHours.totalTheory}</div>
-                <div className="w-3/12 p-2 text-center border-black border">{totalHours.totalPractice}</div>
-              </div>
-              <div className="flex  border-black border font-bosBold">
-                <div className="w-6/12 p-2 text-center border-black border">TOTAL JAM PELAJARAN</div>
-                <div className="w-6/12 p-2 text-center border-black border">{totalHours.totalTheory + totalHours.totalPractice}</div>
-              </div>
+              {
+                CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.length == 4 && <>
+                  <div className="flex  border-black border font-bosBold">
+                    <div className="w-6/12 p-2 text-center border-black border">
+                      <div className="flex flex-col ">
+                        <span className="text-base">JUMLAH JAM PELAJARAN</span>
+                        <span className="italic font-bos">Training Hours</span>
+                      </div>
+                    </div>
+                    <div className="w-3/12 p-2 text-center border-black border">{totalHours.totalTheory}</div>
+                    <div className="w-3/12 p-2 text-center border-black border">{totalHours.totalPractice}</div>
+                  </div>
+                  <div className="flex  border-black border font-bosBold">
+                    <div className="w-6/12 p-2 text-center border-black border">
+                      <div className="flex flex-col ">
+                        <span className="text-base">TOTAL JAM PELAJARAN</span>
+                        <span className="italic font-bos">Total Hours</span>
+                      </div>
+                    </div>
+                    <div className="w-6/12 p-2 text-center border-black border">{totalHours.totalTheory + totalHours.totalPractice}</div>
+                  </div></>
+              }
+
             </div>
           </div >
+
+          {/* Page 3 */}
+
+          {
+            CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.length > 4 && <div className="pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center mt-36 break-before-auto relative">
+              <div className="w-full">
+
+                {CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.slice(5, CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.length).map((materi, index) => (
+                  <div key={index} className={`flex border-black border text-sm`}>
+                    <div className="w-1/12 p-2 text-center border-black border">{6 + index}.</div>
+                    <div className="w-5/12 p-2 border-black border">
+                      <div className="flex flex-col justify-center">
+                        <span className="text-base font-bos">{materi.name_ind}</span>
+                        <span className="italic">{materi.name_eng}</span>
+                      </div>
+                    </div>
+                    <div className="w-3/12 p-2 text-center border-black border">{materi.theory}</div>
+                    <div className="w-3/12 p-2 text-center border-black border">{materi.practice}</div>
+                  </div>
+                ))}
+                <div className="flex  border-black border font-bosBold">
+                  <div className="w-6/12 p-2 text-center border-black border">
+                    <div className="flex flex-col ">
+                      <span className="text-base">JUMLAH JAM PELAJARAN</span>
+                      <span className="italic font-bos">Training Hours</span>
+                    </div>
+                  </div>
+                  <div className="w-3/12 p-2 text-center border-black border">{totalHours.totalTheory}</div>
+                  <div className="w-3/12 p-2 text-center border-black border">{totalHours.totalPractice}</div>
+                </div>
+                <div className="flex  border-black border font-bosBold">
+                  <div className="w-6/12 p-2 text-center border-black border">
+                    <div className="flex flex-col ">
+                      <span className="text-base">TOTAL JAM PELAJARAN</span>
+                      <span className="italic font-bos">Total Hours</span>
+                    </div>
+                  </div>
+                  <div className="w-6/12 p-2 text-center border-black border">{totalHours.totalTheory + totalHours.totalPractice}</div>
+                </div>
+
+              </div>
+            </div >
+          }
+
         </div >
       </div >
     );
@@ -656,20 +728,27 @@ export function DialogSertifikatPelatihan({
     const element = componentRef.current;
     const elementPage = componentRefPage.current;
 
-    // Optimize for PDF generation (preserve text, avoid image rendering)
+    // Calculate height dynamically
+    const firstPageHeight = elementPage.offsetHeight + 180; // Fixed first page height
+    const contentHeight = element.scrollHeight; // Total content height
+    const remainingHeight = contentHeight - firstPageHeight;
+
+    // If there's more content, dynamically adjust second page height
+    const dynamicPageHeight = remainingHeight > 0 ? remainingHeight + 50 : firstPageHeight;
+
     const opt = {
-      margin: [0, 10, 10, 10], // Small margins for better fit
+      margin: [0, 10, 10, 10],
       filename: `${userPelatihan?.Nama}_${userPelatihan?.NoRegistrasi}.pdf`,
-      // pagebreak: { mode: "avoid-all" }, // Prevent splitting important elements
+      pagebreak: { mode: ["avoid-all", "css"] }, // Ensure proper page breaks
       html2canvas: {
-        scale: 1.5, // Higher scale for better quality
-        useCORS: true, // Load external styles correctly
+        scale: 1.5,
+        useCORS: true,
         logging: false,
         backgroundColor: "#fff",
       },
       jsPDF: {
         unit: "px",
-        format: [element.offsetWidth, elementPage.offsetHeight + 180], // Dynamically adjust to content
+        format: [element.offsetWidth, firstPageHeight], // First page height fixed
         orientation: "landscape",
       },
     };
@@ -677,7 +756,7 @@ export function DialogSertifikatPelatihan({
     html2pdf()
       .from(element)
       .set(opt)
-      .toPdf() // Use .toPdf() instead of image-based conversion
+      .toPdf()
       .outputPdf("blob")
       .then(async (pdfBlob: Blob) => {
         const MAX_SIZE_MB = 3;
@@ -720,7 +799,7 @@ export function DialogSertifikatPelatihan({
               icon: "success",
               title: `Sertifikat sudah diupload ke server!`,
             });
-            handleFetchingData()
+            handleFetchingData();
             router.refresh();
           } else {
             Toast.fire({
@@ -739,6 +818,9 @@ export function DialogSertifikatPelatihan({
         setIsUploading(false);
       });
   };
+
+
+
 
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,

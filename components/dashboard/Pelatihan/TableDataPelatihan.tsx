@@ -509,7 +509,7 @@ const TableDataPelatihan: React.FC = () => {
                       )}
 
                       <CardHeader>
-                        <CardTitle>{pelatihan!.NamaPelatihan}</CardTitle>
+                        <CardTitle>{pelatihan!.NamaPelatihan}{!isOperatorBalaiPelatihan && `(${pelatihan!.PenyelenggaraPelatihan})`}</CardTitle>
                         <CardDescription>
                           {" "}
                           {pelatihan!.Program} •{" "}
