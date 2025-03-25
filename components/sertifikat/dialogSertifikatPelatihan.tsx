@@ -339,7 +339,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                   <div className="w-1/12 p-2 text-center border-black border">{index + 1}.</div>
                   <div className="w-5/12 p-2 border-black border">
                     <div className="flex flex-col justify-center">
-                      <span className="text-base !font-inter not-italic font-normal">{materi.name_ind}</span>
+                      <span className="text-base !font-plusSansJakarta not-italic font-normal">{materi.name_ind}</span>
                       <span className="italic font-bosItalic">{materi.name_eng}</span>
                     </div>
                   </div>
@@ -363,7 +363,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                   <div className="w-1/12 p-2 text-center border-black border">{index + 1}.</div>
                   <div className="w-5/12 p-2 border-black border">
                     <div className="flex flex-col justify-center">
-                      <span className="text-base !font-inter not-italic font-normal">{materi.name_ind}</span>
+                      <span className="text-base !font-plusSansJakarta not-italic font-normal">{materi.name_ind}</span>
                       <span className="italic font-bosItalic">{materi.name_eng}</span>
                     </div>
                   </div>
@@ -408,7 +408,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                     <div className="w-1/12 p-2 text-center border-black border">{6 + index}.</div>
                     <div className="w-5/12 p-2 border-black border">
                       <div className="flex flex-col justify-center">
-                        <span className="text-base !font-inter not-italic font-normal">{materi.name_ind}</span>
+                        <span className="text-base !font-plusSansJakarta not-italic font-normal">{materi.name_ind}</span>
                         <span className="italic font-bosItalic">{materi.name_eng}</span>
                       </div>
                     </div>

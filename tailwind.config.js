@@ -228,6 +228,7 @@ module.exports = {
       },
       fontFamily: {
         inter: ['var(--font-inter)', 'sans-serif'],
+        plusSansJakarta: ['var(--font-plusSansJakarta)', 'sans-serif'],
         calsans: ['var(--font-calsans)', 'sans-serif'],
         cambria: ['var(--font-cambria)', 'sans-serif'],
         bos: ['var(--font-bos)', 'sans-serif'],

@@ -51,6 +51,11 @@ const inter = Plus_Jakarta_Sans({
   display: "swap",
 });
 
+const plusSansJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-plusSansJakarta",
+});
+
 /*
   METADATA WEBSITE E-LAUT
 */
@@ -137,7 +142,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         suppressHydrationWarning={true}
-        className={`${inter.className} ${myFont.variable} ${tuwir.variable} ${delius.variable} ${bos.variable} ${bosBold.variable}  ${bosItalic.variable} ${cambria.variable} antialiased bg-white text-gray-900 tracking-tight `}
+        className={`${inter.className} ${myFont.variable} ${plusSansJakarta.variable} ${tuwir.variable} ${delius.variable} ${bos.variable} ${bosBold.variable}  ${bosItalic.variable} ${cambria.variable} antialiased bg-white text-gray-900 tracking-tight `}
       >
         <div className="flex flex-col overflow-hidden supports-[overflow:clip]:overflow-clip relative">
 
