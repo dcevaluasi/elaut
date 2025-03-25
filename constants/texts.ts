@@ -249,8 +249,7 @@ export const CURRICULLUM_CERTIFICATE: Record<
     UMUM: [
       {
         name_ind: 'Kebijakan Sistem Jaminan Mutu dan Keamanan Hasil Perikanan',
-        name_eng:
-          'Policy on Quality Assurance System and Safety of Fishery Products',
+        name_eng: ' Fishery Product Quality and Safety Assurance System Policy',
         theory: 1,
         practice: 0,
       },
@@ -260,7 +259,7 @@ export const CURRICULLUM_CERTIFICATE: Record<
         name_ind:
           'Sertifikasi dalam Sistem Jaminan Mutu dan Keamanan Hasil Perikanan',
         name_eng:
-          'Certification in Quality Assurance System and Safety of Fishery Products',
+          'Certification in Quality Assurance and Fishery Product Safety System',
         theory: 1,
         practice: 1,
       },
