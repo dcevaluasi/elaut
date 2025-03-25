@@ -41,6 +41,11 @@ const delius = Delius_Unicase({
   variable: "--font-delius",
 });
 
+const plusSansJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-plusSansJakarta",
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -57,7 +62,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         suppressHydrationWarning={true}
-        className={`${inter.className} ${myFont.variable} ${bos.variable} ${bosBold.variable} ${bosItalic.variable}  ${delius.variable} `}
+        className={`${inter.className} ${myFont.variable} ${plusSansJakarta.variable} ${bos.variable} ${bosBold.variable} ${bosItalic.variable}  ${delius.variable} `}
       >
         <div className="h-screen max-h-screen overflow-y-hidden">
           {loading ? <Loader /> : children}
