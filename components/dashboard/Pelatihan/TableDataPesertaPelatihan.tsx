@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import TableData from "../Tables/TableData";
 import {
   AlertDialog,
@@ -92,7 +92,7 @@ import { generateTanggalPelatihan } from "@/utils/text";
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import { DIALOG_TEXTS } from "@/constants/texts";
 import { countUserWithNoSertifikat, countUserWithPassed, countUserWithSpesimenTTD, countUserWithTanggalSertifikat, countValidKeterangan } from "@/utils/counter";
-import { generateTimestamp, getTodayInIndonesianFormat } from "@/utils/time";
+import { generateTimestamp, getDateInIndonesianFormat, getTodayInIndonesianFormat } from "@/utils/time";
 import { BiSolidCalendarAlt } from "react-icons/bi";
 import addData from "@/firebase/firestore/addData";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
@@ -360,9 +360,9 @@ const TableDataPesertaPelatihan = () => {
       // Iterate through each user and update their status
       for (const user of data) {
         const formData = new FormData();
-        formData.append("TanggalSertifikat", getTodayInIndonesianFormat());
+        formData.append("TanggalSertifikat", getDateInIndonesianFormat(tanggalSertifikat));
 
-        console.log(`Updating user: ${user.IdUserPelatihan}, Tanggal Sertifikat: ${getTodayInIndonesianFormat()}`);
+        console.log(`Updating user: ${user.IdUserPelatihan}, Tanggal Sertifikat: ${getDateInIndonesianFormat(tanggalSertifikat)}`);
 
         await axios.put(
           `${baseUrl}/lemdik/updatePelatihanUsers?id=${user.IdUserPelatihan}`,
@@ -382,6 +382,7 @@ const TableDataPesertaPelatihan = () => {
       });
 
       setIsIteratingProcess(false)
+      setTanggalSertifikat('')
       handleFetchingPublicTrainingDataById();
       setOpenFormSematkanTanggalSertifikat(false);
     } catch (error) {
@@ -969,6 +970,9 @@ const TableDataPesertaPelatihan = () => {
     }
   };
 
+  const [tanggalSertifikat, setTanggalSertifikat] = React.useState<string>('')
+  console.log()
+
   const [isOpenFormPeserta, setIsOpenFormPeserta] =
     React.useState<boolean>(false);
   const [fileExcelPesertaPelatihan, setFileExcelPesertaPelatihan] =
@@ -1301,7 +1305,17 @@ const TableDataPesertaPelatihan = () => {
             <div className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4 border-gray-300">
               <BiSolidCalendarAlt className="h-7 w-7 text-blue-500 text-lg" />
               <div className="space-y-1 leading-none">
-                <label>{getTodayInIndonesianFormat()}</label>
+                <input
+                  id="tanggalSertifikat"
+                  type="date"
+                  className="form-input w-full text-black border-gray-300 rounded-md"
+                  required
+
+                  value={tanggalSertifikat}
+                  onChange={(
+                    e: ChangeEvent<HTMLInputElement>
+                  ) => setTanggalSertifikat(e.target.value)}
+                />
                 <p className="text-xs leading-[110%] text-gray-600">
                   Tanggal sertifikat yang akan disematkan pada file sertifikat
                 </p>

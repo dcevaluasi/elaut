@@ -94,6 +94,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
     generateRandomString()
   );
   const [namaPelatihan, setNamaPelatihan] = React.useState("");
+  const [namaPelatihanInggris, setNamaPelatihanInggris] = React.useState("");
   const [penyelenggaraPelatihan, setPenyelenggaraPelatihan] = React.useState(
     lemdikData?.data?.NamaLemdik
   );
@@ -168,6 +169,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
     setIdLemdik("");
     setKodePelatihan("");
     setNamaPelatihan("");
+    setNamaPelatihanInggris("");
     setPenyelenggaraPelatihan("");
     setDetailPelatihan("");
     setJenisPelatihan("");
@@ -266,6 +268,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
     data.append("IdLemdik", idLemdik);
     data.append("KodePelatihan", kodePelatihan);
     data.append("NamaPelatihan", namaPelatihan);
+    data.append("NamaPelathanInggris", namaPelatihanInggris);
     data.append("PenyelenggaraPelatihan", penyelenggaraPelatihan!);
     data.append("DetailPelatihan", detailPelatihan);
     data.append("JenisPelatihan", jenisPelatihan);
@@ -585,26 +588,6 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                           <div className="w-full px-3">
                             <label
                               className="block text-gray-800 text-sm font-medium mb-1"
-                              htmlFor="kodePelatihan"
-                            >
-                              Kode Pelatihan{" "}
-                              <span className="text-red-600">*</span>
-                            </label>
-                            <input
-                              id="kodePelatihan"
-                              type="text"
-                              className="form-input w-full text-black border-gray-300 rounded-md"
-                              placeholder="Masukkan kode pelatihan"
-                              required
-                              value={kodePelatihan}
-                              readOnly
-                            />
-                          </div>
-                        </div>
-                        <div className="flex flex-wrap -mx-3 mb-1 w-full">
-                          <div className="w-full px-3">
-                            <label
-                              className="block text-gray-800 text-sm font-medium mb-1"
                               htmlFor="namaPelatihan"
                             >
                               Nama Pelatihan{" "}
@@ -619,6 +602,28 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                               value={namaPelatihan}
                               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                                 setNamaPelatihan(e.target.value)
+                              }
+                            />
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap -mx-3 mb-1 w-full">
+                          <div className="w-full px-3">
+                            <label
+                              className="block text-gray-800 text-sm font-medium mb-1"
+                              htmlFor="namaPelatihan"
+                            >
+                              Nama Pelatihan in English{" "}
+                              <span className="text-red-600">*</span>
+                            </label>
+                            <input
+                              id="namaPelatihanInggris"
+                              type="text"
+                              className="form-input w-full text-black border-gray-300 rounded-md"
+                              placeholder="Masukkan nama pelatihan"
+                              required
+                              value={namaPelatihanInggris}
+                              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                setNamaPelatihanInggris(e.target.value)
                               }
                             />
                           </div>
