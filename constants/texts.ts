@@ -98,7 +98,7 @@ export const CURRICULLUM_CERTIFICATE: Record<
   CBIB: {
     UMUM: [
       {
-        name_ind: 'Policy on the Implementation of SJMHKP in Aquaculture',
+        name_ind: 'Kebijakan Penerapan SJMHKP dalam Perikanan Budidaya',
         name_eng: 'Fishery Product Quality and Safety Assurance System Policy',
         theory: 2,
         practice: 0,
