@@ -469,7 +469,7 @@ const TableDataPelatihan: React.FC = () => {
                         setFilterCategoryPenyelenggara(value)
                       }
                     >
-                      <SelectTrigger className="w-full text-base py-6">
+                      <SelectTrigger className="w-full text-base py-4">
                         <SelectValue placeholder="Pilih penyelenggara" />
                       </SelectTrigger>
                       <SelectContent>
@@ -483,7 +483,7 @@ const TableDataPelatihan: React.FC = () => {
                       </SelectContent>
                     </Select>
                     <Button variant="outline" className='py-5' onClick={() => handleFetchingPublicTrainingData()}><IoRefreshSharp />Refresh</Button>
-                    {filterCategory != "" && (
+                    {(filterCategory != "" || filterCategoryPenyelenggara != "") && (
                       <Button
                         onClick={(e) => setFilterCategory("")}
                         className="border border-neutral-200  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-3 bg-neutral-800 hover:bg-neutral-800 hover:text-white text-white rounded-md"
