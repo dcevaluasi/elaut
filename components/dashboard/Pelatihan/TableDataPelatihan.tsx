@@ -470,7 +470,7 @@ const TableDataPelatihan: React.FC = () => {
                       }
                     >
                       <SelectTrigger className="w-full text-base py-4">
-                        <SelectValue placeholder="Pilih penyelenggara" />
+                        <SelectValue placeholder="Pilih Lembaga Diklat" />
                       </SelectTrigger>
                       <SelectContent>
                         {
