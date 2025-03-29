@@ -485,7 +485,7 @@ const TableDataPelatihan: React.FC = () => {
                     <Button variant="outline" className='py-5' onClick={() => handleFetchingPublicTrainingData()}><IoRefreshSharp />Refresh</Button>
                     {(filterCategory != "" || filterCategoryPenyelenggara != "") && (
                       <Button
-                        onClick={(e) => setFilterCategory("")}
+                        onClick={(e) => {setFilterCategory(""); setFilterCategoryPenyelenggara("")}}
                         className="border border-neutral-200  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-3 bg-neutral-800 hover:bg-neutral-800 hover:text-white text-white rounded-md"
                       >
                         <MdClear className="h-5 w-5 mr-1" />
