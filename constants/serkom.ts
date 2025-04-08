@@ -11,7 +11,7 @@ export const DESC_CERTIFICATE_COMPETENCE_FISHERIES: Record<
     desc_ind:
       'Dalam Pelatihan Hazzard Analysis and Critical Control Points (HACCP) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan SDM Kelautan dan Perikanan (BPPSDMKP) dengan Pusat Pengendalian dan Pengawasan Mutu Pascapanen - Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP) pada tanggal',
     desc_eng:
-      'In the Hazard Analysis and Critical Control Points (HACCP) Training which was held in collaboration between the Maritime and Fisheries Training Center - Maritime and Fisheries Human Resource Development and Extension Agency with Postharvest Quality Control and Supervision Center - Marine and Fisheries Products Quality Control and Supervision Agency on',
+      'In the Hazard Analysis and Critical Control Points (HACCP) Training, which was organized in collaboration between the Maritime and Fisheries Training Center - Maritime and Fisheries Human Resource Development and Extension Agency, and the Postharvest Quality Control and Supervision Center - Marine and Fisheries Products Quality Control and Supervision Agency on',
   },
   CBIB: {
     desc_ind:
