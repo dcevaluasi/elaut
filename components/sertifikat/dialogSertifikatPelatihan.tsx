@@ -358,7 +358,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                 <div className="w-3/12 p-2 border-black border"></div>
                 <div className="w-3/12 p-2 border-black border"></div>
               </div>
-              {CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.slice(0, 5).map((materi, index) => (
+              {CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.slice(0, 4).map((materi, index) => (
                 <div key={index} className={`flex border-black border text-sm`}>
                   <div className="w-1/12 p-2 text-center border-black border">{index + 1}.</div>
                   <div className="w-5/12 p-2 border-black border">
@@ -372,7 +372,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                 </div>
               ))}
               {
-                CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.length <= 4 && <>
+                CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.length <= 3 && <>
                   <div className="flex  border-black border font-plusSansJakarta font-bold">
                     <div className="w-6/12 p-2 text-center border-black border">
                       <div className="flex flex-col ">
@@ -400,12 +400,12 @@ const SertifikatNonKepelautan = React.forwardRef(
           {/* Page 3 */}
 
           {
-            CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.length >= 5 && <div className="pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center mt-36 break-before-auto relative">
+            CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.length >= 4 && <div className="pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center mt-36 break-before-auto relative">
               <div className="w-full">
 
-                {CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.slice(5, CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.length).map((materi, index) => (
+                {CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.slice(4, CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.length).map((materi, index) => (
                   <div key={index} className={`flex border-black border text-sm`}>
-                    <div className="w-1/12 p-2 text-center border-black border">{6 + index}.</div>
+                    <div className="w-1/12 p-2 text-center border-black border">{5 + index}.</div>
                     <div className="w-5/12 p-2 border-black border">
                       <div className="flex flex-col justify-center">
                         <span className="text-base !font-plusSansJakarta not-italic font-normal">{materi.name_ind}</span>
