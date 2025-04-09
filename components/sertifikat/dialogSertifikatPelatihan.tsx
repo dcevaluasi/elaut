@@ -293,7 +293,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                   <p className="font-plusSansJakarta font-bold text-lg max-w-2xl w-full uppercase leading-none">
                     Materi {pelatihan?.NamaPelatihan} tanggal {formatDateRange(generateTanggalPelatihan(pelatihan?.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan))}
                   </p>
-                  <p className="font-bos text-base max-w-2xl leading-none -mt-2">{pelatihan?.NamaPelathanInggris} {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan?.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan))}</p>
+                  <p className="font-bos text-base max-w-2xl leading-none -mt-2">{pelatihan?.NamaPelathanInggris} on {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan?.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan))}</p>
 
                 </div>
               </div>
