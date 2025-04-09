@@ -35,13 +35,13 @@ export const DESC_CERTIFICATE_COMPETENCE_FISHERIES: Record<
     desc_ind:
       'Dalam Pelatihan Cara Pembuatan Pakan Ikan yang Baik (CPPIB) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Ikan Air Tawar - Direktorat Jenderal Perikanan Budidaya Pusat Pengendalian dan Pengawasan Mutu Produksi Primer – Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP) pada tanggal',
     desc_eng:
-      'In the Training on Good Aquaculture Feed Manufacturing Practices which was held in collaboration between the Maritime and Fisheries Training Center - Maritime and Fisheries Human Resource Development and Extension Agency, the Directorate of Freshwater Fish - Directorate General of Fisheries Cultivation, and the Center for Control and Primary Production Quality Control and Supervision - Marine and Fisheries Quality Control and Supervision Agency',
+      'In the Training on Good Aquaculture Feed Manufacturing Practices which was held in collaboration between the Maritime and Fisheries Training Center - Maritime and Fisheries Human Resource Development and Extension Agency, the Directorate of Freshwater Fish - Directorate General of Fisheries Cultivation, and the Center for Control and Primary Production Quality Control and Supervision - Marine and Fisheries Quality Control and Supervision Agency on',
   },
   API: {
     desc_ind:
       'Dalam Pelatihan Asisten Pengolah Ikan (API) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Pengolahan - Direktorat Jenderal Penguatan Daya Saing Produk Kelautan dan perikanan  (DJPDSPKP) dan Pusat Pengendalian dan Pengawasan Mutu Pascapanen - Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP) pada tanggal',
     desc_eng:
-      'In the Fish Processing Assistant Training which was held in  collaboration between the Maritime and Fisheries Training Center - Maritime and Fisheries Human Resource Development and Extension Agency, the Directorate of Processing and Quality Development - Directorate General of Strengthening and Competitiveness of Marine and Fishery Products, and the Postharvest Quality Control and Supervision Center - Marine and Fisheries Products Quality Control and Supervision Agency',
+      'In the Fish Processing Assistant Training which was held in  collaboration between the Maritime and Fisheries Training Center - Maritime and Fisheries Human Resource Development and Extension Agency, the Directorate of Processing and Quality Development - Directorate General of Strengthening and Competitiveness of Marine and Fishery Products, and the Postharvest Quality Control and Supervision Center - Marine and Fisheries Products Quality Control and Supervision Agency on',
   },
   SPI: {
     desc_ind:
