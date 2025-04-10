@@ -363,8 +363,8 @@ const SertifikatNonKepelautan = React.forwardRef(
                 <div className="flex   font-plusSansJakarta font-bold">
                   <div className="w-1/12 px-2  flex items-center justify-center leading-none"></div>
                   <div className="w-9/12 px-2">
-                    <div className="flex flex-col items-start justify-center">
-                      <span className="text-base leading-none">JUMLAH JAM PELAJARAN</span>
+                    <div className="flex flex-row items-center">
+                      <span className="text-base leading-none">JUMLAH JAM PELAJARAN</span>/
                       <span className="italic font-bos leading-none">Training Hours</span>
                     </div>
                   </div>
@@ -374,8 +374,8 @@ const SertifikatNonKepelautan = React.forwardRef(
                 <div className="flex   font-plusSansJakarta font-bold">
                   <div className="w-1/12 px-2  flex items-center justify-center leading-none"></div>
                   <div className="w-9/12 px-2 ">
-                    <div className="flex flex-col items-start justify-center">
-                      <span className="text-base leading-none">TOTAL JAM PELAJARAN</span>
+                    <div className="flex flex-row items-center">
+                      <span className="text-base leading-none">TOTAL JAM PELAJARAN</span>/
                       <span className="italic font-bos leading-none">Total Hours</span>
                     </div>
                   </div>
