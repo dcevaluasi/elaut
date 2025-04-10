@@ -17,7 +17,7 @@ export const DESC_CERTIFICATE_COMPETENCE_FISHERIES: Record<
     desc_ind:
       'Dalam Pelatihan Cara Budidaya Ikan yang Baik (CBIB) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Ikan Air Payau - Direktorat Jenderal Perikanan Budidaya dan Pusat Pengendalian dan Pengawasan Mutu Produksi Primer – Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP) pada tanggal',
     desc_eng:
-      'In the Training on Good Fish Cultivation Methods (CBIB) which was held in collaboration between the Maritime and Fisheries Training Center - Maritime and Fisheries Human Resource Development and Extension Agency, the Directorate of Brackish Fish – Directorate General of Fisheries Cultivation, and the Center for Control and Primary Production Quality Control and Supervision - Marine and Fisheries Quality Control and Supervision Agency on',
+      'In the Training on Good Fish Cultivation Methods which was held in collaboration between the Maritime and Fisheries Training Center - Maritime and Fisheries Human Resource Development and Extension Agency, the Directorate of Brackish Fish – Directorate General of Fisheries Cultivation, and the Center for Control and Primary Production Quality Control and Supervision - Marine and Fisheries Quality Control and Supervision Agency on',
   },
   'MPM-CPIB': {
     desc_ind:
