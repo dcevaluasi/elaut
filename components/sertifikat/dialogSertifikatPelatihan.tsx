@@ -310,7 +310,19 @@ const SertifikatNonKepelautan = React.forwardRef(
                   <span className="italic font-bos leading-none">Time Allocation</span>
                 </div></div>
               </div>
-
+              <div className="flex  text-center font-plusSansJakarta font-bold">
+                <div className="w-10/12 "></div>
+                <div className="w-1/12 px-2 ">
+                  <div className="flex flex-col justify-center">
+                    <span className="text-base leading-none">TEORI</span>
+                    <span className="italic font-bos leading-none">Theory</span>
+                  </div>
+                </div>
+                <div className="w-1/12 px-2 "><div className="flex flex-col justify-center">
+                  <span className="text-base leading-none">PRAKTEK</span>
+                  <span className="italic font-bos leading-none">Practice</span>
+                </div></div>
+              </div>
               <div className="flex ">
                 <div className="w-1/12 px-2 font-plusSansJakarta font-bold text-center ">I</div>
                 <div className="w-9/12 px-2 font-plusSansJakarta font-bold ">
