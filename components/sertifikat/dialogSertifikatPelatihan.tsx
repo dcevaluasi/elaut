@@ -129,7 +129,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                 />
               )}
 
-              <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-6">
+              <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-3">
 
                 <div className="flex flex-col h-fit items-center justify-center space-y-0">
                   <h1 className="text-base font-plusSansJakarta font-bold">
