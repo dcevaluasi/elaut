@@ -307,6 +307,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                 </div></div>
                 <div className="w-2/12 px-2 "><div className="flex flex-col justify-center">
                   <span className="text-base leading-none">ALOKASI WAKTU</span>
+                  <span className="italic font-bos leading-none">Time Allocation</span>
                 </div></div>
               </div>
 
