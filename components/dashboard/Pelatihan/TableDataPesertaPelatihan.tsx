@@ -113,6 +113,9 @@ const TableDataPesertaPelatihan = () => {
   const [emptyFileSertifikatCount, setEmptyFileSertifikatCount] =
     React.useState<number>(0);
 
+  const [signedSertifikat, setSignedSertifikat] =
+    React.useState<number>(0);
+
   const [data, setData] = React.useState<UserPelatihan[] | []>([]);
 
   const [countValid, setCountValid] = React.useState<number>(0)
@@ -145,6 +148,7 @@ const TableDataPesertaPelatihan = () => {
 
       // Update count in state
       setEmptyFileSertifikatCount(count);
+
     } catch (error) {
       console.error("Error posting training data:", error);
       throw error;
@@ -1510,51 +1514,49 @@ const TableDataPesertaPelatihan = () => {
           </AlertDialogContent>
         </AlertDialog>
 
-        {
-          emptyFileSertifikatCount != 0 && <AlertDialog open={openFormDeleteFileSertifikat}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle className="flex items-center gap-2">
-                  {DIALOG_TEXTS['Hapus File Sertifikat'].title}
-                </AlertDialogTitle>
-                <AlertDialogDescription className="-mt-2">
-                  {DIALOG_TEXTS['Hapus File Sertifikat'].desc}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <fieldset>
-                <form autoComplete="off">
-                  <AlertDialogFooter className="mt-3">
-                    {
-                      isDeletingFileSertifikat ? <AlertDialogAction
-                        className="bg-red-500 hover:bg-red-600"
-                        disabled
+        <AlertDialog open={openFormDeleteFileSertifikat}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                {DIALOG_TEXTS['Hapus File Sertifikat'].title}
+              </AlertDialogTitle>
+              <AlertDialogDescription className="-mt-2">
+                {DIALOG_TEXTS['Hapus File Sertifikat'].desc}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <fieldset>
+              <form autoComplete="off">
+                <AlertDialogFooter className="mt-3">
+                  {
+                    isDeletingFileSertifikat ? <AlertDialogAction
+                      className="bg-red-500 hover:bg-red-600"
+                      disabled
+                    >
+                      Sedang diproses...
+                    </AlertDialogAction> : <>
+                      <AlertDialogCancel
+                        onClick={(e) =>
+                          setOpenFormDeleteFileSertifikat(
+                            false
+                          )
+                        }
                       >
-                        Sedang diproses...
-                      </AlertDialogAction> : <>
-                        <AlertDialogCancel
-                          onClick={(e) =>
-                            setOpenFormDeleteFileSertifikat(
-                              false
-                            )
-                          }
-                        >
-                          Cancel
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                          className="bg-red-500 hover:bg-red-600"
-                          onClick={(e) =>
-                            handleDeleteFileSertifikat()
-                          }
-                        >
-                          Hapus Draft File Sertifikat
-                        </AlertDialogAction></>
-                    }
-                  </AlertDialogFooter>
-                </form>
-              </fieldset>
-            </AlertDialogContent>
-          </AlertDialog>
-        }
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-red-500 hover:bg-red-600"
+                        onClick={(e) =>
+                          handleDeleteFileSertifikat()
+                        }
+                      >
+                        Hapus Draft File Sertifikat
+                      </AlertDialogAction></>
+                  }
+                </AlertDialogFooter>
+              </form>
+            </fieldset>
+          </AlertDialogContent>
+        </AlertDialog>
       </>}
 
 
@@ -1653,6 +1655,21 @@ const TableDataPesertaPelatihan = () => {
                   <TbEditCircle />
 
                   Validasi Data Peserta
+                </div>
+              </div>
+            }
+
+            {
+              usePathname().includes('lemdiklat') && data!.length > 0 && countValid != data!.length && <div className="w-full flex justify-end gap-2">
+                <div
+                  onClick={(e) => {
+                    setOpenFormValidasiDataPesertaPelatihan(true)
+                  }}
+                  className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
+                >
+                  <TbEditCircle />
+
+                  Hapus Draft File Sertifikat
                 </div>
               </div>
             }

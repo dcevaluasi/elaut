@@ -114,7 +114,7 @@ const SummaryELAUT: React.FC = () => {
       ) : data != null ? (
         <>
           <Button onClick={handleDownloadExcel} className="bg-blue-500 text-white mb-2 hover:bg-blue-600">
-            {isFetchingDataDukung}
+
             {isFetchingDataDukung ? 'Mengunduh...' : 'Download Data Dukung'}
           </Button>
 

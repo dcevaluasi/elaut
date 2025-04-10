@@ -299,146 +299,106 @@ const SertifikatNonKepelautan = React.forwardRef(
               </div>
             </div>
             <div className="w-full">
-              <div className="flex border border-black  text-center font-plusSansJakarta font-bold">
-                <div className="w-1/12 p-2 border-black border">NO</div>
-                <div className="w-5/12 p-2 border-black border"><div className="flex flex-col justify-center">
-                  <span className="text-base ">MATERI</span>
-                  <span className="italic font-bos">COURSE</span>
+              <div className="flex  text-center font-plusSansJakarta font-bold">
+                <div className="w-1/12 px-2  flex items-center justify-center leading-none">NO</div>
+                <div className="w-9/12 px-2  flex flex-col justify-center items-start"><div className="flex flex-row items-center justify-center">
+                  <span className="text-base leading-none">MATERI</span>/
+                  <span className="italic font-bos leading-none">COURSE</span>
                 </div></div>
-                <div className="w-6/12 p-2 border-black border"><div className="flex flex-col justify-center">
-                  <span className="text-base">ALOKASI WAKTU (@45 Menit)</span>
-                  <span className="italic font-bos">Time Allocation (@45 Minutes)</span>
+                <div className="w-2/12 px-2 "><div className="flex flex-col justify-center">
+                  <span className="text-base leading-none">ALOKASI WAKTU<br /> (@45 Menit)</span>
+                  <span className="italic font-bos leading-none">Time Allocation<br /> (@45 Minutes)</span>
                 </div></div>
               </div>
-              <div className="flex border border-black  text-center font-plusSansJakarta font-bold">
-                <div className="w-6/12 border border-black"></div>
-                <div className="w-3/12 p-2 border-black border">
+              <div className="flex  text-center font-plusSansJakarta font-bold">
+                <div className="w-10/12 "></div>
+                <div className="w-1/12 px-2 ">
                   <div className="flex flex-col justify-center">
-                    <span className="text-base">TEORI</span>
-                    <span className="italic font-bos">Theory</span>
+                    <span className="text-base leading-none">TEORI</span>
+                    <span className="italic font-bos leading-none">Theory</span>
                   </div>
                 </div>
-                <div className="w-3/12 p-2 border-black border"><div className="flex flex-col justify-center">
-                  <span className="text-base">PRAKTEK</span>
-                  <span className="italic font-bos">Practice</span>
+                <div className="w-1/12 px-2 "><div className="flex flex-col justify-center">
+                  <span className="text-base leading-none">PRAKTEK</span>
+                  <span className="italic font-bos leading-none">Practice</span>
                 </div></div>
               </div>
-              <div className="flex border border-black ">
-                <div className="w-1/12 p-2 font-plusSansJakarta font-bold text-center border-black border">I</div>
-                <div className="w-5/12 p-2 font-plusSansJakarta font-bold border-black border">
-                  <div className="flex flex-col justify-start">
-                    <span className="text-base">KOMPETENSI UMUM</span>
-                    <span className="italic font-bos">General Competency</span>
+              <div className="flex ">
+                <div className="w-1/12 px-2 font-plusSansJakarta font-bold text-center ">I</div>
+                <div className="w-9/12 px-2 font-plusSansJakarta font-bold ">
+                  <div className="flex flex-row items-center">
+                    <span className="text-base leading-none">KOMPETENSI UMUM</span>/
+                    <span className="italic font-bos leading-none">General Competency</span>
                   </div>
                 </div>
-                <div className="w-3/12 p-2 border-black border"></div>
-                <div className="w-3/12 p-2 border-black border"></div>
+                <div className="w-1/12 px-2 "></div>
+                <div className="w-1/12 px-2 "></div>
               </div>
               {CURRICULLUM_CERTIFICATE[pelatihan.Program].UMUM.map((materi, index) => (
-                <div key={index} className="flex border border-black  text-sm">
-                  <div className="w-1/12 p-2 text-center border-black border">{index + 1}.</div>
-                  <div className="w-5/12 p-2 border-black border">
+                <div key={index} className={`flex text-sm ${index == CURRICULLUM_CERTIFICATE[pelatihan.Program].UMUM.length - 1 && 'mb-3'}`}>
+                  <div className="w-1/12 px-2 text-center ">{index + 1}.</div>
+                  <div className="w-9/12 px-2 ">
                     <div className="flex flex-col justify-center">
-                      <span className="text-base !font-plusSansJakarta not-italic font-normal">{materi.name_ind}</span>
-                      <span className="italic font-bosItalic">{materi.name_eng}</span>
+                      <span className="text-base !font-plusSansJakarta not-italic font-normal leading-none">{materi.name_ind}</span>
+                      <span className="italic font-bosItalic leading-none">{materi.name_eng}</span>
                     </div>
                   </div>
-                  <div className="w-3/12 p-2 text-center border-black border font-plusSansJakarta">{materi.theory}</div>
-                  <div className="w-3/12 p-2 text-center border-black border font-plusSansJakarta">{materi.practice}</div>
+                  <div className="w-1/12 px-2 text-center  font-plusSansJakarta">{materi.theory}</div>
+                  <div className="w-1/12 px-2 text-center  font-plusSansJakarta">{materi.practice}</div>
                 </div>
               ))}
-              <div className="flex border border-black ">
-                <div className="w-1/12 p-2 font-plusSansJakarta font-bold text-center border-black border">II</div>
-                <div className="w-5/12 p-2 font-plusSansJakarta font-bold border-black border">
-                  <div className="flex flex-col justify-start">
-                    <span className="text-base">KOMPETENSI INTI</span>
-                    <span className="italic font-bos">Core Competency</span>
+              <div className="flex ">
+                <div className="w-1/12 px-2 font-plusSansJakarta font-bold text-center ">II</div>
+                <div className="w-9/12 px-2 font-plusSansJakarta font-bold ">
+                  <div className="flex flex-row items-center">
+                    <span className="text-base leading-none">KOMPETENSI INTI</span>/
+                    <span className="italic font-bos leading-none">Core Competency</span>
                   </div>
                 </div>
-                <div className="w-3/12 p-2 border-black border"></div>
-                <div className="w-3/12 p-2 border-black border"></div>
+                <div className="w-1/12 px-2 "></div>
+                <div className="w-1/12 px-2 "></div>
               </div>
-              {CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.slice(0, 4).map((materi, index) => (
-                <div key={index} className={`flex border-black border text-sm`}>
-                  <div className="w-1/12 p-2 text-center border-black border">{index + 1}.</div>
-                  <div className="w-5/12 p-2 border-black border">
+              {CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.map((materi, index) => (
+                <div key={index} className={`flex  text-sm ${index == CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.length - 1 && 'mb-3'}`}>
+                  <div className="w-1/12 px-2 text-center ">{index + 1}.</div>
+                  <div className="w-9/12 px-2 ">
                     <div className="flex flex-col justify-center">
-                      <span className="text-base !font-plusSansJakarta not-italic font-normal">{materi.name_ind}</span>
-                      <span className="italic font-bosItalic">{materi.name_eng}</span>
+                      <span className="text-base !font-plusSansJakarta not-italic font-normal leading-none">{materi.name_ind}</span>
+                      <span className="italic font-bosItalic leading-none">{materi.name_eng}</span>
                     </div>
                   </div>
-                  <div className="w-3/12 p-2 text-center border-black border font-plusSansJakarta">{materi.theory}</div>
-                  <div className="w-3/12 p-2 text-center border-black border font-plusSansJakarta">{materi.practice}</div>
+                  <div className="w-1/12 px-2 text-center  font-plusSansJakarta">{materi.theory}</div>
+                  <div className="w-1/12 px-2 text-center  font-plusSansJakarta">{materi.practice}</div>
                 </div>
               ))}
-              {
-                CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.length <= 3 && <>
-                  <div className="flex  border-black border font-plusSansJakarta font-bold">
-                    <div className="w-6/12 p-2 text-center border-black border">
-                      <div className="flex flex-col ">
-                        <span className="text-base">JUMLAH JAM PELAJARAN</span>
-                        <span className="italic font-bos">Training Hours</span>
-                      </div>
+              <>
+                <div className="flex   font-plusSansJakarta font-bold">
+                  <div className="w-1/12 px-2  flex items-center justify-center leading-none"></div>
+                  <div className="w-9/12 px-2">
+                    <div className="flex flex-col items-start justify-center">
+                      <span className="text-base leading-none">JUMLAH JAM PELAJARAN</span>
+                      <span className="italic font-bos leading-none">Training Hours</span>
                     </div>
-                    <div className="w-3/12 p-2 text-center border-black border font-plusSansJakarta">{totalHours.totalTheory}</div>
-                    <div className="w-3/12 p-2 text-center border-black border font-plusSansJakarta">{totalHours.totalPractice}</div>
                   </div>
-                  <div className="flex  border-black border font-plusSansJakarta font-bold">
-                    <div className="w-6/12 p-2 text-center border-black border">
-                      <div className="flex flex-col ">
-                        <span className="text-base ">TOTAL JAM PELAJARAN</span>
-                        <span className="italic font-bos">Total Hours</span>
-                      </div>
+                  <div className="w-1/12 px-2 text-center  font-plusSansJakarta">{totalHours.totalTheory}</div>
+                  <div className="w-1/12 px-2 text-center  font-plusSansJakarta">{totalHours.totalPractice}</div>
+                </div>
+                <div className="flex   font-plusSansJakarta font-bold">
+                  <div className="w-1/12 px-2  flex items-center justify-center leading-none"></div>
+                  <div className="w-9/12 px-2 ">
+                    <div className="flex flex-col items-start justify-center">
+                      <span className="text-base leading-none">TOTAL JAM PELAJARAN</span>
+                      <span className="italic font-bos leading-none">Total Hours</span>
                     </div>
-                    <div className="w-6/12 p-2 text-center border-black border">{totalHours.totalTheory + totalHours.totalPractice}</div>
-                  </div></>
-              }
+                  </div>
+                  <div className="w-2/12 px-2 text-center ">{totalHours.totalTheory + totalHours.totalPractice}</div>
+                </div></>
+
 
             </div>
           </div >
 
-          {/* Page 3 */}
 
-          {
-            CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.length >= 4 && <div className="pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center mt-36 break-before-auto relative">
-              <div className="w-full">
-
-                {CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.slice(4, CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.length).map((materi, index) => (
-                  <div key={index} className={`flex border-black border text-sm`}>
-                    <div className="w-1/12 p-2 text-center border-black border">{5 + index}.</div>
-                    <div className="w-5/12 p-2 border-black border">
-                      <div className="flex flex-col justify-center">
-                        <span className="text-base !font-plusSansJakarta not-italic font-normal">{materi.name_ind}</span>
-                        <span className="italic font-bosItalic">{materi.name_eng}</span>
-                      </div>
-                    </div>
-                    <div className="w-3/12 p-2 text-center border-black border">{materi.theory}</div>
-                    <div className="w-3/12 p-2 text-center border-black border">{materi.practice}</div>
-                  </div>
-                ))}
-                <div className="flex  border-black border font-plusSansJakarta font-bold">
-                  <div className="w-6/12 p-2 text-center border-black border">
-                    <div className="flex flex-col ">
-                      <span className="text-base">JUMLAH JAM PELAJARAN</span>
-                      <span className="italic font-bos">Training Hours</span>
-                    </div>
-                  </div>
-                  <div className="w-3/12 p-2 text-center border-black border">{totalHours.totalTheory}</div>
-                  <div className="w-3/12 p-2 text-center border-black border">{totalHours.totalPractice}</div>
-                </div>
-                <div className="flex  border-black border font-plusSansJakarta font-bold">
-                  <div className="w-6/12 p-2 text-center border-black border">
-                    <div className="flex flex-col ">
-                      <span className="text-base">TOTAL JAM PELAJARAN</span>
-                      <span className="italic font-bos">Total Hours</span>
-                    </div>
-                  </div>
-                  <div className="w-6/12 p-2 text-center border-black border">{totalHours.totalTheory + totalHours.totalPractice}</div>
-                </div>
-
-              </div>
-            </div >
-          }
 
         </div >
       </div >
@@ -489,7 +449,7 @@ const SertifikatKepelautan = React.forwardRef(
           ref={ref}
           className="w-full h-full  flex flex-col gap-4 items-center justify-center  px-10  rounded-md font-bos leading-[120%]"
         >
-          <div ref={refPage} className="w-full flex flex-col  gap-4 relative h-full items-center justify-center py-14">
+          <div ref={refPage} className="w-full flex flex-col  gap-4 relative h-full items-center justify-center4">
             <div className="flex flex-row  absolute top-0 right-0">
               <p className="text-sm leading-none not-italic">
                 CERTIFICATE NO:
