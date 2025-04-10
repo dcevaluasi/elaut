@@ -173,6 +173,37 @@ const TableDataPesertaPelatihan = () => {
     }
   };
 
+  const [openFormDeleteFileSertifikat, setOpenFormDeleteFileSertifikat] = React.useState<boolean>(false)
+  const [isDeletingFileSertifikat, setIsDeletingFileSertifikat] = React.useState<boolean>(false)
+  const handleDeleteFileSertifikat = async () => {
+    setIsDeletingFileSertifikat(true)
+    try {
+      const response: AxiosResponse = await axios.get(
+        `${baseUrl}/deleteSertifikatFiles?id_pelatihan?id=${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+          },
+        }
+      );
+      setOpenFormDeleteFileSertifikat(false)
+      setIsDeletingFileSertifikat(false)
+      Toast.fire({
+        icon: "success",
+        title: `Berhasil menghapuskan draft file sertifikat!`,
+      });
+    } catch (error) {
+      console.error("Error posting participants training data:", error);
+      Toast.fire({
+        icon: "error",
+        title: `Gagal menghapuskan draft file sertifikat!`,
+      });
+      setOpenFormDeleteFileSertifikat(false)
+      setIsDeletingFileSertifikat(false)
+      throw error;
+    }
+  };
+
   React.useEffect(() => {
     handleFetchingPublicTrainingDataById();
     handleFetchingPesertaPelatihanDataById(parseInt(id))
@@ -214,7 +245,7 @@ const TableDataPesertaPelatihan = () => {
     } catch (error) {
       console.error("ERROR UPDATE PELATIHAN: ", error);
       Toast.fire({
-        icon: "success",
+        icon: "error",
         title: `Gagal menyisipkan no sertifikat ke akun pesereta pelatihan!`,
       });
       handleFetchingPublicTrainingDataById();
@@ -1478,6 +1509,52 @@ const TableDataPesertaPelatihan = () => {
             </fieldset>
           </AlertDialogContent>
         </AlertDialog>
+
+        {
+          emptyFileSertifikatCount != 0 && <AlertDialog open={openFormDeleteFileSertifikat}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center gap-2">
+                  {DIALOG_TEXTS['Hapus File Sertifikat'].title}
+                </AlertDialogTitle>
+                <AlertDialogDescription className="-mt-2">
+                  {DIALOG_TEXTS['Hapus File Sertifikat'].desc}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <fieldset>
+                <form autoComplete="off">
+                  <AlertDialogFooter className="mt-3">
+                    {
+                      isDeletingFileSertifikat ? <AlertDialogAction
+                        className="bg-red-500 hover:bg-red-600"
+                        disabled
+                      >
+                        Sedang diproses...
+                      </AlertDialogAction> : <>
+                        <AlertDialogCancel
+                          onClick={(e) =>
+                            setOpenFormDeleteFileSertifikat(
+                              false
+                            )
+                          }
+                        >
+                          Cancel
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          className="bg-red-500 hover:bg-red-600"
+                          onClick={(e) =>
+                            handleDeleteFileSertifikat()
+                          }
+                        >
+                          Hapus Draft File Sertifikat
+                        </AlertDialogAction></>
+                    }
+                  </AlertDialogFooter>
+                </form>
+              </fieldset>
+            </AlertDialogContent>
+          </AlertDialog>
+        }
       </>}
 
 

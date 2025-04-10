@@ -50,6 +50,10 @@ export const DIALOG_TEXTS = {
     desc:
       'Masukkan no registrasi atau no peserta sobat E-LAUT untuk mengecek kevalidan data sertifikat dan keikutsertaan dalam pelatihan yang telah diselenggarakan!',
   },
+  'Hapus File Sertifikat': {
+    title: 'Menghapus Draft File Sertifikat',
+    desc: 'Anda yakin ingin menghapus draft file sertifikat?',
+  },
 }
 
 type CertificateCurricullum = {

@@ -9,6 +9,9 @@ import ChartDetailMasyarakatDilatih from "../../Charts/ChartDetailMasyarakatDila
 import { HashLoader } from "react-spinners";
 import Image from "next/image";
 import { User, UserPelatihan } from "@/types/user";
+import useFetchDataDukung from "@/hooks/elaut/useFetchDataDukung";
+import { exportDataDukungToExcel } from "@/lib/exportToExcel";
+import { Button } from "@/components/ui/button";
 
 const SummaryELAUT: React.FC = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -76,6 +79,20 @@ const SummaryELAUT: React.FC = () => {
     }
   };
 
+  const {
+    data: dataDukung,
+    isFetching: isFetchingDataDukung,
+    refetch: refetchDataDukung,
+  } = useFetchDataDukung();
+
+  const handleDownloadExcel = () => {
+    if (dataDukung.length > 0) {
+      exportDataDukungToExcel(dataDukung)
+    } else {
+      alert('Tidak ada data untuk diunduh.')
+    }
+  }
+
   React.useEffect(() => {
     const fetchAllData = () => {
       fetchInformationLemdiklat();
@@ -86,6 +103,8 @@ const SummaryELAUT: React.FC = () => {
     fetchAllData();
   }, []);
 
+  console.log({ dataDukung })
+
   return (
     <div className="w-full">
       {isFetching ? (
@@ -94,6 +113,12 @@ const SummaryELAUT: React.FC = () => {
         </div>
       ) : data != null ? (
         <>
+          <Button onClick={handleDownloadExcel} className="bg-blue-500 text-white mb-2 hover:bg-blue-600">
+            {isFetchingDataDukung}
+            {isFetchingDataDukung ? 'Mengunduh...' : 'Download Data Dukung'}
+          </Button>
+
+
           <ChartMasyarakatDilatihMonthly data={data} dataUser={dataUser} />
           <ChartDetailMasyarakatDilatih data={data} dataUser={dataUser} />
         </>
