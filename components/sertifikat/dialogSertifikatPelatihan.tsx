@@ -452,13 +452,13 @@ const SertifikatNonKepelautan = React.forwardRef(
                   <div className="flex text-center font-plusSansJakarta font-bold bg-gray-100 border-b border-gray-400">
                     <div className="w-1/12 px-1 py-1 flex items-center justify-center border-r border-gray-400 leading-none mb-2">NO</div>
                     <div className="w-7/12 px-1 py-1 flex flex-col justify-center items-start border-r border-gray-400">
-                      <div className="flex flex-row items-center justify-center mb-3">
+                      <div className="flex flex-row items-center justify-center mb-4">
                         <span className="text-base leading-none">MATERI</span>/
                         <span className="italic font-bos leading-none">COURSE</span>
                       </div>
                     </div>
                     <div className="w-4/12 px-1 py-1 flex items-center justify-center">
-                      <div className="flex flex-row items-center justify-center mb-3">
+                      <div className="flex flex-row items-center justify-center mb-4">
                         <span className="text-base leading-none">ALOKASI WAKTU</span>/
                         <span className="italic font-bos leading-none">TIME ALLOCATION</span>
                       </div>
@@ -469,13 +469,13 @@ const SertifikatNonKepelautan = React.forwardRef(
                   <div className="flex text-center font-plusSansJakarta font-bold bg-gray-100 border-b border-gray-400">
                     <div className="w-8/12 px-1 py-1 border-r border-gray-400"></div>
                     <div className="w-2/12 px-1 py-1 border-r border-gray-400">
-                      <div className="flex flex-row items-center justify-center mb-3">
+                      <div className="flex flex-row items-center justify-center mb-4">
                         <span className="text-base leading-none">TEORI</span>/
                         <span className="italic font-bos leading-none">THEORY</span>
                       </div>
                     </div>
                     <div className="w-2/12 px-1 py-1">
-                      <div className="flex flex-row items-center justify-center mb-3">
+                      <div className="flex flex-row items-center justify-center mb-4">
                         <span className="text-base leading-none">PRAKTEK</span>/
                         <span className="italic font-bos leading-none">PRACTICE</span>
                       </div>
@@ -503,7 +503,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                     >
                       <div className="w-1/12 px-1 py-1 text-center border-r border-gray-300">{index + 1}.</div>
                       <div className="w-7/12 px-1 py-1 border-r border-gray-300">
-                        <div className="flex flex-col justify-center mb-2">
+                        <div className="flex flex-col justify-center mb-3">
                           <span className="text-base !font-plusSansJakarta not-italic font-normal leading-none">{materi.name_ind}</span>
                           <span className="italic font-bosItalic leading-none">{materi.name_eng}</span>
                         </div>
@@ -534,13 +534,13 @@ const SertifikatNonKepelautan = React.forwardRef(
                     >
                       <div className="w-1/12 px-1 py-1 text-center border-r border-gray-300">{index + 1}.</div>
                       <div className="w-7/12 px-1 py-1 border-r border-gray-300">
-                        <div className="flex flex-col justify-center mb-2">
+                        <div className="flex flex-col justify-center mb-3">
                           <span className="text-base !font-plusSansJakarta not-italic font-normal leading-none">{materi.name_ind}</span>
                           <span className="italic font-bosItalic leading-none">{materi.name_eng}</span>
                         </div>
                       </div>
-                      <div className="w-2/12 px-1 py-1 text-center font-plusSansJakarta border-r border-gray-300">{materi.theory}</div>
-                      <div className="w-2/12 px-1 py-1 text-center font-plusSansJakarta">{materi.practice}</div>
+                      <div className="w-2/12 px-1 py-1 mb-3 text-center font-plusSansJakarta border-r border-gray-300">{materi.theory}</div>
+                      <div className="w-2/12 px-1 py-1 mb-3 text-center font-plusSansJakarta">{materi.practice}</div>
                     </div>
                   ))}
 
@@ -553,8 +553,8 @@ const SertifikatNonKepelautan = React.forwardRef(
                         <span className="italic font-bos leading-none">Training Hours</span>
                       </div>
                     </div>
-                    <div className="w-2/12 px-1 py-1 mb-2 text-center">{totalHours.totalTheory}</div>
-                    <div className="w-2/12 px-1 py-1 mb-2 text-center">{totalHours.totalPractice}</div>
+                    <div className="w-2/12 px-1 py-1 mb-3 text-center">{totalHours.totalTheory}</div>
+                    <div className="w-2/12 px-1 py-1 mb-3 text-center">{totalHours.totalPractice}</div>
                   </div>
 
                   {/* Total Jam */}
@@ -566,7 +566,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                         <span className="italic font-bos leading-none">Total Hours</span>
                       </div>
                     </div>
-                    <div className="w-4/12 px-1 py-1 mb-2 text-center flex items-center justify-center">{totalHours.totalTheory + totalHours.totalPractice}</div>
+                    <div className="w-4/12 px-1 py-1 mb-3 text-center flex items-center justify-center">{totalHours.totalTheory + totalHours.totalPractice}</div>
                   </div>
                 </div>
               </div >
