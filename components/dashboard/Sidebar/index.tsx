@@ -716,7 +716,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
                                 <li>
                                   <Link
-                                    href={`/${generateRandomId()}/balai/pelatihan`}
+                                    href={`/${generateRandomId()}/lemdiklat/pelatihan`}
                                     className={`group relative flex items-center gap-2.5 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${pathname ===
                                       "/admin/lemdiklat/pelatihan" &&
                                       "text-white"
@@ -1017,7 +1017,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                               <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-3">
                                 <li>
                                   <Link
-                                    href={`/admin/pusat/pelatihan/pelaksanaan`}
+                                    href={`/admin/${Cookies.get('XSRF093') == 'balai' ? 'lemdiklat' : 'pusat'}/pelatihan/pelaksanaan`}
                                     className={`group relative w-fit flex items-center gap-2 rounded-md  font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${pathname.includes('pelatihan/pelaksanaan') &&
                                       "text-white"
                                       }`}

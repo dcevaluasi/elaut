@@ -79,21 +79,21 @@ const SertifikatNonKepelautan = React.forwardRef(
 
     const totalHoursCertificateBPPP = pelatihan!.TtdSertifikat == 'Kepala Balai Pelatihan dan Penyuluhan Perikanan' ? calculateTotalHoursCertificateBPPP(pelatihan!.MateriPelatihan) : { totalTheory: 0, totalPractice: 0 }
 
-    // const calculateTotalHours = (data: any) => {
-    //   let totalTheory = 0;
-    //   let totalPractice = 0;
+    const calculateTotalHours = (data: any) => {
+      let totalTheory = 0;
+      let totalPractice = 0;
 
-    //   Object.values(data).forEach((courses: any) => {
-    //     courses.forEach(({ theory, practice }: { theory: number, practice: number }) => {
-    //       totalTheory += theory;
-    //       totalPractice += practice;
-    //     });
-    //   })
+      Object.values(data).forEach((courses: any) => {
+        courses.forEach(({ theory, practice }: { theory: number, practice: number }) => {
+          totalTheory += theory;
+          totalPractice += practice;
+        });
+      })
 
-    //   return { totalTheory, totalPractice };
-    // };
+      return { totalTheory, totalPractice };
+    };
 
-    // const totalHours = calculateTotalHours(CURRICULLUM_CERTIFICATE[pelatihan!.Program]);
+    const totalHours = calculateTotalHours(CURRICULLUM_CERTIFICATE[pelatihan!.Program]);
 
     React.useEffect(() => {
       handleFetchDetailPeserta();
@@ -521,7 +521,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                     <div className="w-2/12 px-2 text-center  font-plusSansJakarta">{materi.practice}</div>
                   </div>
                 ))}
-                {/* <>
+                <>
                   <div className="flex   font-plusSansJakarta font-bold">
                     <div className="w-1/12 px-2  flex items-center justify-center leading-none"></div>
                     <div className="w-7/12 px-2">
@@ -542,7 +542,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                       </div>
                     </div>
                     <div className="w-4/12 px-2 text-center flex items-center justify-center">{totalHours.totalTheory + totalHours.totalPractice}</div>
-                  </div></> */}
+                  </div></>
 
 
               </div>
