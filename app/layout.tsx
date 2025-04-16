@@ -29,6 +29,11 @@ const bosItalic = localFont({
   variable: "--font-bosItalic",
 });
 
+const bosNormal = localFont({
+  src: "./font/BOOKOS.TTF",
+  variable: "--font-bosNormal",
+});
+
 const cambria = localFont({
   src: "./font/cambria.ttf",
   variable: "--font-cambria",
@@ -142,7 +147,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         suppressHydrationWarning={true}
-        className={`${inter.className} ${myFont.variable} ${plusSansJakarta.variable} ${tuwir.variable} ${delius.variable} ${bos.variable} ${bosBold.variable}  ${bosItalic.variable} ${cambria.variable} antialiased bg-white text-gray-900 tracking-tight `}
+        className={`${inter.className} ${myFont.variable} ${bosNormal.variable} ${plusSansJakarta.variable} ${tuwir.variable} ${delius.variable} ${bos.variable} ${bosBold.variable}  ${bosItalic.variable} ${cambria.variable} antialiased bg-white text-gray-900 tracking-tight `}
       >
         <div className="flex flex-col overflow-hidden supports-[overflow:clip]:overflow-clip relative">
 

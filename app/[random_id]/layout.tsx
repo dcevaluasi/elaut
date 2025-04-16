@@ -24,6 +24,11 @@ const bosBold = localFont({
   variable: "--font-bosBold",
 });
 
+const bosNormal = localFont({
+  src: "../font/BOOKOS.TTF",
+  variable: "--font-bosNormal",
+});
+
 const bosItalic = localFont({
   src: "../font/bookmanoldstyle_italic.ttf",
   variable: "--font-bosItalic",
@@ -62,7 +67,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         suppressHydrationWarning={true}
-        className={`${inter.className} ${myFont.variable} ${plusSansJakarta.variable} ${bos.variable} ${bosBold.variable} ${bosItalic.variable}  ${delius.variable} `}
+        className={`${inter.className} ${myFont.variable} ${bosNormal.variable} ${plusSansJakarta.variable} ${bos.variable} ${bosBold.variable} ${bosItalic.variable}  ${delius.variable} `}
       >
         <div className="h-screen max-h-screen overflow-y-hidden">
           {loading ? <Loader /> : children}
