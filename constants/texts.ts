@@ -79,7 +79,7 @@ export const CURRICULLUM_CERTIFICATE: Record<
     INTI: [
       {
         name_ind: 'Prinsip Kemunduran Mutu Ikan',
-        name_eng: 'Principle of Decline in Fish Quality',
+        name_eng: 'Principles of Fish Quality Deterioration',
         theory: 2,
         practice: 2,
       },
@@ -87,7 +87,7 @@ export const CURRICULLUM_CERTIFICATE: Record<
         name_ind:
           'Penerapan Persyaratan Kelayakan Dasar/Pre Requisite HACCP di UPI',
         name_eng:
-          'Implementation of HACCP Basic/Pre Requisite Eligibility Requirements at UPI',
+          'Implementation of HACCP Basic/Pre Requisite Eligibility Requirements at the Fishery Processing Unit (FPU)',
         theory: 2,
         practice: 2,
       },
@@ -103,13 +103,14 @@ export const CURRICULLUM_CERTIFICATE: Record<
     UMUM: [
       {
         name_ind: 'Kebijakan Penerapan SJMHKP dalam Perikanan Budidaya',
-        name_eng: 'Fishery Product Quality and Safety Assurance System Policy',
+        name_eng:
+          'Policy on the Implementation Fishery Product Quality and Safety Assurance System Policy in Aquaculture',
         theory: 2,
         practice: 0,
       },
       {
         name_ind: 'Kebijakan Pembinaan Penerapan CBIB',
-        name_eng: 'CBIB Implementation Guidance Policy',
+        name_eng: 'GAqPs Implementation Guidance Policy',
         theory: 2,
         practice: 0,
       },
@@ -123,7 +124,7 @@ export const CURRICULLUM_CERTIFICATE: Record<
       },
       {
         name_ind: 'Persyaratan SNI CBIB Keamanan Pangan',
-        name_eng: 'SNI CBIB Food Safety Requirements',
+        name_eng: 'Indonesian National Standard GAqPs Food Safety Requirements',
         theory: 3,
         practice: 6,
       },
@@ -159,7 +160,8 @@ export const CURRICULLUM_CERTIFICATE: Record<
     UMUM: [
       {
         name_ind: 'Kebijakan Penerapan SJMHKP dalam Perikanan Budidaya',
-        name_eng: 'Policy on the Implementation of SJMHKP in Aquaculture',
+        name_eng:
+          'Policy on the Implementation of Fishery Product Quality and Safety Assurance System in Aquaculture',
         theory: 2,
         practice: 0,
       },
@@ -172,26 +174,31 @@ export const CURRICULLUM_CERTIFICATE: Record<
     ],
     INTI: [
       {
-        name_ind: 'Standarisasi dan Pembinaan Penerapan CPIB',
-        name_eng: 'Standardization and Guidance on CPIB Implementation',
+        name_ind:
+          'Standarisasi dan Pembinaan Penerapan Good Fisheries Breeding Practices',
+        name_eng:
+          'Standardization and Guidance on Good Fisheries Breeding Practices Implementation',
         theory: 1,
         practice: 2,
       },
       {
-        name_ind: 'Persyaratan SNI CBIB Keamanan Pangan',
-        name_eng: 'SNI CBIB Food Safety Requirements',
+        name_ind: 'Persyaratan SNI CPIB Keamanan Pangan',
+        name_eng:
+          'SNI Good Fisheries Breeding Practices Food Safety Requirements',
         theory: 3,
         practice: 6,
       },
       {
         name_ind: 'SNI CPIB',
-        name_eng: 'Indonesian National Standard of CPIB',
+        name_eng:
+          'Indonesian National Standard of Good Fisheries Breeding Practices',
         theory: 1,
         practice: 3,
       },
       {
         name_ind: 'Dokumentasi CPIB - Penilaian Mandiri Penerapan CPIB',
-        name_eng: 'CPIB Documentation - CPIB Implementation Self-Assessment',
+        name_eng:
+          'Good Fisheries Breeding Practices Documentation - Good Fisheries Breeding Practices Implementation Self-Assessment',
         theory: 2,
         practice: 4,
       },
@@ -208,13 +215,14 @@ export const CURRICULLUM_CERTIFICATE: Record<
     UMUM: [
       {
         name_ind: 'Kebijakan Penerapan SJMHKP dalam Perikanan Budidaya',
-        name_eng: 'Policy on the Implementation of SJMHKP in Aquaculture',
+        name_eng:
+          'Policy on the Implementation of Fishery Product Quality and Safety Assurance System in Aquaculture',
         theory: 2,
         practice: 0,
       },
       {
         name_ind: 'Kebijakan Pemerintah Dalam Penerapan CPPIB',
-        name_eng: 'Government Policy on CPPIB Implementation',
+        name_eng: 'Government Policy on GfMP Implementation',
         theory: 2,
         practice: 0,
       },
@@ -223,19 +231,20 @@ export const CURRICULLUM_CERTIFICATE: Record<
       {
         name_ind: 'Prinsip Penerapan CPPIB (Sistem Jaminan Mutu)',
         name_eng:
-          'Principles of CPPIB Implementation (Quality Assurance System)',
+          'Principles of GfMP Implementation (Quality Assurance System)',
         theory: 2,
         practice: 6,
       },
       {
         name_ind: 'SNI Bahan Baku dan Pakan Ikan',
-        name_eng: 'SNI for raw materials and fish feed',
+        name_eng:
+          'Indonesian National Standard for raw materials and fish feed',
         theory: 4,
         practice: 4,
       },
       {
         name_ind: 'Penyusunan Dokumen Penerapan CPPIB',
-        name_eng: 'Preparation of CPPIB implementation document',
+        name_eng: 'Preparation of GfMP implementation document',
         theory: 2,
         practice: 9,
       },
@@ -243,7 +252,7 @@ export const CURRICULLUM_CERTIFICATE: Record<
         name_ind:
           'Perizinan berusaha terintegrasi terkait penerbitan  sertifikat  CPPIB',
         name_eng:
-          'Integrated business licensing related to the issuance of CPPIB certificates',
+          'Integrated business licensing related to the issuance of GfMP certificates',
         theory: 1,
         practice: 2,
       },

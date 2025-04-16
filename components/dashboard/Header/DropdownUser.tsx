@@ -274,7 +274,7 @@ const DropdownUser = ({
   };
 
   return (
-    <div className="relative">
+    <div className="relative z-[999999]">
       <AlertDialog open={openDialogEditProfile}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -707,7 +707,7 @@ const DropdownUser = ({
         ref={dropdown}
         onFocus={() => setDropdownOpen(true)}
         onBlur={() => setDropdownOpen(false)}
-        className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default  ${dropdownOpen === true ? "block" : "hidden"
+        className={`absolute right-0 mt-4 flex w-62.5 flex-col z-[9999999] rounded-sm border border-stroke bg-white shadow-default  ${dropdownOpen === true ? "block" : "hidden"
           }`}
       >
         <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 ">

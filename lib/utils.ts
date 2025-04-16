@@ -1,6 +1,7 @@
 import CryptoJS from 'crypto-js';
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { MateriPelatihan } from '@/types/product';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -110,3 +111,16 @@ export const decryptValue = (encryptedValue: string): string => {
   const bytes = CryptoJS.AES.decrypt(decodeURIComponent(encryptedValue), SECRET_KEY);
   return bytes.toString(CryptoJS.enc.Utf8);
 };
+
+
+export const calculateTotalHoursCertificateBPPP = (data: MateriPelatihan[]) => {
+  let totalTheory = 0
+  let totalPractice = 0
+
+  data.forEach((materi) => {
+    totalTheory += Number(materi.JamTeory) || 0
+    totalPractice += Number(materi.JamPraktek) || 0
+  })
+
+  return { totalTheory, totalPractice }
+}

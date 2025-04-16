@@ -401,3 +401,33 @@ export type HistoryItem = {
   upt: string
   created_at: string
 }
+
+export type DataInformationSISJAMUTraining = {
+  id: string
+  naming: {
+    name_ind: string
+    name_eng: string
+  }
+  poltek: InformationSISJAMUTraining
+  supm: InformationSISJAMUTraining
+}
+
+export type InformationSISJAMUTraining = {
+  allocation_time: string
+  desc: {
+    desc_eng: string
+    desc_ind: string
+  }
+  general_competence: {
+    name: string
+    english_name: string
+    theory_time: string
+    practice_time: string
+  }[]
+  main_competence: {
+    name: string
+    english_name: string
+    theory_time: string
+    practice_time: string
+  }[]
+}
