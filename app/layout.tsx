@@ -30,7 +30,7 @@ const bosItalic = localFont({
 });
 
 const bosNormal = localFont({
-  src: "./font/BOOKOS.TTF",
+  src: "./font/bookmanoldstyle.ttf",
   variable: "--font-bosNormal",
 });
 
