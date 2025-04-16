@@ -219,6 +219,7 @@ module.exports = {
         bos: ['var(--font-bos)', 'sans-serif'],
         bosBold: ['var(--font-bosBold)', 'sans-serif'],
         bosItalic: ['var(--font-bosItalic)', 'sans-serif'],
+        bosNormal: ['var(--font-bosNormal)', 'sans-serif'],
         tuwir: ['var(--font-tuwir)', 'sans-serif'],
         delius: ['var(--font-delius)', 'sans-serif'],
       },
