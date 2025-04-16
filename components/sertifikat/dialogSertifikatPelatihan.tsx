@@ -450,15 +450,15 @@ const SertifikatNonKepelautan = React.forwardRef(
                 <div className="w-full border border-gray-400 rounded-md overflow-hidden">
                   {/* Header Baris 1 */}
                   <div className="flex text-center font-plusSansJakarta font-bold bg-gray-100 border-b border-gray-400">
-                    <div className="w-1/12 px-2 py-2 flex items-center justify-center border-r border-gray-400 leading-none">NO</div>
-                    <div className="w-7/12 px-2 py-2 flex flex-col justify-center items-start border-r border-gray-400">
-                      <div className="flex flex-row items-center justify-center mb-2">
+                    <div className="w-1/12 px-1 py-1 flex items-center justify-center border-r border-gray-400 leading-none">NO</div>
+                    <div className="w-7/12 px-1 py-1 flex flex-col justify-center items-start border-r border-gray-400">
+                      <div className="flex flex-row items-center justify-center mb-1">
                         <span className="text-base leading-none">MATERI</span>/
                         <span className="italic font-bos leading-none">COURSE</span>
                       </div>
                     </div>
-                    <div className="w-4/12 px-2 py-2 flex items-center justify-center">
-                      <div className="flex flex-row items-center justify-center mb-2">
+                    <div className="w-4/12 px-1 py-1 flex items-center justify-center">
+                      <div className="flex flex-row items-center justify-center mb-1">
                         <span className="text-base leading-none">ALOKASI WAKTU</span>/
                         <span className="italic font-bos leading-none">TIME ALLOCATION</span>
                       </div>
@@ -467,15 +467,15 @@ const SertifikatNonKepelautan = React.forwardRef(
 
                   {/* Header Baris 2 */}
                   <div className="flex text-center font-plusSansJakarta font-bold bg-gray-100 border-b border-gray-400">
-                    <div className="w-8/12 px-2 py-2 border-r border-gray-400"></div>
-                    <div className="w-2/12 px-2 py-2 border-r border-gray-400">
-                      <div className="flex flex-row items-center justify-center mb-2">
+                    <div className="w-8/12 px-1 py-1 border-r border-gray-400"></div>
+                    <div className="w-2/12 px-1 py-1 border-r border-gray-400">
+                      <div className="flex flex-row items-center justify-center mb-1">
                         <span className="text-base leading-none">TEORI</span>/
                         <span className="italic font-bos leading-none">THEORY</span>
                       </div>
                     </div>
-                    <div className="w-2/12 px-2 py-2">
-                      <div className="flex flex-row items-center justify-center mb-2">
+                    <div className="w-2/12 px-1 py-1">
+                      <div className="flex flex-row items-center justify-center mb-1">
                         <span className="text-base leading-none">PRAKTEK</span>/
                         <span className="italic font-bos leading-none">PRACTICE</span>
                       </div>
@@ -484,15 +484,15 @@ const SertifikatNonKepelautan = React.forwardRef(
 
                   {/* Kompetensi Umum Title */}
                   <div className="flex border-b border-gray-400 bg-white">
-                    <div className="w-1/12 px-2 py-2 font-plusSansJakarta font-bold text-center border-r border-gray-400">I</div>
-                    <div className="w-9/12 px-2 py-2 font-plusSansJakarta font-bold border-r border-gray-400">
+                    <div className="w-1/12 px-1 py-1 font-plusSansJakarta font-bold text-center border-r border-gray-400">I</div>
+                    <div className="w-9/12 px-1 py-1 font-plusSansJakarta font-bold border-r border-gray-400">
                       <div className="flex flex-row items-center mb-2">
                         <span className="text-base leading-none">KOMPETENSI UMUM</span>/
                         <span className="italic font-bos leading-none">General Competency</span>
                       </div>
                     </div>
-                    <div className="w-1/12 px-2 py-2 border-r border-gray-400"></div>
-                    <div className="w-1/12 px-2 py-2"></div>
+                    <div className="w-1/12 px-1 py-1 border-r border-gray-400"></div>
+                    <div className="w-1/12 px-1 py-1"></div>
                   </div>
 
                   {/* Kompetensi Umum Items */}
@@ -501,29 +501,29 @@ const SertifikatNonKepelautan = React.forwardRef(
                       key={index}
                       className="flex text-sm border-b border-gray-300"
                     >
-                      <div className="w-1/12 px-2 py-2 text-center border-r border-gray-300">{index + 1}.</div>
-                      <div className="w-7/12 px-2 py-2 border-r border-gray-300">
+                      <div className="w-1/12 px-1 py-1 text-center border-r border-gray-300">{index + 1}.</div>
+                      <div className="w-7/12 px-1 py-1 border-r border-gray-300">
                         <div className="flex flex-col justify-center mb-2">
                           <span className="text-base !font-plusSansJakarta not-italic font-normal leading-none">{materi.name_ind}</span>
                           <span className="italic font-bosItalic leading-none">{materi.name_eng}</span>
                         </div>
                       </div>
-                      <div className="w-2/12 px-2 py-2 text-center font-plusSansJakarta border-r border-gray-300">{materi.theory}</div>
-                      <div className="w-2/12 px-2 py-2 text-center font-plusSansJakarta">{materi.practice}</div>
+                      <div className="w-2/12 px-1 py-1 text-center font-plusSansJakarta border-r border-gray-300">{materi.theory}</div>
+                      <div className="w-2/12 px-1 py-1 text-center font-plusSansJakarta">{materi.practice}</div>
                     </div>
                   ))}
 
                   {/* Kompetensi Inti Title */}
                   <div className="flex border-b border-gray-400 bg-white">
-                    <div className="w-1/12 px-2 py-2 font-plusSansJakarta font-bold text-center border-r border-gray-400">II</div>
-                    <div className="w-9/12 px-2 py-2 font-plusSansJakarta font-bold border-r border-gray-400">
+                    <div className="w-1/12 px-1 py-1 font-plusSansJakarta font-bold text-center border-r border-gray-400">II</div>
+                    <div className="w-9/12 px-1 py-1 font-plusSansJakarta font-bold border-r border-gray-400">
                       <div className="flex flex-row items-center mb-2">
                         <span className="text-base leading-none">KOMPETENSI INTI</span>/
                         <span className="italic font-bos leading-none">Core Competency</span>
                       </div>
                     </div>
-                    <div className="w-1/12 px-2 py-2 border-r border-gray-400"></div>
-                    <div className="w-1/12 px-2 py-2"></div>
+                    <div className="w-1/12 px-1 py-1 border-r border-gray-400"></div>
+                    <div className="w-1/12 px-1 py-1"></div>
                   </div>
 
                   {/* Kompetensi Inti Items */}
@@ -532,41 +532,41 @@ const SertifikatNonKepelautan = React.forwardRef(
                       key={index}
                       className="flex text-sm border-b border-gray-300"
                     >
-                      <div className="w-1/12 px-2 py-2 text-center border-r border-gray-300">{index + 1}.</div>
-                      <div className="w-7/12 px-2 py-2 border-r border-gray-300">
+                      <div className="w-1/12 px-1 py-1 text-center border-r border-gray-300">{index + 1}.</div>
+                      <div className="w-7/12 px-1 py-1 border-r border-gray-300">
                         <div className="flex flex-col justify-center mb-2">
                           <span className="text-base !font-plusSansJakarta not-italic font-normal leading-none">{materi.name_ind}</span>
                           <span className="italic font-bosItalic leading-none">{materi.name_eng}</span>
                         </div>
                       </div>
-                      <div className="w-2/12 px-2 py-2 text-center font-plusSansJakarta border-r border-gray-300">{materi.theory}</div>
-                      <div className="w-2/12 px-2 py-2 text-center font-plusSansJakarta">{materi.practice}</div>
+                      <div className="w-2/12 px-1 py-1 text-center font-plusSansJakarta border-r border-gray-300">{materi.theory}</div>
+                      <div className="w-2/12 px-1 py-1 text-center font-plusSansJakarta">{materi.practice}</div>
                     </div>
                   ))}
 
                   {/* Jumlah Jam */}
                   <div className="flex font-plusSansJakarta font-bold border-b border-gray-300">
-                    <div className="w-1/12 px-2 py-2 flex items-center justify-center border-r border-gray-300"></div>
-                    <div className="w-7/12 px-2 py-2 border-r border-gray-300">
+                    <div className="w-1/12 px-1 py-1 flex items-center justify-center border-r border-gray-300"></div>
+                    <div className="w-7/12 px-1 py-1 border-r border-gray-300">
                       <div className="flex flex-row items-center mb-2">
                         <span className="text-base leading-none">JUMLAH JAM PELAJARAN</span>/
                         <span className="italic font-bos leading-none">Training Hours</span>
                       </div>
                     </div>
-                    <div className="w-2/12 px-2 py-2 text-center">{totalHours.totalTheory}</div>
-                    <div className="w-2/12 px-2 py-2 text-center">{totalHours.totalPractice}</div>
+                    <div className="w-2/12 px-1 py-1 text-center">{totalHours.totalTheory}</div>
+                    <div className="w-2/12 px-1 py-1 text-center">{totalHours.totalPractice}</div>
                   </div>
 
                   {/* Total Jam */}
                   <div className="flex font-plusSansJakarta font-bold">
-                    <div className="w-1/12 px-2 py-2 flex items-center justify-center border-r border-gray-300"></div>
-                    <div className="w-7/12 px-2 py-2 border-r border-gray-300">
+                    <div className="w-1/12 px-1 py-1 flex items-center justify-center border-r border-gray-300"></div>
+                    <div className="w-7/12 px-1 py-1 border-r border-gray-300">
                       <div className="flex flex-row items-center mb-2">
                         <span className="text-base leading-none">TOTAL JAM PELAJARAN</span>/
                         <span className="italic font-bos leading-none">Total Hours</span>
                       </div>
                     </div>
-                    <div className="w-4/12 px-2 py-2 text-center flex items-center justify-center">{totalHours.totalTheory + totalHours.totalPractice}</div>
+                    <div className="w-4/12 px-1 py-1 text-center flex items-center justify-center">{totalHours.totalTheory + totalHours.totalPractice}</div>
                   </div>
                 </div>
               </div >
