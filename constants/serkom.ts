@@ -9,45 +9,45 @@ export const DESC_CERTIFICATE_COMPETENCE_FISHERIES: Record<
 > = {
   HACCP: {
     desc_ind:
-      'Dalam Pelatihan Hazard Analysis and Critical Control Points (HACCP) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan SDM Kelautan dan Perikanan (BPPSDMKP) dengan Pusat Mutu Pascapanen - Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP) pada tanggal',
+      'Dalam Pelatihan Hazard Analysis and Critical Control Points (HACCP) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan SDM Kelautan dan Perikanan (BPPSDMKP) dengan Pusat Mutu Pascapanen - Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP)',
     desc_eng:
-      'In the Hazard Analysis and Critical Control Points (HACCP) Training, which was organized in collaboration between the Center for Marine and Fisheries Training - Marine and Fisheries Human Resource Development and Extension Agency, and the Center for Post-Harvest Quality Assurance - Marine and Fisheries Products Quality Control and Supervision Agency on',
+      'In the Hazard Analysis and Critical Control Points (HACCP) Training, which was organized in collaboration between the Center for Marine and Fisheries Training - Marine and Fisheries Human Resource Development and Extension Agency, and the Center for Post-Harvest Quality Assurance - Marine and Fisheries Products Quality Control and Supervision Agency',
   },
   CBIB: {
     desc_ind:
-      'Dalam Pelatihan Cara Budidaya Ikan yang Baik (CBIB) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Ikan Air Payau - Direktorat Jenderal Perikanan Budidaya dan Pusat Pengendalian dan Pengawasan Mutu Produksi Primer – Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP) pada tanggal',
+      'Dalam Pelatihan Cara Budidaya Ikan yang Baik (CBIB) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Ikan Air Payau - Direktorat Jenderal Perikanan Budidaya dan Pusat Pengendalian dan Pengawasan Mutu Produksi Primer – Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP)',
     desc_eng:
-      'In the Training on Good Aquaculture Practices (GAqPs) which was held in collaboration between the Center for Marine and Fisheries Training - Marine and Fisheries Human Resource Development and Extension Agency, the Directorate of Brackish Fish – Directorate General of Fisheries Cultivation, and the Center for Primary Production Quality Assurance - Marine and Fisheries Quality Control and Supervision Agency on',
+      'In the Training on Good Aquaculture Practices (GAqPs) which was held in collaboration between the Center for Marine and Fisheries Training - Marine and Fisheries Human Resource Development and Extension Agency, the Directorate of Brackish Fish – Directorate General of Fisheries Cultivation, and the Center for Primary Production Quality Assurance - Marine and Fisheries Quality Control and Supervision Agency',
   },
   'MPM-CPIB': {
     desc_ind:
-      'Dalam Pelatihan Manager Pengendali Mutu Cara Pembenihan Ikan yang Baik (MPM-CPIB) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Pembenihan - Direktorat Jenderal Perikanan Budidaya pada tanggal',
+      'Dalam Pelatihan Manager Pengendali Mutu Cara Pembenihan Ikan yang Baik (MPM-CPIB) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Pembenihan - Direktorat Jenderal Perikanan Budidaya',
     desc_eng:
-      'In the Quality Control Manager Training on Good Fish Hatchery Methods which was held in collaboration with the Center for Marine and Fisheries Training - Marine and Fisheries Human Resource Development and Extension Agency with the Directorate of Seeds - Directorate General of Aquaculture on',
+      'In the Quality Control Manager Training on Good Fish Hatchery Methods which was held in collaboration with the Center for Marine and Fisheries Training - Marine and Fisheries Human Resource Development and Extension Agency with the Directorate of Seeds - Directorate General of Aquaculture',
   },
   CPIB: {
     desc_ind:
-      'Dalam Pelatihan Cara Pembenihan Ikan yang Baik (CPIB) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Rumput Laut - Direktorat Jenderal Perikanan Budidaya dan Pusat Pengendalian dan Pengawasan Mutu Produksi Primer – Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP) pada tanggal',
+      'Dalam Pelatihan Cara Pembenihan Ikan yang Baik (CPIB) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Rumput Laut - Direktorat Jenderal Perikanan Budidaya dan Pusat Pengendalian dan Pengawasan Mutu Produksi Primer – Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP)',
     desc_eng:
-      'In the Training on Good Fish Breeding Practices which was held in collaboration between the Center for Marine and Fisheries Training - Marine and Fisheries Human Resource Development and Extension Agency, the Directorate of Seaweed - Directorate General of Fisheries Cultivation, and the Center for Primary Production Quality Assurance - Marine and Fisheries Quality Control and Supervision Agency on',
+      'In the Training on Good Fish Breeding Practices which was held in collaboration between the Center for Marine and Fisheries Training - Marine and Fisheries Human Resource Development and Extension Agency, the Directorate of Seaweed - Directorate General of Fisheries Cultivation, and the Center for Primary Production Quality Assurance - Marine and Fisheries Quality Control and Supervision Agency',
   },
   CPPIB: {
     desc_ind:
-      'Dalam Pelatihan Cara Pembuatan Pakan Ikan yang Baik (CPPIB) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Ikan Air Tawar - Direktorat Jenderal Perikanan Budidaya Pusat Pengendalian dan Pengawasan Mutu Produksi Primer – Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP) pada tanggal',
+      'Dalam Pelatihan Cara Pembuatan Pakan Ikan yang Baik (CPPIB) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Ikan Air Tawar - Direktorat Jenderal Perikanan Budidaya Pusat Pengendalian dan Pengawasan Mutu Produksi Primer – Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP)',
     desc_eng:
-      'In the Training on Good Aquaculture Feed Manufacturing Practices which was held in collaboration between the Center for Marine and Fisheries Training - Marine and Fisheries Extension and Human Resources Development Agency, the Directorate of Freshwater Fish - Directorate General of Fisheries Cultivation, and the Center for Primary Production Quality Assurance - Marine and Fisheries Quality Control and Supervision Agency on',
+      'In the Training on Good Aquaculture Feed Manufacturing Practices which was held in collaboration between the Center for Marine and Fisheries Training - Marine and Fisheries Extension and Human Resources Development Agency, the Directorate of Freshwater Fish - Directorate General of Fisheries Cultivation, and the Center for Primary Production Quality Assurance - Marine and Fisheries Quality Control and Supervision Agency',
   },
   API: {
     desc_ind:
-      'Dalam Pelatihan Asisten Pengolah Ikan (API) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Pengolahan - Direktorat Jenderal Penguatan Daya Saing Produk Kelautan dan Perikanan (DJPDSPKP) dan Pusat Mutu Pascapanen - Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPHMKP) pada tanggal',
+      'Dalam Pelatihan Asisten Pengolah Ikan (API) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Pengolahan - Direktorat Jenderal Penguatan Daya Saing Produk Kelautan dan Perikanan (DJPDSPKP) dan Pusat Mutu Pascapanen - Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPHMKP)',
     desc_eng:
-      'In the Fish Processing Assistant Training which was held in  collaboration between the Center for Marine and Fisheries Training - Marine and Fisheries Extension and Human Resources Development Agency, the Directorate of Processing and Quality Development - Directorate General of Strengthening and Competitiveness of Marine and the Center for Post-Harvest Quality Assurance - Marine and Fisheries Products Quality Control and Supervision Agency on',
+      'In the Fish Processing Assistant Training which was held in  collaboration between the Center for Marine and Fisheries Training - Marine and Fisheries Extension and Human Resources Development Agency, the Directorate of Processing and Quality Development - Directorate General of Strengthening and Competitiveness of Marine and the Center for Post-Harvest Quality Assurance - Marine and Fisheries Products Quality Control and Supervision Agency',
   },
   SPI: {
     desc_ind:
-      'Dalam Pelatihan Sertifikat Pengolah Ikan (SPI) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Pengolahan - Direktorat Jenderal Penguatan Daya Saing Produk Kelautan dan perikanan  (DJPDSPKP) dan Pusat Mutu Pascapanen - Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP) pada tanggal',
+      'Dalam Pelatihan Sertifikat Pengolah Ikan (SPI) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Pengolahan - Direktorat Jenderal Penguatan Daya Saing Produk Kelautan dan perikanan  (DJPDSPKP) dan Pusat Mutu Pascapanen - Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP)',
     desc_eng:
-      'In the Fish Processing Assistant Training which was held in  collaboration with the Center for Marine and Fisheries Training - Marine and Fisheries Human Resource Development and Extension Agency with the Directorate of Processing and Quality Development - Directorate General of Strengthening and Competitiveness of Marine and Fishery Products on',
+      'In the Fish Processing Assistant Training which was held in  collaboration with the Center for Marine and Fisheries Training - Marine and Fisheries Human Resource Development and Extension Agency with the Directorate of Processing and Quality Development - Directorate General of Strengthening and Competitiveness of Marine and Fishery Products',
   },
 }
 

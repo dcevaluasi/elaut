@@ -160,9 +160,6 @@ const SertifikatNonKepelautan = React.forwardRef(
                   <p className="text-lg font-bosItalic">CERTIFICATE</p>
                 </div>
 
-                <p className="text-xl font-bosNormal font-bold">
-                  Nomor : {userPelatihan?.NoSertifikat}
-                </p>
               </div>
 
               <div className="flex w-full flex-col space-y-0 max-w-5xl mx-auto items-start text-base  text-center font-bos h-fit mt-2">
@@ -278,10 +275,10 @@ const SertifikatNonKepelautan = React.forwardRef(
                       </div>
                     </div></> : <><div className="flex w-full flex-col space-y-0 max-w-7xl mx-auto items-start text-sm -mt-3 text-center font-bos h-fit">
                       <span className="text-base leading-[115%] font-bosNormal">
-                        {DESC_CERTIFICATE_COMPETENCE_FISHERIES[pelatihan!.Program].desc_ind} {formatDateRange(generateTanggalPelatihan(pelatihan?.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan))}
+                        {DESC_CERTIFICATE_COMPETENCE_FISHERIES[pelatihan!.Program].desc_ind}
                       </span>
                       <span className="max-w-6xl leading-none font-bos italic text-[0.85rem] mx-auto">
-                        {DESC_CERTIFICATE_COMPETENCE_FISHERIES[pelatihan!.Program].desc_eng} {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan?.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan))}
+                        {DESC_CERTIFICATE_COMPETENCE_FISHERIES[pelatihan!.Program].desc_eng}
                       </span>
                     </div>
 
