@@ -135,7 +135,54 @@ export default function LayoutAdminElaut({
   return (
     <div className="h-screen w-full flex text-gray-800 bg-white">
       {/* Sidebar */}
-      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      <nav className="flex-none flex flex-col items-center bg-neutral-800 text-gray-400 border-r h-screen">
+        <div className="h-16 flex items-center w-full">
+          <Image
+            src="/logo-kkp-white.png"
+            alt="Logo"
+            width={40}
+            height={40}
+            className="mx-auto"
+          />
+        </div>
+        <ul className="w-full">
+          {navs.map(({ title, href, icon }) => (
+            <li key={title}>
+              <a
+                href={href}
+                title={title}
+                className={`h-16 px-6 flex items-center w-full ${pathname === href
+                  ? "text-white bg-blue-500"
+                  : "hover:text-white hover:bg-blue-500"
+                  } group`}
+              >
+                <div className="mx-auto">{icon}</div>
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <div
+          className="mt-auto h-16 flex items-center w-full cursor-pointer"
+          onClick={() => handleLogOut()}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-7 w-7 mx-auto text-gray-200 hover:text-blue-500 transition-colors"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M16 17v-4H7v-2h9V7l5 5-5 5zm-2 3H5c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2h9v2H5v12h9v2z"
+            />
+          </svg>
+        </div>
+      </nav>
+
       {/* Main Content */}
       <main className="flex-grow overflow-y-scroll w-full scrollbar-hide flex flex-col">
         <nav
@@ -153,12 +200,13 @@ export default function LayoutAdminElaut({
             className="px-8 flex items-center"
           >
             <li className="h-10  ml-3">
-              <DropdownUser lemdiklatLoggedInInfo={lemdikData!} pusatLoggedInInfo={pusatData!} />
+              <DropdownUser lemdiklatLoggedInInfo={lemdikData} pusatLoggedInInfo={pusatData} />
             </li>
           </ul>
         </nav>
         {children}
       </main>
     </div>
+
   );
 }
