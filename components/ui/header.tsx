@@ -61,6 +61,7 @@ export default function Header() {
               className={`font-medium ${top &&
                 (usePathname() == "/" ||
                   usePathname() == "/lembaga/p2mkp" ||
+                  usePathname().includes("/publikasi") ||
                   usePathname().includes("bppp") ||
                   usePathname() == "/lembaga/dpkakp" ||
                   usePathname() == "/lembaga/komite-approval" ||
@@ -160,6 +161,7 @@ export default function Header() {
             (usePathname() == "/" ||
               usePathname() == "/lembaga/p2mkp" ||
               usePathname().includes("bppp") ||
+              usePathname().includes("/publikasi") ||
               usePathname() == "/lembaga/dpkakp" ||
               usePathname() == "/lembaga/komite-approval" ||
               usePathname() == "/lembaga/pukakp" ||
@@ -241,6 +243,7 @@ export default function Header() {
             usePathname().includes("registrasi") ||
             usePathname().includes("pelatihan") ||
             usePathname().includes("dashboard") ||
+            usePathname().includes("publikasi") ||
             usePathname().includes("cek-sertifikat") ||
             usePathname().includes("forget-password") ||
             usePathname().includes("login")) && (
@@ -331,6 +334,7 @@ export default function Header() {
                   name="Dewan Penguji dan Komite Approval"
                   top={top}
                 /> */}
+                <NavLinkDefault href="/layanan/publikasi" name="Publikasi" top={top} />
                 <NavLinkDefault
                   href="/layanan/cek-sertifikat"
                   name="Cek Sertifikat"

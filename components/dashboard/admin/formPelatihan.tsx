@@ -1041,39 +1041,26 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                               Penyelenggara Pelatihan{" "}
                               <span className="text-red-600">*</span>
                             </label>
-                            {
-                              isOperatorBalaiPelatihan ? <input
-                                id="penyelenggaraPelatihan"
-                                type="text"
-                                className="form-input w-full text-black border-gray-300 rounded-md"
-                                placeholder={lemdikData?.data?.NamaLemdik!}
-                                required
-                                value={lemdikData?.data?.NamaLemdik!}
-                                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                                  setPenyelenggaraPelatihan(e.target.value)
+                            <Select
+                              value={penyelenggaraPelatihan}
+                              onValueChange={(value: string) =>
+                                setPenyelenggaraPelatihan(value)
+                              }
+                            >
+                              <SelectTrigger className="w-full text-base py-6">
+                                <SelectValue placeholder="Pilih penyelenggara" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {
+                                  UPT.map((item: string, index: number) => (
+                                    <SelectItem key={index} value={item}>
+                                      {item}
+                                    </SelectItem>
+                                  ))
                                 }
-                                disabled
-                                readOnly
-                              /> : <Select
-                                value={penyelenggaraPelatihan}
-                                onValueChange={(value: string) =>
-                                  setPenyelenggaraPelatihan(value)
-                                }
-                              >
-                                <SelectTrigger className="w-full text-base py-6">
-                                  <SelectValue placeholder="Pilih penyelenggara" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {
-                                    UPT.map((item: string, index: number) => (
-                                      <SelectItem key={index} value={item}>
-                                        {item}
-                                      </SelectItem>
-                                    ))
-                                  }
-                                </SelectContent>
-                              </Select>
-                            }
+                              </SelectContent>
+                            </Select>
+
                           </div>
                         </div>
 
@@ -1119,7 +1106,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                               className="block text-gray-800 text-sm font-medium mb-1"
                               htmlFor="jensiPelatihan"
                             >
-                              Jenis Sertifikasi{" "}
+                              Format Sertifikat{" "}
                               <span className="text-red-600">*</span>
                             </label>
                             <Select
@@ -1129,15 +1116,16 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                               }
                             >
                               <SelectTrigger className="w-full text-base py-5">
-                                <SelectValue placeholder="Pilih jenis sertifikat" />
+                                <SelectValue placeholder="Pilih format sertifikat" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="Kepelautan">
-                                  Kepelautan
+                                <SelectItem value="PERMEN KP No. 33 Tahun 2021">
+                                  PERMEN KP No. 33 Tahun 2021
                                 </SelectItem>
-                                <SelectItem value="Non-Kepelautan">
-                                  Non-Kepelautan
+                                <SelectItem value="PERMEN KP No. 23 Tahun 2024">
+                                  PERMEN KP No. 23 Tahun 2024
                                 </SelectItem>
+
                               </SelectContent>
                             </Select>
                           </div>
