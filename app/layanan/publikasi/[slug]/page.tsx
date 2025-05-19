@@ -222,7 +222,7 @@ function PDFViewerPublication({ fileUrl }: { fileUrl: string }) {
 const PdfViewer = ({ url }: { url: string }) => {
     const defaultLayoutPluginInstance = defaultLayoutPlugin();
     return (
-        <div className="w-[700px] h-full">
+        <div className="w-[1100px] h-full">
             <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
                 <Viewer
                     fileUrl={url}
