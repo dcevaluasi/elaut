@@ -112,10 +112,10 @@ function HeroDetailPublication() {
                         </h1>
 
                         <div className="flex flex-row items-start w-full justify-start gap-1">
-                            <div className="bg-blue-500 text-white rounded-full p-3 px-10 flex items-center justify-center text-base">
+                            <Link href={`${devBaseUrl}/${publikasi.pub_file}`} className="bg-blue-500 text-white rounded-full p-3 px-10 flex items-center justify-center text-base">
                                 <TbDownload />
                                 Unduh [ID]
-                            </div>
+                            </Link>
                             <div className="bg-gray-300 text-black rounded-full py-3 px-10 flex items-center justify-center text-base">
                                 <FiInfo /> Diakses 15,052
                             </div>
