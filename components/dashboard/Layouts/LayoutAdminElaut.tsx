@@ -13,6 +13,7 @@ import { PusatDetailInfo } from "@/types/pusat";
 import { LucideLayoutDashboard } from "lucide-react";
 import { IoSchoolOutline } from "react-icons/io5";
 import Sidebar from "../Sidebar";
+import { GrInfo } from "react-icons/gr";
 
 export default function LayoutAdminElaut({
   children,
@@ -111,7 +112,14 @@ export default function LayoutAdminElaut({
         icon:
           <IoSchoolOutline className="text-2xl" />,
       },
+      {
+        title: "Publikasi dan Regulasi",
+        href: `/admin/pusat/pelatihan/pelaksanaan`,
+        icon:
+          <GrInfo className="text-2xl" />,
+      },
     ]
+
     : [
       {
         title: "Dashboard Pelatihan",
@@ -160,6 +168,20 @@ export default function LayoutAdminElaut({
               </a>
             </li>
           ))}
+          {
+            Cookies.get("Eselon") == 'Operator Pusat' && <li>
+              <a
+                href={'/admin/pusat/pelatihan/publikasi'}
+                title={'Publikasi dan Regulasi'}
+                className={`h-16 px-6 flex items-center w-full ${'/admin/pusat/pelatihan/publikasi' === '/admin/pusat/pelatihan/publikasi'
+                  ? "text-white bg-blue-500"
+                  : "hover:text-white hover:bg-blue-500"
+                  } group`}
+              >
+                <div className="mx-auto"><GrInfo className="text-2xl" /></div>
+              </a>
+            </li>
+          }
         </ul>
 
         <div

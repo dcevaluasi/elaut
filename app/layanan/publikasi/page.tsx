@@ -2,6 +2,9 @@
 
 import ScrollDown from "@/components/scroll-down";
 import Footer from "@/components/ui/footer";
+import { devBaseUrl } from "@/constants/urls";
+import useFetchAllPublication from "@/hooks/elaut/publication/useFetchAllPublication";
+import { Publication } from "@/types/elaut";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -9,7 +12,7 @@ import { FaArrowRight } from "react-icons/fa6";
 import { FiInfo } from "react-icons/fi";
 import { MdOutlineCheckCircleOutline } from "react-icons/md";
 
-function Publication() {
+function PublicationPage() {
     return (
         <>
             <HeroPublication />
@@ -37,7 +40,7 @@ function HeroPublication() {
     }, []);
 
     return (
-        <section className="relative h-[60vh] m-4 rounded-3xl flex items-center justify-center">
+        <section className="relative h-[70vh] m-4 rounded-3xl flex items-center justify-center">
             <Image
                 src={images[imageIndex]}
                 className="absolute w-full h-full object-cover rounded-3xl duration-1000  "
@@ -84,7 +87,7 @@ function HeroPublication() {
                         <h1
                             className="text-4xl md:text-[3.9rem] font-normal leading-tighter tracking-tighter mb-3 -mt-2 text-white font-calsans"
                         >
-                            Publikasi dan Peraturan<br />
+                            Publikasi dan Regulasi<br />
                             <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">
                                 Pelatihan Kelautan dan Perikanan
                             </span>
@@ -134,6 +137,13 @@ function ItemPublication() {
         },
     ];
 
+    const { data: dataPublication, isFetching: isLoadingPublication } = useFetchAllPublication({
+        search: '',
+        doc_type: ''
+    });
+
+    console.log({ dataPublication })
+
     return (
         <section className="relative h-fit pb-10 mt-10" id="explore">
             <div className="max-w-3xl w-full mx-auto text-center pflex flex-col items-center justify-center pb-5 md:pb-8">
@@ -146,43 +156,46 @@ function ItemPublication() {
                     Publikasi dan aturan menjadi landasan penting dalam mendukung efektivitas pelatihan di sektor kelautan dan perikanan. Melalui akses informasi yang jelas dan terstandarisasi, proses pelatihan dapat berlangsung lebih terarah, akuntabel, dan berkelanjutan bagi semua pihak yang terlibat.
                 </p>
             </div>
-            <div className="grid grid-cols-3 gap-3 max-w-7xl mx-auto ">
+            {
+                isLoadingPublication ? <></> : <div className="grid grid-cols-3 gap-3 max-w-7xl mx-auto ">
 
-                {
-                    publications.map((publication: any, index: number) => (
-                        <div className="bg-white shadow-custom flex items-center flex-col flex-1 rounded-md" key={index}>
-                            <div className="flex flex-col items-center justify-center text-ceneter p-6 gap-5">
-                                <div className="flex flex-col gap-1 items-center justify-center text-center gap-3">
-                                    <div className="flex flex-row items-center justify-center gap-1">
-                                        <div className="bg-blue-500 text-white rounded-full py-1 px-3 flex items-center justify-center text-sm">
-                                            <MdOutlineCheckCircleOutline /> Peraturan
+                    {
+                        dataPublication.map((publication: Publication, index: number) => (
+                            <div className="bg-white shadow-custom flex items-center flex-col flex-1 rounded-md" key={index}>
+                                <div className="flex flex-col items-center justify-center text-ceneter p-6 gap-5">
+                                    <div className="flex flex-col gap-1 items-center justify-center text-center gap-3">
+                                        <div className="flex flex-row items-center justify-center gap-1">
+                                            <div className="bg-blue-500 text-white rounded-full py-1 px-3 flex items-center justify-center text-sm">
+                                                <MdOutlineCheckCircleOutline /> {publication.doc_type}
+                                            </div>
+                                            <div className="bg-gray-300 text-black rounded-full py-1 px-3 flex items-center justify-center text-sm">
+                                                <FiInfo /> Diakses 15,052
+                                            </div>
                                         </div>
-                                        <div className="bg-gray-300 text-black rounded-full py-1 px-3 flex items-center justify-center text-sm">
-                                            <FiInfo /> Diakses 15,052
-                                        </div>
+                                        <Link href={`/layanan/publikasi/${index}`} className='text-lg font-semibold leading-none'>
+                                            {publication.pub_short_name}
+                                        </Link>
+                                        <p className="text-gray-600 font-normal text-base text-center">
+                                            Dipublish pada {publication.created_at}
+                                        </p>
                                     </div>
-                                    <Link href={`/layanan/publikasi/${index}`} className='text-lg font-semibold leading-none'>
-                                        Keputusan Menteri Nomor 591 Tahun 2025
-                                    </Link>
                                     <p className="text-gray-600 font-normal text-base text-center">
-                                        Dipublish pada Mei 2025
+                                        {publication.description}
                                     </p>
-                                </div>
-                                <p className="text-gray-600 font-normal text-base text-center">
-                                    Keputusan Menteri Perdagangan Republik Indonesia Nomor 591 Tahun 2025 Tentang Harga Patokan Ekspor Atas Produk Pertambangan Yang Dikenakan Bea Keluar
-                                </p>
 
+                                </div>
+                                <Link href={`/layanan/publikasi/${publication.slug}`} className="flex items-center justify-center font-semibold text-base border-t border-t-gray-500 w-full py-5">
+                                    <span>Detail</span><FaArrowRight />
+                                </Link>
                             </div>
-                            <Link href={`/layanan/publikasi/${index}`} className="flex items-center justify-center font-semibold text-base border-t border-t-gray-500 w-full py-5">
-                                <span>Detail</span><FaArrowRight />
-                            </Link>
-                        </div>
-                    ))
-                }
-            </div>
+                        ))
+                    }
+                </div>
+            }
+
         </section>
 
     )
 }
 
-export default Publication;
+export default PublicationPage;

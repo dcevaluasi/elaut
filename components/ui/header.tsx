@@ -208,6 +208,7 @@ export default function Header() {
         usePathname().includes("/dpkakp/admin") ||
         usePathname().includes("/dpkakp/user") ||
         usePathname().includes("/e-katalog") ||
+
         usePathname().includes("/dpkakp/public") ||
         usePathname().includes("/dpkakp/penguji") ||
         usePathname().includes("/pukakp/admin") ||
@@ -224,7 +225,7 @@ export default function Header() {
           : top && "pt-6"
         }  ${!top
           ? `bg-white backdrop-blur-sm shadow-custom `
-          : usePathname().includes("program")
+          : usePathname().includes("program") || usePathname().includes("/publikasi")
             ? "bg-none"
             : usePathname().includes("pelatihan") ||
               usePathname().includes("sertifikasi") ||

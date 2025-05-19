@@ -14,6 +14,10 @@ import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
+import { useParams, useRouter } from "next/navigation";
+import useFetchDetailPublication from "@/hooks/elaut/publication/useFetchDetailPublication";
+import { devBaseUrl } from "@/constants/urls";
+import { HashLoader } from "react-spinners";
 
 function DetailPublicationPage() {
     return (
@@ -41,6 +45,20 @@ function HeroDetailPublication() {
 
         return () => clearInterval(interval);
     }, []);
+
+    const params = useParams()
+    const slug = params.slug as string
+
+    const {
+        data: publikasi,
+        isFetching
+    } = useFetchDetailPublication(slug as string)
+
+    if (isFetching || !publikasi) {
+        return <div className="my-32 w-full flex items-center justify-center">
+            <HashLoader color="#338CF5" size={50} />
+        </div>
+    }
 
     return (
         <section className="relative h-[45vh] m-4 rounded-3xl flex items-center justify-center">
@@ -90,7 +108,7 @@ function HeroDetailPublication() {
                         <h1
                             className="text-4xl md:text-[2.4rem] font-normal leading-none tracking-tighter mb-3 -mt-2 text-white font-calsans text-left"
                         >
-                            Keputusan Menteri Perdagangan Republik Indonesia Nomor 1438 Tahun 2025 tentang Harga Patokan Ekspor Atas Produk Pertambangan Yang Dikenakan Bea Keluar
+                            {publikasi.pub_full_name}
                         </h1>
 
                         <div className="flex flex-row items-start w-full justify-start gap-1">
@@ -110,13 +128,25 @@ function HeroDetailPublication() {
 }
 
 function DetailPublication() {
+    const params = useParams()
+    const slug = params.slug as string
+
+    const {
+        data: publikasi,
+        isFetching
+    } = useFetchDetailPublication(slug as string)
+
+    if (isFetching || !publikasi) {
+        return <></>
+    }
+
     return (
         <section className="relative h-fit pb-10 mt-5" id="explore">
-            <div className="max-w-7xl flex gap-5 mx-auto z-[40] ">
+            <div className="max-w-7xl flex gap-5 mx-auto z-[40]">
                 <div className="bg-white shadow-custom flex items-center flex-col w-[30%] flex-1 rounded-md">
                     <div className="max-w-xl mx-auto p-6 rounded-md overflow-hidden">
                         <table className="w-full text-left text-base">
-                            <thead className="bg-neutral-900 text-white">
+                            <thead className="bg-neutral-900 text-white rounded-full">
                                 <tr>
                                     <th className="px-4 py-2 font-medium">Meta</th>
                                     <th className="px-4 py-2 font-medium">Keterangan</th>
@@ -125,61 +155,33 @@ function DetailPublication() {
                             <tbody className="divide-y divide-gray-200">
                                 <tr>
                                     <td className="px-4 py-2 font-semibold">Tipe Dokumen</td>
-                                    <td className="px-4 py-2">Peraturan Perundang-undangan</td>
+                                    <td className="px-4 py-2">{publikasi.doc_type}</td>
                                 </tr>
                                 <tr>
                                     <td className="px-4 py-2 font-semibold">Judul</td>
-                                    <td className="px-4 py-2">
-                                        Keputusan Menteri Perdagangan Republik Indonesia Nomor 1438 Tahun
-                                        2025 tentang Harga Patokan Ekspor Atas Produk Pertambangan Yang
-                                        Dikenakan Bea Keluar
-                                    </td>
+                                    <td className="px-4 py-2">{publikasi.pub_full_name}</td>
                                 </tr>
                                 <tr>
                                     <td className="px-4 py-2 font-semibold">Sumber</td>
-                                    <td className="px-4 py-2">
-                                        -
-                                    </td>
+                                    <td className="px-4 py-2">{publikasi.source || '-'}</td>
                                 </tr>
                                 <tr>
                                     <td className="px-4 py-2 font-semibold">Subjek</td>
-                                    <td className="px-4 py-2">
-                                        HPE, Ekspor, Produk Pertambangan
-                                    </td>
+                                    <td className="px-4 py-2">{publikasi.subject}</td>
                                 </tr>
                                 <tr>
                                     <td className="px-4 py-2 font-semibold">Bahasa</td>
-                                    <td className="px-4 py-2">
-                                        Indonesia
-                                    </td>
+                                    <td className="px-4 py-2">{publikasi.language}</td>
                                 </tr>
-
                             </tbody>
                         </table>
                     </div>
                 </div>
+
                 <div className="bg-white shadow-custom flex items-center flex-col flex-1 w-[70%] rounded-md">
-                    <div className="flex flex-col items-center justify-center text-ceneter p-6 gap-5">
-                        <div className="flex flex-col gap-1 items-center justify-center text-center gap-3">
-                            <div className="flex flex-row items-center justify-center gap-1">
-                                <div className="bg-blue-500 text-white rounded-full p-1 flex items-center justify-center text-sm">
-                                    <MdOutlineCheckCircleOutline /> Peraturan
-                                </div>
-                                <div className="bg-gray-300 text-black rounded-full py-1 px-3 flex items-center justify-center text-sm">
-                                    <MdOutlineCheckCircleOutline /> Diakses 15,052
-                                </div>
-                            </div>
-                            <Link href={`/layanan/publikasi`} className='text-lg font-semibold leading-none'>
-                                Keputusan Menteri Nomor 591 Tahun 2025
-                            </Link>
-                            <p className="text-gray-600 font-normal text-base text-center">
-                                Dipublish pada Mei 2025
-                            </p>
-                        </div>
-                        <PDFViewerPublication />
-
+                    <div className="flex flex-col items-center justify-center text-ceneter gap-5">
+                        <PDFViewerPublication fileUrl={publikasi.pub_file} />
                     </div>
-
                 </div>
             </div>
         </section>
@@ -187,14 +189,14 @@ function DetailPublication() {
     )
 }
 
-function PDFViewerPublication() {
+function PDFViewerPublication({ fileUrl }: { fileUrl: string }) {
 
     return (
         <div className="max-w-4xl mx-auto bg-white rounded-lg shadow p-4">
             {/* Top actions */}
             <div className="flex items-center justify-between mb-4">
                 <a
-                    href="https://eskripsi.usm.ac.id/files/skripsi/B11A/2020/B.111.20.0056/B.111.20.0056-15-File-Komplit-20240229022709.pdf"
+                    href={`${devBaseUrl}/${fileUrl}`}
                     download
                     className="inline-flex items-center border-2 border-blue-500 text-blue-500 px-4 py-1.5 rounded hover:bg-blue-50 transition"
                 >
@@ -212,7 +214,7 @@ function PDFViewerPublication() {
 
             {/* PDF viewer */}
             <div className="border border-gray-200 rounded overflow-hidden">
-                <PdfViewer url={"https://eskripsi.usm.ac.id/files/skripsi/B11A/2020/B.111.20.0056/B.111.20.0056-15-File-Komplit-20240229022709.pdf"} />
+                <PdfViewer url={`${devBaseUrl}/${fileUrl}`} />
             </div>
         </div>
     );
