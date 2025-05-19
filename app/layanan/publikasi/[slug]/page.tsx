@@ -142,9 +142,9 @@ function DetailPublication() {
 
     return (
         <section className="relative h-fit pb-10 mt-5" id="explore">
-            <div className="max-w-7xl flex gap-5 mx-auto z-[40]">
+            <div className="w-full flex gap-5 mx-auto z-[40]">
                 <div className="bg-white shadow-custom flex items-center flex-col w-[30%] flex-1 rounded-md">
-                    <div className="max-w-xl mx-auto p-6 rounded-md overflow-hidden">
+                    <div className=" p-6 rounded-md overflow-hidden">
                         <table className="w-full text-left text-base">
                             <thead className="bg-neutral-900 text-white rounded-full">
                                 <tr>
