@@ -192,7 +192,7 @@ function DetailPublication() {
 function PDFViewerPublication({ fileUrl }: { fileUrl: string }) {
 
     return (
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow p-4">
+        <div className=" bg-white rounded-lg shadow p-4">
             {/* Top actions */}
             <div className="flex items-center justify-between mb-4">
                 <a
@@ -222,7 +222,7 @@ function PDFViewerPublication({ fileUrl }: { fileUrl: string }) {
 const PdfViewer = ({ url }: { url: string }) => {
     const defaultLayoutPluginInstance = defaultLayoutPlugin();
     return (
-        <div className="w-screen h-full">
+        <div className="w-[100%] h-full">
             <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
                 <Viewer
                     fileUrl={url}
