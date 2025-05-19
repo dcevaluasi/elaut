@@ -213,25 +213,26 @@ function PDFViewerPublication({ fileUrl }: { fileUrl: string }) {
             </div>
 
             {/* PDF viewer */}
-            <div className="border border-gray-200 rounded overflow-hidden">
+            <div className="w-full h-[80vh]">
                 <PdfViewer url={`${devBaseUrl}/${fileUrl}`} />
             </div>
         </div>
     );
 };
-
 const PdfViewer = ({ url }: { url: string }) => {
     const defaultLayoutPluginInstance = defaultLayoutPlugin();
     return (
-        <div className="h-screen w-full">
+        <div className="w-full h-full">
             <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
                 <Viewer
                     fileUrl={url}
                     plugins={[defaultLayoutPluginInstance]}
+                    defaultScale={1.0}
                 />
             </Worker>
         </div>
     );
 };
+
 
 export default DetailPublicationPage;
