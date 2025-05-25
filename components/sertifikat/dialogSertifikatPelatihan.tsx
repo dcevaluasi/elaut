@@ -137,7 +137,7 @@ const SertifikatNonKepelautan = React.forwardRef(
               <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-3">
 
                 <div className="flex flex-col h-fit items-center justify-center space-y-0">
-                  <h1 className="text-base font-bosNormal font-bold">
+                  <h1 className="text-base font-bosBold font-bold">
                     KEMENTERIAN KELAUTAN DAN PERIKANAN
                   </h1>
                   <p className="text-base font-bosItalic">
@@ -145,7 +145,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                   </p>
                 </div>
                 <div className="flex flex-col h-fit items-center justify-center space-y-0">
-                  <h1 className="text-lg font-bosNormal font-bold">
+                  <h1 className="text-lg font-bosBold font-bold">
                     BADAN PENYULUHAN DAN PENGEMBANGAN SUMBER DAYA MANUSIA KELAUTAN
                     DAN PERIKANAN
                   </h1>
@@ -156,7 +156,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                 </div>
 
                 <div className="flex flex-col h-fit items-center justify-center space-y-1">
-                  <h1 className="text-3xl font-bosNormal font-black leading-none">
+                  <h1 className="text-3xl font-bosBold font-black leading-none">
                     SERTIFIKAT
                   </h1>
                   <p className="text-lg font-bosItalic">CERTIFICATE</p>
@@ -218,7 +218,7 @@ const SertifikatNonKepelautan = React.forwardRef(
               </div>
 
               <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-1 mb-2">
-                <h1 className="font-bosNormal font-black text-2xl leading-none">
+                <h1 className="font-bosBold font-black text-2xl leading-none">
                   {
                     userPelatihan?.IsActice === 'LULUS' ? ' TELAH LULUS' : 'TELAH MENGIKUTI'
                   }
@@ -327,16 +327,24 @@ const SertifikatNonKepelautan = React.forwardRef(
 
             </div>
 
-            {
-              peserta != null && <Image
-                alt=""
-                src={peserta?.Foto! ?? ''}
-                width={0}
-                height={0}
+            <img
+              src={peserta?.Foto || ""}
+              width={100}
+              height={150}
+              alt=""
+              style={{
+                width: "100px",
+                height: "150px",
+                objectFit: "cover",
+                position: "absolute",
+                bottom: "20px",
+                right: "110px",
+                paddingTop: "1rem",
+                zIndex: -10,
+              }}
+            />
 
-                className="w-[100px] h-[150px]  -z-10 pt-4 block absolute bottom-5 right-28"
-              />
-            }
+
 
 
 
@@ -450,7 +458,7 @@ const SertifikatNonKepelautan = React.forwardRef(
               <div className="pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center mt-32 break-before-auto relative">
                 <div className="flex flex-row justify-center items-center">
                   <div className="flex flex-row gap-2 items-center h-fit">
-                    <div className="flex flex-col text-center space-y-0 h-fit items-center justify-center w-full">
+                    <div className="flex flex-col text-center space-y-0 h-fit items-center justify-center w-full gap-0">
                       <p className="font-bosNormal font-bold text-lg max-w-2xl w-full uppercase leading-none">
                         Materi {pelatihan?.NamaPelatihan}
                       </p>
@@ -460,16 +468,16 @@ const SertifikatNonKepelautan = React.forwardRef(
                 </div>
                 <div className="w-full border border-gray-400 rounded-md overflow-hidden">
                   {/* Header Baris 1 */}
-                  <div className="flex text-center font-bosNormal font-bold bg-gray-100 border-b border-gray-400">
-                    <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 leading-none mb-2">NO</div>
-                    <div className="w-7/12 px-1 flex flex-col justify-center items-start border-r border-gray-400">
-                      <div className="flex flex-row items-center justify-center mb-4">
+                  <div className="flex text-center font-bosNormal font-bold bg-gray-100 ">
+                    <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 leading-none relative"><span className='absolute mt-10 right-0 left-0'>NO</span></div>
+                    <div className="w-7/12 px-1 flex flex-col justify-center items-start border-r border-gray-400 relative">
+                      <div className="flex flex-row items-center justify-center absolute mt-10">
                         <span className="text-base leading-none">MATERI</span>/
                         <span className="italic font-bos leading-none">COURSE</span>
                       </div>
                     </div>
-                    <div className="w-4/12 px-1 flex items-center justify-center">
-                      <div className="flex flex-row items-center justify-center mb-4">
+                    <div className="w-4/12 px-1 flex items-center justify-center border-b border-gray-400">
+                      <div className="flex flex-row  items-center justify-center mb-4">
                         <span className="text-base leading-none">ALOKASI WAKTU</span>/
                         <span className="italic font-bos leading-none">TIME ALLOCATION</span>
                       </div>
@@ -478,7 +486,8 @@ const SertifikatNonKepelautan = React.forwardRef(
 
                   {/* Header Baris 2 */}
                   <div className="flex text-center font-bosNormal font-bold bg-gray-100 border-b border-gray-400">
-                    <div className="w-8/12 px-1 border-r border-gray-400"></div>
+                    <div className="w-1/12 px-1 border-r border-gray-400"></div>
+                    <div className="w-7/12 px-1 border-r border-gray-400"></div>
                     <div className="w-2/12 px-1 border-r border-gray-400">
                       <div className="flex flex-row items-center justify-center mb-4">
                         <span className="text-base leading-none">TEORI</span>/
@@ -497,7 +506,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                   <div className="flex border-b border-gray-400 bg-white">
                     <div className="w-1/12 px-1 font-bosNormal font-bold text-center border-r border-gray-400">I</div>
                     <div className="w-9/12 px-1 font-bosNormal font-bold border-r border-gray-400">
-                      <div className="flex flex-row items-center mb-2">
+                      <div className="flex flex-row items-center mb-3">
                         <span className="text-base leading-none">KOMPETENSI UMUM</span>/
                         <span className="italic font-bos leading-none">General Competency</span>
                       </div>
@@ -528,7 +537,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                   <div className="flex border-b border-gray-400 bg-white">
                     <div className="w-1/12 px-1 font-bosNormal font-bold text-center border-r border-gray-400">II</div>
                     <div className="w-9/12 px-1 font-bosNormal font-bold border-r border-gray-400">
-                      <div className="flex flex-row items-center mb-2">
+                      <div className="flex flex-row items-center mb-3">
                         <span className="text-base leading-none">KOMPETENSI INTI</span>/
                         <span className="italic font-bos leading-none">Core Competency</span>
                       </div>
@@ -559,7 +568,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                   <div className="flex font-bosNormal font-bold border-b border-gray-300">
                     <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-300"></div>
                     <div className="w-7/12 px-1 border-r border-gray-300">
-                      <div className="flex flex-row items-center mb-2">
+                      <div className="flex flex-row items-center mb-3">
                         <span className="text-base leading-none">JUMLAH JAM PELAJARAN</span>/
                         <span className="italic font-bos leading-none">Training Hours</span>
                       </div>
@@ -572,7 +581,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                   <div className="flex font-bosNormal font-bold">
                     <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-300"></div>
                     <div className="w-7/12 px-1 border-r border-gray-300">
-                      <div className="flex flex-row items-center mb-2">
+                      <div className="flex flex-row items-center mb-3">
                         <span className="text-base leading-none">TOTAL JAM PELAJARAN</span>/
                         <span className="italic font-bos leading-none">Total Hours</span>
                       </div>
