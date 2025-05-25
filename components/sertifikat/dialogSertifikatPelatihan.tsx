@@ -337,7 +337,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                 height: "190px",
                 objectFit: "cover",
                 position: "absolute",
-                bottom: "20px",
+                bottom: "10px",
                 right: "100px",
                 paddingTop: "1rem",
                 zIndex: -10,
