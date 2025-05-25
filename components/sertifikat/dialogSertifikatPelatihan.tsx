@@ -113,6 +113,8 @@ const SertifikatNonKepelautan = React.forwardRef(
               </p>
             </div>
 
+
+
             <Image
               alt="Logo KKP"
               className="mx-auto w-20 absolute bottom-10 left-28"
@@ -324,6 +326,18 @@ const SertifikatNonKepelautan = React.forwardRef(
 
 
             </div>
+
+            {
+              peserta != null && <Image
+                alt=""
+                src={peserta?.Foto! ?? ''}
+                width={0}
+                height={0}
+
+                className="w-[100px] h-[150px]  -z-10 pt-4 block absolute bottom-5 right-28"
+              />
+            }
+
 
 
           </div>
