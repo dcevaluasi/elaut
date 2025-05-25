@@ -329,16 +329,16 @@ const SertifikatNonKepelautan = React.forwardRef(
 
             <img
               src={peserta?.Foto || ""}
-              width={100}
-              height={150}
+              width={140}
+              height={190}
               alt=""
               style={{
-                width: "100px",
-                height: "150px",
+                width: "140px",
+                height: "190px",
                 objectFit: "cover",
                 position: "absolute",
                 bottom: "20px",
-                right: "110px",
+                right: "100px",
                 paddingTop: "1rem",
                 zIndex: -10,
               }}
