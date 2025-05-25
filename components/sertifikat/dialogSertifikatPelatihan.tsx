@@ -337,7 +337,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                 height: "190px",
                 objectFit: "cover",
                 position: "absolute",
-                bottom: "10px",
+                bottom: "3px",
                 right: "100px",
                 paddingTop: "1rem",
                 zIndex: -10,
@@ -394,8 +394,8 @@ const SertifikatNonKepelautan = React.forwardRef(
                       <span className="text-base leading-none">KOMPETENSI UMUM</span>
                     </div>
                   </div>
-                  <div className="w-1/12 px-2 "></div>
-                  <div className="w-1/12 px-2 "></div>
+                  <div className="w-1/12 px-2 border-none"></div>
+                  <div className="w-1/12 px-2 border-none"></div>
                 </div>
                 {pelatihan!.MateriPelatihan!.filter((pelatihan) => (pelatihan!.Deskripsi == 'UMUM')).map((materi, index) => (
                   <div key={index} className={`flex  text-sm ${index == pelatihan!.MateriPelatihan!.filter((pelatihan) => (pelatihan!.Deskripsi == 'UMUM')).length - 1 && 'mb-3'}`}>
@@ -416,8 +416,8 @@ const SertifikatNonKepelautan = React.forwardRef(
                       <span className="text-base leading-none">KOMPETENSI INTI</span>
                     </div>
                   </div>
-                  <div className="w-1/12 px-2 "></div>
-                  <div className="w-1/12 px-2 "></div>
+                  <div className="w-1/12 px-2 border-none"></div>
+                  <div className="w-1/12 px-2 border-none"></div>
                 </div>
                 {pelatihan!.MateriPelatihan!.filter((pelatihan) => (pelatihan!.Deskripsi == 'INTI')).map((materi, index) => (
                   <div key={index} className={`flex  text-sm ${index == pelatihan!.MateriPelatihan!.filter((pelatihan) => (pelatihan!.Deskripsi == 'INTI')).length - 1 && 'mb-3'}`}>
@@ -511,7 +511,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                         <span className="italic font-bos leading-none">General Competency</span>
                       </div>
                     </div>
-                    <div className="w-1/12 px-1 border-r border-gray-400"></div>
+                    <div className="w-1/12 px-1 "></div>
                     <div className="w-1/12 px-1 py-1"></div>
                   </div>
 
@@ -528,7 +528,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                           <span className="italic font-bosItalic leading-none">{materi.name_eng}</span>
                         </div>
                       </div>
-                      <div className="w-2/12 px-1 text-center font-bosNormal border-r border-gray-300">{materi.theory}</div>
+                      <div className="w-2/12 px-1 text-center font-bosNormal ">{materi.theory}</div>
                       <div className="w-2/12 px-1 text-center font-bosNormal">{materi.practice}</div>
                     </div>
                   ))}
