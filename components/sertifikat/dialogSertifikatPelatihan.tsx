@@ -337,7 +337,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                 height: "190px",
                 objectFit: "cover",
                 position: "absolute",
-                bottom: "3px",
+                bottom: "-5px",
                 right: "100px",
                 paddingTop: "1rem",
                 zIndex: -10,
@@ -505,7 +505,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                   {/* Kompetensi Umum Title */}
                   <div className="flex border-b border-gray-400 bg-white">
                     <div className="w-1/12 px-1 font-bosNormal font-bold text-center border-r border-gray-400">I</div>
-                    <div className="w-9/12 px-1 font-bosNormal font-bold border-r border-gray-400">
+                    <div className="w-9/12 px-1 font-bosNormal font-bold ">
                       <div className="flex flex-row items-center mb-3">
                         <span className="text-base leading-none">KOMPETENSI UMUM</span>/
                         <span className="italic font-bos leading-none">General Competency</span>
@@ -522,7 +522,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                       className="flex text-sm border-b border-gray-300"
                     >
                       <div className="w-1/12 px-1 text-center border-r border-gray-300">{index + 1}.</div>
-                      <div className="w-7/12 px-1 border-r border-gray-300">
+                      <div className="w-7/12 px-1 ">
                         <div className="flex flex-col justify-center mb-3">
                           <span className="text-base !font-bosNormal not-italic font-normal leading-none">{materi.name_ind}</span>
                           <span className="italic font-bosItalic leading-none">{materi.name_eng}</span>
@@ -542,7 +542,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                         <span className="italic font-bos leading-none">Core Competency</span>
                       </div>
                     </div>
-                    <div className="w-1/12 px-1 border-r border-gray-400"></div>
+                    <div className="w-1/12 px-1 "></div>
                     <div className="w-1/12 px-1 py-1"></div>
                   </div>
 
