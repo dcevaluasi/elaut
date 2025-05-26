@@ -106,81 +106,81 @@ function FormLogin() {
             text: `Kamu memasukkan karakter berbahaya pada no telpon atau password, login tidak dapat diproses!`,
           });
         } else {
-          if (captcha) {
-            try {
-              const response: AxiosResponse = await axios.post(
-                selectedMethodLogin == 'NIK' ? `${baseUrl}/users/login` : `${baseUrl}/users/loginNotelpon`,
-                selectedMethodLogin == 'NIK' ?
-                  JSON.stringify({
-                    nik: sanitizedDangerousChars(formData!.no_number),
-                    password: sanitizedDangerousChars(formData!.password),
-                  }) : JSON.stringify({
-                    no_number: sanitizedDangerousChars(formData!.no_number),
-                    password: sanitizedDangerousChars(formData!.password),
-                  }),
-                {
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                }
-              );
-              console.log({ response });
+          // if (captcha) {
+          try {
+            const response: AxiosResponse = await axios.post(
+              selectedMethodLogin == 'NIK' ? `${baseUrl}/users/login` : `${baseUrl}/users/loginNotelpon`,
+              selectedMethodLogin == 'NIK' ?
+                JSON.stringify({
+                  nik: sanitizedDangerousChars(formData!.no_number),
+                  password: sanitizedDangerousChars(formData!.password),
+                }) : JSON.stringify({
+                  no_number: sanitizedDangerousChars(formData!.no_number),
+                  password: sanitizedDangerousChars(formData!.password),
+                }),
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+            console.log({ response });
 
-              Cookies.set("XSRF081", response.data.t, { expires: 1 });
-              Cookies.set("XSRF082", "true", { expires: 1 });
+            Cookies.set("XSRF081", response.data.t, { expires: 1 });
+            Cookies.set("XSRF082", "true", { expires: 1 });
 
-              if (Cookies.get("XSRF085")) {
-                Toast.fire({
-                  icon: "success",
-                  title: "Berhasil login.",
-                  text: `Berhasil melakukan login, ayo segera daftarkan dirimu!`,
-                });
-                router.replace(Cookies.get("XSRF085")!);
+            if (Cookies.get("XSRF085")) {
+              Toast.fire({
+                icon: "success",
+                title: "Berhasil login.",
+                text: `Berhasil melakukan login, ayo segera daftarkan dirimu!`,
+              });
+              router.replace(Cookies.get("XSRF085")!);
+            } else {
+              Toast.fire({
+                icon: "success",
+                title: "Berhasil login.",
+                text: `Berhasil melakukan login kedalam ELAUT!`,
+              });
+              if (Cookies.get("XSRF083")) {
+                router.replace("/dashboard/edit-profile");
+
               } else {
-                Toast.fire({
-                  icon: "success",
-                  title: "Berhasil login.",
-                  text: `Berhasil melakukan login kedalam ELAUT!`,
-                });
-                if (Cookies.get("XSRF083")) {
-                  router.replace("/dashboard/edit-profile");
-
+                if (Cookies.get("LastPath")) {
+                  const path = Cookies.get("LastPath");
+                  router.replace(path!);
                 } else {
-                  if (Cookies.get("LastPath")) {
-                    const path = Cookies.get("LastPath");
-                    router.replace(path!);
-                  } else {
-                    router.replace("layanan/program/akp");
-                  }
+                  router.replace("layanan/program/akp");
                 }
-                router.replace('/dashboard')
               }
-            } catch (error: any) {
-              console.error({ error });
-              if (
-                error.response &&
-                error.response.data &&
-                error.response.data.pesan
-              ) {
-                const errorMsg = error.response.data.pesan;
-                if (errorMsg == "Incorrect password!") {
-                  setCountPassword(countWrongPassword + 1);
-                }
-                Toast.fire({
-                  icon: "error",
-                  title: "Gagal mencoba login.",
-                  text: `Gagal melakukan login, ${errorMsg}!`,
-                });
-              } else {
-                const errorMsg = error.response.data.pesan;
-                Toast.fire({
-                  icon: "error",
-                  title: "Gagal mencoba login.",
-                  text: `Gagal melakukan login. ${errorMsg}!`,
-                });
+              router.replace('/dashboard')
+            }
+          } catch (error: any) {
+            console.error({ error });
+            if (
+              error.response &&
+              error.response.data &&
+              error.response.data.pesan
+            ) {
+              const errorMsg = error.response.data.pesan;
+              if (errorMsg == "Incorrect password!") {
+                setCountPassword(countWrongPassword + 1);
               }
+              Toast.fire({
+                icon: "error",
+                title: "Gagal mencoba login.",
+                text: `Gagal melakukan login, ${errorMsg}!`,
+              });
+            } else {
+              const errorMsg = error.response.data.pesan;
+              Toast.fire({
+                icon: "error",
+                title: "Gagal mencoba login.",
+                text: `Gagal melakukan login. ${errorMsg}!`,
+              });
             }
           }
+          // }
         }
       }
     } else {
@@ -759,7 +759,7 @@ function FormLogin() {
                         ? "bg-blue-500 hover:bg-blue-600"
                         : "bg-gray-500 hover:bg-gray-600"
                         } w-full`}
-                      disabled={captcha ? false : true}
+                    // disabled={captcha ? false : true}
                     >
                       Login
                     </button>
