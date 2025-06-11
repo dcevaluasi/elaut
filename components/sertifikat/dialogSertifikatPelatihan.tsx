@@ -339,19 +339,14 @@ const SertifikatNonKepelautan = React.forwardRef(
                 position: "absolute",
                 bottom: "-5px",
                 right: "100px",
-                paddingTop: "1rem",
+                borderWidth: '10px',
+                borderColor: '#FFF',
+                marginTop: "1rem",
+
                 zIndex: -10,
               }}
             />
-
-
-
-
-
           </div>
-
-          {/* Page 2 */}
-
 
           {
             pelatihan?.TtdSertifikat == 'Kepala Balai Pelatihan dan Penyuluhan Perikanan' ? <div className="pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center mt-44 break-before-auto relative">
@@ -472,13 +467,13 @@ const SertifikatNonKepelautan = React.forwardRef(
                     <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 leading-none relative"><span className='absolute mt-10 right-0 left-0'>NO</span></div>
                     <div className="w-7/12 px-1 flex flex-col justify-center items-start border-r border-gray-400 relative">
                       <div className="flex flex-row items-center justify-center absolute mt-10">
-                        <span className="text-base leading-none">MATERI</span>/
+                        <span className="text-base leading-none !font-bosBold">MATERI</span>/
                         <span className="italic font-bos leading-none">COURSE</span>
                       </div>
                     </div>
                     <div className="w-4/12 px-1 flex items-center justify-center border-b border-gray-400">
                       <div className="flex flex-row  items-center justify-center mb-4">
-                        <span className="text-base leading-none">ALOKASI WAKTU</span>/
+                        <span className="text-base leading-none !font-bosBold">ALOKASI WAKTU</span>/
                         <span className="italic font-bos leading-none">TIME ALLOCATION</span>
                       </div>
                     </div>
@@ -490,13 +485,13 @@ const SertifikatNonKepelautan = React.forwardRef(
                     <div className="w-7/12 px-1 border-r border-gray-400"></div>
                     <div className="w-2/12 px-1 border-r border-gray-400">
                       <div className="flex flex-row items-center justify-center mb-4">
-                        <span className="text-base leading-none">TEORI</span>/
+                        <span className="text-base leading-none !font-bosBold">TEORI</span>/
                         <span className="italic font-bos leading-none">THEORY</span>
                       </div>
                     </div>
                     <div className="w-2/12 px-1 py-1">
                       <div className="flex flex-row items-center justify-center mb-4">
-                        <span className="text-base leading-none">PRAKTEK</span>/
+                        <span className="text-base leading-none !font-bosBold">PRAKTEK</span>/
                         <span className="italic font-bos leading-none">PRACTICE</span>
                       </div>
                     </div>
@@ -504,10 +499,10 @@ const SertifikatNonKepelautan = React.forwardRef(
 
                   {/* Kompetensi Umum Title */}
                   <div className="flex border-b border-gray-400 bg-white">
-                    <div className="w-1/12 px-1 font-bosNormal font-bold text-center border-r border-gray-400">I</div>
+                    <div className="w-1/12 px-1 !font-bosBold  text-center border-r border-gray-400">I</div>
                     <div className="w-9/12 px-1 font-bosNormal font-bold ">
                       <div className="flex flex-row items-center mb-3">
-                        <span className="text-base leading-none">KOMPETENSI UMUM</span>/
+                        <span className="text-base leading-none !font-bosBold">KOMPETENSI UMUM</span>/
                         <span className="italic font-bos leading-none">General Competency</span>
                       </div>
                     </div>
@@ -535,10 +530,10 @@ const SertifikatNonKepelautan = React.forwardRef(
 
                   {/* Kompetensi Inti Title */}
                   <div className="flex border-b border-gray-400 bg-white">
-                    <div className="w-1/12 px-1 font-bosNormal font-bold text-center border-r border-gray-400">II</div>
+                    <div className="w-1/12 px-1 !font-bosBold text-center border-r border-gray-400">II</div>
                     <div className="w-9/12 px-1 font-bosNormal font-bold ">
                       <div className="flex flex-row items-center mb-3">
-                        <span className="text-base leading-none">KOMPETENSI INTI</span>/
+                        <span className="text-base leading-none !font-bosBold">KOMPETENSI INTI</span>/
                         <span className="italic font-bos leading-none">Core Competency</span>
                       </div>
                     </div>
@@ -569,7 +564,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                     <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-300"></div>
                     <div className="w-7/12 px-1 border-r border-gray-300">
                       <div className="flex flex-row items-center mb-3">
-                        <span className="text-base leading-none">JUMLAH JAM PELAJARAN</span>/
+                        <span className="text-base leading-none !font-bosBold">JUMLAH JAM PELAJARAN</span>/
                         <span className="italic font-bos leading-none">Training Hours</span>
                       </div>
                     </div>
@@ -582,7 +577,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                     <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-300"></div>
                     <div className="w-7/12 px-1 border-r border-gray-300">
                       <div className="flex flex-row items-center mb-3">
-                        <span className="text-base leading-none">TOTAL JAM PELAJARAN</span>/
+                        <span className="text-base leading-none !font-bosBold">TOTAL JAM PELAJARAN</span>/
                         <span className="italic font-bos leading-none">Total Hours</span>
                       </div>
                     </div>
