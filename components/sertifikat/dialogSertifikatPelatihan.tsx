@@ -464,7 +464,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                 <div className="w-full border border-gray-400 rounded-md overflow-hidden">
                   {/* Header Baris 1 */}
                   <div className="flex text-center font-bosNormal font-bold bg-gray-100 ">
-                    <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 leading-none relative"><span className='absolute mt-10 right-0 left-0'>NO</span></div>
+                    <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 leading-none relative"><span className='absolute mt-10 right-0 left-0 !font-bosBold'>NO</span></div>
                     <div className="w-7/12 px-1 flex flex-col justify-center items-start border-r border-gray-400 relative">
                       <div className="flex flex-row items-center justify-center absolute mt-10">
                         <span className="text-base leading-none !font-bosBold">MATERI</span>/
