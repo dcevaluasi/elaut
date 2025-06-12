@@ -202,16 +202,16 @@ const CertificateCheckFeature = () => {
                     </AlertDialogHeader>
                     <AlertDialogFooter className="w-full">
                         <div className="flex-col flex w-full">
-                            <div className="flex flex-wrap  border-b py-2 border-b-gray-300 w-full">
+                            <div className="flex flex-wrap border-b py-2 border-b-gray-300 w-full">
                                 <div className="w-full">
                                     <label
-                                        className="block text-sm text-gray-800  font-medium mb-1"
+                                        className="block text-sm text-gray-800 font-medium mb-1"
                                         htmlFor="name"
                                     >
-                                        No Sertifikat{" "}
+                                        Nama Lengkap{" "}
                                     </label>
                                     <p className="text-gray-600 text-base -mt-1">
-                                        {validSertifikat?.NoSertifikat}
+                                        {validSertifikat?.Nama}
                                     </p>
                                 </div>
                             </div>
