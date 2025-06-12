@@ -68,7 +68,7 @@ type TableDataPelatihanMasyarakatProps = {
 const TableDataPelatihanMasyarakatByWilker = ({
   dataUserPelatihan,
 }: TableDataPelatihanMasyarakatProps) => {
-  const [year, setYear] = useState("2024");
+  const [year, setYear] = useState("2025");
   const [quarter, setQuarter] = useState("TW II");
 
   const getTriwulan = (dateString: string) => {

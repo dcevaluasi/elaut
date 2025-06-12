@@ -28,7 +28,7 @@ type TableDataPelatihanMasyarakatProps = {
 const TableDataPelatihanMasyarakatByProgramPrioritas = ({
   dataPelatihan,
 }: TableDataPelatihanMasyarakatProps) => {
-  const [year, setYear] = useState("2024");
+  const [year, setYear] = useState("2025");
   const [quarter, setQuarter] = useState("TW II");
 
   // Fungsi untuk menentukan triwulan berdasarkan tanggal
@@ -133,7 +133,7 @@ const TableDataPelatihanMasyarakatByProgramPrioritas = ({
       <div className="flex justify-between items-center p-4">
         <div className="">
           <div className="flex items-center gap-2 font-medium leading-none">
-          Jumlah Pelatihan dan Lulusan Pelatihan Menurut Sasaran Program {" "}
+            Jumlah Pelatihan dan Lulusan Pelatihan Menurut Sasaran Program {" "}
             <TrendingUp className="h-4 w-4" />
           </div>
           <div className="leading-none text-muted-foreground">
