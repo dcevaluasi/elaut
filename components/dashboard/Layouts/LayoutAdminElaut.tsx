@@ -100,8 +100,6 @@ export default function LayoutAdminElaut({
     router.replace("/admin/auth/login");
   };
 
-
-
   const navs = pathname.includes("pusat")
     ? [
       {
@@ -116,12 +114,12 @@ export default function LayoutAdminElaut({
         icon:
           <IoSchoolOutline className="text-2xl" />,
       },
-      {
-        title: "Publikasi dan Regulasi",
-        href: `/admin/pusat/pelatihan/pelaksanaan`,
-        icon:
-          <GrInfo className="text-2xl" />,
-      },
+      // {
+      //   title: "Publikasi dan Regulasi",
+      //   href: `/admin/pusat/pelatihan/pelaksanaan`,
+      //   icon:
+      //     <GrInfo className="text-2xl" />,
+      // },
     ]
 
     : [
