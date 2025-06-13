@@ -44,6 +44,7 @@ export default function LayoutAdminElaut({
       Cookies.set("Satker", response.data.data.Status);
       Cookies.set("Role", response.data.data.Nip);
       Cookies.set("Jabatan", response.data.data.NoTelpon);
+      Cookies.set("XSRF094", response.data.data.Status);
     } catch (error) {
       console.error({ error });
     }

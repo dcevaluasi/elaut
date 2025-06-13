@@ -9,9 +9,8 @@ import { FiEdit2, FiUploadCloud } from "react-icons/fi";
 import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import Link from "next/link";
-import { elautBaseUrl } from "@/constants/urls";
+import { elautBaseUrl, urlFileSilabus, urlFileSuratPemberitahuan } from "@/constants/urls";
 
-import { FaBookOpen } from "react-icons/fa6";
 import axios from "axios";
 import { HistoryTraining, PelatihanMasyarakat } from "@/types/product";
 import { generateFullNameBalai, generateTanggalPelatihan } from "@/utils/text";
@@ -34,18 +33,15 @@ import { MateriButton, PublishButton } from "./Actions";
 import { ESELON_1, ESELON_2 } from "@/constants/nomenclatures";
 
 function DetailPelatihan() {
-  const isAdminBalaiPelatihan: boolean = usePathname().includes('lemdiklat')
   const isOperatorBalaiPelatihan = Cookies.get('SATKER_BPPP')?.includes('BPPP') || false
   const isOperatorPusatPelatihan = Cookies.get('Status')?.includes('Operator Pusat') || false
   const isLemdiklat = Cookies.get('Status') === 'Lemdiklat'
-  const isSupervisor = Cookies.get('Status') === 'Supervisor'
   const paths = usePathname().split("/");
 
   const isEselonI = Cookies.get('Jabatan')?.includes(ESELON_1.fullName)
   const isEselonII = Cookies.get('Jabatan')?.includes(ESELON_2.fullName)
 
   const idPelatihan = decryptValue(paths[paths.length - 1]);
-  const kodePelatihan = paths[paths.length - 2];
   const [pelatihan, setPelatihan] = React.useState<PelatihanMasyarakat | null>(
     null
   );
@@ -290,298 +286,111 @@ function DetailPelatihan() {
         </div>
 
       )}
-      <div className="grid grid-cols-2 w-full gap-0">
 
-        {pelatihan != null && (
-          <div className="px-4 w-full">
-            <div className="w-full border border-gray-200 rounded-xl">
-              <div className="bg-gray-100 p-4 w-full ">
-                <h2 className="font-calsans text-xl">
-                  Informasi Pelatihan
-                </h2>
-              </div>
-              <table className="w-full">
-                <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">Nama Pelatihan</td>
-                  <td className="p-4 w-2/3">
-                    {pelatihan!.NamaPelatihan || ""}
-                  </td>
-                </tr>
-                <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">Kode Pelatihan</td>
-                  <td className="p-4 w-2/3">
-                    {pelatihan!.KodePelatihan || ""}
-                  </td>
-                </tr>
-                <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">
-                    Penyelenggara Pelatihan
-                  </td>
-                  <td className="p-4 w-[80%] ">
-                    {pelatihan!.PenyelenggaraPelatihan || ""}
-                  </td>
-                </tr>
-                <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">
-                    Lokasi Pelatihan
-                  </td>
-                  <td className="p-4 w-2/3">
-                    {pelatihan!.LokasiPelatihan || ""}
-                  </td>
-                </tr>
-                <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">
-                    Waktu Pelaksanaan
-                  </td>
-                  <td className="p-4 w-2/3">
-                    {pelatihan.TanggalMulaiPelatihan !== "" &&
-                      pelatihan.TanggalBerakhirPelatihan !== "" ? (
-                      <>
-                        {generateTanggalPelatihan(
-                          pelatihan.TanggalMulaiPelatihan
-                        )}{" "}
-                        s.d.{" "}
-                        {generateTanggalPelatihan(
-                          pelatihan.TanggalBerakhirPelatihan
-                        )}
-                      </>
-                    ) : (
-                      "-"
-                    )}
-                  </td>
-                </tr>
-                <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">
-                    Metode Pelaksanaan
-                  </td>
-                  <td className="p-4 w-2/3">
-                    {pelatihan!.PelaksanaanPelatihan || ""}
-                  </td>
-                </tr>
-                <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">
-                    Dukungan Program Terobosan
-                  </td>
-                  <td className="p-4 w-2/3">
-                    {pelatihan!.DukunganProgramTerobosan || ""}
-                  </td>
-                </tr>
-                <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">
-                    Program dan Jenis Program
-                  </td>
-                  <td className="p-4 w-2/3">
-                    {pelatihan!.JenisProgram || ""} &  {pelatihan!.Program || ""}
-                  </td>
-                </tr>
-                <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">Jenis Pelatihan</td>
-                  <td className="p-4 w-2/3">
-                    {pelatihan!.JenisPelatihan || ""}
-                  </td>
-                </tr>
-                <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">
-                    Bidang Pelatihan
-                  </td>
-                  <td className="p-4 w-2/3">
-                    {pelatihan!.BidangPelatihan || ""}
-                  </td>
-                </tr>
-                <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">
-                    Surat Pemberitahuan
-                  </td>
-                  <td className="p-4 w-2/3">
-                    <Link
+      {pelatihan != null && <div className="space-y-6 p-4">
+        {/* Informasi Pelatihan & Sertifikat */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Informasi Pelatihan */}
+          <div className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-x-scroll">
+            <div className="bg-gray-100 p-4 w-full">
+              <h2 className="font-calsans text-xl text-gray-800">Informasi Pelatihan</h2>
+            </div>
+            <table className="w-full text-sm text-gray-700">
+              <tbody>
+                <InfoRow label="Nama Pelatihan" value={pelatihan?.NamaPelatihan} />
+                <InfoRow label="Kode Pelatihan" value={pelatihan?.KodePelatihan} />
+                <InfoRow label="Penyelenggara" value={pelatihan?.PenyelenggaraPelatihan} />
+                <InfoRow label="Lokasi" value={pelatihan?.LokasiPelatihan} />
+                <InfoRow label="Waktu Pelaksanaan" value={
+                  pelatihan?.TanggalMulaiPelatihan && pelatihan?.TanggalBerakhirPelatihan ?
+                    `${generateTanggalPelatihan(pelatihan.TanggalMulaiPelatihan)} s.d. ${generateTanggalPelatihan(pelatihan.TanggalBerakhirPelatihan)}` : "-"
+                } />
+                <InfoRow label="Metode" value={pelatihan?.PelaksanaanPelatihan} />
+                <InfoRow label="Dukungan Program" value={pelatihan?.DukunganProgramTerobosan} />
+                <InfoRow label="Program & Jenis" value={`${pelatihan?.JenisProgram || "-"} & ${pelatihan?.Program || "-"}`} />
+                <InfoRow label="Jenis Pelatihan" value={pelatihan?.JenisPelatihan} />
+                <InfoRow label="Bidang" value={pelatihan?.BidangPelatihan} />
+                <InfoRow
+                  label="Surat Pemberitahuan Diklat"
+                  value={
+                    <a href={`${urlFileSilabus}/${pelatihan?.SilabusPelatihan}`}
                       target="_blank"
-                      className="text-blue-500 underline w-2/3"
-                      href={`${isLemdiklat ? pelatihan!.SuratPemberitahuan || "" : pelatihan!.SilabusPelatihan || ""}`}
-                    >
-                      {isLemdiklat ? pelatihan!.SuratPemberitahuan || "" : pelatihan!.SilabusPelatihan || ""}
-                    </Link>
-
-                  </td>
-                </tr>
-              </table>
-            </div>
+                      className="text-blue-600 underline break-words">
+                      {`${urlFileSilabus}/${pelatihan?.SilabusPelatihan}`}
+                    </a>
+                  }
+                />
+              </tbody>
+            </table>
           </div>
-        )}
-        {pelatihan != null && (
-          <div className="px-4 w-full">
-            <div className=" w-full border border-gray-200 rounded-xl">
-              <div className="bg-gray-100 p-4 w-full ">
-                <h2 className="font-calsans text-xl">
-                  Informasi Penerbitan Sertifikat
-                </h2>
-              </div>
-              <table className="w-full">
-                <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">
-                    Jenis Sertifikat
-                  </td>
-                  <td className="p-4 w-2/3">{pelatihan!.JenisSertifikat}</td>
-                </tr>
-                <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">
-                    Penandatangan Sertifikat
-                  </td>
-                  <td className="p-4 w-2/3">
-                    {pelatihan!.TtdSertifikat == ""
-                      ? "-"
-                      : pelatihan!.TtdSertifikat}
+
+          {/* Informasi Sertifikat */}
+          <div className="bg-white rounded-2xl h-fit shadow-md border border-gray-200 overflow-x-scroll">
+            <div className="bg-gray-100 p-4 w-full">
+              <h2 className="font-calsans text-xl text-gray-800">Informasi Penerbitan Sertifikat</h2>
+            </div>
+            <table className="w-full text-sm text-gray-700">
+              <tbody>
+                <tr className="border-t border-gray-200">
+                  <td className="p-4 font-semibold text-gray-600 w-[35%]">Status</td>
+                  <td className="p-4">
+                    <ShowingBadge data={pelatihan!} isFlying={false} />
                   </td>
                 </tr>
-                <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">No Sertifikat</td>
-                  <td className="p-4 w-2/3">
-                    {pelatihan!.NoSertifikat == ""
-                      ? "-"
-                      : pelatihan!.NoSertifikat}
-                  </td>
-                </tr>
-                <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">Dokumen Permohonan Penerbitan</td>
-                  <td className="p-4 w-2/3">
-                    <Link
+                <InfoRow label="Penandatangan" value={pelatihan?.TtdSertifikat || "-"} />
+                <InfoRow
+                  label="Dokumen Permohonan"
+                  value={
+                    <a href={`${urlFileSuratPemberitahuan}/${pelatihan?.SuratPemberitahuan}`}
                       target="_blank"
-                      className="text-blue-500 underline"
-                      href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/beritaAcara/pelatihan/${pelatihan!.BeritaAcara
-                        }`}
-                    >
-                      {pelatihan!.BeritaAcara}
-                    </Link>
-                  </td>
-                </tr>
-                <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">
-                    Status Penerbitan
-                  </td>
-                  <td className="py-7 px-5 flex items-center">
-                    <ShowingBadge data={pelatihan} isFlying={false} isSupervisor={isSupervisor} />
-                  </td>
-                </tr>
-              </table>
-            </div>
-          </div>
-        )}
-      </div>
+                      className="text-blue-600 underline break-words">
+                      {`${urlFileSuratPemberitahuan}/${pelatihan?.SuratPemberitahuan}`}
+                    </a>
+                  }
+                />
+                <InfoRow label="Format Sertifikat" value={pelatihan?.JenisSertifikat} />
 
-      {pelatihan != null && (
-        <div className="px-4 w-full mt-5">
-          <div className="w-full border border-gray-200 rounded-xl">
-            <div className="bg-gray-100 p-4 w-full ">
-              <h2 className="font-calsans text-xl">
-                Informasi Pendaftaran
-              </h2>
-            </div>
-            <table className="w-full">
-              {pelatihan.TanggalMulaiPendaftaran != "" && (
-                <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">
-                    Tanggal Pendaftaran
-                  </td>
-                  <td className="p-4 w-2/3">
-                    {generateTanggalPelatihan(
-                      pelatihan.TanggalMulaiPendaftaran
-                    )}{" "}
-                    s.d.{" "}
-                    {generateTanggalPelatihan(
-                      pelatihan!.TanggalBerakhirPendaftaran
-                    )}
-                  </td>
-                </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Informasi Pendaftaran */}
+        <div className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
+          <div className="bg-gray-100 p-4">
+            <h2 className="font-calsans text-xl text-gray-800">Informasi Pendaftaran</h2>
+          </div>
+          <table className="w-full text-sm text-gray-700">
+            <tbody>
+              {pelatihan?.TanggalMulaiPendaftaran && (
+                <InfoRow
+                  label="Tanggal Pendaftaran"
+                  value={`${generateTanggalPelatihan(pelatihan.TanggalMulaiPendaftaran)} s.d. ${generateTanggalPelatihan(pelatihan.TanggalBerakhirPendaftaran)}`}
+                />
               )}
-
-              {
-                isLemdiklat && <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">Tarif Pelatihan</td>
-                  <td className="p-4 w-2/3">
-                    {formatToRupiah(pelatihan!.HargaPelatihan) || ""}
-                  </td>
-                </tr>
-              }
-
-              <tr className="border-b border-b-gray-200 w-full">
-                <td className="font-semibold p-4 w-[20%]">Asal Peserta</td>
-                <td className="p-4 w-2/3">{pelatihan!.AsalPelatihan}</td>
-              </tr>
-
-              {
-                isLemdiklat && <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">Kuota Peserta</td>
-                  <td className="p-4 w-2/3">
-                    {pelatihan!.KoutaPelatihan} Peserta
-                  </td>
-                </tr>
-              }
-
-              <tr className="border-b border-b-gray-200 w-full">
-                <td className="font-semibold p-4 w-[20%]">Jumlah Terdaftar</td>
-                <td className="p-4 w-2/3">
-                  {pelatihan!.UserPelatihan.length} Peserta
-                </td>
-              </tr>
-            </table>
-          </div>
+              {isLemdiklat && (
+                <>
+                  <InfoRow label="Tarif Pelatihan" value={formatToRupiah(pelatihan?.HargaPelatihan!)} />
+                  <InfoRow label="Kuota Peserta" value={`${pelatihan?.KoutaPelatihan} Peserta`} />
+                </>
+              )}
+              <InfoRow label="Asal Peserta" value={pelatihan?.AsalPelatihan} />
+              <InfoRow label="Jumlah Terdaftar" value={`${pelatihan?.UserPelatihan.length} Peserta`} />
+            </tbody>
+          </table>
         </div>
-      )}
-
-      {pelatihan != null && (
-        <div className="px-4 w-full mt-5">
-          <div className="w-full border border-gray-200 rounded-xl">
-            <div className="bg-gray-100 p-4 w-full ">
-              <h2 className="font-calsans text-xl">
-                Informasi Teknis Pelatihan
-              </h2>
-            </div>
-            <table className="w-full">
-              {
-                isLemdiklat && <tr className="border-b border-b-gray-200 w-full ">
-                  <td className="font-semibold p-4 w-[20%] h-fit flex">
-                    Instruktur
-                  </td>
-                  <td className="p-4 w-2/3">
-                    {pelatihan.Instruktur != "" ? (
-                      <div className="flex flex-col gap-1">
-                        {generateInstrukturName(pelatihan.Instruktur).map(
-                          (instruktur, index) => (
-                            <span key={index}>
-                              {index + 1}. {instruktur}
-                            </span>
-                          )
-                        )}
-                      </div>
-                    ) : (
-                      <>-</>
-                    )}
-                  </td>
-                </tr>
-              }
-              {
-                isLemdiklat && <tr className="border-b border-b-gray-200 w-full">
-                  <td className="font-semibold p-4 w-[20%]">
-                    Silabus/Modul/Bahan Ajar Pelatihan
-                  </td>
-                  <td className="p-4 w-2/3">
-                    <Link
-                      target="_blank"
-                      className="text-blue-500 underline"
-                      href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/silabus/pelatihan/${pelatihan!.SilabusPelatihan
-                        }`}
-                    >
-                      {pelatihan!.SilabusPelatihan}
-                    </Link>
-                  </td>
-                </tr>
-              }
-
-            </table>
-          </div>
-        </div>
-      )}
+      </div>}
     </section>
   );
 }
+
+const InfoRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
+  <tr className="border-t border-gray-200 text-base">
+    <td className="p-4 font-semibold text-gray-600 w-[35%]">{label}</td>
+    <td className="p-4 break-words">{value || "-"}</td>
+  </tr>
+);
+
 
 export default DetailPelatihan;

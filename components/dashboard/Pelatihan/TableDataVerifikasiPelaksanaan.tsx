@@ -502,7 +502,7 @@ const TrainingCard: React.FC<{
   return (
     <Card className="relative">
       {pelatihan != null && (
-        <ShowingBadge isSupervisor={isSupervisor} data={pelatihan} isFlying={true} />
+        <ShowingBadge data={pelatihan} isFlying={true} />
       )}
       <CardHeader>
         <CardTitle>{pelatihan.NamaPelatihan}</CardTitle>
