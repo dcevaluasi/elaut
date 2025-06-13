@@ -561,7 +561,7 @@ const TableDataPesertaPelatihan = () => {
         return (
           <Button
             variant="ghost"
-            className={`flex items-center justify-center leading-[105%] p-0 w-full text-gray-900 font-semibold`}
+            className={`${Cookies.get('XSRF095') === 'true' ? 'hidden' : 'flex'} items-center justify-center leading-[105%] p-0 w-full text-gray-900 font-semibold`}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             {!isOperatorBalaiPelatihan ? (
@@ -577,7 +577,7 @@ const TableDataPesertaPelatihan = () => {
         );
       },
       cell: ({ row }) => (
-        <div className={` flex items-center justify-center w-full gap-1`}>
+        <div className={` ${Cookies.get('XSRF095') === 'true' ? 'hidden' : 'flex'} items-center justify-center w-full gap-1`}>
           {isOperatorBalaiPelatihan ? (
             row.original.Keterangan == "Valid" ? (
               <Link
@@ -845,108 +845,7 @@ const TableDataPesertaPelatihan = () => {
         </div>
       ),
     },
-    // {
-    //   accessorKey: "IdUsers",
-    //   header: ({ column }) => {
-    //     return (
-    //       <Button
-    //         variant="ghost"
-    //         className={`text-black font-semibold w-fit p-0 ${isOperatorBalaiPelatihan ? "flex" : "hidden"
-    //           } justify-start items-center`}
-    //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-    //       >
-    //         <p className="leading-[105%]"> Pembayaran</p>
-
-    //         <GiTakeMyMoney className="ml-2 h-4 w-4" />
-    //       </Button>
-    //     );
-    //   },
-    //   cell: ({ row }) => (
-    //     <div
-    //       className={`${"ml-0"} text-left capitalize ${isOperatorBalaiPelatihan ? "block" : "hidden"
-    //         }`}
-    //     >
-    //       <p className="text-base font-semibold tracking-tight leading-none">
-    //         {formatToRupiah(parseInt(row.original.TotalBayar))}
-    //       </p>
-    //     </div>
-    //   ),
-    // },
-
-    // {
-    //   accessorKey: "PreTest",
-    //   header: ({ column }) => {
-    //     return (
-    //       <Button
-    //         variant="ghost"
-    //         className={`flex items-center justify-center p-0 leading-[105%] w-full text-gray-900 font-semibold`}
-    //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-    //       >
-    //         {dataPelatihan != null
-    //           ? dataPelatihan!.UjiKompotensi == "Portfolio"
-    //             ? "Portfolio"
-    //             : "Pre Test"
-    //           : ""}
-
-    //         <MdOutlineNumbers className="ml-1 h-4 w-4" />
-    //       </Button>
-    //     );
-    //   },
-    //   cell: ({ row }) => (
-    //     <div
-    //       className={` flex items-center justify-center w-full gap-1 font-semibold ${row.original.PreTest > 70
-    //         ? "text-green-500"
-    //         : row.original.PreTest > 50
-    //           ? "text-yellow-500"
-    //           : "text-rose-500"
-    //         }`}
-    //     >
-    //       {row.original.PreTest}
-    //     </div>
-    //   ),
-    // },
-    // {
-    //   accessorKey: "PostTest",
-    //   header: ({ column }) => {
-    //     return (
-    //       <Button
-    //         variant="ghost"
-    //         className={`${dataPelatihan != null
-    //           ? dataPelatihan!.UjiKompotensi == "Portfolio"
-    //             ? "hidden"
-    //             : "flex items-center justify-center"
-    //           : ""
-    //           }  p-0 leading-[105%] w-full text-gray-900 font-semibold`}
-    //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-    //       >
-    //         Post Test
-    //         <MdOutlineNumbers className="ml-1 h-4 w-4" />
-    //       </Button>
-    //     );
-    //   },
-    //   cell: ({ row }) => (
-    //     <div
-    //       className={` ${dataPelatihan != null
-    //         ? dataPelatihan!.UjiKompotensi == "Portfolio"
-    //           ? "hidden"
-    //           : "flex items-center justify-center"
-    //         : ""
-    //         }  w-full gap-1 font-semibold ${row.original.PostTest > 70
-    //           ? "text-green-500"
-    //           : row.original.PostTest > 50
-    //             ? "text-yellow-500"
-    //             : "text-rose-500"
-    //         }`}
-    //     >
-    //       {row.original.PostTest}
-    //     </div>
-    //   ),
-    // },
-
   ];
-
-  const [showFormAjukanPelatihan, setShowFormAjukanPelatihan] =
-    React.useState<boolean>(false);
 
   const table = useReactTable({
     data,
@@ -1559,222 +1458,156 @@ const TableDataPesertaPelatihan = () => {
         </AlertDialog>
       </>}
 
-
-      <Card className="mx-4 py-5">
-        <CardContent>
-          <div className="flex items-center mb-3 justify-between gap-3 ">
-            {/* Statistik Pelatihan */}
-            {
-              dataPesertaPelatihan != null && <div className="flex w-full gap-3 sm:gap-5">
-                <div className="flex min-w-47.5">
-                  <span className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-primary">
-                    <span className="block h-2.5 w-full max-w-2.5 rounded-full bg-primary"></span>
-                  </span>
-                  <div className="w-full">
-                    <p className="font-semibold text-primary">
-                      Total Pendaftar
-                    </p>
-                    <p className="text-sm font-medium">
-                      {dataPelatihan?.UserPelatihan.length} orang
-                    </p>
-                  </div>
-                </div>
-                {isOperatorBalaiPelatihan && (
-                  <div className="flex min-w-47.5">
-                    <span className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-secondary">
-                      <span className="block h-2.5 w-full max-w-2.5 rounded-full bg-secondary"></span>
-                    </span>
-                    <div className="w-full">
-                      <p className="font-semibold text-secondary">
-                        Total Telah Bayar
-                      </p>
-                      <p className="text-sm font-medium">
-                        {" "}
-                        {dataPelatihan?.UserPelatihan.length} orang / Rp.{" "}
-                        {dataPelatihan?.UserPelatihan?.reduce(
-                          (total: number, jumlahBayar: UserPelatihan) => {
-                            return total + parseInt(jumlahBayar.TotalBayar);
-                          },
-                          0
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex min-w-47.5">
-                  <span className="mr-2 mt-1 flex h-4 w-full max-w-4 items-center justify-center rounded-full border border-green-400">
-                    <span className="block h-2.5 w-full max-w-2.5 rounded-full bg-green-500"></span>
-                  </span>
-                  <div className="w-full">
-                    <p className="font-semibold text-green-500">
-                      Total Verifikasi
-                    </p>
-                    <p className="text-sm font-medium">
-                      {" "}
-                      {dataPelatihan?.UserPelatihan.length} orang
-                    </p>
-                  </div>
-                </div>
-              </div>
-            }
-
-          </div>
-
-          {dataPelatihan !== null && data !== null ? <div className="flex w-full items-center mb-2">
-            {usePathname().includes("lemdiklat") &&
-              dataPelatihan?.StatusApproval != "Selesai" && dataPelatihan?.UserPelatihan.length == 0 && (
-                <div className="w-full flex justify-end gap-2">
-                  <div
-                    onClick={(e) => {
-                      if (dataPelatihan?.StatusApproval == "Selesai") {
-                        Toast.fire({
-                          icon: "error",
-                          title: `Ups, pelatihan sudah ditutup dan no sertifikat telah terbit, tidak dapat menambahkan lagi!`,
-                        });
-                      } else {
-                        setIsOpenFormPeserta(!isOpenFormPeserta);
-                      }
-                    }}
-                    className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
-                  >
-                    <FiUploadCloud />
-                    Tambah Peserta Pelatihan
-                  </div>
-                </div>
-              )}
-
-            {
-              usePathname().includes('lemdiklat') && data!.length > 0 && countValid != data!.length && <div className="w-full flex justify-end gap-2">
+      <div className="w-full p-8">
+        {(dataPelatihan !== null && data !== null) && <div className="flex w-full items-center mb-2">
+          {usePathname().includes("lemdiklat") &&
+            dataPelatihan?.StatusApproval != "Selesai" && dataPelatihan?.UserPelatihan.length == 0 && (
+              <div className="w-full flex justify-end gap-2">
                 <div
                   onClick={(e) => {
-                    setOpenFormValidasiDataPesertaPelatihan(true)
+                    if (dataPelatihan?.StatusApproval == "Selesai") {
+                      Toast.fire({
+                        icon: "error",
+                        title: `Ups, pelatihan sudah ditutup dan no sertifikat telah terbit, tidak dapat menambahkan lagi!`,
+                      });
+                    } else {
+                      setIsOpenFormPeserta(!isOpenFormPeserta);
+                    }
                   }}
                   className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
                 >
-                  <TbEditCircle />
-
-                  Validasi Data Peserta
+                  <FiUploadCloud />
+                  Tambah Peserta Pelatihan
                 </div>
               </div>
-            }
+            )}
 
-            {
-              usePathname().includes('lemdiklat') && data!.length > 0 && countValid != data!.length && <div className="w-full flex justify-end gap-2">
-                <div
-                  onClick={(e) => {
-                    setOpenFormValidasiDataPesertaPelatihan(true)
-                  }}
-                  className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
-                >
-                  <TbEditCircle />
+          {
+            usePathname().includes('lemdiklat') && data!.length > 0 && countValid != data!.length && <div className="w-full flex justify-end gap-2">
+              <div
+                onClick={(e) => {
+                  setOpenFormValidasiDataPesertaPelatihan(true)
+                }}
+                className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
+              >
+                <TbEditCircle />
 
-                  Hapus Draft File Sertifikat
-                </div>
-              </div>
-            }
-
-            {
-              usePathname().includes('lemdiklat') && data!.length > 0 && countValid == data!.length && countPassed == 0 && <div className="w-full flex justify-end gap-2">
-                <div
-                  onClick={(e) => {
-                    setOpenFormKelulusanDataPesertaPelatihan(true)
-                  }}
-                  className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
-                >
-                  <TbEditCircle />
-
-                  Kelulusan Peserta
-                </div>
-              </div>
-            }
-
-            {
-              usePathname().includes('lemdiklat') && data!.length > 0 && countPinnedCertificateNumber != data!.length && dataPelatihan!.NoSertifikat != '' && <div className="w-full flex justify-end gap-2">
-                <div
-                  onClick={(e) => {
-                    setOpenFormSematkanNoSertifikat(true)
-                  }}
-                  className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
-                >
-                  <TbEditCircle />
-
-                  Sematkan No Sertifikat Peserta
-                </div>
-              </div>
-            }
-
-            {
-              usePathname().includes('lemdiklat') && countPinnedCertificateDate != data!.length && dataPelatihan!.NoSertifikat != '' && countPinnedCertificateNumber == data!.length && <div className="w-full flex justify-end gap-2">
-                <div
-                  onClick={(e) => {
-                    setOpenFormSematkanTanggalSertifikat(true)
-                  }}
-                  className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
-                >
-                  <TbEditCircle />
-
-                  Sematkan Tanggal Sertifikat Peserta
-                </div>
-              </div>
-            }
-
-            {
-              usePathname().includes('lemdiklat') && countPinnedCertificateSpesimen != data!.length && dataPelatihan!.NoSertifikat != '' && countPinnedCertificateDate == data!.length && <div className="w-full flex justify-end gap-2">
-                <div
-                  onClick={(e) => {
-                    setOpenFormSematkanSpesimenSertifikat(true)
-                  }}
-                  className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
-                >
-                  <PiSignature />
-                  Sematkan Spesimen TTD
-                </div>
-              </div>
-            }
-          </div> : <></>}
-
-
-          <div>
-            <div id="chartOne" className="-ml-5"></div>
-            <TableData
-              isLoading={false}
-              columns={columns}
-              table={table}
-              type={"short"}
-            />
-
-            <div className="flex items-center justify-end space-x-2 py-4 ">
-              <div className="text-muted-foreground flex-1 text-sm">
-                {table.getFilteredSelectedRowModel().rows.length} of{" "}
-                {table.getFilteredRowModel().rows.length} row(s) selected.
-              </div>
-              <div className="space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="font-inter"
-                  onClick={() => table.previousPage()}
-                  disabled={!table.getCanPreviousPage()}
-                >
-                  Previous
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="font-inter"
-                  onClick={() => table.nextPage()}
-                  disabled={!table.getCanNextPage()}
-                >
-                  Next
-                </Button>
+                Validasi Data Peserta
               </div>
             </div>
+          }
 
+          {
+            usePathname().includes('lemdiklat') && data!.length > 0 && countValid != data!.length && <div className="w-full flex justify-end gap-2">
+              <div
+                onClick={(e) => {
+                  setOpenFormValidasiDataPesertaPelatihan(true)
+                }}
+                className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
+              >
+                <TbEditCircle />
 
+                Hapus Draft File Sertifikat
+              </div>
+            </div>
+          }
+
+          {
+            usePathname().includes('lemdiklat') && data!.length > 0 && countValid == data!.length && countPassed == 0 && <div className="w-full flex justify-end gap-2">
+              <div
+                onClick={(e) => {
+                  setOpenFormKelulusanDataPesertaPelatihan(true)
+                }}
+                className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
+              >
+                <TbEditCircle />
+
+                Kelulusan Peserta
+              </div>
+            </div>
+          }
+
+          {
+            usePathname().includes('lemdiklat') && data!.length > 0 && countPinnedCertificateNumber != data!.length && dataPelatihan!.NoSertifikat != '' && <div className="w-full flex justify-end gap-2">
+              <div
+                onClick={(e) => {
+                  setOpenFormSematkanNoSertifikat(true)
+                }}
+                className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
+              >
+                <TbEditCircle />
+
+                Sematkan No Sertifikat Peserta
+              </div>
+            </div>
+          }
+
+          {
+            usePathname().includes('lemdiklat') && countPinnedCertificateDate != data!.length && dataPelatihan!.NoSertifikat != '' && countPinnedCertificateNumber == data!.length && <div className="w-full flex justify-end gap-2">
+              <div
+                onClick={(e) => {
+                  setOpenFormSematkanTanggalSertifikat(true)
+                }}
+                className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
+              >
+                <TbEditCircle />
+
+                Sematkan Tanggal Sertifikat Peserta
+              </div>
+            </div>
+          }
+
+          {
+            usePathname().includes('lemdiklat') && countPinnedCertificateSpesimen != data!.length && dataPelatihan!.NoSertifikat != '' && countPinnedCertificateDate == data!.length && <div className="w-full flex justify-end gap-2">
+              <div
+                onClick={(e) => {
+                  setOpenFormSematkanSpesimenSertifikat(true)
+                }}
+                className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
+              >
+                <PiSignature />
+                Sematkan Spesimen TTD
+              </div>
+            </div>
+          }
+        </div>}
+        <div>
+          <TableData
+            isLoading={false}
+            columns={columns}
+            table={table}
+            type={"short"}
+          />
+
+          <div className="flex items-center justify-end space-x-2 py-4 ">
+            <div className="text-muted-foreground flex-1 text-sm">
+              {table.getFilteredSelectedRowModel().rows.length} of{" "}
+              {table.getFilteredRowModel().rows.length} row(s) selected.
+            </div>
+            <div className="space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="font-inter"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="font-inter"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                Next
+              </Button>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+
     </div>
   );
 };

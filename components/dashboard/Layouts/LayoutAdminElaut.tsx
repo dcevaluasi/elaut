@@ -85,6 +85,8 @@ export default function LayoutAdminElaut({
     Cookies.remove("XSRF091");
     Cookies.remove("XSRF092");
     Cookies.remove("XSRF093");
+    Cookies.remove("XSRF094");
+    Cookies.remove("XSRF095");
     Cookies.remove("SATKER_BPPP");
     Cookies.remove("IDLemdik");
     Cookies.remove("Eselon");
