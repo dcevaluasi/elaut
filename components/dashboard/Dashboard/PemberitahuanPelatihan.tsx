@@ -5,11 +5,9 @@ import TableDataVerifikasiPelaksanaan from "../Pelatihan/TableDataVerifikasiPela
 
 const PemberitahuanPelatihan: React.FC = () => {
   return (
-    <>
-      <div className="">
-        <TableDataVerifikasiPelaksanaan />
-      </div>
-    </>
+    <section className="mt-14">
+      <TableDataVerifikasiPelaksanaan />
+    </section>
   );
 };
 
