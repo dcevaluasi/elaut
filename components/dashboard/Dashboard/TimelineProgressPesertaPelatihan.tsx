@@ -1005,10 +1005,17 @@ export const TimelineProgressPesertaPelatihan = ({
                   <h3 className="text-lg font-semibold">
                     Sertifikat Pelatihan {pelatihan!.NamaPelatihan}
                   </h3>
-                  <time className="text-sm text-grayUsual flex items-start gap-1">
-                    <PiQuestionFill className="mt-[0.134rem]" />
-                    Bidang {pelatihan!.BidangPelatihan}
-                  </time>
+                  {
+                    pelatihan?.StatusPenerbitan == 'Done' ? <time className="text-sm text-green-500 flex items-start gap-1">
+                      <RiVerifiedBadgeFill className="mt-[0.134rem]" />
+                      Sertifikat telah terbit
+                    </time> : <time className="text-sm text-grayUsual flex items-start gap-1">
+                      <PiQuestionFill className="mt-[0.134rem]" />
+                      Sertifikat belum terbit
+                    </time>
+                  }
+
+
                   <span className="text-xs text-grayUsual leading-none">
                     {pelatihan!.StatusPenerbitan != "Done"
                       ? "Harap mengikuti rangkaian pelaksanaan pelatihan untuk mendapatkan sertifikat."
