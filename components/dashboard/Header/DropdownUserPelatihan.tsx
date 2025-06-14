@@ -125,7 +125,7 @@ const DropdownUserPelatihan = ({ top }: { top: boolean }) => {
       >
         <span className="h-14 w-14 rounded-full">
           <Image
-            src={"/dummies/profile.jpg"}
+            src={userDetail?.Foto! != 'https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/' ? userDetail?.Foto! : "/dummies/profile.jpg"}
             alt={"profile picture"}
             width={0}
             height={0}
