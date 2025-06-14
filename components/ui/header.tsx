@@ -330,11 +330,6 @@ export default function Header() {
                   </NavLink>
                   s
                 </NavDropDown>
-                {/* <NavLinkDefault
-                  href="/lembaga/dpkakp"
-                  name="Dewan Penguji dan Komite Approval"
-                  top={top}
-                /> */}
                 <NavLinkDefault href="/layanan/publikasi" name="Publikasi" top={top} />
                 <NavLinkDefault
                   href="/layanan/cek-sertifikat"

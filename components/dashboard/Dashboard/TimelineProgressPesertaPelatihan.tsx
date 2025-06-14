@@ -997,9 +997,7 @@ export const TimelineProgressPesertaPelatihan = ({
                 )}
 
                 <div
-                  className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${pelatihan!.StatusApproval == "Selesai" &&
-                    userDetail.PostTest != 0 &&
-                    userDetail.PreTest != 0
+                  className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${pelatihan!.StatusApproval == "Selesai"
                     ? "before:bg-grayUsual"
                     : pelatihan?.StatusPenerbitan == "Done"
                       ? "before:bg-green-500"

@@ -25,14 +25,14 @@ export default function Hero() {
       description:
         "Pelatihan perikanan adalah pelatihan yang meliputi kegiata penangkapan ikan, budidaya perikanan, serta inovasi sumber daya laut berkelanjutan.",
     },
-    {
-      id: "002",
-      name: "Awak Kapal Perikanan",
-      icon: "/icons/icawak.png",
-      slug: "akp",
-      description:
-        "Pendidikan dan Pelatihan Awak Kapal Perikanan adalah pendidikan dan/atau pelatihan untuk mencapai tingkat keahlian dan/atau keterampilan tertentu sesuai dengan jenjang, kompetensi, dan jabatan untuk awak Kapal Perikanan.",
-    },
+    // {
+    //   id: "002",
+    //   name: "Awak Kapal Perikanan",
+    //   icon: "/icons/icawak.png",
+    //   slug: "akp",
+    //   description:
+    //     "Pendidikan dan Pelatihan Awak Kapal Perikanan adalah pendidikan dan/atau pelatihan untuk mencapai tingkat keahlian dan/atau keterampilan tertentu sesuai dengan jenjang, kompetensi, dan jabatan untuk awak Kapal Perikanan.",
+    // },
     {
       id: "003",
       name: "Kelautan",
