@@ -997,11 +997,9 @@ export const TimelineProgressPesertaPelatihan = ({
                 )}
 
                 <div
-                  className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${pelatihan!.StatusApproval == "Selesai"
-                    ? "before:bg-grayUsual"
-                    : pelatihan?.StatusPenerbitan == "Done"
-                      ? "before:bg-green-500"
-                      : "before:bg-grayUsual"
+                  className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${pelatihan?.StatusPenerbitan == "Done"
+                    ? "before:bg-green-500"
+                    : "before:bg-grayUsual"
                     } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer `}
                 >
                   <h3 className="text-lg font-semibold">
@@ -1012,15 +1010,14 @@ export const TimelineProgressPesertaPelatihan = ({
                     Bidang {pelatihan!.BidangPelatihan}
                   </time>
                   <span className="text-xs text-grayUsual leading-none">
-                    {pelatihan!.StatusApproval != "Selesai" ||
-                      (userDetail.PostTest == 0 && userDetail.PreTest == 0)
+                    {pelatihan!.StatusPenerbitan != "Done"
                       ? "Harap mengikuti rangkaian pelaksanaan pelatihan untuk mendapatkan sertifikat."
-                      : userDetail?.PostTest >= 65 &&
-                        userDetail?.FileSertifikat.includes('Signed')
+                      :
+                      userDetail?.FileSertifikat.includes('signed')
                         ? "Selamat, anda telah mengikuti dan menyelesaikan rangkaian pelatihan. Berikut sertifikat yang dapat kamu akses"
                         : "Oops. Sertifikat kamu masih dalam proses penerbitan, harap ditunggu ya paling lambat 3x24 jam. Pantau terus dashboard-mu ya sobat E-LAUT!"}
                   </span>
-                  {userDetail!.FileSertifikat.includes('Signed') && (
+                  {userDetail!.FileSertifikat.includes('signed') && (
                     <Button
                       type="button"
                       variant="outline"
