@@ -28,6 +28,7 @@ import Logo from "@/components/ui/logo";
 import { Button } from "@/components/ui/button";
 import { generateTanggalPelatihan } from "@/utils/text";
 import { IoReloadCircle } from "react-icons/io5";
+import { isDatePassedOrToday } from "@/lib/times";
 
 export const TimelineProgressPesertaPelatihan = ({
   userDetail,
@@ -221,7 +222,7 @@ export const TimelineProgressPesertaPelatihan = ({
                   className={`text-sm font-medium text-grayUsual ${userDetail?.Keterangan! == "Tidak Valid"
                     ? "text-rose-500"
                     : userDetail?.Keterangan! == "Valid"
-                      ? "text-green-500"
+                      ? "text-green-400"
                       : "text-grayUsual"
                     }`}
                 >
@@ -316,7 +317,7 @@ export const TimelineProgressPesertaPelatihan = ({
                         pelatihan!.StatusApproval != "Selesai"
                         ? "text-grayUsual"
                         : userDetail?.PreTest >= 65
-                          ? "text-green-500"
+                          ? "text-green-400"
                           : "text-rose-500"
                         }`}
                     >
@@ -547,15 +548,21 @@ export const TimelineProgressPesertaPelatihan = ({
                   <h3 className="text-lg font-semibold">
                     Pelaksanaan Pelatihan {pelatihan!.NamaPelatihan}
                   </h3>
-                  <time className="text-sm text-grayUsual flex items-start gap-1">
-                    <PiQuestionFill className="mt-[0.134rem]" />
-                    {generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan)}{" "}
-                    -{" "}
-                    {generateTanggalPelatihan(
-                      pelatihan!.TanggalBerakhirPelatihan
-                    )}
-                  </time>
-                  {pelatihan!.StatusApproval == "Selesai" ? (
+                  {
+                    isDatePassedOrToday(pelatihan!.TanggalBerakhirPelatihan) ? <time className="text-sm text-green-400 flex items-start gap-1">
+                      <RiVerifiedBadgeFill className="mt-[0.134rem]" />
+                      Pelatihan telah selesai
+                    </time> : <time className="text-sm text-grayUsual flex items-start gap-1">
+                      <PiQuestionFill className="mt-[0.134rem]" />
+                      {generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan)}{" "}
+                      -{" "}
+                      {generateTanggalPelatihan(
+                        pelatihan!.TanggalBerakhirPelatihan
+                      )}
+                    </time>
+                  }
+
+                  {isDatePassedOrToday(pelatihan!.TanggalBerakhirPelatihan) ? (
                     <span className="text-xs text-grayUsual leading-none">
                       Pelatihan{" "}
                       <span className="font-bold">
@@ -588,7 +595,7 @@ export const TimelineProgressPesertaPelatihan = ({
                       userDetail?.PostTest == 0
                       ? "before:bg-grayUsual"
                       : userDetail?.PostTest >= 65
-                        ? "before:bg-green-500"
+                        ? "before:bg-green-400"
                         : "before:bg-rose-500"
                       } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer `}
                   >
@@ -600,7 +607,7 @@ export const TimelineProgressPesertaPelatihan = ({
                         userDetail?.PostTest == 0
                         ? "text-grayUsual"
                         : userDetail?.PostTest >= 65
-                          ? "text-green-500"
+                          ? "text-green-400"
                           : "text-rose-500"
                         }`}
                     >
@@ -998,7 +1005,7 @@ export const TimelineProgressPesertaPelatihan = ({
 
                 <div
                   className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${pelatihan?.StatusPenerbitan == "Done"
-                    ? "before:bg-green-500"
+                    ? "before:bg-green-400"
                     : "before:bg-grayUsual"
                     } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer `}
                 >
@@ -1006,7 +1013,7 @@ export const TimelineProgressPesertaPelatihan = ({
                     Sertifikat Pelatihan {pelatihan!.NamaPelatihan}
                   </h3>
                   {
-                    pelatihan?.StatusPenerbitan == 'Done' ? <time className="text-sm text-green-500 flex items-start gap-1">
+                    pelatihan?.StatusPenerbitan == 'Done' ? <time className="text-sm text-green-400 flex items-start gap-1">
                       <RiVerifiedBadgeFill className="mt-[0.134rem]" />
                       Sertifikat telah terbit
                     </time> : <time className="text-sm text-grayUsual flex items-start gap-1">
