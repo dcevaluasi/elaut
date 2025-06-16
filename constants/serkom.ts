@@ -10,15 +10,22 @@ export type CertificateDescription = {
 //     'In the Hazard Analysis and Critical Control Points (HACCP) Training, which was organized in collaboration between the Center for Marine and Fisheries Training - Marine and Fisheries Human Resource Development and Extension Agency, and the Center for Post-Harvest Quality Assurance - Marine and Fisheries Products Quality Control and Supervision Agency',
 // },
 
+// HACCP: {
+//   desc_ind:
+//     'Dalam Pelatihan Hazard Analysis and Critical Control Points (HACCP) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDM KP) melalui Badan Layanan Umum (BLU) Balai Pelatihan dan Penyuluhan Perikanan (BPPP) Tegal dengan Pusat Pengendalian Mutu – Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP) dengan Jejaring Laboratorium Pengujian Penyakit dan Mutu Hasil Perikanan (JLPPMHP) Jawa Timur',
+//   desc_eng:
+//     'In the Hazard Analysis and Critical Control Points (HACCP) Training which was held in collaboration with the Marine and Fisheries Training Center – Marine and Fisheries Extension and Human Resources and Development Agency through the Public Service Agency Fisheries Training and Extension Center Tegal with the Quality Control Center – Quality Ontrol and Inspection Agency with the East Java Disease and Fishery Product Quality Testing Laboratory Network',
+// },
+
 export const DESC_CERTIFICATE_COMPETENCE_FISHERIES: Record<
   string,
   CertificateDescription
 > = {
   HACCP: {
     desc_ind:
-      'Dalam Pelatihan Hazard Analysis and Critical Control Points (HACCP) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDM KP) melalui Badan Layanan Umum (BLU) Balai Pelatihan dan Penyuluhan Perikanan (BPPP) Tegal dengan Pusat Pengendalian Mutu – Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP) dengan Jejaring Laboratorium Pengujian Penyakit dan Mutu Hasil Perikanan (JLPPMHP) Jawa Timur',
+      'Dalam Pelatihan Hazard Analysis and Critical Control Points (HACCP) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan SDM Kelautan dan Perikanan (BPPSDMKP) dengan Pusat Mutu Pascapanen - Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP)',
     desc_eng:
-      'In the Hazard Analysis and Critical Control Points (HACCP) Training which was held in collaboration with the Marine and Fisheries Training Center – Marine and Fisheries Extension and Human Resources and Development Agency through the Public Service Agency Fisheries Training and Extension Center Tegal with the Quality Control Center – Quality Ontrol and Inspection Agency with the East Java Disease and Fishery Product Quality Testing Laboratory Network',
+      'In the Hazard Analysis and Critical Control Points (HACCP) Training, which was organized in collaboration between the Center for Marine and Fisheries Training - Marine and Fisheries Human Resource Development and Extension Agency, and the Center for Post-Harvest Quality Assurance - Marine and Fisheries Products Quality Control and Supervision Agency',
   },
   CBIB: {
     desc_ind:
