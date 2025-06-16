@@ -21,8 +21,6 @@ const SummaryELAUT: React.FC = () => {
     null
   );
   const [data, setData] = useState<PelatihanMasyarakat[]>([]);
-  const [selectedBalaiPelatihan, setSelectedBalaiPelatihan] =
-    useState<string>("All");
 
   const fetchInformationLemdiklat = async () => {
     try {

@@ -98,6 +98,7 @@ import addData from "@/firebase/firestore/addData";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import firebaseApp from "@/firebase/config";
 import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
+import { isSigned, isUnsigned } from "@/lib/sign";
 
 const TableDataPesertaPelatihan = () => {
   const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
@@ -106,7 +107,6 @@ const TableDataPesertaPelatihan = () => {
   const id = decryptValue(extractLastSegment(pathname));
   const paths = pathname.split("/");
   const [noSertifikatTerbitkan, setNoSertifikatTerbitkan] = React.useState("");
-  const typeRole = Cookies.get("XSRF093");
 
   const [dataPelatihan, setDataPelatihan] =
     React.useState<PelatihanMasyarakat | null>(null);
@@ -561,64 +561,30 @@ const TableDataPesertaPelatihan = () => {
         return (
           <Button
             variant="ghost"
-            className={`${Cookies.get('XSRF095') === 'true' ? 'hidden' : 'flex'} items-center justify-center leading-[105%] p-0 w-full text-gray-900 font-semibold`}
+            className={`flex items-center justify-center leading-[105%] p-0 w-full text-gray-900 font-semibold`}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            {!isOperatorBalaiPelatihan ? (
-              <span>Detail Peserta</span>
-            ) : (
-              <span>
-                Validasi <br /> Data & Berkas
-              </span>
-            )}
+
+            <span>Detail Peserta</span>
+
 
             <TbDatabaseEdit className="ml-1 h-4 w-4" />
           </Button>
         );
       },
       cell: ({ row }) => (
-        <div className={` ${Cookies.get('XSRF095') === 'true' ? 'hidden' : 'flex'} items-center justify-center w-full gap-1`}>
-          {isOperatorBalaiPelatihan ? (
-            row.original.Keterangan == "Valid" ? (
-              <Link
-                href={`/admin/${usePathname().includes("lemdiklat") ? "lemdiklat" : "pusat"
-                  }/pelatihan/${paths[paths.length - 3]}/peserta-pelatihan/${row.original.IdPelatihan
-                  }/${encryptValue(row.original.IdUserPelatihan)}/${encryptValue(
-                    row.original.IdUsers
-                  )}`}
-                className=" border border-green-500  text-white shadow-sm hover:bg-green-500 bg-green-500 hover:text-white h-9 px-4 py-2 mx-0 rounded-md  flex text-base items-center gap-2"
-              >
-                <RiVerifiedBadgeFill className="h-4 w-4 " />{" "}
-                <span className="text-sm">Validasi</span>
-              </Link>
-            ) : (
-              <Link
-                href={`/admin/${usePathname().includes("lemdiklat") ? "lemdiklat" : "pusat"
-                  }/pelatihan/${paths[paths.length - 3]}/peserta-pelatihan/${row.original.IdPelatihan
-                  }/${encryptValue(row.original.IdUserPelatihan)}/${encryptValue(
-                    row.original.IdUsers
-                  )}`}
-                className=" border border-rose-500  text-white   shadow-sm hover:bg-rose-500 bg-rose-500 hover:text-white h-9 px-4 py-2 mx-0 rounded-md  flex text-base items-center gap-2"
-              >
-                <RiVerifiedBadgeFill className="h-4 w-4 " />{" "}
-                <span className="text-sm">Tidak Valid</span>
-              </Link>
-            )
-          ) : (
-            <>
-              <Link
-                href={`/admin/${usePathname().includes("lemdiklat") ? "lemdiklat" : "pusat"
-                  }/pelatihan/${paths[paths.length - 3]}/peserta-pelatihan/${row.original.IdPelatihan
-                  }/${encryptValue(row.original.IdUserPelatihan)}/${encryptValue(
-                    row.original.IdUsers
-                  )}`}
-                className=" border border-neutral-800  text-white  shadow-sm hover:bg-neutral-800 bg-neutral-800 hover:text-white h-9 px-4 py-2 mx-0 rounded-md flex text-sm items-center gap-2"
-              >
-                <LucideInfo className="h-4 w-4 " />{" "}
-                <span className="text-sm">Lihat Detail Peserta</span>
-              </Link>
-            </>
-          )}
+        <div className={`flex items-center justify-center w-full gap-1`}>
+          <Link
+            href={`/admin/${usePathname().includes("lemdiklat") ? "lemdiklat" : "pusat"
+              }/pelatihan/${paths[paths.length - 3]}/peserta-pelatihan/${row.original.IdPelatihan
+              }/${encryptValue(row.original.IdUserPelatihan)}/${encryptValue(
+                row.original.IdUsers
+              )}`}
+            className=" border border-neutral-800  text-white  shadow-sm hover:bg-neutral-800 bg-neutral-800 hover:text-white h-9 px-4 py-2 mx-0 rounded-md flex text-sm items-center gap-2"
+          >
+            <LucideInfo className="h-4 w-4 " />{" "}
+            <span className="text-sm">Lihat Detail Peserta</span>
+          </Link>
         </div>
       ),
     },
@@ -828,7 +794,7 @@ const TableDataPesertaPelatihan = () => {
         return (
           <Button
             variant="ghost"
-            className={`text-black font-semibold w-full p-0 flex justify-start items-centee`}
+            className={`text-black font-semibold w-full p-0 justify-start items-center ${dataPelatihan!.StatusPenerbitan == 'Done' ? 'hidden' : 'flex'}`}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             <p className="leading-[105%]">LULUS/TIDAK LULUS</p>
@@ -838,7 +804,7 @@ const TableDataPesertaPelatihan = () => {
         );
       },
       cell: ({ row }) => (
-        <div className={`${"-ml-7"} text-left capitalize w-full ${row.original.IsActice === '' ? 'hidden' : 'flex'} items-center justify-center  flex`}>
+        <div className={`${"-ml-7"} text-left capitalize w-full ${row.original.IsActice === '' ? 'hidden' : 'flex'} items-center justify-center ${dataPelatihan!.StatusPenerbitan == 'Done' ? 'hidden' : 'flex'}`}>
           <div className='text-black font-semibold w-full p-0 justify-center flex gap-1'><Checkbox id="isActice" onCheckedChange={() => {
             handleLulusDataPeserta(row.original)
           }} checked={row.original.IsActice != 'TIDAK LULUS' ? true : false} /><p> {row.original.IsActice != 'TIDAK LULUS' ? 'LULUS' : 'TIDAK LULUS'}</p></div>
