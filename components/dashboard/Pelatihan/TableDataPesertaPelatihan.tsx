@@ -794,7 +794,7 @@ const TableDataPesertaPelatihan = () => {
         return (
           <Button
             variant="ghost"
-            className={`text-black font-semibold w-full p-0 justify-start items-center ${dataPelatihan!.StatusPenerbitan == 'Done' ? 'hidden' : 'flex'}`}
+            className={`text-black font-semibold w-full p-0 justify-start items-center flex`}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             <p className="leading-[105%]">LULUS/TIDAK LULUS</p>
@@ -804,8 +804,8 @@ const TableDataPesertaPelatihan = () => {
         );
       },
       cell: ({ row }) => (
-        <div className={`${"-ml-7"} text-left capitalize w-full ${row.original.IsActice === '' ? 'hidden' : 'flex'} items-center justify-center ${dataPelatihan!.StatusPenerbitan == 'Done' ? 'hidden' : 'flex'}`}>
-          <div className='text-black font-semibold w-full p-0 justify-center flex gap-1'><Checkbox id="isActice" onCheckedChange={() => {
+        <div className={`${"-ml-7"} text-left capitalize w-full ${row.original.IsActice === '' ? 'hidden' : 'flex'} items-center justify-center `}>
+          <div className='text-black font-semibold w-full p-0 justify-center flex gap-1'><Checkbox disabled={row.original.StatusPenandatangan == 'Done'} id="isActice" onCheckedChange={() => {
             handleLulusDataPeserta(row.original)
           }} checked={row.original.IsActice != 'TIDAK LULUS' ? true : false} /><p> {row.original.IsActice != 'TIDAK LULUS' ? 'LULUS' : 'TIDAK LULUS'}</p></div>
         </div>
