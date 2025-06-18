@@ -155,7 +155,7 @@ const TableDataPelatihanMasyarakatByPendidikan = ({ dataUserPelatihan }: TableDa
               {pendidikanList.map((pendidikan: any, pIndex: any) => (
                 <TableCell key={pIndex}>{row[pendidikan] || 0}</TableCell>
               ))}
-
+              <TableCell>{totalRow.grandTotal}</TableCell>
             </TableRow>
           ))}
           <TableRow className="font-semibold bg-gray-100">
