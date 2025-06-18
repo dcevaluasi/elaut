@@ -13,68 +13,114 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PelatihanMasyarakat } from "@/types/product";
 import { UserPelatihan } from "@/types/user";
+import { getCurrentQuarter, getCurrentYear, getQuarterForFiltering, parseIndonesianDate } from "@/utils/time";
 
 type TableDataPelatihanMasyarakatProps = {
   dataUserPelatihan: UserPelatihan[];
 };
 
-const getTriwulan = (dateString: string) => {
-  const month = new Date(dateString).getMonth() + 1;
-  if (month >= 1 && month <= 3) return "Triwulan I";
-  if (month >= 1 && month <= 6) return "Triwulan II";
-  if (month >= 1 && month <= 9) return "Triwulan III";
-  if (month >= 1 && month <= 12) return "Triwulan IV";
-  return "Unknown";
-};
-
 const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> = ({ dataUserPelatihan }) => {
-  const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
+  const [year, setYear] = React.useState(getCurrentYear);
+  const yearOptions = useMemo(() => {
+    const years = new Set<string>();
+    dataUserPelatihan.forEach((item) => {
+      const date = parseIndonesianDate(item.TanggalSertifikat!);
+      if (date) {
+        years.add(date.getFullYear().toString());
+      }
+    });
+    return Array.from(years).sort((a, b) => parseInt(b) - parseInt(a));
+  }, [dataUserPelatihan]);
 
+  const [quarter, setQuarter] = React.useState(() => getCurrentQuarter());
   const filteredData = useMemo(() => {
-    return dataUserPelatihan.filter(({ CreteAt }) =>
-      new Date(CreteAt!).getFullYear().toString() === selectedYear
-    );
-  }, [dataUserPelatihan, selectedYear]);
+    return dataUserPelatihan.filter((item) => {
+      const date = parseIndonesianDate(item.TanggalSertifikat!);
+      if (!date) return false;
+
+      const itemYear = date.getFullYear().toString();
+      const itemQuarter = getQuarterForFiltering(item.TanggalSertifikat!);
+
+      return itemYear === year && itemQuarter === quarter;
+    });
+  }, [dataUserPelatihan, year, quarter]);
 
   const groupedData = useMemo(() => {
     const map = new Map<string, { total: number; triwulan: Record<string, number> }>();
 
-    filteredData.filter((item) => item.FileSertifikat && item.FileSertifikat.trim() !== "").forEach(({ PenyelenggaraPelatihan, CreteAt }) => {
-      const triwulan = getTriwulan(CreteAt!);
+    filteredData.filter((item) => item.FileSertifikat && item.FileSertifikat.includes('signed')).forEach(({ PenyelenggaraPelatihan, TanggalSertifikat }) => {
+      const triwulan = getQuarterForFiltering(TanggalSertifikat!);
       if (!map.has(PenyelenggaraPelatihan!)) {
         map.set(PenyelenggaraPelatihan!, {
           total: 0,
           triwulan: {
-            "Triwulan I": 0,
-            "Triwulan II": 0,
-            "Triwulan III": 0,
-            "Triwulan IV": 0,
+            "TW I": 0,
+            "TW II": 0,
+            "TW III": 0,
+            "TW IV": 0,
           },
         });
       }
+
       const entry = map.get(PenyelenggaraPelatihan!)!;
-      entry.total += 1;
+      // Fix to avoid NaN:
+      if (entry.triwulan[triwulan] == null) {
+        entry.triwulan[triwulan] = 0;
+      }
+
       entry.triwulan[triwulan] += 1;
+      entry.total += 1;
     });
+
 
     return Array.from(map.entries()).map(([name, data]) => ({ name, ...data }));
   }, [filteredData]);
 
-  const exportToExcel = () => {
-    const worksheet = utils.json_to_sheet(
-      groupedData.map((item, index) => ({
-        No: index + 1,
-        "Nama Balai": item.name,
-        "Triwulan I": item.triwulan["Triwulan I"],
-        "Triwulan II": item.triwulan["Triwulan II"],
-        "Triwulan III": item.triwulan["Triwulan III"],
-        "Triwulan IV": item.triwulan["Triwulan IV"],
-        Total: item.total,
-      }))
+  const totalRow = useMemo(() => {
+    return groupedData.reduce(
+      (acc, item) => {
+        acc["TW I"] += item.triwulan["TW I"];
+        acc["TW II"] += item.triwulan["TW II"];
+        acc["TW III"] += item.triwulan["TW III"];
+        acc["TW IV"] += item.triwulan["TW IV"];
+        acc.total += item.total;
+        return acc;
+      },
+      {
+        "TW I": 0,
+        "TW II": 0,
+        "TW III": 0,
+        "TW IV": 0,
+        total: 0,
+      }
     );
+  }, [groupedData]);
+
+  const exportToExcel = () => {
+    const dataToExport = groupedData.map((item, index) => ({
+      No: index + 1,
+      "Nama Balai": item.name,
+      "TW I": item.triwulan["TW I"],
+      "TW II": item.triwulan["TW II"],
+      "TW III": item.triwulan["TW III"],
+      "TW IV": item.triwulan["TW IV"],
+      Total: item.total,
+    }));
+
+    dataToExport.push({
+      No: 0,
+      "Nama Balai": 'Total',
+      "TW I": totalRow["TW I"],
+      "TW II": totalRow["TW II"],
+      "TW III": totalRow["TW III"],
+      "TW IV": totalRow["TW IV"],
+      Total: totalRow.total,
+    });
+
+    const worksheet = utils.json_to_sheet(dataToExport);
     const workbook = utils.book_new();
     utils.book_append_sheet(workbook, worksheet, "Data Pelatihan");
-    writeFile(workbook, `DataPelatihan_${selectedYear}.xlsx`);
+    writeFile(workbook, `(BY SATKER BY TW) CAPAIAN PELATIHAN ${quarter} TA ${year}.xlsx`);
   };
 
   return (
@@ -82,21 +128,19 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
       <div className="flex justify-between items-center p-4">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2 font-medium leading-none">
-            Total Masyarakat Dilatih per Balai Pelatihan <TrendingUp className="h-4 w-4" />
+            Total Masyarakat Dilatih per Balai Pelatihan TA {year}  <TrendingUp className="h-4 w-4" />
           </div>
           <div className="leading-none text-muted-foreground">Showing total masyarakat dilatih</div>
         </div>
 
         <div className="flex gap-4">
-          <Select onValueChange={setSelectedYear} defaultValue={selectedYear}>
+          <Select onValueChange={setYear} defaultValue={year}>
             <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="Pilih Tahun" />
             </SelectTrigger>
             <SelectContent>
-              {Array.from(new Set(dataUserPelatihan.map(({ CreteAt }) =>
-                new Date(CreteAt!).getFullYear().toString()
-              ))).sort().map(year => (
-                <SelectItem key={year} value={year}>{year}</SelectItem>
+              {yearOptions.map((y) => (
+                <SelectItem key={y} value={y}>{y}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -125,13 +169,22 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
               <TableRow key={index}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{item.name}</TableCell>
-                <TableCell>{item.triwulan["Triwulan I"]}</TableCell>
-                <TableCell>{item.triwulan["Triwulan II"]}</TableCell>
-                <TableCell>{item.triwulan["Triwulan III"]}</TableCell>
-                <TableCell>{item.triwulan["Triwulan IV"]}</TableCell>
+                <TableCell>{item.triwulan["TW I"]}</TableCell>
+                <TableCell>{item.triwulan["TW II"]}</TableCell>
+                <TableCell>{item.triwulan["TW III"]}</TableCell>
+                <TableCell>{item.triwulan["TW IV"]}</TableCell>
                 <TableCell>{item.total}</TableCell>
               </TableRow>
             ))}
+            <TableRow className="font-semibold bg-gray-100">
+              <TableCell colSpan={2}>Total</TableCell>
+              <TableCell>{totalRow["TW I"]}</TableCell>
+              <TableCell>{totalRow["TW II"]}</TableCell>
+              <TableCell>{totalRow["TW III"]}</TableCell>
+              <TableCell>{totalRow["TW IV"]}</TableCell>
+              <TableCell>{totalRow.total}</TableCell>
+            </TableRow>
+
           </TableBody>
         </Table>
       </div>

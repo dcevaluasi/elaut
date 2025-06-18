@@ -110,6 +110,29 @@ const TableDataPelatihanMasyarakatByProgramPrioritas = ({
     }));
   }, [filteredData]);
 
+  const totalRow = useMemo(() => {
+    return groupedData.reduce(
+      (acc, item) => {
+        acc.bppp1 += item.bppp1;
+        acc.bppp2 += item.bppp2;
+        acc.bppp3 += item.bppp3;
+        acc.bppp4 += item.bppp4;
+        acc.bppp5 += item.bppp5;
+        acc.total += item.total;
+        return acc;
+      },
+      {
+        bppp1: 0,
+        bppp2: 0,
+        bppp3: 0,
+        bppp4: 0,
+        bppp5: 0,
+        total: 0,
+      }
+    );
+  }, [groupedData]);
+
+
   const exportToExcel = () => {
     const worksheet = utils.json_to_sheet(
       groupedData.map((item, index) => ({
@@ -198,6 +221,16 @@ const TableDataPelatihanMasyarakatByProgramPrioritas = ({
                 <TableCell>{item.total}</TableCell>
               </TableRow>
             ))}
+            <TableRow className="font-semibold bg-gray-100">
+              <TableCell colSpan={2}>Total</TableCell>
+              <TableCell>{totalRow.bppp1}</TableCell>
+              <TableCell>{totalRow.bppp2}</TableCell>
+              <TableCell>{totalRow.bppp3}</TableCell>
+              <TableCell>{totalRow.bppp4}</TableCell>
+              <TableCell>{totalRow.bppp5}</TableCell>
+              <TableCell>{totalRow.total}</TableCell>
+            </TableRow>
+
           </TableBody>
         </Table>
       </div>

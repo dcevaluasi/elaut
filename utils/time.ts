@@ -178,3 +178,52 @@ export const getDateInIndonesianFormat = (dateString: string): string => {
 
   return `${day} ${month} ${year}`
 }
+
+export const parseIndonesianDate = (dateStr: string): Date | null => {
+  const months: Record<string, number> = {
+    januari: 0,
+    februari: 1,
+    maret: 2,
+    april: 3,
+    mei: 4,
+    juni: 5,
+    juli: 6,
+    agustus: 7,
+    september: 8,
+    oktober: 9,
+    november: 10,
+    desember: 11,
+  }
+
+  const parts = dateStr.toLowerCase().split(' ')
+  if (parts.length !== 3) return null
+
+  const [dayStr, monthStr, yearStr] = parts
+  const day = parseInt(dayStr)
+  const month = months[monthStr]
+  const year = parseInt(yearStr)
+
+  if (isNaN(day) || isNaN(month) || isNaN(year)) return null
+
+  return new Date(year, month, day)
+}
+
+export const getCurrentYear = new Date().getFullYear().toString()
+
+export const getCurrentQuarter = () => {
+  const month = new Date().getMonth() + 1
+  if (month >= 1 && month <= 3) return 'TW I'
+  if (month >= 4 && month <= 6) return 'TW II'
+  if (month >= 7 && month <= 9) return 'TW III'
+  if (month >= 10 && month <= 12) return 'TW IV'
+  return 'Unknown'
+}
+
+export const getQuarterForFiltering = (dateString: string) => {
+  const month = new Date(dateString).getMonth() + 1
+  if (month >= 1 && month <= 3) return 'TW I'
+  if (month >= 1 && month <= 6) return 'TW II'
+  if (month >= 1 && month <= 9) return 'TW III'
+  if (month >= 1 && month <= 12) return 'TW IV'
+  return 'Unknown'
+}

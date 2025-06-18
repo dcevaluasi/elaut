@@ -1,36 +1,40 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UserPelatihan } from "@/types/user";
 import { Button } from "@/components/ui/button";
 import { utils, writeFile } from "xlsx";
+import { getCurrentQuarter, getCurrentYear, getQuarterForFiltering, parseIndonesianDate } from "@/utils/time";
 
 type TableDataProps = {
   dataUserPelatihan: UserPelatihan[];
 };
 
 const TableDataPelatihanMasyarakatByPendidikan = ({ dataUserPelatihan }: TableDataProps) => {
-  const [year, setYear] = useState("2025");
-  const [quarter, setQuarter] = useState("TW I");
+  const [year, setYear] = React.useState(getCurrentYear);
+  const yearOptions = useMemo(() => {
+    const years = new Set<string>();
+    dataUserPelatihan.forEach((item) => {
+      const date = parseIndonesianDate(item.TanggalSertifikat!);
+      if (date) {
+        years.add(date.getFullYear().toString());
+      }
+    });
+    return Array.from(years).sort((a, b) => parseInt(b) - parseInt(a));
+  }, [dataUserPelatihan]);
 
-  const getTriwulan = (dateString: string) => {
-    const month = new Date(dateString).getMonth() + 1;
-    if (month >= 1 && month <= 3) return "TW I";
-    if (month >= 1 && month <= 6) return "TW II";
-    if (month >= 1 && month <= 9) return "TW III";
-    if (month >= 1 && month <= 12) return "TW IV";
-    return "Unknown";
-  };
-
+  const [quarter, setQuarter] = React.useState(() => getCurrentQuarter());
   const filteredData = useMemo(() => {
     return dataUserPelatihan.filter((item) => {
-      const itemYear = new Date(item.CreteAt!)
-        .getFullYear()
-        .toString();
-      const itemQuarter = getTriwulan(item.CreteAt!);
+      const date = parseIndonesianDate(item.TanggalSertifikat!);
+      if (!date) return false;
+
+      const itemYear = date.getFullYear().toString();
+      const itemQuarter = getQuarterForFiltering(item.TanggalSertifikat!);
+
       return itemYear === year && itemQuarter === quarter;
     });
-  }, [dataUserPelatihan, year, quarter])
+  }, [dataUserPelatihan, year, quarter]);
 
   // Ambil daftar unik PenyelenggaraPelatihan sebagai baris
   const penyelenggaraList = useMemo(() => {
@@ -42,54 +46,82 @@ const TableDataPelatihanMasyarakatByPendidikan = ({ dataUserPelatihan }: TableDa
     return Array.from(new Set(dataUserPelatihan.map((item) => item.PendidikanTerakhir)));
   }, [dataUserPelatihan]);
 
-  // Buat matrix data berdasarkan penyelenggara (baris) dan pendidikan (kolom)
   const groupedData = useMemo(() => {
     const map = new Map<string, Record<string, number>>();
 
     penyelenggaraList.forEach((penyelenggara) => {
-      map.set(penyelenggara, Object.fromEntries(pendidikanList.map((p) => [p, 0])));
+      map.set(
+        penyelenggara,
+        Object.fromEntries(pendidikanList.map((p) => [p, 0]))
+      );
     });
 
-    filteredData.filter((item) => item.FileSertifikat && item.FileSertifikat.trim() !== "").forEach((item) => {
-      const penyelenggara = item.PenyelenggaraPelatihan!;
-      const pendidikan = item.PendidikanTerakhir!;
-      if (map.has(penyelenggara)) {
-        map.get(penyelenggara)![pendidikan] = (map.get(penyelenggara)![pendidikan] || 0) + 1;
-      }
-    });
+    filteredData
+      .filter((item) => item.FileSertifikat && item.FileSertifikat.includes("signed"))
+      .forEach((item) => {
+        const penyelenggara = item.PenyelenggaraPelatihan!;
+        const pendidikan = item.PendidikanTerakhir!;
+        if (map.has(penyelenggara)) {
+          const row = map.get(penyelenggara)!;
+          row[pendidikan] = (row[pendidikan] || 0) + 1;
+        }
+      });
 
-    return Array.from(map.entries()).map(([penyelenggara, data]) => ({
-      penyelenggara,
-      ...data,
-    }));
+    return Array.from(map.entries()).map(([penyelenggara, data]) => {
+      const total = Object.values(data).reduce((sum, val) => sum + val, 0);
+      return {
+        penyelenggara,
+        ...data,
+        total,
+      } as {
+        penyelenggara: string;
+        total: number;
+        [key: string]: number | string;
+      };
+    });
   }, [filteredData, penyelenggaraList, pendidikanList]);
+
+  const totalRow: { [key: string]: number } = useMemo(() => {
+    const totals: { [key: string]: number } = {};
+    pendidikanList.forEach((p) => (totals[p] = 0));
+    let grandTotal = 0;
+
+    groupedData.forEach((row) => {
+      pendidikanList.forEach((p) => {
+        totals[p] += Number(row[p] || 0);
+      });
+      grandTotal += Number(row.total || 0);
+    });
+
+    return { ...totals, grandTotal };
+  }, [groupedData, pendidikanList]);
 
   // Fungsi untuk export ke Excel
   const exportToExcel = () => {
     const worksheet = utils.json_to_sheet(groupedData);
     const workbook = utils.book_new();
     utils.book_append_sheet(workbook, worksheet, "Penyelenggara_Pendidikan");
-    writeFile(workbook, "Penyelenggara_Pendidikan.xlsx");
-
+    writeFile(workbook, `(BY PENDIDIKAN) CAPAIAN PELATIHAN ${quarter} TA ${year}.xlsx`);
   };
 
   return (
     <div className="rounded-xl border border-stroke bg-white p-5 shadow-default">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">Lulusan Berdasarkan Penyelenggara & Pendidikan</h3>
+        <h3 className="text-lg font-semibold">Lulusan Berdasarkan Penyelenggara & Pendidikan  {quarter} TA {year} </h3>
         <div className="flex gap-3">
           <Select onValueChange={setYear} defaultValue={year}>
-            <SelectTrigger className="w-[120px]">
+            <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="Pilih Tahun" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="2023">2023</SelectItem>
-              <SelectItem value="2024">2024</SelectItem>
+              {yearOptions.map((y) => (
+                <SelectItem key={y} value={y}>{y}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
-          <Select onValueChange={setQuarter} defaultValue={quarter}>
-            <SelectTrigger className="w-[120px]">
-              <SelectValue placeholder="Pilih Triwulan" />
+          <Select value={quarter} onValueChange={(value: string) => setQuarter(value)}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="TW I">TW I</SelectItem>
@@ -126,6 +158,14 @@ const TableDataPelatihanMasyarakatByPendidikan = ({ dataUserPelatihan }: TableDa
 
             </TableRow>
           ))}
+          <TableRow className="font-semibold bg-gray-100">
+            <TableCell colSpan={2}>Total</TableCell>
+            {pendidikanList.map((pendidikan, index) => (
+              <TableCell key={index}>{totalRow[pendidikan]}</TableCell>
+            ))}
+            <TableCell>{totalRow.grandTotal}</TableCell>
+          </TableRow>
+
         </TableBody>
       </Table>
     </div>
