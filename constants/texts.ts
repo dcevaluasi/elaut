@@ -333,6 +333,72 @@ export const CURRICULLUM_CERTIFICATE: Record<
       },
     ],
   },
+  CPOIB: {
+    UMUM: [
+      {
+        name_ind: 'Kebijakan Penerapan SJMHKP dalam Perikanan Budi Daya',
+        name_eng:
+          'Policy on Implementation of Quality Assurance Certification for Marine and Fishery Products in Aquaculture',
+        theory: 2,
+        practice: 0,
+      },
+      {
+        name_ind:
+          'Kebijakan Pembinaan Penerapan Cara Pembuatan Obat Ikan yang Baik',
+        name_eng:
+          'Policy for Guidance on Implementation of Good Fish Medicine Manufacturing Practices',
+        theory: 2,
+        practice: 0,
+      },
+      {
+        name_ind:
+          'Kebijakan Surveilance AMR dan Monitoring Residu Obat Ikan pada Perikanan  Budi Daya',
+        name_eng:
+          'Antimicrobial Resistance Surveillance Policy and Monitoring of Fish Drug Residues in Aquaculture',
+        theory: 2,
+        practice: 0,
+      },
+    ],
+    INTI: [
+      {
+        name_ind: 'Prinsip-prinsip Cara Pembuatan Obat Ikan yang Baik (CPOIB)',
+        name_eng: 'Principles of Good Fish Medicine Manufacturing Methods',
+        theory: 3,
+        practice: 5,
+      },
+      {
+        name_ind: 'Prinsip-prinsip Cara Distribusi Obat Ikan yang Baik (CDOIB)',
+        name_eng: 'Principles of Good Fish Medicine Distribution Methods',
+        theory: 3,
+        practice: 5,
+      },
+      {
+        name_ind: 'Monitoring Residu Obat Ikan',
+        name_eng: 'Fish Drug Residue Monitoring',
+        theory: 2,
+        practice: 3,
+      },
+      {
+        name_ind:
+          'Surveilance Antimikrobial Resistance pada Perikanan Budi Daya',
+        name_eng: 'Surveillance of Antimicrobial Resistance in Aquaculture',
+        theory: 2,
+        practice: 3,
+      },
+      {
+        name_ind: 'Sertifikasi Cara Pembuatan Obat Ikan Yang Baik',
+        name_eng: 'Certification of Good Fish Medicine Manufacturing Practices',
+        theory: 3,
+        practice: 5,
+      },
+      {
+        name_ind: 'Penggunaan Obat Herbal dalam Penanganan Penyakit Ikan',
+        name_eng: 'Use of Herbal Medicine in Treating Fish Diseases',
+        theory: 2,
+        practice: 3,
+      },
+    ],
+  },
 }
 
 export function capitalizeWords(text: string): string {

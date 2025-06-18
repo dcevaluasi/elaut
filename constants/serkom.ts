@@ -45,6 +45,12 @@ export const DESC_CERTIFICATE_COMPETENCE_FISHERIES: Record<
     desc_eng:
       'In the Training on Good Fish Breeding Practices which was held in collaboration between the Center for Marine and Fisheries Training - Marine and Fisheries Human Resource Development and Extension Agency, the Directorate of Seaweed - Directorate General of Fisheries Cultivation, and the Center for Primary Production Quality Assurance - Marine and Fisheries Quality Control and Supervision Agency',
   },
+  CPOIB: {
+    desc_ind:
+      'Dalam Pelatihan Jaminan Mutu Obat Ikan, Kesehatan Ikan dan Lingkungan Budi Daya yang diselenggarakan atas kerjasama Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Jenderal Perikanan Budidaya dan Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP)',
+    desc_eng:
+      'In the Fish Medicine Quality Assurance Training, Fish Health and Aquaculture Environment held in collaboration with the Agency for Marine and Fisheries Extension and Human Resources Development with the Directorate General of Aquaculture and the Marine and Fisheries Product Quality Control and Supervision Agency',
+  },
   CPPIB: {
     desc_ind:
       'Dalam Pelatihan Cara Pembuatan Pakan Ikan yang Baik (CPPIB) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Ikan Air Tawar - Direktorat Jenderal Perikanan Budidaya Pusat Pengendalian dan Pengawasan Mutu Produksi Primer – Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP)',
@@ -90,6 +96,7 @@ export const AQUACULTURE_CERTIFICATIONS: string[] = [
   'HACCP',
   'MPM-CPIB',
   'SPI',
+  'CPOIB',
   'API',
   'Budidaya',
   'Pengolahan dan Pemasaran',
