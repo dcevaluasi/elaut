@@ -74,7 +74,7 @@ const TableDataPelatihanMasyarakatByWilker = ({
       map.set(provinsi, { provinsi, ...initialData });
     });
 
-    filteredData.filter((item) => item.FileSertifikat && item.FileSertifikat.includes('signed')).forEach((item) => {
+    filteredData.filter((item) => item.FileSertifikat && (item.FileSertifikat.includes("signed") || item.FileSertifikat.includes('drive'))).forEach((item) => {
       const provinsi = item.Provinsi!;
       const penyelenggaraPelatihan = item.PenyelenggaraPelatihan!;
 

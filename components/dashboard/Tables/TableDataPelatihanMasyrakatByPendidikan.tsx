@@ -57,7 +57,7 @@ const TableDataPelatihanMasyarakatByPendidikan = ({ dataUserPelatihan }: TableDa
     });
 
     filteredData
-      .filter((item) => item.FileSertifikat && item.FileSertifikat.includes("signed"))
+      .filter((item) => item.FileSertifikat && (item.FileSertifikat.includes("signed") || item.FileSertifikat.includes('drive')))
       .forEach((item) => {
         const penyelenggara = item.PenyelenggaraPelatihan!;
         const pendidikan = item.PendidikanTerakhir!;

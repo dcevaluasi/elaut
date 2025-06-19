@@ -65,7 +65,7 @@ const TableDataPelatihanMasyrakatByGender = ({
       }
     >();
 
-    filteredData.filter((item) => item.FileSertifikat && item.FileSertifikat.includes('signed')).forEach((item) => {
+    filteredData.filter((item) => item.FileSertifikat && (item.FileSertifikat.includes("signed") || item.FileSertifikat.includes('drive'))).forEach((item) => {
       if (!map.has(item.PenyelenggaraPelatihan!)) {
         map.set(item.PenyelenggaraPelatihan!, { l: 0, p: 0, total: 0 });
       }

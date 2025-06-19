@@ -48,7 +48,7 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
   const groupedData = useMemo(() => {
     const map = new Map<string, { total: number; triwulan: Record<string, number> }>();
 
-    filteredData.filter((item) => item.FileSertifikat && item.FileSertifikat.includes('signed')).forEach(({ PenyelenggaraPelatihan, TanggalSertifikat }) => {
+    filteredData.filter((item) => item.FileSertifikat && (item.FileSertifikat.includes("signed") || item.FileSertifikat.includes('drive'))).forEach(({ PenyelenggaraPelatihan, TanggalSertifikat }) => {
       const triwulan = getQuarterForFiltering(TanggalSertifikat!);
       if (!map.has(PenyelenggaraPelatihan!)) {
         map.set(PenyelenggaraPelatihan!, {
