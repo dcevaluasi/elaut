@@ -39,11 +39,10 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
       if (!date) return false;
 
       const itemYear = date.getFullYear().toString();
-      const itemQuarter = getQuarterForFiltering(item.TanggalSertifikat!);
 
-      return itemYear === year && itemQuarter === quarter;
+      return itemYear === year;
     });
-  }, [dataUserPelatihan, year, quarter]);
+  }, [dataUserPelatihan, year]);
 
   const groupedData = useMemo(() => {
     const map = new Map<string, { total: number; triwulan: Record<string, number> }>();
