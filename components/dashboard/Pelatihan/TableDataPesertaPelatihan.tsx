@@ -50,7 +50,7 @@ import {
   TbSchool,
   TbTargetArrow,
 } from "react-icons/tb";
-import { IoIosInformationCircle, IoMdCloseCircle } from "react-icons/io";
+import { IoIosInformationCircle, IoMdCheckmarkCircleOutline, IoMdCloseCircle } from "react-icons/io";
 import { FiUploadCloud } from "react-icons/fi";
 
 import { usePathname, useRouter } from "next/navigation";
@@ -77,7 +77,7 @@ import {
   RiVerifiedBadgeFill,
 } from "react-icons/ri";
 import Link from "next/link";
-import { FaRupiahSign } from "react-icons/fa6";
+import { FaRegFolderOpen, FaRegIdCard, FaRupiahSign, FaTrash } from "react-icons/fa6";
 import Toast from "@/components/toast";
 import { GiTakeMyMoney } from "react-icons/gi";
 import { DialogSertifikatPelatihan } from "@/components/sertifikat/dialogSertifikatPelatihan";
@@ -91,7 +91,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { generateTanggalPelatihan } from "@/utils/text";
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import { DIALOG_TEXTS } from "@/constants/texts";
-import { countUserWithNoSertifikat, countUserWithPassed, countUserWithSpesimenTTD, countUserWithTanggalSertifikat, countValidKeterangan } from "@/utils/counter";
+import { countUserWithCertificate, countUserWithDraftCertificate, countUserWithNoSertifikat, countUserWithPassed, countUserWithSpesimenTTD, countUserWithTanggalSertifikat, countValidKeterangan } from "@/utils/counter";
 import { generateTimestamp, getDateInIndonesianFormat, getTodayInIndonesianFormat } from "@/utils/time";
 import { BiSolidCalendarAlt } from "react-icons/bi";
 import addData from "@/firebase/firestore/addData";
@@ -99,6 +99,8 @@ import { doc, getDoc, getFirestore } from "firebase/firestore";
 import firebaseApp from "@/firebase/config";
 import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
 import { isSigned, isUnsigned } from "@/lib/sign";
+import { downloadAndZipPDFs } from "@/utils/file";
+import { AiOutlineFieldNumber } from "react-icons/ai";
 
 const TableDataPesertaPelatihan = () => {
   const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
@@ -753,7 +755,7 @@ const TableDataPesertaPelatihan = () => {
           >
             <p className="leading-[105%]"> No Registrasi</p>
 
-            <HiMiniUserGroup className="ml-2 h-4 w-4" />
+            <AiOutlineFieldNumber className="ml-2 h-4 w-4" />
           </Button>
         );
       },
@@ -776,7 +778,7 @@ const TableDataPesertaPelatihan = () => {
           >
             <p className="leading-[105%]"> Nama Peserta</p>
 
-            <HiMiniUserGroup className="ml-2 h-4 w-4" />
+            <FaRegIdCard className="ml-2 h-4 w-4" />
           </Button>
         );
       },
@@ -799,7 +801,7 @@ const TableDataPesertaPelatihan = () => {
           >
             <p className="leading-[105%]">LULUS/TIDAK LULUS</p>
 
-            <HiMiniUserGroup className="ml-2 h-4 w-4" />
+            <IoMdCheckmarkCircleOutline className="ml-2 h-4 w-4" />
           </Button>
         );
       },
@@ -949,8 +951,25 @@ const TableDataPesertaPelatihan = () => {
     }
   };
 
+  const [isZipping, setIsZipping] = React.useState(false)
+
+  const handleDownloadZip = async () => {
+    setIsZipping(true)
+    try {
+      await downloadAndZipPDFs(
+        data,
+        `(${dataPelatihan!.Program}) ${dataPelatihan!.PenyelenggaraPelatihan} - ${generateTanggalPelatihan(dataPelatihan!.TanggalMulaiPelatihan)} - ${generateTanggalPelatihan(dataPelatihan!.TanggalBerakhirPelatihan)}`,
+      )
+    } catch (err) {
+      console.error('Download failed:', err)
+    } finally {
+      setIsZipping(false)
+    }
+  }
+
   return (
     <div className="">
+
       <div className="flex flex-col w-full">
         <div className="flex flex-row gap-2 items-center">
           <header
@@ -963,7 +982,7 @@ const TableDataPesertaPelatihan = () => {
                 <div className="flex flex-col">
                   <h1 id="page-caption" className="font-semibold text-lg">
                     Peserta{" "}
-                    {dataPelatihan != null ? dataPelatihan!.NamaPelatihan : ""}
+                    {dataPelatihan != null ? dataPelatihan!.NamaPelatihan : ""} ({dataPelatihan != null ? dataPelatihan!.PenyelenggaraPelatihan : ""})
                   </h1>
                   <p className="font-medium text-gray-400 text-base">
                     {" "}
@@ -977,6 +996,7 @@ const TableDataPesertaPelatihan = () => {
                     {dataPelatihan != null
                       ? dataPelatihan!.BidangPelatihan
                       : ""}{" "}
+
                     • Mendukung Program Terobosan{" "}
                     {dataPelatihan != null
                       ? dataPelatihan!.DukunganProgramTerobosan
@@ -995,6 +1015,8 @@ const TableDataPesertaPelatihan = () => {
           </header>
         </div>
       </div>
+
+
 
       {dataPelatihan !== null && <>
         <AlertDialog open={isOpenFormInputNilai}>
@@ -1537,6 +1559,53 @@ const TableDataPesertaPelatihan = () => {
             </div>
           }
         </div>}
+        {
+          !Cookies.get('XSRF094') && <div className='w-full gap-0'>
+            <div className=" w-full">
+              <div className="w-full border border-gray-200 rounded-xl">
+                <div className="bg-gray-100 p-4 w-full ">
+                  <h2 className="font-calsans text-xl">
+                    Actions
+                  </h2>
+                </div>
+                <table className="w-full">
+                  <tr className="flex w-fit">
+                    {
+                      countUserWithCertificate(data) == data.length && <Button
+                        onClick={handleDownloadZip}
+                        disabled={isZipping}
+                        className={`w-fit border m-3 flex gap-2 bg-teal-500 text-left capitalize items-center justify-center h-9 px-4 py-3 border-teal-500  whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 ${isZipping ? 'opacity-60 cursor-not-allowed' : 'hover:bg-teal-600'
+                          } text-white`}
+                      >
+                        <FaRegFolderOpen className="h-4 w-4" />
+                        <span className="text-sm">
+                          {isZipping ? 'Zipping & Downloading...' : 'Download Zip Sertifikat'}
+                        </span>
+                      </Button>
+                    }
+
+
+                    {
+                      countUserWithDraftCertificate(data) != 0 && <Button
+                        onClick={(e) => {
+                          setOpenFormValidasiDataPesertaPelatihan(true)
+                        }}
+                        className={`w-fit border my-3 mx-1 flex gap-2 bg-rose-500 text-left capitalize items-center justify-center h-9 px-4 py-3 border-rose-500  whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 ${isZipping ? 'opacity-60 cursor-not-allowed' : 'hover:bg-rose-600'
+                          } text-white`}
+                      >
+                        <FaTrash />
+
+                        Hapus Draft File Sertifikat
+                      </Button>
+                    }
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div className=" w-full mb-4"></div>
+          </div>
+        }
+
         <div>
           <TableData
             isLoading={false}

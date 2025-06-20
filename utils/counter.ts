@@ -8,6 +8,22 @@ export const countUserWithNoSertifikat = (data: UserPelatihan[]): number => {
   return data.filter((item) => item.NoSertifikat !== '').length
 }
 
+export const countUserWithCertificate = (data: UserPelatihan[]): number => {
+  return data.filter((item) => {
+    const file = item.FileSertifikat.toLowerCase()
+    return file.includes('signed') || file.includes('drive')
+  }).length
+}
+
+export const countUserWithDraftCertificate = (
+  data: UserPelatihan[],
+): number => {
+  return data.filter((item) => {
+    const file = item.FileSertifikat.toLowerCase()
+    return !file.includes('signed') && !file.includes('drive')
+  }).length
+}
+
 export const countUserWithTanggalSertifikat = (
   data: UserPelatihan[],
 ): number => {
