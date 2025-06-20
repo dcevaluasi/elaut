@@ -8,6 +8,15 @@ export const countUserWithNoSertifikat = (data: UserPelatihan[]): number => {
   return data.filter((item) => item.NoSertifikat !== '').length
 }
 
+export const countUserWithNonELAUTCertificate = (
+  data: UserPelatihan[],
+): number => {
+  return data.filter((item) => {
+    const file = item.FileSertifikat.toLowerCase()
+    return file.includes('drive')
+  }).length
+}
+
 export const countUserWithCertificate = (data: UserPelatihan[]): number => {
   return data.filter((item) => {
     const file = item.FileSertifikat.toLowerCase()

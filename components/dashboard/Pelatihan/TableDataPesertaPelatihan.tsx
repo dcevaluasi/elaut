@@ -91,7 +91,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { generateTanggalPelatihan } from "@/utils/text";
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import { DIALOG_TEXTS } from "@/constants/texts";
-import { countUserWithCertificate, countUserWithDraftCertificate, countUserWithNoSertifikat, countUserWithPassed, countUserWithSpesimenTTD, countUserWithTanggalSertifikat, countValidKeterangan } from "@/utils/counter";
+import { countUserWithCertificate, countUserWithDraftCertificate, countUserWithNonELAUTCertificate, countUserWithNoSertifikat, countUserWithPassed, countUserWithSpesimenTTD, countUserWithTanggalSertifikat, countValidKeterangan } from "@/utils/counter";
 import { generateTimestamp, getDateInIndonesianFormat, getTodayInIndonesianFormat } from "@/utils/time";
 import { BiSolidCalendarAlt } from "react-icons/bi";
 import addData from "@/firebase/firestore/addData";
@@ -708,8 +708,17 @@ const TableDataPesertaPelatihan = () => {
                       Preview Draft Sertifikat
                     </Button>
                   </DialogSertifikatPelatihan>
-                ) : dataPelatihan!.StatusPenerbitan == "On Progress" ||
-                  dataPelatihan!.StatusPenerbitan == "" ? (
+                ) : countUserWithCertificate(data) == data.length ? (
+                  <Link
+                    target="_blank"
+                    href={`${row.original.FileSertifikat.includes('drive') ? row.original.FileSertifikat : `https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${row.original.FileSertifikat}`}`}
+                    className="w-full border flex gap-2 bg-blue-600 text-left capitalize items-center justify-center h-9 px-4 py-3 border-blue-600  whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 hover:bg-blue-600 text-white"
+                  >
+                    <RiVerifiedBadgeFill className="h-4 w-4  " />
+                    <span className="text-sm">Download Sertifikat</span>
+                  </Link>
+
+                ) : (
                   <Link
                     href={
                       "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-raw/" +
@@ -725,15 +734,6 @@ const TableDataPesertaPelatihan = () => {
                       <RiProgress3Line className="h-4 w-4" />
                       <span className="text-sm">Draft Sertifikat</span>
                     </Button>
-                  </Link>
-                ) : (
-                  <Link
-                    target="_blank"
-                    href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${row.original.FileSertifikat}`}
-                    className="w-full border flex gap-2 bg-blue-600 text-left capitalize items-center justify-center h-9 px-4 py-3 border-blue-600  whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 hover:bg-blue-600 text-white"
-                  >
-                    <RiVerifiedBadgeFill className="h-4 w-4  " />
-                    <span className="text-sm">Download Sertifikat</span>
                   </Link>
                 )}
               </div>
@@ -972,7 +972,7 @@ const TableDataPesertaPelatihan = () => {
 
       <div className="flex flex-col w-full">
         <div className="flex flex-row gap-2 items-center">
-          <header
+          {(dataPelatihan !== null && data !== null) && <header
             aria-label="page caption"
             className="flex-row w-full flex h-20 items-center gap-2 bg-gray-100 border-t px-4"
           >
@@ -1004,15 +1004,19 @@ const TableDataPesertaPelatihan = () => {
                   </p>
                 </div>
               </div>
-              <div className=" flex">
-                {dataPelatihan != null ? (
-                  <ShowingBadge data={dataPelatihan} />
-                ) : (
-                  <></>
-                )}
-              </div>
+              {
+                countUserWithNonELAUTCertificate(data) == 0 && <div className=" flex">
+                  {dataPelatihan != null ? (
+                    <ShowingBadge data={dataPelatihan} />
+                  ) : (
+                    <></>
+                  )}
+                </div>
+              }
+
             </div>
-          </header>
+          </header>}
+
         </div>
       </div>
 

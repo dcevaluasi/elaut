@@ -331,12 +331,15 @@ function DetailPelatihan() {
             </div>
             <table className="w-full text-sm text-gray-700">
               <tbody>
-                <tr className="border-t border-gray-200">
-                  <td className="p-4 font-semibold text-gray-600 w-[35%]">Status</td>
-                  <td className="p-4">
-                    <ShowingBadge data={pelatihan!} isFlying={false} />
-                  </td>
-                </tr>
+                {
+                  pelatihan!.KeteranganTandaTangan == '' && <tr className="border-t border-gray-200">
+                    <td className="p-4 font-semibold text-gray-600 w-[35%]">Status</td>
+                    <td className="p-4">
+                      <ShowingBadge data={pelatihan!} isFlying={false} />
+                    </td>
+                  </tr>
+                }
+
                 <InfoRow label="Penandatangan" value={pelatihan?.TtdSertifikat || "-"} />
                 <InfoRow
                   label="Dokumen Permohonan"

@@ -67,6 +67,7 @@ export type PelatihanMasyarakat = {
   UserPelatihan: UserPelatihan[]
   MateriPelatihan: MateriPelatihan[]
   SarprasPelatihan: Sarpras[]
+  KeteranganTandaTangan?: string
   BeritaAcara: string
   CatatanPenerbitanByPusat: string
   StatusApproval: string
@@ -286,6 +287,7 @@ export type Pelatihan = {
   IdSaranaPrasarana: number
   IdKonsumsi: string
   ModuleMateri: string
+  KeteranganTandaTangan?: string
   CreateAt: string
   UpdateAt: string
   PemberitahuanDiterima: string

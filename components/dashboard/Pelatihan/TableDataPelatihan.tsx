@@ -556,7 +556,7 @@ const TableDataPelatihan: React.FC = () => {
                   ) : (
                     filteredData.map((pelatihan, index) => (
                       <Card key={index} className="relative">
-                        {pelatihan != null ? (
+                        {pelatihan != null && pelatihan!.KeteranganTandaTangan == '' ? (
                           <ShowingBadge data={pelatihan} isFlying={true} />
                         ) : (
                           <></>
