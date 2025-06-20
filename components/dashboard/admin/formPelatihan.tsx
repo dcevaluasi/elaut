@@ -1324,15 +1324,14 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                                 <SelectItem value="Masyarakat Umum">
                                   Masyarakat Umum
                                 </SelectItem>
-                                {
-                                  jenisPelatihan == 'Satuan Pendidikan' && <>
-                                    <SelectItem value="Peserta Didik Sekolah Usaha Perikanan Menengah">
-                                      Peserta Didik Sekolah Usaha Perikanan Menengah
-                                    </SelectItem>
-                                    <SelectItem value="Peserta Didik Politeknik Kelautan dan Perikanan">
-                                      Peserta Didik Politeknik Kelautan dan Perikanan
-                                    </SelectItem></>
-                                }
+
+                                <SelectItem value="Peserta Didik Sekolah Usaha Perikanan Menengah">
+                                  Peserta Didik Sekolah Usaha Perikanan Menengah
+                                </SelectItem>
+                                <SelectItem value="Peserta Didik Politeknik Kelautan dan Perikanan">
+                                  Peserta Didik Politeknik Kelautan dan Perikanan
+                                </SelectItem>
+
                                 <SelectItem value="Karyawan/Pegawai/Mining Agent">
                                   Karyawan/Pegawai/Mining Agent
                                 </SelectItem>
@@ -1703,7 +1702,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
           )}
         </div>
       </div>
-    </section>
+    </section >
   );
 }
 

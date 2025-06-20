@@ -76,7 +76,7 @@ import { countUserWithDrafCertificate } from "@/utils/counter";
 import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
 import HistoryButton from "../Dashboard/Actions/HistoryButton";
 import { ESELON_2, ESELON_3, UPT } from "@/constants/nomenclatures";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const TableDataPelatihan: React.FC = () => {
   const [data, setData] = React.useState<PelatihanMasyarakat[]>([]);
@@ -203,6 +203,7 @@ const TableDataPelatihan: React.FC = () => {
     React.useState<string>("All");
   const [filterCategory, setFilterCategory] = React.useState<string>("");
   const [filterCategoryPenyelenggara, setFilterCategoryPenyelenggara] = React.useState<string>("");
+  const [filterCategorySasaran, setFilterCategorySasaran] = React.useState<string>("");
 
   // SEARCHING
   const [searchQuery, setSearchQuery] = React.useState<string>("");
@@ -211,6 +212,7 @@ const TableDataPelatihan: React.FC = () => {
     const namaPelatihan = pelatihan.NamaPelatihan.toLowerCase();
     const bidangPelatihan = pelatihan.BidangPelatihan.toLowerCase();
     const penyelenggaraPelatihan = pelatihan.PenyelenggaraPelatihan.toLowerCase();
+    const sasaranPelatihan = pelatihan.AsalPelatihan.toLowerCase();
     const statusPenerbitan = pelatihan.StatusPenerbitan;
     const status = pelatihan.Status;
 
@@ -221,12 +223,14 @@ const TableDataPelatihan: React.FC = () => {
     const matchesPenyelenggara =
       !filterCategoryPenyelenggara || penyelenggaraPelatihan === filterCategoryPenyelenggara.toLowerCase();
 
+    const matchesSasaran =
+      !filterCategorySasaran || sasaranPelatihan === filterCategorySasaran.toLowerCase();
+
+
     // Apply search filter
     const searchQueryLower = searchQuery.toLowerCase();
     const matchesSearchQuery =
-      namaPelatihan.includes(searchQueryLower) ||
-      bidangPelatihan.includes(searchQueryLower) ||
-      penyelenggaraPelatihan.includes(searchQueryLower);
+      namaPelatihan.includes(searchQueryLower)
 
     // Apply status filter
     const statusMapping: Record<string, boolean> = {
@@ -239,7 +243,7 @@ const TableDataPelatihan: React.FC = () => {
       selectedStatusFilter === "All" || statusMapping[selectedStatusFilter] || status === selectedStatusFilter;
 
     // Return filtered data based on all conditions
-    return matchesCategory && matchesSearchQuery && matchesStatus && matchesPenyelenggara;
+    return matchesCategory && matchesSearchQuery && matchesStatus && matchesPenyelenggara && matchesSasaran;
   });
 
   const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
@@ -434,43 +438,73 @@ const TableDataPelatihan: React.FC = () => {
               </div> :
                 <div className="flex flex-col gap-1">
                   <div className="mb-1 flex items-center w-full gap-2">
-                    <select
-                      className="text-sm p-2 border border-neutral-200 bg-transparent rounded-md bg-white  w-1/4"
-                      onChange={(e) => setFilterCategory(e.target.value)}
+                    <Select
+                      value={filterCategory}
+                      onValueChange={(value: string) => setFilterCategory(value)}
                     >
-                      <option value="" selected={filterCategory == ""}>
-                        Program Pelatihan
-                      </option>
-                      <optgroup label="AKP">
-                        {PROGRAM_AKP.map((item) => (
-                          <option key={item} value={item}>
-                            {item}
-                          </option>
-                        ))}
-                      </optgroup>
-                      <optgroup label="Perikanan">
-                        {PROGRAM_PERIKANAN.map((item) => (
-                          <option key={item} value={item}>
-                            {item}
-                          </option>
-                        ))}
-                      </optgroup>
-                      <optgroup label="Kelautan">
-                        {PROGRAM_KELAUTAN.map((item) => (
-                          <option key={item} value={item}>
-                            {item}
-                          </option>
-                        ))}
-                      </optgroup>
-                    </select>
+                      <SelectTrigger className="w-2/4 text-base bg-white border border-neutral-200 rounded-md">
+                        <SelectValue placeholder="Program Pelatihan" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>AKP</SelectLabel>
+                          {PROGRAM_AKP.map((item) => (
+                            <SelectItem key={item} value={item}>
+                              {item}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                        <SelectGroup>
+                          <SelectLabel>Perikanan</SelectLabel>
+                          {PROGRAM_PERIKANAN.map((item) => (
+                            <SelectItem key={item} value={item}>
+                              {item}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                        <SelectGroup>
+                          <SelectLabel>Kelautan</SelectLabel>
+                          {PROGRAM_KELAUTAN.map((item) => (
+                            <SelectItem key={item} value={item}>
+                              {item}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+
+                    <Select
+                      value={filterCategorySasaran}
+                      onValueChange={(value: string) =>
+                        setFilterCategorySasaran(value)
+                      }
+                    >
+                      <SelectTrigger className="w-2/4 text-base py-4">
+                        <SelectValue placeholder="Pilih Sasaran" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Masyarakat Umum">
+                          Masyarakat Umum
+                        </SelectItem>
+                        <SelectItem value="Peserta Didik Sekolah Usaha Perikanan Menengah">
+                          Peserta Didik Sekolah Usaha Perikanan Menengah
+                        </SelectItem>
+                        <SelectItem value="Peserta Didik Politeknik Kelautan dan Perikanan">
+                          Peserta Didik Politeknik Kelautan dan Perikanan
+                        </SelectItem>
+                        <SelectItem value="Karyawan/Pegawai/Mining Agent">
+                          Karyawan/Pegawai/Mining Agent
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                     <Select
                       value={filterCategoryPenyelenggara}
                       onValueChange={(value: string) =>
                         setFilterCategoryPenyelenggara(value)
                       }
                     >
-                      <SelectTrigger className="w-full text-base py-4">
-                        <SelectValue placeholder="Pilih Lembaga Diklat" />
+                      <SelectTrigger className="w-2/4 text-base py-4">
+                        <SelectValue placeholder="Pilih Satker/Penyelenggara" />
                       </SelectTrigger>
                       <SelectContent>
                         {
@@ -482,24 +516,22 @@ const TableDataPelatihan: React.FC = () => {
                         }
                       </SelectContent>
                     </Select>
-                    <Button variant="outline" className='py-5' onClick={() => handleFetchingPublicTrainingData()}><IoRefreshSharp />Refresh</Button>
+                    <Input
+                      type="text"
+                      placeholder="Cari berdasarkan Nama Pelatihan"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full text-base"
+                    />
                     {(filterCategory != "" || filterCategoryPenyelenggara != "") && (
                       <Button
-                        onClick={(e) => { setFilterCategory(""); setFilterCategoryPenyelenggara("") }}
-                        className="border border-neutral-200  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-3 bg-neutral-800 hover:bg-neutral-800 hover:text-white text-white rounded-md"
+                        onClick={(e) => { setFilterCategory(""); setFilterCategoryPenyelenggara(""); setFilterCategorySasaran("") }}
+                        className="border border-neutral-200 text-base  shadow-sm  inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-3 bg-neutral-800 hover:bg-neutral-800 hover:text-white text-white rounded-md"
                       >
                         <MdClear className="h-5 w-5 mr-1" />
                         Bersihkan Filter
                       </Button>
                     )}
-
-                    <Input
-                      type="text"
-                      placeholder="Cari berdasarkan Nama, Bidang, dan Penyelenggara Pelatihan"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full text-sm"
-                    />
                   </div>
 
                   {filteredData.length == 0 ? (
@@ -827,7 +859,7 @@ const TableDataPelatihan: React.FC = () => {
           </TabsContent>
         </Tabs>
       </section>
-    </div>
+    </div >
   );
 };
 
