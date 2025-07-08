@@ -222,10 +222,8 @@ const SertifikatNonKepelautan = React.forwardRef(
                         Institution Name
                       </span>
                     </td>
-                    <td className=" w-2/3 text-base font-bosNormal capitalize">
+                    <td className=" w-2/3 text-base font-bosNormal uppercase">
                       : {peserta != null ? capitalizeWords(peserta?.Status) : "-"}
-                      {", "}{" "}
-                      {peserta?.TanggalLahir}{" "}
                     </td>
                   </tr>
                 </table>
