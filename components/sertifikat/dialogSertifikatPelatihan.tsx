@@ -214,6 +214,20 @@ const SertifikatNonKepelautan = React.forwardRef(
                       {peserta?.TanggalLahir}{" "}
                     </td>
                   </tr>
+                  <tr className="w-full">
+                    <td className="font-bos w-full flex flex-col space-y-0">
+                      <span className="text-base font-bosNormal">Nama Institusi</span>
+                      <span className="font-bos italic text-[0.85rem] -mt-2">
+                        {" "}
+                        Institution Name
+                      </span>
+                    </td>
+                    <td className=" w-2/3 text-base font-bosNormal capitalize">
+                      : {peserta != null ? capitalizeWords(peserta?.Status) : "-"}
+                      {", "}{" "}
+                      {peserta?.TanggalLahir}{" "}
+                    </td>
+                  </tr>
                 </table>
               </div>
 
@@ -457,7 +471,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                       <p className="font-bosBold text-lg max-w-2xl w-full uppercase leading-none">
                         Materi {pelatihan?.NamaPelatihan}
                       </p>
-                      <p className="font-bos text-base max-w-6xl leading-none -mt-2">{pelatihan?.NamaPelathanInggris}</p>
+                      <p className="font-bos text-base max-w-4xl leading-none -mt-2">{pelatihan?.NamaPelathanInggris}</p>
                     </div>
                   </div>
                 </div>
