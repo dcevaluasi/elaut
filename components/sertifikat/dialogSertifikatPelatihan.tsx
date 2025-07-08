@@ -289,10 +289,10 @@ const SertifikatNonKepelautan = React.forwardRef(
                       </div>
                     </div></> : <><div className="flex w-full flex-col space-y-0 max-w-7xl mx-auto items-start text-sm -mt-3 text-center font-bos h-fit">
                       <span className="text-base leading-[115%] font-bosNormal">
-                        {DESC_CERTIFICATE_COMPETENCE_FISHERIES[pelatihan!.Program].desc_ind}, pada tanggal {formatDateRange(pelatihan!.TanggalMulaiPelatihan, pelatihan!.TanggalBerakhirPelatihan)}
+                        {DESC_CERTIFICATE_COMPETENCE_FISHERIES[pelatihan!.Program].desc_ind}, pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
                       </span>
                       <span className="max-w-6xl leading-none font-bos italic text-[0.85rem] mx-auto">
-                        {DESC_CERTIFICATE_COMPETENCE_FISHERIES[pelatihan!.Program].desc_eng} on {formatDateRangeEnglish(pelatihan!.TanggalMulaiPelatihan, pelatihan!.TanggalBerakhirPelatihan)}
+                        {DESC_CERTIFICATE_COMPETENCE_FISHERIES[pelatihan!.Program].desc_eng} on {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
                       </span>
                     </div>
 
@@ -466,10 +466,10 @@ const SertifikatNonKepelautan = React.forwardRef(
                 <div className="flex flex-row justify-center items-center">
                   <div className="flex flex-row gap-2 items-center h-fit">
                     <div className="flex flex-col text-center space-y-0 h-fit items-center justify-center w-full gap-0">
-                      <p className="font-bosBold text-lg max-w-2xl w-full uppercase leading-none">
-                        Materi {pelatihan?.NamaPelatihan}, tanggal {formatDateRange(pelatihan!.TanggalMulaiPelatihan, pelatihan!.TanggalBerakhirPelatihan)}
+                      <p className="font-bosBold text-lg max-w-3xl w-full uppercase leading-none">
+                        Materi {pelatihan?.NamaPelatihan}, tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
                       </p>
-                      <p className="font-bos text-base max-w-4xl leading-none -mt-2">{pelatihan?.NamaPelathanInggris}, {formatDateRangeEnglish(pelatihan!.TanggalMulaiPelatihan, pelatihan!.TanggalBerakhirPelatihan)}</p>
+                      <p className="font-bos text-base max-w-4xl leading-none -mt-2">{pelatihan?.NamaPelathanInggris}, {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}</p>
                     </div>
                   </div>
                 </div>
