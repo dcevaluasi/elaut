@@ -462,7 +462,7 @@ const SertifikatNonKepelautan = React.forwardRef(
 
               </div>
             </div > :
-              <div className="pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center mt-32 break-before-auto relative">
+              <div className="pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center mt-44 break-before-auto relative">
                 <div className="flex flex-row justify-center items-center">
                   <div className="flex flex-row gap-2 items-center h-fit">
                     <div className="flex flex-col text-center space-y-0 h-fit items-center justify-center w-full gap-0">
