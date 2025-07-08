@@ -349,7 +349,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                 height: "190px",
                 objectFit: "cover",
                 position: "absolute",
-                bottom: "-25px",
+                bottom: "-40px",
                 right: "100px",
                 borderWidth: '10px',
                 borderColor: '#FFF',
