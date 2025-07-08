@@ -291,7 +291,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                       <span className="text-base leading-[115%] font-bosNormal">
                         {DESC_CERTIFICATE_COMPETENCE_FISHERIES[pelatihan!.Program].desc_ind}, pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
                       </span>
-                      <span className="max-w-6xl leading-none font-bos italic text-[0.85rem] mx-auto">
+                      <span className="max-w-5xl leading-none font-bos italic text-[0.85rem] mx-auto">
                         {DESC_CERTIFICATE_COMPETENCE_FISHERIES[pelatihan!.Program].desc_eng} on {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
                       </span>
                     </div>
@@ -361,7 +361,7 @@ const SertifikatNonKepelautan = React.forwardRef(
           </div>
 
           {
-            pelatihan?.TtdSertifikat == 'Kepala Balai Pelatihan dan Penyuluhan Perikanan' ? <div className="pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center mt-44 break-before-auto relative">
+            pelatihan?.TtdSertifikat == 'Kepala Balai Pelatihan dan Penyuluhan Perikanan' ? <div className="pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center mt-48 break-before-auto relative">
               <div className="flex flex-row justify-center items-center">
                 <div className="flex flex-row gap-2 items-center h-fit">
                   <div className="flex flex-col text-center space-y-0 h-fit items-center justify-center w-full">
