@@ -12,6 +12,6 @@ export const wilayahIDUrl = process.env.NEXT_PUBLIC_WILAYAH_ID_URL
 export const verifyPDFBSrEUrl = 'https://tte.komdigi.go.id/verifyPDF'
 
 export const urlFileSilabus =
-  process.env.NEXT_PUBLIC_BASE_URL + '/public/static/silabusPelatihan'
+  process.env.NEXT_PUBLIC_BASE_URL + '/public/static/suratPemberitahuan'
 export const urlFileSuratPemberitahuan =
   process.env.NEXT_PUBLIC_BASE_URL + '/public/static/suratPemberitahuan'
