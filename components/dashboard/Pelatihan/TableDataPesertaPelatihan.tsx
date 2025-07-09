@@ -66,6 +66,7 @@ import { Pelatihan, PelatihanMasyarakat, UserPelatihan } from "@/types/product";
 import axios, { AxiosResponse } from "axios";
 import { extractLastSegment } from "@/utils";
 import {
+  HiMiniArrowUpTray,
   HiMiniNewspaper,
   HiMiniUserGroup,
   HiOutlineDocument,
@@ -101,6 +102,7 @@ import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/service
 import { isSigned, isUnsigned } from "@/lib/sign";
 import { downloadAndZipPDFs } from "@/utils/file";
 import { AiOutlineFieldNumber } from "react-icons/ai";
+import JSZip from "jszip";
 
 const TableDataPesertaPelatihan = () => {
   const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
@@ -768,6 +770,29 @@ const TableDataPesertaPelatihan = () => {
       ),
     },
     {
+      accessorKey: "IdUsers",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            className={`text-black font-semibold w-fit p-0 flex justify-start items-centee`}
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            <p className="leading-[105%]"> ID Peserta</p>
+
+            <AiOutlineFieldNumber className="ml-2 h-4 w-4" />
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <div className={`${"ml-0"} text-center capitalize `}>
+          <p className="text-base font-semibold tracking-tight leading-none">
+            {row.original.IdUsers}
+          </p>
+        </div>
+      ),
+    },
+    {
       accessorKey: "Nama",
       header: ({ column }) => {
         return (
@@ -951,6 +976,58 @@ const TableDataPesertaPelatihan = () => {
     }
   };
 
+
+  const handleZipUpload = async (
+    zipFile: File,
+    users: UserPelatihan[],
+  ): Promise<void> => {
+    const zip = new JSZip();
+    const zipContent = await zip.loadAsync(zipFile);
+
+    for (const fileName of Object.keys(zipContent.files)) {
+      const baseName = fileName.split("/").pop(); // Get only the filename (e.g. "2290.jpg")
+      if (!baseName) continue;
+
+      const ext = baseName.split(".").pop()?.toLowerCase();
+      if (!["jpg", "jpeg", "png"].includes(ext || "")) continue;
+
+      const id = parseInt(baseName.replace(/\.[^/.]+$/, ""), 10);
+      if (isNaN(id)) continue;
+
+      const matchedUser = users.find((user) => user.IdUsers === id);
+      if (!matchedUser) {
+        console.warn(`No user matched for file: ${fileName}`);
+        continue;
+      }
+
+      const fileBlob = await zipContent.files[fileName].async("blob");
+
+      const formData = new FormData();
+      formData.append("Fotos", fileBlob, baseName); // use baseName here
+      formData.append("Ktps", '');
+      formData.append("KKs", '');
+      formData.append("Ijazahs", '');
+      formData.append("SuratKesehatans", '');
+
+      try {
+        const response = await axios.put(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/users/updateUsersNoJwt?id=${id}`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
+        console.log(`✅ Uploaded for user ID ${id}`, response.data);
+      } catch (error) {
+        console.error(`❌ Failed for user ID ${id}`, error);
+      }
+    }
+
+  };
+
   const [isZipping, setIsZipping] = React.useState(false)
 
   const handleDownloadZip = async () => {
@@ -1077,6 +1154,31 @@ const TableDataPesertaPelatihan = () => {
             </fieldset>
           </AlertDialogContent>
         </AlertDialog>
+
+        <button
+          type="button"
+          onClick={() => {
+            const input = document.getElementById("zip-upload");
+            if (input) (input as HTMLInputElement).click();
+          }}
+          className="mt-2 inline-flex items-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
+        >
+          <HiMiniArrowUpTray className="w-4 h-4 mr-1" />
+          Pilih File Zip Nilai
+        </button>
+
+        <input
+          id="zip-upload"
+          type="file"
+          accept=".zip"
+          className="hidden"
+          onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            await handleZipUpload(file, data); // make sure this is imported
+          }}
+        />
+
 
         <AlertDialog open={isOpenFormPeserta}>
           <AlertDialogContent>
