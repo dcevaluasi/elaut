@@ -1155,29 +1155,7 @@ const TableDataPesertaPelatihan = () => {
           </AlertDialogContent>
         </AlertDialog>
 
-        <button
-          type="button"
-          onClick={() => {
-            const input = document.getElementById("zip-upload");
-            if (input) (input as HTMLInputElement).click();
-          }}
-          className="mt-2 inline-flex items-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
-        >
-          <HiMiniArrowUpTray className="w-4 h-4 mr-1" />
-          Pilih File Zip Nilai
-        </button>
 
-        <input
-          id="zip-upload"
-          type="file"
-          accept=".zip"
-          className="hidden"
-          onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
-            const file = e.target.files?.[0];
-            if (!file) return;
-            await handleZipUpload(file, data); // make sure this is imported
-          }}
-        />
 
 
         <AlertDialog open={isOpenFormPeserta}>
@@ -1690,20 +1668,36 @@ const TableDataPesertaPelatihan = () => {
                       </Button>
                     }
 
-
                     {
-                      countUserWithDraftCertificate(data) != 0 && <Button
-                        onClick={(e) => {
-                          setOpenFormValidasiDataPesertaPelatihan(true)
-                        }}
-                        className={`w-fit border my-3 mx-1 flex gap-2 bg-rose-500 text-left capitalize items-center justify-center h-9 px-4 py-3 border-rose-500  whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 ${isZipping ? 'opacity-60 cursor-not-allowed' : 'hover:bg-rose-600'
-                          } text-white`}
-                      >
-                        <FaTrash />
+                      usePathname().includes('lemdik') && <>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const input = document.getElementById("zip-upload");
+                            if (input) (input as HTMLInputElement).click();
+                          }}
+                          className="mt-2 inline-flex items-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
+                        >
+                          <HiMiniArrowUpTray className="w-4 h-4 mr-1" />
+                          Pilih File Zip Nilai
+                        </button>
 
-                        Hapus Draft File Sertifikat
-                      </Button>
+                        <input
+                          id="zip-upload"
+                          type="file"
+                          accept=".zip"
+                          className="hidden"
+                          onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            await handleZipUpload(file, data); // make sure this is imported
+                          }}
+                        /></>
                     }
+
+
+
+
                   </tr>
                 </table>
               </div>
