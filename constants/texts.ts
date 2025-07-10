@@ -399,6 +399,85 @@ export const CURRICULLUM_CERTIFICATE: Record<
       },
     ],
   },
+  SPI: {
+    UMUM: [
+      {
+        name_ind: 'Kebijakan Sistem Jaminan Mutu dan Keamanan Hasil Perikanan',
+        name_eng: 'Fishery Product Quality and Safety Assurance System Policy',
+        theory: 1,
+        practice: 0,
+      },
+    ],
+    INTI: [
+      {
+        name_ind: 'Kemunduran Mutu Hasil Perikanan',
+        name_eng: 'Deterioration of the Quality of Fishery Products',
+        theory: 1,
+        practice: 3,
+      },
+      {
+        name_ind: 'Teknologi Penanganan Hasil Perikanan',
+        name_eng: 'Fishery Product Handling Technology',
+        theory: 1,
+        practice: 3,
+      },
+      {
+        name_ind: 'Teknologi Pengolahan Hasil Perikanan',
+        name_eng: 'Fishery Product Processing Technology',
+        theory: 1,
+        practice: 3,
+      },
+      {
+        name_ind: 'Inovasi dan Pengembangan Produk',
+        name_eng: 'Product Innovation and Development',
+        theory: 1,
+        practice: 3,
+      },
+      {
+        name_ind: 'Standarisasi Produk Perikanan dan Perikanan Non Pangan',
+        name_eng: 'Standardization of Fishery and Non-Food Fishery Products',
+        theory: 2,
+        practice: 0,
+      },
+      {
+        name_ind: 'Penerapan Good Manufacturing Practices (GMP)',
+        name_eng: 'Implementation of Good Manufacturing Practices (GMP)',
+        theory: 2,
+        practice: 0,
+      },
+      {
+        name_ind: 'Penyusunan Program Penerapan GMP',
+        name_eng: 'Preparation of GMP Implementation Program',
+        theory: 1,
+        practice: 3,
+      },
+      {
+        name_ind: 'Penerapan Standard Sanitation Operating Procedure (SSOP)',
+        name_eng:
+          'Implementation of Standard Sanitation Operating Procedure (SSOP)',
+        theory: 2,
+        practice: 0,
+      },
+      {
+        name_ind: 'Penyusunan Program Pemenuhan Persyaratan SSOP',
+        name_eng: 'Preparation of a Program to Fulfill SSOP Requirements',
+        theory: 1,
+        practice: 3,
+      },
+      {
+        name_ind: 'Penyusunan Panduan Mutu GMP dan SSOP',
+        name_eng: 'Preparation of GMP and SSOP Quality Guidelines',
+        theory: 3,
+        practice: 8,
+      },
+      {
+        name_ind: 'Pengenalan Sertifikat Kelayakan Pengolahan',
+        name_eng: 'Introduction of Processing Eligibility Certificates',
+        theory: 2,
+        practice: 0,
+      },
+    ],
+  },
 }
 
 export function capitalizeWords(text: string): string {

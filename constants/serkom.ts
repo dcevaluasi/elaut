@@ -65,9 +65,9 @@ export const DESC_CERTIFICATE_COMPETENCE_FISHERIES: Record<
   },
   SPI: {
     desc_ind:
-      'Dalam Pelatihan Sertifikat Pengolah Ikan (SPI) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Pengolahan - Direktorat Jenderal Penguatan Daya Saing Produk Kelautan dan perikanan  (DJPDSPKP) dan Pusat Mutu Pascapanen - Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP)',
+      'Dalam Pelatihan Sertifikat Pengolah Ikan (SPI) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Pengolahan - Direktorat Jenderal Penguatan Daya Saing Produk Kelautan dan perikanan  (DJPDSPKP) dan Pusat Pengendalian dan Pengawasan Mutu Pascapanen - Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP)',
     desc_eng:
-      'In the Fish Processing Assistant Training which was held in  collaboration with the Center for Marine and Fisheries Training - Marine and Fisheries Human Resource Development and Extension Agency with the Directorate of Processing and Quality Development - Directorate General of Strengthening and Competitiveness of Marine and Fishery Products',
+      'In the Fish Processing Certificate Training held in collaboration with the Marine and Fisheries Training Center - Marine and Fisheries Human Resources Extension and Development Agency with the Directorate of Processing - Directorate General of Strengthening the Competitiveness of Marine and Fisheries Products and the Center for Post-Harvest Quality Control and Supervision - Marine and Fisheries Product Quality Control and Supervision Agency',
   },
 }
 
