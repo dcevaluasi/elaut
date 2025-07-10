@@ -428,6 +428,12 @@ export const CURRICULLUM_CERTIFICATE: Record<
         practice: 3,
       },
       {
+        name_ind: 'Teknologi Pengemasan dan Pelabelan',
+        name_eng: 'Packaging and Labeling Technology',
+        theory: 1,
+        practice: 3,
+      },
+      {
         name_ind: 'Inovasi dan Pengembangan Produk',
         name_eng: 'Product Innovation and Development',
         theory: 1,
