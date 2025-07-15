@@ -16,6 +16,11 @@ export type CertificateDescription = {
 //   desc_eng:
 //     'In the Hazard Analysis and Critical Control Points (HACCP) Training which was held in collaboration with the Marine and Fisheries Training Center – Marine and Fisheries Extension and Human Resources and Development Agency through the Public Service Agency Fisheries Training and Extension Center Tegal with the Quality Control Center – Quality Ontrol and Inspection Agency with the East Java Disease and Fishery Product Quality Testing Laboratory Network',
 // },
+// desc_ind:
+//     'Dalam Pelatihan Hazard Analysis and Critical Control Points (HACCP) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDM KP) melalui Badan Layanan Umum (BLU) Balai Pelatihan dan Penyuluhan Perikanan (BPPP) Tegal dengan Balai Karantina Ikan Pengendalian Mutu dan Keamanan Hasil Perikanan Kota Balikpapan',
+//   desc_eng:
+//     'In the Hazard Analysis and Critical Control Points (HACCP) Training held in collaboration between the Marine and Fisheries Training Center – the Agency for Marine and Fisheries Extension and Human Resources Development through the Public Service Agency of Fisheries Training and Extension Center Tegal with Fish Quarantine Center Controls the Quality and Safety of Fishery Products in Balikpapan City',
+// },
 
 export const DESC_CERTIFICATE_COMPETENCE_FISHERIES: Record<
   string,
@@ -23,21 +28,21 @@ export const DESC_CERTIFICATE_COMPETENCE_FISHERIES: Record<
 > = {
   HACCP: {
     desc_ind:
-      'Dalam Pelatihan Hazard Analysis and Critical Control Points (HACCP) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDM KP) melalui Badan Layanan Umum (BLU) Balai Pelatihan dan Penyuluhan Perikanan (BPPP) Tegal dengan Balai Karantina Ikan Pengendalian Mutu dan Keamanan Hasil Perikanan Kota Balikpapan',
+      'Dalam Pelatihan Hazzard Analysis and Critical Control Points (HACCP) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan SDM Kelautan dan Perikanan (BPPSDMKP) dengan Pusat Mutu Pascapanen - Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP)',
     desc_eng:
-      'In the Hazard Analysis and Critical Control Points (HACCP) Training held in collaboration between the Marine and Fisheries Training Center – the Agency for Marine and Fisheries Extension and Human Resources Development through the Public Service Agency of Fisheries Training and Extension Center Tegal with Fish Quarantine Center Controls the Quality and Safety of Fishery Products in Balikpapan City',
+      'In the Hazard Analysis and Critical Control Points (HACCP) Training, which was organized in collaboration between the Center for Marine and Fisheries Training - Marine and Fisheries Human Resource Development and Extension Agency, and the Center for Post-Harvest Quality Assurance - Marine and Fisheries Products Quality Control and Supervision Agency',
   },
   CBIB: {
     desc_ind:
-      'Dalam Pelatihan Cara Budidaya Ikan yang Baik (CBIB) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Ikan Air Payau - Direktorat Jenderal Perikanan Budidaya dan Pusat Pengendalian dan Pengawasan Mutu Produksi Primer – Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP)',
+      'Dalam Pelatihan Cara Budidaya Ikan yang Baik (CBIB) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Ikan Air Payau - Direktorat Jenderal Perikanan Budidaya dan Pusat Mutu Produksi Primer – Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP)',
     desc_eng:
       'In the Training on Good Aquaculture Practices (GAqPs) which was held in collaboration between the Center for Marine and Fisheries Training - Marine and Fisheries Human Resource Development and Extension Agency, the Directorate of Brackish Fish – Directorate General of Fisheries Cultivation, and the Center for Primary Production Quality Assurance - Marine and Fisheries Quality Control and Supervision Agency',
   },
   'MPM-CPIB': {
     desc_ind:
-      'Dalam Pelatihan Manager Pengendali Mutu Cara Pembenihan Ikan yang Baik (MPM-CPIB) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Pembenihan - Direktorat Jenderal Perikanan Budidaya',
+      'Dalam Pelatihan Manager Pengendali Mutu Cara Pembenihan Ikan yang Baik (MPM - CPIB) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Rumput Laut - Direktorat Jenderal Perikanan Budidaya dan Pusat  Mutu Produksi Primer – Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP)',
     desc_eng:
-      'In the Quality Control Manager Training on Good Fish Hatchery Methods which was held in collaboration with the Center for Marine and Fisheries Training - Marine and Fisheries Human Resource Development and Extension Agency with the Directorate of Seeds - Directorate General of Aquaculture',
+      'In the Training of Quality Control Managers for Good Fish Breeding Practices which was held in collaboration with the Marine and Fisheries Training Center - Marine and Fisheries Human Resources Extension and Development Agency with the Directorate of Seaweed - Directorate General of Aquaculture and Primary Production Quality Center - Marine and Fisheries Product Quality Control and Supervision Agency',
   },
   CPIB: {
     desc_ind:
@@ -53,7 +58,7 @@ export const DESC_CERTIFICATE_COMPETENCE_FISHERIES: Record<
   },
   CPPIB: {
     desc_ind:
-      'Dalam Pelatihan Cara Pembuatan Pakan Ikan yang Baik (CPPIB) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Ikan Air Tawar - Direktorat Jenderal Perikanan Budidaya Pusat Pengendalian dan Pengawasan Mutu Produksi Primer – Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP)',
+      'Dalam Pelatihan Cara Pembuatan Pakan Ikan yang Baik (CPPIB) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDMKP) dengan Direktorat Ikan Air Tawar - Direktorat Jenderal Perikanan Budidaya dan Pusat Mutu Produksi Primer – Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP) pada tanggal',
     desc_eng:
       'In the Training on Good Aquaculture Feed Manufacturing Practices which was held in collaboration between the Center for Marine and Fisheries Training - Marine and Fisheries Extension and Human Resources Development Agency, the Directorate of Freshwater Fish - Directorate General of Fisheries Cultivation, and the Center for Primary Production Quality Assurance - Marine and Fisheries Quality Control and Supervision Agency',
   },
