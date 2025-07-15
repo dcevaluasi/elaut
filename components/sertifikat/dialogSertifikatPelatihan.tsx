@@ -339,25 +339,29 @@ const SertifikatNonKepelautan = React.forwardRef(
 
             </div>
 
-            <img
-              src={peserta?.Foto || ""}
-              width={140}
-              height={190}
-              alt=""
-              style={{
-                width: "140px",
-                height: "190px",
-                objectFit: "cover",
-                position: "absolute",
-                bottom: "-40px",
-                right: "100px",
-                borderWidth: '10px',
-                borderColor: '#FFF',
-                marginTop: "1rem",
+            {
+              peserta?.Foto == 'https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/' ? <></> : <img
+                src={peserta?.Foto || ""}
+                width={140}
+                height={190}
+                alt=""
+                style={{
+                  width: "140px",
+                  height: "190px",
+                  objectFit: "cover",
+                  position: "absolute",
+                  bottom: "-40px",
+                  right: "100px",
+                  borderWidth: '10px',
+                  borderRadius: '25px',
+                  borderColor: '#FFF',
+                  marginTop: "1rem",
 
-                zIndex: -10,
-              }}
-            />
+                  zIndex: -10,
+                }}
+              />
+            }
+
           </div>
 
           {
