@@ -230,15 +230,13 @@ export const CURRICULLUM_CERTIFICATE: Record<
     INTI: [
       {
         name_ind: 'Standarisasi dan Pembinaan Penerapan CPIB',
-        name_eng:
-          'Standardization and Guidance on Good Fisheries Breeding Practices Implementation',
+        name_eng: 'Standardization and Guidance on GHAP Implementation',
         theory: 2,
         practice: 2,
       },
       {
         name_ind: 'SNI CPIB',
-        name_eng:
-          'Indonesian National Standard of Good Fisheries Breeding Practices',
+        name_eng: 'Indonesian National Standard of GHAP',
         theory: 2,
         practice: 2,
       },
