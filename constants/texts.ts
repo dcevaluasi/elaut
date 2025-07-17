@@ -211,6 +211,61 @@ export const CURRICULLUM_CERTIFICATE: Record<
       },
     ],
   },
+  'MPM-CPIB': {
+    UMUM: [
+      {
+        name_ind: 'Kebijakan Penerapan SJMHKP dalam Perikanan Budidaya',
+        name_eng:
+          'Policy on the Implementation of Fishery Product Quality and Safety Assurance System in Aquaculture',
+        theory: 2,
+        practice: 0,
+      },
+      {
+        name_ind: 'Kebijakan Sistem Perbenihan Ikan Nasional',
+        name_eng: 'National Fish Seed System Policy',
+        theory: 2,
+        practice: 0,
+      },
+    ],
+    INTI: [
+      {
+        name_ind: 'Standarisasi dan Pembinaan Penerapan CPIB',
+        name_eng:
+          'Standardization and Guidance on Good Fisheries Breeding Practices Implementation',
+        theory: 2,
+        practice: 2,
+      },
+      {
+        name_ind: 'SNI CPIB',
+        name_eng:
+          'Indonesian National Standard of Good Fisheries Breeding Practices',
+        theory: 2,
+        practice: 2,
+      },
+      {
+        name_ind:
+          'Dokumentasi CPIB - (Penyusunan Dokumen CPIB, Presentasi Kelompok, Penilaian Mandiri Penerapan CPIB)',
+        name_eng:
+          'GHAP Documentation - (GHAP Document Preparation, Group Presentation, Self-Assessment of GHAP Implementation)',
+        theory: 4,
+        practice: 10,
+      },
+      {
+        name_ind:
+          'Perizinan berusaha unit pembenihan terintegrasi secara elektronik (OSS) Bidang Pembenihan Ikan',
+        name_eng:
+          'Business licensing of integrated hatchery units electronically (OSS) Fish Hatchery Division',
+        theory: 2,
+        practice: 2,
+      },
+      {
+        name_ind: 'Proses Sertifikasi CPIB',
+        name_eng: 'Certification Process of GHAP',
+        theory: 2,
+        practice: 0,
+      },
+    ],
+  },
   CPPIB: {
     UMUM: [
       {
