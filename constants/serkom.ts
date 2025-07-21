@@ -28,9 +28,9 @@ export const DESC_CERTIFICATE_COMPETENCE_FISHERIES: Record<
 > = {
   HACCP: {
     desc_ind:
-      'Dalam Pelatihan Hazzard Analysis and Critical Control Points (HACCP) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan SDM Kelautan dan Perikanan (BPPSDMKP) dengan Pusat Mutu Pascapanen - Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP)',
+      'Dalam Pelatihan Hazard Analysis and Critical Control Points (HACCP) yang diselenggarakan atas kerjasama Pusat Pelatihan Kelautan dan Perikanan - Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan (BPPSDM KP) melalui Badan Layanan Umum (BLU) Balai Pelatihan dan Penyuluhan Perikanan (BPPP) Tegal dengan Pusat Mutu Pascapanen - Badan Pengendalian dan Pengawas Mutu Hasil Kelautan dan Perikanan (BPPMHKP) dan Gabungan Samudera Internasional (GSI) Jakarta Utara',
     desc_eng:
-      'In the Hazard Analysis and Critical Control Points (HACCP) Training, which was organized in collaboration between the Center for Marine and Fisheries Training - Marine and Fisheries Human Resource Development and Extension Agency, and the Center for Post-Harvest Quality Assurance - Marine and Fisheries Products Quality Control and Supervision Agency',
+      'In the Hazard Analysis and Critical Control Points (HACCP) Training held in collaboration between the Marine and Fisheries Training Center – the Agency for Marine and Fisheries Extension and Human Resources Development through the Public Service Agency of Fisheries Training and Extension Center Tegal with Post Harvest Quality Center – Marine and Fishery Products Quality Control Supervision Agency and Gabungan Samudera Internasional (GSI) of North Jakarta City',
   },
   CBIB: {
     desc_ind:
