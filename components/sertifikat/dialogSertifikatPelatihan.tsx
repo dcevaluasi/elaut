@@ -8,6 +8,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import React, { ChangeEvent, ReactElement, useRef } from "react";
+import QRCode from "react-qr-code";
 import { MdVerified } from "react-icons/md";
 import { Button } from "../ui/button";
 import {
@@ -115,13 +116,22 @@ const SertifikatNonKepelautan = React.forwardRef(
 
 
 
-            <Image
+            {/* <Image
               alt="Logo KKP"
               className="mx-auto w-20 absolute bottom-10 left-28"
               width={0}
               height={0}
               src="/qr-code/Cek_Sertifikat_ELAUT.png"
-            />
+            /> */}
+
+            <div className="mx-auto w-20 absolute bottom-10 left-28">
+              <QRCode
+                size={256}
+                style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                value={`https://elaut-bppsdm.kkp.go.id/layanan/cek-sertifikat/${userPelatihan!.NoRegistrasi}`}
+                viewBox={`0 0 256 256`}
+              />
+            </div>
 
             <div className="w-full flex flex-col space-y-0 px-10 mt-10 ">
               {!isPrinting && (
