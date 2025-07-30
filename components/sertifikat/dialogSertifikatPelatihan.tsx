@@ -124,12 +124,12 @@ const SertifikatNonKepelautan = React.forwardRef(
               src="/qr-code/Cek_Sertifikat_ELAUT.png"
             /> */}
 
-            <div className="mx-auto w-20 absolute bottom-10 left-28">
+            <div className="mx-auto w-20 absolute bottom-0 left-28">
               <QRCode
-                size={256}
+                size={280}
                 style={{ height: "auto", maxWidth: "100%", width: "100%" }}
                 value={`https://elaut-bppsdm.kkp.go.id/layanan/cek-sertifikat/${userPelatihan!.NoRegistrasi}`}
-                viewBox={`0 0 256 256`}
+                viewBox={`0 0 280 280`}
               />
             </div>
 
