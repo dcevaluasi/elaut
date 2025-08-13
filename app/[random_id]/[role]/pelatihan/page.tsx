@@ -24,10 +24,10 @@ export default function Home() {
                 <TbSchool className="text-3xl" />
                 <div className="flex flex-col">
                   <h1 id="page-caption" className="font-semibold text-lg">
-                    Database Pelatihan
+                    Penyelenggaraan Pelatihan
                   </h1>
                   <p className="font-medium text-gray-400 text-base">
-                    Tambahkan data pelatihan yang ada di lembaga pendidikan dan pelatihan mu!
+                    Monitoring pelaksanaan pelatihan kelautan dan perikanan!
                   </p>
                 </div>
               </header>

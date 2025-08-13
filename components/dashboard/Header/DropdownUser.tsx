@@ -66,6 +66,7 @@ const DropdownUser = ({
         }
       );
       Cookies.set("Eselon", response.data.data.Nip);
+      Cookies.set('createPenandatanganan', response.data.data.Status.includes('Kepala') ? '1' : '0')
       setDataAdminPusat(response.data.data);
     } catch (error) {
       console.error({ error });
@@ -201,6 +202,7 @@ const DropdownUser = ({
     Cookies.remove("XSRF093");
     Cookies.remove("IDLemdik");
     Cookies.remove("Eselon");
+    Cookies.remove('createPenandatanganan')
     Toast.fire({
       icon: "success",
       title: `Yeayyy!`,

@@ -100,8 +100,7 @@ export default function LayoutAdminElaut({
         title: "Penyelenggaraan Pelatihan",
         icon: <IoSchoolOutline className="text-2xl" />,
         submenu: [
-          { title: "Pelaksanaan", href: "/admin/pusat/pelatihan/pelaksanaan" },
-          { title: "Penerbitan STTPL", href: "/admin/pusat/pelatihan/sttpl" },
+          { title: "Penerbitan STTPL", href: "/admin/pusat/pelatihan/sttpl/penerbitan" },
         ],
       },
       { title: "Modul Pelatihan", href: "/admin/lemdiklat/modul/", icon: <IoBookOutline className="text-xl" /> },

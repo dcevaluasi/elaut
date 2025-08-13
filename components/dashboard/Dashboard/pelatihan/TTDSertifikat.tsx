@@ -171,11 +171,14 @@ const TTDSertifikat = ({ dataPelatihan, handleFetchData }: { dataPelatihan: Pela
               {" "}
               <Button
                 disabled={isSigning}
-                className={`btn text-white bg-blue-500 hover:bg-blue-500 w-full max-w-full text-base`}
+                className={`inline-flex items-center justify-center gap-1 text-sm w-full rounded-full 
+              bg-blue-500 text-white w-full font-medium px-3 py-3 shadow-sm 
+              hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
               >
-                <AiFillSignature className="" />
-                {isSigning ? "...Proses Penandatanganan" : "Tanda Tangan"}
+                <TbSignature className="h-4 w-4" />
+                {isSigning ? "...Proses Penandatanganan" : "TTD-e"}
               </Button>
+
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>

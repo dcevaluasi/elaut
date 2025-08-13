@@ -1,4 +1,7 @@
+"use client";
+
 import React from "react";
+import Cookies from "js-cookie";
 import {
     ListChecks,
     EyeOff,
@@ -7,15 +10,12 @@ import {
     CheckCircle2,
 } from "lucide-react";
 
-interface TabStatusPelatihanMasyarakatProps {
-    dataLength: number;
-    countNotPublished: number;
-    countVerifying: number;
-    countOnProgress: number;
-    countDone: number;
-    selectedStatusFilter: string;
-    setSelectedStatusFilter: (status: string) => void;
-    isOperatorBalaiPelatihan: boolean;
+interface StatusButtonProps {
+    label: string;
+    count: number;
+    icon?: JSX.Element;
+    isSelected: boolean;
+    onClick: () => void;
 }
 
 const StatusButton = ({
@@ -24,13 +24,7 @@ const StatusButton = ({
     icon,
     isSelected,
     onClick,
-}: {
-    label: string;
-    count: number;
-    icon: JSX.Element;
-    isSelected: boolean;
-    onClick: () => void;
-}) => (
+}: StatusButtonProps) => (
     <button
         onClick={onClick}
         className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm transition-all duration-200
@@ -40,7 +34,7 @@ const StatusButton = ({
             }
     `}
     >
-        <span className="flex items-center justify-center">{icon}</span>
+        {icon && <span className="flex items-center justify-center">{icon}</span>}
         <span className="font-medium">{label}</span>
         <span
             className={`px-2 py-0.5 text-xs rounded-full ${isSelected ? "bg-white/20 text-white" : "bg-gray-100 text-gray-700"
@@ -51,6 +45,34 @@ const StatusButton = ({
     </button>
 );
 
+interface TabStatusPelatihanMasyarakatProps {
+    // Common
+    dataLength: number;
+    countNotPublished?: number;
+    countVerifying?: number;
+    countOnProgress?: number;
+    countDone?: number;
+    selectedStatusFilter: string;
+    setSelectedStatusFilter: (status: string) => void;
+    isOperatorBalaiPelatihan?: boolean;
+
+    // Extra
+    data?: any[];
+    isSupervisor?: boolean;
+    isPejabat?: boolean;
+    isEselonI?: boolean;
+    ESELON_2?: { fullName: string };
+    setIsFetching?: (value: boolean) => void;
+
+    countApproval?: number;
+    countSigningByKaBPPSDMKP?: number;
+    countSigning?: number;
+    countSigningEselon1?: number;
+    countSignedEselon1?: number;
+    countSignedEselon2?: number;
+    countApproved?: number;
+}
+
 export default function TabStatusPelatihanMasyarakat({
     dataLength,
     countNotPublished,
@@ -60,13 +82,36 @@ export default function TabStatusPelatihanMasyarakat({
     selectedStatusFilter,
     setSelectedStatusFilter,
     isOperatorBalaiPelatihan,
+
+    // Extra props
+    data = [],
+    isSupervisor = false,
+    isPejabat = false,
+    isEselonI = false,
+    ESELON_2 = { fullName: "" },
+    setIsFetching = () => { },
+
+    countApproval = 0,
+    countSigningByKaBPPSDMKP = 0,
+    countSigning = 0,
+    countSigningEselon1 = 0,
+    countSignedEselon1 = 0,
+    countSignedEselon2 = 0,
+    countApproved = 0,
 }: TabStatusPelatihanMasyarakatProps) {
+
+    const handleClickWithDelay = (status: string) => {
+        setIsFetching(true);
+        setTimeout(() => {
+            setSelectedStatusFilter(status);
+            setIsFetching(false);
+        }, 800);
+    };
+
     return (
         <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-4 py-3 mb-10">
-            <section
-                aria-labelledby="ticket-statistics-tabs-label"
-                className="overflow-x-auto"
-            >
+            {/* Original Buttons */}
+            <section aria-labelledby="ticket-statistics-tabs-label" className="overflow-x-auto mb-4">
                 <ul className="flex gap-2 min-w-max">
                     <StatusButton
                         label="Total"
@@ -76,45 +121,90 @@ export default function TabStatusPelatihanMasyarakat({
                         onClick={() => setSelectedStatusFilter("All")}
                     />
 
-                    {isOperatorBalaiPelatihan && (
+                    {(isOperatorBalaiPelatihan || Cookies.get('XSRF093') == 'balai') && <>
+
                         <StatusButton
                             label="Belum Dipublish"
-                            count={countNotPublished}
+                            count={countNotPublished || 0}
                             icon={<EyeOff size={16} />}
                             isSelected={selectedStatusFilter === "Belum Dipublish"}
                             onClick={() => setSelectedStatusFilter("Belum Dipublish")}
                         />
+
+
+                        < StatusButton
+                            label="Verifikasi"
+                            count={countVerifying || 0}
+                            icon={<ClipboardCheck size={16} />}
+                            isSelected={selectedStatusFilter === "Verifikasi Pelaksanaan"}
+                            onClick={() => setSelectedStatusFilter("Verifikasi Pelaksanaan")}
+                        />
+
+                        <StatusButton
+                            label="Pengajuan Sertifikat"
+                            count={countOnProgress || 0}
+                            icon={<FileCheck2 size={16} />}
+                            isSelected={selectedStatusFilter === "Proses Pengajuan Sertifikat"}
+                            onClick={() => setSelectedStatusFilter("Proses Pengajuan Sertifikat")}
+                        />
+
+                        <StatusButton
+                            label="Sudah Terbit"
+                            count={countDone || 0}
+                            icon={<CheckCircle2 size={16} />}
+                            isSelected={selectedStatusFilter === "Sudah Di TTD"}
+                            onClick={() => setSelectedStatusFilter("Sudah Di TTD")}
+                        />
+                    </>}
+                    {isSupervisor && !isPejabat && (
+                        <StatusButton
+                            label="Perlu DiApprove"
+                            count={countApproval}
+                            isSelected={selectedStatusFilter === "Approval"}
+                            onClick={() => handleClickWithDelay("Approval")}
+                        />
                     )}
 
-                    <StatusButton
-                        label="Verifikasi"
-                        count={countVerifying}
-                        icon={<ClipboardCheck size={16} />}
-                        isSelected={selectedStatusFilter === "Verifikasi Pelaksanaan"}
-                        onClick={() => setSelectedStatusFilter("Verifikasi Pelaksanaan")}
-                    />
+                    {Cookies.get("Jabatan") === ESELON_2.fullName && (
+                        <StatusButton
+                            label="Perlu DiApprove"
+                            count={countSigningByKaBPPSDMKP}
+                            isSelected={selectedStatusFilter === "Signing by Ka BPPSDM KP"}
+                            onClick={() => handleClickWithDelay("Signing by Ka BPPSDM KP")}
+                        />
+                    )}
 
-                    <StatusButton
-                        label="Pengajuan Sertifikat"
-                        count={countOnProgress}
-                        icon={<FileCheck2 size={16} />}
-                        isSelected={
-                            selectedStatusFilter === "Proses Pengajuan Sertifikat"
-                        }
-                        onClick={() =>
-                            setSelectedStatusFilter("Proses Pengajuan Sertifikat")
-                        }
-                    />
+                    {isPejabat && (
+                        <StatusButton
+                            label="Perlu Ditandatangani"
+                            count={isEselonI ? countSigningEselon1 : countSigning}
+                            isSelected={selectedStatusFilter === "Signing"}
+                            onClick={() => handleClickWithDelay("Signing")}
+                        />
+                    )}
 
-                    <StatusButton
-                        label="Sudah Terbit"
-                        count={countDone}
-                        icon={<CheckCircle2 size={16} />}
-                        isSelected={selectedStatusFilter === "Sudah Di TTD"}
-                        onClick={() => setSelectedStatusFilter("Sudah Di TTD")}
-                    />
+                    {isPejabat && (
+                        <StatusButton
+                            label="Sudah Ditandatangani"
+                            count={isEselonI ? countSignedEselon1 : countSignedEselon2}
+                            isSelected={selectedStatusFilter === "Signed"}
+                            onClick={() => handleClickWithDelay("Signed")}
+                        />
+                    )}
+
+                    {isSupervisor && (
+                        <StatusButton
+                            label="Sudah Diapprove"
+                            count={countApproved}
+                            isSelected={selectedStatusFilter === "Approved"}
+                            onClick={() => handleClickWithDelay("Approved")}
+                        />
+                    )}
+
                 </ul>
             </section>
-        </nav>
+
+
+        </nav >
     );
 }

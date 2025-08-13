@@ -118,45 +118,6 @@ const TableDataPelatihan: React.FC = () => {
     }
   };
 
-  // STATUS FILTER
-  const [selectedStatusFilter, setSelectedStatusFilter] =
-    React.useState<string>("All");
-  const [filterCategory, setFilterCategory] = React.useState<string>("");
-  const [filterCategoryPenyelenggara, setFilterCategoryPenyelenggara] = React.useState<string>("");
-  const [filterCategorySasaran, setFilterCategorySasaran] = React.useState<string>("");
-
-  // SEARCHING
-  const [searchQuery, setSearchQuery] = React.useState<string>("");
-  const statusMapping: Record<string, (p: typeof data[number]) => boolean> = {
-    "Proses Pengajuan Sertifikat": p => p.StatusPenerbitan === "On Progress",
-    "Belum Dipublish": p => p.Status !== "Publish",
-    "Sudah Di TTD": p => p.StatusPenerbitan === "Done",
-    "Verifikasi Pelaksanaan": p => p.StatusPenerbitan === "Verifikasi Pelaksanaan",
-  };
-
-  const searchQueryLower = searchQuery.toLowerCase();
-  const filterCategoryLower = filterCategory?.toLowerCase();
-  const filterPenyelenggaraLower = filterCategoryPenyelenggara?.toLowerCase();
-  const filterSasaranLower = filterCategorySasaran?.toLowerCase();
-
-  const filteredData = data.filter(p => {
-    const program = p.Program.toLowerCase();
-    const namaPelatihan = p.NamaPelatihan.toLowerCase();
-    const penyelenggara = p.PenyelenggaraPelatihan.toLowerCase();
-    const sasaran = p.AsalPelatihan.toLowerCase();
-
-    return (
-      (!filterCategoryLower || program === filterCategoryLower) &&
-      (!filterPenyelenggaraLower || penyelenggara === filterPenyelenggaraLower) &&
-      (!filterSasaranLower || sasaran === filterSasaranLower) &&
-      namaPelatihan.includes(searchQueryLower) &&
-      (
-        selectedStatusFilter === "All" ||
-        statusMapping[selectedStatusFilter]?.(p) ||
-        p.Status === selectedStatusFilter
-      )
-    );
-  });
 
   const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
 
@@ -196,6 +157,46 @@ const TableDataPelatihan: React.FC = () => {
       fetchDataPelatihanMasyarakat();
     }
   }
+
+  const [selectedStatusFilter, setSelectedStatusFilter] =
+    React.useState<string>("All");
+  // STATUS FILTER
+  const [filterCategory, setFilterCategory] = React.useState<string>("");
+  const [filterCategoryPenyelenggara, setFilterCategoryPenyelenggara] = React.useState<string>("");
+  const [filterCategorySasaran, setFilterCategorySasaran] = React.useState<string>("");
+
+  // SEARCHING
+  const [searchQuery, setSearchQuery] = React.useState<string>("");
+  const statusMapping: Record<string, (p: typeof data[number]) => boolean> = {
+    "Proses Pengajuan Sertifikat": p => p.StatusPenerbitan === "On Progress",
+    "Belum Dipublish": p => p.Status !== "Publish",
+    "Sudah Di TTD": p => p.StatusPenerbitan === "Done",
+    "Verifikasi Pelaksanaan": p => p.StatusPenerbitan === "Verifikasi Pelaksanaan",
+  };
+
+  const searchQueryLower = searchQuery.toLowerCase();
+  const filterCategoryLower = filterCategory?.toLowerCase();
+  const filterPenyelenggaraLower = filterCategoryPenyelenggara?.toLowerCase();
+  const filterSasaranLower = filterCategorySasaran?.toLowerCase();
+
+  const filteredData = data.filter(p => {
+    const program = p.Program.toLowerCase();
+    const namaPelatihan = p.NamaPelatihan.toLowerCase();
+    const penyelenggara = p.PenyelenggaraPelatihan.toLowerCase();
+    const sasaran = p.AsalPelatihan.toLowerCase();
+
+    return (
+      (!filterCategoryLower || program === filterCategoryLower) &&
+      (!filterPenyelenggaraLower || penyelenggara === filterPenyelenggaraLower) &&
+      (!filterSasaranLower || sasaran === filterSasaranLower) &&
+      namaPelatihan.includes(searchQueryLower) &&
+      (
+        selectedStatusFilter === "All" ||
+        statusMapping[selectedStatusFilter]?.(p) ||
+        p.Status === selectedStatusFilter
+      )
+    );
+  });
 
 
   return (
@@ -309,9 +310,10 @@ const TableDataPelatihan: React.FC = () => {
               </TabsList>
               <TabsContent value="account">
                 {
-                  isFetching ? <div className="py-32 w-full items-center flex justify-center">
-                    <HashLoader color="#338CF5" size={50} />
-                  </div> :
+                  isFetching ?
+                    <div className="py-32 w-full items-center flex justify-center">
+                      <HashLoader color="#338CF5" size={50} />
+                    </div> :
                     <div className="flex flex-col gap-1">
                       <div className="mb-4 flex flex-wrap items-center !text-sm w-full gap-3 p-3 bg-white rounded-2xl shadow-sm border border-neutral-200">
                         {/* Program Pelatihan */}
@@ -420,8 +422,7 @@ const TableDataPelatihan: React.FC = () => {
                         )}
                       </div>
 
-
-                      {filteredData.length == 0 ? (
+                      {data.length == 0 ? (
                         <div className="pt-12 md:pt-20 flex flex-col items-center">
                           <Image
                             src={"/illustrations/not-found.png"}

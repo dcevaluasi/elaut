@@ -29,10 +29,12 @@ import {
     BookOpen
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import Cookies from "js-cookie";
+import TTDSertifikat from "../../Dashboard/pelatihan/TTDSertifikat";
 
 interface TableDataPelatihanMasyarakatProps {
     data: PelatihanMasyarakat[];
-    isOperatorBalaiPelatihan: boolean;
+    isOperatorBalaiPelatihan?: boolean;
     generateTanggalPelatihan: (date: string) => string;
     encryptValue: (val: string) => string;
     countUserWithDrafCertificate: (users: any[]) => number;
@@ -52,6 +54,9 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
     handleSendToSPVAboutCertificateIssueance,
     fetchDataPelatihanMasyarakat,
 }) => {
+
+
+
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedPelatihan, setSelectedPelatihan] =
         useState<PelatihanMasyarakat | null>(null);
@@ -65,6 +70,7 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
 
     return (
         <div>
+
             {/* Table */}
             <div className="overflow-x-auto border border-gray-200 rounded-xl shadow-sm">
                 <table className="min-w-full text-sm border border-gray-200">
@@ -116,21 +122,37 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                         {pelatihan.UserPelatihan?.length ?? 0}
                                     </td>
                                     <td className="px-4 py-3 flex flex-wrap gap-2 justify-center">
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => setSelectedPelatihan(pelatihan)}
-                                        >
-                                            <RiInformationFill size={14} /> Detail
-                                        </Button>
+                                        {Cookies.get('createPenandatanganan') == '1' ?
+                                            <>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="inline-flex w-full items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
+             rounded-full border border-neutral-300 bg-white text-neutral-700 
+             hover:bg-neutral-100 hover:text-neutral-900 transition-colors 
+             shadow-sm"
+                                                    onClick={() => setSelectedPelatihan(pelatihan)}
+                                                >
+                                                    <RiInformationFill size={14} /> Detail
+                                                </Button>
+                                                <TTDSertifikat dataPelatihan={pelatihan!} handleFetchData={fetchDataPelatihanMasyarakat} />
+                                            </> : <Link
+                                                title="Detail Pelatihan"
+                                                href={`/admin/lemdiklat/pelatihan/detail/${pelatihan.KodePelatihan}/${encryptValue(
+                                                    pelatihan.IdPelatihan.toString()
+                                                )}`}
+                                                className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
+             rounded-full border border-neutral-300 bg-white text-neutral-700 
+             hover:bg-neutral-100 hover:text-neutral-900 transition-colors 
+             shadow-sm"
+                                            >
+                                                <RiInformationFill className="h-5 w-5 text-blue-500" />
+                                                Detail
+                                            </Link>
+                                        }
 
-                                        <Link
-                                            title="Detail Pelatihan"
-                                            href={`/admin/lemdiklat/pelatihan/detail/${pelatihan.KodePelatihan}/${encryptValue(pelatihan.IdPelatihan.toString())}`}
-                                            className="border border-neutral-900 shadow-sm inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-neutral-900 hover:bg-neutral-900 hover:text-white text-white rounded-md"
-                                        >
-                                            <RiInformationFill className="h-5 w-5" /> Detail
-                                        </Link>
+
+
 
                                         {!isOperatorBalaiPelatihan &&
                                             pelatihan.PemberitahuanDiterima === "Kirim ke SPV" && (
@@ -263,27 +285,13 @@ function DetailPelatihanDialog({
                                 Calendar
                             )}
                             {renderField(
-                                "Tanggal Pendaftaran",
-                                `${generateTanggalPelatihan(
-                                    selectedPelatihan.TanggalMulaiPendaftaran
-                                )} s.d ${generateTanggalPelatihan(
-                                    selectedPelatihan.TanggalBerakhirPendaftaran
-                                )}`,
-                                Calendar
-                            )}
-                            {renderField(
                                 "Jumlah Peserta",
                                 selectedPelatihan.UserPelatihan?.length ?? 0,
                                 Users
                             )}
                             {renderField("Instruktur", selectedPelatihan.Instruktur, User)}
                             {renderField("Lokasi", selectedPelatihan.LokasiPelatihan, MapPin)}
-                            {renderField(
-                                "Harga",
-                                `Rp ${selectedPelatihan.HargaPelatihan.toLocaleString()}`,
-                                Coins
-                            )}
-                            {renderField("Status", selectedPelatihan.Status, CheckCircle2)}
+
                             {renderField("Jenis Pelatihan", selectedPelatihan.JenisPelatihan, Tag)}
                             {renderField("Bidang", selectedPelatihan.BidangPelatihan, Tag)}
                             {renderField(
@@ -292,51 +300,18 @@ function DetailPelatihanDialog({
                                 Award
                             )}
                             {renderField(
-                                "Deskripsi Sertifikat",
-                                selectedPelatihan.DeskripsiSertifikat,
-                                FileText
-                            )}
-                            {renderField(
                                 "Pelaksanaan Pelatihan",
                                 selectedPelatihan.PelaksanaanPelatihan,
                                 ClipboardList
                             )}
                             {renderField("Uji Kompetensi", selectedPelatihan.UjiKompotensi, Award)}
-                            {renderField("Kuota", selectedPelatihan.KoutaPelatihan, Users)}
                             {renderField("Asal Pelatihan", selectedPelatihan.AsalPelatihan, Tag)}
-                            {renderField("Jenis Sertifikat", selectedPelatihan.JenisSertifikat, Award)}
-                            {renderField("No Sertifikat", selectedPelatihan.NoSertifikat, FileText)}
                             {renderField("Memo Pusat", selectedPelatihan.MemoPusat, FileText)}
                             {renderField("Silabus", selectedPelatihan.SilabusPelatihan, FileText)}
                             {renderField("Ttd Sertifikat", selectedPelatihan.TtdSertifikat, FileText)}
-                            {renderField(
-                                "Keterangan TTD",
-                                selectedPelatihan.KeteranganTandaTangan,
-                                FileText
-                            )}
+
                             {renderField("Berita Acara", selectedPelatihan.BeritaAcara, FileText)}
-                            {renderField(
-                                "Catatan Penerbitan Pusat",
-                                selectedPelatihan.CatatanPenerbitanByPusat,
-                                FileText
-                            )}
-                            {renderField("Status Approval", selectedPelatihan.StatusApproval, CheckCircle2)}
-                            {renderField(
-                                "Penerbitan Sertifikat Diterima",
-                                selectedPelatihan.PenerbitanSertifikatDiterima,
-                                Award
-                            )}
-                            {renderField(
-                                "Pemberitahuan Diterima",
-                                selectedPelatihan.PemberitahuanDiterima,
-                                FileText
-                            )}
-                            {renderField("Is Sematkan", selectedPelatihan.IsSematkan, Info)}
-                            {renderField(
-                                "Is Mengajukan Penerbitan",
-                                selectedPelatihan.IsMengajukanPenerbitan ? "Ya" : "Tidak",
-                                Info
-                            )}
+
                         </div>
                     </ScrollArea>
                 )}
