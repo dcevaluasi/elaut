@@ -43,6 +43,7 @@ import { DESC_CERTIFICATE_COMPETENCE_FISHERIES } from "@/constants/serkom";
 import { ESELON_1, ESELON_2, KA_BPPSDM, KA_PUSLAT_KP } from "@/constants/nomenclatures";
 import html2canvas from "html2canvas";
 import { calculateTotalHoursCertificateBPPP } from "@/lib/utils";
+import { generatedDescriptionCertificate } from "@/utils/certificates";
 
 const html2pdf = dynamic(() => import("html2pdf.js"), { ssr: false });
 
@@ -110,19 +111,9 @@ const SertifikatNonKepelautan = React.forwardRef(
           <div ref={refPage} className="pdf-page w-full flex flex-col  gap-4 relative h-[49.63rem] items-center justify-center">
             <div className="flex flex-row  absolute top-0 right-0">
               <p className="text-lg font-bosNormal">
-                No. Reg : {userPelatihan?.NoRegistrasi}
+                No. STTPL : {userPelatihan?.NoRegistrasi}
               </p>
             </div>
-
-
-
-            {/* <Image
-              alt="Logo KKP"
-              className="mx-auto w-20 absolute bottom-10 left-28"
-              width={0}
-              height={0}
-              src="/qr-code/Cek_Sertifikat_ELAUT.png"
-            /> */}
 
             <div className="mx-auto w-20 absolute bottom-0 left-28">
               <QRCode
@@ -299,10 +290,10 @@ const SertifikatNonKepelautan = React.forwardRef(
                       </div>
                     </div></> : <><div className="flex w-full flex-col space-y-0 max-w-7xl mx-auto items-start text-sm -mt-3 text-center font-bos h-fit">
                       <span className="text-base leading-[115%] font-bosNormal">
-                        {DESC_CERTIFICATE_COMPETENCE_FISHERIES[pelatihan!.Program].desc_ind}, pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
+                        {generatedDescriptionCertificate(pelatihan!.DeskripsiSertifikat).desc_indo}, pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
                       </span>
                       <span className="max-w-5xl leading-none font-bos italic text-[0.85rem] mx-auto">
-                        {DESC_CERTIFICATE_COMPETENCE_FISHERIES[pelatihan!.Program].desc_eng} on {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
+                        {generatedDescriptionCertificate(pelatihan!.DeskripsiSertifikat).desc_eng} on {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
                       </span>
                     </div>
 
@@ -1005,52 +996,6 @@ export function DialogSertifikatPelatihan({
   const handleUploadPDF = () => {
     uploadPdf();
   };
-
-  // React.useEffect(() => {
-  //   if (typeof window !== "undefined" && show && componentRef.current) {
-  //     const generatePDF = async () => {
-  //       const html2pdf = (await import("html2pdf.js")).default;
-
-  //       const element = componentRef.current;
-
-  //       const opt = {
-  //         margin: [10, 10, 10, 10], // Small margins for better fit
-  //         filename: `${userPelatihan?.Nama}_${userPelatihan?.NoRegistrasi}.pdf`,
-  //         // pagebreak: { mode: "avoid-all" }, // Prevent splitting important elements
-  //         html2canvas: {
-  //           scale: 2, // Higher scale for better quality
-  //           useCORS: true, // Load external styles correctly
-  //           logging: false,
-  //           backgroundColor: "#fff",
-  //         },
-  //         jsPDF: {
-  //           unit: "px",
-  //           format: [element.offsetWidth, element.offsetHeight], // Dynamically adjust to content
-  //           orientation: "landscape",
-  //         },
-  //       };
-
-  //       html2pdf()
-  //         .from(element)
-  //         .set(opt)
-  //         .outputPdf("blob")
-  //         .then(async (pdfBlob: Blob) => {
-  //           // Optional: Check size of the PDF blob
-  //           const fileSize = pdfBlob.size / 1024 / 1024; // Convert to MB
-  //           console.log("PDF Blob Size:", fileSize, "MB");
-
-  //           if (fileSize > 1) {
-  //             // If file size is too large, you can notify the user or adjust settings further
-  //             console.warn(
-  //               "The file size exceeds 1MB. Consider further optimizations."
-  //             );
-  //           }
-  //         });
-  //     };
-
-  //     generatePDF();
-  //   }
-  // }, [show, userPelatihan]);
 
   const [isPrinting, setIsPrinting] = React.useState<boolean>(false);
   const [isSpesimen, setIsSpesimen] = React.useState<boolean>(false);
