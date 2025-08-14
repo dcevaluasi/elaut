@@ -113,16 +113,16 @@ export default function TabStatusPelatihanMasyarakat({
             {/* Original Buttons */}
             <section aria-labelledby="ticket-statistics-tabs-label" className="overflow-x-auto mb-4">
                 <ul className="flex gap-2 min-w-max">
-                    <StatusButton
-                        label="Total"
-                        count={dataLength}
-                        icon={<ListChecks size={16} />}
-                        isSelected={selectedStatusFilter === "All"}
-                        onClick={() => setSelectedStatusFilter("All")}
-                    />
+
 
                     {(isOperatorBalaiPelatihan || Cookies.get('XSRF093') == 'balai') && <>
-
+                        <StatusButton
+                            label="Total"
+                            count={dataLength}
+                            icon={<ListChecks size={16} />}
+                            isSelected={selectedStatusFilter === "All"}
+                            onClick={() => setSelectedStatusFilter("All")}
+                        />
                         <StatusButton
                             label="Belum Dipublish"
                             count={countNotPublished || 0}
@@ -132,7 +132,7 @@ export default function TabStatusPelatihanMasyarakat({
                         />
 
 
-                        < StatusButton
+                        <StatusButton
                             label="Verifikasi"
                             count={countVerifying || 0}
                             icon={<ClipboardCheck size={16} />}

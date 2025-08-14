@@ -246,7 +246,9 @@ function DetailPelatihanDialog({
             <Icon className="w-4 h-4 text-gray-500 mt-[2px]" />
             <div className="flex flex-col">
                 <span className="text-xs text-gray-500">{label}</span>
-                <span className="text-sm font-medium text-gray-800">{value || "-"}</span>
+                {
+                    value.include('https') ? <Link href={value} target={'_blank'}><span className="text-sm font-medium text-gray-800">Tautan {label}</span></Link> : <span className="text-sm font-medium text-gray-800">{value || "-"}</span>
+                }
             </div>
         </div>
     );
