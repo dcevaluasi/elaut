@@ -306,13 +306,10 @@ function DetailPelatihanDialog({
                                 selectedPelatihan.PelaksanaanPelatihan,
                                 ClipboardList
                             )}
-                            {renderField("Uji Kompetensi", selectedPelatihan.UjiKompotensi, Award)}
                             {renderField("Asal Pelatihan", selectedPelatihan.AsalPelatihan, Tag)}
-                            {renderField("Memo Pusat", selectedPelatihan.MemoPusat, FileText)}
-                            {renderField("Silabus", selectedPelatihan.SilabusPelatihan, FileText)}
+
                             {renderField("Ttd Sertifikat", selectedPelatihan.TtdSertifikat, FileText)}
 
-                            {renderField("Berita Acara", selectedPelatihan.BeritaAcara, FileText)}
 
                         </div>
                     </ScrollArea>

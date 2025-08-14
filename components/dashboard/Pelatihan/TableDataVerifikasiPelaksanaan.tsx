@@ -208,7 +208,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
   /** 
    * Filtering Utilitess
    */
-  const [selectedStatusFilter, setSelectedStatusFilter] = React.useState<string>("All");
+  const [selectedStatusFilter, setSelectedStatusFilter] = React.useState<string>(isPejabat ? "Perlu Ditandangani" : "All");
   const [filterCategory, setFilterCategory] = React.useState<string>(""); // Program
   const [filterCategoryPenyelenggara, setFilterCategoryPenyelenggara] = React.useState<string>(""); // Penyelenggara
   const [filterCategorySasaran, setFilterCategorySasaran] = React.useState<string>(""); // Sasaran / AsalPelatihan
@@ -393,23 +393,12 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
         </div>
         <TableDataPelatihanMasyarakat
           data={filteredData}
-
           generateTanggalPelatihan={generateTanggalPelatihan}
           encryptValue={encryptValue}
           countUserWithDrafCertificate={countUserWithDrafCertificate}
           handleSendToSPVAboutCertificateIssueance={() => { }}
           fetchDataPelatihanMasyarakat={refetch}
         />
-
-        {isFetching ? (
-          <div className="py-32 w-full flex items-center justify-center">
-            <HashLoader color="#338CF5" size={50} />
-          </div>
-        ) : data.length === 0 ? (
-          <></>
-        ) : (
-          <></>
-        )}
       </section>
 
     </div >
