@@ -208,7 +208,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
   /** 
    * Filtering Utilitess
    */
-  const [selectedStatusFilter, setSelectedStatusFilter] = React.useState<string>(isPejabat ? "Perlu Ditandangani" : "All");
+  const [selectedStatusFilter, setSelectedStatusFilter] = React.useState<string>(isPejabat ? "Perlu Ditandatangani" : "All");
   const [filterCategory, setFilterCategory] = React.useState<string>(""); // Program
   const [filterCategoryPenyelenggara, setFilterCategoryPenyelenggara] = React.useState<string>(""); // Penyelenggara
   const [filterCategorySasaran, setFilterCategorySasaran] = React.useState<string>(""); // Sasaran / AsalPelatihan
@@ -252,7 +252,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
         field.includes(searchLower)
       ) &&
       (
-        selectedStatusFilter === "All" ||
+        selectedStatusFilter === "Perlu Ditandatangani" ||
         statusMapping[selectedStatusFilter]?.(p) ||
         p.Status === selectedStatusFilter
       )
