@@ -247,7 +247,7 @@ function DetailPelatihanDialog({
             <div className="flex flex-col">
                 <span className="text-xs text-gray-500">{label}</span>
                 {
-                    value.include('https') ? <Link href={value} target={'_blank'}><span className="text-sm font-medium text-gray-800">Tautan {label}</span></Link> : <span className="text-sm font-medium text-gray-800">{value || "-"}</span>
+                    label.includes('Memo') || label.includes('Berita') || label.includes('Surat') ? <Link href={value} target={'_blank'}><span className="text-sm font-medium text-gray-800">Tautan {label}</span></Link> : <span className="text-sm font-medium text-gray-800">{value || "-"}</span>
                 }
             </div>
         </div>
