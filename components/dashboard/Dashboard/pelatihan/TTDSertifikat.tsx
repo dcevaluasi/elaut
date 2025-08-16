@@ -120,9 +120,9 @@ const TTDSertifikat = ({ dataPelatihan, handleFetchData }: { dataPelatihan: Pela
 
   const [isShowPassphrase, setIsShowPassphrase] = React.useState<boolean>(false);
 
-  React.useEffect(() => {
-    handleFetchData();
-  }, [dataPelatihan.IdPelatihan]);
+  // React.useEffect(() => {
+  //   handleFetchData();
+  // }, [dataPelatihan.IdPelatihan]);
 
   const handleUpdateStatusPenerbitan = async () => {
     const formData = new FormData();

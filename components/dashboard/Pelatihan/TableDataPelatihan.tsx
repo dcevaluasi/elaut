@@ -55,17 +55,13 @@ const TableDataPelatihan: React.FC = () => {
   const {
     data,
     isFetching,
+    setIsFetching,
     countOnProgress,
     countDone,
     countNotPublished,
     countVerifying,
-    fetchDataPelatihanMasyarakat,
+    refetch,
   } = useFetchDataPelatihanMasyarakat();
-
-  React.useEffect(() => {
-    fetchDataPelatihanMasyarakat();
-  }, [fetchDataPelatihanMasyarakat]);
-
 
   // HANDLING UPDATING DATA PELATIHAN
   const [openFormEditPelatihan, setOpenFormEditPelatihan] =
@@ -104,7 +100,7 @@ const TableDataPelatihan: React.FC = () => {
       setTanggalMulaiPelatihan("");
       setOpenFormEditPelatihan(false);
       setTanggalBerakhirPelatihan("");
-      fetchDataPelatihanMasyarakat();
+      refetch();
     } catch (error) {
       console.error({ error });
       Toast.fire({
@@ -114,7 +110,7 @@ const TableDataPelatihan: React.FC = () => {
       setTanggalMulaiPelatihan("");
       setTanggalBerakhirPelatihan("");
       setOpenFormEditPelatihan(false);
-      fetchDataPelatihanMasyarakat();
+      refetch();
     }
   };
 
@@ -146,7 +142,7 @@ const TableDataPelatihan: React.FC = () => {
       });
       handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyelesaikan drafting sttpl/sertifikat peserta dan mengirimkan ke SPV untuk', Cookies.get('Status'), Cookies.get('SATKER_BPPP'))
 
-      fetchDataPelatihanMasyarakat();
+      refetch();
     } catch (error) {
       console.error("ERROR GENERATE SERTIFIKAT: ", error);
       Toast.fire({
@@ -154,7 +150,7 @@ const TableDataPelatihan: React.FC = () => {
         title: "Oopsss!",
         text: "Gagal mengirimkan informasi pengajuan kepada SPV Pusat!",
       });
-      fetchDataPelatihanMasyarakat();
+      refetch();
     }
   }
 
@@ -201,271 +197,185 @@ const TableDataPelatihan: React.FC = () => {
 
   return (
     <div className="shadow-default -mt-10">
-      <AlertDialog
-        open={openFormEditPelatihan}
-        onOpenChange={setOpenFormEditPelatihan}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Edit Data Pelatihan</AlertDialogTitle>
-            <AlertDialogDescription>
-              {selectedPelatihan != null ? (
-                <div className="flex gap-2 w-full">
-                  <div className="flex flex-wrap -mx-3 mb-1 w-full">
-                    <div className="w-full px-3">
-                      <label
-                        className="block text-gray-800 text-sm font-medium mb-1"
-                        htmlFor="kodePelatihan"
-                      >
-                        Tanggal Mulai Pelatihan{" "}
-                        <span className="text-red-600">*</span>
-                      </label>
-                      <input
-                        id="tanggalMulaiPelatihan"
-                        type="date"
-                        className="form-input w-full text-black border-gray-300 rounded-md"
-                        required
-                        min={
-                          selectedPelatihan.TanggalAkhirPendaftaran ||
-                          new Date().toISOString().split("T")[0]
-                        }
-                        value={tanggalMulaiPelatihan}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                          setTanggalMulaiPelatihan(e.target.value)
-                        }
-                      />
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap -mx-3 mb-1 w-full">
-                    <div className="w-full px-3">
-                      <label
-                        className="block text-gray-800 text-sm font-medium mb-1"
-                        htmlFor="namaPelatihan"
-                      >
-                        Tanggal Berakhir Pelatihan{" "}
-                        <span className="text-red-600">*</span>
-                      </label>
-                      <input
-                        id="tanggalBerakhirPelatihan"
-                        type="date"
-                        className="form-input w-full text-black border-gray-300 rounded-md"
-                        required
-                        min={
-                          tanggalMulaiPelatihan ||
-                          new Date().toISOString().split("T")[0]
-                        }
-                        value={tanggalBerakhirPelatihan}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                          setTanggalBerakhirPelatihan(e.target.value)
-                        }
-                        disabled={!tanggalMulaiPelatihan}
-                      />
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <></>
-              )}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => {
-                setOpenFormEditPelatihan(false);
-                setTanggalMulaiPelatihan("");
-                setTanggalBerakhirPelatihan("");
-              }}
+      <TabStatusPelatihanMasyarakat
+        dataLength={data.length}
+        countNotPublished={countNotPublished}
+        countVerifying={countVerifying}
+        countOnProgress={countOnProgress}
+        countDone={countDone}
+        selectedStatusFilter={selectedStatusFilter}
+        setSelectedStatusFilter={setSelectedStatusFilter}
+        isOperatorBalaiPelatihan={isOperatorBalaiPelatihan}
+      />
+      <section className="px-4 -mt-4 w-full">
+        <Tabs defaultValue="account" className="w-full">
+          <TabsList className={`grid w-full grid-cols-2`}>
+            <TabsTrigger
+              value="account"
+              onClick={() => refetch()}
             >
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={(e) => handleUpdatingDataPelatihan()}>
-              Continue
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {
-        !isFetching && <>
-          <TabStatusPelatihanMasyarakat
-            dataLength={data.length}
-            countNotPublished={countNotPublished}
-            countVerifying={countVerifying}
-            countOnProgress={countOnProgress}
-            countDone={countDone}
-            selectedStatusFilter={selectedStatusFilter}
-            setSelectedStatusFilter={setSelectedStatusFilter}
-            isOperatorBalaiPelatihan={isOperatorBalaiPelatihan}
-          />
-          <section className="px-4 -mt-4 w-full">
-            <Tabs defaultValue="account" className="w-full">
-              <TabsList className={`grid w-full grid-cols-2`}>
-                <TabsTrigger
-                  value="account"
-                  onClick={() => fetchDataPelatihanMasyarakat()}
-                >
-                  Daftar Pelatihan
-                </TabsTrigger>
-                <TabsTrigger value="password">Buat Pelatihan Baru</TabsTrigger>
-              </TabsList>
-              <TabsContent value="account">
-                {
-                  isFetching ?
-                    <div className="py-32 w-full items-center flex justify-center">
-                      <HashLoader color="#338CF5" size={50} />
-                    </div> :
-                    <div className="flex flex-col gap-1">
-                      <div className="mb-4 flex flex-wrap items-center !text-sm w-full gap-3 p-3 bg-white rounded-2xl shadow-sm border border-neutral-200">
-                        {/* Program Pelatihan */}
-                        <Select
-                          value={filterCategory}
-                          onValueChange={(value: string) => setFilterCategory(value)}
-                        >
-                          <SelectTrigger className="w-fit md:w-1/4  bg-neutral-50 border border-neutral-200 rounded-xl shadow-sm h-12 px-4 flex items-center gap-2">
-                            <MdSchool className="text-neutral-500 w-5 h-5" />
-                            <SelectValue placeholder="Program Pelatihan" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectGroup>
-                              <SelectLabel>AKP</SelectLabel>
-                              {PROGRAM_AKP.map((item) => (
-                                <SelectItem key={item} value={item}>
-                                  {item}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                            <SelectGroup>
-                              <SelectLabel>Perikanan</SelectLabel>
-                              {PROGRAM_PERIKANAN.map((item) => (
-                                <SelectItem key={item} value={item}>
-                                  {item}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                            <SelectGroup>
-                              <SelectLabel>Kelautan</SelectLabel>
-                              {PROGRAM_KELAUTAN.map((item) => (
-                                <SelectItem key={item} value={item}>
-                                  {item}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-
-                        {/* Sasaran */}
-                        <Select
-                          value={filterCategorySasaran}
-                          onValueChange={(value: string) => setFilterCategorySasaran(value)}
-                        >
-                          <SelectTrigger className="w-fit md:w-1/4  bg-neutral-50 border border-neutral-200 rounded-xl shadow-sm h-12 px-4 flex items-center gap-2">
-                            <MdPeople className="text-neutral-500 w-5 h-5" />
-                            <SelectValue placeholder="Pilih Sasaran" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Masyarakat Umum">Masyarakat Umum</SelectItem>
-                            <SelectItem value="Peserta Didik Sekolah Usaha Perikanan Menengah">
-                              Peserta Didik Sekolah Usaha Perikanan Menengah
+              Daftar Pelatihan
+            </TabsTrigger>
+            <TabsTrigger value="password">Buat Pelatihan Baru</TabsTrigger>
+          </TabsList>
+          <TabsContent value="account">
+            {
+              isFetching ?
+                <div className="py-32 w-full items-center flex justify-center">
+                  <HashLoader color="#338CF5" size={50} />
+                </div> :
+                <div className="flex flex-col gap-1">
+                  <div className="mb-4 flex flex-wrap items-center !text-sm w-full gap-3 p-3 bg-white rounded-2xl shadow-sm border border-neutral-200">
+                    {/* Program Pelatihan */}
+                    <Select
+                      value={filterCategory}
+                      onValueChange={(value: string) => setFilterCategory(value)}
+                    >
+                      <SelectTrigger className="w-fit md:w-1/4  bg-neutral-50 border border-neutral-200 rounded-xl shadow-sm h-12 px-4 flex items-center gap-2">
+                        <MdSchool className="text-neutral-500 w-5 h-5" />
+                        <SelectValue placeholder="Program Pelatihan" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>AKP</SelectLabel>
+                          {PROGRAM_AKP.map((item) => (
+                            <SelectItem key={item} value={item}>
+                              {item}
                             </SelectItem>
-                            <SelectItem value="Peserta Didik Politeknik Kelautan dan Perikanan">
-                              Peserta Didik Politeknik Kelautan dan Perikanan
+                          ))}
+                        </SelectGroup>
+                        <SelectGroup>
+                          <SelectLabel>Perikanan</SelectLabel>
+                          {PROGRAM_PERIKANAN.map((item) => (
+                            <SelectItem key={item} value={item}>
+                              {item}
                             </SelectItem>
-                            <SelectItem value="Karyawan/Pegawai/Mining Agent">
-                              Karyawan/Pegawai/Mining Agent
+                          ))}
+                        </SelectGroup>
+                        <SelectGroup>
+                          <SelectLabel>Kelautan</SelectLabel>
+                          {PROGRAM_KELAUTAN.map((item) => (
+                            <SelectItem key={item} value={item}>
+                              {item}
                             </SelectItem>
-                          </SelectContent>
-                        </Select>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
 
-                        {/* Penyelenggara */}
-                        <Select
-                          value={filterCategoryPenyelenggara}
-                          onValueChange={(value: string) => setFilterCategoryPenyelenggara(value)}
-                        >
-                          <SelectTrigger className="w-fit  bg-neutral-50 border border-neutral-200 rounded-xl shadow-sm h-12 px-4 flex items-center gap-2">
-                            <MdBusiness className="text-neutral-500 w-5 h-5" />
-                            <SelectValue placeholder="Pilih Satker/Penyelenggara" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {UPT.map((item: string, index: number) => (
-                              <SelectItem key={index} value={item}>
-                                {item}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                    {/* Sasaran */}
+                    <Select
+                      value={filterCategorySasaran}
+                      onValueChange={(value: string) => setFilterCategorySasaran(value)}
+                    >
+                      <SelectTrigger className="w-fit md:w-1/4  bg-neutral-50 border border-neutral-200 rounded-xl shadow-sm h-12 px-4 flex items-center gap-2">
+                        <MdPeople className="text-neutral-500 w-5 h-5" />
+                        <SelectValue placeholder="Pilih Sasaran" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Masyarakat Umum">Masyarakat Umum</SelectItem>
+                        <SelectItem value="Peserta Didik Sekolah Usaha Perikanan Menengah">
+                          Peserta Didik Sekolah Usaha Perikanan Menengah
+                        </SelectItem>
+                        <SelectItem value="Peserta Didik Politeknik Kelautan dan Perikanan">
+                          Peserta Didik Politeknik Kelautan dan Perikanan
+                        </SelectItem>
+                        <SelectItem value="Karyawan/Pegawai/Mining Agent">
+                          Karyawan/Pegawai/Mining Agent
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
 
-                        {/* Search */}
-                        <div className="flex items-center w-full md:flex-1 bg-neutral-50 border border-neutral-200 rounded-xl shadow-sm h-12 px-4 gap-2">
-                          <MdSearch className="text-neutral-500 w-5 h-5" />
-                          <Input
-                            type="text"
-                            placeholder="Cari berdasarkan Nama Pelatihan"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full border-none bg-transparent text-sm focus:ring-0 focus:outline-none"
-                          />
-                        </div>
+                    {/* Penyelenggara */}
+                    <Select
+                      value={filterCategoryPenyelenggara}
+                      onValueChange={(value: string) => setFilterCategoryPenyelenggara(value)}
+                    >
+                      <SelectTrigger className="w-fit  bg-neutral-50 border border-neutral-200 rounded-xl shadow-sm h-12 px-4 flex items-center gap-2">
+                        <MdBusiness className="text-neutral-500 w-5 h-5" />
+                        <SelectValue placeholder="Pilih Satker/Penyelenggara" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {UPT.map((item: string, index: number) => (
+                          <SelectItem key={index} value={item}>
+                            {item}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
 
-                        {/* Clear Filter */}
-                        {(filterCategory || filterCategoryPenyelenggara || filterCategorySasaran) && (
-                          <Button
-                            onClick={() => {
-                              setFilterCategory("");
-                              setFilterCategoryPenyelenggara("");
-                              setFilterCategorySasaran("");
-                            }}
-                            className="h-12 px-4 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl shadow-sm flex items-center gap-2"
-                          >
-                            <MdClear className="w-5 h-5" />
-                            Bersihkan Filter
-                          </Button>
-                        )}
-                      </div>
-
-                      {data.length == 0 ? (
-                        <div className="pt-12 md:pt-20 flex flex-col items-center">
-                          <Image
-                            src={"/illustrations/not-found.png"}
-                            alt="Not Found"
-                            width={0}
-                            height={0}
-                            className="w-[400px]"
-                          />
-                          <div className="max-w-3xl mx-auto text-center pb-5 md:pb-8 -mt-2">
-                            <h1 className="text-3xl font-calsans leading-[110%] text-black">
-                              Belum Ada Pelatihan
-                            </h1>
-                            <div className="text-gray-600 text-sm text-center  max-w-md">
-                              Buka kelas pelatihan segera untuk dapat melihat berbagai
-                              macam pelatihan berdasarkan programnya!
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <TableDataPelatihanMasyarakat
-                          data={filteredData}
-                          isOperatorBalaiPelatihan={isOperatorBalaiPelatihan}
-                          generateTanggalPelatihan={generateTanggalPelatihan}
-                          encryptValue={encryptValue}
-                          countUserWithDrafCertificate={countUserWithDrafCertificate}
-                          handleSendToSPVAboutCertificateIssueance={handleSendToSPVAboutCertificateIssueance}
-                          fetchDataPelatihanMasyarakat={fetchDataPelatihanMasyarakat}
-                        />
-                      )}
+                    {/* Search */}
+                    <div className="flex items-center w-full md:flex-1 bg-neutral-50 border border-neutral-200 rounded-xl shadow-sm h-12 px-4 gap-2">
+                      <MdSearch className="text-neutral-500 w-5 h-5" />
+                      <Input
+                        type="text"
+                        placeholder="Cari berdasarkan Nama Pelatihan"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full border-none bg-transparent text-sm focus:ring-0 focus:outline-none"
+                      />
                     </div>
-                }
 
-              </TabsContent>
-              <TabsContent value="password">
-                <Card>
-                  <CardContent>
-                    <FormPelatihan edit={false} />
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </section></>
-      }
+                    {/* Clear Filter */}
+                    {(filterCategory || filterCategoryPenyelenggara || filterCategorySasaran) && (
+                      <Button
+                        onClick={() => {
+                          setFilterCategory("");
+                          setFilterCategoryPenyelenggara("");
+                          setFilterCategorySasaran("");
+                        }}
+                        className="h-12 px-4 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl shadow-sm flex items-center gap-2"
+                      >
+                        <MdClear className="w-5 h-5" />
+                        Bersihkan Filter
+                      </Button>
+                    )}
+                  </div>
+
+                  {data.length == 0 ? (
+                    <div className="pt-12 md:pt-20 flex flex-col items-center">
+                      <Image
+                        src={"/illustrations/not-found.png"}
+                        alt="Not Found"
+                        width={0}
+                        height={0}
+                        className="w-[400px]"
+                      />
+                      <div className="max-w-3xl mx-auto text-center pb-5 md:pb-8 -mt-2">
+                        <h1 className="text-3xl font-calsans leading-[110%] text-black">
+                          Belum Ada Pelatihan
+                        </h1>
+                        <div className="text-gray-600 text-sm text-center  max-w-md">
+                          Buka kelas pelatihan segera untuk dapat melihat berbagai
+                          macam pelatihan berdasarkan programnya!
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <TableDataPelatihanMasyarakat
+                      data={filteredData}
+                      isOperatorBalaiPelatihan={isOperatorBalaiPelatihan}
+                      generateTanggalPelatihan={generateTanggalPelatihan}
+                      encryptValue={encryptValue}
+                      countUserWithDrafCertificate={countUserWithDrafCertificate}
+                      handleSendToSPVAboutCertificateIssueance={handleSendToSPVAboutCertificateIssueance}
+                      fetchDataPelatihanMasyarakat={refetch}
+                    />
+                  )}
+                </div>
+            }
+
+          </TabsContent>
+          <TabsContent value="password">
+            <Card>
+              <CardContent>
+                <FormPelatihan edit={false} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </section>
+
     </div >
   )
 };

@@ -158,7 +158,10 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                             pelatihan.PemberitahuanDiterima === "Kirim ke SPV" && (
                                                 <Button
                                                     size="sm"
-                                                    className="bg-indigo-600 hover:bg-indigo-500"
+                                                    className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
+             rounded-full border border-neutral-300 bg-white text-neutral-700 
+             hover:bg-neutral-100 hover:text-neutral-900 transition-colors 
+             shadow-sm"
                                                     onClick={() => {
                                                         const isReady =
                                                             countUserWithDrafCertificate(
@@ -174,7 +177,7 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                                             );
                                                     }}
                                                 >
-                                                    <BiPaperPlane size={14} /> Kirim ke SPV
+                                                    <BiPaperPlane className=" text-indigo-500" size={14} /> Kirim ke SPV
                                                 </Button>
                                             )}
 

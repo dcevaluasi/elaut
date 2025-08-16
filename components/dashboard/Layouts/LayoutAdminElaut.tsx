@@ -10,10 +10,15 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import DropdownUser from "../Header/DropdownUser";
-import { LucideLayoutDashboard } from "lucide-react";
+import { LucideBadgeCheck, LucideLayoutDashboard } from "lucide-react";
 import { IoBookOutline, IoSchoolOutline } from "react-icons/io5";
 import { GrInfo } from "react-icons/gr";
 import { FiMenu, FiLogOut, FiChevronDown, FiChevronRight } from "react-icons/fi";
+import { RoleAccess } from "@/types/access";
+import { HiOutlineCheckBadge, HiOutlineUserGroup } from "react-icons/hi2";
+import { TbDatabaseEdit, TbSignature } from "react-icons/tb";
+import { MdOutlinePodcasts } from "react-icons/md";
+import Link from "next/link";
 
 export default function LayoutAdminElaut({
   children,
@@ -58,9 +63,11 @@ export default function LayoutAdminElaut({
         headers: { Authorization: `Bearer ${Cookies.get("XSRF091")}` },
       });
       setLemdikData(data);
+      const parsedData: RoleAccess = JSON.parse(data.data.Deskripsi);
       Cookies.set("IDLemdik", data.data.IdLemdik);
       Cookies.set("SATKER_BPPP", data.data.NamaLemdik);
-      Cookies.set("Eselon", data.data.Deskripsi);
+      Cookies.set("Eselon", parsedData.role);
+      Cookies.set("Access", parsedData.role);
       Cookies.set("Status", data.data.Deskripsi);
     } catch (error) {
       console.error("LEMDIK INFO: ", error);
@@ -83,6 +90,7 @@ export default function LayoutAdminElaut({
       "Eselon",
       "Status",
       "Jabatan",
+      "Access",
       "NIK",
     ].forEach((key) => Cookies.remove(key));
 
@@ -93,38 +101,12 @@ export default function LayoutAdminElaut({
     router.replace("/admin/auth/login");
   };
 
-  const navs = pathname.includes("pusat")
-    ? [
-      { title: "Dashboard", href: "/admin/pusat/dashboard/", icon: <LucideLayoutDashboard /> },
-      {
-        title: "Penyelenggaraan Pelatihan",
-        icon: <IoSchoolOutline className="text-2xl" />,
-        submenu: [
-          { title: "Penerbitan STTPL", href: "/admin/pusat/pelatihan/sttpl/penerbitan" },
-        ],
-      },
-      { title: "Modul Pelatihan", href: "/admin/lemdiklat/modul/", icon: <IoBookOutline className="text-xl" /> },
-      Cookies.get("Eselon") === "Operator Pusat"
-        ? { title: "Publikasi & Regulasi", href: "/admin/pusat/pelatihan/publikasi", icon: <GrInfo className="text-2xl" /> }
-        : null,
-    ].filter(Boolean)
-    : [
-      { title: "Dashboard", href: "/admin/lemdiklat/dashboard/", icon: <LucideLayoutDashboard /> },
-      {
-        title: "Penyelenggaraan Pelatihan",
-        icon: <IoSchoolOutline className="text-2xl" />,
-        submenu: [
-          { title: "Pelaksanaan", href: "/admin/lemdiklat/pelatihan" },
-          { title: "Penerbitan STTPL", href: "/admin/lemdiklat/pelatihan/sttpl" },
-        ],
-      },
-    ];
 
   return (
     <div className="h-screen w-full flex text-gray-800 bg-white">
       {/* Sidebar */}
       <aside
-        className={`flex-none flex flex-col bg-neutral-900 text-gray-300 transition-all duration-300 ${sidebarOpen ? "w-60" : "w-16"
+        className={`flex-none flex flex-col bg-neutral-900 text-gray-300 transition-all duration-300 ${sidebarOpen ? "w-64" : "w-16"
           }`}
       >
         {/* Logo + Toggle */}
@@ -148,56 +130,185 @@ export default function LayoutAdminElaut({
 
         {/* Nav Items */}
         <ul className="flex-1 mt-4 space-y-1">
-          {navs.map((item) =>
-            "submenu" in item! ? (
-              <li key={item.title}>
-                <button
-                  onClick={() => setSubmenuOpen((prev) => !prev)}
-                  className={`flex items-center justify-between w-full px-4 py-3 transition-colors rounded-md ${pathname.startsWith(item.submenu?.[0]?.href || "")
+          {/* ===== PUSAT NAVS ===== */}
+          {pathname.includes("pusat") && (
+            <>
+              {/* Dashboard */}
+              <li>
+                <a
+                  href="/admin/pusat/dashboard/"
+                  className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname === "/admin/pusat/dashboard/"
                     ? "bg-blue-600 text-white"
                     : "hover:bg-blue-500 hover:text-white"
                     }`}
                 >
-                  <div className="flex items-center text-left gap-3">
-                    {item.icon}
-                    {sidebarOpen && <span className="text-sm leading-none">{item.title}</span>}
+                  <LucideLayoutDashboard />
+                  {sidebarOpen && <span className="text-sm">Dashboard</span>}
+                </a>
+              </li>
+
+              {/* Penyelenggaraan Pelatihan */}
+              <li>
+                <button
+                  onClick={() => setSubmenuOpen((prev) => !prev)}
+                  className={`flex items-center justify-between w-full px-4 py-2 transition-colors rounded-md ${pathname.startsWith("/admin/pusat/pelatihan/sttpl")
+                    ? "bg-blue-600 text-white"
+                    : "hover:bg-blue-500 hover:text-white"
+                    }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <IoSchoolOutline className="text-2xl" />
+                    {sidebarOpen && (
+                      <span className="text-sm">Penyelenggaraan Pelatihan</span>
+                    )}
                   </div>
                   {sidebarOpen && (submenuOpen ? <FiChevronDown /> : <FiChevronRight />)}
                 </button>
                 {submenuOpen && sidebarOpen && (
                   <ul className="ml-10 mt-1 space-y-1">
-                    {item.submenu?.map((sub) => (
-                      <li key={sub.title}>
-                        <a
-                          href={sub.href}
-                          className={`block px-3 py-2 rounded-md text-sm ${pathname === sub.href
-                            ? "bg-blue-500 text-white"
-                            : "hover:bg-blue-400 hover:text-white"
-                            }`}
-                        >
-                          {sub.title}
-                        </a>
-                      </li>
-                    ))}
+                    <li>
+                      <a
+                        href="/admin/pusat/pelatihan/sttpl/penerbitan"
+                        className={`block px-3 py-2 rounded-md text-sm ${pathname === "/admin/pusat/pelatihan/sttpl/penerbitan"
+                          ? "bg-blue-500 text-white"
+                          : "hover:bg-blue-400 hover:text-white"
+                          }`}
+                      >
+                        Penerbitan STTPL
+                      </a>
+                    </li>
                   </ul>
                 )}
               </li>
-            ) : (
-              <li key={item!.title}>
+
+              {/* Modul Pelatihan */}
+              <li>
                 <a
-                  href={item!.href}
-                  className={`flex items-center gap-3 px-4 py-3 transition-colors rounded-md ${pathname === item!.href
+                  href="/admin/lemdiklat/modul/"
+                  className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname === "/admin/lemdiklat/modul/"
                     ? "bg-blue-600 text-white"
                     : "hover:bg-blue-500 hover:text-white"
                     }`}
                 >
-                  {item!.icon}
-                  {sidebarOpen && <span className="text-sm">{item!.title}</span>}
+                  <IoBookOutline className="text-xl" />
+                  {sidebarOpen && <span className="text-sm">Modul Pelatihan</span>}
                 </a>
               </li>
-            )
+
+              {/* Publikasi & Regulasi */}
+              {Cookies.get("Eselon") === "Operator Pusat" && (
+                <li>
+                  <a
+                    href="/admin/pusat/pelatihan/publikasi"
+                    className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname === "/admin/pusat/pelatihan/publikasi"
+                      ? "bg-blue-600 text-white"
+                      : "hover:bg-blue-500 hover:text-white"
+                      }`}
+                  >
+                    <GrInfo className="text-2xl" />
+                    {sidebarOpen && <span className="text-sm">Publikasi & Regulasi</span>}
+                  </a>
+                </li>
+              )}
+            </>
           )}
+
+          <>
+            {/* Dashboard */}
+            <li>
+              <a
+                href="/admin/lemdiklat/dashboard/"
+                className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname === "/admin/lemdiklat/dashboard/"
+                  ? "bg-blue-600 text-white"
+                  : "hover:bg-blue-500 hover:text-white"
+                  }`}
+              >
+                <LucideLayoutDashboard />
+                {sidebarOpen && <span className="text-sm">Dashboard</span>}
+              </a>
+            </li>
+
+            {/* Master Pelatihan */}
+            <li>
+              <button
+                onClick={() => setSubmenuOpen((prev) => !prev)}
+                className={`flex items-center justify-between w-full px-4 py-2 transition-colors rounded-md ${pathname.includes("master")
+                  ? "bg-blue-600 text-white"
+                  : "hover:bg-blue-500 hover:text-white"
+                  }`}
+              >
+                <div className="flex items-center gap-3">
+                  <TbDatabaseEdit className="text-2xl" />
+
+                  {sidebarOpen && (
+                    <span className="text-sm text-left">Master Pelatihan</span>
+                  )}
+                </div>
+                {sidebarOpen && (submenuOpen ? <FiChevronDown /> : <FiChevronRight />)}
+              </button>
+              {submenuOpen && sidebarOpen && (
+                <ul className="ml-10 mt-1 space-y-1">
+                  <NavItem
+                    href="/admin/lemdiklat/master/instruktur"
+                    icon={<HiOutlineUserGroup className="text-xl" />}
+                    label="Instruktur"
+                  />
+                  {
+                    Cookies.get('Access')?.includes('viewModul') &&
+                    <NavItem
+                      href="/admin/lemdiklat/master/modul"
+                      icon={<IoBookOutline className="text-xl" />}
+                      label="Modul Pelatihan"
+                    />
+                  }
+                  <NavItem
+                    href="/admin/lemdiklat/master/penandatangan"
+                    icon={<TbSignature className="text-xl" />}
+                    label="Penandatangan"
+                  />
+
+                </ul>
+              )}
+            </li>
+
+            {/* Penyelenggaraan Pelatihan */}
+            <li>
+              <button
+                onClick={() => setSubmenuOpen((prev) => !prev)}
+                className={`flex items-center justify-between w-full px-4 py-2 transition-colors rounded-md ${pathname.includes("pelatihan")
+                  ? "bg-blue-600 text-white"
+                  : "hover:bg-blue-500 hover:text-white"
+                  }`}
+              >
+                <div className="flex items-center gap-3">
+                  <IoSchoolOutline className="text-2xl" />
+                  {sidebarOpen && (
+                    <span className="text-sm text-left">Penyelenggaraan Pelatihan</span>
+                  )}
+                </div>
+                {sidebarOpen && (submenuOpen ? <FiChevronDown /> : <FiChevronRight />)}
+              </button>
+              {submenuOpen && sidebarOpen && (
+                <ul className="ml-10 mt-1 space-y-1">
+                  <NavItem
+                    href="/admin/lemdiklat/pelatihan"
+                    icon={<MdOutlinePodcasts className="text-xl" />}
+                    label="Pelaksanaan"
+                  />
+                  <NavItem
+                    href="/admin/lemdiklat/pelatihan/sttpl"
+                    icon={<HiOutlineCheckBadge className="text-xl" />}
+                    label="Penerbitan STTPL"
+                  />
+                </ul>
+              )}
+            </li>
+
+
+          </>
+
         </ul>
+
 
         {/* Logout */}
         <div className="p-4 border-t border-gray-700">
@@ -214,7 +325,7 @@ export default function LayoutAdminElaut({
       {/* Main Content */}
       <div className="flex-grow flex flex-col overflow-y-auto">
         {/* Top Bar */}
-        <header className="flex justify-end items-center bg-white h-20 px-6 py-3 border-b">
+        <header className="flex justify-end items-center bg-white h-20 px-6 py-2 border-b">
           <DropdownUser lemdiklatLoggedInInfo={lemdikData} pusatLoggedInInfo={pusatData} />
         </header>
         {/* Page Content */}
@@ -223,3 +334,31 @@ export default function LayoutAdminElaut({
     </div>
   );
 }
+
+type NavItemProps = {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+}
+
+const NavItem: React.FC<NavItemProps> = ({ href, icon, label }) => {
+  const pathname = usePathname();
+
+  const isActive = pathname === href;
+
+  return (
+    <li>
+      <Link
+        href={href}
+        className={`flex gap-3 px-3 py-2 rounded-md text-sm transition-colors ${isActive
+          ? "bg-blue-500 text-white"
+          : "hover:bg-blue-400 hover:text-white"
+          }`}
+      >
+        <span className="text-xl">{icon}</span>
+        {label}
+      </Link>
+    </li>
+
+  );
+};

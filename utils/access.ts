@@ -1,3 +1,5 @@
+import { Access, RoleAccess } from '@/types/access'
+
 export const ACCESS_ROLE = [
   {
     name:
@@ -6,3 +8,11 @@ export const ACCESS_ROLE = [
     access: [],
   },
 ]
+
+export function getAccess<
+  T extends keyof Access,
+  K extends keyof NonNullable<Access[T]>
+>(data: RoleAccess, section: T, key: K): string | undefined {
+  const found = data.access.find((a) => section in a)
+  return found?.[section]?.[key]
+}
