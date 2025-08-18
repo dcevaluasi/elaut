@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
-import { RiInformationFill } from "react-icons/ri";
+import { RiCheckboxCircleFill, RiInformationFill, RiSendPlaneFill } from "react-icons/ri";
 import { BiPaperPlane } from "react-icons/bi";
 import { PelatihanMasyarakat } from "@/types/product";
 import UploadSuratButton from "../../Dashboard/Actions/UploadSuratButton";
@@ -31,6 +31,8 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Cookies from "js-cookie";
 import TTDSertifikat from "../../Dashboard/pelatihan/TTDSertifikat";
+import { IoSend } from "react-icons/io5";
+import { HiUserGroup } from "react-icons/hi2";
 
 interface TableDataPelatihanMasyarakatProps {
     data: PelatihanMasyarakat[];
@@ -136,6 +138,21 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                                     <RiInformationFill size={14} /> Detail
                                                 </Button>
                                                 <TTDSertifikat dataPelatihan={pelatihan!} handleFetchData={fetchDataPelatihanMasyarakat} />
+                                                <Link
+                                                    title="Peserta Pelatihan"
+                                                    target={"_blank"}
+                                                    href={`/admin/pusat/pelatihan/${pelatihan.KodePelatihan
+                                                        }/peserta-pelatihan/${encryptValue(
+                                                            pelatihan.IdPelatihan.toString()
+                                                        )}`}
+                                                    className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
+             rounded-full border bg-green-500 text-white 
+             hover:bg-grenn-600 hover:text-white transition-colors  w-full 
+             shadow-sm"
+                                                >
+                                                    <HiUserGroup className="h-3 w-3 text-white" />
+                                                    Peserta
+                                                </Link>
                                             </> : <Link
                                                 title="Detail Pelatihan"
                                                 href={`/admin/lemdiklat/pelatihan/detail/${pelatihan.KodePelatihan}/${encryptValue(
@@ -143,7 +160,7 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                                 )}`}
                                                 className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
              rounded-full border border-neutral-300 bg-white text-neutral-700 
-             hover:bg-neutral-100 hover:text-neutral-900 transition-colors 
+             hover:bg-neutral-100 hover:text-neutral-900 transition-colors  w-full 
              shadow-sm"
                                             >
                                                 <RiInformationFill className="h-5 w-5 text-blue-500" />
@@ -160,7 +177,7 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                                     size="sm"
                                                     className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
              rounded-full border border-neutral-300 bg-white text-neutral-700 
-             hover:bg-neutral-100 hover:text-neutral-900 transition-colors 
+             hover:bg-neutral-100 hover:text-neutral-900 transition-colors w-full  
              shadow-sm"
                                                     onClick={() => {
                                                         const isReady =
@@ -177,7 +194,7 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                                             );
                                                     }}
                                                 >
-                                                    <BiPaperPlane className=" text-indigo-500" size={14} /> Kirim ke SPV
+                                                    <RiCheckboxCircleFill className="h-5 w-5 text-indigo-500" size={14} /> Kirim ke SPV
                                                 </Button>
                                             )}
 

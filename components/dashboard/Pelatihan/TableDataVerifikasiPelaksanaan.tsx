@@ -208,7 +208,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
   /** 
    * Filtering Utilitess
    */
-  const [selectedStatusFilter, setSelectedStatusFilter] = React.useState<string>("Perlu Ditandatangani");
+  const [selectedStatusFilter, setSelectedStatusFilter] = React.useState<string>(statusPejabat?.includes('Kepala') ? "Signing" : "All");
   const [filterCategory, setFilterCategory] = React.useState<string>(""); // Program
   const [filterCategoryPenyelenggara, setFilterCategoryPenyelenggara] = React.useState<string>(""); // Penyelenggara
   const [filterCategorySasaran, setFilterCategorySasaran] = React.useState<string>(""); // Sasaran / AsalPelatihan

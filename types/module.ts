@@ -4,6 +4,7 @@ export interface ModulPelatihan {
   NamaModulPelatihan: string
   DeskripsiModulPelatihan: string
   BahanTayang: string
+  FileModule: string
   CreateAt: string
   UpdateAt: string
 }

@@ -156,6 +156,7 @@ export default function TabStatusPelatihanMasyarakat({
                             onClick={() => setSelectedStatusFilter("Sudah Di TTD")}
                         />
                     </>}
+
                     {isSupervisor && !isPejabat && (
                         <StatusButton
                             label="Perlu DiApprove"

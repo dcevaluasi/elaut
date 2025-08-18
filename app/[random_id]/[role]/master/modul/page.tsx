@@ -2,6 +2,7 @@
 
 import TableModulPelatihan from "@/components/dashboard/Dashboard/Modul/TableModulPelatihan";
 import LayoutAdminElaut from "@/components/dashboard/Layouts/LayoutAdminElaut";
+import { BookOpen } from "lucide-react";
 import React from "react";
 
 import { TbSchool } from "react-icons/tb";
@@ -17,7 +18,7 @@ export default function Home() {
                                 aria-label="page caption"
                                 className="flex-row w-full flex h-20 items-center gap-2 bg-gray-100 border-t px-4"
                             >
-                                <TbSchool className="text-3xl" />
+                                <BookOpen className="text-3xl" />
                                 <div className="flex flex-col">
                                     <h1 id="page-caption" className="font-semibold text-lg">
                                         Modul Pelatihan

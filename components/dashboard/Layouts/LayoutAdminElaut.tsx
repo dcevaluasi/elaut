@@ -67,7 +67,7 @@ export default function LayoutAdminElaut({
       Cookies.set("IDLemdik", data.data.IdLemdik);
       Cookies.set("SATKER_BPPP", data.data.NamaLemdik);
       Cookies.set("Eselon", parsedData.role);
-      Cookies.set("Access", parsedData.role);
+      Cookies.set("Access", data.data.Deskripsi);
       Cookies.set("Status", data.data.Deskripsi);
     } catch (error) {
       console.error("LEMDIK INFO: ", error);
@@ -156,7 +156,7 @@ export default function LayoutAdminElaut({
                     : "hover:bg-blue-500 hover:text-white"
                     }`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 text-left">
                     <IoSchoolOutline className="text-2xl" />
                     {sidebarOpen && (
                       <span className="text-sm">Penyelenggaraan Pelatihan</span>
@@ -180,40 +180,10 @@ export default function LayoutAdminElaut({
                   </ul>
                 )}
               </li>
-
-              {/* Modul Pelatihan */}
-              <li>
-                <a
-                  href="/admin/lemdiklat/modul/"
-                  className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname === "/admin/lemdiklat/modul/"
-                    ? "bg-blue-600 text-white"
-                    : "hover:bg-blue-500 hover:text-white"
-                    }`}
-                >
-                  <IoBookOutline className="text-xl" />
-                  {sidebarOpen && <span className="text-sm">Modul Pelatihan</span>}
-                </a>
-              </li>
-
-              {/* Publikasi & Regulasi */}
-              {Cookies.get("Eselon") === "Operator Pusat" && (
-                <li>
-                  <a
-                    href="/admin/pusat/pelatihan/publikasi"
-                    className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname === "/admin/pusat/pelatihan/publikasi"
-                      ? "bg-blue-600 text-white"
-                      : "hover:bg-blue-500 hover:text-white"
-                      }`}
-                  >
-                    <GrInfo className="text-2xl" />
-                    {sidebarOpen && <span className="text-sm">Publikasi & Regulasi</span>}
-                  </a>
-                </li>
-              )}
             </>
           )}
 
-          <>
+          {pathname.includes("lemdiklat") && <>
             {/* Dashboard */}
             <li>
               <a
@@ -257,7 +227,7 @@ export default function LayoutAdminElaut({
                     Cookies.get('Access')?.includes('viewModul') &&
                     <NavItem
                       href="/admin/lemdiklat/master/modul"
-                      icon={<IoBookOutline className="text-xl" />}
+                      icon={<IoBookOutline className="text-lg" />}
                       label="Modul Pelatihan"
                     />
                   }
@@ -305,7 +275,8 @@ export default function LayoutAdminElaut({
             </li>
 
 
-          </>
+          </>}
+
 
         </ul>
 
@@ -344,7 +315,7 @@ type NavItemProps = {
 const NavItem: React.FC<NavItemProps> = ({ href, icon, label }) => {
   const pathname = usePathname();
 
-  const isActive = pathname === href;
+  const isActive = pathname.includes(href);
 
   return (
     <li>
