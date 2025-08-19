@@ -122,6 +122,8 @@ const TableDataPelatihan: React.FC = () => {
     const updateData = new FormData()
     updateData.append('PenerbitanSertifikatDiterima', 'Pengajuan Telah Dikirim Dari Operator Pusat')
     updateData.append('PemberitahuanDiterima', 'Pengajuan Telah Dikirim ke SPV')
+    updateData.append('StatusPenerbitan', 'On Progress')
+
 
     try {
       const uploadBeritaAcaraResponse = await axios.put(
@@ -140,7 +142,7 @@ const TableDataPelatihan: React.FC = () => {
         title: "Yeayyy!",
         text: "Berhasil mengirimkan informasi pengajuan kepada SPV Pusat!",
       });
-      handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyelesaikan drafting sttpl/sertifikat peserta dan mengirimkan ke SPV untuk', Cookies.get('Status'), Cookies.get('SATKER_BPPP'))
+      handleAddHistoryTrainingInExisting(pelatihan!, 'Telah menyelesaikan drafting sttpl/sertifikat peserta dan mengirimkan ke SPV untuk', Cookies.get('Eselon'), Cookies.get('SATKER_BPPP'))
 
       refetch();
     } catch (error) {

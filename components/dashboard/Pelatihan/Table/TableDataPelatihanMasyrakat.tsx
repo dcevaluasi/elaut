@@ -194,7 +194,7 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                                             );
                                                     }}
                                                 >
-                                                    <RiCheckboxCircleFill className="h-5 w-5 text-indigo-500" size={14} /> Kirim ke SPV
+                                                    <RiCheckboxCircleFill className="h-5 w-5 text-indigo-500" size={14} /> Kirim SPV
                                                 </Button>
                                             )}
 

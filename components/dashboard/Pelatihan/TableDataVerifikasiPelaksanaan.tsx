@@ -89,7 +89,7 @@ const TableDataVerifikasiPelaksanaan: React.FC = () => {
 
 
 
-  const statusPejabat = Cookies.get('Status')
+  const statusPejabat = Cookies.get('Eselon')
 
   // const handleSendToKapuslatAboutCertificateIssueance = async (idPelatihan: string) => {
   //   const updateData = new FormData()

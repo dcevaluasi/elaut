@@ -111,7 +111,7 @@ export default function TabStatusPelatihanMasyarakat({
     return (
         <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-4 py-3 mb-10">
             {/* Original Buttons */}
-            <section aria-labelledby="ticket-statistics-tabs-label" className="overflow-x-auto mb-4">
+            <section aria-labelledby="ticket-statistics-tabs-label" className="overflow-x-auto">
                 <ul className="flex gap-2 min-w-max">
 
 
@@ -132,13 +132,13 @@ export default function TabStatusPelatihanMasyarakat({
                         />
 
 
-                        <StatusButton
+                        {/* <StatusButton
                             label="Verifikasi"
                             count={countVerifying || 0}
                             icon={<ClipboardCheck size={16} />}
                             isSelected={selectedStatusFilter === "Verifikasi Pelaksanaan"}
                             onClick={() => setSelectedStatusFilter("Verifikasi Pelaksanaan")}
-                        />
+                        /> */}
 
                         <StatusButton
                             label="Pengajuan Sertifikat"

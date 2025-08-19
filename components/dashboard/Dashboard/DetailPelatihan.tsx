@@ -34,8 +34,8 @@ import { ESELON_1, ESELON_2 } from "@/constants/nomenclatures";
 
 function DetailPelatihan() {
   const isOperatorBalaiPelatihan = Cookies.get('SATKER_BPPP')?.includes('BPPP') || false
-  const isOperatorPusatPelatihan = Cookies.get('Status')?.includes('Operator Pusat') || false
-  const isLemdiklat = Cookies.get('Status') === 'Lemdiklat'
+  const isOperatorPusatPelatihan = Cookies.get('Eselon')?.includes('Operator Pusat') || false
+  const isLemdiklat = Cookies.get('Eselon') === 'UPT'
   const paths = usePathname().split("/");
 
   const isEselonI = Cookies.get('Jabatan')?.includes(ESELON_1.fullName)

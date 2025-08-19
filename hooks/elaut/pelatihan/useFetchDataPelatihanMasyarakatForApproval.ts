@@ -12,7 +12,7 @@ export const useFetchDataPelatihanMasyarakatForApproval = () => {
   const pathname = usePathname()
 
   const isLemdiklatLevel = pathname.includes('lemdiklat')
-  const isSupervisor = Cookies.get('Status') === 'Supervisor'
+  const isSupervisor = Cookies.get('Eselon') === 'Supervisor'
   const isPejabat = Cookies.get('Jabatan')?.includes('Kepala')
   const isEselonI = Cookies.get('Jabatan')?.includes(ESELON_1.fullName)
   const isEselonII = Cookies.get('Jabatan')?.includes(ESELON_2.fullName)
