@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { Transition } from "@headlessui/react";
 import Link from "next/link";
 import Cookies from "js-cookie";
+import { usePathname } from "next/navigation";
 
 export default function MobileMenu({ isTop }: { isTop: boolean }) {
   const [mobileNavOpen, setMobileNavOpen] = useState<boolean>(false);
@@ -39,7 +40,7 @@ export default function MobileMenu({ isTop }: { isTop: boolean }) {
   });
 
   return (
-    <div className={`flex md:hidden px-6 md:px-0 mt-0`}>
+    <div className={`${usePathname().includes('instruktur/form') ? 'hidden' : 'flex md:hidden'} px-6 md:px-0 mt-0`}>
       {/* Hamburger button */}
       <button
         ref={trigger}

@@ -19,6 +19,7 @@ import { HiOutlineCheckBadge, HiOutlineUserGroup } from "react-icons/hi2";
 import { TbDatabaseEdit, TbSignature } from "react-icons/tb";
 import { MdOutlinePodcasts } from "react-icons/md";
 import Link from "next/link";
+import { breakdownStatus } from "@/lib/utils";
 
 export default function LayoutAdminElaut({
   children,
@@ -43,19 +44,25 @@ export default function LayoutAdminElaut({
       Cookies.set("NIK", data.data.Nip);
       Cookies.set("Status", data.data.Status);
       Cookies.set("Satker", data.data.Status);
-      Cookies.set("Role", data.data.Nip);
+      Cookies.set("InformationLoggedIn", `${data.data.Nama};${data.data.Email};${data.data.Nip}`);
+      Cookies.set("Role", breakdownStatus(data.data.Status)[0]);
       Cookies.set("Jabatan", data.data.NoTelpon);
+      Cookies.set("Access", breakdownStatus(data.data.Status)[1]);
       Cookies.set("XSRF094", data.data.Status);
+
       Cookies.set(
         "XSRF095",
         data.data.Status.includes("Kepala") || data.data.Status.includes("Supervisor")
           ? "true"
           : "false"
       );
+      Cookies.set("XSRF097", data.data.Email); // EMAIL
+
     } catch (error) {
       console.error(error);
     }
   };
+
 
   const fetchInformationLemdiklat = async () => {
     try {
@@ -63,11 +70,12 @@ export default function LayoutAdminElaut({
         headers: { Authorization: `Bearer ${Cookies.get("XSRF091")}` },
       });
       setLemdikData(data);
-      const parsedData: RoleAccess = JSON.parse(data.data.Deskripsi);
       Cookies.set("IDLemdik", data.data.IdLemdik);
       Cookies.set("SATKER_BPPP", data.data.NamaLemdik);
-      Cookies.set("Eselon", parsedData.role);
-      Cookies.set("Access", data.data.Deskripsi);
+      Cookies.set("XSRF097", data.data.Email); // EMAIL
+
+      Cookies.set("Eselon", breakdownStatus(data.data.Deskripsi)[0]);
+      Cookies.set("Access", breakdownStatus(data.data.Deskripsi)[1]);
     } catch (error) {
       console.error("LEMDIK INFO: ", error);
     }
@@ -165,17 +173,16 @@ export default function LayoutAdminElaut({
                 </button>
                 {submenuOpen && sidebarOpen && (
                   <ul className="ml-10 mt-1 space-y-1">
-                    <li>
-                      <a
-                        href="/admin/pusat/pelatihan/sttpl/penerbitan"
-                        className={`block px-3 py-2 rounded-md text-sm ${pathname === "/admin/pusat/pelatihan/sttpl/penerbitan"
-                          ? "bg-blue-500 text-white"
-                          : "hover:bg-blue-400 hover:text-white"
-                          }`}
-                      >
-                        Penerbitan STTPL
-                      </a>
-                    </li>
+                    <NavItem
+                      href="/admin/pusat/pelatihan"
+                      icon={<MdOutlinePodcasts className="text-xl" />}
+                      label="Pelaksanaan"
+                    />
+                    <NavItem
+                      href="/admin/pusat/pelatihan/sttpl"
+                      icon={<HiOutlineCheckBadge className="text-xl" />}
+                      label="Penerbitan STTPL"
+                    />
                   </ul>
                 )}
               </li>

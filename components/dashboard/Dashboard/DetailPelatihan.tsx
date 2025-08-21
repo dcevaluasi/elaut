@@ -31,6 +31,10 @@ import { Button } from "@/components/ui/button";
 import DeleteButton from "./Actions/DeleteButton";
 import { MateriButton, PublishButton } from "./Actions";
 import { ESELON_1, ESELON_2 } from "@/constants/nomenclatures";
+import { ApprovePelaksanaanSPV } from "../admin/spv/ApprovalPelaksanaanSPV";
+import Toast from "@/components/toast";
+import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
+import { ApprovePelaksanaanVerifikator } from "../admin/verifikator/ApprovalPelaksanaanVerifikator";
 
 function DetailPelatihan() {
   const isOperatorBalaiPelatihan = Cookies.get('SATKER_BPPP')?.includes('BPPP') || false
@@ -70,6 +74,42 @@ function DetailPelatihan() {
 
   const typeRole = Cookies.get("XSRF093");
 
+  const handleApprovedPelaksanaanBySPV = async (idPelatihan: string, pelatihan: PelatihanMasyarakat, verifikatorSelected: string) => {
+    const updateData = new FormData()
+    updateData.append('StatusPenerbitan', '2')
+    updateData.append('PenerbitanSertifikatDiterima', verifikatorSelected)
+
+    try {
+      await axios.put(
+        `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${idPelatihan}`,
+        updateData,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      Toast.fire({
+        icon: "success",
+        title: "Yeayyy!",
+        text: "Berhasil Memilih Verifikator Permohonan Pelaksanaan Diklat",
+      });
+      handleAddHistoryTrainingInExisting(pelatihan!, 'Telah Memilih Verifikator Permohonan Pelaksanaan Diklat!', Cookies.get('Eselon'), Cookies.get('SATKER_BPPP'))
+
+      handleFetchDetailPelatihan();
+    } catch (error) {
+      console.error("ERROR GENERATE SERTIFIKAT: ", error);
+      Toast.fire({
+        icon: "error",
+        title: "Oopsss!",
+        text: "Gagal Memilih Verifikator Permohonan Pelaksanaan Diklat",
+      });
+      handleFetchDetailPelatihan();
+    }
+  }
+
   return (
     <section className="pb-20">
       <div className="flex flex-col w-full">
@@ -99,7 +139,7 @@ function DetailPelatihan() {
         </div>
       </div>
 
-      {pelatihan != null && (
+      {pelatihan != null ? pelatihan.StatusPenerbitan != "0" ? (
         <div className=' mt-5 w-full gap-0'>
           <div className="px-4 w-full mb-4">
             <div className="w-full border border-gray-200 rounded-xl">
@@ -123,9 +163,12 @@ function DetailPelatihan() {
                           pelatihan.IdPelatihan
                         )}`}
 
-                      className="  shadow-sm bg-green-500 hover:bg-green-500 text-neutral-100  hover:text-neutral-100 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2"
+                      className="inline-flex items-center justify-center gap-2 
+        h-10 px-5 text-sm font-medium rounded-full 
+        border border-green-500 bg-green-500 text-white 
+        hover:bg-green-600 transition-colors shadow-sm"
                     >
-                      <HiUserGroup className="h-5 w-5 " /> Data Peserta Pelatihan
+                      <HiUserGroup className="h-5 w-5 " /> Peserta Pelatihan
                     </Link>
 
                       {
@@ -162,6 +205,24 @@ function DetailPelatihan() {
                           handleFetchDetailPelatihan
                         }
                       />
+
+                      {/* SPV Approve Pelaksanaan Diklat */}
+                      {(Cookies.get('Access')?.includes('approvePelaksanaanSPV') && pelatihan?.StatusPenerbitan == '1') && (
+                        <ApprovePelaksanaanSPV
+                          pelatihan={pelatihan}
+                          handleApprovedPelaksanaanBySPV={handleApprovedPelaksanaanBySPV}
+                        />
+
+                      )}
+
+                      {/* Verifikator Approve/Reject Pelaksanaan Diklat */}
+                      {(Cookies.get('Access')?.includes('verifikasiPelaksanaan') && pelatihan?.StatusPenerbitan == '2') && (
+                        <ApprovePelaksanaanVerifikator
+                          pelatihan={pelatihan}
+                          refetchDetail={handleFetchDetailPelatihan}
+                        />
+                      )}
+
 
                       {
                         isOperatorBalaiPelatihan && <>
@@ -240,10 +301,8 @@ function DetailPelatihan() {
               </table>
             </div>
           </div>
-          <div className=" w-full mb-4"></div>
         </div>
-
-      )}
+      ) : <></> : <></>}
 
       {pelatihan != null && (isOperatorBalaiPelatihan || isOperatorPusatPelatihan) && (
         <div className=' mt-5 w-full gap-0'>
@@ -313,10 +372,10 @@ function DetailPelatihan() {
                 <InfoRow
                   label="Surat Pemberitahuan Diklat"
                   value={
-                    <a href={`${urlFileSilabus}/${pelatihan?.SilabusPelatihan}`}
+                    <a href={`${urlFileSuratPemberitahuan}/${pelatihan?.SuratPemberitahuan}`}
                       target="_blank"
                       className="text-blue-600 underline break-words">
-                      {`${urlFileSilabus}/${pelatihan?.SilabusPelatihan}`}
+                      {`${urlFileSuratPemberitahuan}/${pelatihan?.SuratPemberitahuan}`}
                     </a>
                   }
                 />

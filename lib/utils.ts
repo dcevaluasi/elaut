@@ -124,3 +124,14 @@ export const calculateTotalHoursCertificateBPPP = (data: MateriPelatihan[]) => {
 
   return { totalTheory, totalPractice }
 }
+
+export const breakdownStatus = (input: string): string[] => {
+  const parts = input.split(/,(?![^\[]*\])/); 
+  return parts.map(part => {
+    const trimmed = part.trim();
+    if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+      return trimmed.slice(1, -1); // remove the brackets, keep as string
+    }
+    return trimmed;
+  });
+}

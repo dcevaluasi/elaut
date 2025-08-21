@@ -3,15 +3,6 @@ export const generateTimestamp = (): string => {
 }
 
 export const formatDateRange = (start: string, end: string): string => {
-  const parseDate = (dateStr: string) => {
-    const [day, month, year] = dateStr
-      .split(' ')
-      .map((part, index) =>
-        index === 1 ? getMonthNumber(part) : parseInt(part, 10),
-      )
-    return new Date(year as number, (month as number) - 1, day as number)
-  }
-
   const getMonthNumber = (month: string): number => {
     const months: { [key: string]: number } = {
       Januari: 1,
@@ -48,27 +39,39 @@ export const formatDateRange = (start: string, end: string): string => {
     return months[month]
   }
 
+  // universal date parser
+  const parseDate = (dateStr: string): Date => {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      // ISO format: 2025-07-29
+      return new Date(dateStr)
+    } else if (/^\d{4}-\d{2}$/.test(dateStr)) {
+      // Year-Month only: 2025-08 → default to first day
+      return new Date(`${dateStr}-01`)
+    } else {
+      // Indonesian format: 29 Juli 2025
+      const [day, monthName, year] = dateStr.split(' ')
+      return new Date(Number(year), getMonthNumber(monthName) - 1, Number(day))
+    }
+  }
+
   const startDate = parseDate(start)
   const endDate = parseDate(end)
 
   const formattedStart = startDate.getDate()
   const formattedEnd = endDate.getDate()
-  const formattedMonth = getMonthName(endDate.getMonth())
-  const formattedYear = endDate.getFullYear()
+  const startMonth = getMonthName(startDate.getMonth())
+  const endMonth = getMonthName(endDate.getMonth())
+  const year = endDate.getFullYear()
 
-  return `${formattedStart} - ${formattedEnd} ${formattedMonth} ${formattedYear}`
+  if (startDate.getMonth() === endDate.getMonth()) {
+    return `${formattedStart} - ${formattedEnd} ${endMonth} ${year}`
+  } else {
+    return `${formattedStart} ${startMonth} - ${formattedEnd} ${endMonth} ${year}`
+  }
 }
 
 export const formatDateRangeEnglish = (start: string, end: string): string => {
-  const parseDate = (dateStr: string) => {
-    const [day, month, year] = dateStr
-      .split(' ')
-      .map((part, index) =>
-        index === 1 ? getMonthNumber(part) : parseInt(part, 10),
-      )
-    return new Date(year as number, (month as number) - 1, day as number)
-  }
-
+  // helper: Indonesian month → number
   const getMonthNumber = (month: string): number => {
     const months: { [key: string]: number } = {
       Januari: 1,
@@ -87,6 +90,7 @@ export const formatDateRangeEnglish = (start: string, end: string): string => {
     return months[month] || 0
   }
 
+  // helper: number → English month
   const getMonthName = (month: number): string => {
     const months = [
       'January',
@@ -105,6 +109,7 @@ export const formatDateRangeEnglish = (start: string, end: string): string => {
     return months[month]
   }
 
+  // helper: day → ordinal
   const getOrdinalSuffix = (day: number): string => {
     if (day >= 11 && day <= 13) return `${day}th`
     const lastDigit = day % 10
@@ -120,15 +125,36 @@ export const formatDateRangeEnglish = (start: string, end: string): string => {
     }
   }
 
+  // universal date parser
+  const parseDate = (dateStr: string): Date => {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      // ISO format: 2025-07-29
+      return new Date(dateStr)
+    } else if (/^\d{4}-\d{2}$/.test(dateStr)) {
+      // Year-Month only: 2025-08 → default to first day
+      return new Date(`${dateStr}-01`)
+    } else {
+      // Indonesian format: 29 Juli 2025
+      const [day, monthName, year] = dateStr.split(' ')
+      return new Date(Number(year), getMonthNumber(monthName) - 1, Number(day))
+    }
+  }
+
   const startDate = parseDate(start)
   const endDate = parseDate(end)
 
   const formattedStart = getOrdinalSuffix(startDate.getDate())
   const formattedEnd = getOrdinalSuffix(endDate.getDate())
-  const formattedMonth = getMonthName(endDate.getMonth())
-  const formattedYear = endDate.getFullYear()
+  const startMonth = getMonthName(startDate.getMonth())
+  const endMonth = getMonthName(endDate.getMonth())
+  const year = endDate.getFullYear()
 
-  return `${formattedMonth} ${formattedStart} - ${formattedEnd} ${formattedYear}`
+  // if same month
+  if (startDate.getMonth() === endDate.getMonth()) {
+    return `${endMonth} ${formattedStart} - ${formattedEnd} ${year}`
+  } else {
+    return `${startMonth} ${formattedStart} - ${endMonth} ${formattedEnd} ${year}`
+  }
 }
 
 export const getTodayInIndonesianFormat = (): string => {

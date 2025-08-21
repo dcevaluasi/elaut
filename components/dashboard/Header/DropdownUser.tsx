@@ -25,6 +25,7 @@ import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { HiMiniUserGroup } from "react-icons/hi2";
 import { elautBaseUrl } from "@/constants/urls";
 import { PusatDetailInfo } from "@/types/pusat";
+import { breakdownStatus } from "@/lib/utils";
 const DropdownUser = ({
   lemdiklatLoggedInInfo,
   pusatLoggedInInfo
@@ -668,7 +669,7 @@ const DropdownUser = ({
             {pathname.includes("lemdiklat")
               ? Cookies.get('Eselon')
               : dataAdminPusat && pathname.includes("pusat")
-                ? `${Cookies.get('Status')!}`
+                ? `${breakdownStatus(Cookies.get('Status')!)[0]}`
                 : ""}
           </span>
         </span>

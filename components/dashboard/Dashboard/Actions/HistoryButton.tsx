@@ -112,7 +112,10 @@ const HistoryButton: React.FC<HistoryButtonProps> = ({
           setOpenFormTutupPelatihan(!openFormTutupPelatihan);
         }}
         variant="outline"
-        className="ml-auto hover:bg-neutral-500 bg-neutral-500 hover:text-white text-white duration-700 w-full"
+        className="inline-flex items-center justify-center gap-2 
+        h-10 px-5 text-sm font-medium rounded-full 
+        border border-neutral-500 bg-neutral-500 text-white 
+        hover:bg-neutral-600 hover:text-white transition-colors shadow-sm"
       >
         <MdOutlineHistory className="h-5 w-5" /> History Pelatihan
       </Button>

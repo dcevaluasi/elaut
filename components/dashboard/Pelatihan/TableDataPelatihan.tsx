@@ -58,6 +58,7 @@ const TableDataPelatihan: React.FC = () => {
     setIsFetching,
     countOnProgress,
     countDone,
+    countDiklatSPV,
     countNotPublished,
     countVerifying,
     refetch,
@@ -116,6 +117,7 @@ const TableDataPelatihan: React.FC = () => {
 
 
   const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
+  const isVerifikator = Cookies.get('Role')?.includes('Verifikator')
 
   // Handling Send to SPV from Operator Pusat
   const handleSendToSPVAboutCertificateIssueance = async (idPelatihan: string, pelatihan: PelatihanMasyarakat) => {
@@ -168,7 +170,8 @@ const TableDataPelatihan: React.FC = () => {
   const statusMapping: Record<string, (p: typeof data[number]) => boolean> = {
     "Proses Pengajuan Sertifikat": p => p.StatusPenerbitan === "On Progress",
     "Belum Dipublish": p => p.Status !== "Publish",
-    "Sudah Di TTD": p => p.StatusPenerbitan === "Done",
+    "Pending SPV": p => p.StatusPenerbitan === "1",
+    "Sudah Di TTD": p => p.StatusPenerbitan === "14" || p.StatusPenerbitan === "17",
     "Verifikasi Pelaksanaan": p => p.StatusPenerbitan === "Verifikasi Pelaksanaan",
   };
 
@@ -205,21 +208,26 @@ const TableDataPelatihan: React.FC = () => {
         countVerifying={countVerifying}
         countOnProgress={countOnProgress}
         countDone={countDone}
+        countDiklatSPV={countDiklatSPV}
         selectedStatusFilter={selectedStatusFilter}
         setSelectedStatusFilter={setSelectedStatusFilter}
         isOperatorBalaiPelatihan={isOperatorBalaiPelatihan}
       />
       <section className="px-4 -mt-4 w-full">
         <Tabs defaultValue="account" className="w-full">
-          <TabsList className={`grid w-full grid-cols-2`}>
-            <TabsTrigger
-              value="account"
-              onClick={() => refetch()}
-            >
-              Daftar Pelatihan
-            </TabsTrigger>
-            <TabsTrigger value="password">Buat Pelatihan Baru</TabsTrigger>
-          </TabsList>
+          {
+            Cookies.get('Access')?.includes('createPelatihan') && <TabsList className={`grid w-full grid-cols-2`}>
+              <TabsTrigger
+                value="account"
+                onClick={() => refetch()}
+              >
+                Daftar Pelatihan
+              </TabsTrigger>
+
+              <TabsTrigger value="password">Buat Pelatihan Baru</TabsTrigger>
+            </TabsList>
+          }
+
           <TabsContent value="account">
             {
               isFetching ?

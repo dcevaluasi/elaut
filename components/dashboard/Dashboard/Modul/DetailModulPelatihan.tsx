@@ -14,9 +14,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { fileModuleBaseUrl, moduleBaseUrl } from "@/constants/urls"
 import { FiEdit, FiEdit2, FiFolder, FiTrash2 } from "react-icons/fi"
 import { ModulPelatihan } from "@/types/module"
-import { FaRegFolderOpen } from "react-icons/fa6"
+import { FaRegFileLines, FaRegFolderOpen } from "react-icons/fa6"
 import JSZip from "jszip"
 import { saveAs } from 'file-saver'
+
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+
 
 export default function DetailModulPelatihan() {
     const params = useParams()
@@ -459,7 +462,15 @@ export default function DetailModulPelatihan() {
                                                     rel="noopener noreferrer"
                                                     className="inline-flex items-center gap-2 text-sm font-medium border text-neutral-700  border-blue-500 px-4 py-2 rounded-full hover:border-blue-500 transition group  hover:bg-blue-500 hover:text-white"
                                                 >
-                                                    <FiFolder className="h-5 w-5 text-blue-500 group-hover:text-white" /> Lihat File Modul
+                                                    <FaRegFileLines className="h-5 w-5 text-blue-500 group-hover:text-white" />  File
+                                                </a>
+                                                <a
+                                                    href={`${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${modul.FileModule}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex items-center gap-2 text-sm font-medium border text-neutral-700  border-teal-500 px-4 py-2 rounded-full hover:border-teal-500 transition group  hover:bg-teal-500 hover:text-white"
+                                                >
+                                                    <FiFolder className="h-5 w-5 text-teal-500 group-hover:text-white" />  Bahan
                                                 </a>
 
                                                 <button

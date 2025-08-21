@@ -33,6 +33,13 @@ import Cookies from "js-cookie";
 import TTDSertifikat from "../../Dashboard/pelatihan/TTDSertifikat";
 import { IoSend } from "react-icons/io5";
 import { HiUserGroup } from "react-icons/hi2";
+import { elautBaseUrl } from "@/constants/urls";
+import axios from "axios";
+import Toast from "@/components/toast";
+import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
+import { usePathname } from "next/navigation";
+import { getStatusInfo } from "@/utils/text";
+import { ApprovePelaksanaanSPV } from "../../admin/spv/ApprovalPelaksanaanSPV";
 
 interface TableDataPelatihanMasyarakatProps {
     data: PelatihanMasyarakat[];
@@ -57,6 +64,7 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
     fetchDataPelatihanMasyarakat,
 }) => {
 
+    const isVerifikator = Cookies.get('Role')?.includes('Verifikator')
 
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -69,6 +77,46 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
+
+    const accessPermissions = Cookies.get('Access')
+
+    const handleApprovedSertifikatBySPV = async (idPelatihan: string, pelatihan: PelatihanMasyarakat) => {
+        const updateData = new FormData()
+        updateData.append('PemberitahuanDiterima', '12')
+
+
+        try {
+            await axios.put(
+                `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${idPelatihan}`,
+                updateData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+
+            Toast.fire({
+                icon: "success",
+                title: "Yeayyy!",
+                text: "Berhasil mengirimkan informasi pengajuan kepada SPV Pusat!",
+            });
+            handleAddHistoryTrainingInExisting(pelatihan!, 'Telah Menyetujui Permohonan Penerbitan Sertifikat', Cookies.get('Eselon'), Cookies.get('SATKER_BPPP'))
+
+            fetchDataPelatihanMasyarakat();
+        } catch (error) {
+            console.error("ERROR GENERATE SERTIFIKAT: ", error);
+            Toast.fire({
+                icon: "error",
+                title: "Oopsss!",
+                text: "Gagal mengirimkan informasi pengajuan kepada SPV Pusat!",
+            });
+            fetchDataPelatihanMasyarakat();
+        }
+    }
+
+
 
     return (
         <div>
@@ -96,17 +144,20 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                     <Users size={14} className="text-emerald-500" /> Peserta
                                 </div>
                             </th>
-                            <th className="px-4 py-3 text-center">Aksi</th>
+                            <th className="px-4 py-3 text-center">Status</th>
+                            <th className="px-4 py-3 text-center">Action</th>
                         </tr>
                     </thead>
 
                     <tbody className="divide-y divide-gray-100">
-                        {paginatedData.map((pelatihan, index) => {
+                        {paginatedData.map((pelatihan: PelatihanMasyarakat, index: number) => {
                             if (!pelatihan) return null;
 
                             const waktuPelaksanaan = pelatihan.TanggalMulaiPelatihan
                                 ? `${generateTanggalPelatihan(pelatihan.TanggalMulaiPelatihan)} s.d ${generateTanggalPelatihan(pelatihan.TanggalBerakhirPelatihan || "")}`
                                 : "-";
+
+                            const { label, color, icon } = getStatusInfo(String(pelatihan.StatusPenerbitan));
 
                             return (
                                 <tr
@@ -123,8 +174,16 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                     <td className="px-4 py-3 text-center">
                                         {pelatihan.UserPelatihan?.length ?? 0}
                                     </td>
-                                    <td className="px-4 py-3 flex flex-wrap gap-2 justify-center">
-                                        {Cookies.get('createPenandatanganan') == '1' ?
+                                    <td className="px-4 h-full">{
+                                        <span className={`w-full inline-flex items-center justify-center gap-2 
+                       h-full px-5 text-sm font-medium  leading-none  text-center ${color}`}>
+                                            {icon}
+                                            {label}
+                                        </span>}
+                                    </td>
+                                    {/* Action Buttons */}
+                                    <td className="px-4 py-3 flex flex-col gap-2 justify-center items-center h-fit">
+                                        {Cookies.get('createPenandatanganan') == '1' &&
                                             <>
                                                 <Button
                                                     variant="outline"
@@ -153,19 +212,7 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                                     <HiUserGroup className="h-3 w-3 text-white" />
                                                     Peserta
                                                 </Link>
-                                            </> : <Link
-                                                title="Detail Pelatihan"
-                                                href={`/admin/lemdiklat/pelatihan/detail/${pelatihan.KodePelatihan}/${encryptValue(
-                                                    pelatihan.IdPelatihan.toString()
-                                                )}`}
-                                                className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
-             rounded-full border border-neutral-300 bg-white text-neutral-700 
-             hover:bg-neutral-100 hover:text-neutral-900 transition-colors  w-full 
-             shadow-sm"
-                                            >
-                                                <RiInformationFill className="h-5 w-5 text-blue-500" />
-                                                Detail
-                                            </Link>
+                                            </>
                                         }
 
 
@@ -198,16 +245,57 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                                 </Button>
                                             )}
 
-                                        {isOperatorBalaiPelatihan &&
-                                            pelatihan.TtdSertifikat !==
-                                            "Kepala Balai Pelatihan dan Penyuluhan Perikanan" && (
-                                                <UploadSuratButton
-                                                    idPelatihan={String(pelatihan.IdPelatihan)}
-                                                    pelatihan={pelatihan}
-                                                    handleFetchingData={fetchDataPelatihanMasyarakat}
-                                                    suratPemberitahuan={pelatihan.SuratPemberitahuan}
-                                                />
-                                            )}
+                                        <Link
+                                            title="Detail Pelatihan"
+                                            target={'_blank'}
+                                            href={`/admin/${usePathname().includes('pusat') ? 'pusat' : 'lemdiklat'}/pelatihan/detail/${pelatihan.KodePelatihan}/${encryptValue(
+                                                pelatihan.IdPelatihan.toString()
+                                            )}`}
+                                            className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
+             rounded-full border border-blue-500 bg-blue-500 text-white 
+             hover:bg-blue-600  transition-colors  w-full 
+             shadow-sm"
+                                        >
+                                            <RiInformationFill className="h-5 w-5 " />
+                                            Review
+                                        </Link>
+
+
+
+
+                                        {/* Upload Surat Pemberitahuan Pelatihan */}
+                                        {accessPermissions?.includes('createPelatihan') && (
+                                            <UploadSuratButton
+                                                idPelatihan={String(pelatihan.IdPelatihan)}
+                                                pelatihan={pelatihan}
+                                                handleFetchingData={fetchDataPelatihanMasyarakat}
+                                            />
+                                        )}
+
+                                        {/* Approve and Send to Kapuslat */}
+
+                                        {/* {
+                                            accessPermissions?.includes('approveSertifikat') &&
+                                            <>
+                                                <Button
+                                                    size="sm"
+                                                    title="Approve"
+                                                    className="w-full inline-flex items-center justify-center gap-2 
+               h-10 px-5 text-sm font-medium rounded-full 
+               border border-teal-500 bg-teal-500 text-white 
+               hover:bg-teal-600 transition-colors shadow-sm"
+                                                    onClick={() => {
+                                                        handleApprovedSertifikatBySPV(
+                                                            String(pelatihan.IdPelatihan),
+                                                            pelatihan
+                                                        )
+                                                    }}
+                                                >
+                                                    <RiCheckboxCircleFill className="h-5 w-5 " size={14} />
+                                                </Button>
+                                            </>
+                                        } */}
+
                                     </td>
                                 </tr>
                             );

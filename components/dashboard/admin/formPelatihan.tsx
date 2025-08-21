@@ -292,6 +292,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
     }
     data.append("LokasiPelatihan", lokasiPelatihan);
     data.append("PelaksanaanPelatihan", pelaksanaanPelatihan);
+    data.append("StatusPenerbitan", '0');
     data.append("PemberitahuanDiterima", 'Proses Buka Kelas');
     data.append("UjiKompotensi", ujiKompetensi);
     data.append("KoutaPelatihan", kuotaPelatihan);

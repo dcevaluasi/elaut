@@ -205,16 +205,9 @@ export default function Header() {
     <header
       className={`fixed mx-auto left-0 right-0 ${usePathname().includes("pre-test") ||
         usePathname().includes("post-test") ||
-        usePathname().includes("/dpkakp/admin") ||
-        usePathname().includes("/dpkakp/user") ||
         usePathname().includes("/e-katalog") ||
-
-        usePathname().includes("/dpkakp/public") ||
-        usePathname().includes("/dpkakp/penguji") ||
-        usePathname().includes("/pukakp/admin") ||
-        usePathname().includes("/pukakp/user") ||
-        usePathname().includes("/pukakp/penguji")
-        ? "hidden"
+        usePathname().includes("instruktur")
+        ? "hidden !bg-none"
         : ""
         }  z-[150] md:bg-opacity-90 transition duration-300 ease-in-out ${(top && usePathname().includes("layanan")) ||
           usePathname() == "/dashboard" ||
@@ -262,7 +255,7 @@ export default function Header() {
               </Link>
             )}
 
-          <nav className="hidden md:flex md:grow">
+          <nav className={`${usePathname().includes("/instruktur/form") ? 'hidden' : 'flex'} md:grow`}>
             <ul className="flex grow gap-0 justify-end flex-wrap items-center w-fit">
               <>
                 {" "}

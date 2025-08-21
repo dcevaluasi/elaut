@@ -56,6 +56,8 @@ interface TabStatusPelatihanMasyarakatProps {
     setSelectedStatusFilter: (status: string) => void;
     isOperatorBalaiPelatihan?: boolean;
 
+    countDiklatSPV?: number
+
     // Extra
     data?: any[];
     isSupervisor?: boolean;
@@ -82,6 +84,8 @@ export default function TabStatusPelatihanMasyarakat({
     selectedStatusFilter,
     setSelectedStatusFilter,
     isOperatorBalaiPelatihan,
+
+    countDiklatSPV,
 
     // Extra props
     data = [],
@@ -114,15 +118,15 @@ export default function TabStatusPelatihanMasyarakat({
             <section aria-labelledby="ticket-statistics-tabs-label" className="overflow-x-auto">
                 <ul className="flex gap-2 min-w-max">
 
+                    <StatusButton
+                        label="Total"
+                        count={dataLength}
+                        icon={<ListChecks size={16} />}
+                        isSelected={selectedStatusFilter === "All"}
+                        onClick={() => setSelectedStatusFilter("All")}
+                    />
+                    {Cookies.get('Access')?.includes('createPelatihan') && <>
 
-                    {(isOperatorBalaiPelatihan || Cookies.get('XSRF093') == 'balai') && <>
-                        <StatusButton
-                            label="Total"
-                            count={dataLength}
-                            icon={<ListChecks size={16} />}
-                            isSelected={selectedStatusFilter === "All"}
-                            onClick={() => setSelectedStatusFilter("All")}
-                        />
                         <StatusButton
                             label="Belum Dipublish"
                             count={countNotPublished || 0}
@@ -141,11 +145,11 @@ export default function TabStatusPelatihanMasyarakat({
                         /> */}
 
                         <StatusButton
-                            label="Pengajuan Sertifikat"
+                            label="On Progress"
                             count={countOnProgress || 0}
                             icon={<FileCheck2 size={16} />}
-                            isSelected={selectedStatusFilter === "Proses Pengajuan Sertifikat"}
-                            onClick={() => setSelectedStatusFilter("Proses Pengajuan Sertifikat")}
+                            isSelected={selectedStatusFilter === "On Progress"}
+                            onClick={() => setSelectedStatusFilter("On Progress")}
                         />
 
                         <StatusButton
@@ -157,23 +161,16 @@ export default function TabStatusPelatihanMasyarakat({
                         />
                     </>}
 
-                    {isSupervisor && !isPejabat && (
+                    {Cookies.get('Access')?.includes('approvePelaksanaanSPV') && (
                         <StatusButton
-                            label="Perlu DiApprove"
-                            count={countApproval}
-                            isSelected={selectedStatusFilter === "Approval"}
-                            onClick={() => handleClickWithDelay("Approval")}
+                            label="Pending SPV"
+                            count={countDiklatSPV || 0}
+                            isSelected={selectedStatusFilter === "Pending SPV"}
+                            onClick={() => handleClickWithDelay("Pending SPV")}
                         />
                     )}
 
-                    {Cookies.get("Jabatan") === ESELON_2.fullName && (
-                        <StatusButton
-                            label="Perlu DiApprove"
-                            count={countSigningByKaBPPSDMKP}
-                            isSelected={selectedStatusFilter === "Signing by Ka BPPSDM KP"}
-                            onClick={() => handleClickWithDelay("Signing by Ka BPPSDM KP")}
-                        />
-                    )}
+
 
                     {isPejabat && (
                         <StatusButton

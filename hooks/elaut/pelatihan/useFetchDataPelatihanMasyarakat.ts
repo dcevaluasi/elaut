@@ -3,6 +3,7 @@ import axios, { AxiosResponse } from 'axios'
 import Cookies from 'js-cookie'
 import { elautBaseUrl } from '@/constants/urls'
 import { PelatihanMasyarakat } from '@/types/product'
+import { usePathname } from 'next/navigation'
 
 export function useFetchDataPelatihanMasyarakat() {
   const [data, setData] = useState<PelatihanMasyarakat[]>([])
@@ -12,8 +13,11 @@ export function useFetchDataPelatihanMasyarakat() {
   const [countNotPublished, setCountNotPublished] = useState(0)
   const [countVerifying, setCountVerifying] = useState(0)
 
+  const [countDiklatSPV, setCountDiklatSPV] = useState(0)
+
   const idLemdik = Cookies.get('IDLemdik')
   const token = Cookies.get('XSRF091')
+  const isPusat = usePathname().includes('pusat')
 
   const fetchDataPelatihanMasyarakat = useCallback(async () => {
     setIsFetching(true)
@@ -21,21 +25,28 @@ export function useFetchDataPelatihanMasyarakat() {
       const response: AxiosResponse<{
         data: PelatihanMasyarakat[]
       }> = await axios.get(
-        `${elautBaseUrl}/lemdik/getPelatihanAdmin?id_lemdik=${idLemdik}`,
+        isPusat
+          ? `${elautBaseUrl}/lemdik/getPelatihanAdmin`
+          : `${elautBaseUrl}/lemdik/getPelatihanAdmin?id_lemdik=${idLemdik}`,
         { headers: { Authorization: `Bearer ${token}` } },
       )
-      console.log(response)
       const items = response.data?.data || []
 
       setCountOnProgress(
         items.filter((i) => i.StatusPenerbitan === 'On Progress').length,
       )
-      setCountDone(items.filter((i) => i.StatusPenerbitan === 'Done').length)
+      setCountDone(
+        items.filter(
+          (i) => i.StatusPenerbitan === '14' || i.StatusPenerbitan === '17',
+        ).length,
+      )
       setCountNotPublished(items.filter((i) => i.Status !== 'Publish').length)
       setCountVerifying(
         items.filter((i) => i.StatusPenerbitan === 'Verifikasi Pelaksanaan')
           .length,
       )
+
+      setCountDiklatSPV(items.filter((i) => i.StatusPenerbitan === '1').length)
 
       setData([...items].reverse())
       setIsFetching(false)
@@ -55,6 +66,7 @@ export function useFetchDataPelatihanMasyarakat() {
     setIsFetching,
     countOnProgress,
     countDone,
+    countDiklatSPV,
     countNotPublished,
     countVerifying,
     refetch: fetchDataPelatihanMasyarakat,

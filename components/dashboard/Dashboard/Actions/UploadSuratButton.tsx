@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,219 +16,138 @@ import { elautBaseUrl } from "@/constants/urls";
 import axios from "axios";
 import Toast from "@/components/toast";
 import Cookies from "js-cookie";
-import { LucideFileCheck2 } from "lucide-react";
-import Link from "next/link";
 import { FiUploadCloud } from "react-icons/fi";
+import Link from "next/link";
 import { PelatihanMasyarakat } from "@/types/product";
+import { truncateText } from "@/utils";
 
 interface UploadSuratButtonProps {
-  suratPemberitahuan: string;
   idPelatihan: string;
-  pelatihan: PelatihanMasyarakat
-  handleFetchingData?: any;
+  pelatihan: PelatihanMasyarakat;
+  handleFetchingData?: () => void;
 }
 
 const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
-  suratPemberitahuan,
   idPelatihan,
   pelatihan,
   handleFetchingData,
 }) => {
-  const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
-  const [isOpenFormSuratPemberitahuan, setIsOpenFormSuratPemberitahuan] =
-    React.useState<boolean>(false);
-  const [suratPemberitahuanFile, setSuratPemberitahuanFile] =
-    React.useState<File | null>(null);
-  const [isUploading, setIsUploading] = React.useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const handleSuratPemberitahuanChange = (e: any) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSuratPemberitahuanFile(file); // Simpan file tanpa validasi ekstensi
-    }
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) setFile(selectedFile);
   };
 
-  const handleUploadSuratPemberitahuan = async (id: string) => {
-    if (suratPemberitahuanFile) {
-      const fileExtension = suratPemberitahuanFile.name
-        .split(".")
-        .pop()
-        ?.toLowerCase();
-      if (fileExtension !== "pdf") {
-        Toast.fire({
-          icon: "error",
-          title: "Oopsss!",
-          text: "Gagal mengupload surat pemberitahuan, harus mengupload dengan format PDF!",
-        });
-        return; // Hentikan proses jika file bukan PDF
-      }
+  const handleUpload = async () => {
+    if (!file) return;
+
+    const fileExtension = file.name.split(".").pop()?.toLowerCase();
+    if (fileExtension !== "pdf") {
+      Toast.fire({
+        icon: "error",
+        title: "Oopsss!",
+        text: "File harus berformat PDF!",
+      });
+      return;
     }
 
     setIsUploading(true);
     const formData = new FormData();
-    formData.append("StatusPenerbitan", "Verifikasi Pelaksanaan");
-
-    if (suratPemberitahuanFile) {
-      formData.append("SuratPemberitahuan", suratPemberitahuanFile);
-    }
-
-    console.log("SURAT PEMBERITAHUAN", suratPemberitahuanFile);
+    formData.append("StatusPenerbitan", "1");
+    formData.append("SuratPemberitahuan", file);
 
     try {
-      const response = await axios.put(
-        `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${id}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      await axios.put(`${elautBaseUrl}/lemdik/UpdatePelatihan?id=${idPelatihan}`, formData, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       Toast.fire({
         icon: "success",
         title: "Yeayyy!",
-        text: "Berhasil mengupload surat pemberitahuan ke Pusat Pelatihan Kelautan dan Perikanan!",
+        text: "Berhasil mengirim pemberitahuan pelatihan, silahkan menunggu approval SPV!",
       });
 
-      console.log("UPDATE PELATIHAN: ", response);
-      handleFetchingData();
-      setIsUploading(false);
-      setIsOpenFormSuratPemberitahuan(false);
-    } catch (error) {
-      console.error("ERROR UPDATE PELATIHAN: ", error);
+      handleFetchingData?.();
+      setIsOpen(false);
+    } catch {
       Toast.fire({
         icon: "error",
         title: "Oopsss!",
-        text: "Gagal mengupload surat pemberitahuan ke Pusat Pelatihan Kelautan dan Perikanan!",
+        text: "Gagal mengupload surat pemberitahuan!",
       });
-
-      setIsOpenFormSuratPemberitahuan(false);
+    } finally {
       setIsUploading(false);
-      handleFetchingData();
     }
   };
 
   return (
     <>
-      <AlertDialog open={isOpenFormSuratPemberitahuan}>
-        <AlertDialogContent>
-          <AlertDialogHeader className="flex gap-0 flex-col">
+      {/* Dialog */}
+      <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+        <AlertDialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              {" "}
               <FiUploadCloud className="h-4 w-4" />
-              Upload Surat Pemberitahuan
+              Pemberitahuan Pelaksanaan Pelatihan
             </AlertDialogTitle>
-            <AlertDialogDescription className="-mt-2">
-              Dalam pelaksanaan pelatihan Pusat Pelatihan Kelautan dan Perikanan
-              perlu tahu untuk pemberitahuan!
+            <AlertDialogDescription>
+              Upload surat pemberitahuan dan kirim ke SPV Pusat, dipastikan terdapat data dan detail informasi pelatihan terlampir pada surat!
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <fieldset>
-            <form autoComplete="off">
-              <div className="flex flex-wrap -mx-3 mb-1">
-                <div className="w-full px-3">
-                  <label
-                    className="block text-gray-800 text-sm font-medium mb-1"
-                    htmlFor="email"
-                  >
-                    Upload Surat Pemberitahuan{" "}
-                  </label>
 
-                  <div className="flex gap-1">
-                    <input
-                      type="file"
-                      className=" text-black h-10 text-base flex items-center cursor-pointer w-full border border-neutral-200 rounded-md"
-                      required
-                      onChange={handleSuratPemberitahuanChange}
-                    />
-                  </div>
+          {/* Beautified File Input */}
+          <div className="mt-3">
+            <label
+              htmlFor="file-upload"
+              className="flex items-center justify-center w-full h-12 px-4 
+                   border-2 border-dashed border-gray-300 rounded-lg 
+                   cursor-pointer hover:border-blue-500 transition-colors"
+            >
+              {file ? (
+                <span className="text-sm text-gray-800 truncate">{truncateText(file.name, 50, '...')}</span>
+              ) : (
+                <span className="text-sm text-gray-500">Klik untuk pilih file (PDF)</span>
+              )}
+            </label>
+            <input
+              id="file-upload"
+              type="file"
+              accept="application/pdf"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+          </div>
 
-                  <p className="text-gray-700 text-xs mt-1">
-                    *Surat pemberitahuan yang diupload merupakan surat yang
-                    sudah ditandatangani melalui portal dengan contoh seperti
-                    <Link
-                      href={
-                        "https://drive.google.com/file/d/1Zzu6DRuaj_SwJ5Sk0XQfShtghA-HYT5F/view?usp=sharing"
-                      }
-                      target="_blank"
-                      className="ml-1 text-blue-500 underline"
-                    >
-                      berikut
-                    </Link>
-                    , hal ini dilakukan untuk pengarsipan dan bahan bukti
-                    penerbitan sertifikat nantinya!
-                  </p>
-                </div>
-              </div>
-
-              <AlertDialogFooter className="mt-3">
-                <>
-                  {" "}
-                  {!isUploading && (
-                    <AlertDialogCancel
-                      onClick={(e) =>
-                        setIsOpenFormSuratPemberitahuan(
-                          !isOpenFormSuratPemberitahuan
-                        )
-                      }
-                    >
-                      Cancel
-                    </AlertDialogCancel>
-                  )}
-                  <AlertDialogAction
-                    onClick={(e) => handleUploadSuratPemberitahuan(idPelatihan)}
-                    disabled={isUploading}
-                    className={`${isUploading && "px-6"}`}
-                  >
-                    {isUploading ? (
-                      <span>Uploading...</span>
-                    ) : (
-                      <span>Upload</span>
-                    )}
-                  </AlertDialogAction>
-                </>
-              </AlertDialogFooter>
-            </form>
-          </fieldset>
+          <AlertDialogFooter className="mt-4">
+            {!isUploading && <AlertDialogCancel>Cancel</AlertDialogCancel>}
+            <AlertDialogAction onClick={handleUpload} disabled={isUploading}>
+              {isUploading ? "Mengirim..." : "Kirim SPV"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {
-        isOperatorBalaiPelatihan ? suratPemberitahuan !=
-          "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/suratPemberitahuan/" ? (
-          <Link
-            href={suratPemberitahuan}
-            title="Surat Pemberitahuan"
-            target="_blank"
-            className="border border-neutral-200  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-gray-800 hover:bg-gray-800 hover:text-white text-white rounded-md"
-          >
-            <LucideFileCheck2 className="h-5 w-5" /> Surat Pemberitahuan
-          </Link>
-        ) : (
+
+      {/* Trigger Button */}
+      {Cookies.get("Access")?.includes("createPelatihan") &&
+        pelatihan.StatusPenerbitan === "0" && (
           <Button
-            onClick={() => {
-              setIsOpenFormSuratPemberitahuan(!isOpenFormSuratPemberitahuan);
-            }}
-            variant="outline"
-            title="Upload Surat Pemberitahuan"
-            className="border border-neutral-200  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-gray-800 hover:bg-gray-800 hover:text-white text-white rounded-md"
+            onClick={() => setIsOpen(true)}
+            size="sm"
+            className="w-full inline-flex items-center justify-center gap-2 
+                       h-10 px-5 text-sm font-medium rounded-full 
+                       border border-indigo-500 bg-indigo-500 text-white 
+                       hover:bg-indigo-600 transition-colors shadow-sm"
           >
-            <FiUploadCloud className="h-5 w-5" /> Upload Surat Pemberitahuan
+            <FiUploadCloud className="h-5 w-5" /> Kirim SPV
           </Button>
-        ) : <Link
-          href={`${pelatihan!.SilabusPelatihan
-            }`}
-          title="Surat Pemberitahuan"
-          target="_blank"
-          className="border border-neutral-200  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-gray-800 hover:bg-gray-800 hover:text-white text-white rounded-md"
-        >
-          <LucideFileCheck2 className="h-5 w-5" /> Surat Pemberitahuan
-        </Link>
-      }
-
-
+        )}
     </>
   );
 };
