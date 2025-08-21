@@ -171,8 +171,8 @@ const TTDSertifikat = ({ dataPelatihan, handleFetchData }: { dataPelatihan: Pela
               {" "}
               <Button
                 disabled={isSigning}
-                className={`inline-flex items-center justify-center gap-1 text-sm w-full rounded-full 
-              bg-blue-500 text-white w-full font-medium px-3 py-3 shadow-sm 
+                className={`inline-flex items-center justify-center gap-1 text-sm w-full rounded-lg 
+              bg-blue-500 text-white  font-medium px-3 py-4 shadow-sm 
               hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 <TbSignature className="h-4 w-4" />

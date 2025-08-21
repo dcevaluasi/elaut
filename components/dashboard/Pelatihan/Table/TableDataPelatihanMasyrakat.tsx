@@ -144,7 +144,7 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                     <Users size={14} className="text-emerald-500" /> Peserta
                                 </div>
                             </th>
-                            <th className="px-4 py-3 text-center">Status</th>
+                            {/* <th className="px-4 py-3 text-center">Status</th> */}
                             <th className="px-4 py-3 text-center">Action</th>
                         </tr>
                     </thead>
@@ -174,29 +174,22 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                     <td className="px-4 py-3 text-center">
                                         {pelatihan.UserPelatihan?.length ?? 0}
                                     </td>
-                                    <td className="px-4 h-full">{
-                                        <span className={`w-full inline-flex items-center justify-center gap-2 
-                       h-full px-5 text-sm font-medium  leading-none  text-center ${color}`}>
+                                    {/* <td className={`px-4 h-full ${color}`}>
+                                        <div
+                                            className={`w-full h-fit flex items-center justify-center gap-2 px-5 text-sm font-medium leading-none text-center `}
+                                        >
                                             {icon}
                                             {label}
-                                        </span>}
-                                    </td>
+                                        </div>
+                                    </td> */}
+
                                     {/* Action Buttons */}
                                     <td className="px-4 py-3 flex flex-col gap-2 justify-center items-center h-fit">
-                                        {Cookies.get('createPenandatanganan') == '1' &&
+                                        {(Cookies.get('Access')?.includes('isSigning') && pelatihan!.PemberitahuanDiterima == 'Pengajuan Telah Dikirim ke Ka BPPSDM KP') &&
+                                            <TTDSertifikat dataPelatihan={pelatihan!} handleFetchData={fetchDataPelatihanMasyarakat} />
+                                        }
+                                        {Cookies.get('Access')?.includes('isSigning') &&
                                             <>
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="inline-flex w-full items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
-             rounded-full border border-neutral-300 bg-white text-neutral-700 
-             hover:bg-neutral-100 hover:text-neutral-900 transition-colors 
-             shadow-sm"
-                                                    onClick={() => setSelectedPelatihan(pelatihan)}
-                                                >
-                                                    <RiInformationFill size={14} /> Detail
-                                                </Button>
-                                                <TTDSertifikat dataPelatihan={pelatihan!} handleFetchData={fetchDataPelatihanMasyarakat} />
                                                 <Link
                                                     title="Peserta Pelatihan"
                                                     target={"_blank"}
@@ -205,7 +198,7 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                                             pelatihan.IdPelatihan.toString()
                                                         )}`}
                                                     className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
-             rounded-full border bg-green-500 text-white 
+             rounded-lg border bg-green-500 text-white 
              hover:bg-grenn-600 hover:text-white transition-colors  w-full 
              shadow-sm"
                                                 >
@@ -215,15 +208,12 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                             </>
                                         }
 
-
-
-
                                         {!isOperatorBalaiPelatihan &&
                                             pelatihan.PemberitahuanDiterima === "Kirim ke SPV" && (
                                                 <Button
                                                     size="sm"
                                                     className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
-             rounded-full border border-neutral-300 bg-white text-neutral-700 
+             rounded-lg border border-neutral-300 bg-white text-neutral-700 
              hover:bg-neutral-100 hover:text-neutral-900 transition-colors w-full  
              shadow-sm"
                                                     onClick={() => {
@@ -245,23 +235,34 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                                 </Button>
                                             )}
 
-                                        <Link
+                                        {Cookies.get('Access')?.includes('viewPelatihan') && <Link
                                             title="Detail Pelatihan"
                                             target={'_blank'}
                                             href={`/admin/${usePathname().includes('pusat') ? 'pusat' : 'lemdiklat'}/pelatihan/detail/${pelatihan.KodePelatihan}/${encryptValue(
                                                 pelatihan.IdPelatihan.toString()
                                             )}`}
                                             className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
-             rounded-full border border-blue-500 bg-blue-500 text-white 
+             rounded-lg border border-blue-500 bg-blue-500 text-white 
              hover:bg-blue-600  transition-colors  w-full 
              shadow-sm"
                                         >
-                                            <RiInformationFill className="h-5 w-5 " />
+                                            <RiInformationFill className="h-4 w-4 " />
                                             Review
-                                        </Link>
+                                        </Link>}
 
-
-
+                                        {
+                                            Cookies.get('Access')?.includes('isSigning') && <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="inline-flex w-full items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
+             rounded-lg border border-neutral-300 bg-white text-neutral-700 
+             hover:bg-neutral-100 hover:text-neutral-900 transition-colors 
+             shadow-sm"
+                                                onClick={() => setSelectedPelatihan(pelatihan)}
+                                            >
+                                                <RiInformationFill size={14} /> Detail
+                                            </Button>
+                                        }
 
                                         {/* Upload Surat Pemberitahuan Pelatihan */}
                                         {accessPermissions?.includes('createPelatihan') && (
@@ -281,7 +282,7 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                                     size="sm"
                                                     title="Approve"
                                                     className="w-full inline-flex items-center justify-center gap-2 
-               h-10 px-5 text-sm font-medium rounded-full 
+               h-10 px-5 text-sm font-medium rounded-lg 
                border border-teal-500 bg-teal-500 text-white 
                hover:bg-teal-600 transition-colors shadow-sm"
                                                     onClick={() => {

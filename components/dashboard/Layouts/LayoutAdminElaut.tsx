@@ -173,16 +173,22 @@ export default function LayoutAdminElaut({
                 </button>
                 {submenuOpen && sidebarOpen && (
                   <ul className="ml-10 mt-1 space-y-1">
-                    <NavItem
-                      href="/admin/pusat/pelatihan"
-                      icon={<MdOutlinePodcasts className="text-xl" />}
-                      label="Pelaksanaan"
-                    />
-                    <NavItem
-                      href="/admin/pusat/pelatihan/sttpl"
-                      icon={<HiOutlineCheckBadge className="text-xl" />}
-                      label="Penerbitan STTPL"
-                    />
+                    {
+                      Cookies.get('Access')?.includes('viewPelatihan') && <NavItem
+                        href="/admin/pusat/pelatihan"
+                        icon={<MdOutlinePodcasts className="text-xl" />}
+                        label="Pelaksanaan"
+                      />
+                    }
+
+                    {
+                      Cookies.get('Access')?.includes('isSigning') && <NavItem
+                        href="/admin/pusat/pelatihan/sttpl/penerbitan"
+                        icon={<HiOutlineCheckBadge className="text-xl" />}
+                        label="Penerbitan STTPL"
+                      />
+                    }
+
                   </ul>
                 )}
               </li>
@@ -272,7 +278,7 @@ export default function LayoutAdminElaut({
                     label="Pelaksanaan"
                   />
                   <NavItem
-                    href="/admin/lemdiklat/pelatihan/sttpl"
+                    href="/admin/lemdiklat/pelatihan/sttpl/penerbitan"
                     icon={<HiOutlineCheckBadge className="text-xl" />}
                     label="Penerbitan STTPL"
                   />
