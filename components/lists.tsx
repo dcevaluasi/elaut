@@ -9,7 +9,7 @@ import "swiper/css/free-mode";
 // Import Swiper modules
 import { Navigation, FreeMode } from "swiper/modules";
 import Image from "next/image";
-import { TbBuilding, TbCalendar, TbMapPin, TbMoneybag } from "react-icons/tb";
+import { TbBuilding, TbCalendar, TbClock, TbMapPin, TbMoneybag } from "react-icons/tb";
 import Link from "next/link";
 import { createSlug, truncateText } from "@/utils";
 import { PelatihanMasyarakat } from "@/types/product";
@@ -17,6 +17,7 @@ import { encryptValue, formatToRupiah, replaceUrl } from "@/lib/utils";
 import "../app/css/navigation.css";
 import { generateTanggalPelatihan } from "@/utils/text";
 import { HiOutlineUserGroup, HiUserGroup } from "react-icons/hi2";
+import { RiInformationFill, RiTimeZoneLine } from "react-icons/ri";
 
 function ListProgram({
   pelatihan,
@@ -88,7 +89,7 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
       {/* Header */}
       <div className="flex justify-between items-center gap-3 mt-3">
         <h2 className="text-xl font-calsans text-white leading-none drop-shadow-md">
-          {truncateText(pelatihan?.NamaPelatihan, 50, "...")}
+          {truncateText(pelatihan?.NamaPelatihan, 100, "...")}
         </h2>
       </div>
 
@@ -102,7 +103,11 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
         </div>
         <div className="flex items-center gap-2 text-gray-300">
           <TbCalendar size={18} className="text-blue-400 flex-shrink-0" />
-          <p className="text-sm">{generateTanggalPelatihan(pelatihan.TanggalMulaiPelatihan)} - {generateTanggalPelatihan(pelatihan.TanggalBerakhirPelatihan)}</p>
+          <p className="text-sm">Pendaftaran : {pelatihan!.TanggalMulaiPendaftaran != '' ? <>{generateTanggalPelatihan(pelatihan.TanggalMulaiPendaftaran)} - {generateTanggalPelatihan(pelatihan.TanggalBerakhirPendaftaran!)}</> : <>-</>}</p>
+        </div>
+        <div className="flex items-center gap-2 text-gray-300">
+          <TbClock size={18} className="text-blue-400 flex-shrink-0" />
+          <p className="text-sm">Pelaksanaan : {generateTanggalPelatihan(pelatihan.TanggalMulaiPelatihan)} - {generateTanggalPelatihan(pelatihan.TanggalBerakhirPelatihan)}</p>
         </div>
         <div className="flex items-center gap-2 text-gray-300">
           <TbMapPin size={18} className="text-blue-400 flex-shrink-0" />
@@ -128,17 +133,30 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
       />
 
       {/* Button */}
-      <Link
-        href={`/layanan/pelatihan/${createSlug(
-          pelatihan.NamaPelatihan
-        )}/${pelatihan?.KodePelatihan}/${encryptValue(pelatihan?.IdPelatihan)}`}
-        className="w-full block text-center font-semibold px-6 py-3 
+      <div className="flex gap-1 w-full">
+        <Link
+          href={`#`}
+          className="w-full flex items-center justify-center text-center font-semibold px-6 py-3 
+          bg-gray-500/90 hover:bg-gray-600/90 
+          backdrop-blur-md border border-white/20 
+          rounded-3xl text-white shadow-md transition text-sm"
+        >
+          <RiTimeZoneLine className="w-5 h-5" />
+          Telah Berakhir
+        </Link>
+        <Link
+          href={`/layanan/pelatihan/${createSlug(
+            pelatihan.NamaPelatihan
+          )}/${pelatihan?.KodePelatihan}/${encryptValue(pelatihan?.IdPelatihan)}`}
+          className="w-full flex items-center justify-center text-center font-semibold px-6 py-3 
           bg-blue-500/90 hover:bg-blue-600/90 
           backdrop-blur-md border border-white/20 
-          rounded-3xl text-white shadow-md transition"
-      >
-        Lihat Detail
-      </Link>
+          rounded-3xl text-white shadow-md transition text-sm"
+        >
+          <RiInformationFill className="w-5 h-5" /> Lihat Detail
+        </Link>
+      </div>
+
     </div>
   );
 };

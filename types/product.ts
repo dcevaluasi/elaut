@@ -109,6 +109,7 @@ export type DetailPelatihanMasyarakat = {
   TtdSertifikat: string
   NoSertifikat: string
   IdSaranaPrasarana: string
+  JumlahPeserta: string
   IdKonsumsi: string
   CreateAt: string
   UpdateAt: string

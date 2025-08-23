@@ -14,6 +14,7 @@ import FormRegistrationTraining from "../dashboard/users/formRegistrationTrainin
 import Features from "../features";
 import { generateTanggalPelatihan } from "@/utils/text";
 import { formatToRupiah, replaceUrl } from "@/lib/utils";
+import { HiOutlineUserGroup } from "react-icons/hi2";
 
 interface DetailPelatihanProps {
   data: DetailPelatihanMasyarakat;
@@ -44,12 +45,7 @@ const DetailPelatihan: React.FC<DetailPelatihanProps> = ({
               />
             }
 
-            {data.StatusApproval === "Selesai" && (
-              <span className="absolute top-4 right-4 flex items-center gap-2 bg-red-500/90 text-white text-sm font-semibold px-4 py-2 rounded-full shadow-md">
-                <RiTimeZoneLine className="w-5 h-5" />
-                Telah Berakhir
-              </span>
-            )}
+
           </div>
 
           <div className={`${data.FotoPelatihan == "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" ? "" : "mt-6"} p-7 rounded-3xl bg-gradient-to-br from-blue-500/70 to-sky-600/20 text-gray-200  backdrop-blur-xl 
@@ -91,15 +87,29 @@ const DetailPelatihan: React.FC<DetailPelatihanProps> = ({
         </div>
 
         {/* RIGHT: Details */}
-        <div className="flex-1 flex flex-col gap-6">
+        <div className="flex-1 flex flex-col gap-6 relative">
+          <div className="flex gap-2 absolute top-4 right-4 z-[99999]">
+            <span className=" flex items-center gap-2 bg-red-500/90 text-white text-sm font-semibold px-4 py-2 rounded-full shadow-md">
+              <HiOutlineUserGroup className="w-5 h-5" />
+              {data?.UserPelatihan.length}/{data?.KoutaPelatihan} Pendaftar
+            </span>
+            {data.StatusApproval === "Selesai" && (
+              <span className=" flex items-center gap-2 bg-red-500/90 text-white text-sm font-semibold px-4 py-2 rounded-full shadow-md">
+                <RiTimeZoneLine className="w-5 h-5" />
+                Telah Berakhir
+              </span>
+            )}
+          </div>
+
+
           {/* Price + Info */}
           <div className="border border-white/15 bg-white/10 backdrop-blur-xl 
                     shadow-[0_8px_40px_rgba(0,0,0,0.35)] transition-all duration-500 
-                    hover:scale-105 hover:border-blue-400/40 rounded-3xl p-8">
+                     hover:border-blue-400/40 rounded-3xl p-8">
 
             {/* Description */}
             <div
-              className="mt-6 prose prose-invert text-gray-200 text-sm md:text-base leading-relaxed max-w-none"
+              className="mt-10 prose prose-invert text-gray-200 text-sm md:text-base leading-relaxed max-w-none"
             >
               <div dangerouslySetInnerHTML={{ __html: data.DetailPelatihan }} />
             </div>
