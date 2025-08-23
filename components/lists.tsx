@@ -133,7 +133,7 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
       />
 
       {/* Button */}
-      <div className="flex gap-1 w-full">
+      <div className="flex flex-col md:flex-row gap-1 w-full">
         {
           pelatihan?.StatusApproval == "Selesai" && <Link
             href={`#`}
