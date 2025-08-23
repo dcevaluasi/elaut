@@ -1,19 +1,6 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Transition } from "@headlessui/react";
-import Image from "next/image";
-import FeaturesBg from "@/public/images/features-bg.png";
-import FeaturesElement from "@/public/images/features-element.png";
-import { GiLuckyFisherman, GiWaterSplash } from "react-icons/gi";
-import { HiUserGroup } from "react-icons/hi2";
-import { TbFileCertificate } from "react-icons/tb";
-import { FaBuildingColumns } from "react-icons/fa6";
-import { FaUserGraduate } from "react-icons/fa";
-
-import { FaUserTie } from "react-icons/fa6";
-
-import { Swiper, SwiperSlide } from "swiper/react";
 
 // Import Swiper styles
 import "swiper/css";
@@ -23,7 +10,6 @@ import "./../app/css/additional-styles/features-slider.css";
 
 // import required modules
 import "swiper/css/navigation";
-import { Pagination, Navigation } from "swiper/modules";
 import ListProgram from "./lists";
 import Link from "next/link";
 import axios, { AxiosResponse } from "axios";
@@ -66,10 +52,10 @@ export default function Features() {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
         <div className="pt-12 md:pt-20">
           <div className="max-w-3xl w-full mx-auto text-center flex gap-2 flex-col items-center justify-center pb-5 md:pb-8">
-            <h1 className="text-2xl md:text-4xl text-blue-500 font-calsans leading-[100%]">
+            <h1 className="text-2xl md:text-4xl text-blue-400 font-calsans leading-[100%]">
               Pelatihan Lainnya
             </h1>
-            <p className="text-[#979797] text-sm md:text-base">
+            <p className="text-gray-200 text-sm md:text-base">
               Pelatihan  serupa lainnya yang berfokus pada <br />{" "}
               peningkatan SDM KP yang berkompetensi dan cari pelatihan yang ingin kamu ikuti.
             </p>

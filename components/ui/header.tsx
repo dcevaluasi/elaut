@@ -1,22 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-
+import React from "react";
 import Link from "next/link";
-import Logo from "./logo";
 import MobileMenu from "./mobile-menu";
 import { usePathname, useRouter } from "next/navigation";
-
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
 import {
-  HiCalendar,
   HiMiniChevronDown,
-  HiMiniUserGroup,
+  HiHome,
+  HiNewspaper,
+  HiIdentification,
 } from "react-icons/hi2";
 import Cookies from "js-cookie";
 import DropdownUserPelatihan from "../dashboard/Header/DropdownUserPelatihan";
@@ -26,165 +23,13 @@ import { Button } from "./button";
 
 export default function Header() {
   const [top, setTop] = React.useState<boolean>(true);
+  const [openModal, setOpenModal] = React.useState(false);
+  const [currentName, setCurrentName] = React.useState("");
+  const router = useRouter();
+  const pathname = usePathname();
 
   const scrollHandler = () => {
     window.pageYOffset > 10 ? setTop(false) : setTop(true);
-  };
-
-  const [openModal, setOpenModal] = React.useState(false);
-  const [currentName, setCurrentName] = React.useState("");
-
-  const router = useRouter();
-
-  const NavDropDown = ({
-    href,
-    name,
-    top,
-    children,
-  }: {
-    href: string;
-    name: string;
-    top: boolean;
-    children: any;
-  }) => {
-    return (
-      <Popover open={openModal}>
-        <PopoverTrigger asChild>
-          <li
-            className="cursor-pointer"
-            onClick={(e) => {
-              setCurrentName(name);
-              setOpenModal(!openModal);
-            }}
-          >
-            <div
-              className={`font-medium ${top &&
-                (usePathname() == "/" ||
-                  usePathname() == "/lembaga/p2mkp" ||
-                  usePathname().includes("/publikasi") ||
-                  usePathname().includes("bppp") ||
-                  usePathname() == "/lembaga/dpkakp" ||
-                  usePathname() == "/lembaga/komite-approval" ||
-                  usePathname() == "/lembaga/pukakp" ||
-
-                  usePathname().includes("registrasi") ||
-                  usePathname().includes("login") ||
-                  usePathname().includes("forget-password"))
-                ? "hover:text-white hover:scale-105 text-white"
-                : top && usePathname().includes("program")
-                  ? "hover:text-white hover:scale-105 text-white"
-                  : (top && usePathname().includes("pelatihan")) ||
-                    usePathname().includes("sertifikasi") ||
-                    usePathname().includes("users")
-                    ? "text-[#979797] hover:text-gray-900 hover:scale-105"
-                    : usePathname().includes("complete-profile")
-                      ? "text-[#979797] hover:text-gray-900 hover:scale-105"
-                      : "text-[#979797] hover:text-gray-900 hover:scale-105"
-                }  px-2 py-3 flex items-center transition  duration-150 ease-in-out font-semibold text-[#979797] hover:!text-blue-500`}
-            >
-              {name} <HiMiniChevronDown className="text-lg" />
-            </div>
-          </li>
-        </PopoverTrigger>
-        {name == currentName && (
-          <PopoverContent
-            onMouseLeave={() => setOpenModal(false)}
-            className={`w-80 flex flex-col z-[1000000] gap-1 ${top ? "-mt-3" : "mt-7"
-              }`}
-          >
-            <ul>{children}</ul>
-          </PopoverContent>
-        )}
-      </Popover>
-    );
-  };
-
-  const NavLink = ({
-    href,
-    name,
-    top,
-    children,
-  }: {
-    href: string;
-    name: string;
-    top: boolean;
-    children?: any;
-  }) => {
-    return (
-      <li>
-        <Link
-          href={href}
-          target={`${name == "Balai Pelatihan dan Penyuluhan Perikanan Tegal" ||
-            name == "Balai Pelatihan dan Penyuluhan Perikanan Banyuwangi" ||
-            name == "Balai Pelatihan dan Penyuluhan Perikanan Ambon" ||
-            name == "Balai Pelatihan dan Penyuluhan Perikanan Medan" ||
-            name == "Balai Pelatihan dan Penyuluhan Perikanan Bitung" ||
-            name == "Balai Pendidikan dan Pelatihan Aparatur Sukamandi"
-            ? "_target"
-            : "_self"
-            }`}
-          onClick={(e) => setOpenModal(false)}
-          className={`font-semibold ${top && usePathname().includes("layanan")
-            ? "text-[#979797] hover:text-gray-900 hover:scale-105"
-            : (top && usePathname().includes("program"))
-              ? "hover:text-white hover:scale-105"
-              : (top && usePathname().includes("pelatihan")) ||
-                usePathname().includes("sertifikasi") ||
-                usePathname().includes("users")
-                ? "text-[#979797] hover:text-gray-900 hover:scale-105"
-                : usePathname().includes("complete-profile") ||
-                  usePathname().includes("layanan")
-                  ? "text-[#979797] hover:text-gray-900 hover:scale-105"
-                  : "text-[#979797] hover:text-gray-900 hover:scale-105"
-            }  px-5 py-3 flex items-center transition duration-150 ease-in-out font-semibold text-[#979797] hover:!text-blue-500`}
-        >
-          {children}
-        </Link>
-      </li>
-    );
-  };
-
-  const NavLinkDefault = ({
-    href,
-    name,
-    top,
-  }: {
-    href: string;
-    name: string;
-    top: boolean;
-  }) => {
-    return (
-      <li>
-        <Link
-          href={href}
-          className={`font-semibold ${top &&
-            (usePathname() == "/" ||
-              usePathname() == "/lembaga/p2mkp" ||
-              usePathname().includes("bppp") ||
-              usePathname().includes("/publikasi") ||
-              usePathname() == "/lembaga/dpkakp" ||
-              usePathname() == "/lembaga/komite-approval" ||
-              usePathname() == "/lembaga/pukakp" ||
-              usePathname().includes("registrasi") ||
-              usePathname().includes("login") ||
-              usePathname().includes("forget-password"))
-            ? "hover:text-white hover:scale-105 text-white"
-            : top && usePathname().includes("program")
-              ? "hover:text-white hover:scale-105 text-white"
-              : (top && usePathname().includes("pelatihan")) ||
-                usePathname().includes("sertifikasi") ||
-                usePathname().includes("users")
-                ? "text-[#979797] hover:text-gray-900 hover:scale-105"
-                : usePathname().includes("complete-profile") ||
-                  usePathname().includes("layanan")
-                  ? "text-[#979797] hover:text-gray-900 hover:scale-105"
-                  : "text-[#979797] hover:text-gray-900 hover:scale-105"
-            }  px-5 py-3 flex items-center transition duration-150 ease-in-out text-[#979797] hover:!text-blue-500`}
-        >
-          {name}
-        </Link>
-      </li>
-    );
   };
 
   React.useEffect(() => {
@@ -193,158 +38,153 @@ export default function Header() {
     return () => window.removeEventListener("scroll", scrollHandler);
   }, [top]);
 
-  const pathname = usePathname();
-  const getLogoHeader = () => {
-    return "/logo-kkp.png";
+  const NavDropDown = ({
+    name,
+    children,
+  }: {
+    name: string;
+    children: any;
+  }) => {
+    return (
+      <Popover open={openModal}>
+        <PopoverTrigger asChild>
+          <li
+            className="cursor-pointer"
+            onClick={() => {
+              setCurrentName(name);
+              setOpenModal(!openModal);
+            }}
+          >
+            <div
+              className={`px-3 py-2 flex items-center gap-1 font-semibold text-white 
+                transition duration-200 ease-in-out rounded-xl
+                hover:text-blue-400 hover:scale-105`}
+            >
+              {name} <HiMiniChevronDown className="text-lg" />
+            </div>
+          </li>
+        </PopoverTrigger>
+        {name == currentName && (
+          <PopoverContent
+            onMouseLeave={() => setOpenModal(false)}
+            className="w-80 flex flex-col gap-1 mt-2 
+              bg-white/10 backdrop-blur-xl border border-white/20 
+              rounded-2xl shadow-xl p-3 text-white"
+          >
+            <ul>{children}</ul>
+          </PopoverContent>
+        )}
+      </Popover>
+    );
   };
-  const getSizeLogoHeader = () => {
-    return "w-20";
-  };
+
+  const NavLinkDefault = ({
+    href,
+    name,
+    icon,
+  }: {
+    href: string;
+    name: string;
+    icon: React.ReactNode;
+  }) => (
+    <li>
+      <Link
+        href={href}
+        className={`px-4 py-2 flex items-center gap-2 rounded-xl font-semibold 
+          transition duration-200 ease-in-out
+          ${pathname === href ? "text-blue-400" : "text-white"}
+          hover:text-blue-400 hover:scale-105`}
+      >
+        {icon}
+        {name}
+      </Link>
+    </li>
+  );
+
+  const getLogoHeader = () => "/logo-kkp-full-white.png";
+  const getSizeLogoHeader = () => "w-16 md:w-20";
 
   return (
     <header
-      className={`fixed mx-auto left-0 right-0 ${usePathname().includes("pre-test") ||
-        usePathname().includes("post-test") ||
-        usePathname().includes("/e-katalog") ||
-        usePathname().includes("instruktur")
-        ? "hidden !bg-none"
-        : ""
-        }  z-[150] md:bg-opacity-90 transition duration-300 ease-in-out ${(top && usePathname().includes("layanan")) ||
-          usePathname() == "/dashboard" ||
-          usePathname() == "/registrasi" ||
-          usePathname().includes("forget-password") ||
-          usePathname() == "/login"
-          ? "pt-0"
-          : top && "pt-6"
-        }  ${!top
-          ? `bg-white backdrop-blur-sm shadow-custom `
-          : usePathname().includes("program") || usePathname().includes("/publikasi")
-            ? "bg-none"
-            : usePathname().includes("pelatihan") ||
-              usePathname().includes("sertifikasi") ||
-              usePathname().includes("users")
-              ? `bg-white backdrop-blur-sm !pt-0 shadow-custom !text-[#979797] hover:!text-blue-500 `
-              :
-              usePathname().includes("cek-sertifikat") || usePathname() == "/dashboard"
-                ? "bg-white backdrop-blur-sm shadow-custom "
-                : ""
-        }  ${usePathname().includes("program") && "bg-transparent"} ${top && usePathname().includes("login") && "bg-transparent !text-white"
-        } max-w-6xl w-full mt-8    rounded-3xl  px-5 hidden md:block`}
+      className={`fixed left-0 right-0 z-[150] transition duration-300 ease-in-out hidden md:block
+        ${pathname.includes("pre-test") ||
+          pathname.includes("post-test") ||
+          pathname.includes("/e-katalog") ||
+          pathname.includes("instruktur")
+          ? "hidden"
+          : ""}`}
     >
-      <div className="w-full mx-auto">
-        <div className="flex items-center justify-between h-24 md:h-24 py-3 w-full mx-auto">
-          {(usePathname().includes("program") ||
-            usePathname().includes("registrasi") ||
-            usePathname().includes("pelatihan") ||
-            usePathname().includes("dashboard") ||
-            usePathname().includes("publikasi") ||
-            usePathname().includes("cek-sertifikat") ||
-            usePathname().includes("forget-password") ||
-            usePathname().includes("login")) && (
-              <Link
-                href={"/"}
-                className="shrink-0 ml-6 md:mr-4 flex items-center gap-4"
-              >
-                <Image
-                  className={getSizeLogoHeader()}
-                  width={0}
-                  height={0}
-                  src={getLogoHeader()}
-                  alt="Kementrian Kelautan dan Perikanan RI Logo"
-                />
-              </Link>
-            )}
+      <div
+        className={`max-w-6xl mx-auto mt-6 px-5 rounded-3xl
+          ${!top
+            ? "bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg"
+            : "bg-transparent"} transition-all`}
+      >
+        <div className="flex items-center justify-between h-20 md:h-24">
+          {/* Logo */}
+          {
+            usePathname() != '/' && <Link href={"/"} className="flex items-center gap-3 shrink-0">
+              <Image
+                className={getSizeLogoHeader()}
+                width={0}
+                height={0}
+                src={getLogoHeader()}
+                alt="Kementrian Kelautan dan Perikanan RI Logo"
+              />
+            </Link>
+          }
 
-          <nav className={`${usePathname().includes("/instruktur/form") ? 'hidden' : 'flex'} md:grow`}>
-            <ul className="flex grow gap-0 justify-end flex-wrap items-center w-fit">
-              <>
-                {" "}
-                <NavLinkDefault href="/" name="Beranda" top={top} />
-                <NavDropDown href="#" name="Balai Pelatihan" top={top}>
-                  <NavLink
+
+          {/* Navbar */}
+          <nav
+            className={`${pathname.includes("/instruktur/form") ? "hidden" : "flex"
+              } md:grow`}
+          >
+            <ul className="flex grow justify-end items-center">
+              <NavLinkDefault href="/" name="Beranda" icon={<HiHome />} />
+              <NavDropDown name="Balai Pelatihan">
+                <li>
+                  <Link
                     href="https://bppptegal.id/tentang-kami"
-                    name="Balai Pelatihan dan Penyuluhan Perikanan Tegal"
-                    top={top}
+                    className="flex gap-2 items-center px-3 py-2 rounded-lg hover:bg-white/5 text-white"
                   >
-                    <div className="flex gap-2 items-center">
-                      <IoMdSchool className="text-4xl" />{" "}
-                      <span>
-                        Balai Pelatihan dan Penyuluhan Perikanan Tegal
-                      </span>
-                    </div>
-                  </NavLink>
-                  <NavLink
-                    href="#"
-                    name="Balai Pelatihan dan Penyuluhan Perikanan Banyuwangi"
-                    top={top}
-                  >
-                    <div className="flex gap-2 items-center">
-                      <IoMdSchool className="text-4xl" />{" "}
-                      <span>
-                        Balai Pelatihan dan Penyuluhan Perikanan Banyuwangi
-                      </span>
-                    </div>
-                  </NavLink>
-                  <NavLink
+                    <IoMdSchool className="text-xl text-blue-400" />
+                    <span>Balai Pelatihan Perikanan Tegal</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="https://bpppbitung.id/#"
-                    name="Balai Pelatihan dan Penyuluhan Perikanan Bitung"
-                    top={top}
+                    className="flex gap-2 items-center px-3 py-2 rounded-lg hover:bg-white/5 text-white"
                   >
-                    <div className="flex gap-2 items-center">
-                      <IoMdSchool className="text-4xl" />{" "}
-                      <span>
-                        Balai Pelatihan dan Penyuluhan Perikanan Bitung
-                      </span>
-                    </div>
-                  </NavLink>
-                  <NavLink
-                    href="https://ppid.sipelatihaksi.com/"
-                    name="Balai Pelatihan dan Penyuluhan Perikanan Medan"
-                    top={top}
-                  >
-                    <div className="flex gap-2 items-center">
-                      <IoMdSchool className="text-4xl" />{" "}
-                      <span>
-                        Balai Pelatihan dan Penyuluhan Perikanan Medan
-                      </span>
-                    </div>
-                  </NavLink>
-                  <NavLink
-                    href="https://bp3ambon.kkp.go.id/"
-                    name="Balai Pelatihan dan Penyuluhan Perikanan Ambon"
-                    top={top}
-                  >
-                    <div className="flex gap-2 items-center">
-                      <IoMdSchool className="text-4xl" />{" "}
-                      <span>
-                        Balai Pelatihan dan Penyuluhan Perikanan Ambon
-                      </span>
-                    </div>
-                  </NavLink>
-                  s
-                </NavDropDown>
-                <NavLinkDefault href="/layanan/publikasi" name="Publikasi" top={top} />
-                <NavLinkDefault
-                  href="/layanan/cek-sertifikat"
-                  name="Cek Sertifikat"
-                  top={top}
-                />
-                {Cookies.get("XSRF081") ? (
-                  <div className="flex items-center gap-3 2xsm:gap-7">
-                    <DropdownUserPelatihan top={top} />
-                  </div>
-                ) : (
-                  <Button
-                    onClick={(e) => router.push("/login")}
-                    className={`${!top || usePathname().includes("/layanan/pelatihan")
-                      ? "text-white bg-blue-500 hover:text-blue"
-                      : "bg-transparent text-blue-500 hover:text-white"
-                      } w-fit text-base border border-blue-500 rounded-xl hover:bg-blue-500  py-3`}
-                  >
-                    Login
-                  </Button>
-                )}
-              </>
+                    <IoMdSchool className="text-xl text-blue-400" />
+                    <span>Balai Pelatihan Perikanan Bitung</span>
+                  </Link>
+                </li>
+              </NavDropDown>
+              <NavLinkDefault
+                href="/layanan/publikasi"
+                name="Publikasi"
+                icon={<HiNewspaper />}
+              />
+              <NavLinkDefault
+                href="/layanan/cek-sertifikat"
+                name="Cek Sertifikat"
+                icon={<HiIdentification />}
+              />
+
+              {/* Login / User */}
+              {Cookies.get("XSRF081") ? (
+                <DropdownUserPelatihan top={top} />
+              ) : (
+                <Button
+                  onClick={() => router.push("/login")}
+                  className="rounded-xl border border-blue-400 bg-blue-500/20 
+                    text-white hover:bg-blue-500 hover:text-white px-6 py-2"
+                >
+                  Login
+                </Button>
+              )}
             </ul>
           </nav>
 

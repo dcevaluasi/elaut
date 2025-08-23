@@ -1,4 +1,5 @@
 import Hero from "@/components/hero";
+import Footer from "@/components/ui/footer";
 
 export const metadata = {
   title: "E-LAUT - Elektronik Layanan Pelatihan Utama Terpadu",
@@ -60,6 +61,9 @@ export const metadata = {
 export default function Home() {
 
   return (
-    <Hero />
+    <>
+      <Hero />
+      <Footer />
+    </>
   );
 }

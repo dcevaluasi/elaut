@@ -3,20 +3,20 @@ import { Swiper, SwiperSlide } from "swiper/react";
 
 // Import Swiper styles
 import "swiper/css";
-import "swiper/css/pagination";
 import "swiper/css/navigation";
 import "swiper/css/free-mode";
 
 // Import Swiper modules
-import { Pagination, Navigation, FreeMode } from "swiper/modules";
+import { Navigation, FreeMode } from "swiper/modules";
 import Image from "next/image";
-import { TbClockHour2, TbMapPin } from "react-icons/tb";
+import { TbBuilding, TbCalendar, TbMapPin, TbMoneybag } from "react-icons/tb";
 import Link from "next/link";
 import { createSlug, truncateText } from "@/utils";
 import { PelatihanMasyarakat } from "@/types/product";
 import { encryptValue, formatToRupiah, replaceUrl } from "@/lib/utils";
+import "../app/css/navigation.css";
 import { generateTanggalPelatihan } from "@/utils/text";
-import '../app/css/navigation.css'
+import { HiOutlineUserGroup, HiUserGroup } from "react-icons/hi2";
 
 function ListProgram({
   pelatihan,
@@ -28,33 +28,22 @@ function ListProgram({
   const filteredPelatihan = pelatihan.filter(
     (item) => item.Status == "Publish"
   );
+
   return (
     <div>
       {filteredPelatihan.length > 0 ? (
         <Swiper
-          slidesPerView={1} // Adjust this to control how many slides are shown on mobile view
+          slidesPerView={1}
           spaceBetween={15}
           freeMode={true}
-          pagination={{
-            clickable: true,
-          }}
-          navigation={true} // Enable navigation arrows
-          modules={[FreeMode, Navigation]} // Add Pagination and Navigation modules
+          navigation={true}
+          modules={[FreeMode, Navigation]}
           className="mySwiper w-full md:max-w-7xl"
           breakpoints={{
-            640: {
-              slidesPerView: 1,
-              spaceBetween: 5,
-            },
-            768: {
-              slidesPerView: 2,
-              spaceBetween: 20,
-            },
-            1024: {
-              slidesPerView: 3,
-              spaceBetween: 30,
-            },
-          }} // Add breakpoints for responsive design
+            640: { slidesPerView: 1, spaceBetween: 5 },
+            768: { slidesPerView: 2, spaceBetween: 20 },
+            1024: { slidesPerView: 3, spaceBetween: 30 },
+          }}
         >
           {filteredPelatihan.map(
             (pelatihan: PelatihanMasyarakat, index: number) => (
@@ -75,10 +64,10 @@ function ListProgram({
               className="w-[350px] md:w-[400px]"
             />
             <div className="max-w-3xl mx-auto text-center pb-5 md:pb-8 -mt-2">
-              <h1 className="text-2xl md:text-3xl font-calsans leading-[110%] text-black">
+              <h1 className="text-2xl md:text-3xl font-calsans leading-[110%] text-gray-200">
                 Belum Ada Pelatihan
               </h1>
-              <div className="text-gray-600 text-center  max-w-md">
+              <div className="text-gray-400 text-center max-w-md">
                 Balai Pelatihan belum mengupload pelatihan yang dapat kamu ikut,
                 stay tune terus sobat elaut!{" "}
               </div>
@@ -92,87 +81,66 @@ function ListProgram({
 
 const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
   return (
-    <div className="shadow-custom flex flex-col relative w-full md:w-[380px] h-fit rounded-3xl bg-white p-6">
-      <div className="w-full h-[200px] relative">
-        <Image
-          className="w-full !h-[200px] rounded-2xl object-cover shadow-custom mb-2"
-          alt=""
-          src={replaceUrl(pelatihan?.FotoPelatihan!)}
-          width={0}
-          height={0}
-        />
-        {
-          pelatihan.PenyelenggaraPelatihan.includes('Politeknik') && <span
-            className="w-fit block text-center font-semibold px-4 py-2 bg-blue-500 rounded-3xl text-white absolute text-xs top-3 z-50 right-3"
-          >
-            Khusus Taruna KP
-          </span>
-        }
-
-      </div>
+    <div className="relative w-full md:w-[380px] h-fit rounded-3xl p-6 
+      bg-white/10 backdrop-blur-xl border border-white/20 
+      shadow-xl text-gray-200 flex flex-col">
 
       {/* Header */}
       <div className="flex justify-between items-center gap-3 mt-3">
-        <h2 className="text-2xl font-calsans text-blue-500 leading-none">
+        <h2 className="text-xl font-calsans text-white leading-none drop-shadow-md">
           {truncateText(pelatihan?.NamaPelatihan, 50, "...")}
         </h2>
-        {/* <div className="text-sm font-medium w-fit px-4 py-2 bg-[#625BF9] rounded-3xl text-white leading-none">
-          {generateTanggalPelatihan(pelatihan.TanggalMulaiPelatihan)}
-        </div> */}
       </div>
 
       {/* Location */}
-      <div className="flex items-center gap-2 text-blue-500 mb-4">
-        <TbMapPin size={18} />
-        <p className="text-sm font-medium">{pelatihan.LokasiPelatihan}</p>
+      <div className="flex flex-col py-5">
+        <div className="flex items-center gap-2 text-gray-300">
+          <TbMoneybag size={18} className="text-blue-400 flex-shrink-0" />
+          <p className="text-sm">Biaya - {pelatihan.HargaPelatihan === 0
+            ? "Gratis"
+            : `${formatToRupiah(pelatihan.HargaPelatihan)}`}</p>
+        </div>
+        <div className="flex items-center gap-2 text-gray-300">
+          <TbCalendar size={18} className="text-blue-400 flex-shrink-0" />
+          <p className="text-sm">{generateTanggalPelatihan(pelatihan.TanggalMulaiPelatihan)} - {generateTanggalPelatihan(pelatihan.TanggalBerakhirPelatihan)}</p>
+        </div>
+        <div className="flex items-center gap-2 text-gray-300">
+          <TbMapPin size={18} className="text-blue-400 flex-shrink-0" />
+          <p className="text-sm">{pelatihan.LokasiPelatihan}</p>
+        </div>
+        <div className="flex items-center gap-2 text-gray-300">
+          <TbBuilding size={18} className="text-blue-400 flex-shrink-0" />
+          <p className="text-sm">Penyelenggara - {pelatihan!.PenyelenggaraPelatihan}</p>
+        </div>
+        <div className="flex items-center gap-2 text-gray-300">
+          <HiOutlineUserGroup size={17} className="text-blue-400 flex-shrink-0" />
+          <p className="text-sm">Pendaftar - {pelatihan?.JumlahPeserta}/{pelatihan.KoutaPelatihan} Peserta</p>
+        </div>
       </div>
+
 
       {/* Description */}
       <p
         dangerouslySetInnerHTML={{
-          __html: pelatihan && truncateText(pelatihan?.DetailPelatihan, 150, "..."),
+          __html: pelatihan && truncateText(pelatihan?.DetailPelatihan, 250, "..."),
         }}
-        className="text-gray-600 text-sm leading-relaxed mb-4"
+        className="text-gray-300 prose-invert text-sm leading-relaxed mb-4"
       />
-
-      {/* Contact Info */}
-      {
-        pelatihan!.PenyelenggaraPelatihan.includes('Politeknik') ? <></> : <div className="flex justify-between text-sm text-blue-500 mb-4">
-          <div>
-            <p className="font-semibold">Layanan {pelatihan.PenyelenggaraPelatihan}</p>
-            <p>62887972983</p>
-          </div>
-          <div>
-            <p className="font-semibold">PTSP BLU</p>
-            <p>62889812833</p>
-          </div>
-        </div>
-      }
-
-
-      {/* Pricing */}
-      <div className=" mb-4">
-        <p className="text-blue-500 text-3xl font-calsans">
-          {pelatihan.HargaPelatihan === 0
-            ? "Gratis"
-            : `${formatToRupiah(pelatihan.HargaPelatihan)}`}
-        </p>
-        <p className="text-sm font-normal text-blue-500">
-          * {pelatihan!.PenyelenggaraPelatihan.includes('Politeknik') ? 'Diperuntukkan untuk taruna Poltek KP dan SUPM' : 'Tidak termasuk akomodasi & konsumsi'} <br />* Kuota Kelas {pelatihan!.KoutaPelatihan} Peserta
-        </p>
-      </div>
 
       {/* Button */}
       <Link
-        href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${pelatihan?.KodePelatihan
-          }/${encryptValue(pelatihan?.IdPelatihan)}`}
-        className="w-full block text-center font-semibold px-6 py-3 bg-blue-500 rounded-3xl text-white"
+        href={`/layanan/pelatihan/${createSlug(
+          pelatihan.NamaPelatihan
+        )}/${pelatihan?.KodePelatihan}/${encryptValue(pelatihan?.IdPelatihan)}`}
+        className="w-full block text-center font-semibold px-6 py-3 
+          bg-blue-500/90 hover:bg-blue-600/90 
+          backdrop-blur-md border border-white/20 
+          rounded-3xl text-white shadow-md transition"
       >
         Lihat Detail
       </Link>
     </div>
   );
 };
-
 
 export default ListProgram;

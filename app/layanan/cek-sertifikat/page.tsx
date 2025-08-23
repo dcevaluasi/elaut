@@ -1,4 +1,5 @@
-import FormCekSertifikat from "@/components/auth/FormCekSertifikat";
+
+import CertificateCheckFeature from "@/components/elaut/CertificateCheckFeature";
 import Footer from "@/components/ui/footer";
 
 export const metadata = {
@@ -57,7 +58,7 @@ export const metadata = {
 export default function CekSertifikat() {
   return (
     <>
-      <FormCekSertifikat />
+      <CertificateCheckFeature />
       <Footer />
     </>
 

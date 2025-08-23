@@ -447,22 +447,31 @@ function FormLogin() {
   const [selectedMethodLogin, setSelectedMethodLogin] = React.useState<string>('Whatsapp/No Telpon')
 
   return (
-    <section className="relative w-full h-full md:h-full bg-none">
+    <section className=" h-full pb-10 min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-sky-900 to-blue-900 text-white">
+      {/* gradient blobs */}
+      <div className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-blue-500/40 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-cyan-400/20 blur-3xl" />
+      <div className="pointer-events-none absolute top-1/3 -right-16 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
+
       <Dialog open={isForgetPassword} onOpenChange={setIsForgetPassword}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent
+          className="sm:max-w-[425px] bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-3xl text-white"
+        >
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-xl font-bold text-white drop-shadow-md">
               {isForgetPhoneNumber ? "Cek No Telpon/WA" : "Reset Password"}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-gray-200">
               {isForgetPhoneNumber
                 ? "Harap masukkan NIK kamu sebelum melihat no telpon/WA mu yang terdaftar pada ELAUT"
                 : "Harap masukkan NIK kamu sebelum melakukan reset, untuk mengetahui NIK tersebut terdaftar atau tidak"}
             </DialogDescription>
           </DialogHeader>
+
+          {/* Input Fields */}
           <div className="grid gap-4 py-2">
             <div className="flex flex-col items-start gap-1">
-              <Label htmlFor="name" className="text-right">
+              <Label htmlFor="nik" className="text-gray-200">
                 NIK
               </Label>
               <div className="flex flex-col gap-1 w-full">
@@ -476,21 +485,23 @@ function FormLogin() {
                   }}
                   maxLength={16}
                   placeholder="Masukkan NIK kamu"
-                  className=" w-full"
+                  className="w-full bg-white/10 border border-white/20 placeholder-gray-400 text-white rounded-xl"
                   readOnly={tokenResetPassword != ""}
                   autoComplete="off"
                 />
                 {isInputErrorNIK && nik != "" && (
-                  <span className="text-rose-500 font-medium text-xs">
+                  <span className="text-rose-400 font-medium text-xs">
                     *NIK harus 16 digit!
                   </span>
                 )}
               </div>
             </div>
+
+            {/* Password Reset Section */}
             {tokenResetPassword != "" && (
               <div className="flex flex-col gap-1">
                 <div className="flex flex-col items-start gap-2">
-                  <Label htmlFor="name" className="text-right">
+                  <Label htmlFor="passwordReset" className="text-gray-200">
                     Password Baru
                   </Label>
                   <Input
@@ -499,25 +510,27 @@ function FormLogin() {
                     type="password"
                     onChange={(e) => setPasswordReset(e.target.value)}
                     placeholder="Masukkan password baru"
-                    className="col-span-3"
+                    className="w-full bg-white/10 border border-white/20 placeholder-gray-400 text-white rounded-xl"
                     autoComplete="off"
                   />
                 </div>
-                <p className="text-gray-500 leading-[100%] text-xs font-medium mt-2">
+                <p className="text-gray-300 leading-[100%] text-xs font-medium mt-2">
                   *Password minimal 8 karakter, harus terdiri dari satu angka,
                   huruf kapital dan kecil, serta karakter
                 </p>
               </div>
             )}
           </div>
+
+          {/* Footer Buttons */}
           <DialogFooter>
             <div className="flex gap-2 -mt-4">
               {tokenResetPassword == "" ? (
                 <Button
                   type="button"
                   onClick={(e) => handleGetTokenResetPassword(e)}
-                  disabled={isInputErrorNIK ? true : false}
-                  className=" bg-blue-500 hover:bg-blue-600"
+                  disabled={isInputErrorNIK}
+                  className="bg-blue-500/90 hover:bg-blue-600/90 text-white font-semibold rounded-xl"
                 >
                   Cek Akunmu
                 </Button>
@@ -525,21 +538,21 @@ function FormLogin() {
                 <Button
                   type="button"
                   onClick={(e) => handleResetPassword(e)}
-                  className=" bg-blue-500 hover:bg-blue-600"
+                  className="bg-blue-500/90 hover:bg-blue-600/90 text-white font-semibold rounded-xl"
                 >
                   Reset Password
                 </Button>
               )}
               <Button
                 type="button"
-                onClick={(e) => {
+                onClick={() => {
                   setNik("");
                   setPasswordReset("");
                   setIsForgetPassword(false);
                   setTokenResetPassword("");
                   setIsInputErrorNIK(true);
                 }}
-                className=" bg-gray-500 hover:bg-gray-600"
+                className="bg-gray-500/80 hover:bg-gray-600/90 text-white font-semibold rounded-xl"
               >
                 Close
               </Button>
@@ -548,18 +561,17 @@ function FormLogin() {
         </DialogContent>
       </Dialog>
 
+
       <Image
         src={images[imageIndex]}
-        className="absolute w-full h-full object-cover duration-1000 -z-40"
+        className="absolute w-full h-full object-cover duration-1000 opacity-20"
         alt=""
         width={0}
         height={0}
         priority
       />
 
-      <div className="absolute w-full h-full bg-black bg-opacity-70 -z-30"></div>
-
-      <div className="max-w-6xl h-full mx-auto px-4 sm:px-6 md:-mt-8">
+      <div className="max-w-6xl h-full mx-auto px-4 sm:px-6 md:-mt-8 relative">
         <div className="pt-44 md:pb-20">
           <div className="w-full mx-auto text-center pb-0 md:pb-0">
             <h1 className="font-bold text-4xl leading-[110%] text-gray-200 font-calsans">
@@ -578,7 +590,7 @@ function FormLogin() {
           {/* Form */}
 
           <div className="max-w-sm  mx-5 md:mx-auto mt-5">
-            <div className="flex flex-col gap-1 mb-2">
+            {/* <div className="flex flex-col gap-1 mb-2">
               <label
                 className="block text-gray-200 text-sm font-medium mb-1"
                 htmlFor="name"
@@ -605,7 +617,7 @@ function FormLogin() {
                   </SelectGroup>
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
             {role == "" ? (
               <></>
             ) : role == "Perseorangan" ? (
@@ -627,11 +639,13 @@ function FormLogin() {
                         {selectedMethodLogin != "" ? selectedMethodLogin : "Pilih Login Menggunakan"}
                       </p>
                     </SelectTrigger>
-                    <SelectContent side="bottom">
+                    <SelectContent side="bottom" className=" flex flex-col gap-1 mt-2 
+              bg-white/10 backdrop-blur-xl border border-white/20 
+              rounded-2xl shadow-xl p-3 text-white">
                       <SelectGroup>
                         <SelectLabel>Login Menggunakan</SelectLabel>
-                        <SelectItem value="Whatsapp/No Telpon">Whatsapp/No Telpon</SelectItem>
-                        <SelectItem value="NIK">
+                        <SelectItem className="flex gap-2 items-center px-3 py-2 rounded-lg !hover:bg-white/5 text-white" value="Whatsapp/No Telpon">Whatsapp/No Telpon</SelectItem>
+                        <SelectItem className="flex gap-2 items-center px-3 py-2 rounded-lg !hover:bg-white/5 text-white" value="NIK">
                           NIK
                         </SelectItem>
                       </SelectGroup>

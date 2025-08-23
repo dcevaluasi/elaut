@@ -5,10 +5,10 @@ import LogoFooter from "./logo-footer";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 shadow-custom px-10 md:px-0">
+    <footer className="bg-gradient-to-br from-slate-900 via-gray-900 to-slate-900 shadow-custom px-10 md:px-0">
       <div className="max-w-7xl mx-auto ">
         {/* Top area: Blocks */}
-        <div className="grid sm:grid-cols-12 gap-8 py-8 md:py-12 border-t border-t-gray-200">
+        <div className="grid sm:grid-cols-12 gap-8 py-8 md:py-12 border-t border-t-gray-400">
           {/* 1st block */}
           <div className="sm:col-span-12 lg:col-span-3">
             <div className="mb-4">
@@ -160,14 +160,7 @@ export default function Footer() {
                   Pusat Pelatihan KP
                 </a>
               </li>
-              <li className="mb-2">
-                <a
-                  href="/lembaga/dpkakp"
-                  className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
-                >
-                  DPKAKP
-                </a>
-              </li>
+
               <li className="mb-2">
                 <a
                   href="/lembaga/komite-approval"

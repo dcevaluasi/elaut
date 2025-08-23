@@ -399,7 +399,12 @@ function FormRegistrasi() {
 
   return (
     <section className="flex flex-col">
-      <div className="relative w-full h-full pb-10">
+      <div className=" h-full pb-10 min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-sky-900 to-blue-900 text-white">
+        {/* gradient blobs */}
+        <div className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-blue-500/40 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-cyan-400/20 blur-3xl" />
+        <div className="pointer-events-none absolute top-1/3 -right-16 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
+
         <AlertDialog open={openInfoKusuka}>
           <AlertDialogContent className="rounded-2xl">
             <AlertDialogHeader>
@@ -456,7 +461,7 @@ function FormRegistrasi() {
 
         <Image
           src={images[imageIndex]}
-          className="absolute w-full h-full hidden md:block object-cover duration-1000 -z-40"
+          className="absolute w-full h-full hidden md:block object-cover duration-1000 opacity-15 z-0"
           alt=""
           layout="fill"
           priority
@@ -464,19 +469,17 @@ function FormRegistrasi() {
 
         <Image
           src={imagesMob[imageMobIndex]}
-          className="absolute w-full h-full block md:hidden object-cover duration-1000 -z-40"
+          className="absolute w-full h-full block md:hidden object-cover duration-1000 opacity-15 z-0"
           alt=""
           layout="fill"
           priority
 
         />
 
-        <div className="absolute w-full h-full bg-black bg-opacity-70 -z-30"></div>
-
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div className="pt-44 ">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6  relative">
+          <div className="pt-48 ">
             <div className="w-full mx-auto text-center pb-0 md:pb-0">
-              <h1 className="font-bold text-4xl leading-[110%] text-gray-200 font-calsans">
+              <h1 className="font-bold text-[2.8rem] leading-[110%] text-gray-200 font-calsans">
                 <span className="">
                   Registrasi Akun
                 </span>{" "}
@@ -497,7 +500,7 @@ function FormRegistrasi() {
                 : "max-w-4xl"
                 }  mx-5 md:mx-auto mt-5`}
             >
-              <div className="flex flex-col gap-1">
+              {/* <div className="flex flex-col gap-1">
                 <label
                   className="block text-gray-200 text-sm font-medium mb-1"
                   htmlFor="name"
@@ -514,18 +517,19 @@ function FormRegistrasi() {
                       {role != "" ? role : "Pilih Mendaftar Sebagai"}
                     </p>
                   </SelectTrigger>
-                  <SelectContent side="bottom">
+                  <SelectContent side="bottom" className=" flex flex-col gap-1 mt-2 
+              bg-white/10 backdrop-blur-xl border border-white/20 
+              rounded-2xl shadow-xl p-3 text-white">
                     <SelectGroup>
                       <SelectLabel>Mendaftar Sebagai</SelectLabel>
-                      <SelectItem value="Perseorangan">Perseorangan</SelectItem>
-                      <SelectItem value="Corporate/Manning Agent" >
+                      <SelectItem className="flex gap-2 items-center px-3 py-2 rounded-lg hover:bg-white/5 text-white" value="Perseorangan">Perseorangan</SelectItem>
+                      <SelectItem className="flex gap-2 items-center px-3 py-2 rounded-lg hover:bg-white/5 text-white" value="Corporate/Manning Agent" >
                         Corporate/Manning Agent
                       </SelectItem>
-                      {/* <SelectItem value="Portfolio">Portfolio</SelectItem> */}
                     </SelectGroup>
                   </SelectContent>
                 </Select>
-              </div>
+              </div> */}
               {useKUSUKA && (
                 <form
                   onSubmit={(e) => handleCheckingNoKusuka(e)}

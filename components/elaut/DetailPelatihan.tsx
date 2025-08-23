@@ -2,20 +2,18 @@
 
 import React from "react";
 import Image from "next/image";
-import { TbLocation } from "react-icons/tb";
+import { TbBook, TbBuilding, TbCalendar, TbCalendarEvent, TbClock, TbInfoCircle, TbLocation, TbMoneybag, TbPin, TbSchool } from "react-icons/tb";
+import { RiTimeZoneLine } from "react-icons/ri";
 import { Button } from "@/components/ui/button";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import {
   DetailPelatihanMasyarakat,
-  PelatihanMasyarakat,
 } from "@/types/product";
 import FormRegistrationTraining from "../dashboard/users/formRegistrationTraining";
 import Features from "../features";
 import { generateTanggalPelatihan } from "@/utils/text";
 import { formatToRupiah, replaceUrl } from "@/lib/utils";
-import { PiStudent } from "react-icons/pi";
-import { RiTimeZoneLine } from "react-icons/ri";
 
 interface DetailPelatihanProps {
   data: DetailPelatihanMasyarakat;
@@ -31,118 +29,130 @@ const DetailPelatihan: React.FC<DetailPelatihanProps> = ({
   const router = useRouter();
 
   return (
-    <div className="bg-[#EEEAEB] h-full p-5 md:p-20 pt-24 md:pt-56 w-full">
-      <div className="w-full flex md:items-end flex-col ">
-        <div className="flex flex-col md:flex-row md:justify-end relative w-full md:max-w-6xl">
-          <div className="bg-blue-500 shadow-custom w-full md:w-fit rounded-3xl md:absolute pb-14 md:-left-10">
-            <div className="flex flex-col gap-2 w-full">
-              <div className="m-2 -mt-16 relative md:w-[400px] md:h-[400px]">
-                <Image
-                  className="md:w-[400px] w-full h-[400px] rounded-3xl object-cover shadow-custom "
-                  alt=""
-                  src={replaceUrl(data.FotoPelatihan)}
-                  width={0}
-                  height={0}
-                />
-                <div className="flex flex-row gap-2 absolute text-sm top-3 z-50 right-3">
-                  {data!.StatusApproval == "Selesai" && (
-                    <span className="w-fit flex items-center text-center font-semibold px-4 py-2 bg-blue-500 rounded-3xl text-white ">
-                      <RiTimeZoneLine /> Telah Berakhir
-                    </span>
-                  )}
-                </div>
-              </div>
+    <div className="relative w-full md:mt-32">
+      <div className="flex flex-col lg:flex-row gap-10 lg:gap-10 items-start">
+        {/* LEFT: Banner */}
+        <div className="relative w-full lg:w-[420px]">
+          <div className="relative rounded-3xl overflow-hidden shadow-xl">
+            {
+              data.FotoPelatihan == "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" ? <></> : <Image
+                className="w-full h-full object-cover"
+                alt={data.NamaPelatihan}
+                src={replaceUrl(data.FotoPelatihan)}
+                width={400}
+                height={400}
+              />
+            }
 
-              <div className="flex flex-col px-5 py-2 gap-3 md:w-[350px]">
-                <h1 className="text-3xl text-white font-calsans leading-[100%]">
-                  {data.NamaPelatihan}
-                </h1>
-                <p className="text-lg text-white flex gap-1 md:w-[450px] leading-none items-center">
-                  <TbLocation className="text-lg w-6" />
-                  {data.LokasiPelatihan}
-                </p>
-              </div>
-            </div>
+            {data.StatusApproval === "Selesai" && (
+              <span className="absolute top-4 right-4 flex items-center gap-2 bg-red-500/90 text-white text-sm font-semibold px-4 py-2 rounded-full shadow-md">
+                <RiTimeZoneLine className="w-5 h-5" />
+                Telah Berakhir
+              </span>
+            )}
           </div>
 
-          <div className="flex flex-col gap-4 w-full">
-            <div className="flex flex-col gap-2 md:items-end w-full text-left bg-white rounded-3xl p-10">
-              <h2 className="text-blue-500 text-[2rem] md:text-[3.6rem] font-calsans leading-none">
-                {formatToRupiah(data.HargaPelatihan)}
-              </h2>
-              <div className="flex flex-col md:items-end text-sm md:text-base">
-                <p className="text-blue-500">
-                  *Tidak termasuk <span className="font-bold">akomodasi</span>{" "}
-                  & <span className="font-bold">konsumsi</span>
-                </p>
+          <div className={`${data.FotoPelatihan == "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" ? "" : "mt-6"} p-7 rounded-3xl bg-gradient-to-br from-blue-500/70 to-sky-600/20 text-gray-200  backdrop-blur-xl 
+                    shadow-[0_8px_40px_rgba(0,0,0,0.35)] border-white/20 border `}>
+            <h1 className="text-2xl font-calsans leading-none mb-6">
+              {data.NamaPelatihan}
+            </h1>
+            <p className="mt-2 flex items-center gap-2 text-base">
+              <TbBook className="w-5 h-5 flex-shrink-0 text-blue-300" />
+              Bidang : {data.JenisProgram}
+            </p>
+            <p className="mt-2 flex items-center gap-2 text-base">
+              <TbSchool className="w-5 h-5 flex-shrink-0 text-blue-300" />
+              Program : {data.Program}
+            </p>
+            <p className="mt-2 flex items-center gap-2 text-base">
+              <TbMoneybag className="w-5 h-5 flex-shrink-0 text-blue-300" />
+              Biaya : {data.HargaPelatihan === 0
+                ? "Gratis"
+                : `${formatToRupiah(data.HargaPelatihan)}`}
+            </p>
+            <p className="mt-2 flex items-center gap-2 text-base">
+              <TbBuilding className="w-5 h-5 flex-shrink-0 text-blue-300" />
+              Penyelenggara : {data.PenyelenggaraPelatihan}
+            </p>
+            <p className="mt-2 flex items-center gap-2 text-base">
+              <TbCalendarEvent className="w-5 h-5 flex-shrink-0 text-blue-300" />
+              Pendaftaran : {data!.TanggalMulaiPendaftaran != '' ? <>{generateTanggalPelatihan(data.TanggalMulaiPendaftaran)} - {generateTanggalPelatihan(data.TanggalAkhirPendaftaran)}</> : <>-</>}
+            </p>
+            <p className="mt-2 flex items-center gap-2 text-base">
+              <TbClock className="w-5 h-5 flex-shrink-0 text-blue-300" />
+              Pelaksanaan : {generateTanggalPelatihan(data.TanggalMulaiPelatihan)} - {generateTanggalPelatihan(data.TanggalBerakhirPelatihan)}
+            </p>
+            <p className="mt-2 flex items-center gap-2 text-base">
+              <TbLocation className="w-5 h-5 flex-shrink-0 text-blue-300" />
+              Lokasi : {data.LokasiPelatihan}
+            </p>
+          </div>
+        </div>
 
-                <p className="text-blue-500">
-                  *Kuota kelas pelatihan{" "}
-                  <span className="font-bold">{data.KoutaPelatihan} orang</span>
-                </p>
-              </div>
+        {/* RIGHT: Details */}
+        <div className="flex-1 flex flex-col gap-6">
+          {/* Price + Info */}
+          <div className="border border-white/15 bg-white/10 backdrop-blur-xl 
+                    shadow-[0_8px_40px_rgba(0,0,0,0.35)] transition-all duration-500 
+                    hover:scale-105 hover:border-blue-400/40 rounded-3xl p-8">
 
-              <Button className="bg-blue-500 text-white font-bold w-full md:w-fit rounded-2xl md:rounded-full text-base md:text-xl p-4 md:p-7">
-                {generateTanggalPelatihan(data.TanggalMulaiPelatihan)} -{" "}
-                {generateTanggalPelatihan(data.TanggalBerakhirPelatihan)}
-              </Button>
+            {/* Description */}
+            <div
+              className="mt-6 prose prose-invert text-gray-200 text-sm md:text-base leading-relaxed max-w-none"
+            >
+              <div dangerouslySetInnerHTML={{ __html: data.DetailPelatihan }} />
+            </div>
 
-              <div className="flex md:items-end">
-                <p
-                  dangerouslySetInnerHTML={{ __html: data.DetailPelatihan }}
-                  className="text-sm md:text-base font-normal text-[#979797] group-hover:duration-1000 prose-p:text-justify prose-p:md-!text-right md:text-right max-w-xl"
-                />
-              </div>
 
-              {data.StatusApproval !== "Selesai" &&
-                !isRegistrasi &&
-                (!Cookies.get("XSRF081") ? (
+            {/* Register Button */}
+            {data.StatusApproval !== "Selesai" && !isRegistrasi && (
+              <div className="mt-8">
+                {!Cookies.get("XSRF081") ? (
                   <Button
                     onClick={() => router.replace("/registrasi")}
-                    className="bg-blue-500 text-white font-extrabold w-fit rounded-2xl md:rounded-full text-lg md:text-2xl px-24 py-4 md:py-7 "
+                    className="bg-gradient-to-r w-full from-blue-600 to-sky-600 hover:from-blue-700 hover:to-sky-700 text-white font-bold px-10 py-5 rounded-full text-lg transition"
                   >
                     DAFTAR
                   </Button>
                 ) : (
                   <Button
                     onClick={handleRegistration}
-                    className="bg-blue-500 text-white font-extrabold w-fit rounded-2xl md:rounded-full text-lg md:text-2xl px-24 py-4 md:py-7 "
+                    className="bg-gradient-to-r w-full from-blue-600 to-sky-600 hover:from-blue-700 hover:to-sky-700 text-white font-bold px-10 py-5 rounded-full text-lg transition"
                   >
                     DAFTAR
                   </Button>
-                ))}
-            </div>
-
-            {isRegistrasi && (
-              <div className="flex flex-col gap-2 items-end w-full text-left bg-white rounded-3xl p-10">
-                <h2 className="text-blue-500 text-[2rem] md:text-[3.6rem] font-calsans leading-none">
-                  Detail Pendaftaran
-                </h2>
-                <div className="flex flex-col md:items-end text-sm md:text-base">
-                  <p className="text-blue-500">
-                    *Tidak termasuk <span className="font-bold">akomodasi</span>{" "}
-                    & <span className="font-bold">konsumsi</span>
-                  </p>
-
-                  <p className="text-blue-500">
-                    *Kuota kelas pelatihan{" "}
-                    <span className="font-bold">{data.KoutaPelatihan} orang</span>
-                  </p>
-                </div>
-
-
-                <FormRegistrationTraining
-                  id={data.IdPelatihan}
-                  harga={data.HargaPelatihan.toString()}
-                  pelatihan={data}
-                />
+                )}
               </div>
             )}
           </div>
+
+          {/* Registration Form */}
+          {isRegistrasi && (
+            <div className="bg-white/90 backdrop-blur-lg shadow-xl rounded-3xl p-8">
+              <h2 className="text-blue-600 text-3xl font-bold">
+                Detail Pendaftaran
+              </h2>
+              <p className="mt-2 text-gray-200 text-sm">
+                *Pastikan data yang kamu masukkan benar ya 👍
+              </p>
+
+              <FormRegistrationTraining
+                id={data.IdPelatihan}
+                harga={data.HargaPelatihan.toString()}
+                pelatihan={data}
+              />
+            </div>
+          )}
         </div>
       </div>
 
-      {!isRegistrasi && <Features />}
+      {!isRegistrasi && (
+        <div className="mt-16">
+          <Features />
+        </div>
+      )}
+
     </div>
   );
 };

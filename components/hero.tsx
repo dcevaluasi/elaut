@@ -2,18 +2,16 @@
 
 import Image from "next/image";
 import React from "react";
-
 import { usePathname } from "next/navigation";
-
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import "swiper/css/free-mode";
 import "../app/css/navigation.css";
 
-import Logo from "./ui/logo";
 import Link from "next/link";
 import { Slide } from "react-awesome-reveal";
+import Logo from "@/components/ui/logo";
 
 export default function Hero() {
   const programPelatihan = [
@@ -25,16 +23,8 @@ export default function Hero() {
       description:
         "Pelatihan perikanan adalah pelatihan yang meliputi kegiata penangkapan ikan, budidaya perikanan, serta inovasi sumber daya laut berkelanjutan.",
     },
-    // {
-    //   id: "002",
-    //   name: "Awak Kapal Perikanan",
-    //   icon: "/icons/icawak.png",
-    //   slug: "akp",
-    //   description:
-    //     "Pendidikan dan Pelatihan Awak Kapal Perikanan adalah pendidikan dan/atau pelatihan untuk mencapai tingkat keahlian dan/atau keterampilan tertentu sesuai dengan jenjang, kompetensi, dan jabatan untuk awak Kapal Perikanan.",
-    // },
     {
-      id: "003",
+      id: "002",
       name: "Kelautan",
       icon: "/icons/ickelautan.png",
       slug: "kelautan",
@@ -43,14 +33,11 @@ export default function Hero() {
     },
   ];
 
-  const [selectedProgram, setSelectedProgram] = React.useState<number | null>(
-    null
-  );
-
+  const [selectedProgram, setSelectedProgram] = React.useState<number | null>(null);
   const [imageIndex, setImageIndex] = React.useState(0);
+
   const images = [
     "/images/hero-img4-preview.jpg",
-
     "/images/hero-img.jpg",
     "/images/hero-img3.jpg",
     "/images/hero-img7.jpg",
@@ -61,166 +48,73 @@ export default function Hero() {
     const interval = setInterval(() => {
       setImageIndex((prevIndex) => (prevIndex + 1) % images.length);
     }, 8000);
-
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="flex flex-col gap-2  w-full">
-      <section className="relative h-full md:h-screen  flex items-center ">
+    <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-sky-900 to-blue-900 text-white">
+      {/* gradient blobs */}
+      <div className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-blue-500/40 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-cyan-400/20 blur-3xl" />
+      <div className="pointer-events-none absolute top-1/3 -right-16 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
+
+      {/* Hero Section */}
+      <section className="relative h-full md:h-screen flex items-center justify-center px-6">
         <Image
           src={images[imageIndex]}
-          className="absolute w-full h-full object-cover duration-1000  "
-          alt=""
-          layout="fill"
+          alt="Hero background"
+          fill
           priority
-          onClick={(e) => setSelectedProgram(null)}
+          className="absolute w-full h-full object-cover opacity-15"
         />
 
-        <div
-          className="absolute w-full h-full bg-black bg-opacity-70  "
-          onClick={(e) => setSelectedProgram(null)}
-        ></div>
-
-        {/* Illustration behind hero content */}
-        <div
-          className="absolute left-1/2 transform -translate-x-1/2 bottom-0 pointer-events-none -z-1"
-          aria-hidden="true"
-          onClick={(e) => setSelectedProgram(null)}
-        >
-          <svg
-            width="1360"
-            height="578"
-            viewBox="0 0 1360 578"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <linearGradient
-                x1="50%"
-                y1="0%"
-                x2="50%"
-                y2="100%"
-                id="illustration-01"
-              >
-                <stop stopColor="#FFF" offset="0%" />
-                <stop stopColor="#EAEAEA" offset="77.402%" />
-                <stop stopColor="#DFDFDF" offset="100%" />
-              </linearGradient>
-            </defs>
-            <g fill="url(#illustration-01)" fillRule="evenodd">
-              <circle cx="1232" cy="128" r="128" />
-              <circle cx="155" cy="443" r="64" />
-            </g>
-          </svg>
-        </div>
-
-        <div className="max-w-7xl z-[40] w-full mx-auto relative flex flex-col items-start justify-center text-left px-6 pb-10 -mb-10 md:pb-0 mt-36 md:mt-0">
-          {/* Hero content */}
-          <div className="flex flex-col md:flex-row w-full items-center justify-center md:justify-between">
-            {/* Section header */}
-            <div className="text-center gap-5 flex flex-col items-center md:items-start">
-              <Logo />
-              <div className="flex flex-col items-center md:items-start">
-                <h1 className="text-[2.5rem] md:text-[3rem] leading-none text-center md:text-left font-calsans text-white">
-                  Elektronik Layanan Pelatihan <br />{" "}
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r leading-none pt-0 from-blue-500 to-teal-400">
-                    Kelautan dan Perikanan
-                  </span>
-                  <br /> Utama Terpadu
-                </h1>
-                <h1 className="text-[3.6rem] text-left font-calsans bg-clip-text text-transparent bg-gradient-to-r leading-none pt-0 from-blue-500 to-teal-400">
-                  E-LAUT
-                </h1>
-              </div>
-            </div>
-
-            <div
-              className="hidden md:flex flex-col gap-3 text-white max-w-md mt-10 md:mt-28 border-t border-t-gray-300 pt-10 md:border-none md:pt-0"
-              onMouseLeave={() => setSelectedProgram(null)}
-            >
-              <h1 className="font-medium font-calsans text-2xl leading-none">
-                {selectedProgram != null
-                  ? programPelatihan[selectedProgram]!.name
-                  : ""}
-              </h1>
-              <p className="text-sm">
-                {" "}
-                {selectedProgram != null
-                  ? programPelatihan[selectedProgram]!.description
-                  : ""}
-              </p>
-
-              {selectedProgram != null && (
-                <Link
-                  href={`/layanan/program/${programPelatihan[selectedProgram]!.slug
-                    }`}
-                  className={`btn-sm ${top
-                    ? usePathname().includes("pelatihan") ||
-                      usePathname().includes("searching")
-                      ? "text-blue-500 hover:text-white"
-                      : "text-gray-200"
-                    : "text-blue-500 hover:text-white"
-                    } bg-transparent border border-blue-500 hover:bg-blue-500 w-fit`}
-                >
-                  <span>Lihat Selengkapnya</span>
-                </Link>
-              )}
-            </div>
+        <div className="relative z-10 max-w-7xl w-full mx-auto flex flex-col items-center md:items-start text-left">
+          {/* Title + Logo */}
+          <div className="text-left gap-6 flex flex-col items-center md:items-start">
+            <Logo />
+            <h1 className="text-[2.5rem] md:text-[3rem] leading-none font-calsans text-white drop-shadow-lg">
+              Elektronik Layanan Pelatihan <br />
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">
+                Kelautan dan Perikanan
+              </span>
+              <br /> Utama Terpadu
+            </h1>
+            <h1 className="text-[3.6rem] font-calsans bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400 -mt-5">
+              E-LAUT
+            </h1>
           </div>
 
+          {/* Program Cards (Glassmorphism style) */}
           <div
-            className={`w-full flex flex-col md:flex-row gap-5 md:gap-14 items-center justify-center  z-[10000] pt-10 md:pt-0 ${selectedProgram === null ? " md:mt-7 px-4" : "mt-0 px-10"
-              }`}
+            className={`w-full flex flex-col md:flex-row gap-5 md:gap-14 items-center justify-center z-[10000]`}
           >
             {programPelatihan.map((item, index) => (
-              <Slide direction="up" duration={index * 1200}>
+              <Slide direction="up" duration={index * 1200} key={item.id}>
                 <div
-                  onClick={(e) => setSelectedProgram(index)}
-                  className={`flex  w-full mx-auto md:mx-0 md:w-full flex-col gap-1 items-center justify-center hover:scale-110 duration-700 cursor-pointer hover:opacity-100 border text-center rounded-3xl border-gray-200 py-7 ${selectedProgram == index
-                    ? "opacity-100 animate-pulse my-10 px md:px-9  "
-                    : "opacity-40 md:px-9 px-12 "
+                  onClick={() => setSelectedProgram(index)}
+                  className={`flex w-full md:w-72 flex-col gap-3 items-center justify-center cursor-pointer 
+                    rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl 
+                    shadow-[0_8px_40px_rgba(0,0,0,0.35)] transition-all duration-500 
+                    hover:scale-105 hover:border-blue-400/40 p-6 text-center ${selectedProgram === index ? "opacity-100" : "opacity-60"
                     }`}
                 >
                   <Image
                     src={item.icon}
                     alt={item.name}
-                    className={
-                      selectedProgram == index ? "w-40 md:w-40" : "w-40 md:w-32"
-                    }
-                    width={0}
-                    height={0}
+                    width={100}
+                    height={100}
+                    className="w-24 h-24 md:w-28 md:h-28 object-contain"
                   />
-                  <h3 className="text-white font-calsans text-base md:text-xl leading-none mt-3">
-                    {item.name}
-                  </h3>
-
-                  {selectedProgram == index && (
-                    <div
-                      className="flex md:hidden items-center  flex-col gap-10 text-white max-w-md mt-10 md:mt-28 border-t border-t-gray-300 pt-6 md:border-none md:pt-0"
-                      onMouseLeave={() => setSelectedProgram(null)}
-                    >
-                      <p className="text-sm">
-                        {" "}
-                        {selectedProgram != null
-                          ? programPelatihan[selectedProgram]!.description
-                          : ""}
-                      </p>
-
-                      {selectedProgram != null && (
-                        <Link
-                          href={`/layanan/program/${programPelatihan[selectedProgram]!.slug
-                            }`}
-                          className={`btn-sm ${top
-                            ? usePathname().includes("pelatihan") ||
-                              usePathname().includes("searching")
-                              ? "text-blue-500 hover:text-white"
-                              : "text-gray-200"
-                            : "text-blue-500 hover:text-white"
-                            } bg-transparent border border-blue-500 text-center hover:bg-blue-500 w-fit`}
-                        >
-                          <span>Lihat Selengkapnya</span>
-                        </Link>
-                      )}
+                  <h3 className="text-white font-calsans text-lg md:text-xl">{item.name}</h3>
+                  {selectedProgram === index && (
+                    <div className="text-sm text-blue-100/90">
+                      <p>{item.description}</p>
+                      <Link
+                        href={`/layanan/pelatihan/program/${item.slug}`}
+                        className="mt-4 inline-block rounded-lg border border-blue-500 bg-blue-500/20 px-4 py-2 text-blue-100 hover:bg-blue-500 hover:text-white transition"
+                      >
+                        Lihat Selengkapnya
+                      </Link>
                     </div>
                   )}
                 </div>

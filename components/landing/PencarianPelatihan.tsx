@@ -2,9 +2,6 @@
 
 import Image from "next/image";
 import React, { FormEvent } from "react";
-import Hero from "@/components/hero";
-import ListBPPP from "@/components/list-bppp";
-import Footer from "@/components/ui/footer";
 import {
   BALAI_PELATIHAN,
   BIDANG_PELATIHAN,
@@ -17,13 +14,6 @@ import axios, { AxiosResponse } from "axios";
 import Link from "next/link";
 import { Bounce, Slide } from "react-awesome-reveal";
 import { MdClear, MdKeyboardArrowRight } from "react-icons/md";
-import {
-  TbCalendarCheck,
-  TbClockHour2,
-  TbLayoutGrid,
-  TbMapPin,
-  TbTargetArrow,
-} from "react-icons/tb";
 
 import { HiViewGrid } from "react-icons/hi";
 
@@ -144,8 +134,6 @@ function PencarianPelatihan() {
 
     handleFetchingPublicTrainingData();
   };
-
-  const [selectedDate, setSelectedDate] = React.useState("15 September 2024");
 
   React.useEffect(() => {
     setLoading(true);
@@ -499,97 +487,5 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
     </div>
   );
 };
-
-// const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
-//   return (
-//     <div className="shadow-custom flex flex-col relative w-[380px] h-fit rounded-3xl bg-white p-6">
-//       <div className="w-full h-[200px] relative">
-//         <Image
-//           className="w-full !h-[200px] rounded-2xl object-cover shadow-custom mb-2"
-//           alt=""
-//           src={replaceUrl(pelatihan?.FotoPelatihan!)}
-//           width={0}
-//           height={0}
-//         />
-//         {pelatihan.PenyelenggaraPelatihan.includes("Politeknik") && (
-//           <span className="w-fit block text-center font-semibold px-4 py-2 bg-blue-600 rounded-3xl text-white absolute text-xs top-3 z-50 right-3">
-//             Khusus Taruna KP
-//           </span>
-//         )}
-//       </div>
-
-//       {/* Header */}
-//       <div className="flex justify-between items-center gap-3 mt-3">
-//         <h2 className="text-2xl font-calsans text-blue-500 leading-none">
-//           {truncateText(pelatihan?.NamaPelatihan, 50, "...")}
-//         </h2>
-//         {/* <div className="text-sm font-medium w-fit px-4 py-2 bg-[#625BF9] rounded-3xl text-white leading-none">
-//           {generateTanggalPelatihan(pelatihan.TanggalMulaiPelatihan)}
-//         </div> */}
-//       </div>
-
-//       {/* Location */}
-//       <div className="flex items-center gap-2 text-blue-500 mb-4">
-//         <TbMapPin size={18} />
-//         <p className="text-sm font-medium">{pelatihan.LokasiPelatihan}</p>
-//       </div>
-
-//       {/* Description */}
-//       <p
-//         dangerouslySetInnerHTML={{
-//           __html:
-//             pelatihan && truncateText(pelatihan?.DetailPelatihan, 150, "..."),
-//         }}
-//         className="text-gray-600 text-sm leading-relaxed mb-4"
-//       />
-
-//       {/* Contact Info */}
-//       {pelatihan!.PenyelenggaraPelatihan.includes("Politeknik") ? (
-//         <></>
-//       ) : (
-//         <div className="flex justify-between text-sm text-blue-500 mb-4">
-//           <div>
-//             <p className="font-semibold">
-//               Layanan {pelatihan.PenyelenggaraPelatihan}
-//             </p>
-//             <p>62887972983</p>
-//           </div>
-//           <div>
-//             <p className="font-semibold">
-//               PTSP {pelatihan.PenyelenggaraPelatihan}
-//             </p>
-//             <p>62889812833</p>
-//           </div>
-//         </div>
-//       )}
-
-//       {/* Pricing */}
-//       <div className=" mb-4">
-//         <p className="text-blue-500 text-3xl font-calsans">
-//           {pelatihan.HargaPelatihan === 0
-//             ? "Gratis"
-//             : `${formatToRupiah(pelatihan.HargaPelatihan)}`}
-//         </p>
-//         <p className="text-sm font-normal text-blue-500">
-//           *{" "}
-//           {pelatihan!.PenyelenggaraPelatihan.includes("Politeknik")
-//             ? "Diperuntukkan untuk taruna Poltek KP dan SUPM"
-//             : "Tidak termasuk akomodasi & konsumsi"}{" "}
-//           <br />* Kuota Kelas {pelatihan!.KoutaPelatihan} Peserta
-//         </p>
-//       </div>
-
-//       {/* Button */}
-//       <Link
-// href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${
-//   pelatihan?.KodePelatihan
-// }/${encryptValue(pelatihan?.IdPelatihan)}`}
-//         className="w-full block text-center font-semibold px-6 py-3 bg-blue-600 rounded-3xl text-white"
-//       >
-//         Lihat Detail
-//       </Link>
-//     </div>
-//   );
-// };
 
 export default PencarianPelatihan;
