@@ -47,9 +47,9 @@ function PencarianPelatihan() {
   const [loading, setLoading] = React.useState<boolean>(true);
 
   const jenisProgram =
-    usePathname() == "/layanan/program/akp"
+    usePathname() == "/layanan/pelatihan/program/akp"
       ? "Awak Kapal Perikanan"
-      : usePathname() == "/layanan/program/perikanan"
+      : usePathname() == "/layanan/pelatihan/program/perikanan"
         ? "Perikanan"
         : "Kelautan";
 
