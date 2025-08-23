@@ -26,7 +26,7 @@ export default function HeroProgramPelatihan({ program }: { program: string }) {
 
   const detailProgramPelatihan: DetailProgramPelatihan = {
     akp: {
-      icon: "/icons/icperikanan.png",
+      icon: "/icons/icawak.png",
       description:
         "Program Pelatihan Awak Kapal Perikanan membekali peserta dengan keterampilan penangkapan ikan, navigasi, dan keselamatan di laut. Dapatkan sertifikasi resmi untuk meningkatkan karier di sektor perikanan dengan fokus pada praktik berkelanjutan dan keselamatan kerja.",
       images: [

@@ -25,6 +25,14 @@ export default function Hero() {
     },
     {
       id: "002",
+      name: "Awak Kapal Perikanan",
+      icon: "/icons/icawak.png",
+      slug: "akp",
+      description:
+        "Pelatihan Awak Kapal Perikanan membekali peserta dengan keterampilan penangkapan ikan, navigasi, dan keselamatan di laut.",
+    },
+    {
+      id: "003",
       name: "Kelautan",
       icon: "/icons/ickelautan.png",
       slug: "kelautan",

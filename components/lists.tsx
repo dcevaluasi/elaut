@@ -127,23 +127,26 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
       {/* Description */}
       <p
         dangerouslySetInnerHTML={{
-          __html: pelatihan && truncateText(pelatihan?.DetailPelatihan, 250, "..."),
+          __html: pelatihan && truncateText(pelatihan?.DetailPelatihan, 100, "..."),
         }}
         className="text-gray-300 prose-invert text-sm leading-relaxed mb-4"
       />
 
       {/* Button */}
       <div className="flex gap-1 w-full">
-        <Link
-          href={`#`}
-          className="w-full flex items-center justify-center text-center font-semibold px-6 py-3 
+        {
+          pelatihan?.StatusApproval == "Selesai" && <Link
+            href={`#`}
+            className="w-full flex items-center justify-center text-center font-semibold px-6 py-3 
           bg-gray-500/90 hover:bg-gray-600/90 
           backdrop-blur-md border border-white/20 
           rounded-3xl text-white shadow-md transition text-sm"
-        >
-          <RiTimeZoneLine className="w-5 h-5" />
-          Telah Berakhir
-        </Link>
+          >
+            <RiTimeZoneLine className="w-5 h-5" />
+            Telah Berakhir
+          </Link>
+        }
+
         <Link
           href={`/layanan/pelatihan/${createSlug(
             pelatihan.NamaPelatihan
