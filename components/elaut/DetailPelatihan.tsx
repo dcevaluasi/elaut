@@ -53,7 +53,7 @@ const DetailPelatihan: React.FC<DetailPelatihanProps> = ({
           {/* Price + Info */}
           <div className="border border-white/15 bg-white/10 backdrop-blur-xl 
                     shadow-[0_8px_40px_rgba(0,0,0,0.35)] transition-all duration-500 
-                     hover:border-blue-400/40 rounded-3xl p-8">
+                     hover:border-blue-400/40 rounded-3xl p-5 md:p-8">
 
             <div className="relative w-full flex md:flex-row flex-col gap-2 items-start">
               <div className="relative rounded-3xl overflow-hidden shadow-xl">

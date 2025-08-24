@@ -95,7 +95,7 @@ export default function HeroProgramPelatihan({ program }: { program: string }) {
       <div className="pointer-events-none absolute top-1/3 -right-16 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
 
       {/* Hero Section */}
-      <section className="relative h-full md:h-[70vh] flex items-center justify-center px-6">
+      <section className="relative h-screen md:h-[70vh] flex items-center justify-center px-6">
         {/* Background Image */}
         {images.length > 0 && (
           <Image
@@ -109,21 +109,21 @@ export default function HeroProgramPelatihan({ program }: { program: string }) {
 
         {/* Content */}
         <div className="relative z-10 max-w-5xl w-full mx-auto flex flex-col items-center text-left">
-          <div className="flex flex-row gap-4 items-center">
+          <div className="flex flex-col md:flex-row  gap-4 items-center">
             <Image
               src={icon}
               alt={programPelatihan}
               width={100}
               height={100}
-              className="w-24 h-24 md:w-28 md:h-28 object-contain"
+              className="w-20 h-20 md:w-28 md:h-28 object-contain"
             />
-            <div className="flex flex-col text-left">
-              <h1 className="font-bold text-5xl md:text-6xl !text-left font-calsans leading-none drop-shadow-lg">
+            <div className="flex flex-col text-center md:text-left">
+              <h1 className="font-bold text-4xl md:text-6xl text-center md:!text-left font-calsans leading-none drop-shadow-lg">
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-300 via-blue-400 to-blue-500">
                   {programPelatihan}
                 </span>
               </h1>
-              <p className="text-gray-200 max-w-3xl mt-4 text-base leading-relaxed">
+              <p className="text-gray-200 max-w-3xl mt-4 text-sm md:text-base leading-relaxed">
                 {description}
               </p>
             </div>

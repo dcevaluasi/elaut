@@ -23,7 +23,7 @@ export default function UserService({ user }: { user: User | null }) {
       name: "Pelatihan Yang Diikuti",
       description: "Lihat daftar pelatihan yang kamu ikuti.",
       image: "/illustrations/bppp-training.png",
-      icon: <FaFilePen className="text-4xl text-gray-200 duration-1000" />,
+      icon: <FaFilePen className="text-5xl text-gray-200 duration-1000" />,
     },
     {
       id: 2,

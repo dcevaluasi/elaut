@@ -87,7 +87,7 @@ const DetailRegistrasiPelatihan: React.FC<DetailRegistrasiPelatihanProps> = ({
                     {/* Price + Info */}
                     <div className="border border-white/15 bg-white/10 backdrop-blur-xl 
                     shadow-[0_8px_40px_rgba(0,0,0,0.35)] transition-all duration-500 
-                     hover:border-blue-400/40 rounded-3xl p-8 flex flex-col gap-3">
+                     hover:border-blue-400/40 rounded-3xl p-5 md:p-8 flex flex-col gap-3">
 
                         <div className="relative w-full flex md:flex-row flex-col gap-2 items-start">
                             <div className={`${data.FotoPelatihan == "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" ? "" : ""}  rounded-3xl p-7 bg-gradient-to-br from-blue-500/70 to-sky-600/20 text-gray-200  backdrop-blur-xl 
@@ -341,10 +341,10 @@ const DetailRegistrasiPelatihan: React.FC<DetailRegistrasiPelatihanProps> = ({
           w-full flex flex-col items-center justify-center space-y-2"
                                     >
                                         <FaLock className="text-5xl text-red-400" />
-                                        <h2 className="text-xl font-bold text-center">
+                                        <h2 className="text-xl font-bold text-center leading-none">
                                             Maaf, kamu tidak bisa melanjutkan pendaftaran
                                         </h2>
-                                        <p className="text-center text-sm text-gray-400">
+                                        <p className="text-center text-sm text-gray-300">
                                             Harap untuk melengkapi data profil kamu terlebih dahulu  pada <Link className="text-blue-500 underline" href="/dashboard/edit-profile">Halaman Edit Profile</Link>
                                         </p>
                                     </div>

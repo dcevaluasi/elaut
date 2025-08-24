@@ -110,7 +110,7 @@ export default function DashboardUser() {
 
                     <div className="relative w-full h-full pb-10">
                         <div className="max-w-6xl mx-auto">
-                            <div className="pt-32  md:pt-32 ">
+                            <div className="pt-28 px-8 md:px-0  md:pt-32 ">
                                 <section
                                     id="cek-sertifikat"
                                     className="scroll-smooth w-full  -mt-16 md:mt-6"
