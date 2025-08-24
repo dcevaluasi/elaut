@@ -136,7 +136,7 @@ const DetailPelatihan: React.FC<DetailPelatihanProps> = ({
                   </Button>
                 ) : (
                   <Link
-                    href={`http://localhost:3000${detailPelatihanUrl}/register`}
+                    href={`https://elaut-bppsdm.kkp.go.id${detailPelatihanUrl}/register`}
                     className="bg-gradient-to-r w-full from-blue-600 to-sky-600 flex gap-2 items-center justify-center text-center hover:from-blue-700 hover:to-sky-700 text-white font-bold px-10 py-3 rounded-full text-lg transition"
                   >
                     <FiUploadCloud />DAFTAR PELATIHAN
