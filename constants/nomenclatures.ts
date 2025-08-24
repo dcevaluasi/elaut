@@ -59,3 +59,7 @@ export const UPT: string[] = [
   'SUPM Tegal',
   'SUPM Waiheru',
 ]
+
+export const ESELON1 =
+  'Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan'
+export const ESELON2 = 'Kepala Pusat Pelatihan Kelautan dan Perikanan'

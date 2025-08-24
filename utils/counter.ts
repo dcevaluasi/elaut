@@ -1,3 +1,4 @@
+import { MateriPelatihan } from '@/types/product'
 import { UserPelatihan } from '@/types/user'
 
 export const countValidKeterangan = (data: UserPelatihan[]): number => {
@@ -45,8 +46,4 @@ export const countUserWithSpesimenTTD = (data: UserPelatihan[]): number => {
 
 export const countUserWithDrafCertificate = (data: UserPelatihan[]): number => {
   return data.filter((item) => item.FileSertifikat !== '').length
-}
-
-export const countUserWithPassed = (data: UserPelatihan[]): number => {
-  return data.filter((item) => item.IsActice === 'LULUS').length
 }

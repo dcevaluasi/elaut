@@ -132,15 +132,20 @@ export const LoginAdminELAUT = () => {
 
   return (
     <section className="w-full">
-      <main className="bg-darkDPKAKP w-full  h-screen  relative">
+      <main className="h-screen w-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-sky-900 to-blue-900 text-white">
         <Image
-          src={"/images/hero-img3.jpg"}
-          className="absolute w-full h-screen  z-10 object-cover duration-1000"
+          src={"/images/hero-img6.jpg"}
+          className="absolute w-full h-screen  opacity-20 object-cover duration-1000"
           alt=""
           fill={true}
           priority
         />
-        <div className="absolute w-full h-screen  bg-black opacity-70 inset-0 z-20"></div>
+
+        {/* gradient blobs */}
+        <div className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-blue-500/40 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-cyan-400/20 blur-3xl" />
+        <div className="pointer-events-none absolute top-1/3 -right-16 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
+
 
         <section className=" z-50 relative h-fit space-y-6 pb-8 pt-36 md:h-screen md:pb-12 md:pt-20 lg:py-44 w-full flex items-center justify-center flex-col">
           {
