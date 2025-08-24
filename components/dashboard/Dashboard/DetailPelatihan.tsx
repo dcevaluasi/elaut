@@ -9,7 +9,7 @@ import { FiEdit2, FiUploadCloud } from "react-icons/fi";
 import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import Link from "next/link";
-import { elautBaseUrl, urlFileSilabus, urlFileSuratPemberitahuan } from "@/constants/urls";
+import { elautBaseUrl, urlFileBeritaAcara, urlFileSilabus, urlFileSuratPemberitahuan } from "@/constants/urls";
 
 import axios from "axios";
 import { HistoryTraining, PelatihanMasyarakat } from "@/types/product";
@@ -403,10 +403,10 @@ function DetailPelatihan() {
                 <InfoRow
                   label="Dokumen Permohonan"
                   value={
-                    <a href={`${urlFileSuratPemberitahuan}/${pelatihan?.SuratPemberitahuan}`}
+                    <a href={`${urlFileBeritaAcara}/${pelatihan?.BeritaAcara}`}
                       target="_blank"
                       className="text-blue-600 underline break-words">
-                      {`${urlFileSuratPemberitahuan}/${pelatihan?.SuratPemberitahuan}`}
+                      {`${urlFileBeritaAcara}/${pelatihan?.BeritaAcara}`}
                     </a>
                   }
                 />

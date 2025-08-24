@@ -75,7 +75,7 @@ const GenerateNoSertifikatButton: React.FC<GenerateNoSertifikatButtonProps> = ({
     updateData.append("PemberitahuanDiterima", "Input no sertifikat");
 
     if (beritaAcara) {
-      updateData.append(isOperatorBalaiPelatihan ? 'BeritaAcara' : 'SuratPemberitahuan', beritaAcara);
+      updateData.append('BeritaAcara', beritaAcara);
     }
 
 

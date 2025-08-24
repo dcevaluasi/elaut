@@ -18,3 +18,5 @@ export const urlFileSilabus =
   process.env.NEXT_PUBLIC_BASE_URL + '/public/static/suratPemberitahuan'
 export const urlFileSuratPemberitahuan =
   process.env.NEXT_PUBLIC_BASE_URL + '/public/static/suratPemberitahuan'
+export const urlFileBeritaAcara =
+  process.env.NEXT_PUBLIC_BASE_URL + '/public/static/BeritaAcara'
