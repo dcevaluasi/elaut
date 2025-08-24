@@ -9,16 +9,6 @@ import {
   HiUserGroup,
 } from "react-icons/hi2";
 
-import {
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogAction,
-  AlertDialogCancel,
-} from "@/components/ui/alert-dialog";
 
 import Link from "next/link";
 import { Slide } from "react-awesome-reveal";
@@ -74,7 +64,7 @@ export default function UserDocuments({ user }: { user: User | null }) {
 
     {
       id: 3,
-      name: "KTP",
+      name: "KTP/Identitas",
       description:
         "Pelatihan yang diselenggaran BPPSDM KP untuk menjaring masyarakat kelautan perikanan yang ingin mengasah skill nya dibidang kelautan dan perikanan",
       image: "/illustrations/ktp.png",
@@ -138,163 +128,151 @@ export default function UserDocuments({ user }: { user: User | null }) {
 
   return (
     <>
-      <section className="relative h-fit pb-20 bg-white rounded-xl" id="explore">
-        <div className="relative max-w-6xl w-full mx-auto px-4 sm:px-6 flex flex-col space-y-2">
-          <div className="pt-12 md:pt-20 pb-6 md:pb-10 text-center flex flex-col space-y-2 border-b border-b-grayUsual mb-5">
-            <h1 className="text-2xl md:text-3xl font-calsans text-blue-500 leading-none">
+
+      <section
+        className="relative h-fit pb-20 rounded-2xl 
+  bg-white/10 backdrop-blur-md border border-white/20 shadow-lg"
+        id="explore"
+      >
+        <div className="relative max-w-6xl w-full mx-auto px-4 sm:px-6 flex flex-col space-y-2 text-gray-200">
+          {/* Header */}
+          <div className="pt-12 md:pt-20 pb-6 md:pb-10 text-center flex flex-col space-y-2 border-b border-white/20 mb-5">
+            <h1 className="text-2xl md:text-3xl font-calsans text-blue-400 leading-none drop-shadow-sm">
               Biodata Pribadi <br /> Pengguna E-LAUT
             </h1>
-            <p className="text-base text-gray-600 max-w-xl text-center mx-auto leading-none">
-              Lihat profile-mu dan edit data agar validitas data dirimu dapat mempercepat proses keikutsertaan pelatihan di E-LAUT, lengkapi juga dokumen serta file yang diperlukan!
+            <p className="text-base text-gray-300 max-w-xl text-center mx-auto leading-relaxed">
+              Lihat profile-mu dan edit data agar validitas data dirimu dapat mempercepat
+              proses keikutsertaan pelatihan di E-LAUT, lengkapi juga dokumen serta file
+              yang diperlukan!
             </p>
           </div>
 
           <div className="flex flex-col md:flex-row space-y-5 md:space-y-0 md:space-x-4 md:items-start text-center">
-            <div className="flex flex-col items-center bg-white shadow-custom rounded-md py-6 px-12 max-w-4xl">
+            {/* Profile Card */}
+            <div
+              className="flex flex-col items-center 
+        bg-white/10 backdrop-blur-md border border-white/20 
+        shadow-lg rounded-2xl py-6 px-12 max-w-4xl"
+            >
               <div className="relative">
                 <Image
-                  src={user?.Foto! != 'https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/' ? user?.Foto! : "/dummies/profile.jpg"}
+                  src={
+                    user?.Foto! !=
+                      "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/"
+                      ? user?.Foto!
+                      : "/dummies/profile.jpg"
+                  }
                   alt={"profile picture"}
                   width={0}
                   height={0}
-                  className="w-32 h-32 rounded-full object-cover"
+                  className="w-32 h-32 rounded-full object-cover border border-white/30"
                 />
                 <Link
                   href={"/dashboard/edit-profile"}
-                  className="w-fit bg-white rounded-full p-2 shadow-custom absolute right-0 cursor-pointer bottom-4"
+                  className="w-fit bg-white/20 backdrop-blur-md border border-white/30 
+            rounded-full p-2 shadow-md absolute right-0 cursor-pointer bottom-4"
                 >
-                  <Edit3Icon className="text-blue-500" />
+                  <Edit3Icon className="text-blue-400" />
                 </Link>
               </div>
 
-              <div className="flex flex-col space-y-1 items-center justify-center">
-                <h2 className="text-2xl font-calsans text-blue-500 leading-none">
+              <div className="flex flex-col space-y-1 items-center justify-center mt-3">
+                <h2 className="text-2xl font-calsans text-blue-400 leading-none">
                   {capitalize(user?.Nama!.toLocaleLowerCase()!)}
                 </h2>
-                {
-                  user!.KusukaUsers == 'yes' && <p className="text-sm text-gray-600 bg-gray-200 px-3 py-1 my-2 rounded-full w-full text-center leading-none">
+                {user!.KusukaUsers == "yes" && (
+                  <p className="text-sm text-gray-200 bg-white/20 px-3 py-1 my-2 rounded-full w-full text-center leading-none">
                     Anggota/Anak Pelaku Utama
                   </p>
-                }
-
+                )}
               </div>
             </div>
 
-            <div className="flex flex-col space-y-5">
-              <div className="flex flex-col space-y-5">
-                <div className="text-left flex flex-col space-y-2">
-                  <h3 className="text-lg md:text-xl font-calsans text-blue-500 leading-none">
-                    Data Pribadi
-                  </h3>
-                  <p className="text-base text-gray-600 max-w-xl text-left  leading-none">
-                    Kumpulan data dasar yang wajib untuk diisi, karena kelengkapan data ini sebagai bahan validasi keikutsertaanmu dalam pelatihan
-                  </p>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2 rounded-md md:gap-5 w-full ">
-                  <UserInfoItem
-                    icon={TbNumber}
-                    title="NIK"
-                    value={user!.Nik.toString()}
-                  />
-                  <UserInfoItem
-                    icon={TbFlag}
-                    title="Kewarganegaraan"
-                    value={user!.Kewarganegaraan}
-                  />
-                  <UserInfoItem
-                    icon={MdAlternateEmail}
-                    title="Email"
-                    value={user!.Email}
-                  />
-                  <UserInfoItem
-                    icon={RiHeart3Line}
-                    title="Status Menikah"
-                    value={user!.StatusMenikah}
-                  />
-                  <UserInfoItem
-                    icon={TbPhone}
-                    title="No Telpon/Whatsapp"
-                    value={user!.NoTelpon.toString()}
-                  />
-                  <UserInfoItem
-                    icon={GrLocation}
-                    title="Alamat"
-                    value={user!.Alamat}
-                  />
-                  <UserInfoItem
-                    icon={PiTrainRegional}
-                    title="Domisili"
-                    value={`${user!.Kota}, ${user!.Provinsi}`}
-                  />
-                  <UserInfoItem
-                    icon={TbGenderBigender}
-                    title="Jenis Kelamin"
-                    value={user!.JenisKelamin}
-                  />
-                  <UserInfoItem
-                    icon={HiOutlineCake}
-                    title="TTL"
-                    value={`${user!.TempatLahir}, ${user!.TanggalLahir}`}
-                  />
-                  <UserInfoItem
-                    icon={MdOutlineWorkOutline}
-                    title="Pekerjaan"
-                    value={user!.Pekerjaan}
-                  />
-                  <UserInfoItem
-                    icon={TbSchool}
-                    title="Pendidikan Terakhir"
-                    value={user!.PendidikanTerakhir}
-                  />
-                  <UserInfoItem
-                    icon={PiHandsPrayingBold}
-                    title="Agama"
-                    value={user!.Agama}
-                  />
-                  <UserInfoItem
-                    icon={BiDonateBlood}
-                    title="Golongan Darah"
-                    value={user!.GolonganDarah}
-                  />
-                  <UserInfoItem
-                    icon={MdOutlineWoman}
-                    title="Ibu Kandung"
-                    value={user!.IbuKandung}
-                  />
-                  <UserInfoItem
-                    icon={HiGlobeAmericas}
-                    title="Negara Tujuan Bekerja"
-                    value={user!.NegaraTujuanBekerja}
-                  />
-                  {/* Add other UserInfoItem components here */}
-                </div>
+            {/* Info Cards */}
+            <div className="flex flex-col space-y-5 w-full">
+              {/* UserInfoItem remains the same but updated with glass styles */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-5">
+                <UserInfoItem icon={TbNumber} title="NIK" value={user!.Nik.toString()} />
+                <UserInfoItem icon={TbFlag} title="Kewarganegaraan" value={user!.Kewarganegaraan} />
+                <UserInfoItem icon={MdAlternateEmail} title="Email" value={user!.Email} />
+                <UserInfoItem
+                  icon={RiHeart3Line}
+                  title="Status Menikah"
+                  value={user!.StatusMenikah}
+                />
+                <UserInfoItem
+                  icon={TbPhone}
+                  title="No Telpon/Whatsapp"
+                  value={user!.NoTelpon.toString()}
+                />
+                <UserInfoItem
+                  icon={GrLocation}
+                  title="Alamat"
+                  value={user!.Alamat}
+                />
+                <UserInfoItem
+                  icon={PiTrainRegional}
+                  title="Domisili"
+                  value={`${user!.Kota}, ${user!.Provinsi}`}
+                />
+                <UserInfoItem
+                  icon={TbGenderBigender}
+                  title="Jenis Kelamin"
+                  value={user!.JenisKelamin}
+                />
+                <UserInfoItem
+                  icon={HiOutlineCake}
+                  title="TTL"
+                  value={`${user!.TempatLahir}, ${user!.TanggalLahir}`}
+                />
+                <UserInfoItem
+                  icon={MdOutlineWorkOutline}
+                  title="Pekerjaan"
+                  value={user!.Pekerjaan}
+                />
+                <UserInfoItem
+                  icon={TbSchool}
+                  title="Pendidikan Terakhir"
+                  value={user!.PendidikanTerakhir}
+                />
+                <UserInfoItem
+                  icon={PiHandsPrayingBold}
+                  title="Agama"
+                  value={user!.Agama}
+                />
+                <UserInfoItem
+                  icon={BiDonateBlood}
+                  title="Golongan Darah"
+                  value={user!.GolonganDarah}
+                />
+                <UserInfoItem
+                  icon={MdOutlineWoman}
+                  title="Ibu Kandung"
+                  value={user!.IbuKandung}
+                />
+                <UserInfoItem
+                  icon={HiGlobeAmericas}
+                  title="Negara Tujuan Bekerja"
+                  value={user!.NegaraTujuanBekerja}
+                />
               </div>
-              <div className="flex flex-col space-y-5">
-                <div className="text-left flex flex-col space-y-2">
-                  <h3 className="text-lg md:text-xl font-calsans text-blue-500 leading-none">
-                    Dokumen dan Persyaratan
-                  </h3>
-                  <p className="text-base text-gray-600 max-w-xl text-left  leading-none">
-                    Kumpulan dokumen yang menjadi kelengkapan dan validitas dari data pribadimu, ayo lengkapi sekarang!
-                  </p>
-                </div>
-                <div className="grid grid-cols-1  gap-2 rounded-md md:gap-5 w-full ">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
-                    {tabMenus.map((tabMenu, index) => (
-                      <TabMenuItem
-                        key={tabMenu.id}
-                        tabMenu={tabMenu}
-                        handleSelectedMenu={handleSelectedMenu}
-                        index={index}
-                      />
-                    ))}
-                  </div>
-                </div>
+
+              {/* Tab Menus */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {tabMenus.map((tabMenu, index) => (
+                  <TabMenuItem
+                    key={tabMenu.id}
+                    tabMenu={tabMenu}
+                    handleSelectedMenu={handleSelectedMenu}
+                    index={index}
+                  />
+                ))}
               </div>
             </div>
           </div>
         </div>
-      </section >
+      </section>
+
     </>
   );
 }
@@ -310,17 +288,18 @@ const UserInfoItem = ({
 }) => (
   <div className="gap-2 md:gap-4 w-full">
     <Slide direction="up">
-      <div className="flex flex-col gap-1 w-full items-center duration-1000 text-center">
-        <div className="flex items-center justify-start gap-2 bg-white shadow-custom rounded-md w-full h-fit md:h-24 px-3 py-3 md:py-1">
-          <Icon className="text-lg text-blue-500" />
+      <div className="flex flex-col gap-1 w-full items-center text-center">
+        <div
+          className="flex items-center justify-start gap-2 
+        bg-white/10 backdrop-blur-md border border-white/20 shadow-md 
+        rounded-xl w-full h-fit md:h-24 px-3 py-3 md:py-1 text-gray-200"
+        >
+          <Icon className="text-lg text-blue-400" />
           <div className="flex flex-col gap-0">
-
-            <p className="text-xs text-blue-500 text-left font-semibold">
-              {
-                value.includes('Politeknik') ? 'Satuan Pendidikan' : title
-              }
+            <p className="text-xs text-blue-400 text-left font-semibold">
+              {value.includes("Politeknik") ? "Satuan Pendidikan" : title}
             </p>
-            <p className="text-sm cursor-pointer hover:underline duration-800 text-grayUsual text-left font-normal leading-[105%]">
+            <p className="text-sm cursor-pointer hover:underline text-gray-300 text-left font-normal leading-[105%]">
               {value}
             </p>
           </div>
@@ -328,6 +307,7 @@ const UserInfoItem = ({
       </div>
     </Slide>
   </div>
+
 );
 
 const TabMenuItem = ({
@@ -342,27 +322,23 @@ const TabMenuItem = ({
   <div className="gap-4 w-full">
     <div
       onClick={() => handleSelectedMenu(index)}
-      className="flex items-center justify-start bg-white shadow-custom rounded-md w-full h-fit md:h-28 p-6 cursor-pointer"
+      className="flex items-center justify-start 
+    bg-white/10 backdrop-blur-md border border-white/20 
+    shadow-md rounded-xl w-full h-fit md:h-28 p-6 cursor-pointer 
+    hover:scale-[1.02] duration-300 text-gray-200"
     >
-      <Image
-        className="w-12"
-        width={0}
-        height={0}
-        src={tabMenu.image}
-        alt="Document Icon"
-      />
+      <Image className="w-12" width={0} height={0} src={tabMenu.image} alt="Document Icon" />
       <div className="ml-2 text-left flex space-y-1 flex-col">
-        <p className="text-blue-500 text-base leading-none font-semibold">{tabMenu.name}</p>
+        <p className="text-blue-400 text-base leading-none font-semibold">{tabMenu.name}</p>
         {tabMenu.available ? (
-          <p className="text-xs text-grayUsual">
-            {truncateText(tabMenu.link, 50, "...")}
-          </p>
+          <p className="text-xs text-gray-300">{truncateText(tabMenu.link, 50, "...")}</p>
         ) : (
-          <p className="text-xs text-grayUsual leading-[115%]">
+          <p className="text-xs text-gray-200 leading-[115%]">
             Belum ada file yang diupload, ke menu pengaturan akun untuk mengunggah
           </p>
         )}
       </div>
     </div>
   </div>
+
 );

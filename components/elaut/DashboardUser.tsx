@@ -102,7 +102,12 @@ export default function DashboardUser() {
     return (
         <>
             {
-                userDetail != null && !isLoading ? <section className="flex flex-col bg-[#EEEAEB] h-full">
+                userDetail != null && !isLoading ? <section className="flex flex-col relative overflow-hidden bg-gradient-to-br from-slate-900 via-sky-900 to-blue-900 text-white">
+                    {/* gradient blobs */}
+                    <div className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-blue-500/40 blur-3xl" />
+                    <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-cyan-400/20 blur-3xl" />
+                    <div className="pointer-events-none absolute top-1/3 -right-16 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
+
                     <div className="relative w-full h-full pb-10">
                         <div className="max-w-6xl mx-auto">
                             <div className="pt-32  md:pt-32 ">
@@ -111,23 +116,28 @@ export default function DashboardUser() {
                                     className="scroll-smooth w-full  -mt-16 md:mt-6"
                                 >
                                     <div className="flex flex-col  space-y-5 w-full items-center justify-center  text-center">
-                                        <div className="flex flex-col space-y-2 text-center rounded-2xl bg-white shadow-custom w-full py-16 px-5 md:px-0">
-                                            <h1 className="text-blue-500 text-[3rem] md:text-[3.6rem] font-calsans leading-none capitalize">
-                                                Dashboard <br /> {(userDetail!.Nama.toLowerCase())}
+                                        <div className="flex flex-col space-y-2 text-center rounded-2xl 
+  bg-white/10 backdrop-blur-md border border-white/20 
+  shadow-lg w-full py-16 px-5 md:px-0 text-gray-200">
+
+                                            <h1 className="text-[3rem] md:text-[3.6rem] font-calsans leading-none capitalize drop-shadow-sm">
+                                                Dashboard <br />  <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-300 via-blue-400 to-blue-500">
+                                                    {userDetail!.Nama.toLowerCase()}
+                                                </span>
                                             </h1>
+
                                             <div className="space-y-1 flex flex-col leading-none">
-                                                <p className="text-blue-500 ">
+                                                <p className="drop-shadow-sm">
                                                     Ayo jelajahi aplikasi E-LAUT dan temukan pelatihan unggul di sektor Kelautan dan Perikanan menarik!
                                                 </p>
 
-                                                <p className="text-xs text-gray-400 ">
+                                                <p className="text-xs opacity-80 drop-shadow-sm">
                                                     *Ini merupakan laman dashboard pengguna E-LAUT, telusuri pelatihan yang kamu ikuti dan nikmati layanan tersedi lainnya!
                                                 </p>
                                             </div>
-
-
-
                                         </div>
+
+
                                         {isManningAgent == "true" ? (
                                             <ManningAgentService manningAgent={manningAgentDetail} />
                                         ) : (

@@ -1178,15 +1178,15 @@ function UserTrainingService({ user }: { user: User | null }) {
                     className="w-[400px]"
                   />
                   <div className="max-w-3xl mx-auto text-center pb-5 md:pb-8 -mt-2">
-                    <h1 className="text-3xl font-calsans leading-[110%] text-blue-500">
+                    <h1 className="text-3xl font-calsans leading-[110%] text-blue-400">
                       Belum Ada Pelatihan
                     </h1>
-                    <div className="text-gray-400 text-center leading-none text-base  max-w-md">
+                    <div className="text-gray-200 text-center leading-none text-base  max-w-md">
                       Kamu belum mengikuti pelatihan apapun, ayo cari pelatihan
                       menarik di E-LAUT dan jadilah SDM unggul untuk Indonesia!{" "}
                       <Link
                         href="/"
-                        className="text-blue-600 hover:underline transition duration-150 ease-in-out"
+                        className="text-blue-400 hover:underline transition duration-150 ease-in-out"
                       >
                         Cari Pelatihan
                       </Link>
