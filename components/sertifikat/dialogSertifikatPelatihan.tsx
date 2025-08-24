@@ -661,15 +661,15 @@ const SertifikatNonKepelautan = React.forwardRef(
                     height={240}
                     alt=""
                     style={{
-                      width: "140px",
-                      height: "190px",
+                      width: "145px",
+                      height: "205px",
                       objectFit: "cover",
                       position: "absolute",
-                      bottom: "-50px",
+                      bottom: "-70px",
                       right: "100px",
-                      borderWidth: '15px',
-                      borderRadius: '18px',
-                      borderColor: '#FFF',
+                      borderWidth: '0px',
+                      borderRadius: '20px',
+                      borderColor: '#fff',
                       marginTop: "1rem",
 
                       zIndex: -10,
@@ -677,7 +677,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                   />
                 }
               </div>
-              <div className={`pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center ${pelatihan?.MateriPelatihan.length < 7 ? 'mt-64' : 'mt-48'} break-before-auto relative`}>
+              <div className={`pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center ${pelatihan?.MateriPelatihan.length < 7 ? 'mt-72' : 'mt-48'} break-before-auto relative`}>
                 <div className="flex flex-row justify-center items-center">
                   <div className="flex flex-row gap-2 items-center h-fit">
                     <div className="flex flex-col text-center space-y-0 h-fit items-center justify-center w-full gap-0">
