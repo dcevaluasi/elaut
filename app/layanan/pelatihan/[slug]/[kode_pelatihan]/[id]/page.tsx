@@ -115,7 +115,7 @@ function Page() {
         <div className="pointer-events-none absolute bottom-0 right-0 h-[28rem] w-[28rem] rounded-full bg-cyan-400/20 blur-3xl" />
         <div className="pointer-events-none absolute top-1/4 left-1/2 h-72 w-72 rounded-full bg-indigo-500/20 blur-3xl" />
 
-        <div className="relative z-10 max-w-6xl mx-auto px-4 py-12">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 py-12">
           {loading ? (
             <div className="flex justify-center items-center py-32">
               <HashLoader color="#38bdf8" size={60} />
