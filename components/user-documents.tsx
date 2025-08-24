@@ -310,6 +310,8 @@ const UserInfoItem = ({
 
 );
 
+
+
 const TabMenuItem = ({
   tabMenu,
   handleSelectedMenu,
@@ -318,27 +320,49 @@ const TabMenuItem = ({
   tabMenu: any;
   handleSelectedMenu: (index: number) => void;
   index: number;
-}) => (
-  <div className="gap-4 w-full">
-    <div
-      onClick={() => handleSelectedMenu(index)}
-      className="flex items-center justify-start 
-    bg-white/10 backdrop-blur-md border border-white/20 
-    shadow-md rounded-xl w-full h-fit md:h-28 p-6 cursor-pointer 
-    hover:scale-[1.02] duration-300 text-gray-200"
-    >
-      <Image className="w-12" width={0} height={0} src={tabMenu.image} alt="Document Icon" />
-      <div className="ml-2 text-left flex space-y-1 flex-col">
-        <p className="text-blue-400 text-base leading-none font-semibold">{tabMenu.name}</p>
-        {tabMenu.available ? (
-          <p className="text-xs text-gray-300">{truncateText(tabMenu.link, 50, "...")}</p>
-        ) : (
-          <p className="text-xs text-gray-200 leading-[115%]">
-            Belum ada file yang diupload, ke menu pengaturan akun untuk mengunggah
+}) => {
+  const hasExtension = (url: string) => {
+    return /\.[0-9a-z]+$/i.test(url);
+  };
+  const hasFile = hasExtension(tabMenu.link);
+
+  return (
+    <div className="gap-4 w-full">
+      <div
+        onClick={() => handleSelectedMenu(index)}
+        className="flex items-center justify-start 
+        bg-white/10 backdrop-blur-md border border-white/20 
+        shadow-md rounded-xl w-full h-fit md:h-28 p-6 cursor-pointer 
+        hover:scale-[1.02] duration-300 text-gray-200"
+      >
+        <Image
+          className="w-12"
+          width={0}
+          height={0}
+          src={tabMenu.image}
+          alt="Document Icon"
+        />
+
+        <div className="ml-2 text-left flex space-y-1 flex-col">
+          <p className="text-blue-400 text-base leading-none font-semibold">
+            {tabMenu.name}
           </p>
-        )}
+
+          {hasFile ? <a
+            href={tabMenu.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-blue-300 underline truncate max-w-[200px]"
+          >
+            {truncateText(tabMenu.link, 50, "...")}
+          </a> : (
+            <p className="text-xs text-gray-200 leading-[115%]">
+              Belum ada file yang diupload, ke menu pengaturan akun untuk
+              mengunggah
+            </p>
+          )}
+        </div>
       </div>
     </div>
-  </div>
-
-);
+  );
+};

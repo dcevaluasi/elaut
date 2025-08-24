@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { TbBook, TbBuilding, TbCalendar, TbCalendarEvent, TbClock, TbInfoCircle, TbLocation, TbMoneybag, TbPin, TbSchool } from "react-icons/tb";
+import { TbBook, TbBuilding, TbCalendar, TbCalendarEvent, TbClock, TbEdit, TbInfoCircle, TbLocation, TbMoneybag, TbPin, TbSchool } from "react-icons/tb";
 import { HiOutlineUser, HiOutlineMail, HiOutlinePhone, HiOutlineHome, HiOutlineIdentification, HiOutlineCalendar } from "react-icons/hi";
 import { RiTimeZoneLine } from "react-icons/ri";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import FormRegistrationTraining from "../dashboard/users/formRegistrationTrainin
 import Features from "../features";
 import { generateTanggalPelatihan } from "@/utils/text";
 import { formatToRupiah, replaceUrl } from "@/lib/utils";
-import { HiOutlineBuildingOffice, HiOutlineBuildingOffice2, HiOutlineHeart, HiOutlineHomeModern, HiOutlineMapPin, HiOutlineUserGroup } from "react-icons/hi2";
+import { HiBookOpen, HiOutlineBuildingOffice, HiOutlineBuildingOffice2, HiOutlineHeart, HiOutlineHomeModern, HiOutlineMapPin, HiOutlineUserGroup } from "react-icons/hi2";
 import { FiUploadCloud } from "react-icons/fi";
 import Link from "next/link";
 import { useFetchUser } from "@/hooks/elaut/user/useFetchUser";
@@ -92,7 +92,8 @@ const DetailRegistrasiPelatihan: React.FC<DetailRegistrasiPelatihanProps> = ({
                         <div className="relative w-full flex md:flex-row flex-col gap-2 items-start">
                             <div className={`${data.FotoPelatihan == "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" ? "" : ""}  rounded-3xl p-7 bg-gradient-to-br from-blue-500/70 to-sky-600/20 text-gray-200  backdrop-blur-xl 
                     shadow-[0_8px_40px_rgba(0,0,0,0.35)] border-white/20 border w-full h-fit`}>
-                                <h1 className="text-3xl font-calsans leading-none mb-6 max-w-3xl">
+                                <h1 className="text-2xl md:text-3xl  font-calsans leading-none mb-6 max-w-3xl">
+                                    <HiBookOpen className="w-8 h-8 flex-shrink-0 inline" />
                                     {data.NamaPelatihan}
                                 </h1>
                                 <p className="mt-2 flex items-center gap-2 text-sm">
@@ -138,9 +139,15 @@ const DetailRegistrasiPelatihan: React.FC<DetailRegistrasiPelatihanProps> = ({
                             isProfileComplete ? <div className="relative w-full flex md:flex-row flex-col gap-2 items-start">
                                 <div className={`${data.FotoPelatihan == "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" ? "" : ""}  rounded-3xl p-7  text-gray-200  backdrop-blur-xl 
                     shadow-[0_8px_40px_rgba(0,0,0,0.35)] border-white/20 border w-full h-fit`}>
-                                    <h1 className="text-3xl font-calsans leading-none mb-6 ">
+                                    <h1 className="text-2xl md:text-3xl   font-calsans leading-none mb-6 ">
+                                        <TbEdit className="w-8 h-8 flex-shrink-0 inline" />
                                         Form Pendaftaran Pelatihan
                                     </h1>
+                                    <p
+                                        className="text-sm peer-disabled:cursor-not-allowed text-gray-200 peer-disabled:opacity-70 mb-5"
+                                    >
+                                        Harap pastikan data Sobat E-LAUT dibawah ini merupakan data valid dan sudah benar, apabila terdapat perubahan data silahkan edit di <Link className="text-white font-medium underline" href="/dashboard/edit-profile">Halaman Edit Profile</Link>. Karena akan digunakan untuk kebutuhan sertifikat (STTPL).
+                                    </p>
 
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -278,7 +285,7 @@ const DetailRegistrasiPelatihan: React.FC<DetailRegistrasiPelatihanProps> = ({
                                             </label>
                                             <input
                                                 type="text"
-                                                value={userDetail.Alamat}
+                                                value={userDetail.Pekerjaan}
                                                 readOnly
                                                 className="w-full rounded-xl px-4 py-2 bg-white/10 border border-white/20 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
                                             />
@@ -345,7 +352,7 @@ const DetailRegistrasiPelatihan: React.FC<DetailRegistrasiPelatihanProps> = ({
                                             Maaf, kamu tidak bisa melanjutkan pendaftaran
                                         </h2>
                                         <p className="text-center text-sm text-gray-300">
-                                            Harap untuk melengkapi data profil kamu terlebih dahulu  pada <Link className="text-blue-500 underline" href="/dashboard/edit-profile">Halaman Edit Profile</Link>
+                                            Harap untuk melengkapi data profil kamu terlebih dahulu  pada <Link className="text-white font-medium underline" href="/dashboard/edit-profile">Halaman Edit Profile</Link>
                                         </p>
                                     </div>
                                 </div>

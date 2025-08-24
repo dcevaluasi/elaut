@@ -15,7 +15,7 @@ import React, { FormEvent } from "react";
 import { TbFileStack, TbMapPinSearch, TbUserEdit } from "react-icons/tb";
 
 import { Progress } from "@/components/ui/progress";
-import { MdWorkOutline } from "react-icons/md";
+import { MdCheckCircle, MdWorkOutline } from "react-icons/md";
 import axios, { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
 import { User } from "@/types/user";
@@ -25,6 +25,8 @@ import { ALLOWED_EXTENSIONS, MAX_FILE_SIZE, MIN_FILE_SIZE } from "@/utils/file";
 import { SATUAN_PENDIDIKAN, SATUAN_PENDIDIKAN_KEAHLIAN } from "@/constants/pelatihan";
 import { wilayahIDUrl } from "@/constants/urls";
 import { KABUPATENS, PROVINCES } from "@/constants/regions";
+import { FaFileUpload } from "react-icons/fa";
+import { truncateText } from "@/utils";
 
 type Region = {
   code: string;
@@ -57,16 +59,16 @@ function FormCompleteProfile() {
   const [ibuKandung, setIbuKandung] = React.useState("");
   const [negaraTujuanBekerja, setNegaraTujuanBekerja] = React.useState("");
   const [alamat, setAlamat] = React.useState<string>("");
+  const [oldFiles, setOldFiles] = React.useState({
+    pasFoto: "",
+    ktp: "",
+    kk: "",
+    ijazah: "",
+    suratKesehatan: "",
+  });
 
   const [kabupaten, setKabupaten] = React.useState<string>("");
   const [provinsi, setProvinsi] = React.useState<string>("");
-
-
-  const [foto, setFoto] = React.useState<any>(null);
-  const [ktp, setKtp] = React.useState<any>(null);
-  const [kk, setKk] = React.useState<any>(null);
-  const [ijazah, setIjazah] = React.useState<any>(null);
-  const [suratKesehatan, setSuratKesehatan] = React.useState<any>(null);
 
   const validateFile = (file: File) => {
     const extension = file.name.split('.').pop()?.toLowerCase();
@@ -100,65 +102,6 @@ function FormCompleteProfile() {
     return true;
   };
 
-  const [provinces, setProvinces] = React.useState<Region[]>([])
-  const [regencies, setRegencies] = React.useState<Region[]>([])
-  const [districts, setDistricts] = React.useState<Region[]>([])
-
-
-  const handleFetchProvinces = async () => {
-    try {
-      const response: AxiosResponse = await axios.get(
-        `${wilayahIDUrl}/provinces.json`,
-      );
-      console.log({ response });
-      setProvinces(response.data)
-    } catch (error) {
-      console.error("Error fetching provinces:", error);
-      throw error;
-    }
-  }
-
-  const handleFetchRegencies = async (code: string) => {
-    try {
-      const response: AxiosResponse = await axios.get(
-        `${wilayahIDUrl}/regencies/${code}.json`,
-      );
-      console.log({ response });
-      setRegencies(response.data)
-    } catch (error) {
-      console.error("Error fetching regencies:", error);
-      throw error;
-    }
-  }
-
-  const handleFetchDistricts = async (code: string) => {
-    try {
-      const response: AxiosResponse = await axios.get(
-        `${wilayahIDUrl}/districts/${code}.json`,
-      );
-      console.log({ response });
-      setDistricts(response.data)
-    } catch (error) {
-      console.error("Error fetching districts:", error);
-      throw error;
-    }
-  }
-
-  const handleFileChange = (setter: any, event: any) => {
-    const file = event.target.files[0];
-    if (file && validateFile(file)) {
-      setter(file);
-    } else {
-      event.target.value = ''; // Reset input file
-    }
-  };
-
-  const handleFotoChange = (event: any) => handleFileChange(setFoto, event);
-  const handleKtpChange = (event: any) => handleFileChange(setKtp, event);
-  const handleKkChange = (event: any) => handleFileChange(setKk, event);
-  const handleIjazahChange = (event: any) => handleFileChange(setIjazah, event);
-  const handleSuratKesehatanChange = (event: any) => handleFileChange(setSuratKesehatan, event);
-
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -184,7 +127,6 @@ function FormCompleteProfile() {
           },
         }
       );
-      console.log({ response });
       setUserDetail(response.data);
       setName(response.data?.Nama);
       setEmail(response.data?.Email);
@@ -201,19 +143,118 @@ function FormCompleteProfile() {
       setNegaraTujuanBekerja(response.data?.NegaraTujuanBekerja);
       setTempatLahir(response.data?.TempatLahir);
       setNik(response.data?.Nik);
+      setProvinsi(response.data?.Provinsi);
+      setKabupaten(response.data?.Kota);
       setPhoneNumber(response.data?.NoTelpon);
+      setOldFiles({
+        pasFoto: response.data?.Foto || "",
+        ktp: response.data?.Ktp || "",
+        kk: response.data?.KK || "",
+        ijazah: response.data?.Ijazah || "",
+        suratKesehatan: response.data?.SuratKesehatan || "",
+      });
     } catch (error) {
       console.error("Error posting training data:", error);
       throw error;
     }
   };
 
-  React.useEffect(() => {
-    handleFetchProvinces()
-    setTimeout(() => {
-      handleFetchingUserDetail();
-    }, 1000);
-  }, []);
+
+  const [files, setFiles] = React.useState({
+    suratKesehatan: null as File | null,
+    pasFoto: null as File | null,
+    ktp: null as File | null,
+    kk: null as File | null,
+    ijazah: null as File | null,
+  });
+
+  const hasExtension = (url: string) => {
+    return /\.[0-9a-z]+$/i.test(url);
+  };
+
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof typeof files) => {
+    if (e.target.files && e.target.files[0]) {
+      setFiles((prev) => ({ ...prev, [field]: e.target.files![0] }));
+    }
+  };
+
+  const renderInput = (
+    label: string,
+    field: keyof typeof files,
+    required = false
+  ) => {
+    const oldFileUrl = oldFiles[field];
+    const hasOld = hasExtension(oldFileUrl);
+
+    return (
+      <div className="w-full px-3 mb-3">
+        <label className="text-sm font-medium text-gray-200">{label}</label>
+
+        {hasOld ? (
+          <div className="mt-2 flex flex-col gap-2 bg-white/10 backdrop-blur-md border border-white/20 shadow-md rounded-xl p-3">
+            {oldFileUrl.match(/\.(jpg|jpeg|png|gif)$/i) ? (
+              <img
+                src={oldFileUrl}
+                alt={field}
+                className="w-40 h-40 object-cover rounded-lg border border-white/30"
+              />
+            ) : (
+              <a
+                href={oldFileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-300 underline text-sm"
+              >
+                Lihat File Lama
+              </a>
+            )}
+            <label
+              className="flex items-center justify-between gap-3 w-full px-4 py-3 rounded-xl 
+            bg-white/10 backdrop-blur-md border border-white/20 shadow-md cursor-pointer 
+            hover:bg-white/20 transition"
+            >
+              <div className="flex items-center gap-3 text-gray-100">
+                <FaFileUpload className="text-lg text-blue-300" />
+                <span className="text-sm">
+                  {files[field] ? truncateText(files[field]!.name, 30, "...") : "Ganti file..."}
+                </span>
+              </div>
+              {files[field] && <MdCheckCircle className="text-green-400 text-xl" />}
+              <input
+                type="file"
+                className="hidden"
+                required={required}
+                onChange={(e) => handleFileChange(e, field)}
+              />
+            </label>
+          </div>
+        ) : (
+          <div className="mt-2 relative flex items-center">
+            <label
+              className="flex items-center justify-between gap-3 w-full px-4 py-3 rounded-xl 
+            bg-white/10 backdrop-blur-md border border-white/20 shadow-md cursor-pointer 
+            hover:bg-white/20 transition"
+            >
+              <div className="flex items-center gap-3 text-gray-100">
+                <FaFileUpload className="text-lg text-blue-300" />
+                <span className="text-sm">
+                  {files[field] ? truncateText(files[field]!.name, 30, "...") : "Pilih file..."}
+                </span>
+              </div>
+              {files[field] && <MdCheckCircle className="text-green-400 text-xl" />}
+              <input
+                type="file"
+                className="hidden"
+                required={required}
+                onChange={(e) => handleFileChange(e, field)}
+              />
+            </label>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const handleCompleteProfileUser = async () => {
     setIsLoadingCompleteProfile(true);
@@ -233,11 +274,6 @@ function FormCompleteProfile() {
       ibuKandung,
       negaraTujuanBekerja
     );
-    console.log({ suratKesehatan });
-    console.log({ foto });
-    console.log({ ktp });
-    console.log({ kk });
-    console.log({ ijazah });
 
     const formData = new FormData();
     formData.append("Nama", name);
@@ -258,12 +294,25 @@ function FormCompleteProfile() {
     formData.append("IbuKandung", ibuKandung);
     formData.append("Alamat", alamat);
     formData.append("NegaraTujuanBekerja", negaraTujuanBekerja);
-    formData.append("Fotos", foto);
-    formData.append("Ktps", ktp);
-    formData.append("KKs", kk);
-    formData.append("Ijazahs", ijazah);
-    formData.append("SuratKesehatans", suratKesehatan);
+    if (files.pasFoto) {
+      formData.append("Fotos", files.pasFoto);
+    }
 
+    if (files.ktp) {
+      formData.append("Ktps", files.ktp);
+    }
+
+    if (files.kk) {
+      formData.append("KKs", files.kk);
+    }
+
+    if (files.ijazah) {
+      formData.append("Ijazahs", files.ijazah);
+    }
+
+    if (files.suratKesehatan) {
+      formData.append("SuratKesehatans", files.suratKesehatan);
+    }
     try {
       const response = await axios.put(
         `${process.env.NEXT_PUBLIC_BASE_URL}/users/updateUsers`,
@@ -282,12 +331,7 @@ function FormCompleteProfile() {
         text: `Berhasil mengupdate data profile-mu!`,
       });
       setIsLoadingCompleteProfile(false);
-      if (Cookies.get("LastPath")) {
-        const path = Cookies.get("LastPath");
-        router.replace(path!);
-      } else {
-        router.push("/dashboard");
-      }
+      router.push("/dashboard");
     } catch (error) {
       console.error({ error });
       Toast.fire({
@@ -298,13 +342,17 @@ function FormCompleteProfile() {
     }
   };
 
-  const [formTab, setFormTab] = React.useState("FormDataUtamaUser");
   const [indexFormTab, setIndexFormTab] = React.useState(0);
 
   const [selectedStatus, setSelectedStatus] = React.useState<string>('')
+  const [isEditingPekerjaan, setIsEditingPekerjaan] = React.useState(false)
 
-  console.log({ indexFormTab });
-  console.log({ formTab });
+  React.useEffect(() => {
+    setTimeout(() => {
+      handleFetchingUserDetail();
+    }, 1000);
+  }, []);
+
 
   return (
     <section className="w-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-sky-900 to-blue-900 text-white shadow-custom mx-auto" id="explore">
@@ -351,7 +399,7 @@ function FormCompleteProfile() {
                   </h2>
                 )}
 
-                <p className="text-base text-grayUsual">
+                <p className="text-base text-gray-200">
                   {indexFormTab == 0 ? (
                     <span className="font-bold  leading-[100%] my-6 text-blue-400 ">
                       1
@@ -387,7 +435,7 @@ function FormCompleteProfile() {
                         className=" text-sm font-medium text-gray-200"
                         htmlFor="name"
                       >
-                        Nama Lengkap <span className="text-red-600">*</span>
+                        Nama Lengkap <span className="text-rose-600">*</span>
                       </label>
                       <input
                         id="name"
@@ -407,7 +455,7 @@ function FormCompleteProfile() {
                         className=" text-sm font-medium text-gray-200"
                         htmlFor="nik"
                       >
-                        NIK <span className="text-red-600">*</span>
+                        NIK <span className="text-rose-600">*</span>
                       </label>
                       <input
                         id="nik"
@@ -427,7 +475,7 @@ function FormCompleteProfile() {
                         className=" text-sm font-medium text-gray-200"
                         htmlFor="email"
                       >
-                        No Telpon <span className="text-red-600">*</span>
+                        No Telpon <span className="text-rose-600">*</span>
                       </label>
                       <input
                         id="phone_number"
@@ -447,7 +495,7 @@ function FormCompleteProfile() {
                         className=" text-sm font-medium text-gray-200"
                         htmlFor="email"
                       >
-                        Email <span className="text-red-600"></span>
+                        Email <span className="text-rose-600"></span>
                       </label>
                       <input
                         id="email"
@@ -457,6 +505,8 @@ function FormCompleteProfile() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                       />
+                      <p className="text-xs">*Email yang anda masukan BENAR dan masih AKTIF</p>
+
                     </div>
                   </div>
                   <div className="flex flex-wrap -mx-3 mb-1">
@@ -465,7 +515,7 @@ function FormCompleteProfile() {
                         className=" text-sm font-medium text-gray-200"
                         htmlFor="email"
                       >
-                        Tanggal Lahir <span className="text-red-600">*</span>
+                        Tanggal Lahir <span className="text-rose-600">*</span>
                       </label>
                       <input
                         id="phone number"
@@ -484,7 +534,7 @@ function FormCompleteProfile() {
                         className=" text-sm font-medium text-gray-200"
                         htmlFor="email"
                       >
-                        Tempat Lahir <span className="text-red-600">*</span>
+                        Tempat Lahir <span className="text-rose-600">*</span>
                       </label>
                       <input
                         id="tempat_lahir"
@@ -500,7 +550,7 @@ function FormCompleteProfile() {
                   <div className="flex flex-wrap -mx-3 mb-1">
                     <div className="w-full px-3">
                       <label className=" text-sm font-medium text-gray-200" htmlFor="jenisKelamin">
-                        Jenis Kelamin <span className="text-red-600">*</span>
+                        Jenis Kelamin <span className="text-rose-600">*</span>
                       </label>
                       <Select
                         value={jenisKelamin || undefined} // Ensure it's undefined if empty
@@ -520,7 +570,7 @@ function FormCompleteProfile() {
                   <div className="flex flex-wrap -mx-3 mb-1">
                     <div className="w-full px-3">
                       <label className=" text-sm font-medium text-gray-200" htmlFor="agama">
-                        Agama <span className="text-red-600">*</span>
+                        Agama <span className="text-rose-600">*</span>
                       </label>
                       <Select
                         value={agama || undefined} // Ensure it's undefined if empty
@@ -569,7 +619,7 @@ function FormCompleteProfile() {
                         className=" text-sm font-medium text-gray-200"
                         htmlFor="email"
                       >
-                        Status Menikah <span className="text-red-600">*</span>
+                        Status Menikah <span className="text-rose-600">*</span>
                       </label>
                       <Select
                         value={statusMenikah}
@@ -596,7 +646,7 @@ function FormCompleteProfile() {
                         htmlFor="email"
                       >
                         Pendidikan Terakhir{" "}
-                        <span className="text-red-600">*</span>
+                        <span className="text-rose-600">*</span>
                       </label>
                       <Select
                         value={pendidikanTerakhir}
@@ -643,7 +693,7 @@ function FormCompleteProfile() {
                         className=" text-sm font-medium text-gray-200"
                         htmlFor="email"
                       >
-                        Kewarganegaraan <span className="text-red-600">*</span>
+                        Kewarganegaraan <span className="text-rose-600">*</span>
                       </label>
                       <Select
                         value={kewarganegaraan}
@@ -669,7 +719,7 @@ function FormCompleteProfile() {
                         className=" text-sm font-medium text-gray-200"
                         htmlFor="email"
                       >
-                        Ibu Kandung <span className="text-red-600">*</span>
+                        Ibu Kandung <span className="text-rose-600">*</span>
                       </label>
                       <input
                         id="ibu_kandung"
@@ -709,10 +759,10 @@ function FormCompleteProfile() {
                         className=" text-sm font-medium text-gray-200"
                         htmlFor="email"
                       >
-                        Provinsi <span className="text-red-600">*</span>
+                        Provinsi <span className="text-rose-600">*</span>
                       </label>
                       {
-                        PROVINCES.length != 0 && <Select onValueChange={(value) => setProvinsi(value)}>
+                        PROVINCES.length != 0 && <Select value={provinsi} onValueChange={(value) => setProvinsi(value)}>
                           <SelectTrigger className="w-full text-base py-6">
                             <SelectValue placeholder="Pilih provinsi" />
                           </SelectTrigger>
@@ -734,10 +784,10 @@ function FormCompleteProfile() {
                         className=" text-sm font-medium text-gray-200"
                         htmlFor="email"
                       >
-                        Kabupaten/Kota <span className="text-red-600">*</span>
+                        Kabupaten/Kota <span className="text-rose-600">*</span>
                       </label>
                       {
-                        KABUPATENS.length != 0 && <Select onValueChange={(value) => setKabupaten(value)}>
+                        KABUPATENS.length != 0 && <Select value={kabupaten} onValueChange={(value) => setKabupaten(value)}>
                           <SelectTrigger className="w-full text-base py-6">
                             <SelectValue placeholder="Pilih kabupaten/kota" />
                           </SelectTrigger>
@@ -752,30 +802,6 @@ function FormCompleteProfile() {
                       }
                     </div>
                   </div>
-                  {/* <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label
-                        className=" text-sm font-medium text-gray-200"
-                        htmlFor="email"
-                      >
-                        Kecamatan <span className="text-red-600">*</span>
-                      </label>
-                      {
-                        districts.length != 0 && <Select>
-                          <SelectTrigger className="w-full text-base py-6">
-                            <SelectValue placeholder="Pilih kecamatan" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {
-                              districts.map((district, i) => (
-                                <SelectItem key={i} value={district.name}>{district.name}</SelectItem>
-                              ))
-                            }
-                          </SelectContent>
-                        </Select>
-                      }
-                    </div>
-                  </div> */}
 
                   <div className="flex flex-wrap -mx-3 mb-1">
                     <div className="w-full px-3">
@@ -783,7 +809,7 @@ function FormCompleteProfile() {
                         className=" text-sm font-medium text-gray-200"
                         htmlFor="email"
                       >
-                        Alamat Domisili <span className="text-red-600">*</span>
+                        Alamat Domisili <span className="text-rose-600">*</span>
                       </label>
                       <textarea
                         id="phone number"
@@ -804,7 +830,7 @@ function FormCompleteProfile() {
                         className=" text-sm font-medium text-gray-200"
                         htmlFor="email"
                       >
-                        Status <span className="text-red-600">*</span>
+                        Status <span className="text-rose-600">*</span>
                       </label>
                       <Select onValueChange={(value) => setSelectedStatus(value)}>
                         <SelectTrigger className="w-full text-base py-6">
@@ -824,26 +850,90 @@ function FormCompleteProfile() {
                       <div className="flex flex-wrap -mx-3 mb-1">
                         <div className="w-full px-3">
                           <label
-                            className=" text-sm font-medium text-gray-200"
-                            htmlFor="email"
+                            className="text-sm font-medium text-gray-200"
+                            htmlFor="pekerjaan"
                           >
                             Pekerjaan
-                            <span className="text-red-600">*</span> <br />
-                            <span className="text-gray-500">
-                              Jika tidak ada isi (-)
+                            <span className="text-rose-600">*</span> <br />
+                            <span className="text-gray-200">
+                              Jika tidak ada pilih <strong>Other</strong> lalu isi dengan tanda (-)
                             </span>
                           </label>
-                          <input
-                            id="phone number"
-                            type="text"
-                            value={pekerjaan}
-                            onChange={(e) => setPekerjaan(e.target.value)}
-                            className="w-full rounded-xl px-4 py-2 bg-white/10 border border-white/20 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            placeholder="Masukkan Nama Perusahaan/Tempat Kerja"
-                            required
-                          />
+
+                          {/* Kondisi: kalau sudah ada pekerjaan dan belum klik edit → tampilkan readonly */}
+                          {pekerjaan && !isEditingPekerjaan ? (
+                            <div className="mt-2 flex items-center justify-between bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-4 py-2 text-gray-200">
+                              <span>{pekerjaan}</span>
+                              <button
+                                type="button"
+                                onClick={() => setIsEditingPekerjaan(true)}
+                                className="text-blue-400 hover:underline text-sm"
+                              >
+                                Edit
+                              </button>
+                            </div>
+                          ) : (
+                            <>
+                              {/* Kalau pekerjaan kosong atau user klik edit → tampilkan select */}
+                              <select
+                                id="pekerjaan"
+                                value={pekerjaan}
+                                onChange={(e) => setPekerjaan(e.target.value)}
+                                className="w-full mt-2 rounded-xl px-4 py-2 bg-white/10 
+                     backdrop-blur-md border border-white/20 
+                     text-gray-200 focus:outline-none focus:ring-2 
+                     focus:ring-blue-400 cursor-pointer"
+                                required
+                              >
+                                <option value="">-- Pilih Pekerjaan --</option>
+                                <option value="Pengolah Ikan">Pengolah Ikan</option>
+                                <option value="Pemasar Ikan">Pemasar Ikan</option>
+                                <option value="Nelayan">Nelayan</option>
+                                <option value="Pembudidaya Ikan">Pembudidaya Ikan</option>
+                                <option value="Petambak Garam">Petambak Garam</option>
+                                <option value="Kelompok Masyarakat Pengawas (POKMASWAS)">
+                                  Kelompok Masyarakat Pengawas (POKMASWAS)
+                                </option>
+                                <option value="Ibu Rumah Tangga">Ibu Rumah Tangga</option>
+                                <option value="Wiraswasta/Wirausaha">Wiraswasta/Wirausaha</option>
+                                <option value="Pencari Kerja / Belum Bekerja">
+                                  Pencari Kerja / Belum Bekerja
+                                </option>
+                                <option value="Penyuluh Perikanan PNS">Penyuluh Perikanan PNS</option>
+                                <option value="Penyuluh Perikanan Bantu">Penyuluh Perikanan Bantu</option>
+                                <option value="ASN">ASN</option>
+                                <option value="TNI/Polri">TNI/Polri</option>
+                                <option value="Mahasiswa/Pelajar">Mahasiswa/Pelajar</option>
+                                <option value="Karyawan Swasta">Karyawan Swasta</option>
+                                <option value="Pegawai Honorer/Karyawan Kontrak">
+                                  Pegawai Honorer/Karyawan Kontrak
+                                </option>
+                                <option value="Tenaga Pendidik (Guru/Dosen)">
+                                  Tenaga Pendidik (Guru/Dosen)
+                                </option>
+                                <option value="Tenaga Medis (Dokter/Perawat/Bidan)">
+                                  Tenaga Medis (Dokter/Perawat/Bidan)
+                                </option>
+                                <option value="Buruh (Buruh lepas)">Buruh (Buruh lepas)</option>
+                                <option value="P3K">P3K</option>
+                                <option value="Other">Other</option>
+                              </select>
+
+                              {/* Kalau pilih "Other" → input manual */}
+                              {pekerjaan === "Other" && (
+                                <input
+                                  type="text"
+                                  value={pekerjaan}
+                                  placeholder="Masukkan pekerjaan lain..."
+                                  className="mt-2 w-full rounded-xl px-4 py-2 bg-white/10 border border-white/20 text-gray-200 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                  onChange={(e) => setPekerjaan(e.target.value)}
+                                />
+                              )}
+                            </>
+                          )}
                         </div>
                       </div>
+
 
                     </> : selectedStatus == 'Taruna Satuan Pendidikan KP' ? <>
                       <div className="flex flex-wrap -mx-3 mb-1">
@@ -853,7 +943,7 @@ function FormCompleteProfile() {
                             htmlFor="email"
                           >
                             Asal Satuan Pendidikan
-                            <span className="text-red-600">*</span> <br />
+                            <span className="text-rose-600">*</span> <br />
                             <span className="text-gray-500">
                               Jika tidak ada isi (-)
                             </span>
@@ -876,110 +966,24 @@ function FormCompleteProfile() {
                           </Select>
                         </div>
                       </div>
-                      {/* <div className="flex flex-wrap -mx-3 mb-1">
-    <div className="w-full px-3">
-      <label
-        className=" text-sm font-medium text-gray-200"
-        htmlFor="email"
-      >
-        Jurusan/Program Studi{" "}
-        <span className="text-red-600">*</span> <br />
-        <span className="text-gray-500">
-          Jika tidak ada isi (-)
-        </span>
-      </label>
-      <input
-        id="phone number"
-        type="text"
-      className="w-full rounded-xl px-4 py-2 bg-white/10 border border-white/20 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        placeholder="Masukkan Nama Perusahaan/Tempat Kerja"
-        required
-      />
-    </div>
-  </div> */}
+
 
                     </> : <></>
                   }
 
                 </div>
                 <div className={`${indexFormTab == 3 ? "block" : "hidden"}`}>
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3 ">
-                      <label className=" text-sm font-medium text-gray-200" htmlFor="email">
-                        File Surat Kesehatan
-                        <br />
-                        <span className="text-gray-600">
-                          Anda wajib mengisi dokumen ini karena mempunya surat kesehatan
-                        </span>
-                      </label>
-                      <input
-                        type="file"
-                        className=" text-black h-10 text-base flex items-center cursor-pointer w-full border border-neutral-200 rounded-md"
-                        required
-                        onChange={handleSuratKesehatanChange}
-                      />
-                    </div>
+                  <div className="flex flex-wrap -mx-3">
+                    {renderInput("File Surat Kesehatan (Opsional)", "suratKesehatan")}
+                    {renderInput("Pas Foto (Wajib)", "pasFoto", true)}
+                    {renderInput("File KTP (Wajib)", "ktp", true)}
+                    {renderInput("File Kartu Keluarga (Opsional)", "kk")}
+                    {renderInput("Ijazah (Opsional)", "ijazah")}
                   </div>
 
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3 ">
-                      <label className=" text-sm font-medium text-gray-200" htmlFor="email">
-                        Pas Foto
-                      </label>
-                      <input
-                        type="file"
-                        className=" text-black h-10 text-base flex items-center cursor-pointer w-full border border-neutral-200 rounded-md"
-                        required
-                        onChange={handleFotoChange}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3 ">
-                      <label className=" text-sm font-medium text-gray-200" htmlFor="email">
-                        File KTP
-                      </label>
-                      <input
-                        type="file"
-                        className=" text-black h-10 text-base flex items-center cursor-pointer w-full border border-neutral-200 rounded-md"
-                        required
-                        onChange={handleKtpChange}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label className=" text-sm font-medium text-gray-200" htmlFor="email">
-                        File Kartu Keluarga
-                      </label>
-                      <input
-                        type="file"
-                        className=" text-black h-10 text-base flex items-center cursor-pointer w-full border border-neutral-200 rounded-md"
-                        required
-                        onChange={handleKkChange}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3 ">
-                      <label className=" text-sm font-medium text-gray-200" htmlFor="email">
-                        Ijazah
-                      </label>
-                      <input
-                        type="file"
-                        className=" text-black h-10 text-base flex items-center cursor-pointer w-full border border-neutral-200 rounded-md"
-                        required
-                        onChange={handleIjazahChange}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="text-sm text-gray-800 text-left mt-3">
+                  <div className="text-sm text-gray-200 text-left mt-3">
                     Demi alasan keamanan maka Anda wajib mengisi foto/file
-                    <span className="underline text-blue-500 font-medium"> KTP, KK, Akta, Ijazah</span> untuk memvalidasi kepemilikan KTP.
+                    <span className="underline text-blue-500 font-medium"> dan KTP</span> untuk memvalidasi kepemilikan data peserta.
                   </div>
 
 
@@ -1003,7 +1007,7 @@ function FormCompleteProfile() {
                   >
                     <button
                       type="submit"
-                      onClick={(e) => setIndexFormTab(indexFormTab + 1)}
+                      onClick={(e) => { setIndexFormTab(indexFormTab + 1); scrollToTop() }}
                       className="btn text-white bg-blue-500 hover:bg-blue-600 w-full"
                     >
                       Selanjutnya

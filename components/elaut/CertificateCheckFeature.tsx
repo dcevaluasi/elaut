@@ -39,7 +39,7 @@ const CertificateCheckFeature = () => {
             link: null,
             steps: [
                 "Klik layanan cek sertifikat di E-LAUT",
-                "Masukkan nomor registrasi sobat E-LAUT jika mengikuti pelatihan",
+                "Masukkan nomor STTPL sobat E-LAUT jika mengikuti pelatihan",
                 "Apabila kamu lulus pelatihan, maka nomor registrasi yang kamu masukkan dan sudah terbit sertifikatnya akan muncul data validitas keikutsertaan-mu dan validitas sertifikat-mu",
             ],
         },
@@ -114,7 +114,7 @@ const CertificateCheckFeature = () => {
     };
 
     return (
-        <section className="flex flex-col h-[80vh] w-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-sky-900 to-blue-900 text-white items-center justify-center">
+        <section className="flex flex-col h-full md:h-[80vh] w-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-sky-900 to-blue-900 text-white items-center justify-center pt-20 md:pt-0">
             <div className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-blue-500/40 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-cyan-400/20 blur-3xl" />
             <div className="pointer-events-none absolute top-1/3 -right-16 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
@@ -129,12 +129,12 @@ const CertificateCheckFeature = () => {
                             <div className="flex flex-col md:flex-row gap-6 w-full items-center justify-center p-5 md:p-0 text-white h-full">
                                 {/* Title & Description */}
                                 <div className="flex flex-col space-y-3 text-center md:text-left">
-                                    <h1 className="text-[3rem] md:text-[3.6rem] font-calsans leading-none drop-shadow-lg">
+                                    <h1 className="text-3xl md:text-[3.6rem] font-calsans leading-none drop-shadow-lg">
                                         Cek    <span className="font-calsans bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400 -mt-5">
                                             E-Validitas
                                         </span> Sertifikat
                                     </h1>
-                                    <p className="text-gray-200">
+                                    <p className="text-gray-200 text-sm md:text-base">
                                         Ayo cek dan lihat kevalidan sertifikat-mu dan keikutsertaanmu dalam
                                         pelatihan yang diselenggarakan oleh Balai Pelatihan KP atau Pusat
                                         Pelatihan KP di layanan ini!
@@ -345,7 +345,7 @@ const CertificateCheckFeature = () => {
                                         <div className="flex flex-col gap-3 w-full mt-3">
                                             <div className="w-full">
                                                 <label className="block text-sm font-medium text-gray-300 mb-1">
-                                                    No Peserta <span className="text-red-400">*</span>
+                                                    No STTPL <span className="text-red-400">*</span>
                                                 </label>
                                                 <input
                                                     id="noPeserta"
@@ -353,7 +353,7 @@ const CertificateCheckFeature = () => {
                                                     value={noRegistrasi}
                                                     onChange={(e) => setNoRegistrasi(e.target.value)}
                                                     className="form-input w-full rounded-lg border border-white/30 bg-white/10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                                    placeholder="Masukkan nomor peserta..."
+                                                    placeholder="Masukkan nomor STTPL..."
                                                 />
                                             </div>
                                         </div>

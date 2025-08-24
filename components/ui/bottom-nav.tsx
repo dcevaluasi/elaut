@@ -124,7 +124,7 @@ const BottomNavigation = () => {
                     <div
                         ref={dropdownRef}
                         className={`absolute bottom-16 right-0 min-w-[240px] rounded-2xl 
-              bg-white/10 backdrop-blur-xl shadow-lg border border-white/20  
+              bg-white/10 backdrop-blur-2xl shadow-lg border border-white/20  
               transition-all duration-300 ${dropdownOpen
                                 ? "opacity-100 visible translate-y-0"
                                 : "opacity-0 invisible translate-y-2"
@@ -132,18 +132,18 @@ const BottomNavigation = () => {
                     >
                         <ul className="flex flex-col divide-y divide-white/10">
                             <li className="p-5 text-center">
-                                <p className="font-semibold text-white">
-                                    {isLoggedIn ? "Welcome" : "Haloo Sobat E-LAUT!"}
+                                <p className="font-semibold text-white leading-none text-sm">
+                                    {isLoggedIn ? "Selamat Datang!" : "Haloo Sobat E-LAUT!"}
                                 </p>
                                 {isLoggedIn && (
-                                    <span className="text-sm text-gray-300 leading-none">{userDetail?.Nama}</span>
+                                    <span className="text-sm font-bold text-gray-300 leading-none">{userDetail?.Nama}</span>
                                 )}
                             </li>
 
                             {isLoggedIn && <>  <li>
                                 <Link
                                     href="/dashboard"
-                                    className="flex items-center gap-3 px-5 py-3 text-white/80 hover:text-white hover:bg-white/10 transition rounded-xl"
+                                    className="flex items-center font-semibold gap-3 px-5 py-3 text-white/80 hover:text-white hover:bg-white/10 transition rounded-xl"
                                 >
                                     <FiGrid className="text-lg" />
                                     Dashboard
@@ -152,7 +152,7 @@ const BottomNavigation = () => {
                                 <li>
                                     <Link
                                         href="/dashboard/edit-profile"
-                                        className="flex items-center gap-3 px-5 py-3 text-white/80 hover:text-white hover:bg-white/10 transition rounded-xl"
+                                        className="flex items-center gap-3 px-5 py-3 font-semibold text-white/80 hover:text-white hover:bg-white/10 transition rounded-xl"
                                     >
                                         <FiSettings className="text-lg" />
                                         Edit Profile
@@ -164,13 +164,13 @@ const BottomNavigation = () => {
                         {isLoggedIn ?
                             <button
                                 onClick={handleLogOut}
-                                className="w-full flex items-center gap-3 px-5 py-4 text-blue-500 hover:text-red-400 hover:bg-red-500/10 transition rounded-b-2xl"
+                                className="w-full flex items-center gap-3 font-semibold px-5 py-4 text-white hover:text-red-400 hover:bg-red-500/10 transition rounded-b-2xl"
                             >
                                 <FiLogOut className="text-lg" />
                                 Log Out
                             </button> : <button
                                 onClick={() => router.push('/login')}
-                                className="w-full flex items-center gap-3 px-5 py-4 text-blue-500 hover:text-red-400 hover:bg-red-500/10 transition rounded-b-2xl"
+                                className="w-full flex items-center gap-3 px-5 py-4 font-semibold text-white hover:text-red-400 hover:bg-red-500/10 transition rounded-b-2xl"
                             >
                                 <FiLogOut className="text-lg" />
                                 Log In
