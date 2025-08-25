@@ -659,26 +659,31 @@ const SertifikatNonKepelautan = React.forwardRef(
                 </div>
 
                 {
-                  peserta?.Foto == 'https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/' ? <></> : <img
-                    src={peserta?.Foto || ""}
-                    width={190}
-                    height={240}
-                    alt=""
+                  peserta?.Foto == 'https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/' ? <></> : <div
                     style={{
                       width: "135px",
                       height: "195px",
-                      objectFit: "cover",
                       position: "absolute",
                       bottom: "-75px",
                       right: "100px",
-                      borderWidth: '1px',
-                      borderRadius: '15px',
-                      borderColor: '#9f9f9f',
-                      marginTop: "1rem",
-                      padding: '3px',
+                      border: "1px solid #9f9f9f",
+                      borderRadius: "15px",
+                      overflow: "hidden",   // <- This is the key!
+                      padding: "3px",
                       zIndex: -10,
                     }}
-                  />
+                  >
+                    <img
+                      src={peserta?.Foto || ""}
+                      alt=""
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  </div>
+
                 }
               </div>
               <div className={`pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center ${pelatihan?.MateriPelatihan.length < 7 ? 'mt-72' : 'mt-48'} break-before-auto relative`}>
