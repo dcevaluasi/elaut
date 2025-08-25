@@ -43,7 +43,7 @@ import { DESC_CERTIFICATE_COMPETENCE_FISHERIES } from "@/constants/serkom";
 import { ESELON1, ESELON2, ESELON_1, ESELON_2, KA_BPPSDM, KA_PUSLAT_KP } from "@/constants/nomenclatures";
 import html2canvas from "html2canvas";
 import { calculateTotalHoursCertificateBPPP } from "@/lib/utils";
-import { generatedDescriptionCertificate } from "@/utils/certificates";
+import { generatedCurriculumCertificate, generatedDescriptionCertificate } from "@/utils/certificates";
 
 const html2pdf = dynamic(() => import("html2pdf.js"), { ssr: false });
 
@@ -601,10 +601,14 @@ const SertifikatNonKepelautan = React.forwardRef(
 
                   <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-1 mb-2">
                     <h1 className="font-bosBold font-black text-2xl leading-none">
-                      TELAH MENGIKUTI
+                      {
+                        userPelatihan?.IsActice === 'LULUS' ? ' TELAH LULUS' : 'TELAH MENGIKUTI'
+                      }
                     </h1>
                     <h3 className="font-bosNormal font-bold text-lg italic">
-                      Has Attended
+                      {
+                        userPelatihan?.IsActice === 'LULUS' ? ' Has Passed' : 'Has Attended'
+                      }
                     </h3>
                   </div>
 
@@ -661,17 +665,17 @@ const SertifikatNonKepelautan = React.forwardRef(
                     height={240}
                     alt=""
                     style={{
-                      width: "145px",
-                      height: "205px",
+                      width: "135px",
+                      height: "195px",
                       objectFit: "cover",
                       position: "absolute",
-                      bottom: "-70px",
+                      bottom: "-75px",
                       right: "100px",
-                      borderWidth: '0px',
-                      borderRadius: '20px',
-                      borderColor: '#fff',
+                      borderWidth: '1px',
+                      borderRadius: '15px',
+                      borderColor: '#9f9f9f',
                       marginTop: "1rem",
-
+                      padding: '3px',
                       zIndex: -10,
                     }}
                   />
@@ -684,6 +688,9 @@ const SertifikatNonKepelautan = React.forwardRef(
                       <p className="font-bosBold text-2xl max-w-4xl w-full uppercase leading-none">
                         Materi {pelatihan?.NamaPelatihan}, tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
                       </p>
+                      {
+                        (pelatihan?.NamaPelathanInggris != "") && <p className="font-bos text-xl max-w-4xl leading-none -mt-2">{pelatihan?.NamaPelathanInggris}, {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}</p>
+                      }
                     </div>
                   </div>
                 </div>
@@ -693,13 +700,22 @@ const SertifikatNonKepelautan = React.forwardRef(
                     <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 leading-none relative"><span className='absolute mt-10 right-0 left-0 !font-bosBold text-lg'>NO</span></div>
                     <div className="w-7/12 px-1 flex flex-col justify-center items-center border-r border-gray-400 relative">
                       <div className="flex flex-row items-center justify-center absolute mt-10">
-                        <span className="text-lg leading-none !font-bosBold">MATERI</span>
+                        <span className="text-lg leading-none !font-bosBold">MATERI</span>/
+                        <span className="italic font-bos leading-none">COURSE</span>
                       </div>
                     </div>
                     <div className="w-4/12 px-1 flex items-center justify-center border-b border-gray-400">
-                      <div className="flex flex-row  items-center justify-center mb-4">
-                        <span className="text-lg leading-none !font-bosBold">ALOKASI WAKTU @45 MENIT</span>
+                      <div className="flex flex-col mb-3">
+                        <div className="flex flex-row  items-center justify-center">
+                          <span className="text-lg leading-none !font-bosBold">ALOKASI WAKTU </span>/
+                          <span className="italic font-bos leading-none">ALLOCATION TIME</span>
+                        </div>
+                        <div className="flex flex-row  items-center justify-center -mt-1">
+                          <span className="text-lg leading-none !font-bosBold">@45 MENIT</span>/
+                          <span className="italic font-bos leading-none">@45 MINS</span>
+                        </div>
                       </div>
+
                     </div>
                   </div>
 
@@ -709,12 +725,14 @@ const SertifikatNonKepelautan = React.forwardRef(
                     <div className="w-7/12 px-1 border-r border-gray-400"></div>
                     <div className="w-2/12 px-1 border-r border-gray-400">
                       <div className="flex flex-row items-center justify-center mb-4">
-                        <span className="text-lg leading-none !font-bosBold">TEORI</span>
+                        <span className="text-lg leading-none !font-bosBold">TEORI</span>/
+                        <span className="italic font-bos leading-none">THEORY</span>
                       </div>
                     </div>
                     <div className="w-2/12 px-1 py-1">
                       <div className="flex flex-row items-center justify-center mb-4">
-                        <span className="text-lg leading-none !font-bosBold">PRAKTEK</span>
+                        <span className="text-lg leading-none !font-bosBold">PRAKTEK</span>/
+                        <span className="italic font-bos leading-none">PRACTICE</span>
                       </div>
                     </div>
                   </div>
@@ -726,7 +744,9 @@ const SertifikatNonKepelautan = React.forwardRef(
                         <div className="w-1/12 px-1 !font-bosBold  text-center border-r border-gray-400">I</div>
                         <div className="w-9/12 px-1 font-bosNormal font-bold ">
                           <div className="flex flex-row items-center mb-3">
-                            <span className="text-base leading-none !font-bosBold">KOMPETENSI UMUM</span>
+                            <span className="text-base leading-none !font-bosBold">KOMPETENSI UMUM</span>/
+                            <span className="italic font-bos leading-none">General Competency</span>
+
                           </div>
                         </div>
                         <div className="w-1/12 px-1 "></div>
@@ -742,7 +762,10 @@ const SertifikatNonKepelautan = React.forwardRef(
                           <div className="w-1/12 px-1 text-center border-r border-gray-300">{index + 1}.</div>
                           <div className="w-7/12 px-1 border-r border-gray-300">
                             <div className="flex flex-col justify-center mb-3">
-                              <span className="text-base !font-bosNormal not-italic font-normal leading-none">{materi.NamaMateri}</span>
+                              <span className="text-lg !font-bosNormal not-italic font-normal leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_indo}</span>
+                              {
+                                generatedCurriculumCertificate(materi.NamaMateri).curr_eng != "" && <span className="italic font-bosItalic leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_eng}</span>
+                              }
                             </div>
                           </div>
                           <div className="w-2/12 px-1 text-center font-bosNormal border-r border-gray-300">{materi.JamTeory}</div>
@@ -755,7 +778,9 @@ const SertifikatNonKepelautan = React.forwardRef(
                         <div className="w-1/12 px-1 !font-bosBold text-center border-r border-gray-400">II</div>
                         <div className="w-9/12 px-1 font-bosNormal font-bold ">
                           <div className="flex flex-row items-center mb-3">
-                            <span className="text-base leading-none !font-bosBold">KOMPETENSI INTI</span>
+                            <span className="text-base leading-none !font-bosBold">KOMPETENSI INTI</span>/
+                            <span className="italic font-bos leading-none">Core Competency</span>
+
                           </div>
                         </div>
                         <div className="w-1/12 px-1 "></div>
@@ -771,7 +796,10 @@ const SertifikatNonKepelautan = React.forwardRef(
                           <div className="w-1/12 px-1 text-center border-r border-gray-300">{index + 1}.</div>
                           <div className="w-7/12 px-1 border-r border-gray-300">
                             <div className="flex flex-col justify-center mb-3">
-                              <span className="text-base !font-bosNormal not-italic font-normal leading-none">{materi.NamaMateri}</span>
+                              <span className="text-lg !font-bosNormal not-italic font-normal leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_indo}</span>
+                              {
+                                generatedCurriculumCertificate(materi.NamaMateri).curr_eng != "" && <span className="italic font-bosItalic leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_eng}</span>
+                              }
                             </div>
                           </div>
                           <div className="w-2/12 px-1 mb-3 text-center font-bosNormal border-r border-gray-300">{materi.JamTeory}</div>
@@ -789,7 +817,10 @@ const SertifikatNonKepelautan = React.forwardRef(
                           <div className="w-1/12 px-1 text-lg text-center border-r border-gray-300">{index + 1}.</div>
                           <div className="w-7/12 px-1 border-r border-gray-300">
                             <div className="flex flex-col justify-center mb-3">
-                              <span className="text-lg !font-bosNormal not-italic font-normal leading-none">{materi.NamaMateri}</span>
+                              <span className="text-lg !font-bosNormal not-italic font-normal leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_indo}</span>
+                              {
+                                generatedCurriculumCertificate(materi.NamaMateri).curr_eng != "" && <span className="italic font-bosItalic leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_eng}</span>
+                              }
                             </div>
                           </div>
                           <div className="w-2/12 px-1 mb-3 text-lg text-center font-bosNormal border-r border-gray-300">{materi.JamTeory}</div>
@@ -804,7 +835,8 @@ const SertifikatNonKepelautan = React.forwardRef(
                     <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-300"></div>
                     <div className="w-7/12 px-1 border-r border-gray-300">
                       <div className="flex flex-row items-center mb-3">
-                        <span className="text-lg leading-none !font-bosBold">JUMLAH JAM PELAJARAN</span>
+                        <span className="text-lg leading-none !font-bosBold">JUMLAH JAM PELAJARAN</span>/
+                        <span className="italic font-bos leading-none">Training Hours</span>
                       </div>
                     </div>
                     <div className="w-2/12 text-lg px-1 mb-3 text-center">{totalHoursCertificateLvl2.totalTheory}</div>
@@ -816,7 +848,8 @@ const SertifikatNonKepelautan = React.forwardRef(
                     <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-300"></div>
                     <div className="w-7/12 px-1 border-r border-gray-300">
                       <div className="flex flex-row items-center mb-3">
-                        <span className="text-text-lg leading-none !font-bosBold">TOTAL JAM PELAJARAN</span>
+                        <span className="text-lg leading-none !font-bosBold">TOTAL JAM PELAJARAN</span>/
+                        <span className="italic font-bos leading-none">Total Hours</span>
                       </div>
                     </div>
                     <div className="w-4/12 px-1 text-lg mb-3 text-center flex items-center justify-center">{totalHoursCertificateLvl2.totalTheory + totalHoursCertificateLvl2.totalPractice}</div>
