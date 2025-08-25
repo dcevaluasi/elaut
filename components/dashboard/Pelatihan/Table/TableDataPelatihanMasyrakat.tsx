@@ -185,7 +185,7 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
 
                                     {/* Action Buttons */}
                                     <td className="px-4 py-3 flex flex-col gap-2 justify-center items-center h-fit">
-                                        {(Cookies.get('Access')?.includes('isSigning') && pelatihan!.PemberitahuanDiterima == 'Pengajuan Telah Dikirim ke Ka BPPSDM KP') &&
+                                        {(Cookies.get('Access')?.includes('isSigning') && pelatihan!.PemberitahuanDiterima.includes('Pengajuan Telah Dikirim ke Ka')) &&
                                             <TTDSertifikat dataPelatihan={pelatihan!} handleFetchData={fetchDataPelatihanMasyarakat} />
                                         }
                                         {Cookies.get('Access')?.includes('isSigning') &&
