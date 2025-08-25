@@ -95,7 +95,7 @@ const TTDSertifikat = ({ dataPelatihan, handleFetchData }: { dataPelatihan: Pela
           });
           handleAddHistoryTrainingInExisting(dataPelatihan!, 'Telah menyetujui permohonan penerbitan dan menandatangani sertifikat secara elektronik', Cookies.get('Jabatan'), Cookies.get('Jabatan') === 'Kepala Pusat Pelatihan Kelautan dan Perikanan' ? 'Pusat Pelatihan Kelatuan dan Perikanan' : 'BPPSDM KP')
 
-          handleUpdateStatusPenerbitan();
+          handleUpdateStatusPenerbitan(passphrase);
           setPassphrase("");
         } else {
           console.error("Failed to upload the file");
@@ -124,9 +124,10 @@ const TTDSertifikat = ({ dataPelatihan, handleFetchData }: { dataPelatihan: Pela
   //   handleFetchData();
   // }, [dataPelatihan.IdPelatihan]);
 
-  const handleUpdateStatusPenerbitan = async () => {
+  const handleUpdateStatusPenerbitan = async (passphrase: string) => {
     const formData = new FormData();
     formData.append("StatusPenerbitan", "Done");
+    formData.append("AsalSertifikat", passphrase);
     formData.append("PenerbitanSertifikatDiterima", generateDate());
     if (isEselonI) {
       formData.append('PemberitahuanDiterima', 'Telah Ditandatangani Ka BPPSDM KP')
