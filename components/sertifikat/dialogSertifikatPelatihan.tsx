@@ -618,7 +618,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                       </span>
                     </div>
 
-                    <div className="flex gap-2 items-center justify-center -mt-2">
+                    <div className="flex gap-2 items-center justify-center mt-2">
                       <div className="flex flex-col  space-y-0 font-bos text-center items-center justify-center">
                         <div className="flex w-full flex-col  space-y-0 items-center mt-2 text-center justify-center">
                           <span className="font-bosNormal text-base leading-[105%] w-full flex items-center gap-1">
@@ -678,7 +678,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                 }
               </div>
               <div className={`pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center ${pelatihan?.MateriPelatihan.length < 7 ? 'mt-72' : 'mt-48'} break-before-auto relative`}>
-                <div className="flex flex-row justify-center items-center">
+                <div className="flex flex-row justify-center items-center mb-6">
                   <div className="flex flex-row gap-2 items-center h-fit">
                     <div className="flex flex-col text-center space-y-0 h-fit items-center justify-center w-full gap-0">
                       <p className="font-bosBold text-2xl max-w-4xl w-full uppercase leading-none">
@@ -691,7 +691,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                   {/* Header Baris 1 */}
                   <div className="flex text-center font-bosNormal font-bold bg-gray-100 ">
                     <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 leading-none relative"><span className='absolute mt-10 right-0 left-0 !font-bosBold text-lg'>NO</span></div>
-                    <div className="w-7/12 px-1 flex flex-col justify-center items-start border-r border-gray-400 relative">
+                    <div className="w-7/12 px-1 flex flex-col justify-center items-center border-r border-gray-400 relative">
                       <div className="flex flex-row items-center justify-center absolute mt-10">
                         <span className="text-lg leading-none !font-bosBold">MATERI</span>
                       </div>
