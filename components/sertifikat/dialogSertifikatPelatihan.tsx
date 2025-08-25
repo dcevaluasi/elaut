@@ -768,8 +768,8 @@ const SertifikatNonKepelautan = React.forwardRef(
                               }
                             </div>
                           </div>
-                          <div className="w-2/12 px-1 text-center font-bosNormal border-r border-gray-300">{materi.JamTeory}</div>
-                          <div className="w-2/12 px-1 text-center font-bosNormal">{materi.JamPraktek}</div>
+                          <div className="w-2/12 px-1 text-center font-bosNormal text-lg border-r border-gray-300">{materi.JamTeory}</div>
+                          <div className="w-2/12 px-1 text-center font-bosNormal text-lg">{materi.JamPraktek}</div>
                         </div>
                       ))}
 
@@ -802,8 +802,8 @@ const SertifikatNonKepelautan = React.forwardRef(
                               }
                             </div>
                           </div>
-                          <div className="w-2/12 px-1 mb-3 text-center font-bosNormal border-r border-gray-300">{materi.JamTeory}</div>
-                          <div className="w-2/12 px-1 mb-3 text-center font-bosNormal">{materi.JamPraktek}</div>
+                          <div className="w-2/12 px-1 mb-3 text-center text-lg font-bosNormal border-r border-gray-300">{materi.JamTeory}</div>
+                          <div className="w-2/12 px-1 mb-3 text-center text-lg font-bosNormal">{materi.JamPraktek}</div>
                         </div>
                       ))}</> : <>  {/* Kompetensi Inti Title */}
 
