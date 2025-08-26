@@ -70,14 +70,21 @@ const SertifikatNonKepelautan = React.forwardRef(
     const handleFetchDetailPeserta = async () => {
       try {
         const response = await axios.get(
-          `${elautBaseUrl}/users/getUsersByIdNoJwt?id=${userPelatihan!.IdUsers}`
+          `${elautBaseUrl}/users/getUsersByIdNoJwt?id=${userPelatihan!.IdUsers}`,
+          {
+            headers: {
+              "x-api-key": "EL@uTs3rv3R",
+            },
+          }
         );
+
         setPeserta(response.data);
         console.log({ response });
       } catch (error) {
         console.error("LEMDIK INFO: ", error);
       }
     };
+
 
     const calculateTotalHours = (data: any) => {
       let totalTheory = 0;
@@ -477,7 +484,7 @@ const SertifikatNonKepelautan = React.forwardRef(
 
           {pelatihan?.TtdSertifikat == ESELON2 &&
             <>
-              <div ref={refPage} className={`pdf-page w-full flex flex-col  gap-4 relative  items-center justify-center ${userPelatihan!.IsActice == "SEBAGAI" ? "h-[52rem] mb-20" : "h-[49.63rem]"}`}>
+              <div ref={refPage} className={`pdf-page w-full flex flex-col  gap-4 relative  items-center justify-center ${userPelatihan!.IsActice.includes("SEBAGAI") ? "h-[86rem] pb-48" : "h-[49.63rem]"}`}>
                 <div className="flex flex-row  absolute top-0 right-0">
                   <p className="text-lg font-bosNormal">
                     No. STTPL : {userPelatihan?.NoRegistrasi}
@@ -895,8 +902,14 @@ const SertifikatKepelautan = React.forwardRef(
     const handleFetchDetailPeserta = async () => {
       try {
         const response = await axios.get(
-          `${elautBaseUrl}/users/getUsersByIdNoJwt?id=${userPelatihan!.IdUsers}`
+          `${elautBaseUrl}/users/getUsersByIdNoJwt?id=${userPelatihan!.IdUsers}`,
+          {
+            headers: {
+              "x-api-key": "EL@uTs3rv3R",
+            },
+          }
         );
+
         setPeserta(response.data);
         console.log({ response });
       } catch (error) {

@@ -250,19 +250,6 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                             Review
                                         </Link>}
 
-                                        {
-                                            Cookies.get('Access')?.includes('isSigning') && <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="inline-flex w-full items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
-             rounded-lg border border-neutral-300 bg-white text-neutral-700 
-             hover:bg-neutral-100 hover:text-neutral-900 transition-colors 
-             shadow-sm"
-                                                onClick={() => setSelectedPelatihan(pelatihan)}
-                                            >
-                                                <RiInformationFill size={14} /> Detail
-                                            </Button>
-                                        }
 
                                         {/* Upload Surat Pemberitahuan Pelatihan */}
                                         {accessPermissions?.includes('createPelatihan') && (

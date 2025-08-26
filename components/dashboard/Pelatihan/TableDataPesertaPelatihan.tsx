@@ -1712,9 +1712,7 @@ const TableDataPesertaPelatihan = () => {
         >
           <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="PESERTA">Peserta Diklat</TabsTrigger>
-            <TabsTrigger value="INSTRUKTUR">Instruktur</TabsTrigger>
-            <TabsTrigger value="PENDAMPING">Pendamping</TabsTrigger>
-            <TabsTrigger value="PANITIA">Panitia</TabsTrigger>
+            <TabsTrigger value="INSTRUKTUR">Pelatih/Trainer</TabsTrigger>
             <TabsTrigger value="FASILITATOR">Fasilitator</TabsTrigger>
             <TabsTrigger value="SUPERVISOR">Supervisor</TabsTrigger>
           </TabsList>
