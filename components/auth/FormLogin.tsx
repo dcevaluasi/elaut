@@ -669,7 +669,7 @@ function FormLogin() {
                       value={formData.no_number}
                       name="no_number"
                       minLength={selectedMethodLogin == 'NIK' ? 16 : 12}
-                      maxLength={selectedMethodLogin == 'NIK' ? 16 : 13}
+                      maxLength={selectedMethodLogin == 'NIK' ? 24 : 13}
                       onChange={(e) => {
                         const value = e.target.value;
                         handleInputChange(e);
