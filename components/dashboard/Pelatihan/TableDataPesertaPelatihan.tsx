@@ -1468,15 +1468,7 @@ const TableDataPesertaPelatihan = () => {
                         </Button>
                       )}
 
-                    <Button
-                      type="button"
 
-                      className="flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border bg-indigo-500 text-white 
-                     hover:bg-indigo-600 transition-colors w-fit shadow-sm flex-shrink-0"
-                    >
-                      <PiMicrosoftExcelLogoFill />
-                      Import Data Peserta
-                    </Button>
 
                     <AlertDialog open={isOpenFormPeserta}>
                       <AlertDialogContent className="max-w-lg rounded-xl shadow-xl">
