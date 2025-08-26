@@ -477,7 +477,7 @@ const SertifikatNonKepelautan = React.forwardRef(
 
           {pelatihan?.TtdSertifikat == ESELON2 &&
             <>
-              <div ref={refPage} className={`pdf-page w-full flex flex-col  gap-4 relative  items-center justify-center ${userPelatihan!.IsActice == "SEBAGAI" ? "h-[52rem]" : "h-[49.63rem]"}`}>
+              <div ref={refPage} className={`pdf-page w-full flex flex-col  gap-4 relative  items-center justify-center ${userPelatihan!.IsActice == "SEBAGAI" ? "h-[52rem] mb-20" : "h-[49.63rem]"}`}>
                 <div className="flex flex-row  absolute top-0 right-0">
                   <p className="text-lg font-bosNormal">
                     No. STTPL : {userPelatihan?.NoRegistrasi}
