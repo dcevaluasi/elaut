@@ -1702,7 +1702,7 @@ const TableDataPesertaPelatihan = () => {
           className="w-full"
           onValueChange={(val) => setSelectedRole(val)}
         >
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="PESERTA">Peserta Diklat</TabsTrigger>
             <TabsTrigger value="INSTRUKTUR">Pelatih/Trainer</TabsTrigger>
             <TabsTrigger value="FASILITATOR">Fasilitator</TabsTrigger>

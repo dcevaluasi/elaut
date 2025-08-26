@@ -5,13 +5,6 @@ import { BiPaperPlane } from "react-icons/bi";
 import { PelatihanMasyarakat } from "@/types/product";
 import UploadSuratButton from "../../Dashboard/Actions/UploadSuratButton";
 import { Button } from "@/components/ui/button";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-} from "@/components/ui/dialog";
 
 import {
     Calendar,
@@ -64,12 +57,7 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
     fetchDataPelatihanMasyarakat,
 }) => {
 
-    const isVerifikator = Cookies.get('Role')?.includes('Verifikator')
-
-
     const [currentPage, setCurrentPage] = useState(1);
-    const [selectedPelatihan, setSelectedPelatihan] =
-        useState<PelatihanMasyarakat | null>(null);
     const itemsPerPage = 10;
     const totalPages = Math.ceil(data.length / itemsPerPage);
 
@@ -79,44 +67,6 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
     );
 
     const accessPermissions = Cookies.get('Access')
-
-    const handleApprovedSertifikatBySPV = async (idPelatihan: string, pelatihan: PelatihanMasyarakat) => {
-        const updateData = new FormData()
-        updateData.append('PemberitahuanDiterima', '12')
-
-
-        try {
-            await axios.put(
-                `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${idPelatihan}`,
-                updateData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${Cookies.get("XSRF091")}`,
-                        "Content-Type": "multipart/form-data",
-                    },
-                }
-            );
-
-            Toast.fire({
-                icon: "success",
-                title: "Yeayyy!",
-                text: "Berhasil mengirimkan informasi pengajuan kepada SPV Pusat!",
-            });
-            handleAddHistoryTrainingInExisting(pelatihan!, 'Telah Menyetujui Permohonan Penerbitan Sertifikat', Cookies.get('Eselon'), Cookies.get('SATKER_BPPP'))
-
-            fetchDataPelatihanMasyarakat();
-        } catch (error) {
-            console.error("ERROR GENERATE SERTIFIKAT: ", error);
-            Toast.fire({
-                icon: "error",
-                title: "Oopsss!",
-                text: "Gagal mengirimkan informasi pengajuan kepada SPV Pusat!",
-            });
-            fetchDataPelatihanMasyarakat();
-        }
-    }
-
-
 
     return (
         <div>
@@ -144,7 +94,6 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                     <Users size={14} className="text-emerald-500" /> Peserta
                                 </div>
                             </th>
-                            {/* <th className="px-4 py-3 text-center">Status</th> */}
                             <th className="px-4 py-3 text-center">Action</th>
                         </tr>
                     </thead>
@@ -174,14 +123,6 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                     <td className="px-4 py-3 text-center">
                                         {pelatihan.UserPelatihan?.length ?? 0}
                                     </td>
-                                    {/* <td className={`px-4 h-full ${color}`}>
-                                        <div
-                                            className={`w-full h-fit flex items-center justify-center gap-2 px-5 text-sm font-medium leading-none text-center `}
-                                        >
-                                            {icon}
-                                            {label}
-                                        </div>
-                                    </td> */}
 
                                     {/* Action Buttons */}
                                     <td className="px-4 py-3 flex flex-col gap-2 justify-center items-center h-fit">
@@ -317,102 +258,8 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                     </Button>
                 </div>
             </div>
-
-            {/* Detail Modal */}
-            <DetailPelatihanDialog selectedPelatihan={selectedPelatihan} setSelectedPelatihan={setSelectedPelatihan} generateTanggalPelatihan={generateTanggalPelatihan} />
         </div>
     );
 };
-
-function DetailPelatihanDialog({
-    selectedPelatihan,
-    setSelectedPelatihan,
-    generateTanggalPelatihan,
-}: {
-    selectedPelatihan: PelatihanMasyarakat | null;
-    setSelectedPelatihan: (pel: PelatihanMasyarakat | null) => void;
-    generateTanggalPelatihan: (tanggal: string) => string;
-}) {
-    const renderField = (
-        label: string,
-        value: any,
-        Icon: React.ElementType = Info
-    ) => (
-        <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-            <Icon className="w-4 h-4 text-gray-500 mt-[2px]" />
-            <div className="flex flex-col">
-                <span className="text-xs text-gray-500">{label}</span>
-                {
-                    label.includes('Memo') || label.includes('Berita') || label.includes('Surat') ? <Link href={value} target={'_blank'}><span className="text-sm font-medium text-gray-800">Tautan {label}</span></Link> : <span className="text-sm font-medium text-gray-800">{value || "-"}</span>
-                }
-            </div>
-        </div>
-    );
-
-    return (
-        <Dialog
-            open={!!selectedPelatihan}
-            onOpenChange={() => setSelectedPelatihan(null)}
-        >
-            <DialogContent className="max-w-3xl p-0 overflow-hidden rounded-xl shadow-lg">
-                <DialogHeader className="p-6 border-b bg-gradient-to-r from-indigo-50 to-white">
-                    <DialogTitle className="text-lg font-semibold">
-                        Detail Pelatihan
-                    </DialogTitle>
-                    <DialogDescription className="text-sm text-gray-500">
-                        Informasi lengkap tentang pelatihan yang dipilih.
-                    </DialogDescription>
-                </DialogHeader>
-
-                {selectedPelatihan && (
-                    <ScrollArea className="max-h-[70vh] p-6">
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-                            {renderField("Nama Pelatihan", selectedPelatihan.NamaPelatihan, Tag)}
-                            {renderField("Program", selectedPelatihan.Program, ClipboardList)}
-                            {renderField("Jenis Program", selectedPelatihan.JenisProgram, ClipboardList)}
-                            {renderField("Penyelenggara", selectedPelatihan.PenyelenggaraPelatihan, Building)}
-                            {renderField(
-                                "Tanggal Pelatihan",
-                                selectedPelatihan.TanggalMulaiPelatihan
-                                    ? `${generateTanggalPelatihan(
-                                        selectedPelatihan.TanggalMulaiPelatihan
-                                    )} s.d ${generateTanggalPelatihan(
-                                        selectedPelatihan.TanggalBerakhirPelatihan || ""
-                                    )}`
-                                    : "-",
-                                Calendar
-                            )}
-                            {renderField(
-                                "Jumlah Peserta",
-                                selectedPelatihan.UserPelatihan?.length ?? 0,
-                                Users
-                            )}
-                            {renderField("Instruktur", selectedPelatihan.Instruktur, User)}
-                            {renderField("Lokasi", selectedPelatihan.LokasiPelatihan, MapPin)}
-
-                            {renderField("Jenis Pelatihan", selectedPelatihan.JenisPelatihan, Tag)}
-                            {renderField("Bidang", selectedPelatihan.BidangPelatihan, Tag)}
-                            {renderField(
-                                "Dukungan Program Terobosan",
-                                selectedPelatihan.DukunganProgramTerobosan,
-                                Award
-                            )}
-                            {renderField(
-                                "Pelaksanaan Pelatihan",
-                                selectedPelatihan.PelaksanaanPelatihan,
-                                ClipboardList
-                            )}
-                            {renderField("Asal Pelatihan", selectedPelatihan.AsalPelatihan, Tag)}
-
-                            {renderField("Ttd Sertifikat", selectedPelatihan.TtdSertifikat, FileText)}
-
-
-                        </div>
-                    </ScrollArea>
-                )}
-            </DialogContent>
-        </Dialog>
-    );
-}
 
 export default TableDataPelatihanMasyarakat;
