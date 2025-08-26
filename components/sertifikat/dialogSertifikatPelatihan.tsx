@@ -43,7 +43,7 @@ import { DESC_CERTIFICATE_COMPETENCE_FISHERIES } from "@/constants/serkom";
 import { ESELON1, ESELON2, ESELON_1, ESELON_2, KA_BPPSDM, KA_PUSLAT_KP } from "@/constants/nomenclatures";
 import html2canvas from "html2canvas";
 import { calculateTotalHoursCertificateBPPP } from "@/lib/utils";
-import { generatedCurriculumCertificate, generatedDescriptionCertificate } from "@/utils/certificates";
+import { generatedCurriculumCertificate, generatedDescriptionCertificate, generatedStatusCertificate } from "@/utils/certificates";
 
 const html2pdf = dynamic(() => import("html2pdf.js"), { ssr: false });
 
@@ -253,12 +253,12 @@ const SertifikatNonKepelautan = React.forwardRef(
                   <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-1 mb-2">
                     <h1 className="font-bosBold font-black text-2xl leading-none">
                       {
-                        userPelatihan?.IsActice === 'LULUS' ? ' TELAH LULUS' : 'TELAH MENGIKUTI'
+                        userPelatihan?.IsActice == "" ? "-" : generatedStatusCertificate(userPelatihan?.IsActice).status_indo
                       }
                     </h1>
                     <h3 className="font-bosNormal font-bold text-lg italic">
                       {
-                        userPelatihan?.IsActice === 'LULUS' ? ' Has Passed' : 'Has Attended'
+                        userPelatihan?.IsActice == "" ? "-" : generatedStatusCertificate(userPelatihan?.IsActice).status_eng
                       }
                     </h3>
                   </div>
@@ -602,12 +602,12 @@ const SertifikatNonKepelautan = React.forwardRef(
                   <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-1 mb-2">
                     <h1 className="font-bosBold font-black text-2xl leading-none">
                       {
-                        userPelatihan?.IsActice === 'LULUS' ? ' TELAH LULUS' : 'TELAH MENGIKUTI'
+                        userPelatihan?.IsActice == "" ? "-" : generatedStatusCertificate(userPelatihan?.IsActice).status_indo
                       }
                     </h1>
                     <h3 className="font-bosNormal font-bold text-lg italic">
                       {
-                        userPelatihan?.IsActice === 'LULUS' ? ' Has Passed' : 'Has Attended'
+                        userPelatihan?.IsActice == "" ? "-" : generatedStatusCertificate(userPelatihan?.IsActice).status_eng
                       }
                     </h3>
                   </div>
@@ -617,7 +617,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                       <span className="text-base leading-[115%] font-bosNormal max-w-6xl">
                         {generatedDescriptionCertificate(pelatihan!.DeskripsiSertifikat).desc_indo}, pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
                       </span>
-                      <span className="max-w-5xl leading-none font-bos italic text-[0.85rem] mx-auto">
+                      <span className="max-w-5xl mt-1 leading-none font-bos italic text-[0.85rem] mx-auto">
                         {generatedDescriptionCertificate(pelatihan!.DeskripsiSertifikat).desc_eng} on {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
                       </span>
                     </div>
@@ -686,181 +686,183 @@ const SertifikatNonKepelautan = React.forwardRef(
 
                 }
               </div>
-              <div className={`pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center ${pelatihan?.MateriPelatihan.length < 7 ? 'mt-72' : 'mt-48'} break-before-auto relative`}>
-                <div className="flex flex-row justify-center items-center mb-6">
-                  <div className="flex flex-row gap-2 items-center h-fit">
-                    <div className="flex flex-col text-center space-y-0 h-fit items-center justify-center w-full gap-0">
-                      <p className="font-bosBold text-2xl max-w-4xl w-full uppercase leading-none">
-                        Materi {pelatihan?.NamaPelatihan}, tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
-                      </p>
-                      {
-                        (pelatihan?.NamaPelathanInggris != "") && <p className="font-bos text-xl max-w-4xl leading-none -mt-2">{pelatihan?.NamaPelathanInggris}, {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}</p>
-                      }
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full border border-gray-400 rounded-md overflow-hidden">
-                  {/* Header Baris 1 */}
-                  <div className="flex text-center font-bosNormal font-bold bg-gray-100 ">
-                    <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 leading-none relative"><span className='absolute mt-10 right-0 left-0 !font-bosBold text-lg'>NO</span></div>
-                    <div className="w-7/12 px-1 flex flex-col justify-center items-center border-r border-gray-400 relative">
-                      <div className="flex flex-row items-center justify-center absolute mt-10">
-                        <span className="text-lg leading-none !font-bosBold">MATERI</span>/
-                        <span className="italic font-bos leading-none">COURSE</span>
+              {
+                !userPelatihan?.IsActice.includes('SEBAGAI') && <div className={`pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center ${pelatihan?.MateriPelatihan.length < 7 ? 'mt-72' : 'mt-48'} break-before-auto relative`}>
+                  <div className="flex flex-row justify-center items-center mb-6">
+                    <div className="flex flex-row gap-2 items-center h-fit">
+                      <div className="flex flex-col text-center space-y-0 h-fit items-center justify-center w-full gap-0">
+                        <p className="font-bosBold text-2xl max-w-4xl w-full uppercase leading-none">
+                          Materi {pelatihan?.NamaPelatihan}, tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
+                        </p>
+                        {
+                          (pelatihan?.NamaPelathanInggris != "") && <p className="font-bos text-xl max-w-4xl leading-none -mt-3">{pelatihan?.NamaPelathanInggris}, {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}</p>
+                        }
                       </div>
                     </div>
-                    <div className="w-4/12 px-1 flex items-center justify-center border-b border-gray-400">
-                      <div className="flex flex-col mb-3">
-                        <div className="flex flex-row  items-center justify-center">
-                          <span className="text-lg leading-none !font-bosBold">ALOKASI WAKTU </span>/
-                          <span className="italic font-bos leading-none">ALLOCATION TIME</span>
-                        </div>
-                        <div className="flex flex-row  items-center justify-center -mt-1">
-                          <span className="text-lg leading-none !font-bosBold">@45 MENIT</span>/
-                          <span className="italic font-bos leading-none">@45 MINS</span>
+                  </div>
+                  <div className="w-full border border-gray-400 rounded-md overflow-hidden">
+                    {/* Header Baris 1 */}
+                    <div className="flex text-center font-bosNormal font-bold bg-gray-100 ">
+                      <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 leading-none relative"><span className='absolute mt-10 right-0 left-0 !font-bosBold text-lg'>NO</span></div>
+                      <div className="w-7/12 px-1 flex flex-col justify-center items-center border-r border-gray-400 relative">
+                        <div className="flex flex-row items-center justify-center absolute mt-10">
+                          <span className="text-lg leading-none !font-bosBold">MATERI</span>/
+                          <span className="italic font-bos leading-none">COURSE</span>
                         </div>
                       </div>
-
-                    </div>
-                  </div>
-
-                  {/* Header Baris 2 */}
-                  <div className="flex text-center font-bosNormal font-bold bg-gray-100 border-b border-gray-400">
-                    <div className="w-1/12 px-1 border-r border-gray-400"></div>
-                    <div className="w-7/12 px-1 border-r border-gray-400"></div>
-                    <div className="w-2/12 px-1 border-r border-gray-400">
-                      <div className="flex flex-row items-center justify-center mb-4">
-                        <span className="text-lg leading-none !font-bosBold">TEORI</span>/
-                        <span className="italic font-bos leading-none">THEORY</span>
-                      </div>
-                    </div>
-                    <div className="w-2/12 px-1 py-1">
-                      <div className="flex flex-row items-center justify-center mb-4">
-                        <span className="text-lg leading-none !font-bosBold">PRAKTEK</span>/
-                        <span className="italic font-bos leading-none">PRACTICE</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {
-                    pelatihan?.AsalSertifikat == 'Specific' ? <>
-                      {/* Kompetensi Umum Title */}
-                      <div className="flex border-b border-gray-400 bg-white">
-                        <div className="w-1/12 px-1 !font-bosBold  text-center border-r border-gray-400">I</div>
-                        <div className="w-9/12 px-1 font-bosNormal font-bold ">
-                          <div className="flex flex-row items-center mb-3">
-                            <span className="text-base leading-none !font-bosBold">KOMPETENSI UMUM</span>/
-                            <span className="italic font-bos leading-none">General Competency</span>
-
+                      <div className="w-4/12 px-1 flex items-center justify-center border-b border-gray-400">
+                        <div className="flex flex-col mb-3">
+                          <div className="flex flex-row  items-center justify-center">
+                            <span className="text-lg leading-none !font-bosBold">ALOKASI WAKTU </span>/
+                            <span className="italic font-bos leading-none">ALLOCATION TIME</span>
+                          </div>
+                          <div className="flex flex-row  items-center justify-center -mt-1">
+                            <span className="text-lg leading-none !font-bosBold">@45 MENIT</span>/
+                            <span className="italic font-bos leading-none">@45 MINS</span>
                           </div>
                         </div>
-                        <div className="w-1/12 px-1 "></div>
-                        <div className="w-1/12 px-1 py-1"></div>
-                      </div>
 
-                      {/* Kompetensi Umum Items */}
-                      {pelatihan.MateriPelatihan.filter((item) => item.Deskripsi == 'Umum').map((materi, index) => (
-                        <div
-                          key={index}
-                          className="flex text-sm border-b border-gray-300"
-                        >
-                          <div className="w-1/12 px-1 text-center border-r border-gray-300">{index + 1}.</div>
-                          <div className="w-7/12 px-1 border-r border-gray-300">
-                            <div className="flex flex-col justify-center mb-3">
-                              <span className="text-lg !font-bosNormal not-italic font-normal leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_indo}</span>
-                              {
-                                generatedCurriculumCertificate(materi.NamaMateri).curr_eng != "" && <span className="italic font-bosItalic leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_eng}</span>
-                              }
+                      </div>
+                    </div>
+
+                    {/* Header Baris 2 */}
+                    <div className="flex text-center font-bosNormal font-bold bg-gray-100 border-b border-gray-400">
+                      <div className="w-1/12 px-1 border-r border-gray-400"></div>
+                      <div className="w-7/12 px-1 border-r border-gray-400"></div>
+                      <div className="w-2/12 px-1 border-r border-gray-400">
+                        <div className="flex flex-row items-center justify-center mb-4">
+                          <span className="text-lg leading-none !font-bosBold">TEORI</span>/
+                          <span className="italic font-bos leading-none mb-1">THEORY</span>
+                        </div>
+                      </div>
+                      <div className="w-2/12 px-1 py-1">
+                        <div className="flex flex-row items-center justify-center mb-4">
+                          <span className="text-lg leading-none !font-bosBold">PRAKTEK</span>/
+                          <span className="italic font-bos leading-none mb-1">PRACTICE</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {
+                      pelatihan?.AsalSertifikat == 'Specific' ? <>
+                        {/* Kompetensi Umum Title */}
+                        <div className="flex border-b border-gray-400 bg-white">
+                          <div className="w-1/12 px-1 !font-bosBold  text-center border-r border-gray-400">I</div>
+                          <div className="w-9/12 px-1 font-bosNormal font-bold ">
+                            <div className="flex flex-row items-center mb-3">
+                              <span className="text-base leading-none !font-bosBold">KOMPETENSI UMUM</span>/
+                              <span className="italic font-bos leading-none mb-1">General Competency</span>
+
                             </div>
                           </div>
-                          <div className="w-2/12 px-1 text-center font-bosNormal text-lg border-r border-gray-300">{materi.JamTeory}</div>
-                          <div className="w-2/12 px-1 text-center font-bosNormal text-lg">{materi.JamPraktek}</div>
+                          <div className="w-1/12 px-1 "></div>
+                          <div className="w-1/12 px-1 py-1"></div>
                         </div>
-                      ))}
 
-                      {/* Kompetensi Inti Title */}
-                      <div className="flex border-b border-gray-400 bg-white">
-                        <div className="w-1/12 px-1 !font-bosBold text-center border-r border-gray-400">II</div>
-                        <div className="w-9/12 px-1 font-bosNormal font-bold ">
-                          <div className="flex flex-row items-center mb-3">
-                            <span className="text-base leading-none !font-bosBold">KOMPETENSI INTI</span>/
-                            <span className="italic font-bos leading-none">Core Competency</span>
-
+                        {/* Kompetensi Umum Items */}
+                        {pelatihan.MateriPelatihan.filter((item) => item.Deskripsi == 'Umum').map((materi, index) => (
+                          <div
+                            key={index}
+                            className="flex text-sm border-b border-gray-300"
+                          >
+                            <div className="w-1/12 px-1 text-center border-r border-gray-300">{index + 1}.</div>
+                            <div className="w-7/12 px-1 border-r border-gray-300">
+                              <div className="flex flex-col justify-center mb-4">
+                                <span className="text-lg !font-bosNormal not-italic font-normal leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_indo}</span>
+                                {
+                                  generatedCurriculumCertificate(materi.NamaMateri).curr_eng != "" && <span className="italic font-bosItalic leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_eng}</span>
+                                }
+                              </div>
+                            </div>
+                            <div className="w-2/12 px-1 text-center font-bosNormal text-lg border-r border-gray-300">{materi.JamTeory}</div>
+                            <div className="w-2/12 px-1 text-center font-bosNormal text-lg">{materi.JamPraktek}</div>
                           </div>
-                        </div>
-                        <div className="w-1/12 px-1 "></div>
-                        <div className="w-1/12 px-1 py-1"></div>
-                      </div>
+                        ))}
 
-                      {/* Kompetensi Inti Items */}
-                      {pelatihan.MateriPelatihan.filter((item) => item.Deskripsi == 'Inti').map((materi, index) => (
-                        <div
-                          key={index}
-                          className="flex text-sm border-b border-gray-300"
-                        >
-                          <div className="w-1/12 px-1 text-center border-r border-gray-300">{index + 1}.</div>
-                          <div className="w-7/12 px-1 border-r border-gray-300">
-                            <div className="flex flex-col justify-center mb-3">
-                              <span className="text-lg !font-bosNormal not-italic font-normal leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_indo}</span>
-                              {
-                                generatedCurriculumCertificate(materi.NamaMateri).curr_eng != "" && <span className="italic font-bosItalic leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_eng}</span>
-                              }
+                        {/* Kompetensi Inti Title */}
+                        <div className="flex border-b border-gray-400 bg-white">
+                          <div className="w-1/12 px-1 !font-bosBold text-center border-r border-gray-400">II</div>
+                          <div className="w-9/12 px-1 font-bosNormal font-bold ">
+                            <div className="flex flex-row items-center mb-3">
+                              <span className="text-base leading-none !font-bosBold">KOMPETENSI INTI</span>/
+                              <span className="italic font-bos leading-none mb-1">Core Competency</span>
+
                             </div>
                           </div>
-                          <div className="w-2/12 px-1 mb-3 text-center text-lg font-bosNormal border-r border-gray-300">{materi.JamTeory}</div>
-                          <div className="w-2/12 px-1 mb-3 text-center text-lg font-bosNormal">{materi.JamPraktek}</div>
+                          <div className="w-1/12 px-1 "></div>
+                          <div className="w-1/12 px-1 py-1"></div>
                         </div>
-                      ))}</> : <>  {/* Kompetensi Inti Title */}
 
-
-                      {/* Kompetensi Inti Items */}
-                      {pelatihan.MateriPelatihan.filter((item) => item.Deskripsi == '-').map((materi, index) => (
-                        <div
-                          key={index}
-                          className="flex text-sm border-b border-gray-300"
-                        >
-                          <div className="w-1/12 px-1 text-lg text-center border-r border-gray-300">{index + 1}.</div>
-                          <div className="w-7/12 px-1 border-r border-gray-300">
-                            <div className="flex flex-col justify-center mb-3">
-                              <span className="text-lg !font-bosNormal not-italic font-normal leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_indo}</span>
-                              {
-                                generatedCurriculumCertificate(materi.NamaMateri).curr_eng != "" && <span className="italic font-bosItalic leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_eng}</span>
-                              }
+                        {/* Kompetensi Inti Items */}
+                        {pelatihan.MateriPelatihan.filter((item) => item.Deskripsi == 'Inti').map((materi, index) => (
+                          <div
+                            key={index}
+                            className="flex text-sm border-b border-gray-300"
+                          >
+                            <div className="w-1/12 px-1 text-center border-r border-gray-300">{index + 1}.</div>
+                            <div className="w-7/12 px-1 border-r border-gray-300">
+                              <div className="flex flex-col justify-center mb-4">
+                                <span className="text-lg !font-bosNormal not-italic font-normal leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_indo}</span>
+                                {
+                                  generatedCurriculumCertificate(materi.NamaMateri).curr_eng != "" && <span className="italic text-base font-bosItalic leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_eng}</span>
+                                }
+                              </div>
                             </div>
+                            <div className="w-2/12 px-1 mb-3 text-center text-lg font-bosNormal border-r border-gray-300">{materi.JamTeory}</div>
+                            <div className="w-2/12 px-1 mb-3 text-center text-lg font-bosNormal">{materi.JamPraktek}</div>
                           </div>
-                          <div className="w-2/12 px-1 mb-3 text-lg text-center font-bosNormal border-r border-gray-300">{materi.JamTeory}</div>
-                          <div className="w-2/12 px-1 mb-3 text-lg text-center font-bosNormal">{materi.JamPraktek}</div>
+                        ))}</> : <>  {/* Kompetensi Inti Title */}
+
+
+                        {/* Kompetensi Inti Items */}
+                        {pelatihan.MateriPelatihan.filter((item) => item.Deskripsi == '-').map((materi, index) => (
+                          <div
+                            key={index}
+                            className="flex text-sm border-b border-gray-300"
+                          >
+                            <div className="w-1/12 px-1 text-lg text-center border-r border-gray-300">{index + 1}.</div>
+                            <div className="w-7/12 px-1 border-r border-gray-300">
+                              <div className="flex flex-col justify-center mb-4">
+                                <span className="text-lg !font-bosNormal not-italic font-normal leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_indo}</span>
+                                {
+                                  generatedCurriculumCertificate(materi.NamaMateri).curr_eng != "" && <span className="italic text-base font-bosItalic leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_eng}</span>
+                                }
+                              </div>
+                            </div>
+                            <div className="w-2/12 px-1 mb-3 text-lg text-center font-bosNormal border-r border-gray-300">{materi.JamTeory}</div>
+                            <div className="w-2/12 px-1 mb-3 text-lg text-center font-bosNormal">{materi.JamPraktek}</div>
+                          </div>
+                        ))}</>
+                    }
+
+
+                    {/* Jumlah Jam */}
+                    <div className="flex font-bosNormal font-bold border-b border-gray-300">
+                      <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-300"></div>
+                      <div className="w-7/12 px-1 border-r border-gray-300">
+                        <div className="flex flex-row items-center mb-4">
+                          <span className="text-lg leading-none !font-bosBold">JUMLAH JAM PELAJARAN</span>/
+                          <span className="italic font-bos leading-none">Training Hours</span>
                         </div>
-                      ))}</>
-                  }
-
-
-                  {/* Jumlah Jam */}
-                  <div className="flex font-bosNormal font-bold border-b border-gray-300">
-                    <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-300"></div>
-                    <div className="w-7/12 px-1 border-r border-gray-300">
-                      <div className="flex flex-row items-center mb-3">
-                        <span className="text-lg leading-none !font-bosBold">JUMLAH JAM PELAJARAN</span>/
-                        <span className="italic font-bos leading-none">Training Hours</span>
                       </div>
+                      <div className="w-2/12 text-lg px-1 mb-3 text-center">{totalHoursCertificateLvl2.totalTheory}</div>
+                      <div className="w-2/12 text-lg px-1 mb-3 text-center">{totalHoursCertificateLvl2.totalPractice}</div>
                     </div>
-                    <div className="w-2/12 text-lg px-1 mb-3 text-center">{totalHoursCertificateLvl2.totalTheory}</div>
-                    <div className="w-2/12 text-lg px-1 mb-3 text-center">{totalHoursCertificateLvl2.totalPractice}</div>
-                  </div>
 
-                  {/* Total Jam */}
-                  <div className="flex font-bosNormal font-bold">
-                    <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-300"></div>
-                    <div className="w-7/12 px-1 border-r border-gray-300">
-                      <div className="flex flex-row items-center mb-3">
-                        <span className="text-lg leading-none !font-bosBold">TOTAL JAM PELAJARAN</span>/
-                        <span className="italic font-bos leading-none">Total Hours</span>
+                    {/* Total Jam */}
+                    <div className="flex font-bosNormal font-bold">
+                      <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-300"></div>
+                      <div className="w-7/12 px-1 border-r border-gray-300">
+                        <div className="flex flex-row items-center mb-4">
+                          <span className="text-lg leading-none !font-bosBold">TOTAL JAM PELAJARAN</span>/
+                          <span className="italic font-bos leading-none">Total Hours</span>
+                        </div>
                       </div>
+                      <div className="w-4/12 px-1 text-lg mb-3 text-center flex items-center justify-center">{totalHoursCertificateLvl2.totalTheory + totalHoursCertificateLvl2.totalPractice}</div>
                     </div>
-                    <div className="w-4/12 px-1 text-lg mb-3 text-center flex items-center justify-center">{totalHoursCertificateLvl2.totalTheory + totalHoursCertificateLvl2.totalPractice}</div>
                   </div>
-                </div>
-              </div >
+                </div >
+              }
             </>
           }
 

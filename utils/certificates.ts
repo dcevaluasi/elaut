@@ -15,3 +15,13 @@ export function generatedCurriculumCertificate(input: string) {
 
   return { curr_indo, curr_eng }
 }
+
+export function generatedStatusCertificate(input: string) {
+  const matches = [...input.matchAll(/\{([^}]*)\}/g)].map((m) => m[1].trim())
+
+  const position = matches[0] || ''
+  const status_indo = matches[1] || ''
+  const status_eng = matches.length > 2 ? matches[2] : ''
+
+  return { position, status_indo, status_eng }
+}

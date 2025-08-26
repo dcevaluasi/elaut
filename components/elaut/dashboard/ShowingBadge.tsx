@@ -16,7 +16,7 @@ const ShowingBadge = ({ data, isFlying }: { data: PelatihanMasyarakat, isFlying?
         <Badge
             variant="outline"
             className={`${isFlying && 'top-4 right-4 absolute'} cursor-pointer  
-        ${colorBadge(data!.PemberitahuanDiterima)} animate-pulse duration-700`}
+        ${colorBadge(data!.PemberitahuanDiterima)} animate-pulse duration-700 flex-shrink-0`}
         >
             <PiRecordFill />
             {data!.PemberitahuanDiterima}
