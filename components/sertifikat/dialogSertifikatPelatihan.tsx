@@ -128,7 +128,7 @@ const SertifikatNonKepelautan = React.forwardRef(
       <div className=" flex-col gap-8 font-bos">
         <div
           ref={ref}
-          className="w-full h-full scale-95 flex flex-col gap-4 items-center justify-center  px-10  rounded-md font-bos leading-[120%]"
+          className={`w-full h-full scale-95 flex flex-col gap-4 items-center justify-center  px-10  rounded-md font-bos leading-[120%] ${userPelatihan!.IsActice.includes("SEBAGAI") ? "pb-[100px] " : "pb-0"}`}
         >
           {/* Page 1 */}
 
