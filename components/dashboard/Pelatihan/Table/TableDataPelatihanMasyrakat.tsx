@@ -129,25 +129,10 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                         {(Cookies.get('Access')?.includes('isSigning') && pelatihan!.PemberitahuanDiterima.includes('Pengajuan Telah Dikirim ke Ka')) &&
                                             <TTDSertifikat dataPelatihan={pelatihan!} handleFetchData={fetchDataPelatihanMasyarakat} />
                                         }
-                                        {Cookies.get('Access')?.includes('isSigning') &&
-                                            <>
-                                                <Link
-                                                    title="Peserta Pelatihan"
-                                                    target={"_blank"}
-                                                    href={`/admin/pusat/pelatihan/${pelatihan.KodePelatihan
-                                                        }/peserta-pelatihan/${encryptValue(
-                                                            pelatihan.IdPelatihan.toString()
-                                                        )}`}
-                                                    className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
-             rounded-lg border bg-green-500 text-white 
-             hover:bg-grenn-600 hover:text-white transition-colors  w-full 
-             shadow-sm"
-                                                >
-                                                    <HiUserGroup className="h-3 w-3 text-white" />
-                                                    Peserta
-                                                </Link>
-                                            </>
-                                        }
+
+
+
+
 
                                         {!isOperatorBalaiPelatihan &&
                                             pelatihan.PemberitahuanDiterima === "Kirim ke SPV" && (
@@ -191,6 +176,22 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                             Review
                                         </Link>}
 
+                                        <Link
+                                            title="Peserta Pelatihan"
+                                            target={"_blank"}
+                                            href={`/admin/${usePathname().includes('pusat') ? 'pusat' : 'lemdiklat'}/pelatihan/${pelatihan.KodePelatihan
+                                                }/peserta-pelatihan/${encryptValue(
+                                                    pelatihan.IdPelatihan.toString()
+                                                )}`}
+                                            className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
+             rounded-lg border bg-green-500 text-white 
+             hover:bg-grenn-600 hover:text-white transition-colors  w-full 
+             shadow-sm"
+                                        >
+                                            <HiUserGroup className="h-3 w-3 text-white" />
+                                            Peserta
+                                        </Link>
+
 
                                         {/* Upload Surat Pemberitahuan Pelatihan */}
                                         {accessPermissions?.includes('createPelatihan') && (
@@ -200,31 +201,6 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                                 handleFetchingData={fetchDataPelatihanMasyarakat}
                                             />
                                         )}
-
-                                        {/* Approve and Send to Kapuslat */}
-
-                                        {/* {
-                                            accessPermissions?.includes('approveSertifikat') &&
-                                            <>
-                                                <Button
-                                                    size="sm"
-                                                    title="Approve"
-                                                    className="w-full inline-flex items-center justify-center gap-2 
-               h-10 px-5 text-sm font-medium rounded-lg 
-               border border-teal-500 bg-teal-500 text-white 
-               hover:bg-teal-600 transition-colors shadow-sm"
-                                                    onClick={() => {
-                                                        handleApprovedSertifikatBySPV(
-                                                            String(pelatihan.IdPelatihan),
-                                                            pelatihan
-                                                        )
-                                                    }}
-                                                >
-                                                    <RiCheckboxCircleFill className="h-5 w-5 " size={14} />
-                                                </Button>
-                                            </>
-                                        } */}
-
                                     </td>
                                 </tr>
                             );

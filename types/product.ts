@@ -78,6 +78,7 @@ export type PelatihanMasyarakat = {
   Program: string
   JenisProgram: string
   IsSematkan: string
+  IsRevisi: string
   IsMengajukanPenerbitan?: string
   AsalSertifikat: string
 }

@@ -42,6 +42,7 @@ import {
   TbFileStack,
   TbRubberStamp,
   TbSchool,
+  TbSignature,
   TbTargetArrow,
 } from "react-icons/tb";
 import { IoIosInformationCircle, IoMdCheckmarkCircleOutline, IoMdCloseCircle } from "react-icons/io";
@@ -64,6 +65,7 @@ import {
   HiMiniNewspaper,
   HiMiniUserGroup,
   HiOutlineDocument,
+  HiOutlineEye,
   HiOutlineUserGroup,
   HiTrash,
   HiUserGroup,
@@ -104,6 +106,9 @@ import JSZip from "jszip";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { generatedStatusCertificate } from "@/utils/certificates";
 import { BsFileExcel } from "react-icons/bs";
+import { IoReload } from "react-icons/io5";
+import { Input } from "@/components/ui/input";
+import { HiOutlineEyeOff } from "react-icons/hi";
 
 const TableDataPesertaPelatihan = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -111,6 +116,9 @@ const TableDataPesertaPelatihan = () => {
   const id = decryptValue(extractLastSegment(pathname));
   const paths = pathname.split("/");
   const [noSertifikatTerbitkan, setNoSertifikatTerbitkan] = React.useState("");
+
+  const [searchQuery, setSearchQuery] = React.useState<string>("");
+
 
   const [dataPelatihan, setDataPelatihan] =
     React.useState<PelatihanMasyarakat | null>(null);
@@ -510,6 +518,41 @@ const TableDataPesertaPelatihan = () => {
     }
   };
 
+  const handleRevisiSertifikatPeserta = async (user: UserPelatihan) => {
+    try {
+      const formData = new FormData();
+      formData.append("StatusPenandatangan", user.StatusPenandatangan == 'Done' ? 'Revisi' : '');
+
+      const response = await axios.put(
+        `${baseUrl}/lemdik/updatePelatihanUsers?id=${user.IdUserPelatihan}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+          },
+        }
+      );
+
+      console.log({ response })
+
+      Toast.fire({
+        icon: "success",
+        title: 'Yeayyy!',
+        text: `Oke, silahkan lanjut lakukan revisi sertifikat peserta pelatihan!`,
+      });
+
+      handleFetchingPublicTrainingDataById();
+    } catch (error) {
+      Toast.fire({
+        icon: "error",
+        title: 'Oopsss!',
+        text: `Gagal lanjut lakukan revisi sertifikat peserta pelatihan!`,
+      });
+
+      handleFetchingPublicTrainingDataById();
+    }
+  };
+
   const [
     openFormValidasiDataPesertaPelatihan,
     setOpenFormValidasiDataPesertaPelatihan,
@@ -523,6 +566,44 @@ const TableDataPesertaPelatihan = () => {
   const [openFormSematkanNoSertifikat, setOpenFormSematkanNoSertifikat] = React.useState<boolean>(false)
   const [openFormSematkanTanggalSertifikat, setOpenFormSematkanTanggalSertifikat] = React.useState<boolean>(false)
   const [openFormSematkanSpesimenSertifikat, setOpenFormSematkanSpesimenSertifikat] = React.useState<boolean>(false)
+
+  const handleTTDeById = async (idUserPelatihan: string, passphrase: string) => {
+    if (!passphrase) {
+      Toast.fire({
+        icon: "error",
+        text: "Harap memasukkan passphrase!",
+        title: `Tidak ada passphrase`,
+      });
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        elautBaseUrl + "/lemdik/sendSertifikatTtdeById",
+        {
+          id_users_pelatihan: idUserPelatihan,
+          kodeParafrase: passphrase,
+          nik: Cookies.get("NIK"),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+          },
+        }
+      );
+
+      Toast.fire({
+        icon: "success",
+        text: "Berhasil melakukan penandatangan sertifikat revisi!",
+        title: `Berhasil TTDe`,
+      });
+
+      handleFetchingPublicTrainingDataById();
+    } catch (error) {
+      handleFetchingPublicTrainingDataById();
+    }
+  };
+
 
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -697,15 +778,38 @@ const TableDataPesertaPelatihan = () => {
                       Generate Sertifikat
                     </Button>
                   </DialogSertifikatPelatihan>
-                ) : countUserWithCertificate(data) == data.length ? (
-                  <Link
-                    target="_blank"
-                    href={`${row.original.FileSertifikat.includes('drive') ? row.original.FileSertifikat : `https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${row.original.FileSertifikat}`}`}
-                    className="w-full border flex gap-2 bg-blue-600 text-left capitalize items-center justify-center h-9 px-4 py-3 border-blue-600  whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 hover:bg-blue-600 text-white"
-                  >
-                    <RiVerifiedBadgeFill className="h-4 w-4  " />
-                    <span className="text-sm">Download Sertifikat</span>
-                  </Link>
+                ) : countUserWithCertificate(data) > 1 ? (
+                  <div className='flex gap-1'>
+                    <Link
+                      target="_blank"
+                      href={`${row.original.FileSertifikat.includes('drive') ? row.original.FileSertifikat : `https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${row.original.FileSertifikat}`}`}
+                      className="w-full border flex gap-2 bg-blue-600 text-left capitalize items-center justify-center h-9 px-4 py-3 border-blue-600  whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 hover:bg-blue-600 text-white"
+                    >
+                      <RiVerifiedBadgeFill className="h-4 w-4  " />
+                      <span className="text-sm">Download Sertifikat</span>
+                    </Link>
+                    {
+                      (dataPelatihan?.IsRevisi == "1" && row.original.StatusPenandatangan == 'Revisi') && <Button
+                        onClick={() => handleDeleteCertificateById(row.original.IdUserPelatihan)}
+                        className="w-full border flex gap-2 bg-rose-600 text-left capitalize items-center justify-center h-9 px-4 py-3 border-rose-600  whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 hover:bg-rose-600 text-white"
+                      >
+                        <HiTrash className="h-4 w-4 " />
+                        <span className="text-sm">Hapus Sertifikat</span>
+                      </Button>
+                    }
+
+                    {
+                      (dataPelatihan?.IsRevisi == "1" &&
+                        row.original.StatusPenandatangan == "Revisi" &&
+                        Cookies.get("Access")?.includes("isSigning")) && (
+                        <TTDRevisiButton
+                          row={row}
+                          handleTTDeSertifikat={handleTTDeById}
+                        />
+                      )
+                    }
+
+                  </div>
 
                 ) : (
                   <Link
@@ -809,20 +913,42 @@ const TableDataPesertaPelatihan = () => {
         return (
           <Button
             variant="ghost"
-            className={`text-black font-semibold w-full p-0 justify-start items-center flex`}
+            className={`text-black font-semibold w-full p-0 justify-center items-center flex`}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            <p className="leading-[105%]">LULUS/TIDAK LULUS</p>
+            <p className="leading-[105%]">Kelulusan <br /> Peserta</p>
 
             <IoMdCheckmarkCircleOutline className="ml-2 h-4 w-4" />
           </Button>
         );
       },
       cell: ({ row }) => (
-        <div className={`${"-ml-7"} text-left capitalize w-full ${row.original.IsActice === '' ? 'hidden' : 'flex'} items-center justify-center `}>
+        <div className={`text-left capitalize w-full ${row.original.IsActice === '' ? 'hidden' : 'flex -ml-2'} items-center justify-center `}>
           <div className='text-black font-semibold w-full p-0 justify-center flex gap-1'><Checkbox disabled={row.original.StatusPenandatangan == 'Done'} id="isActice" onCheckedChange={() => {
             handleLulusDataPeserta(row.original)
-          }} checked={row.original.IsActice != 'TIDAK LULUS' ? true : false} /><p> {row.original.IsActice != 'TIDAK LULUS' ? 'LULUS' : 'TIDAK LULUS'}</p></div>
+          }} checked={row.original.IsActice != 'TIDAK LULUS' ? true : false} /></div>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "IdUserPelatihan",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            className={`text-black font-semibold w-full p-0 ${dataPelatihan?.IsRevisi == "" ? "hidden" : "justify-center items-center flex"}`}
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            <p className="leading-[105%]">Revisi <br /> Sertifikat</p>
+            <IoReload className="ml-2 h-4 w-4" />
+          </Button>
+        );
+      },
+      cell: ({ row }) => (
+        <div className={`text-left capitalize w-full ${dataPelatihan?.IsRevisi == "" ? "hidden" : "justify-center items-center flex -ml-2"}  `}>
+          <div className='text-black font-semibold w-full p-0 justify-center flex gap-1'><Checkbox id="isActice" onCheckedChange={() => {
+            handleRevisiSertifikatPeserta(row.original)
+          }} checked={row.original.StatusPenandatangan == 'Revisi' ? true : false} /></div>
         </div>
       ),
     },
@@ -830,7 +956,6 @@ const TableDataPesertaPelatihan = () => {
 
   const [selectedRole, setSelectedRole] = useState("PESERTA")
 
-  // filter data based on tab
   const filteredData = React.useMemo(() => {
     return data.filter(
       (row: UserPelatihan) =>
@@ -838,7 +963,6 @@ const TableDataPesertaPelatihan = () => {
         selectedRole.toUpperCase()
     )
   }, [data, selectedRole])
-
 
   const table = useReactTable({
     data: filteredData,
@@ -1052,6 +1176,78 @@ const TableDataPesertaPelatihan = () => {
       handleFetchingPublicTrainingDataById()
     }
   }
+
+  /**
+  * Handling Revisi Sertifikat
+  */
+  const handleReviseCertificate = async (id_pelatihan: number) => {
+    try {
+      const token = Cookies.get("XSRF091")
+      const updateData = new FormData()
+      updateData.append('IsRevisi', '1')
+
+      const response = await axios.put(
+        `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${id_pelatihan}`,
+        updateData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+
+      Toast.fire({
+        icon: "success",
+        title: "Yeayyy!!",
+        text: `Silahkan melakukan revisi sertifikat, notifikasi sudah dikirimkan ke pihak pusat/penandatangan!`,
+      });
+      handleFetchingPublicTrainingDataById()
+    } catch (error: any) {
+      Toast.fire({
+        icon: "error",
+        title: "Upssss!!",
+        text: `Gagal menghapus draft sertifikat!`,
+      });
+      handleFetchingPublicTrainingDataById()
+    }
+  }
+
+  /**
+ * Handling Delete Sertifikat
+ */
+  const handleDeleteCertificateById = async (id: number) => {
+    try {
+      const token = Cookies.get("XSRF091")
+      const updateData = new FormData()
+      updateData.append('IsRevisi', '1')
+
+      const response = await axios.delete(
+        `${elautBaseUrl}/deleteSertifikatTTde?id=${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+
+      Toast.fire({
+        icon: "success",
+        title: "Yeayyy!!",
+        text: `Berhasil menghapus file sertifikat yang telah terbit, silahkan perbaiki kesalahan dan ajukan kembali draft sertifikat!`,
+      });
+      handleFetchingPublicTrainingDataById()
+    } catch (error: any) {
+      Toast.fire({
+        icon: "error",
+        title: "Upssss!!",
+        text: `Gagal menghapus file sertifikat yang telah terbit, silahkan perbaiki kesalahan dan ajukan kembali draft sertifikat!`,
+      });
+      handleFetchingPublicTrainingDataById()
+    }
+  }
+
+
 
   return (
     <div className="">
@@ -1468,8 +1664,6 @@ const TableDataPesertaPelatihan = () => {
                         </Button>
                       )}
 
-
-
                     <AlertDialog open={isOpenFormPeserta}>
                       <AlertDialogContent className="max-w-lg rounded-xl shadow-xl">
                         <AlertDialogHeader>
@@ -1553,7 +1747,7 @@ const TableDataPesertaPelatihan = () => {
                     </AlertDialog>
 
                     {/* Upload Zip Foto Participants And Before Draft All Certificates */}
-                    {(Cookies.get('Access')?.includes('createCertificates') && countUserWithDraftCertificate(data) <= data.length) && (
+                    {(Cookies.get('Access')?.includes('createCertificates') && countUserWithCertificate(data) != data.length) && (
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <button
@@ -1690,6 +1884,47 @@ const TableDataPesertaPelatihan = () => {
                       </span>
                     </Button>
                     }
+
+                    {/* Update Certificates */}
+                    {(Cookies.get('Access')?.includes('updateCertificates') && countUserWithCertificate(data) == data.length && dataPelatihan?.IsRevisi != "1") && (
+                      <div className="w-full flex justify-end gap-2">
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <button
+                              type="button"
+                              className="flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border bg-gray-500 text-white 
+              hover:bg-gray-600 transition-colors shadow-sm w-fit flex-shrink-0"
+                            >
+                              <IoReload />
+                              Revisi Sertifikat
+                            </button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Ada sertifikat yang perlu direvisi?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Langkah melakukan revisi,
+                                <div className="flex flex-col">
+                                  <span>1. Identifikasi Sertifikat Yang Dianggap Perlu Direvisi/Ditambahkan;</span>
+                                  <span>2. Lakukan Penambahan/Pengupdatean Data Sesuai Kebutuhan dan Pastikan Tersampaikan Secara Formal;</span>
+                                  <span>3. Hapus Terlebih Dahulu Sertifikat Yang Telah Terbit Sebelumnya</span>
+                                  <span>4. Ajukan Sertifikat Kembali;</span>
+                                </div>
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Batal</AlertDialogCancel>
+                              <AlertDialogAction
+                                className="bg-gray-500 text-white hover:bg-gray-600"
+                                onClick={() => handleReviseCertificate(parseInt(id))}
+                              >
+                                Lakukan Revisi
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    )}
                   </tr>
                 </table>
               </div>
@@ -1710,11 +1945,27 @@ const TableDataPesertaPelatihan = () => {
           </TabsList>
 
           <TabsContent value={selectedRole}>
+            {/* 🔍 Search input */}
+            <Input
+              placeholder="Cari data peserta..."
+              value={(table.getColumn("Nama")?.getFilterValue() as string) ?? ""}
+              onChange={(event) =>
+                table.getColumn("Nama")?.setFilterValue(event.target.value)
+              }
+              className="w-full text-sm py-2 px-4 rounded-lg border border-gray-300 
+             bg-gray-50 text-gray-800 placeholder-gray-400
+             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+             transition mb-3"
+            />
+
+
+
+            {/* Pass filtered data */}
             <TableData
               isLoading={false}
               columns={columns}
-              table={table}
-              type={"short"}
+              table={{ ...table, rows: filteredData }}
+              type="short"
             />
           </TabsContent>
         </Tabs>
@@ -1722,5 +1973,81 @@ const TableDataPesertaPelatihan = () => {
     </div>
   );
 };
+
+const TTDRevisiButton = ({ row, handleTTDeSertifikat }: { row: any, handleTTDeSertifikat: any }) => {
+  const [passphrase, setPassphrase] = React.useState("")
+  const [isShowPassphrase, setIsShowPassphrase] = React.useState(false)
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button className="w-full flex gap-2 items-center justify-center h-9 px-4 py-3 rounded-md text-sm font-medium transition-colors bg-teal-600 text-white border border-teal-600 shadow-sm hover:bg-teal-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-teal-500">
+          <TbSignature className="h-4 w-4" />
+          <span className="text-sm">TTDe Sertifikat</span>
+        </Button>
+      </AlertDialogTrigger>
+
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <div className="flex flex-col gap-1">
+            <AlertDialogTitle className="flex items-center gap-2">
+              <TbSignature className="text-3xl" />
+              Passphrase
+            </AlertDialogTitle>
+            <p className="-mt-1 text-gray-500 text-sm leading-[110%]">
+              Masukkan passphrase anda untuk melanjutkan proses
+              penandatanganan sertifikat revisi.
+            </p>
+          </div>
+        </AlertDialogHeader>
+
+        <fieldset>
+          <form autoComplete="off">
+            <div className="flex flex-wrap -mx-3 mb-1 -mt-2">
+              <div className="w-full px-3">
+                <label className="block text-gray-800 text-sm font-medium mb-1">
+                  Passphrase
+                </label>
+                <div className="flex gap-1">
+                  <span className="relative w-full h-fit">
+                    <input
+                      type={isShowPassphrase ? "text" : "password"}
+                      className="text-black h-10 text-base flex items-center w-full border border-neutral-200 rounded-md px-3"
+                      required
+                      autoComplete="off"
+                      value={passphrase}
+                      onChange={(e) => setPassphrase(e.target.value)}
+                    />
+                    <span
+                      onClick={() => setIsShowPassphrase(!isShowPassphrase)}
+                    >
+                      {isShowPassphrase ? (
+                        <HiOutlineEyeOff className="absolute right-3 top-2.5 text-gray-500 text-xl cursor-pointer" />
+                      ) : (
+                        <HiOutlineEye className="absolute right-3 top-2.5 text-gray-500 text-xl cursor-pointer" />
+                      )}
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <AlertDialogFooter className="mt-3">
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() =>
+                  handleTTDeSertifikat(row.original.IdUserPelatihan, passphrase)
+                }
+              >
+                Tanda Tangan
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </form>
+        </fieldset>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
+
 
 export default TableDataPesertaPelatihan;
