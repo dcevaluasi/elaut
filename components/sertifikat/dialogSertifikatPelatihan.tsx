@@ -29,6 +29,7 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import { User, UserPelatihan } from "@/types/user";
 import {
+  formatName,
   generateTanggalPelatihan,
   generateTanggalPelatihanWithoutDay,
 } from "@/utils/text";
@@ -294,6 +295,14 @@ const SertifikatNonKepelautan = React.forwardRef(
                               ? ESELON_1.fullNameEng
                               : ESELON_2.fullNameEng}
                           </span>
+
+                          <Image
+                            alt=""
+                            width={0}
+                            height={0}
+                            src={"/ttd-elektronik.png"}
+                            className="w-[230px] h-[100px] relative -z-10 pt-4 block"
+                          />
 
                           {userPelatihan?.StatusPenandatangan == 'Spesimen' ? (
                             <Image
@@ -561,7 +570,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                           <span className="font-bosNormal text-base">Nama</span>
                           <span className="font-bos italic text-[0.85rem] -mt-2">Name</span>
                         </td>
-                        <td className=" w-2/3 text-base font-bosNormal uppercase">: {capitalizeWords(userPelatihan!.Nama)}</td>
+                        <td className=" w-2/3 text-base font-bosNormal uppercase">: {formatName(userPelatihan!.Nama)}</td>
                       </tr>
                       <tr className="w-full">
                         <td className="font-bos w-full flex flex-col  space-y-0">
@@ -643,7 +652,9 @@ const SertifikatNonKepelautan = React.forwardRef(
                             {ESELON_2.fullNameEng}
                           </span>
 
-                          {userPelatihan?.StatusPenandatangan == 'Spesimen' ? (
+
+
+                          {userPelatihan?.StatusPenandatangan == 'Spesimen' || userPelatihan?.StatusPenandatangan == 'Revisi' ? (
                             <Image
                               alt=""
                               width={0}
@@ -1372,6 +1383,22 @@ export function DialogSertifikatPelatihan({
                         )}
                       </Button>
                     )}
+
+                    <Button
+                      onClick={(e) => handleUploadPDF()}
+                      type="submit"
+                      disabled={isUploading}
+                      className="flex items-center gap-1"
+                    >
+                      {isUploading ? (
+                        <>Uploading...</>
+                      ) : (
+                        <>
+                          <TbCloudUpload />
+                          Generate PDF dan Ajukan Penerbitan
+                        </>
+                      )}
+                    </Button>
                   </>
                 )}
             </DialogFooter>

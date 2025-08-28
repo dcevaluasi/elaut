@@ -177,3 +177,13 @@ export function getStatusInfo(
       };
   }
 }
+
+export function formatName(name: string): string {
+  const [beforeComma, ...afterComma] = name.split(",");
+
+  if (afterComma.length > 0) {
+    return beforeComma.toUpperCase() + ", " + afterComma.join(",").trim();
+  } else {
+    return name.toUpperCase();
+  }
+}

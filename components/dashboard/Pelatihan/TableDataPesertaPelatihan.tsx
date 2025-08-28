@@ -581,7 +581,7 @@ const TableDataPesertaPelatihan = () => {
       const response = await axios.post(
         elautBaseUrl + "/lemdik/sendSertifikatTtdeById",
         {
-          id_users_pelatihan: idUserPelatihan,
+          id_user_pelatihan: idUserPelatihan.toString(),
           kodeParafrase: passphrase,
           nik: Cookies.get("NIK"),
         },
@@ -592,6 +592,8 @@ const TableDataPesertaPelatihan = () => {
         }
       );
 
+      console.log({ response })
+
       Toast.fire({
         icon: "success",
         text: "Berhasil melakukan penandatangan sertifikat revisi!",
@@ -600,6 +602,7 @@ const TableDataPesertaPelatihan = () => {
 
       handleFetchingPublicTrainingDataById();
     } catch (error) {
+      console.log({ error })
       handleFetchingPublicTrainingDataById();
     }
   };
@@ -789,7 +792,7 @@ const TableDataPesertaPelatihan = () => {
                       <span className="text-sm">Download Sertifikat</span>
                     </Link>
                     {
-                      (dataPelatihan?.IsRevisi == "1" && row.original.StatusPenandatangan == 'Revisi') && <Button
+                      (dataPelatihan?.IsRevisi == "1" && row.original.StatusPenandatangan == 'Revisi' && Cookies.get("Access")?.includes("createCertificates")) && <Button
                         onClick={() => handleDeleteCertificateById(row.original.IdUserPelatihan)}
                         className="w-full border flex gap-2 bg-rose-600 text-left capitalize items-center justify-center h-9 px-4 py-3 border-rose-600  whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 hover:bg-rose-600 text-white"
                       >
@@ -797,6 +800,7 @@ const TableDataPesertaPelatihan = () => {
                         <span className="text-sm">Hapus Sertifikat</span>
                       </Button>
                     }
+
 
                     {
                       (dataPelatihan?.IsRevisi == "1" &&
