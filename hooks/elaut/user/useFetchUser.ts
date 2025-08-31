@@ -21,6 +21,7 @@ export const useFetchUser = () => {
         },
       )
       setUserDetail(response.data)
+      console.log(response)
       return response.data
     } catch (error) {
       console.error('Error fetching user detail:', error)

@@ -78,7 +78,6 @@ const DropdownUserPelatihan = ({ top }: { top: boolean }) => {
 
   const handleLogOut = async () => {
     Cookies.remove("XSRF081");
-    Cookies.remove("XSRF082");
     Cookies.remove("XSRF083");
     Cookies.remove("status");
     Cookies.remove("isManningAgent");
@@ -115,6 +114,7 @@ const DropdownUserPelatihan = ({ top }: { top: boolean }) => {
     document.addEventListener("keydown", keyHandler);
     return () => document.removeEventListener("keydown", keyHandler);
   });
+
 
   return (
     <div className="relative">
@@ -186,18 +186,9 @@ const DropdownUserPelatihan = ({ top }: { top: boolean }) => {
               Edit Profile
             </Link>
           </li>
-          {/* <li>
-            <Link
-              href="/settings"
-              className="flex items-center gap-3 px-5 py-3 text-white/80 hover:text-white hover:bg-white/10 transition rounded-xl"
-            >
-              <FiSettings className="text-lg" />
-              Account Settings
-            </Link>
-          </li> */}
         </ul>
 
-        {/* Logout */}
+        {/* handling logout user */}
         <button
           onClick={handleLogOut}
           className="w-full flex items-center gap-3 px-5 py-4 text-blue-300 hover:text-red-400 hover:bg-red-500/10 transition rounded-b-2xl"

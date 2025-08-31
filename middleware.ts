@@ -14,6 +14,7 @@ export function middleware(request: any) {
 
   const XSRF091 = request.cookies.get('XSRF091')
   const XSRF081 = request.cookies.get('XSRF081')
+  const XSRF087 = request.cookies.get('XSRF087')
   const XSRF095 = request.cookies.get('XSRF095') // DPKAKP ADMIN
   const XSRF096 = request.cookies.get('XSRF096') // DPKAKP USERS
   const XSRF097 = request.cookies.get('XSRF097') // DPKAKP USERS
@@ -22,16 +23,29 @@ export function middleware(request: any) {
 
   // Role-based access control
   if (!XSRF081) {
-    const protectedPaths = ['/dashboard/complete-profile', '/dashboard']
-
+    const protectedPaths = ['/dashboard/edit-profile', '/dashboard']
     if (protectedPaths.includes(path)) {
       return NextResponse.redirect(new URL('/', request.url))
     }
   } else {
     const protectedPaths = ['/registrasi', '/login']
-
     if (protectedPaths.includes(path)) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+  }
+
+  if (XSRF081 && XSRF087) {
+    const protectedPaths = [
+      '/',
+      '/layanan/pelatihan/akp',
+      '/layanan/pelatihan/perikanan',
+      '/layanan/pelatihan/kelautan',
+      '/layanan/cek-sertifikat',
+    ]
+    if (protectedPaths.includes(path)) {
+      return NextResponse.redirect(
+        new URL('/dashboard/edit-profile', request.url),
+      )
     }
   }
 

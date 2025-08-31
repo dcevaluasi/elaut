@@ -25,6 +25,10 @@ import { MdWork } from "react-icons/md";
 import { Checkbox } from "../ui/checkbox";
 import { User } from "@/types/user";
 import { FaLock } from "react-icons/fa6";
+import { elautBaseUrl } from "@/constants/urls";
+import axios from "axios";
+import Toast from "../toast";
+import { formatTanggalIndo } from "@/utils/time";
 
 interface DetailRegistrasiPelatihanProps {
     data: DetailPelatihanMasyarakat;
@@ -37,6 +41,12 @@ const DetailRegistrasiPelatihan: React.FC<DetailRegistrasiPelatihanProps> = ({
     isRegistrasi,
     handleRegistration,
 }) => {
+
+    React.useEffect(() => {
+        // remove last path of selected training's detail
+        Cookies.remove('XSRF088');
+    }, [])
+
     const router = useRouter();
     const detailPelatihanUrl = usePathname()
     const [isAgreeWithAggreement, setIsAgreeWithAgreement] =
@@ -68,11 +78,49 @@ const DetailRegistrasiPelatihan: React.FC<DetailRegistrasiPelatihanProps> = ({
         (field) => userDetail?.[field] && userDetail?.[field] !== ""
     );
 
+    const handleRegistrationTrainingForPeople = async () => {
+        try {
+            const formData = new FormData();
+            formData.append("IdPelatihan", data?.IdPelatihan.toString());
+            formData.append("TotalBayar", data?.HargaPelatihan.toString());
+            formData.append("NamaPelatihan", data?.NamaPelatihan || "");
+            formData.append("BidangPelatihan", data?.BidangPelatihan || "");
+            formData.append("DetailPelatihan", data?.DetailPelatihan || "");
+            formData.append("StatusAproval", "Registrasi");
+            formData.append("TanggalMulai", data?.TanggalMulaiPelatihan || "");
+            formData.append("TanggalBerakhir", data?.TanggalBerakhirPelatihan || "");
+            formData.append("PenyelenggaraPelatihan", data?.PenyelenggaraPelatihan || "");
+            formData.append("TempatTanggalLahir", `${userDetail?.TempatLahir}, ${formatTanggalIndo(userDetail?.TanggalLahir)}` || "");
+
+            const response = await axios.post(
+                `${elautBaseUrl}/users/addPelatihan`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${Cookies.get('XSRF081')}`,
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+            Toast.fire({
+                icon: "success",
+                title: 'Yeayyy!',
+                text: `Berhasil melakukan pendaftaran, tunggu kabar selanjutnya sobat ELAUT!`,
+            });
+            router.push("/dashboard")
+        } catch (error) {
+            console.error({ error })
+            Toast.fire({
+                icon: "error",
+                title: "Oopsss!",
+                text: "Anda gagal mendaftar pelatihan ini!",
+            });
+        }
+    };
 
     return (
         <div className="relative w-full md:mt-28">
             <div className="flex flex-col lg:flex-row gap-10 lg:gap-10 items-start">
-
                 <div className="flex-1 flex flex-col gap-6 relative">
                     <div className="flex gap-2 absolute top-4 right-4 z-[99999]">
 
@@ -229,7 +277,7 @@ const DetailRegistrasiPelatihan: React.FC<DetailRegistrasiPelatihanProps> = ({
                                             </label>
                                             <input
                                                 type="text"
-                                                value={userDetail.TanggalLahir}
+                                                value={formatTanggalIndo(userDetail.TanggalLahir)}
                                                 readOnly
                                                 className="w-full rounded-xl px-4 py-2 bg-white/10 border border-white/20 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
                                             />
@@ -332,7 +380,7 @@ const DetailRegistrasiPelatihan: React.FC<DetailRegistrasiPelatihanProps> = ({
                                     </div>
 
                                     <Button
-                                        onClick={() => router.replace("/registrasi")}
+                                        onClick={handleRegistrationTrainingForPeople}
                                         className="bg-gradient-to-r w-full from-blue-600 to-sky-600 flex gap-2 items-center hover:from-blue-700 hover:to-sky-700 text-white font-bold px-10 py-6 rounded-full text-lg transition"
                                     >
                                         <FiUploadCloud />DAFTAR PELATIHAN
@@ -357,8 +405,6 @@ const DetailRegistrasiPelatihan: React.FC<DetailRegistrasiPelatihanProps> = ({
                                     </div>
                                 </div>
                         }
-
-
 
                     </div>
                 </div>

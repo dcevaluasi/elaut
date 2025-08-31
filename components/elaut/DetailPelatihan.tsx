@@ -17,6 +17,7 @@ import { formatToRupiah, replaceUrl } from "@/lib/utils";
 import { HiOutlineUserGroup } from "react-icons/hi2";
 import { FiUploadCloud } from "react-icons/fi";
 import Link from "next/link";
+import AuthenticationDialog from "./reusable/AuthenticationDialog";
 
 interface DetailPelatihanProps {
   data: DetailPelatihanMasyarakat;
@@ -32,6 +33,8 @@ const DetailPelatihan: React.FC<DetailPelatihanProps> = ({
   const router = useRouter();
   const detailPelatihanUrl = usePathname()
 
+  const [openDialogAuth, setOpenDialogAuth] = React.useState(false)
+
   return (
     <div className="relative w-full md:mt-28">
       <div className="flex flex-col lg:flex-row gap-10 lg:gap-10 items-start">
@@ -46,9 +49,6 @@ const DetailPelatihan: React.FC<DetailPelatihanProps> = ({
               </span>
             )}
           </div>
-
-
-
 
           {/* Price + Info */}
           <div className="border border-white/15 bg-white/10 backdrop-blur-xl 
@@ -66,8 +66,6 @@ const DetailPelatihan: React.FC<DetailPelatihanProps> = ({
                     height={400}
                   />
                 }
-
-
               </div>
 
               <div className={`${data.FotoPelatihan == "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" ? "" : ""}  rounded-3xl p-7 bg-gradient-to-br from-blue-500/70 to-sky-600/20 text-gray-200  backdrop-blur-xl 
@@ -110,11 +108,7 @@ const DetailPelatihan: React.FC<DetailPelatihanProps> = ({
                   Lokasi : {data.LokasiPelatihan}
                 </p>
               </div>
-
-
             </div>
-
-
 
             {/* Description */}
             <div
@@ -124,16 +118,20 @@ const DetailPelatihan: React.FC<DetailPelatihanProps> = ({
             </div>
 
 
+
             {/* Register Button */}
             {data.StatusApproval !== "Selesai" && !isRegistrasi && (
               <div className="mt-8">
                 {!Cookies.get("XSRF081") ? (
-                  <Button
-                    onClick={() => router.replace("/registrasi")}
-                    className="bg-gradient-to-r w-full from-blue-600 to-sky-600 flex gap-2 items-center hover:from-blue-700 hover:to-sky-700 text-white font-bold px-10 py-6 rounded-full text-lg transition"
-                  >
-                    <FiUploadCloud />DAFTAR PELATIHAN
-                  </Button>
+                  <>
+                    <Button
+                      onClick={() => setOpenDialogAuth(true)}
+                      className="bg-gradient-to-r w-full from-blue-600 to-sky-600 flex gap-2 items-center hover:from-blue-700 hover:to-sky-700 text-white font-bold px-10 py-6 rounded-full text-lg transition"
+                    >
+                      <FiUploadCloud />DAFTAR PELATIHAN
+                    </Button>
+                    <AuthenticationDialog open={openDialogAuth} setOpen={setOpenDialogAuth} />
+                  </>
                 ) : (
                   <Link
                     href={`https://elaut-bppsdm.kkp.go.id${detailPelatihanUrl}/register`}
@@ -171,7 +169,6 @@ const DetailPelatihan: React.FC<DetailPelatihanProps> = ({
           <Features />
         </div>
       )}
-
     </div>
   );
 };

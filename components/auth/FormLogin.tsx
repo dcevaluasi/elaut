@@ -74,10 +74,7 @@ function FormLogin() {
     }
   };
 
-  /* state variable to store basic user information to register */
-  // const [noNumber, setNoNumber] = React.useState<string>("");
-  // const [password, setPassword] = React.useState<string>("");
-  const recaptchaRef = React.createRef();
+
   const [countWrongPassword, setCountPassword] = React.useState<number>(0);
 
   const [captcha, setCaptcha] = React.useState<string | null>();
@@ -126,35 +123,33 @@ function FormLogin() {
             );
             console.log({ response });
 
+            // setting user's token
             Cookies.set("XSRF081", response.data.t, { expires: 1 });
-            Cookies.set("XSRF082", "true", { expires: 1 });
 
-            if (Cookies.get("XSRF085")) {
+            // user is first timer and has registered
+            if (Cookies.get('XSRF087')) {
               Toast.fire({
                 icon: "success",
                 title: "Berhasil login.",
-                text: `Berhasil melakukan login, ayo segera daftarkan dirimu!`,
+                text: `Silahkan melengkapi dahulu biodata mu sebelum menjelajah lebih jauh di E-LAUT!`,
               });
-              router.replace(Cookies.get("XSRF085")!);
+              router.replace('/dashboard/edit-profile')
             } else {
-              Toast.fire({
-                icon: "success",
-                title: "Berhasil login.",
-                text: `Berhasil melakukan login kedalam ELAUT!`,
-              });
-              if (Cookies.get("XSRF083")) {
-                router.replace("/dashboard/edit-profile");
-
+              // user before selected one of training's detail before
+              if (Cookies.get("XSRF088")) {
+                Toast.fire({
+                  icon: "success",
+                  title: "Berhasil login.",
+                  text: `Berhasil melakukan login, ayo segera daftarkan dirimu dalam pelatihan!`,
+                });
+                router.replace(Cookies.get("XSRF088")!);
               } else {
-                if (Cookies.get("LastPath")) {
-                  const path = Cookies.get("LastPath");
-                  router.replace(path!);
-                } else {
-                  router.replace("layanan/program/akp");
-                }
+                // instead will redirect to the main page
+                router.replace('/')
               }
-              router.replace('/dashboard')
             }
+
+
           } catch (error: any) {
             console.error({ error });
             if (
@@ -233,7 +228,7 @@ function FormLogin() {
               console.log({ response });
 
               Cookies.set("XSRF081", response.data.t, { expires: 1 });
-              Cookies.set("XSRF082", "true", { expires: 1 });
+
               Cookies.set("isManningAgent", "true", { expires: 1 });
 
               if (Cookies.get("XSRF085")) {
@@ -680,20 +675,14 @@ function FormLogin() {
                       required
                     />
 
-                    {isInputErrorNoTelpon && formData.no_telpon != "" && (
-                      <span className="text-rose-500 font-medium text-xs">
-                        *No Telpon minimal 12 digit!
-                      </span>
-                    )}
-
-                    <span className="block text-gray-200 text-xs font-medium">
+                    <span className="block text-gray-400 text-xs font-medium">
                       Lupa no telpon/WA? klik{" "}
                       <span
                         onClick={(e) => {
                           setIsForgetPhoneNumber(true);
                           setIsForgetPassword(true);
                         }}
-                        className="text-blue-500 cursor-pointer"
+                        className="text-white font-semibold cursor-pointer"
                       >
                         disini
                       </span>
@@ -728,52 +717,22 @@ function FormLogin() {
                       </span>
                     </span>
 
-                    <span className="block text-gray-200 text-xs font-medium">
+                    <span className="block text-gray-400 text-xs font-medium">
                       Lupa password? klik{" "}
                       <span
                         onClick={(e) => setIsForgetPassword(true)}
-                        className="text-blue-500 cursor-pointer"
+                        className="text-white font-semibold cursor-pointer"
                       >
                         disini
                       </span>
                     </span>
                   </div>
                 </div>
-                {formData!.password != "" && (
-                  <div
-                    className="flex flex-wrap w-full -mx-3 mb-2"
-                    style={{ width: "100% !important" }}
-                  >
-                    <div
-                      className="w-full px-3"
-                      style={{ width: "100% !important" }}
-                    >
-                      <label
-                        className="block text-gray-200 text-sm font-medium mb-1"
-                        htmlFor="password"
-                      >
-                        Verify if you are not a robot{" "}
-                        <span className="text-red-600">*</span>
-                      </label>
-                      <ReCAPTCHA
-                        style={{ width: "100% !important" }}
-                        sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
-                        className="mx-auto w-full font-inter text-sm"
-                        onChange={setCaptcha}
-                      />
-                    </div>
-                  </div>
-                )}
-
                 <div className="flex flex-wrap -mx-3 mt-3">
                   <div className="w-full px-3">
                     <button
                       type="submit"
-                      className={`btn text-white ${captcha
-                        ? "bg-blue-500 hover:bg-blue-600"
-                        : "bg-gray-500 hover:bg-gray-600"
-                        } w-full`}
-                    // disabled={captcha ? false : true}
+                      className={`btn text-white bg-blue-500 hover:bg-blue-600 w-full`}
                     >
                       Login
                     </button>
@@ -912,6 +871,7 @@ function FormLogin() {
               Belum punya akun sebelumnya?{" "}
               <Link
                 href="/registrasi"
+                onClick={() => Cookies.set("XSRF087", "1")}
                 className="text-blue-500 hover:underline transition duration-150 ease-in-out"
               >
                 Registrasi

@@ -47,7 +47,6 @@ const BottomNavigation = () => {
 
     const handleLogOut = () => {
         Cookies.remove("XSRF081");
-        Cookies.remove("XSRF082");
         Cookies.remove("XSRF083");
         Cookies.remove("status");
         Cookies.remove("isManningAgent");

@@ -99,9 +99,7 @@ function Page() {
 
     React.useEffect(() => {
         handleFetchingPublicTrainingDataById();
-        if (!Cookies.get("XSRF081")) {
-            Cookies.set("LastPath", pathname);
-        }
+
         const timer = setTimeout(() => {
             handleFetchingPublicTrainingData();
         }, 500);

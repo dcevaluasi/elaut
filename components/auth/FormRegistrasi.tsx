@@ -125,7 +125,22 @@ function FormRegistrasi() {
   /* state variable to store basic user information to register */
   const [name, setName] = React.useState<string>("");
   const [nik, setNik] = React.useState<string>("");
-  const [phoneNumber, setPhoneNumber] = React.useState<string>("");
+
+  const [phoneNumber, setPhoneNumber] = React.useState<string>("62");
+  const handleChangePhoneNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+
+    // Always force prefix "62"
+    if (!value.startsWith("62")) {
+      value = "62" + value.replace(/^0?/, ""); // remove leading 0 if user types it
+    }
+
+    setPhoneNumber(value);
+
+    // Error if length (after 62) is too short
+    setIsInputErrorNoTelpon(value.length > 0 && value.length <= 14);
+  };
+
   const [email, setEmail] = React.useState<string>("");
   const [password, setPassword] = React.useState<string>("");
   const [confirmPassword, setConfirmPassword] = React.useState<string>("");
@@ -599,11 +614,13 @@ function FormRegistrasi() {
                           onChange={(e) => setName(e.target.value)}
                           required
                         />
-                        {isInputError && (
+                        {isInputError ? (
                           <span className="text-rose-500 font-medium">
                             *Masukkan nama lengkap!
                           </span>
-                        )}
+                        ) : <p className="text-gray-400 leading-[100%] text-xs font-medium mt-2">
+                          * Tanpa gelar apapun, hanya nama lengkap
+                        </p>}
                       </div>
                     </div>
                     <div className="flex flex-wrap -mx-3 mb-1">
@@ -612,29 +629,29 @@ function FormRegistrasi() {
                           className="block text-gray-200 text-sm font-medium mb-1"
                           htmlFor="nik"
                         >
-                          NIK <span className="text-red-600">*</span>
+                          NIK/NIP/NIM/PASPOR <span className="text-red-600">*</span>
                         </label>
                         <input
                           id="nik"
                           type="text"
                           className={`form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200 active:border-gray-200 text-gray-200 ${isInputError ? "border-red-600" : ""
                             }`}
-                          placeholder="Masukkan NIK"
+                          placeholder="Masukkan NIK/NIP/NIM/PASPOR"
                           value={nik}
-                          maxLength={16}
+                          maxLength={20}
                           onChange={(e) => {
                             const value = e.target.value;
                             setNik(value);
-                            setIsInputErrorNIK(value.length > 0 && value.length < 16);
+                            setIsInputErrorNIK(value.length > 20);
                           }}
                           required
                         />
                         {isInputErrorNIK ? (
                           <span className="text-rose-500 font-medium text-xs">
-                            *NIK harus 16 karakter!
+                            *NIK/NIP/NIM/PASPOR maksimal 20 karakter!
                           </span>
-                        ) : <p className="text-gray-300 leading-[100%] text-xs font-medium mt-2">
-                          * NIK harus sesuai KTP karena untuk kebutuhan sertifikat
+                        ) : <p className="text-gray-400 leading-[100%] text-xs font-medium mt-2">
+                          * NIK/NIP/NIM/PASPOR harus valid karena untuk kebutuhan sertifikat
                         </p>}
                       </div>
                     </div>
@@ -654,12 +671,8 @@ function FormRegistrasi() {
                           placeholder="Masukkan no telpon/WA"
                           value={phoneNumber}
                           minLength={12}
-                          maxLength={13}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            setPhoneNumber(value);
-                            setIsInputErrorNoTelpon(value.length > 0 && value.length < 12);
-                          }}
+                          maxLength={14}
+                          onChange={handleChangePhoneNumber}
                           required
                         />
                         {isInputErrorNoTelpon && phoneNumber != '' && (
@@ -672,6 +685,9 @@ function FormRegistrasi() {
                             *Masukkan no telpon!
                           </span>
                         )}
+                        {(!isInputError && !isInputErrorNoTelpon) && <p className="text-gray-400 leading-[100%] text-xs font-medium mt-2">
+                          * Masukkan nomor yang dapat dihubungi penyelenggara
+                        </p>}
                       </div>
                     </div>
                     <div className="flex flex-wrap -mx-3 mb-1">
@@ -706,7 +722,7 @@ function FormRegistrasi() {
                             *Masukkan password!
                           </span>
                         ) : (
-                          <p className="text-gray-300 leading-[100%] text-xs font-medium mt-2">
+                          <p className="text-gray-400 leading-[100%] text-xs font-medium mt-2">
                             *Password minimal 8 karakter, harus terdiri dari
                             satu angka, huruf kapital dan kecil, serta karakter
                           </p>

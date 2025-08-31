@@ -256,6 +256,8 @@ function FormCompleteProfile() {
     );
   };
 
+  const isFirstTimerUser = Cookies.get('XSRF087')
+
   const handleCompleteProfileUser = async () => {
     setIsLoadingCompleteProfile(true);
     console.log(
@@ -331,7 +333,18 @@ function FormCompleteProfile() {
         text: `Berhasil mengupdate data profile-mu!`,
       });
       setIsLoadingCompleteProfile(false);
-      router.push("/dashboard");
+
+      if (Cookies.get('XSRF087')) {
+        if (Cookies.get('XSRF088')) {
+          Cookies.remove('XSRF087')
+          router.push(Cookies.get('XSRF088')!);
+        } else {
+          Cookies.remove('XSRF087')
+          router.push('/');
+        }
+      } else {
+        router.push('/dashboard')
+      }
     } catch (error) {
       console.error({ error });
       Toast.fire({

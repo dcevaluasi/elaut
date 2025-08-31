@@ -235,14 +235,13 @@ function UserTrainingService({ user }: { user: User | null }) {
                 )}
 
                 <div
-                  className={`w-full ${isExpand ? "w-full" : "max-w-full"
-                    } mx-auto flex gap-5 `}
+                  className={`w-full   flex gap-5 `}
                 >
                   <div
                     className={`gap-2  ${indexPelatihanSelected != 100000000
                       ? isExpand
                         ? "hidden"
-                        : "w-full md:w-5/12 flex flex-col "
+                        : "w-full flex flex-col "
                       : "w-full flex flex-col "
                       }`}
                   >
@@ -258,7 +257,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                       <Input
                         value={keywordSearch}
                         onChange={(e) => setKeywordSearch(e.target.value)}
-                        className="text-sm border-none -ml-1 focus:border-none active:outline-none active:border-none focus:outline-none focus-visible:ring-0"
+                        className="text-sm border-none -ml-1 focus:border-none active:outline-none active:border-none focus:outline-none focus-visible:ring-0 placeholder:text-gray-300"
                         placeholder="Cari Pelatihan Yang Kamu Ikuti"
                       />
                     </div>
@@ -462,7 +461,7 @@ function UserTrainingService({ user }: { user: User | null }) {
 
                   {indexPelatihanSelected != 100000000 && !isExpand && (
                     <div
-                      className={`hidden md:flex items-start justify-center ${isExpand ? "w-8/12" : "w-full flex"
+                      className={`hidden md:flex items-start justify-center ${isExpand ? "w-9/12" : "w-full flex"
                         }`}
                     >
                       <div
@@ -1076,7 +1075,7 @@ function UserTrainingService({ user }: { user: User | null }) {
                 )}
               </>
             ) : (
-              <div className="relative max-w-6xl w-full mx-auto px-4 sm:px-6">
+              <div className="relative max-w-7xl w-full mx-auto px-4 sm:px-6">
                 <div className="pt-12 md:pt-20 flex flex-col items-center">
                   <Image
                     src={"/illustrations/not-found.png"}

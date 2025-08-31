@@ -253,3 +253,25 @@ export const getQuarterForFiltering = (dateString: string) => {
   if (month >= 1 && month <= 12) return 'TW IV'
   return 'Unknown'
 }
+
+export function formatTanggalIndo(dateString: string): string {
+  const bulanIndo = [
+    'JANUARI',
+    'FEBRUARI',
+    'MARET',
+    'APRIL',
+    'MEI',
+    'JUNI',
+    'JULI',
+    'AGUSTUS',
+    'SEPTEMBER',
+    'OKTOBER',
+    'NOVEMBER',
+    'DESEMBER',
+  ]
+
+  const [year, month, day] = dateString.split('-')
+
+  const bulan = bulanIndo[parseInt(month, 10) - 1]
+  return `${day} ${bulan} ${year}`
+}

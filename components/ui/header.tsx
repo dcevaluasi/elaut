@@ -103,94 +103,99 @@ export default function Header() {
 
   const getLogoHeader = () => "/logo-kkp-full-white.png";
   const getSizeLogoHeader = () => "w-16 md:w-20";
+  const isFirstTimerUser = Cookies.get('XSRF087')
+
 
   return (
-    <header
-      className={`fixed left-0 right-0 z-[150] transition duration-300 ease-in-out hidden md:block
+    <>
+      {isFirstTimerUser ? <></> : <header
+        className={`fixed left-0 right-0 z-[150] transition duration-300 ease-in-out hidden md:block
         ${pathname.includes("pre-test") ||
-          pathname.includes("post-test") ||
-          pathname.includes("/e-katalog") ||
-          pathname.includes("instruktur")
-          ? "hidden"
-          : ""}`}
-    >
-      <div
-        className={`max-w-6xl mx-auto mt-6 px-5 rounded-3xl
-          ${!top
-            ? "bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg"
-            : "bg-transparent"} transition-all`}
+            pathname.includes("post-test") ||
+            pathname.includes("/e-katalog") ||
+            pathname.includes("instruktur")
+            ? "hidden"
+            : ""}`}
       >
-        <div className="flex items-center justify-between h-20 md:h-24">
-          {/* Logo */}
-          {
-            usePathname() != '/' && <Link href={"/"} className="flex items-center gap-3 shrink-0">
-              <Image
-                className={getSizeLogoHeader()}
-                width={0}
-                height={0}
-                src={getLogoHeader()}
-                alt="Kementrian Kelautan dan Perikanan RI Logo"
-              />
-            </Link>
-          }
+        <div
+          className={`max-w-6xl mx-auto mt-6 px-5 rounded-3xl
+          ${!top
+              ? "bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg"
+              : "bg-transparent"} transition-all`}
+        >
+          <div className="flex items-center justify-between h-20 md:h-24">
+            {/* Logo */}
+            {
+              usePathname() != '/' && <Link href={"/"} className="flex items-center gap-3 shrink-0">
+                <Image
+                  className={getSizeLogoHeader()}
+                  width={0}
+                  height={0}
+                  src={getLogoHeader()}
+                  alt="Kementrian Kelautan dan Perikanan RI Logo"
+                />
+              </Link>
+            }
 
 
-          {/* Navbar */}
-          <nav
-            className={`${pathname.includes("/instruktur/form") ? "hidden" : "flex"
-              } md:grow`}
-          >
-            <ul className="flex grow justify-end items-center">
-              <NavLinkDefault href="/" name="Beranda" icon={<HiHome />} />
-              <NavDropDown name="Balai Pelatihan">
-                <li>
-                  <Link
-                    href="https://bppptegal.id/tentang-kami"
-                    className="flex gap-2 items-center px-3 py-2 rounded-lg hover:bg-white/5 text-white"
-                  >
-                    <IoMdSchool className="text-xl text-blue-400" />
-                    <span>Balai Pelatihan Perikanan Tegal</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="https://bpppbitung.id/#"
-                    className="flex gap-2 items-center px-3 py-2 rounded-lg hover:bg-white/5 text-white"
-                  >
-                    <IoMdSchool className="text-xl text-blue-400" />
-                    <span>Balai Pelatihan Perikanan Bitung</span>
-                  </Link>
-                </li>
-              </NavDropDown>
-              <NavLinkDefault
-                href="/layanan/publikasi"
-                name="Publikasi"
-                icon={<HiNewspaper />}
-              />
-              <NavLinkDefault
-                href="/layanan/cek-sertifikat"
-                name="Cek Sertifikat"
-                icon={<HiIdentification />}
-              />
+            {/* Navbar */}
+            <nav
+              className={`${pathname.includes("/instruktur/form") ? "hidden" : "flex"
+                } md:grow`}
+            >
+              <ul className="flex grow justify-end items-center">
+                <NavLinkDefault href="/" name="Beranda" icon={<HiHome />} />
+                <NavDropDown name="Balai Pelatihan">
+                  <li>
+                    <Link
+                      href="https://bppptegal.id/tentang-kami"
+                      className="flex gap-2 items-center px-3 py-2 rounded-lg hover:bg-white/5 text-white"
+                    >
+                      <IoMdSchool className="text-xl text-blue-400" />
+                      <span>Balai Pelatihan Perikanan Tegal</span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="https://bpppbitung.id/#"
+                      className="flex gap-2 items-center px-3 py-2 rounded-lg hover:bg-white/5 text-white"
+                    >
+                      <IoMdSchool className="text-xl text-blue-400" />
+                      <span>Balai Pelatihan Perikanan Bitung</span>
+                    </Link>
+                  </li>
+                </NavDropDown>
+                <NavLinkDefault
+                  href="/layanan/publikasi"
+                  name="Publikasi"
+                  icon={<HiNewspaper />}
+                />
+                <NavLinkDefault
+                  href="/layanan/cek-sertifikat"
+                  name="Cek Sertifikat"
+                  icon={<HiIdentification />}
+                />
 
-              {/* Login / User */}
-              {Cookies.get("XSRF081") ? (
-                <DropdownUserPelatihan top={top} />
-              ) : (
-                <Button
-                  onClick={() => router.push("/login")}
-                  className="rounded-xl border border-blue-400 bg-blue-500/20 
+                {/* Login / User */}
+                {Cookies.get("XSRF081") ? (
+                  <DropdownUserPelatihan top={top} />
+                ) : (
+                  <Button
+                    onClick={() => router.push("/login")}
+                    className="rounded-xl border border-blue-400 bg-blue-500/20 
                     text-white hover:bg-blue-500 hover:text-white px-6 py-2"
-                >
-                  Login
-                </Button>
-              )}
-            </ul>
-          </nav>
+                  >
+                    Login
+                  </Button>
+                )}
+              </ul>
+            </nav>
 
-          <MobileMenu isTop={top} />
+            <MobileMenu isTop={top} />
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+      }</>
+
   );
 }

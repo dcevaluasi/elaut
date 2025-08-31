@@ -52,7 +52,6 @@ function FormLoginManningAgent() {
             console.log({ response });
 
             Cookies.set("XSRF081", response.data.t, { expires: 1 });
-            Cookies.set("XSRF082", "true", { expires: 1 });
 
             if (Cookies.get("XSRF085")) {
               Toast.fire({
@@ -224,11 +223,10 @@ function FormLoginManningAgent() {
                 <div className="w-full px-3">
                   <button
                     type="submit"
-                    className={`btn text-white ${
-                      captcha
+                    className={`btn text-white ${captcha
                         ? "bg-blue-500 hover:bg-blue-600"
                         : "bg-gray-500 hover:bg-gray-600"
-                    } w-full`}
+                      } w-full`}
                     disabled={captcha ? false : true}
                   >
                     Login
