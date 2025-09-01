@@ -20,6 +20,10 @@ import Cookies from "js-cookie";
 import UserPelatihanTable from "./Tables/UserPelatihanTable";
 import DeletePelatihanAction from "./Actions/DeletePelatihanAction";
 import EditPelatihanAction from "./Actions/EditPelatihanAction";
+import { truncateText } from "@/utils";
+import Link from "next/link";
+import UploadSuratButton from "./Actions/UploadSuratButton";
+import { urlFileSuratPemberitahuan } from "@/constants/urls";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -47,17 +51,19 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 currentData={data}
                                 onSuccess={fetchData} />
 
-                            {data!.UserPelatihan.length == 0 && data!.MateriPelatihan.length == 0 && data!.SarprasPelatihan == null && data!.Status != "Publish" && (
-                                <>
-                                    <DeletePelatihanAction
-                                        idPelatihan={data!.IdPelatihan.toString()}
-                                        pelatihan={data}
-                                        handleFetchingData={
-                                            fetchData
-                                        }
-                                    />
-                                </>
-                            )}
+                            <DeletePelatihanAction
+                                idPelatihan={data!.IdPelatihan.toString()}
+                                pelatihan={data}
+                                handleFetchingData={
+                                    fetchData
+                                }
+                            />
+
+                            <UploadSuratButton
+                                idPelatihan={String(data.IdPelatihan)}
+                                pelatihan={data}
+                                handleFetchingData={fetchData}
+                            />
                         </div>
 
                         <div className="w-full ">
@@ -78,6 +84,15 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 <InfoItem label="Harga" value={`Rp ${data.HargaPelatihan.toLocaleString()}`} />
                                 <InfoItem label="Pelaksanaan" value={data.PelaksanaanPelatihan} />
                             </SectionGrid>
+
+                            <div className="grid grid-cols-1 gap-4 mt-4 text-sm">
+                                <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
+                                    <span className="text-xs font-medium text-gray-500">Surat Pemberitahuan</span>
+                                    <Link target="_blank" href={`${urlFileSuratPemberitahuan}/${data?.SuratPemberitahuan}`} className="text-sm font-semibold text-gray-800 mt-1">
+                                        {urlFileSuratPemberitahuan}/{data?.SuratPemberitahuan != '' ? truncateText(data?.SuratPemberitahuan, 30, '...') : "-"}
+                                    </Link>
+                                </div>
+                            </div>
 
                         </div>
                     </div>

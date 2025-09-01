@@ -12,7 +12,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { elautBaseUrl } from "@/constants/urls";
+import { elautBaseUrl, urlFileSuratPemberitahuan } from "@/constants/urls";
 import axios from "axios";
 import Toast from "@/components/toast";
 import Cookies from "js-cookie";
@@ -56,7 +56,6 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
 
     setIsUploading(true);
     const formData = new FormData();
-    formData.append("StatusPenerbitan", "1");
     formData.append("SuratPemberitahuan", file);
 
     try {
@@ -70,7 +69,7 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
       Toast.fire({
         icon: "success",
         title: "Yeayyy!",
-        text: "Berhasil mengirim pemberitahuan pelatihan, silahkan menunggu approval SPV!",
+        text: "Berhasil mengupload surat pemberitahuan pelatihan!",
       });
 
       handleFetchingData?.();
@@ -88,7 +87,6 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
 
   return (
     <>
-      {/* Dialog */}
       <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
         <AlertDialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <AlertDialogHeader>
@@ -97,7 +95,7 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
               Pemberitahuan Pelaksanaan Pelatihan
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Upload surat pemberitahuan dan kirim ke SPV Pusat, dipastikan terdapat data dan detail informasi pelatihan terlampir pada surat!
+              Upload surat pemberitahuan dan dipastikan terdapat data dan detail informasi pelatihan terlampir pada surat!
             </AlertDialogDescription>
           </AlertDialogHeader>
 
@@ -122,30 +120,40 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
               className="hidden"
               onChange={handleFileChange}
             />
+
+            {pelatihan?.SuratPemberitahuan != "" && (
+              <p className="text-xs text-gray-500 mt-1">
+                File saat ini:{" "}
+                <Link
+                  href={`${urlFileSuratPemberitahuan}/${pelatihan?.SuratPemberitahuan}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 underline"
+                >
+                  Lihat Surat
+                </Link>
+              </p>
+            )}
           </div>
 
           <AlertDialogFooter className="mt-4">
             {!isUploading && <AlertDialogCancel>Cancel</AlertDialogCancel>}
             <AlertDialogAction onClick={handleUpload} disabled={isUploading}>
-              {isUploading ? "Mengirim..." : "Kirim SPV"}
+              {isUploading ? "Mengirim..." : "Upload"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
 
       {/* Trigger Button */}
       {Cookies.get("Access")?.includes("createPelatihan") &&
         pelatihan.StatusPenerbitan === "0" && (
           <Button
             onClick={() => setIsOpen(true)}
-            size="sm"
-            className="w-full inline-flex items-center justify-center gap-2 
-                       h-10 px-5 text-sm font-medium rounded-full 
-                       border border-indigo-500 bg-indigo-500 text-white 
-                       hover:bg-indigo-600 transition-colors shadow-sm"
+            variant="outline"
+            className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-neutral-500 text-neutral-500 hover:text-white hover:bg-neutral-500"
           >
-            <FiUploadCloud className="h-5 w-5" /> Kirim SPV
+            <FiUploadCloud className="h-5 w-5" /> {pelatihan?.SuratPemberitahuan != "" ? 'Edit' : 'Upload'} Surat Pemberitahuan
           </Button>
         )}
     </>

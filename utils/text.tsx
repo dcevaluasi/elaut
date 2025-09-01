@@ -109,7 +109,7 @@ export function getStatusInfo(
     case "0":
       return {
         label: "Draft",
-        color: "bg-neutral-500 text-white",
+        color: "bg-gray-500 text-white",
         icon: <RiTimeLine className="w-4 h-4" />,
       };
     case "0.1":

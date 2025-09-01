@@ -109,14 +109,16 @@ const DeletePelatihanAction: React.FC<DeletePelatihanActionProps> = ({
         </AlertDialogContent>
       </AlertDialog>
 
-      <Button
+      {pelatihan!.UserPelatihan.length == 0 && pelatihan!.MateriPelatihan.length == 0 && pelatihan!.Status != "Publish" && Cookies.get('Access')?.includes('createPelatihan') && pelatihan!.StatusPenerbitan == "0" && <Button
         onClick={() => setIsOpenFormDelete(!isOpenFormDelete)}
         variant="outline"
         title="Hapus Pelatihan"
         className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-rose-500 text-rose-500 hover:text-white hover:bg-rose-500"
       >
         <Trash className="h-5 w-5" /> Hapus Pelatihan
-      </Button>
+      </Button>}
+
+
     </>
   );
 };
