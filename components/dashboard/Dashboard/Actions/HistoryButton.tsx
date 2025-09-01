@@ -1,31 +1,8 @@
 import React from "react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetTrigger } from "@/components/ui/sheet";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { RiVerifiedBadgeFill } from "react-icons/ri";
-import { elautBaseUrl } from "@/constants/urls";
-import axios from "axios";
-import Toast from "@/components/toast";
-import Cookies from "js-cookie";
-import { HiLockClosed } from "react-icons/hi2";
 import { HistoryItem, HistoryTraining, PelatihanMasyarakat } from "@/types/product";
-import { doc, DocumentData, getDoc, getFirestore } from "firebase/firestore";
-import firebaseApp from "@/firebase/config";
-import { generateTimestamp } from "@/utils/time";
-import addData from "@/firebase/firestore/addData";
-import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
 import { MdOutlineHistory } from "react-icons/md";
 import getDocument from "@/firebase/firestore/getData";
 import { DIALOG_TEXTS } from "@/constants/texts";
@@ -54,9 +31,6 @@ const HistoryButton: React.FC<HistoryButtonProps> = ({
     const doc = await getDocument('historical-training-notes', pelatihan!.KodePelatihan)
     setDataHistoryTraining(doc.data as HistoryTraining)
   }
-
-
-  console.log({ dataHistoryTraining })
 
   React.useEffect(() => { handleFetchDataHistoryTraining() }, [])
 
@@ -113,11 +87,11 @@ const HistoryButton: React.FC<HistoryButtonProps> = ({
         }}
         variant="outline"
         className="inline-flex items-center justify-center gap-2 
-        h-10 px-5 text-sm font-medium rounded-full 
-        border border-neutral-500 bg-neutral-500 text-white 
-        hover:bg-neutral-600 hover:text-white transition-colors shadow-sm"
+        h-10 px-5 text-sm font-medium rounded-md 
+         bg-gray-100 text-gray-700 
+        hover:bg-gray-200 hover:text-gray-700 transition-colors"
       >
-        <MdOutlineHistory className="h-5 w-5" /> History Pelatihan
+        <MdOutlineHistory className="h-5 w-5" /> History
       </Button>
     </>
   );

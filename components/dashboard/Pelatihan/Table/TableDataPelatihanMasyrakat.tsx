@@ -76,25 +76,20 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                 <table className="min-w-full text-sm border border-gray-200">
                     <thead className="bg-gray-50 text-gray-700 text-xs uppercase">
                         <tr>
-                            <th className="px-4 py-3 text-center">No</th>
-                            <th className="px-4 py-3 text-left">
-                                <div className="flex items-center gap-1">
+                            <th className="px-4 py-5 text-center">No</th>
+                            <th className="px-4 py-5 text-center">
+                                <div className="flex items-center justify-center w-full gap-1">
                                     <BookOpen size={14} className="text-blue-500" /> Nama Pelatihan
                                 </div>
                             </th>
-                            <th className="px-4 py-3 text-left">Program</th>
-                            <th className="px-4 py-3 text-left">Penyelenggara</th>
-                            <th className="px-4 py-3 text-center">
-                                <div className="flex items-center justify-center gap-1">
-                                    <Calendar size={14} className="text-indigo-500" /> Waktu
-                                </div>
-                            </th>
-                            <th className="px-4 py-3 text-center">
+                            <th className="px-4 py-5 text-center">Program</th>
+                            <th className="px-4 py-5 text-center">
                                 <div className="flex items-center justify-center gap-1">
                                     <Users size={14} className="text-emerald-500" /> Peserta
                                 </div>
                             </th>
-                            <th className="px-4 py-3 text-center">Action</th>
+                            <th className="px-4 py-5 text-center">Status</th>
+                            <th className="px-4 py-5 text-center">Action</th>
                         </tr>
                     </thead>
 
@@ -106,6 +101,10 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                 ? `${generateTanggalPelatihan(pelatihan.TanggalMulaiPelatihan)} s.d ${generateTanggalPelatihan(pelatihan.TanggalBerakhirPelatihan || "")}`
                                 : "-";
 
+                            const waktuPendaftaran = pelatihan.TanggalMulaiPendaftaran
+                                ? `${generateTanggalPelatihan(pelatihan.TanggalMulaiPendaftaran)} s.d ${generateTanggalPelatihan(pelatihan.TanggalAkhirPendaftaran || "")}`
+                                : "-";
+
                             const { label, color, icon } = getStatusInfo(String(pelatihan.StatusPenerbitan));
 
                             return (
@@ -113,95 +112,114 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                     key={pelatihan.IdPelatihan}
                                     className="hover:bg-gray-50 transition-colors duration-150"
                                 >
-                                    <td className="px-4 py-3 text-center text-gray-500">
+                                    <td className="px-4 py-3 border border-gray-200 text-center text-gray-500">
                                         {(currentPage - 1) * itemsPerPage + index + 1}
                                     </td>
-                                    <td className="px-4 py-3 font-medium">{pelatihan.NamaPelatihan}</td>
-                                    <td className="px-4 py-3">{pelatihan.Program}</td>
-                                    <td className="px-4 py-3">{pelatihan.PenyelenggaraPelatihan}</td>
-                                    <td className="px-4 py-3 text-center">{waktuPelaksanaan}</td>
-                                    <td className="px-4 py-3 text-center">
+                                    <td className="px-4 py-3 border border-gray-200 font-medium">
+                                        <div className="flex flex-col w-full h-full ">
+                                            <p className="text-base font-semibold leading-none">{pelatihan.NamaPelatihan}</p>
+                                            <div className="flex flex-col">
+                                                <span className="text-sm text-gray-400 leading-none">Pendaftaran : {waktuPendaftaran}</span>
+                                                <span className="text-sm text-gray-400 leading-none">Pelaksanaan : {waktuPelaksanaan}</span>
+                                                <span className="text-sm text-gray-400 leading-none">Lokasi : {pelatihan?.LokasiPelatihan}</span>
+                                                <span className="text-sm text-gray-400 leading-none">Penyelenggara : {pelatihan?.PenyelenggaraPelatihan}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-3 border border-gray-200 text-center">
+                                        <div className="flex items-center justify-center w-full h-full">
+                                            <p className="font-semibold">{pelatihan.Program}</p>
+                                        </div>
+                                    </td>
+
+
+                                    <td className="px-4 py-3 border border-gray-200 text-center">
                                         {pelatihan.UserPelatihan?.length ?? 0}
                                     </td>
 
+                                    <td className={`px-4 py-3 border border-gray-200 text-center  ${color}`}>
+                                        <span className="flex items-center justify-center w-full h-full">{icon}{label}</span>
+
+                                    </td>
+
                                     {/* Action Buttons */}
-                                    <td className="px-4 py-3 flex flex-col gap-2 justify-center items-center h-fit">
-                                        {(Cookies.get('Access')?.includes('isSigning') && pelatihan!.PemberitahuanDiterima.includes('Pengajuan Telah Dikirim ke Ka')) &&
-                                            <TTDSertifikat dataPelatihan={pelatihan!} handleFetchData={fetchDataPelatihanMasyarakat} />
-                                        }
+                                    <td className="px-4 py-3 border border-gray-200">
+                                        <div className=" flex flex-col gap-2 justify-center items-center h-full">
+                                            {(Cookies.get('Access')?.includes('isSigning') && pelatihan!.PemberitahuanDiterima.includes('Pengajuan Telah Dikirim ke Ka')) &&
+                                                <TTDSertifikat dataPelatihan={pelatihan!} handleFetchData={fetchDataPelatihanMasyarakat} />
+                                            }
 
-
-
-
-
-                                        {!isOperatorBalaiPelatihan &&
-                                            pelatihan.PemberitahuanDiterima === "Kirim ke SPV" && (
-                                                <Button
-                                                    size="sm"
-                                                    className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
+                                            {/* {!isOperatorBalaiPelatihan &&
+                                                pelatihan.PemberitahuanDiterima === "Kirim ke SPV" && (
+                                                    <Button
+                                                        size="sm"
+                                                        className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
              rounded-lg border border-neutral-300 bg-white text-neutral-700 
              hover:bg-neutral-100 hover:text-neutral-900 transition-colors w-full  
              shadow-sm"
-                                                    onClick={() => {
-                                                        const isReady =
-                                                            countUserWithDrafCertificate(
-                                                                pelatihan.UserPelatihan || []
-                                                            ) === pelatihan.UserPelatihan?.length;
-                                                        isReady
-                                                            ? handleSendToSPVAboutCertificateIssueance(
-                                                                String(pelatihan.IdPelatihan),
-                                                                pelatihan
-                                                            )
-                                                            : alert(
-                                                                "Oopsss, penyiapan draft sertifikat peserta belum selesai!"
-                                                            );
-                                                    }}
-                                                >
-                                                    <RiCheckboxCircleFill className="h-5 w-5 text-indigo-500" size={14} /> Kirim SPV
-                                                </Button>
-                                            )}
+                                                        onClick={() => {
+                                                            const isReady =
+                                                                countUserWithDrafCertificate(
+                                                                    pelatihan.UserPelatihan || []
+                                                                ) === pelatihan.UserPelatihan?.length;
+                                                            isReady
+                                                                ? handleSendToSPVAboutCertificateIssueance(
+                                                                    String(pelatihan.IdPelatihan),
+                                                                    pelatihan
+                                                                )
+                                                                : alert(
+                                                                    "Oopsss, penyiapan draft sertifikat peserta belum selesai!"
+                                                                );
+                                                        }}
+                                                    >
+                                                        <RiCheckboxCircleFill className="h-5 w-5 text-indigo-500" size={14} /> Kirim SPV
+                                                    </Button>
+                                                )} */}
 
-                                        {Cookies.get('Access')?.includes('viewPelatihan') && <Link
-                                            title="Detail Pelatihan"
-                                            target={'_blank'}
-                                            href={`/admin/${usePathname().includes('pusat') ? 'pusat' : 'lemdiklat'}/pelatihan/detail/${pelatihan.KodePelatihan}/${encryptValue(
-                                                pelatihan.IdPelatihan.toString()
-                                            )}`}
-                                            className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
+                                            {Cookies.get('Access')?.includes('isSigning') && <Link
+                                                title="Detail Pelatihan"
+                                                target={'_blank'}
+                                                href={`/admin/${usePathname().includes('pusat') ? 'pusat' : 'lemdiklat'}/pelatihan/detail/${pelatihan.KodePelatihan}/${encryptValue(
+                                                    pelatihan.IdPelatihan.toString()
+                                                )}`}
+                                                className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
              rounded-lg border border-blue-500 bg-blue-500 text-white 
              hover:bg-blue-600  transition-colors  w-full 
              shadow-sm"
-                                        >
-                                            <RiInformationFill className="h-4 w-4 " />
-                                            Review
-                                        </Link>}
+                                            >
+                                                <RiInformationFill className="h-4 w-4 " />
+                                                Review
+                                            </Link>}
 
-                                        <Link
-                                            title="Peserta Pelatihan"
-                                            target={"_blank"}
-                                            href={`/admin/${usePathname().includes('pusat') ? 'pusat' : 'lemdiklat'}/pelatihan/${pelatihan.KodePelatihan
-                                                }/peserta-pelatihan/${encryptValue(
+                                            {Cookies.get('Access')?.includes('createPelatihan') && <Link
+                                                title="Kelola Pelatihan"
+                                                target={'_blank'}
+                                                href={`/admin/${usePathname().includes('pusat') ? 'pusat' : 'lemdiklat'}/pelatihan/detail/${pelatihan.KodePelatihan}/${encryptValue(
                                                     pelatihan.IdPelatihan.toString()
                                                 )}`}
-                                            className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
-             rounded-lg border bg-green-500 text-white 
-             hover:bg-grenn-600 hover:text-white transition-colors  w-full 
+                                                className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
+             rounded-lg border border-gray-500 bg-gray-500 text-white 
+             hover:bg-gray-600  transition-colors  w-full 
              shadow-sm"
-                                        >
-                                            <HiUserGroup className="h-3 w-3 text-white" />
-                                            Peserta
-                                        </Link>
+                                            >
+                                                <RiInformationFill className="h-4 w-4 " />
+                                                Manage
+                                            </Link>}
 
 
-                                        {/* Upload Surat Pemberitahuan Pelatihan */}
-                                        {accessPermissions?.includes('createPelatihan') && (
-                                            <UploadSuratButton
-                                                idPelatihan={String(pelatihan.IdPelatihan)}
-                                                pelatihan={pelatihan}
-                                                handleFetchingData={fetchDataPelatihanMasyarakat}
-                                            />
-                                        )}
+
+
+                                            {/* Upload Surat Pemberitahuan Pelatihan */}
+                                            {/* {accessPermissions?.includes('createPelatihan') && (
+                                                <UploadSuratButton
+                                                    idPelatihan={String(pelatihan.IdPelatihan)}
+                                                    pelatihan={pelatihan}
+                                                    handleFetchingData={fetchDataPelatihanMasyarakat}
+                                                />
+                                            )} */}
+                                        </div>
                                     </td>
+
                                 </tr>
                             );
                         })}

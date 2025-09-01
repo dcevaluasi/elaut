@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { MdOutlineClose } from "react-icons/md";
 
-function DetailPeserta() {
+function Page() {
   const paths = usePathname().split("/");
   const idPeserta = decryptValue(paths[paths.length - 1]);
   const idPesertaPelatihan = decryptValue(paths[paths.length - 2]);
@@ -30,7 +30,11 @@ function DetailPeserta() {
   const handleFetchDetailPeserta = async () => {
     try {
       const response = await axios.get(
-        `${elautBaseUrl}/users/getUsersByIdNoJwt?id=${idPeserta}`
+        `${elautBaseUrl}/users/getUsersByIdNoJwt?id=${idPeserta}`, {
+        headers: {
+          "x-api-key": "EL@uTs3rv3R",
+        },
+      }
       );
       setPeserta(response.data);
       const filteredPelatihan = response.data.Pelatihan.filter(
@@ -105,9 +109,9 @@ function DetailPeserta() {
                           <Link
                             target="_blank"
                             className="text-blue-500"
-                            href={`https://wa.me/62${peserta!.NoTelpon}`}
+                            href={`https://wa.me/${peserta!.NoTelpon}`}
                           >
-                            62{peserta!.NoTelpon || ""}
+                            {peserta!.NoTelpon || ""}
                           </Link>{" "}
                         </td>
                       </tr>
@@ -339,4 +343,4 @@ function DetailPeserta() {
   );
 }
 
-export default DetailPeserta;
+export default Page;

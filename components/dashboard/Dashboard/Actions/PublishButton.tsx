@@ -1,10 +1,6 @@
+"use client";
+
 import React from "react";
-import {
-  Tooltip,
-  TooltipProvider,
-  TooltipTrigger,
-  TooltipContent,
-} from "@/components/ui/tooltip";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,7 +10,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -24,6 +19,7 @@ import { elautBaseUrl } from "@/constants/urls";
 import axios from "axios";
 import Toast from "@/components/toast";
 import Cookies from "js-cookie";
+import { FiUploadCloud } from "react-icons/fi";
 
 interface PublishButtonProps {
   title: string;
@@ -59,20 +55,19 @@ const PublishButton: React.FC<PublishButtonProps> = ({
       Toast.fire({
         icon: "success",
         title: `Yeayyy!`,
-        text: 'Berhasil mempublish informasi pelatihan masyarakat ke laman E-LAUT!',
+        text: "Berhasil mempublish informasi pelatihan masyarakat ke laman E-LAUT!",
       });
-      console.log("UPDATE PELATIHAN: ", response);
       handleFetchingData();
-      setIsOpenFormPublishedPelatihan(!isOpenFormPublishedPelatihan);
+      setIsOpenFormPublishedPelatihan(false);
     } catch (error) {
-      setIsOpenFormPublishedPelatihan(!isOpenFormPublishedPelatihan);
       console.error("ERROR UPDATE PELATIHAN: ", error);
       Toast.fire({
         icon: "error",
         title: `Oopsss!`,
-        text: 'Gagal mempublish informasi pelatihan masyarakat ke laman E-LAUT!'
+        text: "Gagal mempublish informasi pelatihan masyarakat ke laman E-LAUT!",
       });
       handleFetchingData();
+      setIsOpenFormPublishedPelatihan(false);
     }
   };
 
@@ -82,56 +77,72 @@ const PublishButton: React.FC<PublishButtonProps> = ({
         open={isOpenFormPublishedPelatihan}
         onOpenChange={setIsOpenFormPublishedPelatihan}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="rounded-2xl shadow-lg border border-gray-200">
           <AlertDialogHeader>
-            <AlertDialogTitle>Publikasi ke Web E-LAUT</AlertDialogTitle>
-            <AlertDialogDescription className="-mt-2">
+            <AlertDialogTitle className="text-lg font-semibold text-gray-800">
+              Publikasi ke Web E-LAUT
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-gray-600 mt-1">
               Agar pelatihan di balai/lemdiklat-mu dapat dilihat oleh masyarakat
               umum lakukan checklist agar tampil di website E-LAUT!
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <fieldset>
+
+          <fieldset className="mt-4">
             <form autoComplete="off">
-              {statusPelatihan == "Belum Publish" ? (
-                <div className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 border-gray-300">
-                  <div>
+              {statusPelatihan === "Belum Publish" ? (
+                <div className="space-y-4">
+                  {/* Checkbox publish */}
+                  <div className="flex flex-row items-center space-x-3 rounded-xl border border-gray-200 p-4 bg-gray-50">
                     <Checkbox
                       id="publish"
-                      onCheckedChange={(e) => setSelectedStatus("Publish")}
+                      onCheckedChange={() => setSelectedStatus("Publish")}
                     />
-                  </div>
-                  <div className="space-y-1 leading-none">
-                    <label>Publish Website E-LAUT</label>
-                    <p className="text-xs leading-[110%] text-gray-600">
-                      Dengan ini sebagai pihak lemdiklat saya mempublish
-                      informasi pelatihan terbuka untuk masyarakat umum!
-                    </p>
+                    <div className="space-y-1">
+                      <label className="font-medium text-gray-800">
+                        Publish Website E-LAUT
+                      </label>
+                      <p className="text-xs text-gray-600 leading-snug">
+                        Dengan ini sebagai pihak lemdiklat saya mempublish informasi
+                        pelatihan terbuka untuk masyarakat umum!
+                      </p>
+                    </div>
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4 border-gray-300">
-                  <RiVerifiedBadgeFill className="h-7 w-7 text-green-500 text-lg" />
-                  <div className="space-y-1 leading-none">
-                    <label>Published Website E-LAUT</label>
-                    <p className="text-xs leading-[110%] text-gray-600">
-                      Informasi Kelas Pelatihanmu telah dipublikasikan melalui
-                      laman Website E-LAUT balai mu!
+                <div className="flex flex-row items-center space-x-3 rounded-xl border border-gray-200 p-4 bg-green-50">
+                  <RiVerifiedBadgeFill className="h-7 w-7 text-green-500" />
+                  <div className="space-y-1">
+                    <label className="font-medium text-gray-800">
+                      Published Website E-LAUT
+                    </label>
+                    <p className="text-xs text-gray-600 leading-snug">
+                      Informasi Kelas Pelatihanmu telah dipublikasikan melalui laman
+                      Website E-LAUT balai mu!
                     </p>
                   </div>
                 </div>
               )}
+
             </form>
           </fieldset>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+
+          <AlertDialogFooter className="mt-4">
+            <AlertDialogCancel className="rounded-lg border-gray-300">
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
-              onClick={(e) =>
-                statusPelatihan == "Belum Publish"
+              className={`rounded-lg shadow-sm transition-all ${statusPelatihan === "Publish"
+                ? "bg-gray-600 hover:bg-gray-700 text-white"
+                : "bg-purple-600 hover:bg-purple-700 text-white"
+                }`}
+              onClick={() =>
+                statusPelatihan === "Belum Publish"
                   ? handlePublish(idPelatihan, selectedStatus)
                   : handlePublish(idPelatihan, "Belum Publish")
               }
             >
-              {statusPelatihan == "Publish" ? "Take Down" : "Publish"}
+              {statusPelatihan === "Publish" ? "Take Down" : "Publish"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -141,20 +152,22 @@ const PublishButton: React.FC<PublishButtonProps> = ({
         title={title}
         onClick={() => {
           setSelectedStatus(statusPelatihan);
-          setIsOpenFormPublishedPelatihan(!isOpenFormPublishedPelatihan);
+          setIsOpenFormPublishedPelatihan(true);
         }}
         variant="outline"
-        className={`ml-auto hover:text-neutral-100 w-full  text-neutral-100  duration-700 ${title == "Publish"
-          ? "bg-purple-600 hover:bg-purple-600"
-          : "bg-teal-600 hover:bg-teal-600"
+        className={`flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all ${title === "Publish"
+          ? "bg-transparent border-purple-500 text-purple-500 hover:text-white hover:bg-purple-500"
+          : "bg-transparent border-gray-500 text-gray-500 hover:text-white hover:bg-gray-500"
           }`}
       >
-        {title == "Publish" ? (
+        {title === "Publish" ? (
           <>
-            <TbBroadcast className="h-5 w-5" /> <span>Publish</span></>
+            <TbBroadcast className="h-5 w-5" /> <span>Publish</span>
+          </>
         ) : (
           <>
-            <TbWorldCancel className="h-5 w-5" />Takedown</>
+            <TbWorldCancel className="h-5 w-5" /> <span>Takedown</span>
+          </>
         )}
       </Button>
     </>

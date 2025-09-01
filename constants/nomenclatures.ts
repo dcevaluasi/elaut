@@ -37,6 +37,7 @@ export const ESELON_3: ESELON = {
 }
 
 export const UPT: string[] = [
+  'Pusat Pelatihan Kelautan dan Perikanan',
   'BPPP Medan',
   'BPPP Tegal',
   'BPPP Banyuwangi',

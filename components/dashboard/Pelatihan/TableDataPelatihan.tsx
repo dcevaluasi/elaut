@@ -216,7 +216,8 @@ const TableDataPelatihan: React.FC = () => {
       <section className="px-4 -mt-4 w-full">
         <Tabs defaultValue="account" className="w-full">
           {
-            Cookies.get('Access')?.includes('createPelatihan') && <TabsList className={`grid w-full grid-cols-2`}>
+            Cookies.get('Access')?.includes('createPelatihan') &&
+            <TabsList className={`grid w-full grid-cols-2`}>
               <TabsTrigger
                 value="account"
                 onClick={() => refetch()}

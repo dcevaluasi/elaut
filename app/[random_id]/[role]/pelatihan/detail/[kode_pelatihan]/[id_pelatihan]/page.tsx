@@ -1,9 +1,10 @@
 "use client";
 
 import DetailPelatihan from "@/components/dashboard/Dashboard/DetailPelatihan";
+import ManagePelatihan from "@/components/dashboard/Dashboard/ManagePelatihan";
 import LayoutAdminElaut from "@/components/dashboard/Layouts/LayoutAdminElaut";
+import Cookies from "js-cookie";
 import React from "react";
-import { TbSchool } from "react-icons/tb";
 
 function page() {
   return (
@@ -11,7 +12,9 @@ function page() {
       <LayoutAdminElaut>
         <section className="flex-1 flex flex-col">
           <main className="w-full h-full">
-            <DetailPelatihan />
+            {
+              Cookies.get('Access')?.includes('createPelatihan') ? <ManagePelatihan /> : <DetailPelatihan />
+            }
           </main>
         </section>
       </LayoutAdminElaut>

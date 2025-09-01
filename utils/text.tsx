@@ -1,3 +1,4 @@
+import { MdPodcasts } from 'react-icons/md'
 import {
   RiCheckboxCircleFill,
   RiTimeLine,
@@ -29,43 +30,48 @@ export function generateFullNameBalai(bppp: string): string {
 }
 
 export function generateTanggalPelatihan(tanggal: string): string {
-  const date = new Date(tanggal)
+  if (tanggal != "") {
+    const date = new Date(tanggal)
 
-  // Array nama-nama hari
-  const weekdays = [
-    'Minggu',
-    'Senin',
-    'Selasa',
-    'Rabu',
-    'Kamis',
-    'Jumat',
-    'Sabtu',
-  ]
+    // Array nama-nama hari
+    const weekdays = [
+      'Minggu',
+      'Senin',
+      'Selasa',
+      'Rabu',
+      'Kamis',
+      'Jumat',
+      'Sabtu',
+    ]
 
-  // Array nama-nama bulan
-  const months = [
-    'Januari',
-    'Februari',
-    'Maret',
-    'April',
-    'Mei',
-    'Juni',
-    'Juli',
-    'Agustus',
-    'September',
-    'Oktober',
-    'November',
-    'Desember',
-  ]
+    // Array nama-nama bulan
+    const months = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ]
 
-  // Mengambil nama hari, tanggal, bulan, dan tahun
-  const dayOfWeek = weekdays[date.getUTCDay()]
-  const day = date.getUTCDate()
-  const month = months[date.getUTCMonth()]
-  const year = date.getUTCFullYear()
+    // Mengambil nama hari, tanggal, bulan, dan tahun
+    const dayOfWeek = weekdays[date.getUTCDay()]
+    const day = date.getUTCDate()
+    const month = months[date.getUTCMonth()]
+    const year = date.getUTCFullYear()
 
-  // Mengembalikan string tanggal yang telah diformat
-  return `${day} ${month} ${year}`
+    // Mengembalikan string tanggal yang telah diformat
+    return `${day} ${month} ${year}`
+  } else {
+    return `-`
+  }
+
 }
 
 export function generateTanggalPelatihanWithoutDay(tanggal: string): string {
@@ -102,9 +108,15 @@ export function getStatusInfo(
   switch (status) {
     case "0":
       return {
-        label: "Dibuat",
+        label: "Draft",
         color: "bg-neutral-500 text-white",
         icon: <RiTimeLine className="w-4 h-4" />,
+      };
+    case "0.1":
+      return {
+        label: "Publish",
+        color: "bg-indigo-500 text-white",
+        icon: <MdPodcasts className="w-4 h-4" />,
       };
     case "1":
     case "6":
@@ -131,9 +143,15 @@ export function getStatusInfo(
         icon: <RiCloseCircleFill className="w-4 h-4" />,
       };
     case "4":
-    case "17":
       return {
         label: "Approved",
+        color: "bg-green-500 text-white",
+        icon: <RiCheckboxCircleFill className="w-4 h-4" />,
+      };
+    case "14":
+    case "17":
+      return {
+        label: "Signed",
         color: "bg-green-500 text-white",
         icon: <RiCheckboxCircleFill className="w-4 h-4" />,
       };
@@ -155,12 +173,6 @@ export function getStatusInfo(
         label: "Reject Kapus",
         color: "bg-rose-500 text-white",
         icon: <RiCloseCircleFill className="w-4 h-4" />,
-      };
-    case "14":
-      return {
-        label: "Approve Kapus",
-        color: "bg-green-500 text-white",
-        icon: <RiCheckboxCircleFill className="w-4 h-4" />,
       };
     case "16":
       return {

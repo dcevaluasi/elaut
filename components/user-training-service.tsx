@@ -235,7 +235,8 @@ function UserTrainingService({ user }: { user: User | null }) {
                 )}
 
                 <div
-                  className={`w-full   flex gap-5 `}
+                  className={`w-full ${isExpand ? "w-full mx-auto" : "w-full"
+                    }  flex gap-5 `}
                 >
                   <div
                     className={`gap-2  ${indexPelatihanSelected != 100000000
