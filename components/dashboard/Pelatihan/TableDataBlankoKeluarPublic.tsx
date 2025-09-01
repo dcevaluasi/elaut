@@ -67,8 +67,6 @@ import { useRouter } from "next/navigation";
 import { MdOutlineSaveAlt } from "react-icons/md";
 import FormPelatihan from "../admin/formPelatihan";
 import Toast from "@/components/toast";
-import SertifikatSettingPage1 from "@/components/sertifikat/sertifikatSettingPage1";
-import SertifikatSettingPage2 from "@/components/sertifikat/sertifikatSettingPage2";
 import { PiMicrosoftExcelLogoFill, PiStampLight } from "react-icons/pi";
 import Image from "next/image";
 import axios, { AxiosResponse } from "axios";
@@ -379,7 +377,7 @@ const TableDataBlankoKeluarPublic: React.FC = () => {
         </div>
       ),
     },
-   
+
 
     {
       accessorKey: "NoSeriBlanko",

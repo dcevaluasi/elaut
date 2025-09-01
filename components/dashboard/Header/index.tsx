@@ -9,7 +9,6 @@ import React from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import Toast from "@/components/toast";
-import DropdownUserDPKAKP from "./DropdownUserDPKAKP";
 import { UserInformationDPKAKP } from "@/types/dpkakp";
 
 const Header = (props: {
@@ -73,13 +72,7 @@ const Header = (props: {
         </div>
 
         <div className="flex items-center gap-3 2xsm:gap-7">
-          {/* <!-- User Area --> */}
-          {usePathname().includes("dpkakp") ||
-            usePathname().includes("pukakp") ? (
-            <DropdownUserDPKAKP dpkakpLoggedInfo={props?.dpkakpInfo!} />
-          ) : (
-            <></>
-          )}
+
 
           {/* <!-- User Area --> */}
         </div>

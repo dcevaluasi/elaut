@@ -1,7 +1,6 @@
 "use client";
 
 import HeroBPPP from "@/components/bppp/HeroBPPP";
-import FeaturesBlocks from "@/components/features-blocks";
 import Footer from "@/components/ui/footer";
 import Image from "next/image";
 import Link from "next/link";
@@ -150,7 +149,7 @@ function page() {
           </div>
         </div>
       </section>
-      
+
       <Footer />
     </>
   );

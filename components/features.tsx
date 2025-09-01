@@ -10,7 +10,6 @@ import "./../app/css/additional-styles/features-slider.css";
 
 // import required modules
 import "swiper/css/navigation";
-import ListProgram from "./lists";
 import Link from "next/link";
 import axios, { AxiosResponse } from "axios";
 import { PelatihanMasyarakat } from "@/types/product";
@@ -60,7 +59,6 @@ export default function Features() {
               peningkatan SDM KP yang berkompetensi dan cari pelatihan yang ingin kamu ikuti.
             </p>
           </div>
-          <ListProgram pelatihan={data} type="" />
         </div>
       </div>
     </section>

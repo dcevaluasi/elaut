@@ -67,8 +67,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { MdOutlineSaveAlt } from "react-icons/md";
 import FormPelatihan from "../admin/formPelatihan";
 import Toast from "@/components/toast";
-import SertifikatSettingPage1 from "@/components/sertifikat/sertifikatSettingPage1";
-import SertifikatSettingPage2 from "@/components/sertifikat/sertifikatSettingPage2";
 import { PiMicrosoftExcelLogoFill, PiStampLight } from "react-icons/pi";
 import Image from "next/image";
 import axios, { AxiosResponse } from "axios";
@@ -164,9 +162,8 @@ const TableDataSertifikatKeterampilan: React.FC = () => {
         return (
           <Button
             variant="ghost"
-            className={`p-0 !text-center max-w-full  ${
-              pathPublic == "/akp" ? "hidden" : "flex"
-            } items-center justify-start text-gray-900 font-semibold`}
+            className={`p-0 !text-center max-w-full  ${pathPublic == "/akp" ? "hidden" : "flex"
+              } items-center justify-start text-gray-900 font-semibold`}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Tipe Blanko
@@ -176,9 +173,8 @@ const TableDataSertifikatKeterampilan: React.FC = () => {
       },
       cell: ({ row }) => (
         <div
-          className={`text-left  capitalize ${
-            pathPublic == "/akp" ? "hidden" : "flex flex-wrap flex-col"
-          }`}
+          className={`text-left  capitalize ${pathPublic == "/akp" ? "hidden" : "flex flex-wrap flex-col"
+            }`}
         >
           <p className="text-sm text-black leading-[100%]">
             {row.original.TipeBlanko}
@@ -292,11 +288,10 @@ const TableDataSertifikatKeterampilan: React.FC = () => {
         return (
           <Button
             variant="ghost"
-            className={` ${
-              pathPublic == "/akp"
+            className={` ${pathPublic == "/akp"
                 ? "hidden"
                 : "flex items-center justify-start"
-            } p-0 !text-center max-w-full  text-gray-900 font-semibold`}
+              } p-0 !text-center max-w-full  text-gray-900 font-semibold`}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Link Permohonan
@@ -306,9 +301,8 @@ const TableDataSertifikatKeterampilan: React.FC = () => {
       },
       cell: ({ row }) => (
         <div
-          className={` ${
-            pathPublic == "/akp" ? "hidden" : "flex flex-wrap flex-col"
-          }   text-left`}
+          className={` ${pathPublic == "/akp" ? "hidden" : "flex flex-wrap flex-col"
+            }   text-left`}
         >
           <p className="text-sm text-blue-500 underline leading-[100%] ">
             {" "}
@@ -448,11 +442,10 @@ const TableDataSertifikatKeterampilan: React.FC = () => {
         return (
           <Button
             variant="ghost"
-            className={`${
-              pathPublic == "/akp"
+            className={`${pathPublic == "/akp"
                 ? "hidden"
                 : "flex items-center justify-start"
-            } p-0 !text-center max-w-full  text-gray-900 font-semibold`}
+              } p-0 !text-center max-w-full  text-gray-900 font-semibold`}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Sertifikat Digital <br /> Sudah Diterbitkan
@@ -462,9 +455,8 @@ const TableDataSertifikatKeterampilan: React.FC = () => {
       },
       cell: ({ row }) => (
         <div
-          className={`${
-            pathPublic == "/akp" ? "hidden" : "flex flex-wrap flex-col"
-          }  text-left  text-blue-500`}
+          className={`${pathPublic == "/akp" ? "hidden" : "flex flex-wrap flex-col"
+            }  text-left  text-blue-500`}
         >
           <Link
             href={row.original.LinkDataDukung}

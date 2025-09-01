@@ -2,8 +2,6 @@
 
 import React from "react";
 import { BsSendArrowUp } from "react-icons/bs";
-import TableDataPengajuanPelatihan from "../Pelatihan/TableDataPengajuanPelatihan";
-
 const PengajuanPelatihan: React.FC = () => {
   return (
     <>
@@ -23,7 +21,6 @@ const PengajuanPelatihan: React.FC = () => {
       </div>
 
       <div className="mt-4 md:mt-6 2xl:mt-7.5">
-        <TableDataPengajuanPelatihan />
       </div>
     </>
   );

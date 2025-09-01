@@ -62,8 +62,6 @@ import { useRouter } from "next/navigation";
 import { MdOutlineSaveAlt, MdVerified } from "react-icons/md";
 import FormPelatihan from "../admin/formPelatihan";
 import Toast from "@/components/toast";
-import SertifikatSettingPage1 from "@/components/sertifikat/sertifikatSettingPage1";
-import SertifikatSettingPage2 from "@/components/sertifikat/sertifikatSettingPage2";
 import { PiStampLight } from "react-icons/pi";
 import Image from "next/image";
 import axios, { AxiosResponse } from "axios";
@@ -90,8 +88,6 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import { convertDate } from "@/utils";
-import SertifikatPage1 from "@/components/sertifikat/sertifikatPage1";
-import SertifikatPage2 from "@/components/sertifikat/sertifikatPage2";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
@@ -415,10 +411,7 @@ const TableDataPelatihanUser: React.FC = () => {
             </div>
           </div>
 
-          <div className="max-h-[500px] flex flex-col gap-2 overflow-y-auto scroll-smooth">
-            <SertifikatSettingPage1 />
-            <SertifikatSettingPage2 />
-          </div>
+
         </>
       ) : (
         <>

@@ -1,6 +1,6 @@
 "use client";
 
-import FeaturesDiklatKepelautan from "@/components/features-diklat-kepelautan";
+
 import Hero from "@/components/hero";
 import HeroProgramPelatihan from "@/components/hero/HeroProgramPelatihan";
 import { getLastValuePath } from "@/lib/utils";

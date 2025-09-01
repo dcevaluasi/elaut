@@ -20,6 +20,7 @@ import ImportPesertaAction from "./Actions/ImportPesertaAction";
 import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
 import Cookies from "js-cookie";
 import UserPelatihanTable from "./Tables/UserPelatihanTable";
+import DeletePelatihanAction from "./Actions/DeletePelatihanAction";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -37,20 +38,53 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                 defaultValue="📌 Informasi Umum"
             >
                 <AccordionSection title="📌 Informasi Umum">
-                    <SectionGrid>
-                        <InfoItem label="Kode Pelatihan" value={data.KodePelatihan} />
-                        <InfoItem label="Bidang" value={data.JenisProgram} />
-                        <InfoItem label="Program" value={data.Program} />
-                        <InfoItem label="Jenis Pelatihan" value={data.JenisPelatihan} />
-                        <InfoItem label="Dukungan Program Terobosan" value={data.DukunganProgramTerobosan} />
-                        <InfoItem label="Penyelenggara" value={data.PenyelenggaraPelatihan} />
-                        <InfoItem label="Mulai Pelatihan" value={generateTanggalPelatihan(data.TanggalMulaiPelatihan)} />
-                        <InfoItem label="Selesai Pelatihan" value={generateTanggalPelatihan(data.TanggalBerakhirPelatihan)} />
-                        <InfoItem label="Lokasi" value={data.LokasiPelatihan} />
-                        <InfoItem label="Instruktur" value={data.Instruktur} />
-                        <InfoItem label="Harga" value={`Rp ${data.HargaPelatihan.toLocaleString()}`} />
-                        <InfoItem label="Pelaksanaan" value={data.PelaksanaanPelatihan} />
-                    </SectionGrid>
+                    <div className="flex flex-col w-full gap-4">
+                        <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
+                            <p className="font-medium text-gray-600">
+                                Action :
+                            </p>
+                            <EditPublishAction
+                                idPelatihan={data.IdPelatihan.toString()}
+                                currentDetail={data.DetailPelatihan}
+                                currentFoto={data.FotoPelatihan}
+                                tanggalPendaftaran={[data.TanggalMulaiPendaftaran, data.TanggalAkhirPendaftaran!]}
+                                onSuccess={fetchData} />
+
+                            {data!.UserPelatihan.length == 0 && data!.MateriPelatihan.length == 0 && data!.SarprasPelatihan == null && data!.Status != "Publish" && (
+                                <>
+                                    <DeletePelatihanAction
+                                        idPelatihan={data!.IdPelatihan.toString()}
+                                        pelatihan={data}
+                                        handleFetchingData={
+                                            fetchData
+                                        }
+                                    />
+                                </>
+                            )}
+                        </div>
+
+                        <div className="w-full ">
+                            <p className="font-medium text-gray-600 mb-2">
+                                Detail  :
+                            </p>
+                            <SectionGrid>
+                                <InfoItem label="Kode Pelatihan" value={data.KodePelatihan} />
+                                <InfoItem label="Bidang" value={data.JenisProgram} />
+                                <InfoItem label="Program" value={data.Program} />
+                                <InfoItem label="Jenis Pelatihan" value={data.JenisPelatihan} />
+                                <InfoItem label="Dukungan Program Terobosan" value={data.DukunganProgramTerobosan} />
+                                <InfoItem label="Penyelenggara" value={data.PenyelenggaraPelatihan} />
+                                <InfoItem label="Mulai Pelatihan" value={generateTanggalPelatihan(data.TanggalMulaiPelatihan)} />
+                                <InfoItem label="Selesai Pelatihan" value={generateTanggalPelatihan(data.TanggalBerakhirPelatihan)} />
+                                <InfoItem label="Lokasi" value={data.LokasiPelatihan} />
+                                <InfoItem label="Instruktur" value={data.Instruktur} />
+                                <InfoItem label="Harga" value={`Rp ${data.HargaPelatihan.toLocaleString()}`} />
+                                <InfoItem label="Pelaksanaan" value={data.PelaksanaanPelatihan} />
+                            </SectionGrid>
+
+                        </div>
+                    </div>
+
                 </AccordionSection>
 
                 <AccordionSection title="🌐 Publish Informasi">

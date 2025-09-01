@@ -19,13 +19,13 @@ import axios from "axios";
 import { PelatihanMasyarakat } from "@/types/product";
 import { useRouter } from "next/navigation";
 
-interface DeleteButtonProps {
+interface DeletePelatihanActionProps {
   idPelatihan: string;
   pelatihan: PelatihanMasyarakat | null;
   handleFetchingData: any;
 }
 
-const DeleteButton: React.FC<DeleteButtonProps> = ({
+const DeletePelatihanAction: React.FC<DeletePelatihanActionProps> = ({
   idPelatihan,
   pelatihan,
   handleFetchingData,
@@ -113,7 +113,7 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({
         onClick={() => setIsOpenFormDelete(!isOpenFormDelete)}
         variant="outline"
         title="Hapus Pelatihan"
-        className="ml-auto text-neutral-100  bg-rose-600 hover:bg-rose-600 hover:text-neutral-100 duration-700 w-full"
+        className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-rose-500 text-rose-500 hover:text-white hover:bg-rose-500"
       >
         <Trash className="h-5 w-5" /> Hapus Pelatihan
       </Button>
@@ -121,4 +121,4 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({
   );
 };
 
-export default DeleteButton;
+export default DeletePelatihanAction;

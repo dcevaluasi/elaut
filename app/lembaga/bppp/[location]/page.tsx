@@ -6,17 +6,12 @@ import React from "react";
 import { PelatihanMasyarakat } from "@/types/product";
 import axios, { AxiosResponse } from "axios";
 import { extractPathAfterBppp, getPenyeleggara } from "@/utils/pelatihan";
-import TrainingTypeSection from "@/components/trainingTypeSection";
-import BPPPServices from "@/components/bppp-services";
 import BPPPTrainings from "@/components/bppp-trainings";
 import { convertToBPPP } from "@/utils/lemdiklat";
 import Footer from "@/components/ui/footer";
 import HeroLandingBPPP from "@/components/bppp/location/HeroLandingBPPP";
-import LogoIntegrated from "@/components/bppp/location/LogoIntegrated";
-import StatistikPelatihan from "@/components/StatistikPelatihan";
 import Keunggulan from "@/components/bppp/location/Keunggulan";
 import Layanan from "@/components/bppp/location/Layanan";
-import FeaturesBlocks from "@/components/features-blocks";
 import Features from "@/components/features";
 
 export default function Page() {
@@ -58,7 +53,6 @@ export default function Page() {
       <Layanan />
       <Keunggulan />
       <Features />
-      <LogoIntegrated />
       <Footer />
     </>
   );

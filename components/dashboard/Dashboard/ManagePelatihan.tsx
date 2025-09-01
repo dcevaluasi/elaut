@@ -27,7 +27,6 @@ import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import NoSertifikatButton from "./Actions/NoSertifikatButton";
 import HistoryButton from "./Actions/HistoryButton";
 import { Button } from "@/components/ui/button";
-import DeleteButton from "./Actions/DeleteButton";
 import { MateriButton, PublishButton } from "./Actions";
 import { ApprovePelaksanaanSPV } from "../admin/spv/ApprovalPelaksanaanSPV";
 import Toast from "@/components/toast";

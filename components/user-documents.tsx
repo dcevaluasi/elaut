@@ -16,7 +16,6 @@ import { GrFormEdit, GrFormTrash, GrLocation } from "react-icons/gr";
 import { Button } from "./ui/button";
 import { usePathname, useRouter } from "next/navigation";
 import axios, { AxiosResponse } from "axios";
-import BPPPCertificates from "./bppp-certificates";
 import { IoIosInformationCircle, IoMdCloseCircle } from "react-icons/io";
 import { Edit3Icon, LucideDot, Trash } from "lucide-react";
 import { User } from "@/types/user";

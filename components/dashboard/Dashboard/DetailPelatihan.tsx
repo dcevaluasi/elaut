@@ -28,7 +28,6 @@ import NoSertifikatButton from "./Actions/NoSertifikatButton";
 import HistoryButton from "./Actions/HistoryButton";
 import TTDSertifikat from "./pelatihan/TTDSertifikat";
 import { Button } from "@/components/ui/button";
-import DeleteButton from "./Actions/DeleteButton";
 import { MateriButton, PublishButton } from "./Actions";
 import { ESELON_1, ESELON_2 } from "@/constants/nomenclatures";
 import { ApprovePelaksanaanSPV } from "../admin/spv/ApprovalPelaksanaanSPV";
@@ -265,17 +264,7 @@ function DetailPelatihan() {
                             ))
                           }
 
-                          {pelatihan!.UserPelatihan.length == 0 && pelatihan!.MateriPelatihan.length == 0 && pelatihan!.SarprasPelatihan == null && pelatihan!.Status != "Publish" && (
-                            <>
-                              <DeleteButton
-                                idPelatihan={pelatihan!.IdPelatihan.toString()}
-                                pelatihan={pelatihan}
-                                handleFetchingData={
-                                  handleFetchDetailPelatihan
-                                }
-                              />
-                            </>
-                          )}
+
 
                           <GenerateNoSertifikatButton
                             idPelatihan={pelatihan!.IdPelatihan.toString()}

@@ -5,7 +5,6 @@ import { Delius_Unicase, Inter, Plus_Jakarta_Sans } from "next/font/google";
 import localFont from "next/font/local";
 
 import Header from "@/components/ui/header";
-import Banner from "@/components/banner";
 import CallCenter from "@/components/call-center";
 import BottomNavigation from "@/components/ui/bottom-nav";
 

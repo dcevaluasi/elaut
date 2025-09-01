@@ -24,7 +24,6 @@ import "./../app/css/additional-styles/features-slider.css";
 // import required modules
 import "swiper/css/navigation";
 import { Pagination, Navigation } from "swiper/modules";
-import ListProgram from "./lists";
 import Link from "next/link";
 
 export default function PelatihanAspirasi() {
@@ -124,7 +123,6 @@ export default function PelatihanAspirasi() {
               berkelanjutan dan produktif.
             </p>
           </div>
-          <ListProgram type="" pelatihan={[]} />
         </div>
       </div>
     </section>

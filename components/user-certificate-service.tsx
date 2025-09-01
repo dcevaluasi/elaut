@@ -17,7 +17,6 @@ import "./../app/css/additional-styles/features-slider.css";
 // import required modules
 import "swiper/css/navigation";
 import { Pagination, Navigation } from "swiper/modules";
-import ListProgram from "./lists";
 import Link from "next/link";
 import { Slide } from "react-awesome-reveal";
 import { FaPlaceOfWorship } from "react-icons/fa6";
@@ -30,7 +29,6 @@ import { usePathname } from "next/navigation";
 import { extractPathAfterBppp, getPenyeleggara } from "@/utils/pelatihan";
 import { PelatihanMasyarakat } from "@/types/product";
 import axios, { AxiosResponse } from "axios";
-import BPPPCertificates from "./bppp-certificates";
 import { IoIosInformationCircle, IoMdCloseCircle } from "react-icons/io";
 import { Edit3Icon, LucideDot, Trash } from "lucide-react";
 import { User } from "@/types/user";
@@ -43,7 +41,6 @@ import {
 import { PiHandsPrayingBold, PiTrainRegional } from "react-icons/pi";
 import { TbGenderBigender, TbSchool } from "react-icons/tb";
 import { BiDonateBlood } from "react-icons/bi";
-import ListUser from "./list-users";
 import Cookies from "js-cookie";
 import TableDataPelatihan from "./dashboard/Pelatihan/TableDataPelatihan";
 import TableDataPelatihanUser from "./dashboard/Pelatihan/TableDataPelatihanUser";
@@ -197,8 +194,8 @@ export default function UserCertificateService({
         ></div>
         <div className="absolute left-0 right-0 m-auto w-px p-px h-28 bg-gray-200 transform -translate-y-1/2"></div>
 
-       
-       
+
+
       </section>
     </>
   );
