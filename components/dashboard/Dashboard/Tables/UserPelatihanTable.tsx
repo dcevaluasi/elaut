@@ -7,6 +7,7 @@ import {
     getSortedRowModel,
     flexRender,
     ColumnDef,
+    getPaginationRowModel,
 } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import {
@@ -81,11 +82,35 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                             )}/${encryptValue(
                                 row.original.IdUsers
                             )}`}
-                        className=" border border-neutral-800  text-white  shadow-sm hover:bg-neutral-800 bg-neutral-800 hover:text-white h-9 px-4 py-2 mx-0 rounded-md flex text-sm items-center gap-2"
+                        className="flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border   
+            bg-transparent border-neutral-500 text-neutral-500 hover:text-white hover:bg-neutral-500 transition-colors w-fit shadow-sm"
                     >
                         <LucideInfo className="h-4 w-4 " />{" "}
                         <span className="text-sm">Detail</span>
                     </Link>
+                </div>
+            ),
+        },
+        {
+            accessorKey: "IdUserPelatihan",
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        className={`text-black font-semibold w-full p-0 flex justify-center items-center`}
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        <p className="leading-[105%]">No Registrasi</p>
+
+                        <AiOutlineFieldNumber className="ml-2 h-4 w-4" />
+                    </Button>
+                );
+            },
+            cell: ({ row }) => (
+                <div className={`${"ml-0"} text-center capitalize `}>
+                    <p className="text-base font-semibold tracking-tight leading-none">
+                        {row.original.IdUserPelatihan}
+                    </p>
                 </div>
             ),
         },
@@ -142,6 +167,8 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
         columns,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+
     });
 
     return (
@@ -193,6 +220,31 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                         )}
                     </TableBody>
                 </Table>
+
+                <div className="flex items-center justify-between border-t px-4 py-3">
+                    <div className="text-sm text-gray-600">
+                        Halaman {table.getState().pagination.pageIndex + 1} dari{" "}
+                        {table.getPageCount()}
+                    </div>
+                    <div className="flex gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => table.previousPage()}
+                            disabled={!table.getCanPreviousPage()}
+                        >
+                            Previous
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => table.nextPage()}
+                            disabled={!table.getCanNextPage()}
+                        >
+                            Next
+                        </Button>
+                    </div>
+                </div>
             </div>
         </div>
     );

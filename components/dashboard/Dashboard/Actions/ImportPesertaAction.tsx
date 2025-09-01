@@ -100,7 +100,7 @@ const ImportPesertaAction: React.FC<ImportPesertaActionProps> = ({
                 <Button
                     type="button"
                     onClick={() => {
-                        if (statusApproval !== "Selesai") {
+                        if (statusApproval === "Selesai") {
                             Toast.fire({
                                 icon: "error",
                                 title: "Ups!!!",

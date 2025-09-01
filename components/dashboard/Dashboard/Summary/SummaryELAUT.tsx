@@ -17,23 +17,7 @@ const SummaryELAUT: React.FC = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const token = Cookies.get("XSRF091");
 
-  const [lemdikData, setLemdikData] = useState<LemdiklatDetailInfo | null>(
-    null
-  );
   const [data, setData] = useState<PelatihanMasyarakat[]>([]);
-
-  const fetchInformationLemdiklat = async () => {
-    try {
-      const response = await axios.get(`${baseUrl}/lemdik/getLemdik`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setLemdikData(response.data);
-      Cookies.set("IDLemdik", response.data.data.IdLemdik);
-      console.log("LEMDIK INFO: ", response);
-    } catch (error) {
-      console.error("LEMDIK INFO: ", error);
-    }
-  };
 
   const [isFetching, setIsFetching] = React.useState<boolean>(false);
 
@@ -51,10 +35,8 @@ const SummaryELAUT: React.FC = () => {
         }
       );
       setDataUser(response.data.data);
-      console.log("User Pelatihan Data Response:", response);
       setIsFetching(false);
     } catch (error) {
-      console.error("Error fetching training data:", error);
       setIsFetching(false);
     }
   };
@@ -69,10 +51,8 @@ const SummaryELAUT: React.FC = () => {
         }`
       );
       setData(response.data.data);
-      console.log("Training Data Response:", response);
       setIsFetching(false);
     } catch (error) {
-      console.error("Error fetching training data:", error);
       setIsFetching(false);
     }
   };
@@ -93,15 +73,12 @@ const SummaryELAUT: React.FC = () => {
 
   React.useEffect(() => {
     const fetchAllData = () => {
-      fetchInformationLemdiklat();
       handleFetchingUserPelatihan();
       handleFetchingPublicTrainingData("All");
     };
 
     fetchAllData();
   }, []);
-
-  console.log({ dataDukung })
 
   return (
     <div className="w-full">
@@ -112,16 +89,14 @@ const SummaryELAUT: React.FC = () => {
       ) : data != null ? (
         <>
           <Button onClick={handleDownloadExcel} className="bg-blue-500 text-white mb-2 hover:bg-blue-600">
-
             {isFetchingDataDukung ? 'Mengunduh...' : 'Download Data Dukung'}
           </Button>
-
 
           <ChartMasyarakatDilatihMonthly data={data} dataUser={dataUser} />
           <ChartDetailMasyarakatDilatih data={data} dataUser={dataUser} />
         </>
       ) : (
-        <div className="relative max-w-6xl w-full mx-auto px-4 sm:px-6 mt-20">
+        <div className="relative max-w-7xl w-full mx-auto mt-20">
           <div className="pt-7 md:pt-0 flex flex-col items-center">
             <Image
               src={"/illustrations/not-found.png"}

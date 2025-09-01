@@ -10,8 +10,6 @@ import {
 import { PelatihanMasyarakat } from "@/types/product";
 import { generateTanggalPelatihan } from "@/utils/text";
 import { PublishButton } from "./Actions";
-import { TbEditCircle, TbLock } from "react-icons/tb";
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { replaceUrl } from "@/lib/utils";
 import EditPublishAction from "./Actions/EditPublishAction";
@@ -21,6 +19,7 @@ import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/service
 import Cookies from "js-cookie";
 import UserPelatihanTable from "./Tables/UserPelatihanTable";
 import DeletePelatihanAction from "./Actions/DeletePelatihanAction";
+import EditPelatihanAction from "./Actions/EditPelatihanAction";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -43,11 +42,9 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                             <p className="font-medium text-gray-600">
                                 Action :
                             </p>
-                            <EditPublishAction
+                            <EditPelatihanAction
                                 idPelatihan={data.IdPelatihan.toString()}
-                                currentDetail={data.DetailPelatihan}
-                                currentFoto={data.FotoPelatihan}
-                                tanggalPendaftaran={[data.TanggalMulaiPendaftaran, data.TanggalAkhirPendaftaran!]}
+                                currentData={data}
                                 onSuccess={fetchData} />
 
                             {data!.UserPelatihan.length == 0 && data!.MateriPelatihan.length == 0 && data!.SarprasPelatihan == null && data!.Status != "Publish" && (
@@ -164,7 +161,6 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
 
                         </div>
                     </div>
-
                 </AccordionSection>
 
                 <AccordionSection title="👥 Peserta Pelatihan">
@@ -208,10 +204,8 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         </p>
                                     </div>
                             }
-
                         </div>
                     </div>
-
                 </AccordionSection>
 
 
@@ -220,22 +214,6 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                         <InfoItem label="Deskripsi" value={data.DetailPelatihan} />
                     </SectionGrid>
                 </AccordionSection>
-
-                {/* <AccordionSection title="⚙️ Metadata">
-                    <SectionGrid>
-                        <InfoItem label="ID Pelatihan" value={data.IdPelatihan.toString()} />
-                        <InfoItem label="ID Lemdik" value={data.IdLemdik} />
-                        <InfoItem label="ID Sarana Prasarana" value={data.IdSaranaPrasarana} />
-                        <InfoItem label="ID Konsumsi" value={data.IdKonsumsi} />
-                        <InfoItem label="Created At" value={data.CreateAt} />
-                        <InfoItem label="Updated At" value={data.UpdateAt} />
-                        <InfoItem label="Status Approval" value={data.StatusApproval} />
-                        <InfoItem label="Status Penerbitan" value={data.StatusPenerbitan} />
-                        <InfoItem label="Pemberitahuan Diterima" value={data.PemberitahuanDiterima} />
-                        <InfoItem label="Is Revisi" value={data.IsRevisi} />
-                        <InfoItem label="Is Sematkan" value={data.IsSematkan} />
-                    </SectionGrid>
-                </AccordionSection> */}
             </Accordion>
         </div>
     );

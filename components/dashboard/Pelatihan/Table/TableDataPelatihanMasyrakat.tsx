@@ -115,14 +115,14 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                     <td className="px-4 py-3 border border-gray-200 text-center text-gray-500">
                                         {(currentPage - 1) * itemsPerPage + index + 1}
                                     </td>
-                                    <td className="px-4 py-3 border border-gray-200 font-medium">
+                                    <td className="px-4 py-3 border border-gray-200">
                                         <div className="flex flex-col w-full h-full ">
-                                            <p className="text-base font-semibold leading-none">{pelatihan.NamaPelatihan}</p>
-                                            <div className="flex flex-col">
-                                                <span className="text-sm text-gray-400 leading-none">Pendaftaran : {waktuPendaftaran}</span>
-                                                <span className="text-sm text-gray-400 leading-none">Pelaksanaan : {waktuPelaksanaan}</span>
-                                                <span className="text-sm text-gray-400 leading-none">Lokasi : {pelatihan?.LokasiPelatihan}</span>
-                                                <span className="text-sm text-gray-400 leading-none">Penyelenggara : {pelatihan?.PenyelenggaraPelatihan}</span>
+                                            <p className="text-base font-semibold leading-relaxed">{pelatihan.NamaPelatihan}</p>
+                                            <div className="flex flex-col !font-normal">
+                                                <span className="text-sm text-gray-400 leading-relaxed">Pendaftaran : {waktuPendaftaran}</span>
+                                                <span className="text-sm text-gray-400 leading-relaxed">Pelaksanaan : {waktuPelaksanaan}</span>
+                                                <span className="text-sm text-gray-400 leading-relaxed">Lokasi : {pelatihan?.LokasiPelatihan}</span>
+                                                <span className="text-sm text-gray-400 leading-relaxed">Penyelenggara : {pelatihan?.PenyelenggaraPelatihan}</span>
                                             </div>
                                         </div>
                                     </td>
