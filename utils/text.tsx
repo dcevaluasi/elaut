@@ -116,7 +116,6 @@ export function getStatusInfo(
         icon: <MdPodcasts className="w-4 h-4" />,
       };
     case "1":
-    case "10":
     case "12":
     case "15":
       return {
@@ -126,7 +125,6 @@ export function getStatusInfo(
       };
     case "2":
     case "3":
-    case "9":
       return {
         label: "Reject Verifikator",
         color: "bg-rose-500 text-white",
@@ -153,21 +151,33 @@ export function getStatusInfo(
       };
     case "6":
       return {
-        label: "Pending Verifikator",
+        label: "Pending STTPL Verifikator",
         color: "bg-primary text-white",
         icon: <RiLockFill className="w-4 h-4" />,
       };
     case "7":
       return {
-        label: "Reject Verifikator",
-        color: "bg-primary text-white",
-        icon: <RiLockFill className="w-4 h-4" />,
+        label: "Reject STTPL Verifikator",
+        color: "bg-rose-500 text-white",
+        icon: <RiCloseCircleFill className="w-4 h-4" />,
       };
     case "8":
       return {
-        label: "Approved Verifikator",
-        color: "bg-primary text-white",
+        label: "Pending Kapus",
+        color: "bg-blue-500 text-white",
         icon: <RiLockFill className="w-4 h-4" />,
+      };
+    case "9":
+      return {
+        label: "Reject Kapus",
+        color: "bg-rose-500 text-white",
+        icon: <RiCloseCircleFill className="w-4 h-4" />,
+      };
+    case "10":
+      return {
+        label: "Approved Kapus",
+        color: "bg-amber-500 text-white",
+        icon: <RiCheckboxCircleFill className="w-4 h-4" />,
       };
     case "11":
       return {
@@ -206,3 +216,13 @@ export function formatName(name: string): string {
     return name.toUpperCase();
   }
 }
+
+export const parseDateFirebase = (dateStr: string): Date => {
+  // format: "2/9/2025 10.31.59"
+  const [datePart, timePart] = dateStr.split(" ");
+  const [day, month, year] = datePart.split("/").map(Number);
+  const [hour, minute, second] = timePart.split(".").map(Number);
+
+  // JS Date uses month index starting at 0
+  return new Date(year, month - 1, day, hour, minute, second);
+};

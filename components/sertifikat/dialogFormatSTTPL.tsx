@@ -1,0 +1,790 @@
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import React, { ReactElement, useRef } from "react";
+import QRCode from "react-qr-code";
+import { MdVerified } from "react-icons/md";
+import { MateriPelatihan, PelatihanMasyarakat } from "@/types/product";
+import Image from "next/image";
+import {
+    generateTanggalPelatihan,
+} from "@/utils/text";
+import { formatDateRange, formatDateRangeEnglish } from "@/utils/time";
+import { ESELON1, ESELON2, ESELON_1, ESELON_2, KA_BPPSDM, KA_PUSLAT_KP } from "@/constants/nomenclatures";
+
+import { generatedCurriculumCertificate, generatedDescriptionCertificate } from "@/utils/certificates";
+
+
+const SertifikatNonKepelautan = React.forwardRef(
+    (
+        {
+            pelatihan,
+            refPage
+        }: {
+            pelatihan: PelatihanMasyarakat;
+            refPage: any
+        },
+        ref: any,
+
+    ) => {
+        const calculateTotalHoursWithMateri = (data: MateriPelatihan[]) => {
+            let totalTheory = 0;
+            let totalPractice = 0;
+
+            data.forEach((course) => {
+                const theory = parseFloat(course.JamTeory) || 0;
+                const practice = parseFloat(course.JamPraktek) || 0;
+
+                totalTheory += theory;
+                totalPractice += practice;
+            });
+
+            return { totalTheory, totalPractice };
+        };
+
+        const totalHoursCertificateLvl = calculateTotalHoursWithMateri(pelatihan?.MateriPelatihan || []);
+
+        return (
+            <div className=" flex-col gap-8 font-bos">
+                <div
+                    ref={ref}
+                    className={`w-full h-full scale-95 flex flex-col gap-4 items-center justify-center  px-10  rounded-md font-bos leading-[120%] pb-0`}
+                >
+                    {/* Page 1 */}
+                    {pelatihan?.TtdSertifikat == ESELON1 &&
+                        <>
+                            <div ref={refPage} className={`pdf-page w-full flex flex-col  gap-4 relative  items-center justify-center h-[49.63rem]}`}>
+                                <div className="flex flex-row  absolute top-0 right-0">
+                                    <p className="text-lg font-bosNormal">
+                                        No. STTPL : -
+                                    </p>
+                                </div>
+
+                                <div className="mx-auto w-20 absolute bottom-0 left-28">
+                                    <QRCode
+                                        size={280}
+                                        style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                                        value={`https://elaut-bppsdm.kkp.go.id/layanan/cek-sertifikat/-`}
+                                        viewBox={`0 0 280 280`}
+                                    />
+                                </div>
+
+                                <div className="w-full flex flex-col space-y-0 px-10 mt-10 ">
+                                    <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-3">
+                                        <div className="flex flex-col h-fit items-center justify-center space-y-0">
+                                            <h1 className="text-base font-bosBold font-bold">
+                                                KEMENTERIAN KELAUTAN DAN PERIKANAN
+                                            </h1>
+                                            <p className="text-base font-bosItalic">
+                                                MINISTRY OF MARINE AFFAIRS AND FISHERIES
+                                            </p>
+                                        </div>
+                                        <div className="flex flex-col h-fit items-center justify-center space-y-0">
+                                            <h1 className="text-lg font-bosBold font-bold">
+                                                BADAN PENYULUHAN DAN PENGEMBANGAN SUMBER DAYA MANUSIA KELAUTAN
+                                                DAN PERIKANAN
+                                            </h1>
+                                            <p className="text-sm font-bosItalic">
+                                                THE AGENCY FOR MARINE AND FISHERIES EXTENSION AND HUMAN
+                                                RESOURCES DEVELOPMENT
+                                            </p>
+                                        </div>
+
+                                        <div className="flex flex-col h-fit items-center justify-center space-y-1">
+                                            <h1 className="text-3xl font-bosBold font-black leading-none">
+                                                SERTIFIKAT
+                                            </h1>
+                                            <p className="text-lg font-bosItalic">CERTIFICATE</p>
+                                        </div>
+
+                                    </div>
+
+                                    <div className="flex w-full flex-col space-y-0 max-w-5xl mx-auto items-start text-base  text-center font-bos h-fit mt-2">
+                                        <span className="text-base leading-none font-bosNormal">
+                                            Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan berdasarkan Peraturan Pemerintah Nomor.62 Tahun 2014 tentang Penyelenggaraan Pendidikan, Pelatihan dan Penyuluhan Perikanan, serta ketentuan pelaksanaannya menyatakan bahwa :
+                                        </span>
+                                        <span className="max-w-4xl leading-none font-bosItalic text-[0.85rem] mx-auto">
+                                            The Agency for Marine and Fisheries Extension and Human
+                                            Resources Development based on Government Regulation Number 62
+                                            of 2014 concerning the Implementation of Fisheries Education,
+                                            Training and Extension as well as its implementing provisions
+                                            States that :
+                                        </span>
+                                    </div>
+
+                                    <div className="flex flex-col space-y-0 w-full h-fit -mt-1">
+                                        <table className="w-full h-fit" cellPadding={0} cellSpacing={0}>
+                                            <tr className="w-full">
+                                                <td className="font-bos w-full flex flex-col space-y-0">
+                                                    <span className="font-bosNormal text-base">Nama</span>
+                                                    <span className="font-bos italic text-[0.85rem] -mt-2">Name</span>
+                                                </td>
+                                                <td className=" w-2/3 text-base font-bosNormal uppercase">: -</td>
+                                            </tr>
+                                            <tr className="w-full">
+                                                <td className="font-bos w-full flex flex-col  space-y-0">
+                                                    <span className="text-base font-bosNormal">
+                                                        NIK
+                                                    </span>
+                                                    <span className="font-bos italic text-[0.85rem] -mt-2">
+                                                        {" "}
+                                                        Identification Number
+                                                    </span>
+                                                </td>
+                                                <td className=" w-2/3 text-base font-bosNormal">
+                                                    : -
+                                                </td>
+                                            </tr>
+                                            <tr className="w-full">
+                                                <td className="font-bos w-full flex flex-col space-y-0">
+                                                    <span className="text-base font-bosNormal">Tempat Tanggal Lahir</span>
+                                                    <span className="font-bos italic text-[0.85rem] -mt-2">
+                                                        {" "}
+                                                        Place and date of birth
+                                                    </span>
+                                                </td>
+                                                <td className=" w-2/3 text-base font-bosNormal capitalize">
+                                                    : -
+                                                </td>
+                                            </tr>
+                                            <tr className="w-full">
+                                                <td className="font-bos w-full flex flex-col space-y-0">
+                                                    <span className="text-base font-bosNormal">Nama Institusi</span>
+                                                    <span className="font-bos italic text-[0.85rem] -mt-2">
+                                                        {" "}
+                                                        Institution Name
+                                                    </span>
+                                                </td>
+                                                <td className=" w-2/3 text-base font-bosNormal uppercase">
+                                                    : -
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+
+                                    <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-1 mb-2">
+                                        <h1 className="font-bosBold font-black text-2xl leading-none">
+                                            TELAH LULUS
+                                        </h1>
+                                        <h3 className="font-bosNormal font-bold text-lg italic">
+                                            HAS PASSED
+                                        </h3>
+                                    </div>
+
+                                    <>
+                                        <div className="flex w-full flex-col space-y-0 max-w-7xl mx-auto items-start text-sm -mt-2 text-center font-bos h-fit">
+                                            <span className="text-base leading-[115%] font-bosNormal max-w-6xl">
+                                                {generatedDescriptionCertificate(pelatihan!.DeskripsiSertifikat).desc_indo}, pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
+                                            </span>
+                                            <span className="max-w-5xl mt-1 leading-none font-bos italic text-[0.85rem] mx-auto">
+                                                {generatedDescriptionCertificate(pelatihan!.DeskripsiSertifikat).desc_eng} on {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex gap-2 items-center justify-center mt-2">
+                                            <div className="flex flex-col  space-y-0 font-bos text-center items-center justify-center">
+                                                <div className="flex w-full flex-col  space-y-0 items-center mt-2 text-center justify-center">
+                                                    <span className="font-bosNormal text-base leading-[105%] w-full flex items-center gap-1">
+                                                        Jakarta,{" "} -
+                                                        <br /> {pelatihan?.TtdSertifikat}
+                                                    </span>
+
+
+                                                    <span className="leading-none font-bosItalic text-[0.85rem]">
+                                                        {ESELON_1.fullNameEng}
+                                                    </span>
+
+                                                    <Image
+                                                        alt=""
+                                                        width={0}
+                                                        height={0}
+                                                        src={"/ttd-elektronik.png"}
+                                                        className="w-[230px] h-[100px] relative -z-10 pt-4 block"
+                                                    />
+
+                                                    <span className=" font-bosNormal font-bold text-lg -mt-3">
+                                                        {KA_BPPSDM}
+                                                    </span>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </>
+                                </div>
+
+
+                            </div>
+                            {
+                                <div className={`pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center ${pelatihan?.MateriPelatihan.length < 7 ? 'mt-72' : 'mt-48'} break-before-auto relative`}>
+                                    <div className="flex flex-row justify-center items-center mb-6">
+                                        <div className="flex flex-row gap-2 items-center h-fit">
+                                            <div className="flex flex-col text-center space-y-0 h-fit items-center justify-center w-full gap-0">
+                                                <p className="font-bosBold text-2xl max-w-4xl w-full uppercase leading-none">
+                                                    Materi {pelatihan?.NamaPelatihan}, tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
+                                                </p>
+                                                {
+                                                    (pelatihan?.NamaPelathanInggris != "") && <p className="font-bos text-xl max-w-4xl leading-none -mt-3">{pelatihan?.NamaPelathanInggris}, {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}</p>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="w-full border border-gray-400 rounded-md overflow-hidden">
+                                        <div className="flex text-center font-bosNormal font-bold bg-gray-100 ">
+                                            <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 leading-none relative"><span className='absolute mt-10 right-0 left-0 !font-bosBold text-lg'>NO</span></div>
+                                            <div className="w-7/12 px-1 flex flex-col justify-center items-center border-r border-gray-400 relative">
+                                                <div className="flex flex-row items-center justify-center absolute mt-10">
+                                                    <span className="text-lg leading-none !font-bosBold">MATERI</span>/
+                                                    <span className="italic font-bos leading-none">COURSE</span>
+                                                </div>
+                                            </div>
+                                            <div className="w-4/12 px-1 flex items-center justify-center border-b border-gray-400">
+                                                <div className="flex flex-col mb-3">
+                                                    <div className="flex flex-row  items-center justify-center">
+                                                        <span className="text-lg leading-none !font-bosBold">ALOKASI WAKTU </span>/
+                                                        <span className="italic font-bos leading-none">ALLOCATION TIME</span>
+                                                    </div>
+                                                    <div className="flex flex-row  items-center justify-center -mt-1">
+                                                        <span className="text-lg leading-none !font-bosBold">@45 MENIT</span>/
+                                                        <span className="italic font-bos leading-none">@45 MINS</span>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        {/* Header Baris 2 */}
+                                        <div className="flex text-center font-bosNormal font-bold bg-gray-100 border-b border-gray-400">
+                                            <div className="w-1/12 px-1 border-r border-gray-400"></div>
+                                            <div className="w-7/12 px-1 border-r border-gray-400"></div>
+                                            <div className="w-2/12 px-1 border-r border-gray-400">
+                                                <div className="flex flex-row items-center justify-center mb-4">
+                                                    <span className="text-lg leading-none !font-bosBold">TEORI</span>/
+                                                    <span className="italic font-bos leading-none mb-1">THEORY</span>
+                                                </div>
+                                            </div>
+                                            <div className="w-2/12 px-1 py-1">
+                                                <div className="flex flex-row items-center justify-center mb-4">
+                                                    <span className="text-lg leading-none !font-bosBold">PRAKTEK</span>/
+                                                    <span className="italic font-bos leading-none mb-1">PRACTICE</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {
+                                            pelatihan?.AsalSertifikat == 'Specific' ? <>
+                                                {/* Kompetensi Umum Title */}
+                                                <div className="flex border-b border-gray-400 bg-white">
+                                                    <div className="w-1/12 px-1 !font-bosBold  text-center border-r border-gray-400">I</div>
+                                                    <div className="w-9/12 px-1 font-bosNormal font-bold ">
+                                                        <div className="flex flex-row items-center mb-3">
+                                                            <span className="text-base leading-none !font-bosBold">KOMPETENSI UMUM</span>/
+                                                            <span className="italic font-bos leading-none mb-1">General Competency</span>
+
+                                                        </div>
+                                                    </div>
+                                                    <div className="w-1/12 px-1 "></div>
+                                                    <div className="w-1/12 px-1 py-1"></div>
+                                                </div>
+
+                                                {/* Kompetensi Umum Items */}
+                                                {pelatihan.MateriPelatihan.filter((item) => item.Deskripsi == 'Umum').map((materi, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="flex text-sm border-b border-gray-300"
+                                                    >
+                                                        <div className="w-1/12 px-1 text-center border-r border-gray-300">{index + 1}.</div>
+                                                        <div className="w-7/12 px-1 border-r border-gray-300">
+                                                            <div className="flex flex-col justify-center mb-4">
+                                                                <span className="text-lg !font-bosNormal not-italic font-normal leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_indo}</span>
+                                                                {
+                                                                    generatedCurriculumCertificate(materi.NamaMateri).curr_eng != "" && <span className="italic font-bosItalic leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_eng}</span>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                        <div className="w-2/12 px-1 text-center font-bosNormal text-lg border-r border-gray-300">{materi.JamTeory}</div>
+                                                        <div className="w-2/12 px-1 text-center font-bosNormal text-lg">{materi.JamPraktek}</div>
+                                                    </div>
+                                                ))}
+
+                                                {/* Kompetensi Inti Title */}
+                                                <div className="flex border-b border-gray-400 bg-white">
+                                                    <div className="w-1/12 px-1 !font-bosBold text-center border-r border-gray-400">II</div>
+                                                    <div className="w-9/12 px-1 font-bosNormal font-bold ">
+                                                        <div className="flex flex-row items-center mb-3">
+                                                            <span className="text-base leading-none !font-bosBold">KOMPETENSI INTI</span>/
+                                                            <span className="italic font-bos leading-none mb-1">Core Competency</span>
+
+                                                        </div>
+                                                    </div>
+                                                    <div className="w-1/12 px-1 "></div>
+                                                    <div className="w-1/12 px-1 py-1"></div>
+                                                </div>
+
+                                                {/* Kompetensi Inti Items */}
+                                                {pelatihan.MateriPelatihan.filter((item) => item.Deskripsi == 'Inti').map((materi, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="flex text-sm border-b border-gray-300"
+                                                    >
+                                                        <div className="w-1/12 px-1 text-center border-r border-gray-300">{index + 1}.</div>
+                                                        <div className="w-7/12 px-1 border-r border-gray-300">
+                                                            <div className="flex flex-col justify-center mb-4">
+                                                                <span className="text-lg !font-bosNormal not-italic font-normal leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_indo}</span>
+                                                                {
+                                                                    generatedCurriculumCertificate(materi.NamaMateri).curr_eng != "" && <span className="italic text-base font-bosItalic leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_eng}</span>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                        <div className="w-2/12 px-1 mb-3 text-center text-lg font-bosNormal border-r border-gray-300">{materi.JamTeory}</div>
+                                                        <div className="w-2/12 px-1 mb-3 text-center text-lg font-bosNormal">{materi.JamPraktek}</div>
+                                                    </div>
+                                                ))}</> : <>  {/* Kompetensi Inti Title */}
+
+
+                                                {/* Kompetensi Inti Items */}
+                                                {pelatihan.MateriPelatihan.filter((item) => item.Deskripsi == '-').map((materi, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="flex text-sm border-b border-gray-300"
+                                                    >
+                                                        <div className="w-1/12 px-1 text-lg text-center border-r border-gray-300">{index + 1}.</div>
+                                                        <div className="w-7/12 px-1 border-r border-gray-300">
+                                                            <div className="flex flex-col justify-center mb-4">
+                                                                <span className="text-lg !font-bosNormal not-italic font-normal leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_indo}</span>
+                                                                {
+                                                                    generatedCurriculumCertificate(materi.NamaMateri).curr_eng != "" && <span className="italic text-base font-bosItalic leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_eng}</span>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                        <div className="w-2/12 px-1 mb-3 text-lg text-center font-bosNormal border-r border-gray-300">{materi.JamTeory}</div>
+                                                        <div className="w-2/12 px-1 mb-3 text-lg text-center font-bosNormal">{materi.JamPraktek}</div>
+                                                    </div>
+                                                ))}</>
+                                        }
+
+
+                                        {/* Jumlah Jam */}
+                                        <div className="flex font-bosNormal font-bold border-b border-gray-300">
+                                            <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-300"></div>
+                                            <div className="w-7/12 px-1 border-r border-gray-300">
+                                                <div className="flex flex-row items-center mb-4">
+                                                    <span className="text-lg leading-none !font-bosBold">JUMLAH JAM PELAJARAN</span>/
+                                                    <span className="italic font-bos leading-none">Training Hours</span>
+                                                </div>
+                                            </div>
+                                            <div className="w-2/12 text-lg px-1 mb-3 text-center">{totalHoursCertificateLvl.totalTheory}</div>
+                                            <div className="w-2/12 text-lg px-1 mb-3 text-center">{totalHoursCertificateLvl.totalPractice}</div>
+                                        </div>
+
+                                        {/* Total Jam */}
+                                        <div className="flex font-bosNormal font-bold">
+                                            <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-300"></div>
+                                            <div className="w-7/12 px-1 border-r border-gray-300">
+                                                <div className="flex flex-row items-center mb-4">
+                                                    <span className="text-lg leading-none !font-bosBold">TOTAL JAM PELAJARAN</span>/
+                                                    <span className="italic font-bos leading-none">Total Hours</span>
+                                                </div>
+                                            </div>
+                                            <div className="w-4/12 px-1 text-lg mb-3 text-center flex items-center justify-center">{totalHoursCertificateLvl.totalTheory + totalHoursCertificateLvl.totalPractice}</div>
+                                        </div>
+                                    </div>
+                                </div >
+                            }
+                        </>
+                    }
+
+                    {pelatihan?.TtdSertifikat == ESELON2 &&
+                        <>
+                            <div ref={refPage} className={`pdf-page w-full flex flex-col  gap-4 relative  items-center justify-center h-[49.63rem]}`}>
+                                <div className="flex flex-row  absolute top-0 right-0">
+                                    <p className="text-lg font-bosNormal">
+                                        No. STTPL : -
+                                    </p>
+                                </div>
+
+                                <div className="mx-auto w-20 absolute bottom-0 left-28">
+                                    <QRCode
+                                        size={280}
+                                        style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                                        value={`https://elaut-bppsdm.kkp.go.id/layanan/cek-sertifikat/-`}
+                                        viewBox={`0 0 280 280`}
+                                    />
+                                </div>
+
+                                <div className="w-full flex flex-col space-y-0 px-10 mt-10 ">
+
+
+                                    <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-3">
+
+                                        <div className="flex flex-col h-fit items-center justify-center space-y-0">
+                                            <h1 className="text-base font-bosBold font-bold">
+                                                KEMENTERIAN KELAUTAN DAN PERIKANAN
+                                            </h1>
+                                            <p className="text-base font-bosItalic">
+                                                MINISTRY OF MARINE AFFAIRS AND FISHERIES
+                                            </p>
+                                        </div>
+                                        <div className="flex flex-col h-fit items-center justify-center space-y-0">
+                                            <h1 className="text-lg font-bosBold font-bold">
+                                                BADAN PENYULUHAN DAN PENGEMBANGAN SUMBER DAYA MANUSIA KELAUTAN
+                                                DAN PERIKANAN
+                                            </h1>
+                                            <p className="text-sm font-bosItalic">
+                                                THE AGENCY FOR MARINE AND FISHERIES EXTENSION AND HUMAN
+                                                RESOURCES DEVELOPMENT
+                                            </p>
+                                        </div>
+
+                                        <div className="flex flex-col h-fit items-center justify-center space-y-1">
+                                            <h1 className="text-3xl font-bosBold font-black leading-none">
+                                                SERTIFIKAT
+                                            </h1>
+                                            <p className="text-lg font-bosItalic">CERTIFICATE</p>
+                                        </div>
+
+                                    </div>
+
+                                    <div className="flex w-full flex-col space-y-0 max-w-5xl mx-auto items-start text-base  text-center font-bos h-fit mt-2">
+                                        <span className="text-base leading-none font-bosNormal">
+                                            Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan berdasarkan Peraturan Pemerintah Nomor.62 Tahun 2014 tentang Penyelenggaraan Pendidikan, Pelatihan dan Penyuluhan Perikanan, serta ketentuan pelaksanaannya menyatakan bahwa :
+                                        </span>
+                                        <span className="max-w-4xl leading-none font-bosItalic text-[0.85rem] mx-auto">
+                                            The Agency for Marine and Fisheries Extension and Human
+                                            Resources Development based on Government Regulation Number 62
+                                            of 2014 concerning the Implementation of Fisheries Education,
+                                            Training and Extension as well as its implementing provisions
+                                            States that :
+                                        </span>
+                                    </div>
+
+                                    <div className="flex flex-col space-y-0 w-full h-fit -mt-1">
+                                        <table className="w-full h-fit" cellPadding={0} cellSpacing={0}>
+                                            <tr className="w-full">
+                                                <td className="font-bos w-full flex flex-col space-y-0">
+                                                    <span className="font-bosNormal text-base">Nama</span>
+                                                    <span className="font-bos italic text-[0.85rem] -mt-2">Name</span>
+                                                </td>
+                                                <td className=" w-2/3 text-base font-bosNormal uppercase">: -</td>
+                                            </tr>
+                                            <tr className="w-full">
+                                                <td className="font-bos w-full flex flex-col  space-y-0">
+                                                    <span className="text-base font-bosNormal">
+                                                        NIK/NIP/NIM/PASPOR
+                                                    </span>
+                                                    <span className="font-bos italic text-[0.85rem] -mt-2">
+                                                        {" "}
+                                                        Identification Number
+                                                    </span>
+                                                </td>
+                                                <td className=" w-2/3 text-base font-bosNormal">
+                                                    : -
+                                                </td>
+                                            </tr>
+                                            <tr className="w-full">
+                                                <td className="font-bos w-full flex flex-col space-y-0">
+                                                    <span className="text-base font-bosNormal">Tempat Tanggal Lahir</span>
+                                                    <span className="font-bos italic text-[0.85rem] -mt-2">
+                                                        {" "}
+                                                        Place and date of birth
+                                                    </span>
+                                                </td>
+                                                <td className=" w-2/3 text-base font-bosNormal capitalize">
+                                                    : -
+                                                </td>
+                                            </tr>
+                                            <tr className="w-full">
+                                                <td className="font-bos w-full flex flex-col space-y-0">
+                                                    <span className="text-base font-bosNormal">Nama Institusi/Kelompok</span>
+                                                    <span className="font-bos italic text-[0.85rem] -mt-2">
+                                                        {" "}
+                                                        Institution/Group Name
+                                                    </span>
+                                                </td>
+                                                <td className=" w-2/3 text-base font-bosNormal uppercase">
+                                                    : -
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+
+                                    <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-1 mb-2">
+                                        <h1 className="font-bosBold font-black text-2xl leading-none">
+                                            TELAH LULUS
+                                        </h1>
+                                        <h3 className="font-bosNormal font-bold text-lg italic">
+                                            HAS PASSED
+                                        </h3>
+                                    </div>
+
+                                    <>
+                                        <div className="flex w-full flex-col space-y-0 max-w-7xl mx-auto items-start text-sm -mt-2 text-center font-bos h-fit">
+                                            <span className="text-base leading-[115%] font-bosNormal max-w-6xl">
+                                                {generatedDescriptionCertificate(pelatihan!.DeskripsiSertifikat).desc_indo}, pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
+                                            </span>
+                                            <span className="max-w-5xl mt-1 leading-none font-bos italic text-[0.85rem] mx-auto">
+                                                {generatedDescriptionCertificate(pelatihan!.DeskripsiSertifikat).desc_eng} on {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex gap-2 items-center justify-center mt-2">
+                                            <div className="flex flex-col  space-y-0 font-bos text-center items-center justify-center">
+                                                <div className="flex w-full flex-col  space-y-0 items-center mt-2 text-center justify-center">
+                                                    <span className="font-bosNormal text-base leading-[105%] w-full flex items-center gap-1">
+                                                        Jakarta,{" "} -
+
+                                                        <br /> {pelatihan?.TtdSertifikat}
+                                                    </span>
+
+
+                                                    <span className="leading-none font-bosItalic text-[0.85rem]">
+                                                        {ESELON_2.fullNameEng}
+                                                    </span>
+
+                                                    <Image
+                                                        alt=""
+                                                        width={0}
+                                                        height={0}
+                                                        src={"/ttd-elektronik.png"}
+                                                        className="w-[230px] h-[100px] relative -z-10 pt-4 block"
+                                                    />
+
+                                                    <span className=" font-bosNormal font-bold text-lg -mt-3">
+                                                        {KA_PUSLAT_KP}
+                                                    </span>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </>
+                                </div>
+
+
+                            </div>
+                            {
+                                <div className={`pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center ${pelatihan?.MateriPelatihan.length < 7 ? 'mt-72' : 'mt-48'} break-before-auto relative`}>
+                                    <div className="flex flex-row justify-center items-center mb-6">
+                                        <div className="flex flex-row gap-2 items-center h-fit">
+                                            <div className="flex flex-col text-center space-y-0 h-fit items-center justify-center w-full gap-0">
+                                                <p className="font-bosBold text-2xl max-w-4xl w-full uppercase leading-none">
+                                                    Materi {pelatihan?.NamaPelatihan}, tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
+                                                </p>
+                                                {
+                                                    (pelatihan?.NamaPelathanInggris != "") && <p className="font-bos text-xl max-w-4xl leading-none -mt-3">{pelatihan?.NamaPelathanInggris}, {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}</p>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="w-full border border-gray-400 rounded-md overflow-hidden">
+                                        {/* Header Baris 1 */}
+                                        <div className="flex text-center font-bosNormal font-bold bg-gray-100 ">
+                                            <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 leading-none relative"><span className='absolute mt-10 right-0 left-0 !font-bosBold text-lg'>NO</span></div>
+                                            <div className="w-7/12 px-1 flex flex-col justify-center items-center border-r border-gray-400 relative">
+                                                <div className="flex flex-row items-center justify-center absolute mt-10">
+                                                    <span className="text-lg leading-none !font-bosBold">MATERI</span>/
+                                                    <span className="italic font-bos leading-none">COURSE</span>
+                                                </div>
+                                            </div>
+                                            <div className="w-4/12 px-1 flex items-center justify-center border-b border-gray-400">
+                                                <div className="flex flex-col mb-3">
+                                                    <div className="flex flex-row  items-center justify-center">
+                                                        <span className="text-lg leading-none !font-bosBold">ALOKASI WAKTU </span>/
+                                                        <span className="italic font-bos leading-none">ALLOCATION TIME</span>
+                                                    </div>
+                                                    <div className="flex flex-row  items-center justify-center -mt-1">
+                                                        <span className="text-lg leading-none !font-bosBold">@45 MENIT</span>/
+                                                        <span className="italic font-bos leading-none">@45 MINS</span>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        {/* Header Baris 2 */}
+                                        <div className="flex text-center font-bosNormal font-bold bg-gray-100 border-b border-gray-400">
+                                            <div className="w-1/12 px-1 border-r border-gray-400"></div>
+                                            <div className="w-7/12 px-1 border-r border-gray-400"></div>
+                                            <div className="w-2/12 px-1 border-r border-gray-400">
+                                                <div className="flex flex-row items-center justify-center mb-4">
+                                                    <span className="text-lg leading-none !font-bosBold">TEORI</span>/
+                                                    <span className="italic font-bos leading-none mb-1">THEORY</span>
+                                                </div>
+                                            </div>
+                                            <div className="w-2/12 px-1 py-1">
+                                                <div className="flex flex-row items-center justify-center mb-4">
+                                                    <span className="text-lg leading-none !font-bosBold">PRAKTEK</span>/
+                                                    <span className="italic font-bos leading-none mb-1">PRACTICE</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {
+                                            pelatihan?.AsalSertifikat == 'Specific' ? <>
+                                                {/* Kompetensi Umum Title */}
+                                                <div className="flex border-b border-gray-400 bg-white">
+                                                    <div className="w-1/12 px-1 !font-bosBold  text-center border-r border-gray-400">I</div>
+                                                    <div className="w-9/12 px-1 font-bosNormal font-bold ">
+                                                        <div className="flex flex-row items-center mb-3">
+                                                            <span className="text-base leading-none !font-bosBold">KOMPETENSI UMUM</span>/
+                                                            <span className="italic font-bos leading-none mb-1">General Competency</span>
+
+                                                        </div>
+                                                    </div>
+                                                    <div className="w-1/12 px-1 "></div>
+                                                    <div className="w-1/12 px-1 py-1"></div>
+                                                </div>
+
+                                                {/* Kompetensi Umum Items */}
+                                                {pelatihan.MateriPelatihan.filter((item) => item.Deskripsi == 'Umum').map((materi, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="flex text-sm border-b border-gray-300"
+                                                    >
+                                                        <div className="w-1/12 px-1 text-center border-r border-gray-300">{index + 1}.</div>
+                                                        <div className="w-7/12 px-1 border-r border-gray-300">
+                                                            <div className="flex flex-col justify-center mb-4">
+                                                                <span className="text-lg !font-bosNormal not-italic font-normal leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_indo}</span>
+                                                                {
+                                                                    generatedCurriculumCertificate(materi.NamaMateri).curr_eng != "" && <span className="italic font-bosItalic leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_eng}</span>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                        <div className="w-2/12 px-1 text-center font-bosNormal text-lg border-r border-gray-300">{materi.JamTeory}</div>
+                                                        <div className="w-2/12 px-1 text-center font-bosNormal text-lg">{materi.JamPraktek}</div>
+                                                    </div>
+                                                ))}
+
+                                                {/* Kompetensi Inti Title */}
+                                                <div className="flex border-b border-gray-400 bg-white">
+                                                    <div className="w-1/12 px-1 !font-bosBold text-center border-r border-gray-400">II</div>
+                                                    <div className="w-9/12 px-1 font-bosNormal font-bold ">
+                                                        <div className="flex flex-row items-center mb-3">
+                                                            <span className="text-base leading-none !font-bosBold">KOMPETENSI INTI</span>/
+                                                            <span className="italic font-bos leading-none mb-1">Core Competency</span>
+
+                                                        </div>
+                                                    </div>
+                                                    <div className="w-1/12 px-1 "></div>
+                                                    <div className="w-1/12 px-1 py-1"></div>
+                                                </div>
+
+                                                {/* Kompetensi Inti Items */}
+                                                {pelatihan.MateriPelatihan.filter((item) => item.Deskripsi == 'Inti').map((materi, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="flex text-sm border-b border-gray-300"
+                                                    >
+                                                        <div className="w-1/12 px-1 text-center border-r border-gray-300">{index + 1}.</div>
+                                                        <div className="w-7/12 px-1 border-r border-gray-300">
+                                                            <div className="flex flex-col justify-center mb-4">
+                                                                <span className="text-lg !font-bosNormal not-italic font-normal leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_indo}</span>
+                                                                {
+                                                                    generatedCurriculumCertificate(materi.NamaMateri).curr_eng != "" && <span className="italic text-base font-bosItalic leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_eng}</span>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                        <div className="w-2/12 px-1 mb-3 text-center text-lg font-bosNormal border-r border-gray-300">{materi.JamTeory}</div>
+                                                        <div className="w-2/12 px-1 mb-3 text-center text-lg font-bosNormal">{materi.JamPraktek}</div>
+                                                    </div>
+                                                ))}</> : <>  {/* Kompetensi Inti Title */}
+
+
+                                                {/* Kompetensi Inti Items */}
+                                                {pelatihan.MateriPelatihan.filter((item) => item.Deskripsi == '-').map((materi, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="flex text-sm border-b border-gray-300"
+                                                    >
+                                                        <div className="w-1/12 px-1 text-lg text-center border-r border-gray-300">{index + 1}.</div>
+                                                        <div className="w-7/12 px-1 border-r border-gray-300">
+                                                            <div className="flex flex-col justify-center mb-4">
+                                                                <span className="text-lg !font-bosNormal not-italic font-normal leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_indo}</span>
+                                                                {
+                                                                    generatedCurriculumCertificate(materi.NamaMateri).curr_eng != "" && <span className="italic text-base font-bosItalic leading-none">{generatedCurriculumCertificate(materi.NamaMateri).curr_eng}</span>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                        <div className="w-2/12 px-1 mb-3 text-lg text-center font-bosNormal border-r border-gray-300">{materi.JamTeory}</div>
+                                                        <div className="w-2/12 px-1 mb-3 text-lg text-center font-bosNormal">{materi.JamPraktek}</div>
+                                                    </div>
+                                                ))}</>
+                                        }
+
+
+                                        {/* Jumlah Jam */}
+                                        <div className="flex font-bosNormal font-bold border-b border-gray-300">
+                                            <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-300"></div>
+                                            <div className="w-7/12 px-1 border-r border-gray-300">
+                                                <div className="flex flex-row items-center mb-4">
+                                                    <span className="text-lg leading-none !font-bosBold">JUMLAH JAM PELAJARAN</span>/
+                                                    <span className="italic font-bos leading-none">Training Hours</span>
+                                                </div>
+                                            </div>
+                                            <div className="w-2/12 text-lg px-1 mb-3 text-center">{totalHoursCertificateLvl.totalTheory}</div>
+                                            <div className="w-2/12 text-lg px-1 mb-3 text-center">{totalHoursCertificateLvl.totalPractice}</div>
+                                        </div>
+
+                                        {/* Total Jam */}
+                                        <div className="flex font-bosNormal font-bold">
+                                            <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-300"></div>
+                                            <div className="w-7/12 px-1 border-r border-gray-300">
+                                                <div className="flex flex-row items-center mb-4">
+                                                    <span className="text-lg leading-none !font-bosBold">TOTAL JAM PELAJARAN</span>/
+                                                    <span className="italic font-bos leading-none">Total Hours</span>
+                                                </div>
+                                            </div>
+                                            <div className="w-4/12 px-1 text-lg mb-3 text-center flex items-center justify-center">{totalHoursCertificateLvl.totalTheory + totalHoursCertificateLvl.totalPractice}</div>
+                                        </div>
+                                    </div>
+                                </div >
+                            }
+                        </>
+                    }
+                </div >
+            </div >
+        );
+    }
+);
+
+export function DialogFormatSTTPL({
+    children,
+    pelatihan,
+}: {
+    children: ReactElement;
+    pelatihan: PelatihanMasyarakat;
+}) {
+    const componentRef = useRef<HTMLDivElement | null>(null);
+    const componentRefPage = useRef<HTMLDivElement | null>(null);
+
+    return (
+        <div>
+            <Dialog>
+                <DialogTrigger asChild>{children}</DialogTrigger>
+                <DialogContent className="sm:max-w-[1425px]">
+                    <DialogHeader>
+                        <div className="flex gap-2 items-center">
+                            <MdVerified className="text-3xl text-blue-500" />
+                            <div className="flex flex-col">
+                                <DialogDescription>
+                                    Sertifikat Pelatihan
+                                </DialogDescription>
+                            </div>
+                        </div>
+                    </DialogHeader>
+                    <div className="max-h-[700px] scale-95 flex flex-col gap-2 overflow-y-auto scroll-smooth">
+                        <SertifikatNonKepelautan
+                            ref={componentRef}
+                            refPage={componentRefPage}
+                            pelatihan={pelatihan}
+                        />
+                    </div>
+                </DialogContent>
+            </Dialog>
+        </div>
+    );
+}

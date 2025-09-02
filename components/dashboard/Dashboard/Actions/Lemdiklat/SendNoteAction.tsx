@@ -21,10 +21,10 @@ import {
     SelectItem,
     SelectValue,
 } from "@/components/ui/select";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import Cookies from "js-cookie";
 import Toast from "@/components/toast";
-import { elautBaseUrl } from "@/constants/urls";
+import { elautBaseUrl, urlFileBeritaAcara } from "@/constants/urls";
 import { IconType } from "react-icons";
 import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
 import { PelatihanMasyarakat } from "@/types/product";
@@ -33,6 +33,8 @@ import { breakdownStatus } from "@/lib/utils";
 import { ESELON_1, ESELON_2, ESELON_3 } from "@/constants/nomenclatures";
 import { truncateText } from "@/utils";
 import { UK_ESELON_2 } from "@/constants/unitkerja";
+import { HiOutlineEyeOff } from "react-icons/hi";
+import { HiOutlineEye } from "react-icons/hi2";
 
 interface SendNoteActionProps {
     idPelatihan: string;
@@ -62,7 +64,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
     const [message, setMessage] = useState("");
     const [verifikatorPelaksanaan, setVerifikatorPelaksanaan] = useState(pelatihan!.VerifikatorPelatihan)
     const [beritaAcaraFile, setBeritaAcaraFile] = useState<File | null>(null);
-    const [ttdSertifikat, setTtdSertifikat] = useState("");
+    const [ttdSertifikat, setTtdSertifikat] = useState(pelatihan!.TtdSertifikat);
     const oldFileUrl = pelatihan!.BeritaAcara
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,6 +82,64 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
             fetchAdminPusatData();
         }
     }, [isOpen, fetchAdminPusatData]);
+
+    const [passphrase, setPassphrase] = React.useState<string>("");
+    const [isSigning, setIsSigning] = React.useState<boolean>(false);
+    const handleTTDElektronik = async () => {
+        setIsSigning(true);
+        if (passphrase === "") {
+            Toast.fire({
+                icon: "error",
+                text: "Harap memasukkan passphrase untuk dapat melakukan penandatanganan file sertifikat!",
+                title: `Tidak ada passphrase`,
+            });
+            setPassphrase("");
+            setIsSigning(false);
+        } else {
+            try {
+                const response = await axios.post(
+                    elautBaseUrl + "/lemdik/sendSertifikatTtde",
+                    {
+                        idPelatihan: pelatihan?.IdPelatihan.toString(),
+                        kodeParafrase: passphrase,
+                        nik: Cookies.get('NIK'),
+                    },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+                        },
+                    }
+                );
+
+
+                console.log("TTDE", response);
+                console.log("File uploaded successfully");
+                Toast.fire({
+                    icon: "success",
+                    text: "Berhasil melakuukan penandatangan sertifikat secara elektronik!",
+                    title: `Berhasil TTDe`,
+                });
+                await handleSubmit()
+                setPassphrase("");
+
+                onSuccess()
+            } catch (error) {
+                console.error("Error uploading the file:", error);
+                setPassphrase("");
+                onSuccess()
+                setIsSigning(false);
+                if (error instanceof AxiosError)
+                    Toast.fire({
+                        icon: "error",
+                        text: "Internal server error",
+                        title: `Gagal TTDe`,
+                    });
+            }
+        }
+    };
+
+    const [isShowPassphrase, setIsShowPassphrase] = React.useState<boolean>(false);
+
 
     const handleSubmit = async () => {
         const formData = new FormData();
@@ -117,12 +177,13 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
 
             setMessage("");
             setVerifikatorPelaksanaan("");
-            setIsOpen(false);
+
             setBeritaAcaraFile(null);
             setTtdSertifikat("");
             setLoading(false);
             onSuccess();
             console.log("SEND ACTION RESPONSE: ", response);
+            setIsOpen(false);
         } catch (error) {
             console.error("ERROR SEND ACTION: ", error);
             setLoading(false);
@@ -132,6 +193,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                 title: "Gagal!",
                 text: "Terjadi kesalahan saat memproses tindakan.",
             });
+            setIsOpen(false);
         }
     };
 
@@ -179,7 +241,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                 }
 
                 {
-                    (pelatihan?.StatusPenerbitan == "5" || pelatihan?.StatusPenerbitan == "7" || pelatihan?.StatusPenerbitan == "10") && <>
+                    (pelatihan?.StatusPenerbitan == "5" || pelatihan?.StatusPenerbitan == "7" || pelatihan?.StatusPenerbitan == "9") && <>
                         <div>
                             <label className="block text-sm font-semibold text-gray-800 mb-2">
                                 Upload Dokumen Penerbitan STTPL
@@ -212,7 +274,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                                         <span className="truncate max-w-[200px]">Dokumen Penerbitan STTPL</span>
                                     </div>
                                     <a
-                                        href={oldFileUrl}
+                                        href={`${urlFileBeritaAcara}/${oldFileUrl}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-navy-600 hover:text-navy-800 font-medium transition"
@@ -247,7 +309,15 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                     </>
                 }
 
-                <div className="mb-4">
+
+
+                <div className="mb-2">
+                    <label
+                        className="block text-gray-800 text-sm font-medium mb-1"
+                        htmlFor="email"
+                    >
+                        Catatan
+                    </label>
                     <Textarea
                         placeholder="Tulis catatan atau pesan Anda di sini..."
                         value={message}
@@ -256,7 +326,55 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                     />
                 </div>
 
-                <AlertDialogFooter>
+                {(Cookies.get('Access')?.includes('approveKapus') && pelatihan.StatusPenerbitan == "10" && pelatihan.TtdSertifikat == Cookies.get("Role")) &&
+                    <fieldset>
+                        <form autoComplete="off">
+                            <div className="flex flex-wrap -mx-3 mb-1 -mt-2">
+                                <div className="w-full px-3">
+                                    <label
+                                        className="block text-gray-800 text-sm font-medium mb-1"
+                                        htmlFor="email"
+                                    >
+                                        Passphrase
+                                    </label>
+                                    <div className="flex gap-1">
+                                        <span className="relative w-full h-fit">
+                                            <input
+                                                type={isShowPassphrase ? 'text' : 'password'}
+                                                className=" text-black h-10 text-base flex items-center cursor-pointer w-full border border-neutral-200 rounded-md"
+                                                required
+                                                autoComplete="off"
+                                                value={passphrase}
+                                                onChange={(e) => setPassphrase(e.target.value)}
+                                            />
+                                            <span onClick={(e) => setIsShowPassphrase(!isShowPassphrase)}>
+                                                {isShowPassphrase ? (
+                                                    <HiOutlineEyeOff className="text-gray-500 my-auto top-2 mr-5 absolute right-0 text-xl cursor-pointer" />
+                                                ) : (
+                                                    <HiOutlineEye className="text-gray-500 my-auto top-2 mr-5 absolute right-0 text-xl cursor-pointer" />
+                                                )}
+                                            </span>
+                                        </span>
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </form>
+                    </fieldset>
+                }
+
+                {(Cookies.get('Access')?.includes('approveKapus') && pelatihan.StatusPenerbitan == "10" && pelatihan.TtdSertifikat == Cookies.get("Role")) ? <AlertDialogFooter>
+                    <AlertDialogCancel disabled={loading}>Batal</AlertDialogCancel>
+                    <AlertDialogAction
+                        onClick={handleTTDElektronik}
+                        className={`bg-${buttonColor}-600 hover:bg-${buttonColor}-700 text-white`}
+                        disabled={isSigning || !message}
+                    >
+                        {isSigning ? "Menandatangan..." : "TTDe"}
+                    </AlertDialogAction>
+                </AlertDialogFooter> : <AlertDialogFooter>
                     <AlertDialogCancel disabled={loading}>Batal</AlertDialogCancel>
                     <AlertDialogAction
                         onClick={handleSubmit}
@@ -265,7 +383,8 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                     >
                         {loading ? "Memproses..." : "Kirim"}
                     </AlertDialogAction>
-                </AlertDialogFooter>
+                </AlertDialogFooter>}
+
             </AlertDialogContent>
         </AlertDialog >
     );

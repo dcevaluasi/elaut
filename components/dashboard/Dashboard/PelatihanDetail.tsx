@@ -193,7 +193,10 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 </p>
                                             </div> :
                                             <div className="grid grid-cols-2 gap-4 mt-4 w-full text-sm">
-                                                <InfoItem label="Status" value={label} />
+                                                <div className={`flex flex-col p-3 ${color} rounded-lg shadow-sm border border-gray-100 animate-pulse`}>
+                                                    <span className="text-xs font-medium text-gray-100">Status</span>
+                                                    <span className="flex items-center">{icon}{label}</span>
+                                                </div>
                                                 <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
                                                     <span className="text-xs font-medium text-gray-500">Surat Pemberitahuan</span>
                                                     <Link target="_blank" href={`${urlFileSuratPemberitahuan}/${data?.SuratPemberitahuan}`} className="text-sm font-semibold text-gray-800 mt-1">

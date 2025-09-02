@@ -38,7 +38,7 @@ const DualLangInput: React.FC<{
         <div className="space-y-2 my-3">
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Bahasa Indonesia
+                    Deskripsi Sertifikat Bahasa Indonesia
                 </label>
                 <textarea
                     value={indo}
@@ -54,7 +54,7 @@ const DualLangInput: React.FC<{
 
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                    English
+                    Deskripsi Sertifikat English
                 </label>
                 <textarea
                     value={english}
@@ -87,6 +87,7 @@ const FormatCertificateAction: React.FC<FormatCertificateActionProps> = ({
         useState<boolean>(false);
     const [materiPelatihan, setMateriPelatihan] = useState<File | null>(null);
     const [dualLangText, setDualLangText] = useState("");
+    const [asalSertifikat, setAsalSertifikat] = useState("Not Specific");
     const [loading, setLoading] = useState(false);
 
     const handleFileMateriChange = (e: any) => {
@@ -121,6 +122,7 @@ const FormatCertificateAction: React.FC<FormatCertificateActionProps> = ({
             // STEP 2: Update Pelatihan with BeritaAcara, TtdSertifikat, dll
             const updateForm = new FormData();
             if (dualLangText) updateForm.append("DeskripsiSertifikat", dualLangText);
+            if (asalSertifikat) updateForm.append("AsalSertifikat", asalSertifikat);
 
             setLoading(true);
             await axios.put(
@@ -172,7 +174,33 @@ const FormatCertificateAction: React.FC<FormatCertificateActionProps> = ({
 
                     <fieldset>
                         <form autoComplete="off">
-                            <div className="flex flex-col gap-2">
+                            <div className="flex flex-col gap-4">
+                                {/* Specific / Not Specific Checkbox */}
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        id="isSpecific"
+                                        type="checkbox"
+                                        checked={asalSertifikat === "Specific"}
+                                        onChange={(e) =>
+                                            setAsalSertifikat(e.target.checked ? "Specific" : "Not Specific")
+                                        }
+                                        className="h-4 w-4 rounded border-gray-300 text-navy-600 focus:ring-navy-500"
+                                    />
+                                    <div className="flex flex-col">
+                                        <label
+                                            htmlFor="isSpecific"
+                                            className="text-sm text-gray-800 font-medium cursor-pointer"
+                                        >
+                                            {asalSertifikat}
+                                        </label>
+                                        <p className="text-sm text-gray-400">
+                                            Apabila materi yang akan tampil pada sertifikat terdiri dari Inti dan Umum maka ceklist jika hanya Umum saja maka biarkan
+                                        </p>
+                                    </div>
+
+                                </div>
+
+
                                 {/* Upload File */}
                                 <div className="space-y-2">
                                     <label className="block text-gray-800 text-sm font-medium">
@@ -205,7 +233,6 @@ const FormatCertificateAction: React.FC<FormatCertificateActionProps> = ({
                                     </p>
                                 </div>
 
-
                                 {/* Dual Language Input */}
                                 <DualLangInput
                                     value={dualLangText}
@@ -222,7 +249,9 @@ const FormatCertificateAction: React.FC<FormatCertificateActionProps> = ({
                                 </AlertDialogCancel>
                                 {data!.MateriPelatihan.length === 0 && (
                                     <AlertDialogAction
-                                        onClick={() => handleUploadMateriPelatihan(idPelatihan)}
+                                        onClick={() =>
+                                            handleUploadMateriPelatihan(idPelatihan)
+                                        }
                                         disabled={loading}
                                     >
                                         {loading ? "Memproses..." : "Upload"}
@@ -231,6 +260,7 @@ const FormatCertificateAction: React.FC<FormatCertificateActionProps> = ({
                             </AlertDialogFooter>
                         </form>
                     </fieldset>
+
                 </AlertDialogContent>
             </AlertDialog>
 

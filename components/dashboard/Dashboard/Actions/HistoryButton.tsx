@@ -10,6 +10,7 @@ import {
 import getDocument from "@/firebase/firestore/getData"
 import { DIALOG_TEXTS } from "@/constants/texts"
 import { HistoryItem, HistoryTraining, PelatihanMasyarakat } from "@/types/product"
+import { parseDateFirebase } from "@/utils/text"
 
 interface HistoryButtonProps {
   statusPelatihan: string
@@ -47,34 +48,43 @@ const HistoryButton: React.FC<HistoryButtonProps> = ({ pelatihan }) => {
 
           </AccordionTrigger>
           <AccordionContent>
-            {/* Contents shown beautifully without accordion */}
+
             {dataHistoryTraining ? (
               <div className="space-y-2">
                 {dataHistoryTraining.historical
                   .slice()
-                  .sort((a: HistoryItem, b: HistoryItem) =>
-                    new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+                  .sort(
+                    (a: HistoryItem, b: HistoryItem) =>
+                      parseDateFirebase(b.created_at).getTime() - parseDateFirebase(a.created_at).getTime()
                   )
-                  .map((item: HistoryItem, index: number) => (
-                    <div
-                      key={index}
-                      className=" rounded-xl bg-white p-4 shadow-sm"
-                    >
-                      <div className="flex justify-between items-center text-sm text-gray-500 mb-2">
-                        <span className="font-medium">Catatan {index + 1}</span>
-                        <span className="text-xs">{item.created_at}</span>
+                  .map((item: HistoryItem, index: number, arr) => {
+                    const isLatest = index === 0;
+                    return (
+                      <div
+                        key={index}
+                        className={`rounded-xl p-4 shadow-sm transition ${isLatest
+                          ? "bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-300"
+                          : "bg-white border border-gray-200"
+                          }`}
+                      >
+                        <div className="flex justify-between items-center text-sm text-gray-500 mb-2">
+                          <span className="font-medium">
+                            {isLatest ? "Catatan Terbaru" : `Catatan ${arr.length - index}`}
+                          </span>
+                          <span className="text-xs">{item.created_at}</span>
+                        </div>
+                        <p>
+                          <span className="font-semibold">Catatan:</span> {item.notes}
+                        </p>
+                        <p>
+                          <span className="font-semibold">Role:</span> {item.role}
+                        </p>
+                        <p>
+                          <span className="font-semibold">Satuan Kerja:</span> {item.upt}
+                        </p>
                       </div>
-                      <p>
-                        <span className="font-semibold">Catatan:</span> {item.notes}
-                      </p>
-                      <p>
-                        <span className="font-semibold">Role:</span> {item.role}
-                      </p>
-                      <p>
-                        <span className="font-semibold">Satuan Kerja:</span> {item.upt}
-                      </p>
-                    </div>
-                  ))}
+                    );
+                  })}
 
               </div>
             ) : (

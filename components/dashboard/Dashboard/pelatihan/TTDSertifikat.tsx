@@ -34,10 +34,6 @@ import { Button } from "@/components/ui/button";
 
 import { HiOutlineEye, HiUserGroup } from "react-icons/hi2";
 import Cookies from "js-cookie";
-import { AiFillSignature } from "react-icons/ai";
-import { MdOutlinePodcasts } from "react-icons/md";
-import { Badge } from "@/components/ui/badge";
-import { decryptValue } from "@/lib/utils";
 import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
 import { HiOutlineEyeOff } from "react-icons/hi";
 
@@ -119,10 +115,6 @@ const TTDSertifikat = ({ dataPelatihan, handleFetchData }: { dataPelatihan: Pela
   };
 
   const [isShowPassphrase, setIsShowPassphrase] = React.useState<boolean>(false);
-
-  // React.useEffect(() => {
-  //   handleFetchData();
-  // }, [dataPelatihan.IdPelatihan]);
 
   const handleUpdateStatusPenerbitan = async (passphrase: string) => {
     const formData = new FormData();

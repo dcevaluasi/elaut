@@ -8,29 +8,21 @@ import {
     AccordionContent,
 } from "@/components/ui/accordion";
 import { MateriPelatihan, PelatihanMasyarakat } from "@/types/product";
-import { generateTanggalPelatihan, getStatusInfo } from "@/utils/text";
-import { PublishButton } from "./Actions";
-import Image from "next/image";
-import { replaceUrl } from "@/lib/utils";
-import EditPublishAction from "./Actions/EditPublishAction";
+import { getStatusInfo } from "@/utils/text";
 import { MdLock } from "react-icons/md";
-import ImportPesertaAction from "./Actions/ImportPesertaAction";
-import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
 import Cookies from "js-cookie";
-import UserPelatihanTable from "./Tables/UserPelatihanTable";
-import DeletePelatihanAction from "./Actions/DeletePelatihanAction";
-import EditPelatihanAction from "./Actions/EditPelatihanAction";
 import { truncateText } from "@/utils";
 import Link from "next/link";
-import UploadSuratButton from "./Actions/UploadSuratButton";
 import { urlFileBeritaAcara, urlFileSuratPemberitahuan } from "@/constants/urls";
 import SendNoteAction from "./Actions/Lemdiklat/SendNoteAction";
-import { TbCheck, TbClock, TbCursorOff, TbPencilCheck, TbPencilCog, TbPencilX, TbSend } from "react-icons/tb";
-import { isToday } from "@/utils/time";
+import { TbPencilCheck, TbPencilX, TbSend } from "react-icons/tb";
 import HistoryButton from "./Actions/HistoryButton";
 import { LuSignature } from "react-icons/lu";
 import { generatedCurriculumCertificate, generatedDescriptionCertificate } from "@/utils/certificates";
 import FormatCertificateAction from "./Actions/FormatCertificateAction";
+import { DialogFormatSTTPL } from "@/components/sertifikat/dialogFormatSTTPL";
+import { Button } from "@/components/ui/button";
+import { FaSearch } from "react-icons/fa";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -77,25 +69,8 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             />
                                         }
 
-                                        {/* (3) Operator : Send to Verifikator After Reject */}
-                                        {
-                                            (data.SuratPemberitahuan != "" && data.StatusPenerbitan == "3") &&
-                                            <SendNoteAction
-                                                idPelatihan={data.IdPelatihan.toString()}
-                                                title="Kirim ke Verifikator"
-                                                description="Perbaiki permohonan pelaksanaan sesuai catatan Verifikator"
-                                                buttonLabel="Send to Verifikator"
-                                                icon={TbSend}
-                                                buttonColor="teal"
-                                                onSuccess={fetchData}
-                                                status={"2"}
-                                                pelatihan={data}
-                                            />
-                                        }
-
                                         {/* (5) Operator : Send Penerbitan STTPL */}
-                                        {
-                                            data.StatusPenerbitan == "5" &&
+                                        {(data.StatusPenerbitan == "5" && data?.DeskripsiSertifikat != "") && (
                                             <SendNoteAction
                                                 idPelatihan={data.IdPelatihan.toString()}
                                                 title="Ajukan Penerbitan STTPL"
@@ -107,57 +82,104 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 status={"6"}
                                                 pelatihan={data}
                                             />
+                                        )}
+
+                                        {parseInt(data.StatusPenerbitan) <= 5 && <p className="text-gray-600 text-sm">Harap Mengatur Format Sertifikat Terlebih Dahulu Untuk Melanjutkan Proses Berikutnya!</p>}
+
+
+                                        {/* (7) | (9) Operator : Send to Verifikator After Reject */}
+                                        {
+                                            (data.StatusPenerbitan == "7" || data.StatusPenerbitan == "9") &&
+                                            <SendNoteAction
+                                                idPelatihan={data.IdPelatihan.toString()}
+                                                title="Kirim ke Verifikator"
+                                                description="Perbaiki pengajuan penerbitan STTPL sesuai catatan Verifikator"
+                                                buttonLabel="Send to Verifikator"
+                                                icon={TbSend}
+                                                buttonColor="teal"
+                                                onSuccess={fetchData}
+                                                status={"6"}
+                                                pelatihan={data}
+                                            />
                                         }
                                     </>
                                 }
 
-                                {/* (1) SPV : Pending Pilih Verifikator */}
+                                {/* (6) Verifikator : Pending Verifikator for Reject */}
                                 {
-                                    (Cookies.get('Access')?.includes('supervisePelaksanaan') && data.StatusPenerbitan == "1") && <SendNoteAction
+                                    (Cookies.get('Access')?.includes('verifyCertificate') && data.StatusPenerbitan == "6") && <SendNoteAction
                                         idPelatihan={data.IdPelatihan.toString()}
-                                        title="Pilih Verifikator"
-                                        description="Segera menunjuk verifikator dalam melalukan verifikasi pelaksanaan pelatihan"
-                                        buttonLabel="Pilih Verifikator"
-                                        icon={TbPencilCog}
-                                        buttonColor="teal"
-                                        onSuccess={fetchData}
-                                        status={"2"}
-                                        pelatihan={data}
-                                    />
-                                }
-
-                                {/* (2) Verifikator : Pending Verifikator for Reject */}
-                                {
-                                    (Cookies.get('Access')?.includes('verifyPelaksanaan') && data.StatusPenerbitan == "2") && <SendNoteAction
-                                        idPelatihan={data.IdPelatihan.toString()}
-                                        title="Reject Pelaksaan"
-                                        description="Segera melakukan verifikasi pelaksanaan diklat, pastikan perangkat dan kelengkapan administrasi pelatihan sesuai dan lengkap"
-                                        buttonLabel="Reject Pelaksanaan"
+                                        title="Reject Penerbitan"
+                                        description="Segera melakukan verifikasi pengajuan penerbitan STTPL, kelengkapan administrasi pelatihan sesuai dan lengkap"
+                                        buttonLabel="Reject Penerbitan"
                                         icon={TbPencilX}
                                         buttonColor="rose"
                                         onSuccess={fetchData}
-                                        status={"3"}
+                                        status={"7"}
                                         pelatihan={data}
                                     />
                                 }
 
-                                {/* (2) Verifikator : Pending Verifikator for Approve */}
+                                {/* (6) Verifikator : Pending Verifikator for Approve */}
                                 {
-                                    (Cookies.get('Access')?.includes('verifyPelaksanaan') && data.StatusPenerbitan == "2") && <SendNoteAction
+                                    (Cookies.get('Access')?.includes('verifyCertificate') && data.StatusPenerbitan == "6") && <SendNoteAction
                                         idPelatihan={data.IdPelatihan.toString()}
-                                        title="Approve Pelaksanaan"
-                                        description="Segera melakukan verifikasi pelaksanaan diklat, pastikan perangkat dan kelengkapan administrasi pelatihan sesuai dan lengkap"
-                                        buttonLabel="Approve Pelaksanaan"
+                                        title="Approve Penerbitan"
+                                        description="Segera melakukan verifikasi pengajuan penerbitan STTPL, kelengkapan administrasi pelatihan sesuai dan lengkap"
+                                        buttonLabel="Approve Penerbitan"
+                                        icon={TbPencilCheck}
+                                        buttonColor="blue"
+                                        onSuccess={fetchData}
+                                        status={"8"}
+                                        pelatihan={data}
+                                    />
+                                }
+
+                                {/* (8) Kapus : Pending Kapus for Reject */}
+                                {
+                                    (Cookies.get('Access')?.includes('approveKapus') && data.StatusPenerbitan == "8") && <SendNoteAction
+                                        idPelatihan={data.IdPelatihan.toString()}
+                                        title="Reject Penerbitan"
+                                        description="Segera melakukan approval pengajuan penerbitan STTPL"
+                                        buttonLabel="Reject Penerbitan"
+                                        icon={TbPencilX}
+                                        buttonColor="rose"
+                                        onSuccess={fetchData}
+                                        status={"9"}
+                                        pelatihan={data}
+                                    />
+                                }
+
+                                {/* (8) Kapus : Pending Kapus for Approve */}
+                                {
+                                    (Cookies.get('Access')?.includes('approveKapus') && data.StatusPenerbitan == "8") && <SendNoteAction
+                                        idPelatihan={data.IdPelatihan.toString()}
+                                        title="Approve Penerbitan"
+                                        description="Segera melakukan approval pengajuan penerbitan STTPL"
+                                        buttonLabel="Approve Penerbitan"
                                         icon={TbPencilCheck}
                                         buttonColor="green"
                                         onSuccess={fetchData}
-                                        status={"4"}
+                                        status={"10"}
                                         pelatihan={data}
                                     />
                                 }
 
-
-
+                                {/* (10) Kapus : Pending Kapus for Approve */}
+                                {
+                                    (Cookies.get('Access')?.includes('approveKapus') && data.StatusPenerbitan == "10" && data.TtdSertifikat == Cookies.get("Role")) && <SendNoteAction
+                                        idPelatihan={data.IdPelatihan.toString()}
+                                        title="TTDe STTPL"
+                                        description="Masukkan passphrase anda untuk melanjutkan proses
+                    penandatanganan pada sertifikat yang akan diterbitkan"
+                                        buttonLabel="TTDe STTPL"
+                                        icon={TbPencilCheck}
+                                        buttonColor="blue"
+                                        onSuccess={fetchData}
+                                        status={"11"}
+                                        pelatihan={data}
+                                    />
+                                }
                             </div>
 
                             <div className="w-full ">
@@ -173,7 +195,11 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             </p>
                                         </div> :
                                         <div className="grid grid-cols-3 gap-4 mt-4 w-full text-sm">
-                                            <InfoItem label="Status" value={label} />
+
+                                            <div className={`flex flex-col p-3 ${color} rounded-lg shadow-sm border border-gray-100 animate-pulse`}>
+                                                <span className="text-xs font-medium text-gray-100">Status</span>
+                                                <span className="flex items-center">{icon}{label}</span>
+                                            </div>
                                             <InfoItem label="Penandatangan" value={data?.TtdSertifikat} />
                                             <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
                                                 <span className="text-xs font-medium text-gray-500">Dokumen Penerbitan STTPL</span>
@@ -198,16 +224,18 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                 <AccordionSection title="📑 Format Sertifikat">
                     <div className="flex flex-col w-full gap-4">
                         {
-                            parseInt(data?.StatusPenerbitan) >= 8 ? <>
+                            parseInt(data?.StatusPenerbitan) >= 5 ? <>
                                 <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
                                     <p className="font-medium text-gray-600">
                                         Action :
                                     </p>
-                                    <FormatCertificateAction
+
+                                    {(data?.StatusPenerbitan == "5" && data?.DeskripsiSertifikat == "") && <FormatCertificateAction
                                         idPelatihan={data?.IdPelatihan.toString()}
                                         handleFetchingData={fetchData}
                                         data={data}
-                                    />
+                                    />}
+
                                 </div>
                                 <div className="w-full ">
                                     <p className="font-medium text-gray-600 mb-2">
@@ -247,7 +275,18 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                     </tbody>
                                                 </table>
                                             </div>
-                                        </div></> : <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">
+                                        </div>
+
+                                        <DialogFormatSTTPL pelatihan={data}>
+                                            <Button
+                                                variant="outline"
+                                                title="Preview  Sertifikat"
+                                                className="flex items-center w-full mt-4 rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
+                                            >
+                                                <FaSearch className="h-4 w-4 mr-1" /> Preview Sertifikat
+                                            </Button>
+                                        </DialogFormatSTTPL>
+                                    </> : <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">
                                         <MdLock className='w-14 h-14 text-gray-600' />
                                         <p className="text-gray-500 font-normal text-center">
                                             Harap upload materi yang akan tampil di lembar sertifikat serta deskripsi sertifikat, aksi ini hanya dilakukan sekali. Apabila terjadi kesalahan, tidak dapat melakukan perbaikan!

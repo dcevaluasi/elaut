@@ -46,7 +46,7 @@ const ManagePelatihan = () => {
                             </div>
                         </header>
 
-                        <Tabs defaultValue={parseInt(dataPelatihan?.StatusPenerbitan) > 5 ? '2' : '1'} className="w-full rounded-none">
+                        <Tabs defaultValue={parseInt(dataPelatihan?.StatusPenerbitan) >= 5 ? '2' : '1'} className="w-full rounded-none">
                             <TabsList className="grid w-full grid-cols-2 !bg-gray-100 rounded-none">
                                 <TabsTrigger
                                     value="1"
@@ -68,7 +68,7 @@ const ManagePelatihan = () => {
                             </TabsContent>
                             <TabsContent value="2">
                                 {
-                                    dataPelatihan?.StatusPenerbitan != "6" ? <div className="py-32 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-3">
+                                    parseInt(dataPelatihan?.StatusPenerbitan) < 5 ? <div className="py-32 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-3">
                                         <MdLock className='w-14 h-14 text-gray-600 animate-pulse' />
                                         <p className="text-gray-500 font-normal text-center">
                                             Oopsss, Penyelenggara pelatihan belum mengajukan penerbitan STTPL dan mengupload dokumen Berita Acara, Laporan Pelaksanaan serta Kelengkapan Lainnya. Segera ajukan, jangan sampai pengajuan penerbitan STTPL berlangsung lama!
