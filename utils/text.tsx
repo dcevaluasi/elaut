@@ -116,7 +116,6 @@ export function getStatusInfo(
         icon: <MdPodcasts className="w-4 h-4" />,
       };
     case "1":
-    case "6":
     case "10":
     case "12":
     case "15":
@@ -126,12 +125,6 @@ export function getStatusInfo(
         icon: <RiTimeLine className="w-4 h-4" />,
       };
     case "2":
-    case "8":
-      return {
-        label: "Pending Verifikator",
-        color: "bg-amber-500 text-white",
-        icon: <RiTimeLine className="w-4 h-4" />,
-      };
     case "3":
     case "9":
       return {
@@ -158,7 +151,24 @@ export function getStatusInfo(
         color: "bg-primary text-white",
         icon: <RiLockFill className="w-4 h-4" />,
       };
+    case "6":
+      return {
+        label: "Pending Verifikator",
+        color: "bg-primary text-white",
+        icon: <RiLockFill className="w-4 h-4" />,
+      };
     case "7":
+      return {
+        label: "Reject Verifikator",
+        color: "bg-primary text-white",
+        icon: <RiLockFill className="w-4 h-4" />,
+      };
+    case "8":
+      return {
+        label: "Approved Verifikator",
+        color: "bg-primary text-white",
+        icon: <RiLockFill className="w-4 h-4" />,
+      };
     case "11":
       return {
         label: "Reject SPV",

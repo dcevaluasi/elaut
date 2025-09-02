@@ -30,6 +30,9 @@ import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/service
 import { PelatihanMasyarakat } from "@/types/product";
 import { useFetchDataPusat } from "@/hooks/elaut/pusat/useFetchDataPusat";
 import { breakdownStatus } from "@/lib/utils";
+import { ESELON_1, ESELON_2, ESELON_3 } from "@/constants/nomenclatures";
+import { truncateText } from "@/utils";
+import { UK_ESELON_2 } from "@/constants/unitkerja";
 
 interface SendNoteActionProps {
     idPelatihan: string;
@@ -57,7 +60,17 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
-    const [verifikatorPelaksanaan, setVerifikatorPelaksanaan] = useState("");
+    const [verifikatorPelaksanaan, setVerifikatorPelaksanaan] = useState(pelatihan!.VerifikatorPelatihan)
+    const [beritaAcaraFile, setBeritaAcaraFile] = useState<File | null>(null);
+    const [ttdSertifikat, setTtdSertifikat] = useState("");
+    const oldFileUrl = pelatihan!.BeritaAcara
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            setBeritaAcaraFile(e.target.files[0]);
+        }
+    };
+
 
     const { adminPusatData, loading: loadingPusat, error, fetchAdminPusatData } =
         useFetchDataPusat();
@@ -69,17 +82,22 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
     }, [isOpen, fetchAdminPusatData]);
 
     const handleSubmit = async () => {
+        const formData = new FormData();
+        formData.append("StatusPenerbitan", status);
+        formData.append("VerifikatorPelatihan", verifikatorPelaksanaan);
+        formData.append("VerifikatorSertifikat", verifikatorPelaksanaan);
+        if (beritaAcaraFile) formData.append("BeritaAcara", beritaAcaraFile);
+        if (ttdSertifikat) formData.append("TtdSertifikat", ttdSertifikat);
+
         try {
             setLoading(true);
             const response = await axios.put(
                 `${elautBaseUrl}/lemdik/updatePelatihan?id=${idPelatihan}`,
-                {
-                    StatusPenerbitan: status,
-                    VerifikatorPelatihan: verifikatorPelaksanaan,
-                },
+                formData,
                 {
                     headers: {
                         Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+                        "Content-Type": "multipart/form-data",
                     },
                 }
             );
@@ -100,6 +118,8 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
             setMessage("");
             setVerifikatorPelaksanaan("");
             setIsOpen(false);
+            setBeritaAcaraFile(null);
+            setTtdSertifikat("");
             setLoading(false);
             onSuccess();
             console.log("SEND ACTION RESPONSE: ", response);
@@ -158,6 +178,75 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                     </div>
                 }
 
+                {
+                    (pelatihan?.StatusPenerbitan == "5" || pelatihan?.StatusPenerbitan == "7" || pelatihan?.StatusPenerbitan == "10") && <>
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-800 mb-2">
+                                Upload Dokumen Penerbitan STTPL
+                            </label>
+
+                            <div className="relative">
+                                <input
+                                    type="file"
+                                    accept=".pdf,.doc,.docx"
+                                    onChange={handleFileChange}
+                                    disabled={loading}
+                                    className="peer block w-full cursor-pointer rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm transition 
+                 file:mr-4 file:cursor-pointer file:rounded-md file:border-0 
+                 file:bg-navy-500 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white 
+                 hover:file:bg-navy-600 
+                 focus:border-navy-400 focus:ring-2 focus:ring-navy-300 
+                 disabled:cursor-not-allowed disabled:opacity-60"
+                                />
+                            </div>
+
+                            <p className="mt-1 text-xs text-gray-500">
+                                Format file: <span className="font-medium">PDF, DOC, DOCX</span>
+                            </p>
+
+                            {/* Old file preview */}
+                            {oldFileUrl && (
+                                <div className="mt-3 flex items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm shadow-sm">
+                                    <div className="flex items-center gap-2 text-gray-700">
+                                        📄
+                                        <span className="truncate max-w-[200px]">Dokumen Penerbitan STTPL</span>
+                                    </div>
+                                    <a
+                                        href={oldFileUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-navy-600 hover:text-navy-800 font-medium transition"
+                                    >
+                                        Lihat
+                                    </a>
+                                </div>
+                            )}
+                        </div>
+
+
+                        {/* Select Ttd Sertifikat */}
+                        <div className="">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Penandatangan Sertifikat
+                            </label>
+                            <Select
+                                value={ttdSertifikat}
+                                onValueChange={setTtdSertifikat}
+                                disabled={loading}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Pilih Penandatangan" />
+                                </SelectTrigger>
+                                <SelectContent position="popper" className="z-[9999999]">
+                                    <SelectItem value={ESELON_1.fullName}>{ESELON_1.abbrv}</SelectItem>
+                                    <SelectItem value={ESELON_2.fullName}>{ESELON_2.abbrv}</SelectItem>
+                                    <SelectItem value={ESELON_3.fullName}>{ESELON_3.abbrv}</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </>
+                }
+
                 <div className="mb-4">
                     <Textarea
                         placeholder="Tulis catatan atau pesan Anda di sini..."
@@ -172,13 +261,13 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                     <AlertDialogAction
                         onClick={handleSubmit}
                         className={`bg-${buttonColor}-600 hover:bg-${buttonColor}-700 text-white`}
-                        disabled={loading}
+                        disabled={loading || !message}
                     >
                         {loading ? "Memproses..." : "Kirim"}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
-        </AlertDialog>
+        </AlertDialog >
     );
 };
 

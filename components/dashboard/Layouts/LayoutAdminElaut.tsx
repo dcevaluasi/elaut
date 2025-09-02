@@ -156,41 +156,16 @@ export default function LayoutAdminElaut({
 
               {/* Penyelenggaraan Pelatihan */}
               <li>
-                <button
-                  onClick={() => setSubmenuOpen((prev) => !prev)}
-                  className={`flex items-center justify-between w-full px-4 py-2 transition-colors rounded-md ${pathname.startsWith("/admin/pusat/pelatihan/sttpl")
+                <a
+                  href="/admin/pusat/pelatihan"
+                  className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname === "/admin/pusat/pelatihan/"
                     ? "bg-blue-600 text-white"
                     : "hover:bg-blue-500 hover:text-white"
                     }`}
                 >
-                  <div className="flex items-center gap-3 text-left">
-                    <IoSchoolOutline className="text-2xl" />
-                    {sidebarOpen && (
-                      <span className="text-sm">Penyelenggaraan Pelatihan</span>
-                    )}
-                  </div>
-                  {sidebarOpen && (submenuOpen ? <FiChevronDown /> : <FiChevronRight />)}
-                </button>
-                {submenuOpen && sidebarOpen && (
-                  <ul className="ml-10 mt-1 space-y-1">
-                    {
-                      Cookies.get('Access')?.includes('viewPelatihan') && <NavItem
-                        href="/admin/pusat/pelatihan"
-                        icon={<MdOutlinePodcasts className="text-xl" />}
-                        label="Pelaksanaan"
-                      />
-                    }
-
-                    {
-                      Cookies.get('Access')?.includes('isSigning') && <NavItem
-                        href="/admin/pusat/pelatihan/sttpl/penerbitan"
-                        icon={<HiOutlineCheckBadge className="text-xl" />}
-                        label="Penerbitan STTPL"
-                      />
-                    }
-
-                  </ul>
-                )}
+                  <IoSchoolOutline className="flex-shrink-0 w-6 h-6" />
+                  {sidebarOpen && <span className="text-sm">Penyelenggaraan Pelatihan</span>}
+                </a>
               </li>
             </>
           )}
@@ -255,35 +230,16 @@ export default function LayoutAdminElaut({
 
             {/* Penyelenggaraan Pelatihan */}
             <li>
-              <button
-                onClick={() => setSubmenuOpen((prev) => !prev)}
-                className={`flex items-center justify-between w-full px-4 py-2 transition-colors rounded-md ${pathname.includes("pelatihan")
+              <a
+                href="/admin/lemdiklat/pelatihan"
+                className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname === "/admin/lemdiklat/pelatihan/"
                   ? "bg-blue-600 text-white"
                   : "hover:bg-blue-500 hover:text-white"
                   }`}
               >
-                <div className="flex items-center gap-3">
-                  <IoSchoolOutline className="text-2xl" />
-                  {sidebarOpen && (
-                    <span className="text-sm text-left">Penyelenggaraan Pelatihan</span>
-                  )}
-                </div>
-                {sidebarOpen && (submenuOpen ? <FiChevronDown /> : <FiChevronRight />)}
-              </button>
-              {submenuOpen && sidebarOpen && (
-                <ul className="ml-10 mt-1 space-y-1">
-                  <NavItem
-                    href="/admin/lemdiklat/pelatihan"
-                    icon={<MdOutlinePodcasts className="text-xl" />}
-                    label="Pelaksanaan"
-                  />
-                  <NavItem
-                    href="/admin/lemdiklat/pelatihan/sttpl/penerbitan"
-                    icon={<HiOutlineCheckBadge className="text-xl" />}
-                    label="Penerbitan STTPL"
-                  />
-                </ul>
-              )}
+                <IoSchoolOutline className="flex-shrink-0 w-6 h-6" />
+                {sidebarOpen && <span className="text-sm">Penyelenggaraan Pelatihan</span>}
+              </a>
             </li>
           </>}
         </ul>

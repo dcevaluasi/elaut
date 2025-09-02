@@ -19,6 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PelatihanDetail from "./PelatihanDetail";
 import Cookies from "js-cookie";
 import { MdLock } from "react-icons/md";
+import STTPLDetail from "./STTPLDetail";
 const ManagePelatihan = () => {
     const paths = usePathname().split("/");
     const idPelatihan = decryptValue(paths[paths.length - 1]);
@@ -45,7 +46,7 @@ const ManagePelatihan = () => {
                             </div>
                         </header>
 
-                        <Tabs defaultValue={activeTab} className="w-full rounded-none">
+                        <Tabs defaultValue={parseInt(dataPelatihan?.StatusPenerbitan) > 5 ? '2' : '1'} className="w-full rounded-none">
                             <TabsList className="grid w-full grid-cols-2 !bg-gray-100 rounded-none">
                                 <TabsTrigger
                                     value="1"
@@ -68,42 +69,11 @@ const ManagePelatihan = () => {
                             <TabsContent value="2">
                                 {
                                     dataPelatihan?.StatusPenerbitan != "6" ? <div className="py-32 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-3">
-                                        <MdLock className='w-14 h-14 text-gray-600' />
+                                        <MdLock className='w-14 h-14 text-gray-600 animate-pulse' />
                                         <p className="text-gray-500 font-normal text-center">
-                                            Oopsss, Penyelenggara pelatihan belum mengajukan penerbitan STTPL dan mengupload dokumen Berita Acara, Laporan Pelaksanaan pelaksanaan. Segera ajukan, jangan sampai pengajuan penerbitan STTPL berlangsung lama!
+                                            Oopsss, Penyelenggara pelatihan belum mengajukan penerbitan STTPL dan mengupload dokumen Berita Acara, Laporan Pelaksanaan serta Kelengkapan Lainnya. Segera ajukan, jangan sampai pengajuan penerbitan STTPL berlangsung lama!
                                         </p>
-                                    </div> : <>
-                                        <section className="mt-5 my-5  w-full ">
-                                            <div className="w-full border border-gray-200 rounded-xl">
-                                                <div className="bg-gray-100 p-4 w-full ">
-                                                    <h2 className="font-calsans text-xl">
-                                                        Materi, Kurikulum, dan Bank Soal Pre-Test & Post-Test
-                                                    </h2>
-                                                </div>
-                                                <table className="w-full">
-                                                    <tr className="border-b border-b-gray-200 w-full">
-                                                        <td className="p-4 w-fit gap-1 flex justify-start ">
-                                                            <>
-                                                                <MateriButton
-                                                                    idPelatihan={dataPelatihan!.IdPelatihan.toString()}
-                                                                    handleFetchingData={
-                                                                        refetchDetailPelatihan
-                                                                    }
-                                                                    data={dataPelatihan!}
-                                                                />
-                                                                <Link
-                                                                    title="Bank Soal"
-                                                                    href={`/admin/lemdiklat/pelatihan/${dataPelatihan!.KodePelatihan
-                                                                        }/bank-soal/${encryptValue(dataPelatihan!.IdPelatihan)}`}
-                                                                    className="border border-blue-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-blue-900 hover:bg-blue-900 hover:text-white text-white rounded-md"
-                                                                >
-                                                                    <TbDatabase className="h-5 w-5" /> Bank Soal Pre-Test & Post-Test
-                                                                </Link></>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </div>
-                                        </section></>
+                                    </div> : <STTPLDetail data={dataPelatihan!} fetchData={refetchDetailPelatihan} />
                                 }
 
                             </TabsContent>

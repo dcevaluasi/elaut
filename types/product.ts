@@ -81,6 +81,7 @@ export type PelatihanMasyarakat = {
   IsRevisi: string
   IsMengajukanPenerbitan?: string
   AsalSertifikat: string
+  VerifikatorPelatihan: string
 }
 
 export type DetailPelatihanMasyarakat = {
