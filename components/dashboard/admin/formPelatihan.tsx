@@ -208,7 +208,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
             id: kodePelatihan,
             notes: `Telah membuka kelas pelatihan ${namaPelatihan}`,
             role: Cookies.get('Eselon'),
-            upt: Cookies.get('SATKER_BPPP')
+            upt: Cookies.get('Satker')
           }
         ],
         status: 'On Progress'

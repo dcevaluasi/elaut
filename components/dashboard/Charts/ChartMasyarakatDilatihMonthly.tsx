@@ -61,7 +61,7 @@ export default function ChartMasyarakatDilatihMonthly({ data, dataUser }: Props)
   const [totalMasyarakat, setTotalMasyarakat] = useState(0);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const isAdmin = Cookies.get("XSRF093") === "balai";
-  const namaBalai = Cookies.get("SATKER_BPPP");
+  const namaBalai = Cookies.get("Satker");
 
   useEffect(() => {
     const fetchData = async () => {

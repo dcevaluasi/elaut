@@ -63,7 +63,7 @@ const CloseButton: React.FC<CloseButtonProps> = ({
         text: 'Berhasil menutup pelatihan!',
       });
       console.log("UPDATE PELATIHAN: ", response);
-      handleAddHistoryTrainingInExisting(pelatihan, 'Telah menutup kelas', Cookies.get('Eselon'), Cookies.get('SATKER_BPPP'))
+      handleAddHistoryTrainingInExisting(pelatihan, 'Telah menutup kelas', Cookies.get('Eselon'), Cookies.get('Satker'))
       handleFetchingData();
       setOpenFormTutupPelatihan(!openFormTutupPelatihan);
     } catch (error) {

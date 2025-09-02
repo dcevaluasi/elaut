@@ -43,13 +43,12 @@ export default function LayoutAdminElaut({
       setPusatData(data);
       Cookies.set("NIK", data.data.Nip);
       Cookies.set("Status", data.data.Status);
-      Cookies.set("Satker", data.data.Status);
+      Cookies.set("Satker", data.data.NoTelpon);
       Cookies.set("InformationLoggedIn", `${data.data.Nama};${data.data.Email};${data.data.Nip}`);
       Cookies.set("Role", breakdownStatus(data.data.Status)[0]);
       Cookies.set("Jabatan", data.data.NoTelpon);
       Cookies.set("Access", breakdownStatus(data.data.Status)[1]);
       Cookies.set("XSRF094", data.data.Status);
-
       Cookies.set(
         "XSRF095",
         data.data.Status.includes("Kepala") || data.data.Status.includes("Supervisor")
@@ -71,9 +70,10 @@ export default function LayoutAdminElaut({
       });
       setLemdikData(data);
       Cookies.set("IDLemdik", data.data.IdLemdik);
-      Cookies.set("SATKER_BPPP", data.data.NamaLemdik);
+      Cookies.set("Satker", data.data.NamaLemdik);
+      Cookies.set("Satker", data.data.NamaLemdik);
       Cookies.set("XSRF097", data.data.Email); // EMAIL
-
+      Cookies.set("Role", breakdownStatus(data.data.Deskripsi)[0]);
       Cookies.set("Eselon", breakdownStatus(data.data.Deskripsi)[0]);
       Cookies.set("Access", breakdownStatus(data.data.Deskripsi)[1]);
     } catch (error) {
@@ -92,7 +92,7 @@ export default function LayoutAdminElaut({
       "XSRF093",
       "XSRF094",
       "XSRF095",
-      "SATKER_BPPP",
+      "Satker",
       "IDLemdik",
       "Eselon",
       "Status",

@@ -199,7 +199,7 @@ const ChartDetailMasyarakatDilatih: React.FC<{
 }> = ({ data, dataUser }) => {
 
   const isAdminBalaiPelatihan = Cookies.get('XSRF093') == 'balai'
-  const nameBalaiPelatihan = Cookies.get('SATKER_BPPP')
+  const nameBalaiPelatihan = Cookies.get('Satker')
 
 
   const [selectedLemdiklat, setSelectedLemdiklat] =

@@ -118,7 +118,7 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
             <AlertDialogTrigger asChild>
                 {
                     (Cookies.get("Access")?.includes("createPelatihan") &&
-                        currentData?.StatusPenerbitan === "0") && <Button
+                        (currentData?.StatusPenerbitan === "0" || currentData?.StatusPenerbitan === "3")) && <Button
                             variant="outline"
                             className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500"
                         >

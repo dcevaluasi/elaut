@@ -18,6 +18,16 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import {
+    AlertDialog,
+    AlertDialogTrigger,
+    AlertDialogContent,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 
 import { ArrowUpDown, LucideInfo } from "lucide-react";
 import { UserPelatihan } from "@/types/product";
@@ -26,7 +36,11 @@ import { FaRegIdCard } from "react-icons/fa6";
 import Link from "next/link";
 import { TbDatabaseEdit } from "react-icons/tb";
 import { usePathname } from "next/navigation";
-import { decryptValue, encryptValue } from "@/lib/utils";
+import { formatToRupiah } from "@/lib/utils";
+import { User } from "@/types/user";
+import axios from "axios";
+import { elautBaseUrl } from "@/constants/urls";
+import VerifikasiPesertaAction from "../Actions/VerifikasiPesertaAction";
 
 interface UserPelatihanTableProps {
     data: UserPelatihan[];
@@ -65,30 +79,30 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                         className={`flex items-center justify-center leading-[105%] p-0 w-full text-gray-900 font-semibold`}
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                     >
-
                         <span>Detail Peserta</span>
-
                         <TbDatabaseEdit className="ml-1 h-4 w-4" />
                     </Button>
                 );
             },
             cell: ({ row }) => (
-                <div className={`flex items-center justify-center w-full gap-1`}>
-                    <Link
-                        target="_blank"
-                        href={`/admin/${usePathname().includes("lemdiklat") ? "lemdiklat" : "pusat"
-                            }/pelatihan/${paths[paths.length - 2]}/peserta-pelatihan/${paths[paths.length - 1]}/${encryptValue(
-                                row.original.IdUserPelatihan
-                            )}/${encryptValue(
-                                row.original.IdUsers
-                            )}`}
-                        className="flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border   
-            bg-transparent border-neutral-500 text-neutral-500 hover:text-white hover:bg-neutral-500 transition-colors w-fit shadow-sm"
-                    >
-                        <LucideInfo className="h-4 w-4 " />{" "}
-                        <span className="text-sm">Detail</span>
-                    </Link>
+                <div className="w-full flex items-center justify-center">
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button
+                                variant="outline"
+                                className=" gap-2 h-10 px-5 text-sm font-medium rounded-lg border text-neutral-500 hover:text-white hover:bg-neutral-500 transition-colors "
+                            >
+                                <LucideInfo className="h-4 w-4" />
+                                Detail
+                            </Button>
+                        </AlertDialogTrigger>
+                        <DetailPesertaDialog
+                            pesertaId={row.original.IdUsers}
+                            userPelatihanId={row.original.IdUserPelatihan}
+                        />
+                    </AlertDialog>
                 </div>
+
             ),
         },
         {
@@ -249,5 +263,90 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
         </div>
     );
 };
+
+const DetailPesertaDialog = ({ pesertaId, userPelatihanId }: { pesertaId: number; userPelatihanId: number }) => {
+    const [peserta, setPeserta] = React.useState<User | null>(null);
+    const [pesertaPelatihan, setPesertaPelatihan] = React.useState<UserPelatihan | null>(null);
+
+    const handleFetchDetailPeserta = async () => {
+        try {
+            const response = await axios.get(`${elautBaseUrl}/users/getUsersByIdNoJwt?id=${pesertaId}`, {
+                headers: {
+                    "x-api-key": "EL@uTs3rv3R",
+                },
+            });
+            setPeserta(response.data);
+            const filteredPelatihan = response.data.Pelatihan.filter(
+                (item: UserPelatihan) => item.IdUserPelatihan.toString() === userPelatihanId.toString()
+            );
+            setPesertaPelatihan(filteredPelatihan[0]);
+        } catch (error) {
+            console.error("LEMDIK INFO: ", error);
+        }
+    };
+
+    React.useEffect(() => {
+        handleFetchDetailPeserta();
+    }, []);
+
+    return (
+        <AlertDialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto rounded-xl">
+            <AlertDialogHeader>
+                <AlertDialogTitle>Detail Peserta</AlertDialogTitle>
+                <AlertDialogDescription>
+                    Verifikasi, Monitoring, dan Lihat Data Peserta
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+
+            {peserta ? (
+                <div className="space-y-6">
+                    <div className="border rounded-lg p-4">
+                        <h2 className="font-semibold text-lg mb-2">Informasi Peserta</h2>
+                        <p><strong>Nama:</strong> {peserta.Nama}</p>
+                        <p><strong>NIK:</strong> {peserta.Nik}</p>
+                        <p><strong>No Telepon:</strong> {peserta.NoTelpon}</p>
+                        <p><strong>Email:</strong> {peserta.Email}</p>
+                        <p><strong>Alamat:</strong> {peserta.Alamat}</p>
+                        <p><strong>Tempat dan Tanggal Lahir:</strong> <span className="uppercase">
+                            {peserta!.TempatLahir || "-"}.{" "}
+                            {peserta!.TanggalLahir}</span></p>
+                        <p><strong>Jenis Kelamin:</strong> {peserta.JenisKelamin}</p>
+                    </div>
+
+                    {pesertaPelatihan && (
+                        <div className="border rounded-lg p-4">
+                            <h2 className="font-semibold text-lg mb-2">Status Verifikasi</h2>
+                            <p><strong>Status:</strong> {pesertaPelatihan.Keterangan}</p>
+                            <p><strong>Metode Pembayaran:</strong> {pesertaPelatihan.MetodoPembayaran}</p>
+                            <p><strong>Total Bayar:</strong> {formatToRupiah(parseInt(pesertaPelatihan.TotalBayar))}</p>
+                        </div>
+                    )}
+
+                    <div className="border rounded-lg p-4">
+                        <h2 className="font-semibold text-lg mb-2">Dokumen Peserta</h2>
+                        <p><strong>Pas Foto:</strong> {peserta.Foto != "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/" ? <Link target="_blank" className="text-blue-500 underline" href={peserta.Foto}>{peserta.Foto}</Link> : "-"}</p>
+                        <p><strong>KTP:</strong> <Link target="_blank" className="text-blue-500 underline" href={peserta.Ktp}>{peserta.Ktp}</Link></p>
+                    </div>
+                </div>
+            ) : (
+                <p>Loading...</p>
+            )}
+
+            {peserta != null && (
+                <div className={`w-full flex items-center justify-center gap-1`}>
+                    <VerifikasiPesertaAction
+                        idUser={userPelatihanId.toString()}
+                        peserta={pesertaPelatihan!}
+                        handleFetchingData={handleFetchDetailPeserta}
+                    />
+                </div>
+            )}
+
+            <AlertDialogFooter>
+                <AlertDialogCancel>Tutup</AlertDialogCancel>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    );
+}
 
 export default UserPelatihanTable;

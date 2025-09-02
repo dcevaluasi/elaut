@@ -32,9 +32,9 @@ export const handleAddHistoryTrainingInExisting = async (
     const newEntryData = {
       created_at: generateTimestamp(),
       id: pelatihan.KodePelatihan,
-      notes: `${msg} ${pelatihan.NamaPelatihan}`,
-      role: role ? Cookies.get('Jabatan') : Cookies.get('Eselon'),
-      upt: upt ? upt : Cookies.get('SATKER_BPPP'),
+      notes: `${msg}`,
+      role: role,
+      upt: upt ? upt : Cookies.get('Satker'),
     }
 
     existingHistory.push(newEntryData)

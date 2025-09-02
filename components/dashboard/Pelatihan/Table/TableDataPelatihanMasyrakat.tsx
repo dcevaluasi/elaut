@@ -137,8 +137,8 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                         {pelatihan.UserPelatihan?.length ?? 0}
                                     </td>
 
-                                    <td className={`px-4 py-3 border border-gray-200 text-center  ${color}`}>
-                                        <span className="flex items-center justify-center w-full h-full">{icon}{label}</span>
+                                    <td className={`px-4 py-3 border border-gray-200 text-center flex-shrink-0  ${color}`}>
+                                        <span className="flex items-center justify-center w-full h-full  flex-shrink-0"><span className="flex-shrink-0">{icon}</span>{label}</span>
 
                                     </td>
 
@@ -149,74 +149,34 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                                 <TTDSertifikat dataPelatihan={pelatihan!} handleFetchData={fetchDataPelatihanMasyarakat} />
                                             }
 
-                                            {/* {!isOperatorBalaiPelatihan &&
-                                                pelatihan.PemberitahuanDiterima === "Kirim ke SPV" && (
-                                                    <Button
-                                                        size="sm"
-                                                        className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
-             rounded-lg border border-neutral-300 bg-white text-neutral-700 
-             hover:bg-neutral-100 hover:text-neutral-900 transition-colors w-full  
-             shadow-sm"
-                                                        onClick={() => {
-                                                            const isReady =
-                                                                countUserWithDrafCertificate(
-                                                                    pelatihan.UserPelatihan || []
-                                                                ) === pelatihan.UserPelatihan?.length;
-                                                            isReady
-                                                                ? handleSendToSPVAboutCertificateIssueance(
-                                                                    String(pelatihan.IdPelatihan),
-                                                                    pelatihan
-                                                                )
-                                                                : alert(
-                                                                    "Oopsss, penyiapan draft sertifikat peserta belum selesai!"
-                                                                );
-                                                        }}
-                                                    >
-                                                        <RiCheckboxCircleFill className="h-5 w-5 text-indigo-500" size={14} /> Kirim SPV
-                                                    </Button>
-                                                )} */}
 
-                                            {Cookies.get('Access')?.includes('isSigning') && <Link
-                                                title="Detail Pelatihan"
-                                                target={'_blank'}
-                                                href={`/admin/${usePathname().includes('pusat') ? 'pusat' : 'lemdiklat'}/pelatihan/detail/${pelatihan.KodePelatihan}/${encryptValue(
-                                                    pelatihan.IdPelatihan.toString()
-                                                )}`}
-                                                className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
-             rounded-lg border border-blue-500 bg-blue-500 text-white 
-             hover:bg-blue-600  transition-colors  w-full 
-             shadow-sm"
-                                            >
-                                                <RiInformationFill className="h-4 w-4 " />
-                                                Review
-                                            </Link>}
+                                            {
+                                                (Cookies.get('Access')?.includes('isSigning') || Cookies.get('Access')?.includes('verifyPelaksanaan') || Cookies.get('Access')?.includes('supervisePelaksanaan')) && <Link
+                                                    title="Review Pelatihan"
+                                                    target={'_blank'}
+                                                    href={`/admin/${usePathname().includes('pusat') ? 'pusat' : 'lemdiklat'}/pelatihan/detail/${pelatihan.KodePelatihan}/${encryptValue(
+                                                        pelatihan.IdPelatihan.toString()
+                                                    )}`}
+                                                    className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
+                                                >
+                                                    <RiInformationFill className="h-4 w-4 " />
+                                                    Review
+                                                </Link>
+                                            }
 
-                                            {Cookies.get('Access')?.includes('createPelatihan') && <Link
-                                                title="Kelola Pelatihan"
-                                                target={'_blank'}
-                                                href={`/admin/${usePathname().includes('pusat') ? 'pusat' : 'lemdiklat'}/pelatihan/detail/${pelatihan.KodePelatihan}/${encryptValue(
-                                                    pelatihan.IdPelatihan.toString()
-                                                )}`}
-                                                className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium 
-             rounded-lg border border-gray-500 bg-gray-500 text-white 
-             hover:bg-gray-600  transition-colors  w-full 
-             shadow-sm"
-                                            >
-                                                <RiInformationFill className="h-4 w-4 " />
-                                                Manage
-                                            </Link>}
-
-
-
-
-                                            {/* Upload Surat Pemberitahuan Pelatihan */}
-                                            {/* {accessPermissions?.includes('createPelatihan') && (
-                                                <UploadSuratButton
-                                                    idPelatihan={String(pelatihan.IdPelatihan)}
-                                                    pelatihan={pelatihan}
-                                                    handleFetchingData={fetchDataPelatihanMasyarakat}
-                                                />
-                                            )} */}
+                                            {
+                                                Cookies.get('Access')?.includes('createPelatihan') && <Link
+                                                    title="Kelola Pelatihan"
+                                                    target={'_blank'}
+                                                    href={`/admin/${usePathname().includes('pusat') ? 'pusat' : 'lemdiklat'}/pelatihan/detail/${pelatihan.KodePelatihan}/${encryptValue(
+                                                        pelatihan.IdPelatihan.toString()
+                                                    )}`}
+                                                    className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border border-gray-500 text-gray-500 hover:text-white hover:bg-gray-500"
+                                                >
+                                                    <RiInformationFill className="h-4 w-4 " />
+                                                    Manage
+                                                </Link>
+                                            }
                                         </div>
                                     </td>
 

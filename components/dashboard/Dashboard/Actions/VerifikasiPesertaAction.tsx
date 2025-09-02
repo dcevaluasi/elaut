@@ -13,30 +13,21 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { TbBroadcast, TbEditCircle } from "react-icons/tb";
-import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { elautBaseUrl } from "@/constants/urls";
 import axios from "axios";
 import Toast from "@/components/toast";
 import Cookies from "js-cookie";
-import { LucideFileCheck2 } from "lucide-react";
-import Link from "next/link";
-import { FiUploadCloud } from "react-icons/fi";
 import { PelatihanMasyarakat, UserPelatihan } from "@/types/product";
-import Image from "next/image";
-import { User } from "@/types/user";
-import { MdClose, MdOutlineClose } from "react-icons/md";
-import { Textarea } from "@/components/ui/textarea";
 import { Editor } from "@tinymce/tinymce-react";
 
-interface ValidasiPesertaButtonProps {
+interface VerifikasiPesertaActionProps {
   idUser: string;
   peserta: UserPelatihan;
   handleFetchingData: any;
 }
 
-const ValidasiPesertaButton: React.FC<ValidasiPesertaButtonProps> = ({
+const VerifikasiPesertaAction: React.FC<VerifikasiPesertaActionProps> = ({
   idUser,
   peserta,
   handleFetchingData,
@@ -264,4 +255,4 @@ const ValidasiPesertaButton: React.FC<ValidasiPesertaButtonProps> = ({
   );
 };
 
-export default ValidasiPesertaButton;
+export default VerifikasiPesertaAction;

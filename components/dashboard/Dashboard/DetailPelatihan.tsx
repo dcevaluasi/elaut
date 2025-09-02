@@ -36,7 +36,7 @@ import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/service
 import { ApprovePelaksanaanVerifikator } from "../admin/verifikator/ApprovalPelaksanaanVerifikator";
 
 function DetailPelatihan() {
-  const isOperatorBalaiPelatihan = Cookies.get('SATKER_BPPP')?.includes('BPPP') || false
+  const isOperatorBalaiPelatihan = Cookies.get('Satker')?.includes('BPPP') || false
   const isOperatorPusatPelatihan = Cookies.get('Eselon')?.includes('Operator Pusat') || false
   const isLemdiklat = Cookies.get('Eselon') === 'UPT'
   const paths = usePathname().split("/");
@@ -95,7 +95,7 @@ function DetailPelatihan() {
         title: "Yeayyy!",
         text: "Berhasil Memilih Verifikator Permohonan Pelaksanaan Diklat",
       });
-      handleAddHistoryTrainingInExisting(pelatihan!, 'Telah Memilih Verifikator Permohonan Pelaksanaan Diklat!', Cookies.get('Eselon'), Cookies.get('SATKER_BPPP'))
+      handleAddHistoryTrainingInExisting(pelatihan!, 'Telah Memilih Verifikator Permohonan Pelaksanaan Diklat!', Cookies.get('Eselon'), Cookies.get('Satker'))
 
       handleFetchDetailPelatihan();
     } catch (error) {

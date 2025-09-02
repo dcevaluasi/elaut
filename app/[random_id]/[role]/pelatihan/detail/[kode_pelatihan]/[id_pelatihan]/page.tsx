@@ -12,9 +12,11 @@ function page() {
       <LayoutAdminElaut>
         <section className="flex-1 flex flex-col">
           <main className="w-full h-full">
-            {
+            {/* {
               Cookies.get('Access')?.includes('createPelatihan') ? <ManagePelatihan /> : <DetailPelatihan />
-            }
+            } */}
+
+            <ManagePelatihan />
           </main>
         </section>
       </LayoutAdminElaut>

@@ -1,87 +1,27 @@
 "use client";
 
 import React from "react";
-
-import { HiLockClosed, HiMiniUserGroup, HiUserGroup } from "react-icons/hi2";
 import { TbDatabase, TbSchool } from "react-icons/tb";
-import { FiEdit2, FiUploadCloud } from "react-icons/fi";
-
-import { usePathname, useRouter } from "next/navigation";
-import Cookies from "js-cookie";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { elautBaseUrl, urlFileBeritaAcara, urlFileSilabus, urlFileSuratPemberitahuan } from "@/constants/urls";
-
-import axios from "axios";
-import { HistoryTraining, PelatihanMasyarakat } from "@/types/product";
-import { generateFullNameBalai, generateTanggalPelatihan } from "@/utils/text";
+import { urlFileBeritaAcara } from "@/constants/urls";
 import {
     decryptValue,
     encryptValue,
-    formatToRupiah,
-    generateInstrukturName,
 } from "@/lib/utils";
-import CloseButton from "./Actions/CloseButton";
-import GenerateNoSertifikatButton from "./Actions/GenerateNoSertifikatButton";
-
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
-import NoSertifikatButton from "./Actions/NoSertifikatButton";
 import HistoryButton from "./Actions/HistoryButton";
-import { Button } from "@/components/ui/button";
-import { MateriButton, PublishButton } from "./Actions";
-import { ApprovePelaksanaanSPV } from "../admin/spv/ApprovalPelaksanaanSPV";
-import Toast from "@/components/toast";
-import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
-import { ApprovePelaksanaanVerifikator } from "../admin/verifikator/ApprovalPelaksanaanVerifikator";
+import { MateriButton } from "./Actions";
 import { useFetchDataPelatihanMasyarakatDetail } from "@/hooks/elaut/pelatihan/useFetchDataPelatihanMasyarkatDetail";
 import { HashLoader } from "react-spinners";
 
-// shadcn ui components
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PelatihanDetail from "./PelatihanDetail";
-
+import Cookies from "js-cookie";
 const ManagePelatihan = () => {
     const paths = usePathname().split("/");
-
     const idPelatihan = decryptValue(paths[paths.length - 1]);
-
     const { data: dataPelatihan, loading: loadingDataPelatihan, error, refetch: refetchDetailPelatihan } = useFetchDataPelatihanMasyarakatDetail(idPelatihan);
-
-    const handleApprovedPelaksanaanBySPV = async (idPelatihan: string, pelatihan: PelatihanMasyarakat, verifikatorSelected: string) => {
-        const updateData = new FormData()
-        updateData.append('StatusPenerbitan', '2')
-        updateData.append('PenerbitanSertifikatDiterima', verifikatorSelected)
-
-        try {
-            await axios.put(
-                `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${idPelatihan}`,
-                updateData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${Cookies.get("XSRF091")}`,
-                        "Content-Type": "multipart/form-data",
-                    },
-                }
-            );
-
-            Toast.fire({
-                icon: "success",
-                title: "Yeayyy!",
-                text: "Berhasil Memilih Verifikator Permohonan Pelaksanaan Diklat",
-            });
-            handleAddHistoryTrainingInExisting(pelatihan!, 'Telah Memilih Verifikator Permohonan Pelaksanaan Diklat!', Cookies.get('Eselon'), Cookies.get('SATKER_BPPP'))
-
-            refetchDetailPelatihan();
-        } catch (error) {
-            console.error("ERROR GENERATE SERTIFIKAT: ", error);
-            Toast.fire({
-                icon: "error",
-                title: "Oopsss!",
-                text: "Gagal Memilih Verifikator Permohonan Pelaksanaan Diklat",
-            });
-            refetchDetailPelatihan();
-        }
-    }
-
     const [activeTab, setActiveTab] = React.useState('1')
 
     return (
@@ -113,12 +53,34 @@ const ManagePelatihan = () => {
                         </header>
 
                         <Tabs defaultValue={activeTab} className="w-full rounded-none">
-                            <TabsList className={`grid w-full grid-cols-3 !bg-gray-100 rounded-none`}>
-                                <TabsTrigger value="1" onClick={() => setActiveTab("1")}
-                                > 1. Persiapan Pelatihan </TabsTrigger>
-                                <TabsTrigger value="2" onClick={() => setActiveTab("2")}>2. Pelaksanaan Pelatihan</TabsTrigger>
-                                <TabsTrigger value="3" onClick={() => setActiveTab("3")}>3. Penerbitan STTPL</TabsTrigger>
-                            </TabsList>
+                            {
+                                (!Cookies.get("Access")?.includes("verifyPelaksanaan") && !Cookies.get("Access")?.includes("supervisePelaksanaan")) && (
+                                    <TabsList className="grid w-full grid-cols-3 !bg-gray-100 rounded-none">
+                                        <TabsTrigger
+                                            value="1"
+                                            onClick={() => setActiveTab("1")}
+                                        >
+                                            1. Persiapan Pelatihan
+                                        </TabsTrigger>
+
+                                        <TabsTrigger
+                                            value="2"
+                                            onClick={() => setActiveTab("2")}
+                                            disabled={dataPelatihan?.StatusPenerbitan !== "4"}
+                                        >
+                                            2. Pelaksanaan Pelatihan
+                                        </TabsTrigger>
+
+                                        <TabsTrigger
+                                            value="3"
+                                            onClick={() => setActiveTab("3")}
+                                            disabled={dataPelatihan?.StatusPenerbitan !== "4"}
+                                        >
+                                            3. Penerbitan STTPL
+                                        </TabsTrigger>
+                                    </TabsList>
+                                )
+                            }
 
                             <TabsContent value="1">
                                 <PelatihanDetail data={dataPelatihan!} fetchData={refetchDetailPelatihan} />
@@ -159,11 +121,7 @@ const ManagePelatihan = () => {
                             </TabsContent>
                             <TabsContent value="3">
                                 <section className="space-y-6 py-4">
-                                    {/* Informasi Pelatihan & Sertifikat */}
                                     <div className="grid grid-cols-1 gap-6">
-
-
-                                        {/* Informasi Sertifikat */}
                                         <div className="bg-white rounded-2xl h-fit shadow-md border border-gray-200 overflow-x-scroll">
                                             <div className="bg-gray-100 p-4 w-full">
                                                 <h2 className="font-calsans text-xl text-gray-800">Informasi Penerbitan Sertifikat</h2>
@@ -178,7 +136,6 @@ const ManagePelatihan = () => {
                                                             </td>
                                                         </tr>
                                                     }
-
                                                     <InfoRow label="Penandatangan" value={dataPelatihan?.TtdSertifikat || "-"} />
                                                     <InfoRow
                                                         label="Dokumen Permohonan"
@@ -191,8 +148,6 @@ const ManagePelatihan = () => {
                                                         }
                                                     />
                                                     <InfoRow label="Format Sertifikat" value={dataPelatihan?.JenisSertifikat} />
-
-
                                                 </tbody>
                                             </table>
                                         </div>
@@ -201,8 +156,6 @@ const ManagePelatihan = () => {
                                 </section>
                             </TabsContent>
                         </Tabs>
-
-
                     </>
                     :
                     <section className="py-32 w-full items-center flex justify-center">

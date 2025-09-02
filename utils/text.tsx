@@ -33,7 +33,6 @@ export function generateTanggalPelatihan(tanggal: string): string {
   if (tanggal != "") {
     const date = new Date(tanggal)
 
-    // Array nama-nama hari
     const weekdays = [
       'Minggu',
       'Senin',
@@ -44,7 +43,6 @@ export function generateTanggalPelatihan(tanggal: string): string {
       'Sabtu',
     ]
 
-    // Array nama-nama bulan
     const months = [
       'Januari',
       'Februari',
@@ -60,13 +58,11 @@ export function generateTanggalPelatihan(tanggal: string): string {
       'Desember',
     ]
 
-    // Mengambil nama hari, tanggal, bulan, dan tahun
     const dayOfWeek = weekdays[date.getUTCDay()]
     const day = date.getUTCDate()
     const month = months[date.getUTCMonth()]
     const year = date.getUTCFullYear()
 
-    // Mengembalikan string tanggal yang telah diformat
     return `${day} ${month} ${year}`
   } else {
     return `-`
@@ -144,7 +140,7 @@ export function getStatusInfo(
       };
     case "4":
       return {
-        label: "Approved",
+        label: "Approved Pelaksanaan",
         color: "bg-green-500 text-white",
         icon: <RiCheckboxCircleFill className="w-4 h-4" />,
       };

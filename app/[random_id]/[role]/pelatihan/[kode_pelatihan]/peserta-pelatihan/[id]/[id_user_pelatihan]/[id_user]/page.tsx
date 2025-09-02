@@ -13,12 +13,13 @@ import { generateTanggalPelatihan } from "@/utils/text";
 import { decryptValue, formatToRupiah } from "@/lib/utils";
 import DefaultLayout from "@/components/dashboard/Layouts/DefaultLayout";
 import { User } from "@/types/user";
-import ValidasiPesertaButton from "@/components/dashboard/Dashboard/Actions/ValidasiPesertaButton";
+import ValidasiPesertaButton from "@/components/dashboard/Dashboard/Actions/VerifikasiPesertaAction";
 import LayoutAdminElaut from "@/components/dashboard/Layouts/LayoutAdminElaut";
 import { HiUserGroup } from "react-icons/hi2";
 import { Button } from "@/components/ui/button";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { MdOutlineClose } from "react-icons/md";
+import VerifikasiPesertaAction from "@/components/dashboard/Dashboard/Actions/VerifikasiPesertaAction";
 
 function Page() {
   const paths = usePathname().split("/");
@@ -51,11 +52,6 @@ function Page() {
   React.useEffect(() => {
     handleFetchDetailPeserta();
   }, []);
-
-  console.log({ peserta });
-  console.log({ pesertaPelatihan });
-  console.log({ idPesertaPelatihan });
-  console.log({ idPeserta });
 
   return (
     <LayoutAdminElaut>
@@ -329,7 +325,7 @@ function Page() {
 
             {peserta != null && (
               <div className={`w-full flex items-center justify-center gap-1`}>
-                <ValidasiPesertaButton
+                <VerifikasiPesertaAction
                   idUser={idPesertaPelatihan}
                   peserta={pesertaPelatihan!}
                   handleFetchingData={handleFetchDetailPeserta}

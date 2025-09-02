@@ -8,7 +8,7 @@ import {
     AccordionContent,
 } from "@/components/ui/accordion";
 import { PelatihanMasyarakat } from "@/types/product";
-import { generateTanggalPelatihan } from "@/utils/text";
+import { generateTanggalPelatihan, getStatusInfo } from "@/utils/text";
 import { PublishButton } from "./Actions";
 import Image from "next/image";
 import { replaceUrl } from "@/lib/utils";
@@ -24,6 +24,8 @@ import { truncateText } from "@/utils";
 import Link from "next/link";
 import UploadSuratButton from "./Actions/UploadSuratButton";
 import { urlFileSuratPemberitahuan } from "@/constants/urls";
+import SendNoteAction from "./Actions/Lemdiklat/SendNoteAction";
+import { TbCheck, TbCursorOff, TbPencilCheck, TbPencilCog, TbPencilX, TbSend } from "react-icons/tb";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -31,15 +33,138 @@ interface Props {
 }
 
 const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
+    const { label, color, icon } = getStatusInfo(data.StatusPenerbitan)
+
     return (
         <div className="w-full space-y-6 py-5">
-            {/* Accordion Sections */}
             <Accordion
                 type="single"
                 collapsible
                 className="w-full space-y-3"
                 defaultValue="📌 Informasi Umum"
             >
+                <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm bg-white">
+                    <div className="px-4 py-3 text-sm font-semibold text-gray-800 hover:bg-gray-50 transition">
+                        ⚙️ Metadata
+                    </div>
+                    <div className="px-6 py-4 bg-gray-50">
+                        <div className="flex flex-col w-full gap-4">
+                            <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
+                                <p className="font-medium text-gray-600 text-sm">
+                                    Action :
+                                </p>
+                                {/* (0) Operator : Send to SPV */}
+                                {
+                                    Cookies.get('Access')?.includes('createPelatihan') &&
+                                    <>
+                                        {
+                                            (data.SuratPemberitahuan != "" && data.StatusPenerbitan == "0") &&
+                                            <SendNoteAction
+                                                idPelatihan={data.IdPelatihan.toString()}
+                                                title="Kirim ke SPV"
+                                                description="Apakah Anda yakin ingin mengirim pelaksanaan ini ke SPV untuk proses verifikasi lebih lanjut?"
+                                                buttonLabel="Send to SPV"
+                                                icon={TbSend}
+                                                buttonColor="blue"
+                                                onSuccess={fetchData}
+                                                status={"1"}
+                                                pelatihan={data}
+                                            />
+                                        }
+                                        {
+                                            (data.SuratPemberitahuan != "" && data.StatusPenerbitan == "3") &&
+                                            <SendNoteAction
+                                                idPelatihan={data.IdPelatihan.toString()}
+                                                title="Kirim ke Verifikator"
+                                                description="Perbaiki permohonan pelaksanaan sesuai catatan Verifikator"
+                                                buttonLabel="Send to Verifikator"
+                                                icon={TbSend}
+                                                buttonColor="teal"
+                                                onSuccess={fetchData}
+                                                status={"2"}
+                                                pelatihan={data}
+                                            />
+                                        }
+                                        <UploadSuratButton
+                                            idPelatihan={String(data.IdPelatihan)}
+                                            pelatihan={data}
+                                            handleFetchingData={fetchData}
+                                        />
+                                    </>
+                                }
+
+                                {/* (1) SPV : Pending Pilih Verifikator */}
+                                {
+                                    (Cookies.get('Access')?.includes('supervisePelaksanaan') && data.StatusPenerbitan == "1") && <SendNoteAction
+                                        idPelatihan={data.IdPelatihan.toString()}
+                                        title="Pilih Verifikator"
+                                        description="Segera menunjuk verifikator dalam melalukan verifikasi pelaksanaan pelatihan"
+                                        buttonLabel="Pilih Verifikator"
+                                        icon={TbPencilCog}
+                                        buttonColor="teal"
+                                        onSuccess={fetchData}
+                                        status={"2"}
+                                        pelatihan={data}
+                                    />
+                                }
+
+                                {/* (2) Verifikator : Pending Verifikator */}
+                                {
+                                    (Cookies.get('Access')?.includes('verifyPelaksanaan') && data.StatusPenerbitan == "2") && <SendNoteAction
+                                        idPelatihan={data.IdPelatihan.toString()}
+                                        title="Reject Pelaksaan"
+                                        description="Segera melakukan verifikasi pelaksanaan diklat, pastikan perangkat dan kelengkapan administrasi pelatihan sesuai dan lengkap"
+                                        buttonLabel="Reject Pelaksanaan"
+                                        icon={TbPencilX}
+                                        buttonColor="rose"
+                                        onSuccess={fetchData}
+                                        status={"3"}
+                                        pelatihan={data}
+                                    />
+                                }
+
+                                {
+                                    (Cookies.get('Access')?.includes('verifyPelaksanaan') && data.StatusPenerbitan == "2") && <SendNoteAction
+                                        idPelatihan={data.IdPelatihan.toString()}
+                                        title="Approve Pelaksanaan"
+                                        description="Segera melakukan verifikasi pelaksanaan diklat, pastikan perangkat dan kelengkapan administrasi pelatihan sesuai dan lengkap"
+                                        buttonLabel="Approve Pelaksanaan"
+                                        icon={TbPencilCheck}
+                                        buttonColor="green"
+                                        onSuccess={fetchData}
+                                        status={"4"}
+                                        pelatihan={data}
+                                    />
+                                }
+
+                            </div>
+
+                            <div className="w-full ">
+                                <p className="font-medium text-gray-600 mb-2 text-sm">
+                                    Detail  :
+                                </p>
+                                {
+                                    data.SuratPemberitahuan == "" ?
+                                        <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">
+                                            <MdLock className='w-14 h-14 text-gray-600' />
+                                            <p className="text-gray-500 font-normal text-center">
+                                                Harap mengupload surat pemberitahuan pelaksanaan pelatihan dan menunggu verifikasi pelaksanaan agar dapat melanjutkan tahapan berikutnya!
+                                            </p>
+                                        </div> :
+                                        <div className="grid grid-cols-2 gap-4 mt-4 w-full text-sm">
+                                            <InfoItem label="Status" value={label} />
+                                            <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
+                                                <span className="text-xs font-medium text-gray-500">Surat Pemberitahuan</span>
+                                                <Link target="_blank" href={`${urlFileSuratPemberitahuan}/${data?.SuratPemberitahuan}`} className="text-sm font-semibold text-gray-800 mt-1">
+                                                    {urlFileSuratPemberitahuan}/{data?.SuratPemberitahuan != '' ? truncateText(data?.SuratPemberitahuan, 10, '...') : "-"}
+                                                </Link>
+                                            </div>
+                                        </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <AccordionSection title="📌 Informasi Umum">
                     <div className="flex flex-col w-full gap-4">
                         <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
@@ -58,14 +183,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     fetchData
                                 }
                             />
-
-                            <UploadSuratButton
-                                idPelatihan={String(data.IdPelatihan)}
-                                pelatihan={data}
-                                handleFetchingData={fetchData}
-                            />
                         </div>
-
                         <div className="w-full ">
                             <p className="font-medium text-gray-600 mb-2">
                                 Detail  :
@@ -80,25 +198,12 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 <InfoItem label="Mulai Pelatihan" value={generateTanggalPelatihan(data.TanggalMulaiPelatihan)} />
                                 <InfoItem label="Selesai Pelatihan" value={generateTanggalPelatihan(data.TanggalBerakhirPelatihan)} />
                                 <InfoItem label="Lokasi" value={data.LokasiPelatihan} />
-                                <InfoItem label="Instruktur" value={data.Instruktur} />
                                 <InfoItem label="Harga" value={`Rp ${data.HargaPelatihan.toLocaleString()}`} />
                                 <InfoItem label="Pelaksanaan" value={data.PelaksanaanPelatihan} />
                             </SectionGrid>
-
-                            <div className="grid grid-cols-1 gap-4 mt-4 text-sm">
-                                <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
-                                    <span className="text-xs font-medium text-gray-500">Surat Pemberitahuan</span>
-                                    <Link target="_blank" href={`${urlFileSuratPemberitahuan}/${data?.SuratPemberitahuan}`} className="text-sm font-semibold text-gray-800 mt-1">
-                                        {urlFileSuratPemberitahuan}/{data?.SuratPemberitahuan != '' ? truncateText(data?.SuratPemberitahuan, 30, '...') : "-"}
-                                    </Link>
-                                </div>
-                            </div>
-
                         </div>
                     </div>
-
                 </AccordionSection>
-
                 <AccordionSection title="🌐 Publish Informasi">
                     <div className="flex flex-col w-full gap-4">
                         <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
@@ -115,18 +220,14 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 data?.FotoPelatihan != "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" && <>
                                     {new Date() <= new Date(data!.TanggalMulaiPelatihan) &&
                                         (data!.Status == "Publish" ? (
-                                            data!.UserPelatihan.length == 0 ? (
-                                                <PublishButton
-                                                    title="Take Down"
-                                                    statusPelatihan={data?.Status ?? ""}
-                                                    idPelatihan={data!.IdPelatihan.toString()}
-                                                    handleFetchingData={
-                                                        fetchData
-                                                    }
-                                                />
-                                            ) : (
-                                                <></>
-                                            )
+                                            data!.UserPelatihan.length == 0 && <PublishButton
+                                                title="Take Down"
+                                                statusPelatihan={data?.Status ?? ""}
+                                                idPelatihan={data!.IdPelatihan.toString()}
+                                                handleFetchingData={
+                                                    fetchData
+                                                }
+                                            />
                                         ) : (
                                             <PublishButton
                                                 title="Publish"
@@ -139,9 +240,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         ))
                                     }</>
                             }
-
                         </div>
-
                         <div className="w-full ">
                             <p className="font-medium text-gray-600 mb-2">
                                 Detail  :
@@ -173,11 +272,9 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         </p>
                                     </div>
                             }
-
                         </div>
                     </div>
                 </AccordionSection>
-
                 <AccordionSection title="👥 Peserta Pelatihan">
                     <div className="flex flex-col w-full gap-4">
                         <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
@@ -193,7 +290,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         data!,
                                         msg,
                                         Cookies.get("Eselon"),
-                                        Cookies.get("SATKER_BPPP")
+                                        Cookies.get("Satker")
                                     )
                                 }
                             />
@@ -221,13 +318,6 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                             }
                         </div>
                     </div>
-                </AccordionSection>
-
-
-                <AccordionSection title="📂 Dokumentasi & Administrasi">
-                    <SectionGrid>
-                        <InfoItem label="Deskripsi" value={data.DetailPelatihan} />
-                    </SectionGrid>
                 </AccordionSection>
             </Accordion>
         </div>
@@ -263,9 +353,7 @@ const InfoItem = ({ label, value }: { label: string; value?: string }) => (
         <span className="text-xs font-medium text-gray-500">{label}</span>
         {
             value?.includes('<p>') ?
-                <div
-                    className="prose  text-gray-800 text-sm leading-relaxed max-w-none"
-                >
+                <div className="prose  text-gray-800 text-sm leading-relaxed max-w-none">
                     <div dangerouslySetInnerHTML={{ __html: value }} />
                 </div> : <span className="text-sm font-semibold text-gray-800 mt-1">
                     {value || "-"}
