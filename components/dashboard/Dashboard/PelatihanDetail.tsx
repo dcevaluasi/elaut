@@ -25,7 +25,9 @@ import Link from "next/link";
 import UploadSuratButton from "./Actions/UploadSuratButton";
 import { urlFileSuratPemberitahuan } from "@/constants/urls";
 import SendNoteAction from "./Actions/Lemdiklat/SendNoteAction";
-import { TbCheck, TbCursorOff, TbPencilCheck, TbPencilCog, TbPencilX, TbSend } from "react-icons/tb";
+import { TbCheck, TbClock, TbCursorOff, TbPencilCheck, TbPencilCog, TbPencilX, TbSend } from "react-icons/tb";
+import { isToday } from "@/utils/time";
+import HistoryButton from "./Actions/HistoryButton";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -57,6 +59,11 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 {
                                     Cookies.get('Access')?.includes('createPelatihan') &&
                                     <>
+                                        <UploadSuratButton
+                                            idPelatihan={String(data.IdPelatihan)}
+                                            pelatihan={data}
+                                            handleFetchingData={fetchData}
+                                        />
                                         {
                                             (data.SuratPemberitahuan != "" && data.StatusPenerbitan == "0") &&
                                             <SendNoteAction
@@ -71,6 +78,8 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 pelatihan={data}
                                             />
                                         }
+
+                                        {/* (3) Operator : Send to Verifikator After Reject */}
                                         {
                                             (data.SuratPemberitahuan != "" && data.StatusPenerbitan == "3") &&
                                             <SendNoteAction
@@ -85,11 +94,22 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 pelatihan={data}
                                             />
                                         }
-                                        <UploadSuratButton
-                                            idPelatihan={String(data.IdPelatihan)}
-                                            pelatihan={data}
-                                            handleFetchingData={fetchData}
-                                        />
+
+                                        {/* (4) Operator : Close Pelatihan */}
+                                        {
+                                            (data.StatusPenerbitan == "4" && isToday(data.TanggalBerakhirPelatihan)) &&
+                                            <SendNoteAction
+                                                idPelatihan={data.IdPelatihan.toString()}
+                                                title="Tutup Pelatihan"
+                                                description="Dengan menutup pelatihan ini, proses selanjutnya adalah penerbitan STTPL. Segala data terkait pelatihan tidak dapat diedit!"
+                                                buttonLabel="Close Pelatihan"
+                                                icon={TbClock}
+                                                buttonColor="neutral"
+                                                onSuccess={fetchData}
+                                                status={"5"}
+                                                pelatihan={data}
+                                            />
+                                        }
                                     </>
                                 }
 
@@ -108,7 +128,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     />
                                 }
 
-                                {/* (2) Verifikator : Pending Verifikator */}
+                                {/* (2) Verifikator : Pending Verifikator for Reject */}
                                 {
                                     (Cookies.get('Access')?.includes('verifyPelaksanaan') && data.StatusPenerbitan == "2") && <SendNoteAction
                                         idPelatihan={data.IdPelatihan.toString()}
@@ -123,6 +143,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     />
                                 }
 
+                                {/* (2) Verifikator : Pending Verifikator for Approve */}
                                 {
                                     (Cookies.get('Access')?.includes('verifyPelaksanaan') && data.StatusPenerbitan == "2") && <SendNoteAction
                                         idPelatihan={data.IdPelatihan.toString()}
@@ -136,6 +157,13 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         pelatihan={data}
                                     />
                                 }
+
+                                <HistoryButton
+                                    pelatihan={data!}
+                                    statusPelatihan={data?.Status ?? ""}
+                                    idPelatihan={data!.IdPelatihan.toString()}
+                                    handleFetchingData={fetchData}
+                                />
 
                             </div>
 
@@ -210,17 +238,22 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                             <p className="font-medium text-gray-600">
                                 Action :
                             </p>
-                            <EditPublishAction
-                                idPelatihan={data.IdPelatihan.toString()}
-                                currentDetail={data.DetailPelatihan}
-                                currentFoto={data.FotoPelatihan}
-                                tanggalPendaftaran={[data.TanggalMulaiPendaftaran, data.TanggalAkhirPendaftaran!]}
-                                onSuccess={fetchData} />
+                            {
+                                data?.StatusPenerbitan == "0" && <>
+                                    <EditPublishAction
+                                        idPelatihan={data.IdPelatihan.toString()}
+                                        currentDetail={data.DetailPelatihan}
+                                        currentFoto={data.FotoPelatihan}
+                                        tanggalPendaftaran={[data.TanggalMulaiPendaftaran, data.TanggalAkhirPendaftaran!]}
+                                        onSuccess={fetchData} />
+
+                                </>
+                            }
                             {
                                 data?.FotoPelatihan != "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" && <>
-                                    {new Date() <= new Date(data!.TanggalMulaiPelatihan) &&
-                                        (data!.Status == "Publish" ? (
-                                            data!.UserPelatihan.length == 0 && <PublishButton
+                                    {
+                                        data!.Status == "Publish" ? (
+                                            <PublishButton
                                                 title="Take Down"
                                                 statusPelatihan={data?.Status ?? ""}
                                                 idPelatihan={data!.IdPelatihan.toString()}
@@ -237,7 +270,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                     fetchData
                                                 }
                                             />
-                                        ))
+                                        )
                                     }</>
                             }
                         </div>

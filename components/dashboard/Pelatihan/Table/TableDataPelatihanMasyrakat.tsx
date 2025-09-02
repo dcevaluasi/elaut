@@ -117,12 +117,12 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                     </td>
                                     <td className="px-4 py-3 border border-gray-200">
                                         <div className="flex flex-col w-full h-full ">
-                                            <p className="text-base font-semibold leading-relaxed">{pelatihan.NamaPelatihan}</p>
+                                            <p className="text-base font-semibold leading-tight">{pelatihan.NamaPelatihan}</p>
                                             <div className="flex flex-col !font-normal">
-                                                <span className="text-sm text-gray-400 leading-relaxed">Pendaftaran : {waktuPendaftaran}</span>
-                                                <span className="text-sm text-gray-400 leading-relaxed">Pelaksanaan : {waktuPelaksanaan}</span>
-                                                <span className="text-sm text-gray-400 leading-relaxed">Lokasi : {pelatihan?.LokasiPelatihan}</span>
-                                                <span className="text-sm text-gray-400 leading-relaxed">Penyelenggara : {pelatihan?.PenyelenggaraPelatihan}</span>
+                                                <span className="text-sm text-gray-400 leading-tight">Pendaftaran : {waktuPendaftaran}</span>
+                                                <span className="text-sm text-gray-400 leading-tight">Pelaksanaan : {waktuPelaksanaan}</span>
+                                                <span className="text-sm text-gray-400 leading-tight">Lokasi : {pelatihan?.LokasiPelatihan}</span>
+                                                <span className="text-sm text-gray-400 leading-tight">Penyelenggara : {pelatihan?.PenyelenggaraPelatihan}</span>
                                             </div>
                                         </div>
                                     </td>

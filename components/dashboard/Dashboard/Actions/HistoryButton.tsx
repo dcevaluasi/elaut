@@ -49,7 +49,7 @@ const HistoryButton: React.FC<HistoryButtonProps> = ({
                 <thead className="bg-gray-100 font-bold">
                   <tr>
                     <th className="border p-2 text-center">No</th>
-                    <th className="border p-2">Riwayat</th>
+                    <th className="border p-2">Catatan</th>
                     <th className="border p-2 text-center">Role</th>
                     <th className="border p-2 text-center">Satuan Kerja</th>
                     <th className="border p-2 text-center">Waktu</th>
@@ -86,13 +86,10 @@ const HistoryButton: React.FC<HistoryButtonProps> = ({
           setOpenFormTutupPelatihan(!openFormTutupPelatihan);
         }}
         variant="outline"
-        className="inline-flex items-center justify-center gap-2 
-        h-10 px-5 text-sm font-medium rounded-md 
-         bg-gray-100 text-gray-700 
-        hover:bg-gray-200 hover:text-gray-700 transition-colors"
+        className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-neutral-800 text-neutral-800 hover:text-white hover:bg-neutral-800"
       >
-        <MdOutlineHistory className="h-5 w-5" /> History
-      </Button>
+        <MdOutlineHistory className="h-5 w-5" /> History Pelatihan
+      </Button >
     </>
   );
 };

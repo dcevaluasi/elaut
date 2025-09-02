@@ -9,15 +9,11 @@ import {
     decryptValue,
     encryptValue,
 } from "@/lib/utils";
-import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import HistoryButton from "./Actions/HistoryButton";
-import { MateriButton } from "./Actions";
 import { useFetchDataPelatihanMasyarakatDetail } from "@/hooks/elaut/pelatihan/useFetchDataPelatihanMasyarkatDetail";
 import { HashLoader } from "react-spinners";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PelatihanDetail from "./PelatihanDetail";
-import Cookies from "js-cookie";
 const ManagePelatihan = () => {
     const paths = usePathname().split("/");
     const idPelatihan = decryptValue(paths[paths.length - 1]);
@@ -42,120 +38,12 @@ const ManagePelatihan = () => {
 
                                 </div>
                             </div>
-                            <HistoryButton
-                                pelatihan={dataPelatihan!}
-                                statusPelatihan={dataPelatihan?.Status ?? ""}
-                                idPelatihan={dataPelatihan!.IdPelatihan.toString()}
-                                handleFetchingData={
-                                    refetchDetailPelatihan
-                                }
-                            />
+
                         </header>
 
-                        <Tabs defaultValue={activeTab} className="w-full rounded-none">
-                            {
-                                (!Cookies.get("Access")?.includes("verifyPelaksanaan") && !Cookies.get("Access")?.includes("supervisePelaksanaan")) && (
-                                    <TabsList className="grid w-full grid-cols-3 !bg-gray-100 rounded-none">
-                                        <TabsTrigger
-                                            value="1"
-                                            onClick={() => setActiveTab("1")}
-                                        >
-                                            1. Persiapan Pelatihan
-                                        </TabsTrigger>
-
-                                        <TabsTrigger
-                                            value="2"
-                                            onClick={() => setActiveTab("2")}
-                                            disabled={dataPelatihan?.StatusPenerbitan !== "4"}
-                                        >
-                                            2. Pelaksanaan Pelatihan
-                                        </TabsTrigger>
-
-                                        <TabsTrigger
-                                            value="3"
-                                            onClick={() => setActiveTab("3")}
-                                            disabled={dataPelatihan?.StatusPenerbitan !== "4"}
-                                        >
-                                            3. Penerbitan STTPL
-                                        </TabsTrigger>
-                                    </TabsList>
-                                )
-                            }
-
-                            <TabsContent value="1">
-                                <PelatihanDetail data={dataPelatihan!} fetchData={refetchDetailPelatihan} />
-                            </TabsContent>
-                            <TabsContent value="2">
-                                <>
-                                    <section className="mt-5 my-5  w-full ">
-                                        <div className="w-full border border-gray-200 rounded-xl">
-                                            <div className="bg-gray-100 p-4 w-full ">
-                                                <h2 className="font-calsans text-xl">
-                                                    Materi, Kurikulum, dan Bank Soal Pre-Test & Post-Test
-                                                </h2>
-                                            </div>
-                                            <table className="w-full">
-                                                <tr className="border-b border-b-gray-200 w-full">
-                                                    <td className="p-4 w-fit gap-1 flex justify-start ">
-                                                        <>
-                                                            <MateriButton
-                                                                idPelatihan={dataPelatihan!.IdPelatihan.toString()}
-                                                                handleFetchingData={
-                                                                    refetchDetailPelatihan
-                                                                }
-                                                                data={dataPelatihan!}
-                                                            />
-                                                            <Link
-                                                                title="Bank Soal"
-                                                                href={`/admin/lemdiklat/pelatihan/${dataPelatihan!.KodePelatihan
-                                                                    }/bank-soal/${encryptValue(dataPelatihan!.IdPelatihan)}`}
-                                                                className="border border-blue-900  shadow-sm  inline-flex items-center justify-center whitespace-nowrap  text-sm font-medium transition-colors  disabled:pointer-events-none disabled:opacity-50 h-9 px-4 py-2 bg-blue-900 hover:bg-blue-900 hover:text-white text-white rounded-md"
-                                                            >
-                                                                <TbDatabase className="h-5 w-5" /> Bank Soal Pre-Test & Post-Test
-                                                            </Link></>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>
-                                    </section></>
-                            </TabsContent>
-                            <TabsContent value="3">
-                                <section className="space-y-6 py-4">
-                                    <div className="grid grid-cols-1 gap-6">
-                                        <div className="bg-white rounded-2xl h-fit shadow-md border border-gray-200 overflow-x-scroll">
-                                            <div className="bg-gray-100 p-4 w-full">
-                                                <h2 className="font-calsans text-xl text-gray-800">Informasi Penerbitan Sertifikat</h2>
-                                            </div>
-                                            <table className="w-full text-sm text-gray-700">
-                                                <tbody>
-                                                    {
-                                                        dataPelatihan!.KeteranganTandaTangan == '' && <tr className="border-t border-gray-200">
-                                                            <td className="p-4 font-semibold text-gray-600 w-[35%]">Status</td>
-                                                            <td className="p-4">
-                                                                <ShowingBadge data={dataPelatihan!} isFlying={false} />
-                                                            </td>
-                                                        </tr>
-                                                    }
-                                                    <InfoRow label="Penandatangan" value={dataPelatihan?.TtdSertifikat || "-"} />
-                                                    <InfoRow
-                                                        label="Dokumen Permohonan"
-                                                        value={
-                                                            <a href={`${urlFileBeritaAcara}/${dataPelatihan?.BeritaAcara}`}
-                                                                target="_blank"
-                                                                className="text-blue-600 underline break-words">
-                                                                {`${urlFileBeritaAcara}/${dataPelatihan?.BeritaAcara}`}
-                                                            </a>
-                                                        }
-                                                    />
-                                                    <InfoRow label="Format Sertifikat" value={dataPelatihan?.JenisSertifikat} />
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-
-                                </section>
-                            </TabsContent>
-                        </Tabs>
+                        <div className="w-full rounded-none">
+                            <PelatihanDetail data={dataPelatihan!} fetchData={refetchDetailPelatihan} />
+                        </div>
                     </>
                     :
                     <section className="py-32 w-full items-center flex justify-center">

@@ -4,6 +4,7 @@ import {
   RiTimeLine,
   RiCloseCircleFill,
   RiQuestionFill,
+  RiLockFill,
 } from 'react-icons/ri'
 
 export function capitalize(text: string): string {
@@ -153,9 +154,9 @@ export function getStatusInfo(
       };
     case "5":
       return {
-        label: "Telah Selesai",
-        color: "bg-green-600 text-white",
-        icon: <RiCheckboxCircleFill className="w-4 h-4" />,
+        label: "Closed",
+        color: "bg-primary text-white",
+        icon: <RiLockFill className="w-4 h-4" />,
       };
     case "7":
     case "11":
