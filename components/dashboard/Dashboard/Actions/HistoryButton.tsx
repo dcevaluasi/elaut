@@ -1,97 +1,92 @@
-import React from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetTrigger } from "@/components/ui/sheet";
+"use client"
 
-import { Button } from "@/components/ui/button";
-import { HistoryItem, HistoryTraining, PelatihanMasyarakat } from "@/types/product";
-import { MdOutlineHistory } from "react-icons/md";
-import getDocument from "@/firebase/firestore/getData";
-import { DIALOG_TEXTS } from "@/constants/texts";
+import React from "react"
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion"
+import getDocument from "@/firebase/firestore/getData"
+import { DIALOG_TEXTS } from "@/constants/texts"
+import { HistoryItem, HistoryTraining, PelatihanMasyarakat } from "@/types/product"
 
 interface HistoryButtonProps {
-  statusPelatihan: string;
-  idPelatihan: string;
-  pelatihan: PelatihanMasyarakat;
-  handleFetchingData: any;
+  statusPelatihan: string
+  idPelatihan: string
+  pelatihan: PelatihanMasyarakat
+  handleFetchingData: any
 }
 
-const HistoryButton: React.FC<HistoryButtonProps> = ({
-  statusPelatihan,
-  idPelatihan,
-  pelatihan,
-  handleFetchingData,
-}) => {
-  const [openFormTutupPelatihan, setOpenFormTutupPelatihan] =
-    React.useState(false);
-  const [selectedStatus, setSelectedStatus] =
-    React.useState<string>(statusPelatihan);
-
-  const [dataHistoryTraining, setDataHistoryTraining] = React.useState<HistoryTraining | null>(null)
+const HistoryButton: React.FC<HistoryButtonProps> = ({ pelatihan }) => {
+  const [dataHistoryTraining, setDataHistoryTraining] =
+    React.useState<HistoryTraining | null>(null)
 
   const handleFetchDataHistoryTraining = async () => {
-    const doc = await getDocument('historical-training-notes', pelatihan!.KodePelatihan)
+    const doc = await getDocument("historical-training-notes", pelatihan!.KodePelatihan)
     setDataHistoryTraining(doc.data as HistoryTraining)
   }
 
-  React.useEffect(() => { handleFetchDataHistoryTraining() }, [])
+  React.useEffect(() => {
+    handleFetchDataHistoryTraining()
+  }, [])
 
   return (
-    <>
-      <Sheet open={openFormTutupPelatihan} onOpenChange={setOpenFormTutupPelatihan}>
-        <SheetContent className="!max-w-3xl z-[999999999]">
-          <SheetHeader>
-            <SheetTitle>{DIALOG_TEXTS['History Pelatihan'].title}</SheetTitle>
-            <SheetDescription>{DIALOG_TEXTS['History Pelatihan'].desc}</SheetDescription>
-          </SheetHeader>
-
-          {dataHistoryTraining && (
-            <div className="h-[700px] w-full  overflow-y-scroll rounded-lg mt-4 mb-10">
-              <table className="w-full   text-sm">
-                <thead className="bg-gray-100 font-bold">
-                  <tr>
-                    <th className="border p-2 text-center">No</th>
-                    <th className="border p-2">Catatan</th>
-                    <th className="border p-2 text-center">Role</th>
-                    <th className="border p-2 text-center">Satuan Kerja</th>
-                    <th className="border p-2 text-center">Waktu</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {dataHistoryTraining.historical
-                    .slice()
-                    .reverse()
-                    .map((item: HistoryItem, index: number, arr) => (
-                      <tr key={index} className="odd:bg-white even:bg-gray-50">
-                        <td className="border p-2 text-center">{index + 1}</td>
-                        <td className="border p-2">{item.notes}</td>
-                        <td className="border p-2 text-center">{item.role}</td>
-                        <td className="border p-2 text-center">{item.upt}</td>
-                        <td className="border p-2 text-center">{item.created_at}</td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
+    <div className="w-full border-t border-t-gray-200 mt-4">
+      <Accordion type="single" collapsible>
+        <AccordionItem value="info" className="border-none shadow-none">
+          <AccordionTrigger className="text-lg text-gray-800 hover:no-underline ">
+            <div className="flex flex-col">
+              <p className=" text-gray-600 text-sm">
+                {DIALOG_TEXTS["History Pelatihan"].title}  :
+              </p>
+              <p className="text-xs text-gray-500 mb-4 font-normal">
+                {DIALOG_TEXTS["History Pelatihan"].desc}
+              </p>
             </div>
-          )}
 
-          <SheetFooter>
-            <Button variant="outline" onClick={() => setOpenFormTutupPelatihan(false)}>Tutup</Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+          </AccordionTrigger>
+          <AccordionContent>
+            {/* Contents shown beautifully without accordion */}
+            {dataHistoryTraining ? (
+              <div className="space-y-2">
+                {dataHistoryTraining.historical
+                  .slice()
+                  .sort((a: HistoryItem, b: HistoryItem) =>
+                    new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+                  )
+                  .map((item: HistoryItem, index: number) => (
+                    <div
+                      key={index}
+                      className=" rounded-xl bg-white p-4 shadow-sm"
+                    >
+                      <div className="flex justify-between items-center text-sm text-gray-500 mb-2">
+                        <span className="font-medium">Catatan {index + 1}</span>
+                        <span className="text-xs">{item.created_at}</span>
+                      </div>
+                      <p>
+                        <span className="font-semibold">Catatan:</span> {item.notes}
+                      </p>
+                      <p>
+                        <span className="font-semibold">Role:</span> {item.role}
+                      </p>
+                      <p>
+                        <span className="font-semibold">Satuan Kerja:</span> {item.upt}
+                      </p>
+                    </div>
+                  ))}
 
-      <Button
-        title="History Administrasi Pelatihan"
-        onClick={() => {
-          setSelectedStatus(statusPelatihan);
-          setOpenFormTutupPelatihan(!openFormTutupPelatihan);
-        }}
-        variant="outline"
-        className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-neutral-800 text-neutral-800 hover:text-white hover:bg-neutral-800"
-      >
-        <MdOutlineHistory className="h-5 w-5" /> History Pelatihan
-      </Button >
-    </>
-  );
-};
+              </div>
+            ) : (
+              <p className="text-gray-500 mt-4">Belum ada catatan history.</p>
+            )}
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
 
-export default HistoryButton;
+
+    </div>
+  )
+}
+
+export default HistoryButton

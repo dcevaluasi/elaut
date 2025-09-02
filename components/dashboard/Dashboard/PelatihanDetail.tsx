@@ -158,12 +158,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     />
                                 }
 
-                                <HistoryButton
-                                    pelatihan={data!}
-                                    statusPelatihan={data?.Status ?? ""}
-                                    idPelatihan={data!.IdPelatihan.toString()}
-                                    handleFetchingData={fetchData}
-                                />
+
 
                             </div>
 
@@ -189,6 +184,13 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             </div>
                                         </div>
                                 }
+
+                                <HistoryButton
+                                    pelatihan={data!}
+                                    statusPelatihan={data?.Status ?? ""}
+                                    idPelatihan={data!.IdPelatihan.toString()}
+                                    handleFetchingData={fetchData}
+                                />
                             </div>
                         </div>
                     </div>
