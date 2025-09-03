@@ -4,6 +4,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogOverlay,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
@@ -126,7 +127,7 @@ const SertifikatNonKepelautan = React.forwardRef(
     }, []);
 
     return (
-      <div className=" flex-col gap-8 font-bos">
+      <div className=" flex-col gap-8 font-bos ">
         <div
           ref={ref}
           className={`w-full h-full scale-95 flex flex-col gap-4 items-center justify-center  px-10  rounded-md font-bos leading-[120%] ${userPelatihan!.IsActice.includes("SEBAGAI") ? "pb-[100px] " : "pb-0"}`}
@@ -750,13 +751,13 @@ const SertifikatNonKepelautan = React.forwardRef(
                       <div className="w-2/12 px-1 border-r border-gray-400">
                         <div className="flex flex-row items-center justify-center mb-4">
                           <span className="text-lg leading-none !font-bosBold">TEORI</span>/
-                          <span className="italic font-bos leading-none mb-1">THEORY</span>
+                          <span className="italic font-bos leading-none ">THEORY</span>
                         </div>
                       </div>
                       <div className="w-2/12 px-1 py-1">
                         <div className="flex flex-row items-center justify-center mb-4">
                           <span className="text-lg leading-none !font-bosBold">PRAKTEK</span>/
-                          <span className="italic font-bos leading-none mb-1">PRACTICE</span>
+                          <span className="italic font-bos leading-none ">PRACTICE</span>
                         </div>
                       </div>
                     </div>
@@ -1271,12 +1272,6 @@ export function DialogSertifikatPelatihan({
   };
 
 
-
-
-  const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
-  });
-
   const handleUploadPDF = () => {
     uploadPdf();
   };
@@ -1287,15 +1282,12 @@ export function DialogSertifikatPelatihan({
   return (
     <div>
       <Dialog>
-        {userPelatihan!.NoSertifikat == "" ? (
-          <DialogTrigger className="w-full" onClick={() => handleUploadPDF()}>
-            {children}
-          </DialogTrigger>
-        ) : (
-          <DialogTrigger asChild>{children}</DialogTrigger>
-        )}
+        <DialogTrigger className="w-full" >
+          {children}
+        </DialogTrigger>
 
-        <DialogContent className="sm:max-w-[1425px]">
+        <DialogContent className="sm:max-w-[1425px] bg-none">
+
           <DialogHeader>
             <div className="flex gap-2 items-center">
               <MdVerified className="text-3xl text-blue-500" />
@@ -1307,65 +1299,21 @@ export function DialogSertifikatPelatihan({
               </div>
             </div>
           </DialogHeader>
-          <div className="max-h-[700px] scale-95 flex flex-col gap-2 overflow-y-auto scroll-smooth">
-            {pelatihan?.JenisSertifikat == "Kepelautan" ? (
-              <SertifikatKepelautan
-                ref={componentRef}
-                refPage={componentRefPage}
-                pelatihan={pelatihan}
-                isSpesimen={isSpesimen}
-                userPelatihan={userPelatihan}
-                isPrinting={isPrinting}
-              />
-            ) : (
-              <SertifikatNonKepelautan
-                ref={componentRef}
-                refPage={componentRefPage}
-                pelatihan={pelatihan}
-                isSpesimen={isSpesimen}
-                userPelatihan={userPelatihan}
-                isPrinting={isPrinting}
-              />
-            )}
+          <div className="max-h-[700px] scale-95  flex flex-col gap-2 overflow-y-auto scroll-smooth">
+            <SertifikatNonKepelautan
+              ref={componentRef}
+              refPage={componentRefPage}
+              pelatihan={pelatihan}
+              isSpesimen={isSpesimen}
+              userPelatihan={userPelatihan}
+              isPrinting={isPrinting}
+            />
           </div>
-          {userPelatihan != null && (
+          {/* {userPelatihan != null && (
             <DialogFooter>
-              {pelatihan!.StatusPenerbitan == "Done" && (
-                <>
-                  {" "}
-                  <Button
-                    type="submit"
-                    className="flex items-center gap-1 bg-blue-500 hover:bg-blue-500"
-                  >
-                    <TbLink />
-                    Salin Tautan
-                  </Button>
-                  <Button
-                    type="submit"
-                    onClick={(e) => handlePrint()}
-                    className="flex items-center gap-1 bg-gray-700 hover:bg-gray-700"
-                  >
-                    <BsFillPrinterFill />
-                    Print Sertifikat
-                  </Button>
-                  <Link
-                    href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${userPelatihan!.FileSertifikat
-                      }`}
-                    target="_blank"
-                    type="submit"
-                    className="bg-neutral-900 text-neutral-50 shadow hover:bg-neutral-900/90 h-9 px-4 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-neutral-950 disabled:pointer-events-none disabled:opacity-50"
-                  >
-                    <TbCloudDownload />
-                    Download
-                  </Link>
-                </>
-              )}
-
-              {usePathname().includes("lemdiklat") &&
+              {
                 userPelatihan!.FileSertifikat == "" && (
                   <>
-
-
                     {userPelatihan.StatusPenandatangan == 'Spesimen' && (
                       <Button
                         onClick={(e) => handleUploadPDF()}
@@ -1383,26 +1331,10 @@ export function DialogSertifikatPelatihan({
                         )}
                       </Button>
                     )}
-
-                    <Button
-                      onClick={(e) => handleUploadPDF()}
-                      type="submit"
-                      disabled={isUploading}
-                      className="flex items-center gap-1"
-                    >
-                      {isUploading ? (
-                        <>Uploading...</>
-                      ) : (
-                        <>
-                          <TbCloudUpload />
-                          Generate PDF dan Ajukan Penerbitan
-                        </>
-                      )}
-                    </Button>
                   </>
                 )}
             </DialogFooter>
-          )}
+          )} */}
         </DialogContent>
       </Dialog>
     </div>

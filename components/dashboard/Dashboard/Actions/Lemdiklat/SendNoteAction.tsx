@@ -35,6 +35,8 @@ import { truncateText } from "@/utils";
 import { UK_ESELON_2 } from "@/constants/unitkerja";
 import { HiOutlineEyeOff } from "react-icons/hi";
 import { HiOutlineEye } from "react-icons/hi2";
+import { getDateInIndonesianFormat } from "@/utils/time";
+import { countUserWithTanggalSertifikat } from "@/utils/counter";
 
 interface SendNoteActionProps {
     idPelatihan: string;
@@ -66,6 +68,8 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
     const [beritaAcaraFile, setBeritaAcaraFile] = useState<File | null>(null);
     const [ttdSertifikat, setTtdSertifikat] = useState(pelatihan!.TtdSertifikat);
     const oldFileUrl = pelatihan!.BeritaAcara
+    const [tanggalSertifikat, setTanggalSertifikat] = useState('')
+    const [step, setStep] = useState<"tanggal" | "progress" | "passphrase">("tanggal")
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -82,6 +86,48 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
             fetchAdminPusatData();
         }
     }, [isOpen, fetchAdminPusatData]);
+
+    const [loadingTanggalSertifikat, setLoadingTanggalSertifikat] = useState(false)
+    const handleTanggalSertifikatDataPesertaPelatihan = async () => {
+        const dataUserPelatihan = pelatihan?.UserPelatihan ?? []
+        setLoadingTanggalSertifikat(true)
+        try {
+            setStep("progress")
+
+            for (const user of dataUserPelatihan) {
+                const formData = new FormData()
+                formData.append("TanggalSertifikat", getDateInIndonesianFormat(tanggalSertifikat))
+
+                await axios.put(
+                    `${elautBaseUrl}/lemdik/updatePelatihanUsers?id=${user.IdUserPelatihan}`,
+                    formData,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+                        },
+                    }
+                )
+            }
+
+            Toast.fire({
+                icon: "success",
+                title: "Yeayyy!",
+                text: `Berhasil menyematkan tanggal penandatanganan untuk ${dataUserPelatihan.length} sertifikat!`,
+            })
+
+            setLoadingTanggalSertifikat(false)
+            setTanggalSertifikat("")
+            setStep("passphrase") // lanjut step passphrase
+        } catch (error) {
+            Toast.fire({
+                icon: "error",
+                title: "Oopsss!",
+                text: `Gagal menyematkan tanggal penandatanganan untuk ${dataUserPelatihan.length} sertifikat!`,
+            })
+            setLoadingTanggalSertifikat(false)
+            setStep("tanggal")
+        }
+    }
 
     const [passphrase, setPassphrase] = React.useState<string>("");
     const [isSigning, setIsSigning] = React.useState<boolean>(false);
@@ -285,7 +331,6 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                             )}
                         </div>
 
-
                         {/* Select Ttd Sertifikat */}
                         <div className="">
                             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -309,9 +354,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                     </>
                 }
 
-
-
-                <div className="mb-2">
+                {!Cookies.get('Access')?.includes('approveKapus') && <div className="mb-2">
                     <label
                         className="block text-gray-800 text-sm font-medium mb-1"
                         htmlFor="email"
@@ -324,45 +367,72 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                         onChange={(e) => setMessage(e.target.value)}
                         disabled={loading}
                     />
-                </div>
+                </div>}
 
                 {(Cookies.get('Access')?.includes('approveKapus') && pelatihan.StatusPenerbitan == "10" && pelatihan.TtdSertifikat == Cookies.get("Role")) &&
-                    <fieldset>
-                        <form autoComplete="off">
-                            <div className="flex flex-wrap -mx-3 mb-1 -mt-2">
-                                <div className="w-full px-3">
-                                    <label
-                                        className="block text-gray-800 text-sm font-medium mb-1"
-                                        htmlFor="email"
-                                    >
-                                        Passphrase
-                                    </label>
-                                    <div className="flex gap-1">
-                                        <span className="relative w-full h-fit">
-                                            <input
-                                                type={isShowPassphrase ? 'text' : 'password'}
-                                                className=" text-black h-10 text-base flex items-center cursor-pointer w-full border border-neutral-200 rounded-md"
-                                                required
-                                                autoComplete="off"
-                                                value={passphrase}
-                                                onChange={(e) => setPassphrase(e.target.value)}
-                                            />
-                                            <span onClick={(e) => setIsShowPassphrase(!isShowPassphrase)}>
-                                                {isShowPassphrase ? (
-                                                    <HiOutlineEyeOff className="text-gray-500 my-auto top-2 mr-5 absolute right-0 text-xl cursor-pointer" />
-                                                ) : (
-                                                    <HiOutlineEye className="text-gray-500 my-auto top-2 mr-5 absolute right-0 text-xl cursor-pointer" />
-                                                )}
-                                            </span>
-                                        </span>
-
-                                    </div>
+                    <div className="space-y-4">
+                        {/* Step 1: Pilih Tanggal */}
+                        {(step === "tanggal" && countUserWithTanggalSertifikat(pelatihan!.UserPelatihan) == 0) && (
+                            <div className="space-x-1 flex flex-col w-full">
+                                <div className="
+                                ">
+                                    <label className="text-sm font-medium text-gray-700">Tanggal Penandatangan</label>
+                                    <input
+                                        type="date"
+                                        className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
+                                        value={tanggalSertifikat}
+                                        onChange={(e) => {
+                                            setTanggalSertifikat(e.target.value)
+                                            setMessage("Telah ditandatangani")
+                                        }}
+                                    />
                                 </div>
+                                <button
+                                    onClick={handleTanggalSertifikatDataPesertaPelatihan}
+                                    className="mt-2 px-4 py-2 h-fit bg-gray-500 text-white rounded-md hover:bg-gray-600"
+                                >
+                                    {loadingTanggalSertifikat ? "Loading..." : "Simpan"}
+                                </button>
                             </div>
+                        )}
 
 
-                        </form>
-                    </fieldset>
+                        {/* Step 3: Passphrase */}
+                        {step === "passphrase" && (
+                            <fieldset>
+                                <form autoComplete="off">
+                                    <div className="flex flex-wrap -mx-3 mb-1 -mt-2">
+                                        <div className="w-full px-3">
+                                            <label className="block text-gray-800 text-sm font-medium mb-1">Passphrase</label>
+                                            <div className="flex gap-1">
+                                                <span className="relative w-full h-fit">
+                                                    <input
+                                                        type={isShowPassphrase ? "text" : "password"}
+                                                        className="text-black h-10 text-base flex items-center cursor-pointer w-full border border-neutral-200 rounded-md px-2"
+                                                        required
+                                                        autoComplete="off"
+                                                        value={passphrase}
+                                                        onChange={(e) => setPassphrase(e.target.value)}
+                                                    />
+                                                    <span
+                                                        onClick={() => setIsShowPassphrase(!isShowPassphrase)}
+                                                        className="absolute right-2 top-2 cursor-pointer"
+                                                    >
+                                                        {isShowPassphrase ? (
+                                                            <HiOutlineEyeOff className="text-gray-500 text-xl" />
+                                                        ) : (
+                                                            <HiOutlineEye className="text-gray-500 text-xl" />
+                                                        )}
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </fieldset>
+                        )}
+                    </div>
+
                 }
 
                 {(Cookies.get('Access')?.includes('approveKapus') && pelatihan.StatusPenerbitan == "10" && pelatihan.TtdSertifikat == Cookies.get("Role")) ? <AlertDialogFooter>
@@ -370,7 +440,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                     <AlertDialogAction
                         onClick={handleTTDElektronik}
                         className={`bg-${buttonColor}-600 hover:bg-${buttonColor}-700 text-white`}
-                        disabled={isSigning || !message}
+                        disabled={isSigning || !message || !passphrase}
                     >
                         {isSigning ? "Menandatangan..." : "TTDe"}
                     </AlertDialogAction>

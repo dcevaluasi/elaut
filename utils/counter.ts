@@ -49,5 +49,11 @@ export const countUserWithDrafCertificate = (data: UserPelatihan[]): number => {
 }
 
 export const countUserWithPassed = (data: UserPelatihan[]): number => {
-  return data.filter((item) => item.IsActice === 'LULUS').length
+  return data.filter(
+    (item) => item.IsActice === '{PESERTA}{TELAH LULUS}{Has Passed}',
+  ).length
+}
+
+export const countUserWithStatus = (data: UserPelatihan[]): number => {
+  return data.filter((item) => item.IsActice !== '').length
 }

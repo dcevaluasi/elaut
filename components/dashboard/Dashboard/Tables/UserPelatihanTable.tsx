@@ -29,8 +29,8 @@ import {
     AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 
-import { ArrowUpDown, LucideInfo } from "lucide-react";
-import { UserPelatihan } from "@/types/product";
+import { ArrowUpDown, Check, LucideInfo } from "lucide-react";
+import { PelatihanMasyarakat, UserPelatihan } from "@/types/product";
 import { AiOutlineFieldNumber } from "react-icons/ai";
 import { FaRegIdCard } from "react-icons/fa6";
 import Link from "next/link";
@@ -41,16 +41,62 @@ import { User } from "@/types/user";
 import axios from "axios";
 import { elautBaseUrl } from "@/constants/urls";
 import VerifikasiPesertaAction from "../Actions/VerifikasiPesertaAction";
+import { FaEdit } from "react-icons/fa";
+import { IoMdCheckmarkCircleOutline } from "react-icons/io";
+import { Checkbox } from "@radix-ui/react-checkbox";
+import Cookies from "js-cookie";
+import Toast from "@/components/toast";
+import { generatedStatusCertificate } from "@/utils/certificates";
+import { DialogSertifikatPelatihan } from "@/components/sertifikat/dialogSertifikatPelatihan";
+import { FiUploadCloud } from "react-icons/fi";
+import { RiVerifiedBadgeFill } from "react-icons/ri";
 
 interface UserPelatihanTableProps {
+    pelatihan: PelatihanMasyarakat
     data: UserPelatihan[];
+    onSuccess: any
 }
 
 const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
+    pelatihan,
     data,
+    onSuccess
 }) => {
     const pathName = usePathname();
     const paths = pathName.split("/");
+
+    const handleLulusDataPeserta = async (user: UserPelatihan) => {
+        try {
+            const formData = new FormData();
+            formData.append("IsActice", user.IsActice == '{PESERTA}{TELAH LULUS}{Has Passed}' ? '{PESERTA}{TELAH MENGIKUTI}{Has Attended}' : '{PESERTA}{TELAH LULUS}{Has Passed}');
+
+            await axios.put(
+                `${elautBaseUrl}/lemdik/updatePelatihanUsers?id=${user.IdUserPelatihan}`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+                    },
+                }
+            );
+
+            Toast.fire({
+                icon: "success",
+                title: 'Yeayyy!',
+                text: `Berhasil meluluskan peserta pelatihan!`,
+            });
+            onSuccess()
+        } catch (error) {
+            console.error("ERROR UPDATE PELATIHAN:", error);
+            Toast.fire({
+                icon: "error",
+                title: 'Oopsss!',
+                text: `Gagal meluluskan  peserta pelatihan!`,
+            });
+            onSuccess()
+        }
+    };
+
     const columns: ColumnDef<UserPelatihan>[] = [
         {
             accessorKey: "KodePelatihan",
@@ -106,6 +152,38 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
             ),
         },
         {
+            accessorKey: "NoSertifikat",
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        className={`text-black font-semibold text-center w-full  items-center justify-center p-0 flex `}
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        Sertifikat
+                        <RiVerifiedBadgeFill className="ml-2 h-4 w-4" />
+                    </Button>
+                );
+            },
+            cell: ({ row }) => {
+                return (
+                    <DialogSertifikatPelatihan
+                        pelatihan={pelatihan!}
+                        userPelatihan={row.original}
+                        handleFetchingData={onSuccess}
+                    >
+                        <Button
+                            variant="outline"
+                            className="w-full border flex gap-2 border-gray-700 bg-neutral-600 text-neutral-200 text-left capitalize items-center justify-center hover:bg-neutral-700 hover:text-neutral-200"
+                        >
+                            <FiUploadCloud className="h-4 w-4 text-neutral-200" />
+                            Preview Sertifikat
+                        </Button>
+                    </DialogSertifikatPelatihan>
+                );
+            },
+        },
+        {
             accessorKey: "IdUserPelatihan",
             header: ({ column }) => {
                 return (
@@ -129,7 +207,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
             ),
         },
         {
-            accessorKey: "IdUsers",
+            accessorKey: "NoRegistrasi",
             header: ({ column }) => {
                 return (
                     <Button
@@ -137,7 +215,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                         className={`text-black font-semibold w-full p-0 flex justify-center items-center`}
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                     >
-                        <p className="leading-[105%]"> ID Peserta</p>
+                        <p className="leading-[105%]">No STTPL</p>
 
                         <AiOutlineFieldNumber className="ml-2 h-4 w-4" />
                     </Button>
@@ -146,11 +224,38 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
             cell: ({ row }) => (
                 <div className={`${"ml-0"} text-center capitalize `}>
                     <p className="text-base font-semibold tracking-tight leading-none">
-                        {row.original.IdUsers}
+                        {row.original.NoRegistrasi}
                     </p>
                 </div>
             ),
         },
+
+        ...(parseInt(pelatihan.StatusPenerbitan) <= 5
+            ? [
+                {
+                    accessorKey: "IdUsers",
+                    header: ({ column }) => (
+                        <Button
+                            variant="ghost"
+                            className="text-black font-semibold w-full p-0 flex justify-center items-center"
+                            onClick={() =>
+                                column.toggleSorting(column.getIsSorted() === "asc")
+                            }
+                        >
+                            <p className="leading-[105%]">ID Peserta</p>
+                            <AiOutlineFieldNumber className="ml-2 h-4 w-4" />
+                        </Button>
+                    ),
+                    cell: ({ row }) => (
+                        <div className="ml-0 text-center capitalize">
+                            <p className="text-base font-semibold tracking-tight leading-none">
+                                {row.original.IdUsers}
+                            </p>
+                        </div>
+                    ),
+                } as ColumnDef<UserPelatihan>,
+            ]
+            : []),
         {
             accessorKey: "Nama",
             header: ({ column }) => {
@@ -174,6 +279,105 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                 </div>
             ),
         },
+        {
+            accessorKey: "PreTest",
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        className={`text-black font-semibold w-full p-0 flex justify-center items-center`}
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        <p className="leading-[105%]"> PreTest</p>
+
+                        <FaEdit className="ml-2 h-4 w-4" />
+                    </Button>
+                );
+            },
+            cell: ({ row }) => (
+                <div className={`${"ml-0"} text-center capitalize w-full`}>
+                    <p className="text-base font-semibold tracking-tight leading-none">
+                        {row.original.PreTest}
+                    </p>
+                </div>
+            ),
+        },
+        {
+            accessorKey: "PostTest",
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        className={`text-black font-semibold w-full p-0 flex justify-center items-center`}
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        <p className="leading-[105%]"> PostTest</p>
+
+                        <FaEdit className="ml-2 h-4 w-4" />
+                    </Button>
+                );
+            },
+            cell: ({ row }) => (
+                <div className={`${"ml-0"} text-center capitalize w-full`}>
+                    <p className="text-base font-semibold tracking-tight leading-none">
+                        {row.original.PostTest}
+                    </p>
+                </div>
+            ),
+        },
+        ...(parseInt(pelatihan.StatusPenerbitan) >= 5
+            ? [
+                {
+                    accessorKey: "IsActice",
+                    header: ({ column }) => {
+                        return (
+                            <Button
+                                variant="ghost"
+                                className={`text-black font-semibold w-full p-0  text-center justify-center items-center flex`}
+                                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                            >
+                                <p className="leading-[105%]">Status <br /> Kelulusan</p>
+                                <IoMdCheckmarkCircleOutline className="ml-2 h-4 w-4" />
+                            </Button>
+                        );
+                    },
+                    cell: ({ row }) => (
+                        <div className="capitalize w-full flex items-center justify-center">
+                            {
+                                row.original.IsActice != "" && <label className="flex items-center gap-2 text-base font-semibold tracking-tight leading-none">
+                                    <label
+                                        htmlFor="isActice"
+                                        className="flex items-center gap-2 cursor-pointer font-semibold  disabled:cursor-not-allowed justify-center"
+                                    >
+                                        <Checkbox
+                                            disabled={row.original.StatusPenandatangan === "Done"}
+                                            id="isActice"
+                                            onCheckedChange={() => handleLulusDataPeserta(row.original)}
+                                            checked={
+                                                row.original.IsActice !== "{PESERTA}{TELAH MENGIKUTI}{Has Attended}"
+                                            }
+                                            className="h-6 w-8 rounded-md border border-gray-300 bg-white shadow-sm
+             data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500 
+             transition-all duration-200 ease-in-out
+             hover:border-blue-400 hover:shadow-md
+             focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 
+             disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
+                                        >
+                                            <Check className="h-4 w-4 text-white" />
+                                        </Checkbox>
+
+                                        {generatedStatusCertificate(row.original.IsActice).status_indo}
+                                    </label>
+
+                                </label>
+                            }
+
+                        </div>
+
+                    ),
+                } as ColumnDef<UserPelatihan>,
+            ]
+            : []),
     ];
 
     const table = useReactTable({

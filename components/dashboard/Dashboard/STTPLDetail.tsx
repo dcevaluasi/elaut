@@ -23,6 +23,9 @@ import FormatCertificateAction from "./Actions/FormatCertificateAction";
 import { DialogFormatSTTPL } from "@/components/sertifikat/dialogFormatSTTPL";
 import { Button } from "@/components/ui/button";
 import { FaSearch } from "react-icons/fa";
+import UserPelatihanTable from "./Tables/UserPelatihanTable";
+import { PassedParticipantAction } from "./Actions/Lemdiklat/PassedParticipantAction";
+import { countUserWithPassed, countUserWithStatus } from "@/utils/counter";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -221,7 +224,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                     </div>
                 </div>
 
-                <AccordionSection title="📑 Format Sertifikat">
+                {!Cookies.get('Access')?.includes('isSigning') && <AccordionSection title="📑 Format Sertifikat">
                     <div className="flex flex-col w-full gap-4">
                         {
                             parseInt(data?.StatusPenerbitan) >= 5 ? <>
@@ -301,7 +304,49 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                         }
 
                     </div>
+                </AccordionSection>}
+
+
+                <AccordionSection title="👥 Peserta Pelatihan">
+                    <div className="flex flex-col w-full gap-4">
+                        <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
+                            <p className="font-medium text-gray-600">
+                                Action :
+                            </p>
+
+                            {
+                                countUserWithPassed(data?.UserPelatihan) == 0 && <PassedParticipantAction data={data?.UserPelatihan} onSuccess={fetchData} />
+                            }
+
+                        </div>
+
+                        <div className="w-full ">
+                            <p className="font-medium text-gray-600 mb-2">
+                                Detail  :
+                            </p>
+                            {
+                                data?.FotoPelatihan != "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" ?
+                                    <div className="flex flex-col gap-2 w-full">
+                                        <div className="grid grid-cols-2 gap-4 text-sm">
+                                            <InfoItem label="Kuota Peserta" value={data.KoutaPelatihan} />
+                                            <InfoItem label="Jumlah Peserta" value={data.UserPelatihan.length.toString()} />
+                                        </div>
+                                        <UserPelatihanTable pelatihan={data} data={data.UserPelatihan} onSuccess={fetchData} />
+                                    </div>
+                                    : <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">
+                                        <MdLock className='w-14 h-14 text-gray-600' />
+                                        <p className="text-gray-500 font-normal text-center">
+                                            Harap Mengedit Informasi Publish Terlebih Dahulu Untuk Menampilkan Informasi Pelatihan Pada Halaman Pencarian E-LAUT Untuk Masyarakat
+                                        </p>
+                                    </div>
+                            }
+                        </div>
+                    </div>
                 </AccordionSection>
+
+
+
+
             </Accordion>
         </div>
     );
