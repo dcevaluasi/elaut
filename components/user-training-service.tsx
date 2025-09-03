@@ -2,33 +2,8 @@
 
 import React, { useState, useRef, useEffect, ReactElement } from "react";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { MdVerified } from "react-icons/md";
-import { TbCloudDownload } from "react-icons/tb";
-import { getCurrentDate } from "@/utils/sertifikat";
-import html2pdf from "html2pdf.js";
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 
 import Link from "next/link";
 import { Button } from "./ui/button";
@@ -47,10 +22,6 @@ import { IoIosInformationCircle, IoMdCloseCircle } from "react-icons/io";
 import { User, UserPelatihan } from "@/types/user";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 import Cookies from "js-cookie";
-import TableDataPelatihan from "./dashboard/Pelatihan/TableDataPelatihan";
-import TableDataPelatihanUser from "./dashboard/Pelatihan/TableDataPelatihanUser";
-import { DialogSertifikatPelatihan } from "./sertifikat/dialogSertifikatPelatihan";
-import { InfoCircledIcon } from "@radix-ui/react-icons";
 import { createSlug, truncateText } from "@/utils";
 import { Pelatihan } from "@/types/pelatihan";
 import Logo from "./ui/logo";
@@ -873,30 +844,15 @@ function UserTrainingService({ user }: { user: User | null }) {
                                     </table>
 
                                     {userDetail?.Pelatihan[indexPelatihanSelected]
-                                      .NoSertifikat == "" ? null : (
-                                      <div>
-                                        <DialogSertifikatPelatihan
-                                          userPelatihan={
-                                            userDetail?.Pelatihan[
-                                            indexPelatihanSelected
-                                            ]!
-                                          }
-                                          pelatihan={selectedPelatihan!}
-                                        >
-                                          <Button
-                                            type="button"
-                                            variant="outline"
-                                            className="w-full border flex gap-2 border-blue-600 text-left capitalize items-center justify-center"
-                                          >
-                                            <RiVerifiedBadgeFill className="h-4 w-4 text-blue-600" />{" "}
-                                            <span className="text-sm">
-                                              {" "}
-                                              Lihat Sertifikat
-                                            </span>
-                                          </Button>
-                                        </DialogSertifikatPelatihan>
-                                      </div>
-                                    )}
+                                      .StatusPenandatangan != "Done" ? null : <Link
+                                        target="_blank"
+                                        href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${userDetail?.Pelatihan[indexPelatihanSelected]
+                                          .FileSertifikat}`}
+                                        className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 border "
+                                      >
+                                      <RiVerifiedBadgeFill className="h-4 w-4  " />
+                                      <span className="text-sm">Download Sertifikat</span>
+                                    </Link>}
                                   </div>
                                 </div>
                               </div>

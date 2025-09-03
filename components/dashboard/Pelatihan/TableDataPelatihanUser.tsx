@@ -178,34 +178,7 @@ const TableDataPelatihanUser: React.FC = () => {
         <div className={`text-center uppercase`}>{row.index + 1}</div>
       ),
     },
-    {
-      accessorKey: "IdPelatihan",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            className={`${"flex"} w-full text-gray-900 font-semibold`}
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Action
-            <TbDatabaseEdit className="ml-1 h-4 w-4" />
-          </Button>
-        );
-      },
-      cell: ({ row }) => (
-        <div className={`${"flex"} flex items-center justify-center gap-1`}>
-          <DialogSertifikat>
-            <Button
-              variant="outline"
-              className="w-full border border-purple-600"
-            >
-              <RiVerifiedBadgeFill className="h-4 w-4 text-purple-600" /> Lihat
-              Sertifikat
-            </Button>
-          </DialogSertifikat>
-        </div>
-      ),
-    },
+
     {
       accessorKey: "NamaPelatihan",
 

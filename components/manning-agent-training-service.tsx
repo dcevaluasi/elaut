@@ -27,7 +27,6 @@ import { RiVerifiedBadgeFill } from "react-icons/ri";
 import Cookies from "js-cookie";
 import TableDataPelatihan from "./dashboard/Pelatihan/TableDataPelatihan";
 import TableDataPelatihanUser from "./dashboard/Pelatihan/TableDataPelatihanUser";
-import { DialogSertifikatPelatihan } from "./sertifikat/dialogSertifikatPelatihan";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
 import { createSlug, truncateText } from "@/utils";
 import { Pelatihan } from "@/types/pelatihan";
@@ -181,18 +180,16 @@ function ManningAgentTrainingService({
                 )}
 
                 <div
-                  className={`w-full ${
-                    isExpand ? "w-full" : "max-w-7xl"
-                  } mx-auto flex gap-5 mt-8`}
+                  className={`w-full ${isExpand ? "w-full" : "max-w-7xl"
+                    } mx-auto flex gap-5 mt-8`}
                 >
                   <div
-                    className={`gap-2  ${
-                      indexPelatihanSelected != 100000000
+                    className={`gap-2  ${indexPelatihanSelected != 100000000
                         ? isExpand
                           ? "hidden"
                           : "w-5/12 flex flex-col "
                         : "w-full flex flex-col "
-                    }`}
+                      }`}
                   >
                     <div className="relative w-full flex items-center border-gray-300 border px-2 rounded-xl">
                       <Button
@@ -399,9 +396,8 @@ function ManningAgentTrainingService({
 
                   {indexPelatihanSelected != 100000000 && !isExpand && (
                     <div
-                      className={` items-start justify-center ${
-                        isExpand ? "w-12/12" : "w-7/12 flex"
-                      }`}
+                      className={` items-start justify-center ${isExpand ? "w-12/12" : "w-7/12 flex"
+                        }`}
                     >
                       <div className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:px-6 lg:py-0">
                         <div className="sm:flex justify-between sm:gap-4 items-center border-b-2 border-b-gray-200 pb-4">
@@ -423,14 +419,14 @@ function ManningAgentTrainingService({
                                 ·{" "}
                                 {selectedDetailPelatihan != null
                                   ? generateTanggalPelatihan(
-                                      selectedDetailPelatihan?.TanggalMulaiPelatihan
-                                    )
+                                    selectedDetailPelatihan?.TanggalMulaiPelatihan
+                                  )
                                   : "-"}{" "}
                                 s.d.{" "}
                                 {selectedDetailPelatihan != null
                                   ? generateTanggalPelatihan(
-                                      selectedDetailPelatihan?.TanggalBerakhirPelatihan
-                                    )
+                                    selectedDetailPelatihan?.TanggalBerakhirPelatihan
+                                  )
                                   : "-"}
                               </p>
                               <div
@@ -483,15 +479,15 @@ function ManningAgentTrainingService({
                                     indexPelatihanSelected
                                   ]! && !seeMore
                                     ? truncateText(
-                                        manningAgent?.ManingAgentPelatihan[
-                                          indexPelatihanSelected
-                                        ]?.DetailPelatihan!,
-                                        300,
-                                        "..."
-                                      )
-                                    : manningAgent?.ManingAgentPelatihan[
+                                      manningAgent?.ManingAgentPelatihan[
                                         indexPelatihanSelected
                                       ]?.DetailPelatihan!,
+                                      300,
+                                      "..."
+                                    )
+                                    : manningAgent?.ManingAgentPelatihan[
+                                      indexPelatihanSelected
+                                    ]?.DetailPelatihan!,
                               }}
                               className="text-sm prose   text-justify group-hover:text-xs text-gray-500 prose-strong:text-gray-500 prose-p:leading-[140%] prose-strong:font-bold group-hover:duration-1000"
                             />{" "}
@@ -510,7 +506,7 @@ function ManningAgentTrainingService({
                           <TimelineProgressManningAgent
                             manningAgent={
                               manningAgent?.ManingAgentPelatihan[
-                                indexPelatihanSelected
+                              indexPelatihanSelected
                               ]!
                             }
                             pelatihan={selectedPelatihan!}
@@ -545,14 +541,14 @@ function ManningAgentTrainingService({
                                 ·{" "}
                                 {selectedDetailPelatihan != null
                                   ? generateTanggalPelatihan(
-                                      selectedDetailPelatihan?.TanggalMulaiPelatihan
-                                    )
+                                    selectedDetailPelatihan?.TanggalMulaiPelatihan
+                                  )
                                   : "-"}{" "}
                                 s.d.{" "}
                                 {selectedDetailPelatihan != null
                                   ? generateTanggalPelatihan(
-                                      selectedDetailPelatihan?.TanggalBerakhirPelatihan
-                                    )
+                                    selectedDetailPelatihan?.TanggalBerakhirPelatihan
+                                  )
                                   : "-"}
                               </p>
                               <div
@@ -603,7 +599,7 @@ function ManningAgentTrainingService({
                                 dangerouslySetInnerHTML={{
                                   __html:
                                     manningAgent!.ManingAgentPelatihan[
-                                      indexPelatihanSelected
+                                    indexPelatihanSelected
                                     ]! &&
                                     manningAgent!.ManingAgentPelatihan[
                                       indexPelatihanSelected
@@ -619,7 +615,7 @@ function ManningAgentTrainingService({
                               <TimelineProgressManningAgent
                                 manningAgent={
                                   manningAgent?.ManingAgentPelatihan[
-                                    indexPelatihanSelected
+                                  indexPelatihanSelected
                                   ]!
                                 }
                                 pelatihan={selectedPelatihan!}
@@ -639,11 +635,10 @@ function ManningAgentTrainingService({
                               <div className="grid grid-cols-2 w-full gap-2 mt-2">
                                 {[1, 2, 3, 4, 5, 6].map((pelatihan, index) => (
                                   <Link
-                                    href={`/dashboard/pelatihan/online/${
-                                      manningAgent!.ManingAgentPelatihan[
+                                    href={`/dashboard/pelatihan/online/${manningAgent!.ManingAgentPelatihan[
                                         indexPelatihanSelected
                                       ]!.IdPelatihan
-                                    }`}
+                                      }`}
                                     className="flex shadow-custom w-full rounded-md p-5 cursor-pointer flex-col gap-1 hover:scale-105 duration-700 hover:bg-blue-500 hover:text-white group"
                                   >
                                     <h3 className="font-bold font-calsans leading-[105%]">

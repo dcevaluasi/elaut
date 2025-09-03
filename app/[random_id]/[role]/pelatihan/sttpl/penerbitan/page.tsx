@@ -1,7 +1,6 @@
 import React from "react";
 import { LucideFileSignature } from "lucide-react";
 import LayoutAdminElaut from "@/components/dashboard/Layouts/LayoutAdminElaut";
-import PemberitahuanPelatihan from "@/components/dashboard/Dashboard/PemberitahuanPelatihan";
 import { TbSchool } from "react-icons/tb";
 
 function page() {
@@ -27,7 +26,6 @@ function page() {
           </div>
         </div>
         <main className="w-full h-full">
-          <PemberitahuanPelatihan />
         </main>
       </section>
 

@@ -1,15 +1,12 @@
 "use client";
 
 import React from "react";
-import { BsSendArrowUp } from "react-icons/bs";
 import {
   TbBroadcast,
   TbFileCertificate,
   TbListDetails,
   TbSignature,
 } from "react-icons/tb";
-import TableDataPemberitahuanPelatihan from "../../Pelatihan/TableDataPemberitahuanPelatihan";
-import { getNumberFromURLDetailPelatihanAdmin } from "@/utils/pelatihan";
 import { usePathname, useRouter } from "next/navigation";
 import axios, { AxiosError } from "axios";
 import { elautBaseUrl, fileBaseUrl } from "@/constants/urls";
