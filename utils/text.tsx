@@ -116,8 +116,6 @@ export function getStatusInfo(
         icon: <MdPodcasts className="w-4 h-4" />,
       };
     case "1":
-    case "12":
-    case "15":
       return {
         label: "Pending SPV",
         color: "bg-amber-500 text-white",
@@ -136,7 +134,6 @@ export function getStatusInfo(
         color: "bg-green-500 text-white",
         icon: <RiCheckboxCircleFill className="w-4 h-4" />,
       };
-    case "14":
     case "17":
       return {
         label: "Signed",
@@ -185,17 +182,23 @@ export function getStatusInfo(
         color: "bg-green-500 text-white",
         icon: <RiCheckboxCircleFill className="w-4 h-4" />,
       };
-    case "13":
+    case "12":
       return {
-        label: "Reject Kapus",
-        color: "bg-rose-500 text-white",
-        icon: <RiCloseCircleFill className="w-4 h-4" />,
+        label: "Pending Kabadan",
+        color: "bg-amber-500 text-white",
+        icon: <RiTimeLine className="w-4 h-4" />,
       };
-    case "16":
+    case "13":
       return {
         label: "Reject Kabadan",
         color: "bg-rose-500 text-white",
         icon: <RiCloseCircleFill className="w-4 h-4" />,
+      };
+    case "14":
+      return {
+        label: "Signed Kabadan",
+        color: "bg-green-500 text-white",
+        icon: <RiCheckboxCircleFill className="w-4 h-4" />,
       };
 
     default:
