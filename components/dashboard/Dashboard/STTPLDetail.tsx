@@ -25,7 +25,9 @@ import { Button } from "@/components/ui/button";
 import { FaSearch } from "react-icons/fa";
 import UserPelatihanTable from "./Tables/UserPelatihanTable";
 import { PassedParticipantAction } from "./Actions/Lemdiklat/PassedParticipantAction";
-import { countUserWithPassed, countUserWithStatus } from "@/utils/counter";
+import { countUserWithPassed } from "@/utils/counter";
+import TTDAction from "./Actions/Lemdiklat/TTDAction";
+import TTDeDetail from "./TTDeDetail";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -34,6 +36,7 @@ interface Props {
 
 const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
     const { label, color, icon } = getStatusInfo(data.StatusPenerbitan)
+    const [open, setOpen] = React.useState(false);
 
     return (
         <div className="w-full space-y-6 py-5">
@@ -167,22 +170,6 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         pelatihan={data}
                                     />
                                 }
-
-                                {/* (10) Kapus : Pending Kapus for Approve */}
-                                {
-                                    (Cookies.get('Access')?.includes('approveKapus') && data.StatusPenerbitan == "10" && data.TtdSertifikat == Cookies.get("Role")) && <SendNoteAction
-                                        idPelatihan={data.IdPelatihan.toString()}
-                                        title="TTDe STTPL"
-                                        description="Masukkan passphrase anda untuk melanjutkan proses
-                    penandatanganan pada sertifikat yang akan diterbitkan"
-                                        buttonLabel="TTDe STTPL"
-                                        icon={TbPencilCheck}
-                                        buttonColor="blue"
-                                        onSuccess={fetchData}
-                                        status={"11"}
-                                        pelatihan={data}
-                                    />
-                                }
                             </div>
 
                             <div className="w-full ">
@@ -224,129 +211,126 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                     </div>
                 </div>
 
-                {!Cookies.get('Access')?.includes('isSigning') && <AccordionSection title="📑 Format Sertifikat">
-                    <div className="flex flex-col w-full gap-4">
-                        {
-                            parseInt(data?.StatusPenerbitan) >= 5 ? <>
-                                <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
-                                    <p className="font-medium text-gray-600">
-                                        Action :
-                                    </p>
+                <TTDeDetail data={data} fetchData={fetchData} />
 
-                                    {(data?.StatusPenerbitan == "5" && data?.DeskripsiSertifikat == "") && <FormatCertificateAction
-                                        idPelatihan={data?.IdPelatihan.toString()}
-                                        handleFetchingData={fetchData}
-                                        data={data}
-                                    />}
+                {!Cookies.get('Access')?.includes('isSigning') && <>
+                    <AccordionSection title="📑 Format Sertifikat">
+                        <div className="flex flex-col w-full gap-4">
+                            {
+                                parseInt(data?.StatusPenerbitan) >= 5 ? <>
+                                    <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
+                                        <p className="font-medium text-gray-600">
+                                            Action :
+                                        </p>
 
-                                </div>
-                                <div className="w-full ">
-                                    <p className="font-medium text-gray-600 mb-2">
-                                        Detail  :
-                                    </p>
-                                    {data.DeskripsiSertifikat != "" || data.MateriPelatihan.length != 0 ? <><SectionGrid>
-                                        <InfoItem label="Deskripsi Indonesia" value={generatedDescriptionCertificate(data.DeskripsiSertifikat).desc_indo} />
-                                        <InfoItem label="Deskripsi Inggris" value={generatedDescriptionCertificate(data.DeskripsiSertifikat).desc_eng} />
-                                    </SectionGrid>
+                                        {(data?.StatusPenerbitan == "5" && data?.DeskripsiSertifikat == "") && <FormatCertificateAction
+                                            idPelatihan={data?.IdPelatihan.toString()}
+                                            handleFetchingData={fetchData}
+                                            data={data}
+                                        />}
 
-                                        <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100 mt-4">
-                                            <span className="text-xs font-medium text-gray-500">Materi Sertifikat</span>
-                                            <div className="overflow-x-auto !text-sm mt-4">
-                                                <table className="min-w-full border border-gray-300">
-                                                    <thead className="bg-gray-100">
-                                                        <tr>
-                                                            <th className="border p-3 text-sm">No</th>
-                                                            <th className="border p-3 text-sm">Nama Materi</th>
-                                                            <th className="border p-3 text-sm">Tipe</th>
-                                                            <th className="border p-3 text-sm">Jam Teori</th>
-                                                            <th className="border p-3 text-sm">Jam Praktek</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {data.MateriPelatihan!.map((item: MateriPelatihan, index: number) => (
-                                                            <tr key={item.IdMateriPelatihan} className="odd:bg-white even:bg-gray-50">
-                                                                <td className="border p-3 text-center">{index + 1}</td>
-                                                                <td className="border p-3"><div className="flex flex-col">
-                                                                    <p className="font-medium">
-                                                                        {generatedCurriculumCertificate(item.NamaMateri).curr_indo}</p>
-                                                                    <span className="text-xs italic">{generatedCurriculumCertificate(item.NamaMateri).curr_eng}</span></div></td>
-                                                                <td className="border p-3 text-center capitalize">{item.Deskripsi}</td>
-                                                                <td className="border p-3 text-center">{item.JamTeory}</td>
-                                                                <td className="border p-3 text-center">{item.JamPraktek}</td>
+                                    </div>
+                                    <div className="w-full ">
+                                        <p className="font-medium text-gray-600 mb-2">
+                                            Detail  :
+                                        </p>
+                                        {data.DeskripsiSertifikat != "" || data.MateriPelatihan.length != 0 ? <><SectionGrid>
+                                            <InfoItem label="Deskripsi Indonesia" value={generatedDescriptionCertificate(data.DeskripsiSertifikat).desc_indo} />
+                                            <InfoItem label="Deskripsi Inggris" value={generatedDescriptionCertificate(data.DeskripsiSertifikat).desc_eng} />
+                                        </SectionGrid>
+
+                                            <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100 mt-4">
+                                                <span className="text-xs font-medium text-gray-500">Materi Sertifikat</span>
+                                                <div className="overflow-x-auto !text-sm mt-4">
+                                                    <table className="min-w-full border border-gray-300">
+                                                        <thead className="bg-gray-100">
+                                                            <tr>
+                                                                <th className="border p-3 text-sm">No</th>
+                                                                <th className="border p-3 text-sm">Nama Materi</th>
+                                                                <th className="border p-3 text-sm">Tipe</th>
+                                                                <th className="border p-3 text-sm">Jam Teori</th>
+                                                                <th className="border p-3 text-sm">Jam Praktek</th>
                                                             </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
+                                                        </thead>
+                                                        <tbody>
+                                                            {data.MateriPelatihan!.map((item: MateriPelatihan, index: number) => (
+                                                                <tr key={item.IdMateriPelatihan} className="odd:bg-white even:bg-gray-50">
+                                                                    <td className="border p-3 text-center">{index + 1}</td>
+                                                                    <td className="border p-3"><div className="flex flex-col">
+                                                                        <p className="font-medium">
+                                                                            {generatedCurriculumCertificate(item.NamaMateri).curr_indo}</p>
+                                                                        <span className="text-xs italic">{generatedCurriculumCertificate(item.NamaMateri).curr_eng}</span></div></td>
+                                                                    <td className="border p-3 text-center capitalize">{item.Deskripsi}</td>
+                                                                    <td className="border p-3 text-center">{item.JamTeory}</td>
+                                                                    <td className="border p-3 text-center">{item.JamPraktek}</td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        <DialogFormatSTTPL pelatihan={data}>
-                                            <Button
-                                                variant="outline"
-                                                title="Preview  Sertifikat"
-                                                className="flex items-center w-full mt-4 rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
-                                            >
-                                                <FaSearch className="h-4 w-4 mr-1" /> Preview Sertifikat
-                                            </Button>
-                                        </DialogFormatSTTPL>
-                                    </> : <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">
-                                        <MdLock className='w-14 h-14 text-gray-600' />
-                                        <p className="text-gray-500 font-normal text-center">
-                                            Harap upload materi yang akan tampil di lembar sertifikat serta deskripsi sertifikat, aksi ini hanya dilakukan sekali. Apabila terjadi kesalahan, tidak dapat melakukan perbaikan!
-                                        </p>
-                                    </div>}
-                                </div></> : <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">
-                                <MdLock className='w-14 h-14 text-gray-600' />
-                                <p className="text-gray-500 font-normal text-center">
-                                    Oopsss! Dalam melakukan pengaturan format sertifikat, pengajuan penerbitan STTPL untuk pelaksanaan pelatihan ini harus disetujui pihak Pusat dulu, harap hub verifikator terkait untuk mempercepat proses!
+                                            <DialogFormatSTTPL pelatihan={data}>
+                                                <Button
+                                                    variant="outline"
+                                                    title="Preview  Sertifikat"
+                                                    className="flex items-center w-full mt-4 rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
+                                                >
+                                                    <FaSearch className="h-4 w-4 mr-1" /> Preview Sertifikat
+                                                </Button>
+                                            </DialogFormatSTTPL>
+                                        </> : <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">
+                                            <MdLock className='w-14 h-14 text-gray-600' />
+                                            <p className="text-gray-500 font-normal text-center">
+                                                Harap upload materi yang akan tampil di lembar sertifikat serta deskripsi sertifikat, aksi ini hanya dilakukan sekali. Apabila terjadi kesalahan, tidak dapat melakukan perbaikan!
+                                            </p>
+                                        </div>}
+                                    </div></> : <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">
+                                    <MdLock className='w-14 h-14 text-gray-600' />
+                                    <p className="text-gray-500 font-normal text-center">
+                                        Oopsss! Dalam melakukan pengaturan format sertifikat, pengajuan penerbitan STTPL untuk pelaksanaan pelatihan ini harus disetujui pihak Pusat dulu, harap hub verifikator terkait untuk mempercepat proses!
+                                    </p>
+                                </div>
+                            }
+
+                        </div>
+                    </AccordionSection>
+                    <AccordionSection title="👥 Peserta Pelatihan">
+                        <div className="flex flex-col w-full gap-4">
+                            <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
+                                <p className="font-medium text-gray-600">
+                                    Action :
                                 </p>
+
+                                {
+                                    countUserWithPassed(data?.UserPelatihan) == 0 && <PassedParticipantAction data={data?.UserPelatihan} onSuccess={fetchData} />
+                                }
+
                             </div>
-                        }
 
-                    </div>
-                </AccordionSection>}
-
-
-                <AccordionSection title="👥 Peserta Pelatihan">
-                    <div className="flex flex-col w-full gap-4">
-                        <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
-                            <p className="font-medium text-gray-600">
-                                Action :
-                            </p>
-
-                            {
-                                countUserWithPassed(data?.UserPelatihan) == 0 && <PassedParticipantAction data={data?.UserPelatihan} onSuccess={fetchData} />
-                            }
-
-                        </div>
-
-                        <div className="w-full ">
-                            <p className="font-medium text-gray-600 mb-2">
-                                Detail  :
-                            </p>
-                            {
-                                data?.FotoPelatihan != "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" ?
-                                    <div className="flex flex-col gap-2 w-full">
-                                        <div className="grid grid-cols-2 gap-4 text-sm">
-                                            <InfoItem label="Kuota Peserta" value={data.KoutaPelatihan} />
-                                            <InfoItem label="Jumlah Peserta" value={data.UserPelatihan.length.toString()} />
+                            <div className="w-full ">
+                                <p className="font-medium text-gray-600 mb-2">
+                                    Detail  :
+                                </p>
+                                {
+                                    data?.FotoPelatihan != "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" ?
+                                        <div className="flex flex-col gap-2 w-full">
+                                            <div className="grid grid-cols-2 gap-4 text-sm">
+                                                <InfoItem label="Kuota Peserta" value={data.KoutaPelatihan} />
+                                                <InfoItem label="Jumlah Peserta" value={data.UserPelatihan.length.toString()} />
+                                            </div>
+                                            <UserPelatihanTable pelatihan={data} data={data.UserPelatihan} onSuccess={fetchData} />
                                         </div>
-                                        <UserPelatihanTable pelatihan={data} data={data.UserPelatihan} onSuccess={fetchData} />
-                                    </div>
-                                    : <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">
-                                        <MdLock className='w-14 h-14 text-gray-600' />
-                                        <p className="text-gray-500 font-normal text-center">
-                                            Harap Mengedit Informasi Publish Terlebih Dahulu Untuk Menampilkan Informasi Pelatihan Pada Halaman Pencarian E-LAUT Untuk Masyarakat
-                                        </p>
-                                    </div>
-                            }
+                                        : <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">
+                                            <MdLock className='w-14 h-14 text-gray-600' />
+                                            <p className="text-gray-500 font-normal text-center">
+                                                Harap Mengedit Informasi Publish Terlebih Dahulu Untuk Menampilkan Informasi Pelatihan Pada Halaman Pencarian E-LAUT Untuk Masyarakat
+                                            </p>
+                                        </div>
+                                }
+                            </div>
                         </div>
-                    </div>
-                </AccordionSection>
-
-
-
-
+                    </AccordionSection></>}
             </Accordion>
         </div>
     );

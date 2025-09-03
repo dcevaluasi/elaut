@@ -181,9 +181,9 @@ export function getStatusInfo(
       };
     case "11":
       return {
-        label: "Reject SPV",
-        color: "bg-rose-500 text-white",
-        icon: <RiCloseCircleFill className="w-4 h-4" />,
+        label: "Signed Kapus",
+        color: "bg-green-500 text-white",
+        icon: <RiCheckboxCircleFill className="w-4 h-4" />,
       };
     case "13":
       return {

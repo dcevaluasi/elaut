@@ -45,7 +45,10 @@ export const countUserWithSpesimenTTD = (data: UserPelatihan[]): number => {
 }
 
 export const countUserWithDrafCertificate = (data: UserPelatihan[]): number => {
-  return data.filter((item) => item.FileSertifikat !== '').length
+  return data.filter(
+    (item) =>
+      item.FileSertifikat !== '' && !item.FileSertifikat.includes('signed'),
+  ).length
 }
 
 export const countUserWithPassed = (data: UserPelatihan[]): number => {

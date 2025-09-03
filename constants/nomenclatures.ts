@@ -9,6 +9,28 @@ export type ESELON = {
 export const KA_BPPSDM = 'Dr. I Nyoman Radiarta, S.Pi, M.Sc'
 export const KA_PUSLAT_KP = 'Dr. Lilly Aprilya Pregiwati, S.Pi., M.Si'
 
+export const ESELONS = {
+  'Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan': {
+    abbrv: 'Kepala BPPSDM KP',
+    fullName:
+      'Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan',
+    fullNameEng:
+      'Chairman of The Agency for Marine and Fisheries Extension and Human Resources Development',
+    abbrvEselon: 'BPPSDM KP',
+    fullNameEselon:
+      'Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan',
+    currentPerson: 'Dr. I Nyoman Radiarta, S.Pi, M.Sc',
+  },
+  'Kepala Pusat Pelatihan Kelautan dan Perikanan': {
+    abbrv: 'Kepala Puslat KP',
+    fullName: 'Kepala Pusat Pelatihan Kelautan dan Perikanan',
+    fullNameEng: 'Director for Marine And Fisheries Training Center',
+    abbrvEselon: 'Puslat KP',
+    fullNameEselon: 'Pusat Pelatihan Kelautan dan Perikanan',
+    currentPerson: 'Dr. Lilly Aprilya Pregiwati, S.Pi., M.Si',
+  },
+}
+
 export const ESELON_1: ESELON = {
   abbrv: 'Kepala BPPSDM KP',
   fullName:

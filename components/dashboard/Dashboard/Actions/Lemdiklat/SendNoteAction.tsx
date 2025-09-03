@@ -69,8 +69,6 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
     const [ttdSertifikat, setTtdSertifikat] = useState(pelatihan!.TtdSertifikat);
     const oldFileUrl = pelatihan!.BeritaAcara
     const [tanggalSertifikat, setTanggalSertifikat] = useState('')
-    const [step, setStep] = useState<"tanggal" | "progress" | "passphrase">("tanggal")
-
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             setBeritaAcaraFile(e.target.files[0]);
@@ -92,7 +90,6 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
         const dataUserPelatihan = pelatihan?.UserPelatihan ?? []
         setLoadingTanggalSertifikat(true)
         try {
-            setStep("progress")
 
             for (const user of dataUserPelatihan) {
                 const formData = new FormData()
@@ -117,7 +114,6 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
 
             setLoadingTanggalSertifikat(false)
             setTanggalSertifikat("")
-            setStep("passphrase") // lanjut step passphrase
         } catch (error) {
             Toast.fire({
                 icon: "error",
@@ -125,7 +121,6 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                 text: `Gagal menyematkan tanggal penandatanganan untuk ${dataUserPelatihan.length} sertifikat!`,
             })
             setLoadingTanggalSertifikat(false)
-            setStep("tanggal")
         }
     }
 
@@ -372,7 +367,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                 {(Cookies.get('Access')?.includes('approveKapus') && pelatihan.StatusPenerbitan == "10" && pelatihan.TtdSertifikat == Cookies.get("Role")) &&
                     <div className="space-y-4">
                         {/* Step 1: Pilih Tanggal */}
-                        {(step === "tanggal" && countUserWithTanggalSertifikat(pelatihan!.UserPelatihan) == 0) && (
+                        {(countUserWithTanggalSertifikat(pelatihan!.UserPelatihan) == 0) ? (
                             <div className="space-x-1 flex flex-col w-full">
                                 <div className="
                                 ">
@@ -394,43 +389,37 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                                     {loadingTanggalSertifikat ? "Loading..." : "Simpan"}
                                 </button>
                             </div>
-                        )}
-
-
-                        {/* Step 3: Passphrase */}
-                        {step === "passphrase" && (
-                            <fieldset>
-                                <form autoComplete="off">
-                                    <div className="flex flex-wrap -mx-3 mb-1 -mt-2">
-                                        <div className="w-full px-3">
-                                            <label className="block text-gray-800 text-sm font-medium mb-1">Passphrase</label>
-                                            <div className="flex gap-1">
-                                                <span className="relative w-full h-fit">
-                                                    <input
-                                                        type={isShowPassphrase ? "text" : "password"}
-                                                        className="text-black h-10 text-base flex items-center cursor-pointer w-full border border-neutral-200 rounded-md px-2"
-                                                        required
-                                                        autoComplete="off"
-                                                        value={passphrase}
-                                                        onChange={(e) => setPassphrase(e.target.value)}
-                                                    />
-                                                    <span
-                                                        onClick={() => setIsShowPassphrase(!isShowPassphrase)}
-                                                        className="absolute right-2 top-2 cursor-pointer"
-                                                    >
-                                                        {isShowPassphrase ? (
-                                                            <HiOutlineEyeOff className="text-gray-500 text-xl" />
-                                                        ) : (
-                                                            <HiOutlineEye className="text-gray-500 text-xl" />
-                                                        )}
-                                                    </span>
+                        ) : <fieldset>
+                            <form autoComplete="off">
+                                <div className="flex flex-wrap -mx-3 mb-1 -mt-2">
+                                    <div className="w-full px-3">
+                                        <label className="block text-gray-800 text-sm font-medium mb-1">Passphrase</label>
+                                        <div className="flex gap-1">
+                                            <span className="relative w-full h-fit">
+                                                <input
+                                                    type={isShowPassphrase ? "text" : "password"}
+                                                    className="text-black h-10 text-base flex items-center cursor-pointer w-full border border-neutral-200 rounded-md px-2"
+                                                    required
+                                                    autoComplete="off"
+                                                    value={passphrase}
+                                                    onChange={(e) => setPassphrase(e.target.value)}
+                                                />
+                                                <span
+                                                    onClick={() => setIsShowPassphrase(!isShowPassphrase)}
+                                                    className="absolute right-2 top-2 cursor-pointer"
+                                                >
+                                                    {isShowPassphrase ? (
+                                                        <HiOutlineEyeOff className="text-gray-500 text-xl" />
+                                                    ) : (
+                                                        <HiOutlineEye className="text-gray-500 text-xl" />
+                                                    )}
                                                 </span>
-                                            </div>
+                                            </span>
                                         </div>
                                     </div>
-                                </form>
-                            </fieldset>
-                        )}
+                                </div>
+                            </form>
+                        </fieldset>}
                     </div>
 
                 }

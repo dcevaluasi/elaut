@@ -214,9 +214,6 @@ const DropdownUser = ({
 
   // close on click outside
   useEffect(() => {
-    if (pathname.includes("pusat")) {
-      handleGetAdminPusat();
-    }
     const clickHandler = ({ target }: MouseEvent) => {
       if (!dropdown.current) return;
       if (
@@ -229,7 +226,14 @@ const DropdownUser = ({
     };
     document.addEventListener("click", clickHandler);
     return () => document.removeEventListener("click", clickHandler);
-  });
+  }, [dropdownOpen]);
+
+  useEffect(() => {
+    if (pathname.includes("pusat")) {
+      handleGetAdminPusat();
+    }
+  }, [pathname]);
+
 
   // close if the esc key is pressed
   useEffect(() => {
@@ -239,7 +243,7 @@ const DropdownUser = ({
     };
     document.addEventListener("keydown", keyHandler);
     return () => document.removeEventListener("keydown", keyHandler);
-  });
+  }, []);
 
   const [lastSertifikat, setLastSertifikat] = React.useState<string>("");
   const [openDialogLastSertifikat, setOpenDialogLastSertifikat] =

@@ -83,7 +83,7 @@ export default function LayoutAdminElaut({
 
   useEffect(() => {
     isLemdiklatLevel ? fetchInformationLemdiklat() : fetchInformationPusat();
-  }, []);
+  }, [isLemdiklatLevel]);
 
   const handleLogOut = () => {
     [

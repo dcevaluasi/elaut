@@ -47,7 +47,6 @@ import { Checkbox } from "@radix-ui/react-checkbox";
 import Cookies from "js-cookie";
 import Toast from "@/components/toast";
 import { generatedStatusCertificate } from "@/utils/certificates";
-import { DialogSertifikatPelatihan } from "@/components/sertifikat/dialogSertifikatPelatihan";
 import { FiUploadCloud } from "react-icons/fi";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 
@@ -150,38 +149,6 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                 </div>
 
             ),
-        },
-        {
-            accessorKey: "NoSertifikat",
-            header: ({ column }) => {
-                return (
-                    <Button
-                        variant="ghost"
-                        className={`text-black font-semibold text-center w-full  items-center justify-center p-0 flex `}
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    >
-                        Sertifikat
-                        <RiVerifiedBadgeFill className="ml-2 h-4 w-4" />
-                    </Button>
-                );
-            },
-            cell: ({ row }) => {
-                return (
-                    <DialogSertifikatPelatihan
-                        pelatihan={pelatihan!}
-                        userPelatihan={row.original}
-                        handleFetchingData={onSuccess}
-                    >
-                        <Button
-                            variant="outline"
-                            className="w-full border flex gap-2 border-gray-700 bg-neutral-600 text-neutral-200 text-left capitalize items-center justify-center hover:bg-neutral-700 hover:text-neutral-200"
-                        >
-                            <FiUploadCloud className="h-4 w-4 text-neutral-200" />
-                            Preview Sertifikat
-                        </Button>
-                    </DialogSertifikatPelatihan>
-                );
-            },
         },
         {
             accessorKey: "IdUserPelatihan",

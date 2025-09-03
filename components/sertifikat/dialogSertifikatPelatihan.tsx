@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import React, { ChangeEvent, ReactElement, useRef } from "react";
+import React, { ChangeEvent, forwardRef, ReactElement, useImperativeHandle, useRef } from "react";
 import QRCode from "react-qr-code";
 import { MdVerified } from "react-icons/md";
 import { Button } from "../ui/button";
@@ -42,7 +42,7 @@ import Toast from "../toast";
 import { capitalizeWords, CURRICULLUM_CERTIFICATE } from "@/constants/texts";
 import { formatDateRange, formatDateRangeEnglish } from "@/utils/time";
 import { DESC_CERTIFICATE_COMPETENCE_FISHERIES } from "@/constants/serkom";
-import { ESELON1, ESELON2, ESELON_1, ESELON_2, KA_BPPSDM, KA_PUSLAT_KP } from "@/constants/nomenclatures";
+import { ESELON1, ESELON2, ESELON_1, ESELON_2, ESELONS, KA_BPPSDM, KA_PUSLAT_KP } from "@/constants/nomenclatures";
 import html2canvas from "html2canvas";
 import { calculateTotalHoursCertificateBPPP } from "@/lib/utils";
 import { generatedCurriculumCertificate, generatedDescriptionCertificate, generatedStatusCertificate } from "@/utils/certificates";
@@ -54,14 +54,10 @@ const SertifikatNonKepelautan = React.forwardRef(
     {
       pelatihan,
       userPelatihan,
-      isPrinting,
-      isSpesimen,
       refPage
     }: {
       pelatihan: PelatihanMasyarakat;
       userPelatihan: UserPelatihan;
-      isPrinting?: boolean;
-      isSpesimen?: boolean;
       refPage: any
     },
     ref: any,
@@ -132,365 +128,7 @@ const SertifikatNonKepelautan = React.forwardRef(
           ref={ref}
           className={`w-full h-full scale-95 flex flex-col gap-4 items-center justify-center  px-10  rounded-md font-bos leading-[120%] ${userPelatihan!.IsActice.includes("SEBAGAI") ? "pb-[100px] " : "pb-0"}`}
         >
-          {/* Page 1 */}
 
-
-          {pelatihan?.TtdSertifikat == ESELON1 &&
-            <>
-              <div ref={refPage} className="pdf-page w-full flex flex-col  gap-4 relative h-[49.63rem] items-center justify-center">
-                <div className="flex flex-row  absolute top-0 right-0">
-                  <p className="text-lg font-bosNormal">
-                    No. STTPL : {userPelatihan?.NoRegistrasi}
-                  </p>
-                </div>
-
-                <div className="mx-auto w-20 absolute bottom-0 left-28">
-                  <QRCode
-                    size={280}
-                    style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                    value={`https://elaut-bppsdm.kkp.go.id/layanan/cek-sertifikat/${userPelatihan!.NoRegistrasi}`}
-                    viewBox={`0 0 280 280`}
-                  />
-                </div>
-
-                <div className="w-full flex flex-col space-y-0 px-10 mt-10 ">
-                  {!isPrinting && (
-                    <Image
-                      alt="Logo KKP"
-                      className="mx-auto w-28"
-                      width={0}
-                      height={0}
-                      src="/logo-kkp-2.png"
-                    />
-                  )}
-
-                  <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-3">
-
-                    <div className="flex flex-col h-fit items-center justify-center space-y-0">
-                      <h1 className="text-base font-bosBold font-bold">
-                        KEMENTERIAN KELAUTAN DAN PERIKANAN
-                      </h1>
-                      <p className="text-base font-bosItalic">
-                        MINISTRY OF MARINE AFFAIRS AND FISHERIES
-                      </p>
-                    </div>
-                    <div className="flex flex-col h-fit items-center justify-center space-y-0">
-                      <h1 className="text-lg font-bosBold font-bold">
-                        BADAN PENYULUHAN DAN PENGEMBANGAN SUMBER DAYA MANUSIA KELAUTAN
-                        DAN PERIKANAN
-                      </h1>
-                      <p className="text-sm font-bosItalic">
-                        THE AGENCY FOR MARINE AND FISHERIES EXTENSION AND HUMAN
-                        RESOURCES DEVELOPMENT
-                      </p>
-                    </div>
-
-                    <div className="flex flex-col h-fit items-center justify-center space-y-1">
-                      <h1 className="text-3xl font-bosBold font-black leading-none">
-                        SERTIFIKAT
-                      </h1>
-                      <p className="text-lg font-bosItalic">CERTIFICATE</p>
-                    </div>
-
-                  </div>
-
-                  <div className="flex w-full flex-col space-y-0 max-w-5xl mx-auto items-start text-base  text-center font-bos h-fit mt-2">
-                    <span className="text-base leading-none font-bosNormal">
-                      Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan berdasarkan Peraturan Pemerintah Nomor.62 Tahun 2014 tentang Penyelenggaraan Pendidikan, Pelatihan dan Penyuluhan Perikanan, serta ketentuan pelaksanaannya menyatakan bahwa :
-                    </span>
-                    <span className="max-w-4xl leading-none font-bosItalic text-[0.85rem] mx-auto">
-                      The Agency for Marine and Fisheries Extension and Human
-                      Resources Development based on Government Regulation Number 62
-                      of 2014 concerning the Implementation of Fisheries Education,
-                      Training and Extension as well as its implementing provisions
-                      States that :
-                    </span>
-                  </div>
-
-                  <div className="flex flex-col space-y-0 w-full h-fit -mt-2">
-                    <table className="w-full h-fit" cellPadding={0} cellSpacing={0}>
-                      <tr className="w-full">
-                        <td className="font-bos w-full flex flex-col space-y-0">
-                          <span className="font-bosNormal text-base">Nama</span>
-                          <span className="font-bos italic text-[0.85rem] -mt-2">Name</span>
-                        </td>
-                        <td className=" w-2/3 text-base font-bosNormal uppercase">: {capitalizeWords(userPelatihan!.Nama)}</td>
-                      </tr>
-                      <tr className="w-full">
-                        <td className="font-bos w-full flex flex-col  space-y-0">
-                          <span className="text-base font-bosNormal">
-                            Nomor Induk Kependudukan (NIK)
-                          </span>
-                          <span className="font-bos italic text-[0.85rem] -mt-2">
-                            {" "}
-                            Population Identification Number (PIN)
-                          </span>
-                        </td>
-                        <td className=" w-2/3 text-base font-bosNormal">
-                          : {peserta != null ? peserta!.Nik : "-"}
-                        </td>
-                      </tr>
-                      <tr className="w-full">
-                        <td className="font-bos w-full flex flex-col space-y-0">
-                          <span className="text-base font-bosNormal">Tempat Tanggal Lahir</span>
-                          <span className="font-bos italic text-[0.85rem] -mt-2">
-                            {" "}
-                            Place and date of birth
-                          </span>
-                        </td>
-                        <td className=" w-2/3 text-base font-bosNormal capitalize">
-                          : {peserta != null ? capitalizeWords(peserta?.TempatLahir) : "-"}
-                          {", "}{" "}
-                          {peserta?.TanggalLahir}{" "}
-                        </td>
-                      </tr>
-                      <tr className="w-full">
-                        <td className="font-bos w-full flex flex-col space-y-0">
-                          <span className="text-base font-bosNormal">Nama Institusi</span>
-                          <span className="font-bos italic text-[0.85rem] -mt-2">
-                            {" "}
-                            Institution Name
-                          </span>
-                        </td>
-                        <td className=" w-2/3 text-base font-bosNormal uppercase">
-                          : {peserta != null ? capitalizeWords(peserta?.Status) : "-"}
-                        </td>
-                      </tr>
-                    </table>
-                  </div>
-
-                  <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-1 mb-2">
-                    <h1 className="font-bosBold font-black text-2xl leading-none">
-                      {
-                        userPelatihan?.IsActice == "" ? "-" : generatedStatusCertificate(userPelatihan?.IsActice).status_indo
-                      }
-                    </h1>
-                    <h3 className="font-bosNormal font-bold text-lg italic">
-                      {
-                        userPelatihan?.IsActice == "" ? "-" : generatedStatusCertificate(userPelatihan?.IsActice).status_eng
-                      }
-                    </h3>
-                  </div>
-
-                  <><div className="flex w-full flex-col space-y-0 max-w-7xl mx-auto items-start text-sm -mt-3 text-center font-bos h-fit">
-                    <span className="text-base leading-[115%] font-bosNormal">
-                      {generatedDescriptionCertificate(pelatihan!.DeskripsiSertifikat).desc_indo}, pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
-                    </span>
-                    <span className="max-w-5xl leading-none font-bos italic text-[0.85rem] mx-auto">
-                      {generatedDescriptionCertificate(pelatihan!.DeskripsiSertifikat).desc_eng} on {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
-                    </span>
-                  </div>
-
-                    <div className="flex gap-2 items-center justify-center -mt-2">
-                      <div className="flex flex-col  space-y-0 font-bos text-center items-center justify-center">
-                        <div className="flex w-full flex-col  space-y-0 items-center mt-2 text-center justify-center">
-                          <span className="font-bosNormal text-base leading-[105%] w-full flex items-center gap-1">
-                            Jakarta,{" "}{userPelatihan?.TanggalSertifikat}
-
-                            <br /> {pelatihan?.TtdSertifikat}
-                          </span>
-
-                          <span className="leading-none font-bosItalic text-[0.85rem]">
-                            {pelatihan?.TtdSertifikat ==
-                              ESELON_1.fullName
-                              ? ESELON_1.fullNameEng
-                              : ESELON_2.fullNameEng}
-                          </span>
-
-                          <Image
-                            alt=""
-                            width={0}
-                            height={0}
-                            src={"/ttd-elektronik.png"}
-                            className="w-[230px] h-[100px] relative -z-10 pt-4 block"
-                          />
-
-                          {userPelatihan?.StatusPenandatangan == 'Spesimen' ? (
-                            <Image
-                              alt=""
-                              width={0}
-                              height={0}
-                              src={"/ttd-elektronik.png"}
-                              className="w-[230px] h-[100px] relative -z-10 pt-4 block"
-                            />
-                          ) : (
-                            <div className="h-[80px]"></div>
-                          )}
-
-                          <span className=" font-bosNormal font-bold text-lg -mt-3">
-                            {pelatihan?.TtdSertifikat ==
-                              ESELON_1.fullName
-                              ? KA_BPPSDM
-                              : KA_PUSLAT_KP}
-                          </span>
-                        </div>
-
-                      </div>
-                    </div></>
-
-                </div>
-
-                {
-                  peserta?.Foto == 'https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/' ? <></> : <img
-                    src={peserta?.Foto || ""}
-                    width={140}
-                    height={190}
-                    alt=""
-                    style={{
-                      width: "140px",
-                      height: "190px",
-                      objectFit: "cover",
-                      position: "absolute",
-                      bottom: "-40px",
-                      right: "100px",
-                      borderWidth: '10px',
-                      borderRadius: '25px',
-                      borderColor: '#FFF',
-                      marginTop: "1rem",
-
-                      zIndex: -10,
-                    }}
-                  />
-                }
-
-              </div>
-              <div className="pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center mt-48 break-before-auto relative">
-                <div className="flex flex-row justify-center items-center">
-                  <div className="flex flex-row gap-2 items-center h-fit">
-                    <div className="flex flex-col text-center space-y-0 h-fit items-center justify-center w-full gap-0">
-                      <p className="font-bosBold text-lg max-w-3xl w-full uppercase leading-none">
-                        Materi {pelatihan?.NamaPelatihan}, tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
-                      </p>
-                      <p className="font-bos text-base max-w-4xl leading-none -mt-2">{pelatihan?.NamaPelathanInggris}, {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full border border-gray-400 rounded-md overflow-hidden">
-                  {/* Header Baris 1 */}
-                  <div className="flex text-center font-bosNormal font-bold bg-gray-100 ">
-                    <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 leading-none relative"><span className='absolute mt-10 right-0 left-0 !font-bosBold'>NO</span></div>
-                    <div className="w-7/12 px-1 flex flex-col justify-center items-start border-r border-gray-400 relative">
-                      <div className="flex flex-row items-center justify-center absolute mt-10">
-                        <span className="text-base leading-none !font-bosBold">MATERI</span>/
-                        <span className="italic font-bos leading-none">COURSE</span>
-                      </div>
-                    </div>
-                    <div className="w-4/12 px-1 flex items-center justify-center border-b border-gray-400">
-                      <div className="flex flex-row  items-center justify-center mb-4">
-                        <span className="text-base leading-none !font-bosBold">ALOKASI WAKTU</span>/
-                        <span className="italic font-bos leading-none">TIME ALLOCATION</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Header Baris 2 */}
-                  <div className="flex text-center font-bosNormal font-bold bg-gray-100 border-b border-gray-400">
-                    <div className="w-1/12 px-1 border-r border-gray-400"></div>
-                    <div className="w-7/12 px-1 border-r border-gray-400"></div>
-                    <div className="w-2/12 px-1 border-r border-gray-400">
-                      <div className="flex flex-row items-center justify-center mb-4">
-                        <span className="text-base leading-none !font-bosBold">TEORI</span>/
-                        <span className="italic font-bos leading-none">THEORY</span>
-                      </div>
-                    </div>
-                    <div className="w-2/12 px-1 py-1">
-                      <div className="flex flex-row items-center justify-center mb-4">
-                        <span className="text-base leading-none !font-bosBold">PRAKTEK</span>/
-                        <span className="italic font-bos leading-none">PRACTICE</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Kompetensi Umum Title */}
-                  <div className="flex border-b border-gray-400 bg-white">
-                    <div className="w-1/12 px-1 !font-bosBold  text-center border-r border-gray-400">I</div>
-                    <div className="w-9/12 px-1 font-bosNormal font-bold ">
-                      <div className="flex flex-row items-center mb-3">
-                        <span className="text-base leading-none !font-bosBold">KOMPETENSI UMUM</span>/
-                        <span className="italic font-bos leading-none">General Competency</span>
-                      </div>
-                    </div>
-                    <div className="w-1/12 px-1 "></div>
-                    <div className="w-1/12 px-1 py-1"></div>
-                  </div>
-
-                  {/* Kompetensi Umum Items */}
-                  {CURRICULLUM_CERTIFICATE[pelatihan.Program].UMUM.map((materi, index) => (
-                    <div
-                      key={index}
-                      className="flex text-sm border-b border-gray-300"
-                    >
-                      <div className="w-1/12 px-1 text-center border-r border-gray-300">{index + 1}.</div>
-                      <div className="w-7/12 px-1 border-r border-gray-300">
-                        <div className="flex flex-col justify-center mb-3">
-                          <span className="text-base !font-bosNormal not-italic font-normal leading-none">{materi.name_ind}</span>
-                          <span className="italic font-bosItalic leading-none">{materi.name_eng}</span>
-                        </div>
-                      </div>
-                      <div className="w-2/12 px-1 text-center font-bosNormal border-r border-gray-300">{materi.theory}</div>
-                      <div className="w-2/12 px-1 text-center font-bosNormal">{materi.practice}</div>
-                    </div>
-                  ))}
-
-                  {/* Kompetensi Inti Title */}
-                  <div className="flex border-b border-gray-400 bg-white">
-                    <div className="w-1/12 px-1 !font-bosBold text-center border-r border-gray-400">II</div>
-                    <div className="w-9/12 px-1 font-bosNormal font-bold ">
-                      <div className="flex flex-row items-center mb-3">
-                        <span className="text-base leading-none !font-bosBold">KOMPETENSI INTI</span>/
-                        <span className="italic font-bos leading-none">Core Competency</span>
-                      </div>
-                    </div>
-                    <div className="w-1/12 px-1 "></div>
-                    <div className="w-1/12 px-1 py-1"></div>
-                  </div>
-
-                  {/* Kompetensi Inti Items */}
-                  {CURRICULLUM_CERTIFICATE[pelatihan.Program].INTI.map((materi, index) => (
-                    <div
-                      key={index}
-                      className="flex text-sm border-b border-gray-300"
-                    >
-                      <div className="w-1/12 px-1 text-center border-r border-gray-300">{index + 1}.</div>
-                      <div className="w-7/12 px-1 border-r border-gray-300">
-                        <div className="flex flex-col justify-center mb-3">
-                          <span className="text-base !font-bosNormal not-italic font-normal leading-none">{materi.name_ind}</span>
-                          <span className="italic font-bosItalic leading-none">{materi.name_eng}</span>
-                        </div>
-                      </div>
-                      <div className="w-2/12 px-1 mb-3 text-center font-bosNormal border-r border-gray-300">{materi.theory}</div>
-                      <div className="w-2/12 px-1 mb-3 text-center font-bosNormal">{materi.practice}</div>
-                    </div>
-                  ))}
-
-                  {/* Jumlah Jam */}
-                  <div className="flex font-bosNormal font-bold border-b border-gray-300">
-                    <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-300"></div>
-                    <div className="w-7/12 px-1 border-r border-gray-300">
-                      <div className="flex flex-row items-center mb-3">
-                        <span className="text-base leading-none !font-bosBold">JUMLAH JAM PELAJARAN</span>/
-                        <span className="italic font-bos leading-none">Training Hours</span>
-                      </div>
-                    </div>
-                    <div className="w-2/12 px-1 mb-3 text-center">{totalHours.totalTheory}</div>
-                    <div className="w-2/12 px-1 mb-3 text-center">{totalHours.totalPractice}</div>
-                  </div>
-
-                  {/* Total Jam */}
-                  <div className="flex font-bosNormal font-bold">
-                    <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-300"></div>
-                    <div className="w-7/12 px-1 border-r border-gray-300">
-                      <div className="flex flex-row items-center mb-3">
-                        <span className="text-base leading-none !font-bosBold">TOTAL JAM PELAJARAN</span>/
-                        <span className="italic font-bos leading-none">Total Hours</span>
-                      </div>
-                    </div>
-                    <div className="w-4/12 px-1 mb-3 text-center flex items-center justify-center">{totalHours.totalTheory + totalHours.totalPractice}</div>
-                  </div>
-                </div>
-              </div >
-            </>
-          }
 
           {pelatihan?.TtdSertifikat == ESELON2 &&
             <>
@@ -511,15 +149,13 @@ const SertifikatNonKepelautan = React.forwardRef(
                 </div>
 
                 <div className="w-full flex flex-col space-y-0 px-10 mt-10 ">
-                  {!isPrinting && (
-                    <Image
-                      alt="Logo KKP"
-                      className="mx-auto w-28"
-                      width={0}
-                      height={0}
-                      src="/logo-kkp-2.png"
-                    />
-                  )}
+                  <Image
+                    alt="Logo KKP"
+                    className="mx-auto w-28"
+                    width={0}
+                    height={0}
+                    src="/logo-kkp-2.png"
+                  />
 
                   <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-3">
 
@@ -576,7 +212,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                       <tr className="w-full">
                         <td className="font-bos w-full flex flex-col  space-y-0">
                           <span className="text-base font-bosNormal">
-                            NIK/NIP/NIM/PASPOR
+                            NIK/NIP/PASPOR
                           </span>
                           <span className="font-bos italic text-[0.85rem] -mt-2">
                             {" "}
@@ -597,16 +233,16 @@ const SertifikatNonKepelautan = React.forwardRef(
                         </td>
                         <td className=" w-2/3 text-base font-bosNormal capitalize">
                           : {peserta != null ? capitalizeWords(peserta?.TempatLahir) : "-"}
-                          {", "}{" "}
+                          {", "}
                           {peserta?.TanggalLahir}{" "}
                         </td>
                       </tr>
                       <tr className="w-full">
                         <td className="font-bos w-full flex flex-col space-y-0">
-                          <span className="text-base font-bosNormal">Nama Institusi/Kelompok</span>
+                          <span className="text-base font-bosNormal">Institusi/Organisasi</span>
                           <span className="font-bos italic text-[0.85rem] -mt-2">
                             {" "}
-                            Institution/Group Name
+                            Institution/Organization
                           </span>
                         </td>
                         <td className=" w-2/3 text-base font-bosNormal uppercase">
@@ -644,16 +280,13 @@ const SertifikatNonKepelautan = React.forwardRef(
                         <div className="flex w-full flex-col  space-y-0 items-center mt-2 text-center justify-center">
                           <span className="font-bosNormal text-base leading-[105%] w-full flex items-center gap-1">
                             Jakarta,{" "}{userPelatihan?.TanggalSertifikat}
-
                             <br /> {pelatihan?.TtdSertifikat}
                           </span>
-
-
                           <span className="leading-none font-bosItalic text-[0.85rem]">
-                            {ESELON_2.fullNameEng}
+                            {
+                              ESELONS[pelatihan?.TtdSertifikat].fullNameEng
+                            }
                           </span>
-
-
 
                           {userPelatihan?.StatusPenandatangan == 'Spesimen' || userPelatihan?.StatusPenandatangan == 'Revisi' ? (
                             <Image
@@ -668,7 +301,9 @@ const SertifikatNonKepelautan = React.forwardRef(
                           )}
 
                           <span className=" font-bosNormal font-bold text-lg -mt-3">
-                            {KA_PUSLAT_KP}
+                            {
+                              ESELONS[pelatihan?.TtdSertifikat].currentPerson
+                            }
                           </span>
                         </div>
 
@@ -1149,194 +784,120 @@ const SertifikatKepelautan = React.forwardRef(
   }
 );
 
-export function DialogSertifikatPelatihan({
-  children,
-  userPelatihan,
-  pelatihan,
-  handleFetchingData
-}: {
+interface DialogSertifikatPelatihanProps {
   children: ReactElement;
   userPelatihan: UserPelatihan;
   pelatihan: PelatihanMasyarakat;
-  handleFetchingData?: any
-}) {
-  const componentRef = useRef<HTMLDivElement | null>(null);
-  const componentRefPage = useRef<HTMLDivElement | null>(null);
+  handleFetchingData?: () => void;
+  open?: boolean;
+  setOpen?: (open: boolean) => void;
+}
 
-  const [show, setShow] = React.useState<boolean>(false);
-  const router = useRouter();
-  const [isUploading, setIsUploading] = React.useState<boolean>(false);
+export type DialogSertifikatHandle = {
+  uploadPdf: () => Promise<void>;
+};
 
-  const uploadPdf = async () => {
-    setIsUploading(true);
-    const html2pdf = (await import("html2pdf.js")).default;
+type Props = {
+  userPelatihan: UserPelatihan;
+  pelatihan: PelatihanMasyarakat;
+  handleFetchingData?: () => void;
+};
 
-    if (!componentRef.current || !componentRefPage.current) {
-      console.error("Component reference is null");
-      setIsUploading(false);
-      return;
-    }
+const DialogSertifikatPelatihan = forwardRef<DialogSertifikatHandle, Props>(
+  ({ userPelatihan, pelatihan }, ref) => {
+    const componentRef = useRef<HTMLDivElement>(null);
+    const componentRefPage = useRef<HTMLDivElement>(null);
+    const html2pdfRef = useRef<any>(null);
+    // cache html2pdf
+    let html2pdfInstance: any = null;
 
-    const element = componentRef.current;
-    const elementPage = componentRefPage.current;
+    const uploadPdf = async () => {
+      if (!userPelatihan) return;
+      console.log("⬆️ Uploading PDF for:", userPelatihan.Nama);
 
-    // Calculate height dynamically
-    const firstPageHeight = elementPage.offsetHeight + 180; // Fixed first page height
-    const contentHeight = element.scrollHeight; // Total content height
-    const remainingHeight = contentHeight - firstPageHeight;
+      try {
+        if (!html2pdfInstance) {
+          html2pdfInstance = (await import("html2pdf.js")).default;
+        }
 
-    // If there's more content, dynamically adjust second page height
-    const dynamicPageHeight = remainingHeight > 0 ? remainingHeight + 50 : firstPageHeight;
+        if (!componentRef.current || !componentRefPage.current) {
+          console.error("❌ Component reference is null");
+          return;
+        }
 
-    const opt = {
-      margin: [0, 10, 10, 10],
-      filename: `${userPelatihan?.Nama}_${userPelatihan?.NoRegistrasi}.pdf`,
-      pagebreak: { mode: ["avoid-all", "css"] }, // Ensure proper page breaks
-      html2canvas: {
-        scale: 1.5,
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#fff",
-      },
-      jsPDF: {
-        unit: "px",
-        format: [element.offsetWidth, firstPageHeight], // First page height fixed
-        orientation: "landscape",
-      },
-    };
+        const element = componentRef.current;
+        const elementPage = componentRefPage.current;
 
-    html2pdf()
-      .from(element)
-      .set(opt)
-      .toPdf()
-      .outputPdf("blob")
-      .then(async (pdfBlob: Blob) => {
+        const { offsetWidth, scrollHeight } = element;
+        const firstPageHeight = elementPage.offsetHeight + 180;
+        const remainingHeight = scrollHeight - firstPageHeight;
+
+        const opt = {
+          margin: [0, 10, 10, 10],
+          filename: `${userPelatihan.Nama}_${userPelatihan.NoRegistrasi}.pdf`,
+          pagebreak: { mode: ["avoid-all", "css"] },
+          html2canvas: {
+            scale: 1.5,
+            useCORS: true,
+            logging: false,
+            backgroundColor: "#fff",
+          },
+          jsPDF: {
+            unit: "px",
+            format: [offsetWidth, firstPageHeight],
+            orientation: "landscape",
+          },
+        };
+
+        const pdfBlob: Blob = await html2pdfInstance()
+          .from(element)
+          .set(opt)
+          .toPdf()
+          .outputPdf("blob");
+
         const MAX_SIZE_MB = 3;
-        const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
-
-        if (pdfBlob.size > MAX_SIZE_BYTES) {
+        if (pdfBlob.size > MAX_SIZE_MB * 1024 * 1024) {
           Toast.fire({
             icon: "error",
             title: `Ukuran file terlalu besar! Maksimum ${MAX_SIZE_MB} MB.`,
           });
-          setIsUploading(false);
           return;
         }
 
         const formData = new FormData();
-        formData.append(
-          "IdUserPelatihan",
-          String(userPelatihan?.IdUserPelatihan ?? "")
-        );
+        formData.append("IdUserPelatihan", String(userPelatihan.IdUserPelatihan ?? ""));
         formData.append(
           "fileSertifikat",
           pdfBlob,
-          `${userPelatihan?.Nama}_${userPelatihan?.NoRegistrasi}.pdf`
+          `${userPelatihan.Nama}_${userPelatihan.NoRegistrasi}.pdf`
         );
 
-        try {
-          const response = await axios.post(
-            elautBaseUrl + "/lemdik/saveSertifikat",
-            formData,
-            {
-              headers: {
-                Authorization: `Bearer ${Cookies.get("XSRF091")}`,
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
+        await axios.post(elautBaseUrl + "/lemdik/saveSertifikat", formData, {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+          },
+        });
 
-          if (response.status === 200) {
-            Toast.fire({
-              icon: "success",
-              title: `Sertifikat sudah diupload ke server!`,
-            });
-            handleFetchingData();
-            router.refresh();
-          } else {
-            Toast.fire({
-              icon: "error",
-              title: `Sertifikat gagal diupload ke server!`,
-            });
-            console.error("Failed to upload the file");
-          }
-        } catch (error) {
-          Toast.fire({
-            icon: "error",
-            title: `Sertifikat gagal diupload ke server! Terdapat masalah di server!`,
-          });
-          console.error("Error uploading the file:", error);
-        }
-        setIsUploading(false);
-      });
-  };
+        console.log("✅ Upload selesai:", userPelatihan.Nama);
+      } catch (error) {
+        console.error("❌ Error uploading PDF:", error);
+      }
+    };
 
+    useImperativeHandle(ref, () => ({ uploadPdf }), []);
 
-  const handleUploadPDF = () => {
-    uploadPdf();
-  };
+    return (
+      <div className="max-h-[700px] scale-95 bg-white flex flex-col gap-2 overflow-y-auto scroll-smooth">
+        <SertifikatNonKepelautan
+          ref={componentRef}
+          refPage={componentRefPage}
+          pelatihan={pelatihan}
+          userPelatihan={userPelatihan}
+        />
+      </div>
+    );
+  }
+);
 
-  const [isPrinting, setIsPrinting] = React.useState<boolean>(false);
-  const [isSpesimen, setIsSpesimen] = React.useState<boolean>(false);
-
-  return (
-    <div>
-      <Dialog>
-        <DialogTrigger className="w-full" >
-          {children}
-        </DialogTrigger>
-
-        <DialogContent className="sm:max-w-[1425px] bg-none">
-
-          <DialogHeader>
-            <div className="flex gap-2 items-center">
-              <MdVerified className="text-3xl text-blue-500" />
-              <div className="flex flex-col">
-
-                <DialogDescription>
-                  Sertifikat Pelatihan {pelatihan?.NamaPelatihan}
-                </DialogDescription>
-              </div>
-            </div>
-          </DialogHeader>
-          <div className="max-h-[700px] scale-95  flex flex-col gap-2 overflow-y-auto scroll-smooth">
-            <SertifikatNonKepelautan
-              ref={componentRef}
-              refPage={componentRefPage}
-              pelatihan={pelatihan}
-              isSpesimen={isSpesimen}
-              userPelatihan={userPelatihan}
-              isPrinting={isPrinting}
-            />
-          </div>
-          {/* {userPelatihan != null && (
-            <DialogFooter>
-              {
-                userPelatihan!.FileSertifikat == "" && (
-                  <>
-                    {userPelatihan.StatusPenandatangan == 'Spesimen' && (
-                      <Button
-                        onClick={(e) => handleUploadPDF()}
-                        type="submit"
-                        disabled={isUploading}
-                        className="flex items-center gap-1"
-                      >
-                        {isUploading ? (
-                          <>Uploading...</>
-                        ) : (
-                          <>
-                            <TbCloudUpload />
-                            Generate PDF dan Ajukan Penerbitan
-                          </>
-                        )}
-                      </Button>
-                    )}
-                  </>
-                )}
-            </DialogFooter>
-          )} */}
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
+DialogSertifikatPelatihan.displayName = "DialogSertifikatPelatihan";
+export default DialogSertifikatPelatihan;
