@@ -26,8 +26,8 @@ import { FaSearch } from "react-icons/fa";
 import UserPelatihanTable from "./Tables/UserPelatihanTable";
 import { PassedParticipantAction } from "./Actions/Lemdiklat/PassedParticipantAction";
 import { countUserWithPassed } from "@/utils/counter";
-import TTDAction from "./Actions/Lemdiklat/TTDAction";
 import TTDeDetail from "./TTDeDetail";
+import { ESELON1, ESELON_1 } from "@/constants/nomenclatures";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -36,7 +36,6 @@ interface Props {
 
 const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
     const { label, color, icon } = getStatusInfo(data.StatusPenerbitan)
-    const [open, setOpen] = React.useState(false);
 
     return (
         <div className="w-full space-y-6 py-5">
@@ -161,12 +160,42 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     (Cookies.get('Access')?.includes('approveKapus') && data.StatusPenerbitan == "8") && <SendNoteAction
                                         idPelatihan={data.IdPelatihan.toString()}
                                         title="Approve Penerbitan"
-                                        description="Segera melakukan approval pengajuan penerbitan STTPL"
+                                        description={data?.TtdSertifikat == ESELON_1.fullName ? "Segera melakukan approval untuk diteruskan kepada Kepala BPPSDM KP" : "Segera melakukan approval pengajuan penerbitan STTPL"}
                                         buttonLabel="Approve Penerbitan"
                                         icon={TbPencilCheck}
                                         buttonColor="green"
                                         onSuccess={fetchData}
-                                        status={"10"}
+                                        status={data?.TtdSertifikat == ESELON_1.fullName ? "12" : "10"}
+                                        pelatihan={data}
+                                    />
+                                }
+
+                                {/* (12) Kabadan : Pending Kabadan for Reject */}
+                                {
+                                    (Cookies.get('Access')?.includes('approveKabadan') && data.StatusPenerbitan == "12") && <SendNoteAction
+                                        idPelatihan={data.IdPelatihan.toString()}
+                                        title="Reject Penerbitan"
+                                        description="Segera melakukan approval pengajuan penerbitan STTPL"
+                                        buttonLabel="Reject Penerbitan"
+                                        icon={TbPencilX}
+                                        buttonColor="rose"
+                                        onSuccess={fetchData}
+                                        status={"13"}
+                                        pelatihan={data}
+                                    />
+                                }
+
+                                {/* (12) Kabadan : Pending Kabadan for Approve */}
+                                {
+                                    (Cookies.get('Access')?.includes('approveKabadan') && data.StatusPenerbitan == "12") && <SendNoteAction
+                                        idPelatihan={data.IdPelatihan.toString()}
+                                        title="Approve Penerbitan"
+                                        description={data?.TtdSertifikat == ESELON_1.fullName ? "Segera melakukan approval untuk diteruskan kepada Kepala BPPSDM KP" : "Segera melakukan approval pengajuan penerbitan STTPL"}
+                                        buttonLabel="Approve Penerbitan"
+                                        icon={TbPencilCheck}
+                                        buttonColor="green"
+                                        onSuccess={fetchData}
+                                        status={"14"}
                                         pelatihan={data}
                                     />
                                 }
@@ -193,7 +222,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             <InfoItem label="Penandatangan" value={data?.TtdSertifikat} />
                                             <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
                                                 <span className="text-xs font-medium text-gray-500">Dokumen Penerbitan STTPL</span>
-                                                <Link target="_blank" href={`${urlFileSuratPemberitahuan}/${data?.SuratPemberitahuan}`} className="text-sm font-semibold text-gray-800 mt-1">
+                                                <Link target="_blank" href={`${urlFileBeritaAcara}/${data?.BeritaAcara}`} className="text-sm font-semibold text-gray-800 mt-1">
                                                     {urlFileBeritaAcara}/{data?.BeritaAcara != '' ? truncateText(data?.BeritaAcara, 10, '...') : "-"}
                                                 </Link>
                                             </div>
@@ -211,7 +240,13 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                     </div>
                 </div>
 
-                <TTDeDetail data={data} fetchData={fetchData} />
+                {
+                    Cookies.get('Role') == data?.TtdSertifikat && <>
+                        {(Cookies.get('Access')?.includes('isSigning') && (data?.StatusPenerbitan == "10" || data?.StatusPenerbitan == "14")) && <TTDeDetail data={data} fetchData={fetchData} />}
+                    </>
+                }
+
+
 
                 {!Cookies.get('Access')?.includes('isSigning') && <>
                     <AccordionSection title="📑 Format Sertifikat">
@@ -312,22 +347,13 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 <p className="font-medium text-gray-600 mb-2">
                                     Detail  :
                                 </p>
-                                {
-                                    data?.FotoPelatihan != "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" ?
-                                        <div className="flex flex-col gap-2 w-full">
-                                            <div className="grid grid-cols-2 gap-4 text-sm">
-                                                <InfoItem label="Kuota Peserta" value={data.KoutaPelatihan} />
-                                                <InfoItem label="Jumlah Peserta" value={data.UserPelatihan.length.toString()} />
-                                            </div>
-                                            <UserPelatihanTable pelatihan={data} data={data.UserPelatihan} onSuccess={fetchData} />
-                                        </div>
-                                        : <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">
-                                            <MdLock className='w-14 h-14 text-gray-600' />
-                                            <p className="text-gray-500 font-normal text-center">
-                                                Harap Mengedit Informasi Publish Terlebih Dahulu Untuk Menampilkan Informasi Pelatihan Pada Halaman Pencarian E-LAUT Untuk Masyarakat
-                                            </p>
-                                        </div>
-                                }
+                                <div className="flex flex-col gap-2 w-full">
+                                    <div className="grid grid-cols-2 gap-4 text-sm">
+                                        <InfoItem label="Kuota Peserta" value={data.KoutaPelatihan} />
+                                        <InfoItem label="Jumlah Peserta" value={data.UserPelatihan.length.toString()} />
+                                    </div>
+                                    <UserPelatihanTable pelatihan={data} data={data.UserPelatihan} onSuccess={fetchData} />
+                                </div>
                             </div>
                         </div>
                     </AccordionSection></>}

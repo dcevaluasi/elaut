@@ -85,103 +85,6 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
         }
     }, [isOpen, fetchAdminPusatData]);
 
-    const [loadingTanggalSertifikat, setLoadingTanggalSertifikat] = useState(false)
-    const handleTanggalSertifikatDataPesertaPelatihan = async () => {
-        const dataUserPelatihan = pelatihan?.UserPelatihan ?? []
-        setLoadingTanggalSertifikat(true)
-        try {
-
-            for (const user of dataUserPelatihan) {
-                const formData = new FormData()
-                formData.append("TanggalSertifikat", getDateInIndonesianFormat(tanggalSertifikat))
-
-                await axios.put(
-                    `${elautBaseUrl}/lemdik/updatePelatihanUsers?id=${user.IdUserPelatihan}`,
-                    formData,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
-                        },
-                    }
-                )
-            }
-
-            Toast.fire({
-                icon: "success",
-                title: "Yeayyy!",
-                text: `Berhasil menyematkan tanggal penandatanganan untuk ${dataUserPelatihan.length} sertifikat!`,
-            })
-
-            setLoadingTanggalSertifikat(false)
-            setTanggalSertifikat("")
-        } catch (error) {
-            Toast.fire({
-                icon: "error",
-                title: "Oopsss!",
-                text: `Gagal menyematkan tanggal penandatanganan untuk ${dataUserPelatihan.length} sertifikat!`,
-            })
-            setLoadingTanggalSertifikat(false)
-        }
-    }
-
-    const [passphrase, setPassphrase] = React.useState<string>("");
-    const [isSigning, setIsSigning] = React.useState<boolean>(false);
-    const handleTTDElektronik = async () => {
-        setIsSigning(true);
-        if (passphrase === "") {
-            Toast.fire({
-                icon: "error",
-                text: "Harap memasukkan passphrase untuk dapat melakukan penandatanganan file sertifikat!",
-                title: `Tidak ada passphrase`,
-            });
-            setPassphrase("");
-            setIsSigning(false);
-        } else {
-            try {
-                const response = await axios.post(
-                    elautBaseUrl + "/lemdik/sendSertifikatTtde",
-                    {
-                        idPelatihan: pelatihan?.IdPelatihan.toString(),
-                        kodeParafrase: passphrase,
-                        nik: Cookies.get('NIK'),
-                    },
-                    {
-                        headers: {
-                            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
-                        },
-                    }
-                );
-
-
-                console.log("TTDE", response);
-                console.log("File uploaded successfully");
-                Toast.fire({
-                    icon: "success",
-                    text: "Berhasil melakuukan penandatangan sertifikat secara elektronik!",
-                    title: `Berhasil TTDe`,
-                });
-                await handleSubmit()
-                setPassphrase("");
-
-                onSuccess()
-            } catch (error) {
-                console.error("Error uploading the file:", error);
-                setPassphrase("");
-                onSuccess()
-                setIsSigning(false);
-                if (error instanceof AxiosError)
-                    Toast.fire({
-                        icon: "error",
-                        text: "Internal server error",
-                        title: `Gagal TTDe`,
-                    });
-            }
-        }
-    };
-
-    const [isShowPassphrase, setIsShowPassphrase] = React.useState<boolean>(false);
-
-
     const handleSubmit = async () => {
         const formData = new FormData();
         formData.append("StatusPenerbitan", status);
@@ -349,7 +252,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                     </>
                 }
 
-                {!Cookies.get('Access')?.includes('approveKapus') && <div className="mb-2">
+                <div className="mb-2">
                     <label
                         className="block text-gray-800 text-sm font-medium mb-1"
                         htmlFor="email"
@@ -362,78 +265,11 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                         onChange={(e) => setMessage(e.target.value)}
                         disabled={loading}
                     />
-                </div>}
+                </div>
 
-                {(Cookies.get('Access')?.includes('approveKapus') && pelatihan.StatusPenerbitan == "10" && pelatihan.TtdSertifikat == Cookies.get("Role")) &&
-                    <div className="space-y-4">
-                        {/* Step 1: Pilih Tanggal */}
-                        {(countUserWithTanggalSertifikat(pelatihan!.UserPelatihan) == 0) ? (
-                            <div className="space-x-1 flex flex-col w-full">
-                                <div className="
-                                ">
-                                    <label className="text-sm font-medium text-gray-700">Tanggal Penandatangan</label>
-                                    <input
-                                        type="date"
-                                        className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
-                                        value={tanggalSertifikat}
-                                        onChange={(e) => {
-                                            setTanggalSertifikat(e.target.value)
-                                            setMessage("Telah ditandatangani")
-                                        }}
-                                    />
-                                </div>
-                                <button
-                                    onClick={handleTanggalSertifikatDataPesertaPelatihan}
-                                    className="mt-2 px-4 py-2 h-fit bg-gray-500 text-white rounded-md hover:bg-gray-600"
-                                >
-                                    {loadingTanggalSertifikat ? "Loading..." : "Simpan"}
-                                </button>
-                            </div>
-                        ) : <fieldset>
-                            <form autoComplete="off">
-                                <div className="flex flex-wrap -mx-3 mb-1 -mt-2">
-                                    <div className="w-full px-3">
-                                        <label className="block text-gray-800 text-sm font-medium mb-1">Passphrase</label>
-                                        <div className="flex gap-1">
-                                            <span className="relative w-full h-fit">
-                                                <input
-                                                    type={isShowPassphrase ? "text" : "password"}
-                                                    className="text-black h-10 text-base flex items-center cursor-pointer w-full border border-neutral-200 rounded-md px-2"
-                                                    required
-                                                    autoComplete="off"
-                                                    value={passphrase}
-                                                    onChange={(e) => setPassphrase(e.target.value)}
-                                                />
-                                                <span
-                                                    onClick={() => setIsShowPassphrase(!isShowPassphrase)}
-                                                    className="absolute right-2 top-2 cursor-pointer"
-                                                >
-                                                    {isShowPassphrase ? (
-                                                        <HiOutlineEyeOff className="text-gray-500 text-xl" />
-                                                    ) : (
-                                                        <HiOutlineEye className="text-gray-500 text-xl" />
-                                                    )}
-                                                </span>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </fieldset>}
-                    </div>
 
-                }
 
-                {(Cookies.get('Access')?.includes('approveKapus') && pelatihan.StatusPenerbitan == "10" && pelatihan.TtdSertifikat == Cookies.get("Role")) ? <AlertDialogFooter>
-                    <AlertDialogCancel disabled={loading}>Batal</AlertDialogCancel>
-                    <AlertDialogAction
-                        onClick={handleTTDElektronik}
-                        className={`bg-${buttonColor}-600 hover:bg-${buttonColor}-700 text-white`}
-                        disabled={isSigning || !message || !passphrase}
-                    >
-                        {isSigning ? "Menandatangan..." : "TTDe"}
-                    </AlertDialogAction>
-                </AlertDialogFooter> : <AlertDialogFooter>
+                <AlertDialogFooter>
                     <AlertDialogCancel disabled={loading}>Batal</AlertDialogCancel>
                     <AlertDialogAction
                         onClick={handleSubmit}
@@ -442,7 +278,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                     >
                         {loading ? "Memproses..." : "Kirim"}
                     </AlertDialogAction>
-                </AlertDialogFooter>}
+                </AlertDialogFooter>
 
             </AlertDialogContent>
         </AlertDialog >

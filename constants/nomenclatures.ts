@@ -29,7 +29,9 @@ export const ESELONS = {
     fullNameEselon: 'Pusat Pelatihan Kelautan dan Perikanan',
     currentPerson: 'Dr. Lilly Aprilya Pregiwati, S.Pi., M.Si',
   },
-}
+} as const
+
+export type EselonKey = keyof typeof ESELONS
 
 export const ESELON_1: ESELON = {
   abbrv: 'Kepala BPPSDM KP',

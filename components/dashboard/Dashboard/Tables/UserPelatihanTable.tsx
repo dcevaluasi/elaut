@@ -96,6 +96,38 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
         }
     };
 
+    const handleLulusValidPeserta = async (user: UserPelatihan) => {
+        try {
+            const formData = new FormData();
+            formData.append("Keterangan", user.Keterangan === 'Valid' ? 'Tidak Valid' : 'Valid');
+
+            await axios.put(
+                `${elautBaseUrl}/lemdik/updatePelatihanUsers?id=${user.IdUserPelatihan}`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+                    },
+                }
+            );
+
+            Toast.fire({
+                icon: "success",
+                title: 'Yeayyy!',
+                text: `Berhasil memvalidasi peserta pelatihan!`,
+            });
+            onSuccess()
+        } catch (error) {
+            console.error("ERROR UPDATE PELATIHAN:", error);
+            Toast.fire({
+                icon: "error",
+                title: 'Oopsss!',
+                text: `Gagal memvalidasi  peserta pelatihan!`,
+            });
+            onSuccess()
+        }
+    };
+
     const columns: ColumnDef<UserPelatihan>[] = [
         {
             accessorKey: "KodePelatihan",
@@ -115,6 +147,59 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                 <div className={`w-full text-center uppercase`}>{row.index + 1}</div>
             ),
         },
+        ...(parseInt(pelatihan.StatusPenerbitan) == 0
+            ? [
+                {
+                    accessorKey: "IsActice",
+                    header: ({ column }) => {
+                        return (
+                            <Button
+                                variant="ghost"
+                                className={`text-black font-semibold w-full p-0  text-center justify-center items-center flex`}
+                                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                            >
+                                <p className="leading-[105%]">Status <br /> Valid</p>
+                                <IoMdCheckmarkCircleOutline className="ml-2 h-4 w-4" />
+                            </Button>
+                        );
+                    },
+                    cell: ({ row }) => (
+                        <div className="capitalize w-full flex items-center justify-center">
+                            {
+                                row.original.Keterangan != "" && <label className="flex items-center gap-2 text-base font-semibold tracking-tight leading-none">
+                                    <label
+                                        htmlFor="keterangan"
+                                        className="flex items-center gap-2 cursor-pointer font-semibold  disabled:cursor-not-allowed justify-center"
+                                    >
+                                        <Checkbox
+                                            disabled={row.original.StatusPenandatangan === "Done"}
+                                            id="keterangan"
+                                            onCheckedChange={() => handleLulusValidPeserta(row.original)}
+                                            checked={
+                                                row.original.Keterangan === "Valid"
+                                            }
+                                            className="h-7 w-8 rounded-md border border-gray-300 bg-white shadow-sm
+             data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500 
+             transition-all duration-200 ease-in-out
+             hover:border-green-400 hover:shadow-md
+             focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-500 
+             disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
+                                        >
+                                            <Check className="h-4 w-4 text-white" />
+                                        </Checkbox>
+
+                                        {row.original.Keterangan}
+                                    </label>
+
+                                </label>
+                            }
+
+                        </div>
+
+                    ),
+                } as ColumnDef<UserPelatihan>,
+            ]
+            : []),
         {
             accessorKey: "IdPelatihan",
             header: ({ column }) => {
@@ -246,52 +331,54 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                 </div>
             ),
         },
-        {
-            accessorKey: "PreTest",
-            header: ({ column }) => {
-                return (
-                    <Button
-                        variant="ghost"
-                        className={`text-black font-semibold w-full p-0 flex justify-center items-center`}
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    >
-                        <p className="leading-[105%]"> PreTest</p>
+        ...(parseInt(pelatihan.StatusPenerbitan) >= 4 ? [
+            {
+                accessorKey: "PreTest",
+                header: ({ column }: { column: any }) => {
+                    return (
+                        <Button
+                            variant="ghost"
+                            className={`text-black font-semibold w-full p-0 flex justify-center items-center`}
+                            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        >
+                            <p className="leading-[105%]"> PreTest</p>
 
-                        <FaEdit className="ml-2 h-4 w-4" />
-                    </Button>
-                );
+                            <FaEdit className="ml-2 h-4 w-4" />
+                        </Button>
+                    );
+                },
+                cell: ({ row }: { row: any }) => (
+                    <div className={`${"ml-0"} text-center capitalize w-full`}>
+                        <p className="text-base font-semibold tracking-tight leading-none">
+                            {row.original.PreTest}
+                        </p>
+                    </div>
+                ),
             },
-            cell: ({ row }) => (
-                <div className={`${"ml-0"} text-center capitalize w-full`}>
-                    <p className="text-base font-semibold tracking-tight leading-none">
-                        {row.original.PreTest}
-                    </p>
-                </div>
-            ),
-        },
-        {
-            accessorKey: "PostTest",
-            header: ({ column }) => {
-                return (
-                    <Button
-                        variant="ghost"
-                        className={`text-black font-semibold w-full p-0 flex justify-center items-center`}
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    >
-                        <p className="leading-[105%]"> PostTest</p>
+            {
+                accessorKey: "PostTest",
+                header: ({ column }: { column: any }) => {
+                    return (
+                        <Button
+                            variant="ghost"
+                            className={`text-black font-semibold w-full p-0 flex justify-center items-center`}
+                            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        >
+                            <p className="leading-[105%]"> PostTest</p>
 
-                        <FaEdit className="ml-2 h-4 w-4" />
-                    </Button>
-                );
+                            <FaEdit className="ml-2 h-4 w-4" />
+                        </Button>
+                    );
+                },
+                cell: ({ row }: { row: any }) => (
+                    <div className={`${"ml-0"} text-center capitalize w-full`}>
+                        <p className="text-base font-semibold tracking-tight leading-none">
+                            {row.original.PostTest}
+                        </p>
+                    </div>
+                ),
             },
-            cell: ({ row }) => (
-                <div className={`${"ml-0"} text-center capitalize w-full`}>
-                    <p className="text-base font-semibold tracking-tight leading-none">
-                        {row.original.PostTest}
-                    </p>
-                </div>
-            ),
-        },
+        ] : []),
         ...(parseInt(pelatihan.StatusPenerbitan) >= 5
             ? [
                 {

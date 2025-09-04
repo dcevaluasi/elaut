@@ -286,3 +286,14 @@ export function isToday(dateString: string): boolean {
     inputDate.getDate() === today.getDate()
   )
 }
+
+export function isMoreThanToday(dateString: string): boolean {
+  const inputDate = new Date(dateString)
+  const today = new Date()
+
+  // reset jam ke 00:00:00 supaya bandingannya hanya tanggal
+  today.setHours(0, 0, 0, 0)
+  inputDate.setHours(0, 0, 0, 0)
+
+  return inputDate < today
+}

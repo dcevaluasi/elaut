@@ -57,7 +57,7 @@ const ManagePelatihan = () => {
                                 <TabsTrigger
                                     value="2"
                                     onClick={() => setActiveTab("2")}
-                                    disabled={parseInt(dataPelatihan?.StatusPenerbitan) < 5}
+                                    disabled={parseInt(dataPelatihan?.StatusPenerbitan) < 5 || dataPelatihan?.StatusPenerbitan == ""}
                                 >
                                     2. Penerbitan STTPL
                                 </TabsTrigger>

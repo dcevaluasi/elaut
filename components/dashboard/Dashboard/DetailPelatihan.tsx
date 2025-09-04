@@ -21,12 +21,10 @@ import {
   generateInstrukturName,
 } from "@/lib/utils";
 import CloseButton from "./Actions/CloseButton";
-import GenerateNoSertifikatButton from "./Actions/GenerateNoSertifikatButton";
 
 import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
-import NoSertifikatButton from "./Actions/NoSertifikatButton";
 import HistoryButton from "./Actions/HistoryButton";
-import TTDSertifikat from "./pelatihan/TTDSertifikat";
+
 import { Button } from "@/components/ui/button";
 import { MateriButton, PublishButton } from "./Actions";
 import { ESELON_1, ESELON_2 } from "@/constants/nomenclatures";
@@ -172,20 +170,7 @@ function DetailPelatihan() {
 
                       {
                         isOperatorPusatPelatihan || isOperatorBalaiPelatihan ? <>
-                          <GenerateNoSertifikatButton
-                            idPelatihan={pelatihan!.IdPelatihan.toString()}
-                            pelatihan={pelatihan!}
-                            handleFetchingData={
-                              handleFetchDetailPelatihan
-                            }
-                          />
-                          <NoSertifikatButton
-                            idPelatihan={pelatihan!.IdPelatihan.toString()}
-                            pelatihan={pelatihan!}
-                            handleFetchingData={
-                              handleFetchDetailPelatihan
-                            }
-                          />
+
                           {new Date() >= new Date(pelatihan!.TanggalMulaiPelatihan) && (
                             <CloseButton
                               pelatihan={pelatihan!}
@@ -266,23 +251,10 @@ function DetailPelatihan() {
 
 
 
-                          <GenerateNoSertifikatButton
-                            idPelatihan={pelatihan!.IdPelatihan.toString()}
-                            pelatihan={pelatihan!}
-                            handleFetchingData={
-                              handleFetchDetailPelatihan
-                            }
-                          />
                         </>
                       }
 
-                      {
-                        pelatihan!.PemberitahuanDiterima === 'Pengajuan Telah Dikirim ke Ka BPPSDM KP' && isEselonI && <TTDSertifikat dataPelatihan={pelatihan!} handleFetchData={handleFetchDetailPelatihan} />
-                      }
 
-                      {
-                        pelatihan!.PemberitahuanDiterima === 'Pengajuan Telah Dikirim ke Kapuslat KP' && isEselonII && <TTDSertifikat dataPelatihan={pelatihan!} handleFetchData={handleFetchDetailPelatihan} />
-                      }
 
                     </>
                   </td>

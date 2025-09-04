@@ -4,7 +4,6 @@ import React, { useRef } from "react";
 import { PelatihanMasyarakat, UserPelatihan } from "@/types/product";
 import Cookies from "js-cookie";
 import { TbCalendar, TbPencilCheck } from "react-icons/tb";
-import TTDAction from "./Actions/Lemdiklat/TTDAction";
 import { Button } from "@/components/ui/button";
 import DialogSertifikatPelatihan, { DialogSertifikatHandle } from "@/components/sertifikat/dialogSertifikatPelatihan";
 import { elautBaseUrl } from "@/constants/urls";
@@ -43,8 +42,6 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
     const [isShowPassphrase, setIsShowPassphrase] = React.useState(false);
     const [isSigning, setIsSigning] = React.useState(false);
     const [statusTanggalSertifikat, setStatusTanggalSertifikat] = React.useState(false)
-
-
 
     const [progress, setProgress] = React.useState<number>(0);
     const [counter, setCounter] = React.useState<number>(0);
@@ -313,7 +310,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                         </AlertDialog>
 
                         {
-                            data?.StatusPenerbitan == "10" && <Button
+                            (Cookies.get('Role') == data?.TtdSertifikat && (data?.StatusPenerbitan == "10" || data?.StatusPenerbitan == "14")) && <Button
                                 onClick={() => {
                                     setOpen(!open);
                                     if (countUserWithDrafCertificate(data?.UserPelatihan) == 0) {
@@ -351,15 +348,14 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             </Link>}
                                     </div>
 
-                                    {
-                                        !item.FileSertifikat?.includes('signed') && <DialogSertifikatPelatihan
-                                            key={item.IdUserPelatihan ?? i}
-                                            ref={refs.current[i]}                 // ✅ pass the ref object directly
-                                            pelatihan={data}
-                                            userPelatihan={item}
-                                            handleFetchingData={fetchData}
-                                        />
-                                    }
+                                    <DialogSertifikatPelatihan
+                                        key={item.IdUserPelatihan ?? i}
+                                        ref={refs.current[i]}                 // ✅ pass the ref object directly
+                                        pelatihan={data}
+                                        userPelatihan={item}
+                                        handleFetchingData={fetchData}
+                                    />
+
                                 </>
                             ))}
                         </div>

@@ -23,7 +23,6 @@ import {
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Cookies from "js-cookie";
-import TTDSertifikat from "../../Dashboard/pelatihan/TTDSertifikat";
 import { IoSend } from "react-icons/io5";
 import { HiUserGroup } from "react-icons/hi2";
 import { elautBaseUrl } from "@/constants/urls";
@@ -145,9 +144,7 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                     {/* Action Buttons */}
                                     <td className="px-4 py-3 border border-gray-200">
                                         <div className=" flex flex-col gap-2 justify-center items-center h-full">
-                                            {(Cookies.get('Access')?.includes('isSigning') && pelatihan!.PemberitahuanDiterima.includes('Pengajuan Telah Dikirim ke Ka')) &&
-                                                <TTDSertifikat dataPelatihan={pelatihan!} handleFetchData={fetchDataPelatihanMasyarakat} />
-                                            }
+
 
 
                                             {

@@ -11,7 +11,6 @@ import axios from "axios";
 import { UserPelatihan } from "@/types/product";
 import { generateTanggalPelatihan } from "@/utils/text";
 import { decryptValue, formatToRupiah } from "@/lib/utils";
-import DefaultLayout from "@/components/dashboard/Layouts/DefaultLayout";
 import { User } from "@/types/user";
 import ValidasiPesertaButton from "@/components/dashboard/Dashboard/Actions/VerifikasiPesertaAction";
 import LayoutAdminElaut from "@/components/dashboard/Layouts/LayoutAdminElaut";

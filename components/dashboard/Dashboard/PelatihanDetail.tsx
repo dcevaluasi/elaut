@@ -26,9 +26,11 @@ import UploadSuratButton from "./Actions/UploadSuratButton";
 import { urlFileSuratPemberitahuan } from "@/constants/urls";
 import SendNoteAction from "./Actions/Lemdiklat/SendNoteAction";
 import { TbCheck, TbClock, TbCursorOff, TbPencilCheck, TbPencilCog, TbPencilX, TbSend } from "react-icons/tb";
-import { isToday } from "@/utils/time";
+import { isMoreThanToday, isToday } from "@/utils/time";
 import HistoryButton from "./Actions/HistoryButton";
 import { LuSignature } from "react-icons/lu";
+import { ValidateParticipantAction } from "./Actions/Lemdiklat/ValidateParticipantAction";
+import { countValidKeterangan } from "@/utils/counter";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -99,7 +101,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
 
                                             {/* (4) Operator : Close Pelatihan */}
                                             {
-                                                (data.StatusPenerbitan == "4" && isToday(data.TanggalBerakhirPelatihan)) &&
+                                                (data.StatusPenerbitan == "4" && isMoreThanToday(data.TanggalBerakhirPelatihan)) &&
                                                 <SendNoteAction
                                                     idPelatihan={data.IdPelatihan.toString()}
                                                     title="Tutup Pelatihan"
@@ -369,28 +371,23 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     />
                                 }
 
+                                {
+                                    (countValidKeterangan(data?.UserPelatihan) == 0 || countValidKeterangan(data?.UserPelatihan) < data?.UserPelatihan.length) && <ValidateParticipantAction data={data?.UserPelatihan} onSuccess={fetchData} />
+                                }
+
                             </div>
 
                             <div className="w-full ">
                                 <p className="font-medium text-gray-600 mb-2">
                                     Detail  :
                                 </p>
-                                {
-                                    data?.FotoPelatihan != "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" ?
-                                        <div className="flex flex-col gap-2 w-full">
-                                            <div className="grid grid-cols-2 gap-4 text-sm">
-                                                <InfoItem label="Kuota Peserta" value={data.KoutaPelatihan} />
-                                                <InfoItem label="Jumlah Peserta" value={data.UserPelatihan.length.toString()} />
-                                            </div>
-                                            <UserPelatihanTable pelatihan={data} data={data.UserPelatihan} onSuccess={fetchData} />
-                                        </div>
-                                        : <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">
-                                            <MdLock className='w-14 h-14 text-gray-600' />
-                                            <p className="text-gray-500 font-normal text-center">
-                                                Harap Mengedit Informasi Publish Terlebih Dahulu Untuk Menampilkan Informasi Pelatihan Pada Halaman Pencarian E-LAUT Untuk Masyarakat
-                                            </p>
-                                        </div>
-                                }
+                                <div className="flex flex-col gap-2 w-full">
+                                    <div className="grid grid-cols-2 gap-4 text-sm">
+                                        <InfoItem label="Kuota Peserta" value={data.KoutaPelatihan} />
+                                        <InfoItem label="Jumlah Peserta" value={data.UserPelatihan.length.toString()} />
+                                    </div>
+                                    <UserPelatihanTable pelatihan={data} data={data.UserPelatihan} onSuccess={fetchData} />
+                                </div>
                             </div>
                         </div>
                     </AccordionSection>

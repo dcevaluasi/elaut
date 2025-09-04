@@ -1,17 +1,15 @@
 "use client";
 
-import React, { useState, useRef, useEffect, ReactElement } from "react";
+import React, { useRef } from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { FiMaximize, FiMinimize, FiSearch, FiSlack } from "react-icons/fi";
+import { FiMaximize, FiMinimize, FiSearch } from "react-icons/fi";
 import { Input } from "./ui/input";
-import BPPPTrainings from "./bppp-trainings";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
-  addFiveYears,
   extractPathAfterBppp,
   getPenyeleggara,
 } from "@/utils/pelatihan";
@@ -21,22 +19,11 @@ import {
   PelatihanMasyarakat,
 } from "@/types/product";
 import axios, { AxiosResponse } from "axios";
-import { IoIosInformationCircle, IoMdCloseCircle } from "react-icons/io";
-import { User, UserPelatihan } from "@/types/user";
-import { RiVerifiedBadgeFill } from "react-icons/ri";
 import Cookies from "js-cookie";
-import TableDataPelatihan from "./dashboard/Pelatihan/TableDataPelatihan";
-import TableDataPelatihanUser from "./dashboard/Pelatihan/TableDataPelatihanUser";
-import { InfoCircledIcon } from "@radix-ui/react-icons";
-import { createSlug, truncateText } from "@/utils";
-import { Pelatihan } from "@/types/pelatihan";
-import Logo from "./ui/logo";
-import Toast from "./toast";
+import { truncateText } from "@/utils";
 import { generateTanggalPelatihan } from "@/utils/text";
 import { elautBaseUrl } from "@/constants/urls";
 import Image from "next/image";
-import { PiQuestionFill } from "react-icons/pi";
-import { TimelineProgressPesertaPelatihan } from "./dashboard/Dashboard/TimelineProgressPesertaPelatihan";
 import { TimelineProgressManningAgent } from "./dashboard/Dashboard/TimelineProgressManningAgent";
 
 function ManningAgentTrainingService({
@@ -185,10 +172,10 @@ function ManningAgentTrainingService({
                 >
                   <div
                     className={`gap-2  ${indexPelatihanSelected != 100000000
-                        ? isExpand
-                          ? "hidden"
-                          : "w-5/12 flex flex-col "
-                        : "w-full flex flex-col "
+                      ? isExpand
+                        ? "hidden"
+                        : "w-5/12 flex flex-col "
+                      : "w-full flex flex-col "
                       }`}
                   >
                     <div className="relative w-full flex items-center border-gray-300 border px-2 rounded-xl">
@@ -636,8 +623,8 @@ function ManningAgentTrainingService({
                                 {[1, 2, 3, 4, 5, 6].map((pelatihan, index) => (
                                   <Link
                                     href={`/dashboard/pelatihan/online/${manningAgent!.ManingAgentPelatihan[
-                                        indexPelatihanSelected
-                                      ]!.IdPelatihan
+                                      indexPelatihanSelected
+                                    ]!.IdPelatihan
                                       }`}
                                     className="flex shadow-custom w-full rounded-md p-5 cursor-pointer flex-col gap-1 hover:scale-105 duration-700 hover:bg-blue-500 hover:text-white group"
                                   >

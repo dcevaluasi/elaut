@@ -104,6 +104,7 @@ export function getStatusInfo(
 ): { label: string; color: string; icon: JSX.Element } {
   switch (status) {
     case "0":
+    case "":
       return {
         label: "Draft",
         color: "bg-gray-500 text-white",
@@ -122,6 +123,11 @@ export function getStatusInfo(
         icon: <RiTimeLine className="w-4 h-4" />,
       };
     case "2":
+      return {
+        label: "Pending Verifikator",
+        color: "bg-amber-500 text-white",
+        icon: <RiTimeLine className="w-4 h-4" />,
+      };
     case "3":
       return {
         label: "Reject Verifikator",
@@ -131,12 +137,6 @@ export function getStatusInfo(
     case "4":
       return {
         label: "Approved Pelaksanaan",
-        color: "bg-green-500 text-white",
-        icon: <RiCheckboxCircleFill className="w-4 h-4" />,
-      };
-    case "17":
-      return {
-        label: "Signed",
         color: "bg-green-500 text-white",
         icon: <RiCheckboxCircleFill className="w-4 h-4" />,
       };
@@ -150,7 +150,7 @@ export function getStatusInfo(
       return {
         label: "Pending STTPL Verifikator",
         color: "bg-primary text-white",
-        icon: <RiLockFill className="w-4 h-4" />,
+        icon: <RiTimeLine className="w-4 h-4" />,
       };
     case "7":
       return {
@@ -195,6 +195,12 @@ export function getStatusInfo(
         icon: <RiCloseCircleFill className="w-4 h-4" />,
       };
     case "14":
+      return {
+        label: "Approved Kabadan",
+        color: "bg-green-500 text-white",
+        icon: <RiCheckboxCircleFill className="w-4 h-4" />,
+      };
+    case "15":
       return {
         label: "Signed Kabadan",
         color: "bg-green-500 text-white",
