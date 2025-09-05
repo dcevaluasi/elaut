@@ -242,7 +242,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
 
                 {
                     Cookies.get('Role') == data?.TtdSertifikat && <>
-                        {(Cookies.get('Access')?.includes('isSigning') && (data?.StatusPenerbitan == "10" || data?.StatusPenerbitan == "14")) && <TTDeDetail data={data} fetchData={fetchData} />}
+                        {Cookies.get('Access')?.includes('isSigning') && parseInt(data?.StatusPenerbitan) >= 10 && <TTDeDetail data={data} fetchData={fetchData} />}
                     </>
                 }
 
