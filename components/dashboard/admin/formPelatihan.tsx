@@ -46,7 +46,6 @@ import addData from "@/firebase/firestore/addData";
 import { generateTimestamp } from "@/utils/time";
 import { ESELON_1, ESELON_2, ESELON_3, UPT } from "@/constants/nomenclatures";
 
-type Checked = DropdownMenuCheckboxItemProps["checked"];
 
 function FormPelatihan({ edit = false }: { edit: boolean }) {
   const typeRole = Cookies.get('XSRF093')
@@ -55,25 +54,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
 
   const token = Cookies.get("XSRF091");
 
-  const [lemdikData, setLemdikData] =
-    React.useState<LemdiklatDetailInfo | null>(null);
-
-  const handleFetchInformationLemdiklat = async () => {
-    try {
-      const response = await axios.get(`${baseUrl}/lemdik/getLemdik`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setLemdikData(response.data);
-    } catch (error) {
-      console.error("LEMDIK INFO: ", error);
-    }
-  };
-
   const pathname = usePathname();
-  const id = extractLastSegment(pathname);
-
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -82,13 +63,11 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
     });
   };
 
-  const [isInputError, setIsInputError] = React.useState(false);
-
-  const editorRef = useRef(null);
 
   /*
     state variables for posting & updating public training data
   */
+  const penyelenggara = Cookies.get('Satker')
   const [idLemdik, setIdLemdik] = React.useState("");
   const [kodePelatihan, setKodePelatihan] = React.useState(
     generateRandomString()
@@ -96,7 +75,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
   const [namaPelatihan, setNamaPelatihan] = React.useState("");
   const [namaPelatihanInggris, setNamaPelatihanInggris] = React.useState("");
   const [penyelenggaraPelatihan, setPenyelenggaraPelatihan] = React.useState(
-    lemdikData?.data?.NamaLemdik
+    penyelenggara
   );
   const [detailPelatihan, setDetailPelatihan] = React.useState("");
   const [jenisPelatihan, setJenisPelatihan] = React.useState("");
@@ -164,41 +143,6 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
 
   const [isUploading, setIsUploading] = React.useState<boolean>(false);
 
-  const [detailPelatihanById, setDetailPelatihanById] =
-    React.useState<PelatihanMasyarakat | null>(null);
-  const [fotoPelatihanOld, setFotoPelatihanOld] = React.useState<string>("");
-  const handleFetchingPelatihanById = async () => {
-    try {
-      const response = await axios.get(
-        `${baseUrl}/getPelatihanUser?idPelatihan=${id}`
-      );
-      setDetailPelatihanById(response.data);
-      setNamaPelatihan(response.data.NamaPelatihan);
-      setTanggalMulaiPelatihan(response.data.TanggalMulaiPelatihan);
-      setTanggalBerakhirPelatihan(response.data.TanggalBerakhirPelatihan);
-      setPenyelenggaraPelatihan(response.data.PenyelenggaraPelatihan);
-      setJenisPelatihan(response.data.JenisPelatihan);
-      setLokasiPelatihan(response.data.LokasiPelatihan);
-      setPelaksanaanPelatihan(response.data.PelaksanaanPelatihan);
-      setBidangPelatihan(response.data.BidangPelatihan);
-      setDukunganProgramTerobosan(response.data.DukunganProgramTerobosan);
-      setHargaPelatihan(response.data.HargaPelatihan);
-      setDetailPelatihan(response.data.DetailPelatihan);
-      setFotoPelatihanOld(response.data.FotoPelatihan);
-      setAsalPelatihan(response.data.AsalPelatihan);
-      setKuotaPelatihan(response.data.KoutaPelatihan);
-      console.log("PELATIHANN BY ID: ", response);
-    } catch (error) {
-      console.error("ERROR PELATIHAN BY ID: ", error);
-    }
-  };
-
-  console.log("PELATIHAN DETAI BY ID STATE: ", detailPelatihanById);
-  console.log(lemdikData?.data?.NamaLemdik);
-  /*
-    method for processing posting data public traning (POST)
-  */
-
   const handleAddHistoryPelatihan = async () => {
     try {
       const { result, error } = await addData('historical-training-notes', kodePelatihan, {
@@ -208,7 +152,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
             id: kodePelatihan,
             notes: `Telah membuka kelas pelatihan ${namaPelatihan}`,
             role: Cookies.get('Eselon'),
-            upt: Cookies.get('Satker')
+            upt: `${Cookies.get("Nama")} - ${Cookies.get("Satker")}`
           }
         ],
         status: 'On Progress'
@@ -272,8 +216,6 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
           },
         }
       );
-      console.log({ data });
-      console.log("Training data posted successfully:", response.data);
       Toast.fire({
         icon: "success",
         title: `Yeayyy!`,
@@ -299,7 +241,6 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
 
   const handleNext = () => {
     if (indexFormTab == 0 && isOperatorBalaiPelatihan) {
-      console.log({ fotoPelatihan });
       if (
         namaPelatihan == "" ||
         jenisPelatihan == "" ||
@@ -319,7 +260,6 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
           title: "Ups!",
           text: "Inputan belum terisi. Pastikan semua data terisi terlebih dahulu!",
         });
-        console.log({ fotoPelatihan });
         window.scrollTo({
           top: 0,
           behavior: "smooth",
@@ -352,11 +292,6 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
     }
   };
 
-  const handleFileChange = (e: any) => {
-    setFotoPelatihan(e.target.files[0]);
-  };
-
-  const [formTab, setFormTab] = React.useState("FormDataPelatihan");
   const [indexFormTab, setIndexFormTab] = React.useState(0);
 
   type Sarpras = {
@@ -384,7 +319,6 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
           },
         }
       );
-      console.log({ response });
       setSarpras(response.data.data);
     } catch (error) {
       console.error("Error fetching data sarpras:", error);
@@ -402,7 +336,6 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
           },
         }
       );
-      console.log({ response });
       setKonsumsi(response.data.data);
     } catch (error) {
       console.error("Error fetching data konsumsi:", error);
@@ -410,15 +343,9 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
     }
   };
 
-  console.log({ konsumsi });
-
   React.useEffect(() => {
     handleFetchingSarprasData();
     handleFetchingKonsumsiData();
-    handleFetchInformationLemdiklat();
-    if (edit) {
-      handleFetchingPelatihanById();
-    }
   }, []);
 
   const [prosesPendaftaran, setProsesPendaftaran] = React.useState(false);
@@ -1188,41 +1115,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                         </Select>
                       </div>
 
-                      {
-                        isOperatorBalaiPelatihan && <> <p className="text-base flex gap-2 border-b border-b-gray-300 pb-2 mb-2 items-center text-gray-900 font-semibold max-w-md mt-5">
-                          <FiFileText /> <span>Deskripsi Pelatihan</span>
-                        </p>
 
-                          <div className="flex flex-wrap -mx-3 mb-1">
-                            <div className="w-full px-3">
-                              <label
-                                className="block text-gray-800 text-sm font-medium mb-1"
-                                htmlFor="detailPelatithan"
-                              >
-                                Deksripsi dan Detail Pelatihan{" "}
-                                <span className="text-red-600">*</span>
-                              </label>
-                              <Editor
-                                apiKey={process.env.NEXT_PUBLIC_TINY_MCE_KEY}
-                                value={detailPelatihan}
-                                onEditorChange={(content: string, editor: any) =>
-                                  setDetailPelatihan(content)
-                                }
-                                init={{
-                                  height: 500,
-                                  menubar: false,
-                                  plugins:
-                                    "anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount linkchecker",
-                                  toolbar:
-                                    "undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat",
-                                  content_style:
-                                    "body { font-family:Plus Jakarta Sans,Arial,sans-serif; font-size:14px }",
-                                }}
-                              />
-                            </div>
-                          </div>
-                        </>
-                      }
                     </div>
                   </>
                 )}

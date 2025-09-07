@@ -18,6 +18,7 @@ import { TbDatabaseEdit, TbSignature } from "react-icons/tb";
 import Link from "next/link";
 import { breakdownStatus } from "@/lib/utils";
 import { generatedSignedCertificate } from "@/utils/certificates";
+import { generatedDetailInfoLemdiklat } from "@/utils/lemdiklat";
 
 export default function LayoutAdminElaut({
   children,
@@ -41,17 +42,12 @@ export default function LayoutAdminElaut({
       setPusatData(data);
       Cookies.set("NIK", data.data.Nip);
       Cookies.set("Status", data.data.Status);
+      Cookies.set("Nama", data.data.Nama);
       Cookies.set("Satker", generatedSignedCertificate(data.data.NoTelpon).status_indo);
       Cookies.set("PimpinanLemdiklat", data.data.NoTelpon);
       Cookies.set("Role", breakdownStatus(data.data.Status)[0]);
       Cookies.set("Access", breakdownStatus(data.data.Status)[1]);
-      Cookies.set(
-        "XSRF095",
-        data.data.Status.includes("Kepala") || data.data.Status.includes("Supervisor")
-          ? "true"
-          : "false"
-      );
-      Cookies.set("XSRF097", data.data.Email); // EMAIL
+
 
     } catch (error) {
       console.error(error);
@@ -65,10 +61,9 @@ export default function LayoutAdminElaut({
         headers: { Authorization: `Bearer ${Cookies.get("XSRF091")}` },
       });
       setLemdikData(data);
-      console.log(data)
       Cookies.set("IDLemdik", data.data.IdLemdik);
-      Cookies.set("Satker", data.data.NamaLemdik);
-      Cookies.set("XSRF097", data.data.Email); // EMAIL
+      Cookies.set("Satker", generatedDetailInfoLemdiklat(data.data.NamaLemdik!).lemdiklat);
+      Cookies.set("Nama", generatedDetailInfoLemdiklat(data.data.NamaLemdik!).name);
       Cookies.set("Role", breakdownStatus(data.data.Deskripsi)[0]);
       Cookies.set("Eselon", breakdownStatus(data.data.Deskripsi)[0]);
       Cookies.set("Access", breakdownStatus(data.data.Deskripsi)[1]);
@@ -87,7 +82,6 @@ export default function LayoutAdminElaut({
       "XSRF091",
       "XSRF092",
       "XSRF093",
-      "XSRF095",
       "Satker",
       "IDLemdik",
       "Eselon",
@@ -95,6 +89,8 @@ export default function LayoutAdminElaut({
       "Jabatan",
       "Access",
       "NIK",
+      "Nama",
+      "Role",
       "PimpinanLemdiklat"
     ].forEach((key) => Cookies.remove(key));
 

@@ -99,7 +99,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                 pelatihan,
                 message,
                 Cookies.get("Role"),
-                Cookies.get("Satker")
+                `${Cookies.get("Nama")} - ${Cookies.get("Satker")}`
             );
 
             Toast.fire({
