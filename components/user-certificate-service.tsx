@@ -43,7 +43,6 @@ import { TbGenderBigender, TbSchool } from "react-icons/tb";
 import { BiDonateBlood } from "react-icons/bi";
 import Cookies from "js-cookie";
 import TableDataPelatihan from "./dashboard/Pelatihan/TableDataPelatihan";
-import TableDataPelatihanUser from "./dashboard/Pelatihan/TableDataPelatihanUser";
 
 export default function UserCertificateService({
   user,
