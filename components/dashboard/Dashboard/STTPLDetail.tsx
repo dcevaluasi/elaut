@@ -482,6 +482,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     {countUserWithCertificate(data.UserPelatihan) == data.UserPelatihan.length && <Button
                                         onClick={handleDownloadZip}
                                         disabled={isZipping}
+                                        variant="outline"
                                         className={`flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-indigo-500 text-indigo-500 hover:text-white hover:bg-indigo-500`}
                                     >
                                         <FaRegFolderOpen className="h-4 w-4" />
