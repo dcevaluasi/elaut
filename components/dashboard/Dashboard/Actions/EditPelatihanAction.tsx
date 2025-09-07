@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/select";
 import { PelatihanMasyarakat } from "@/types/product";
 import { AKP_CERTIFICATIONS, AQUACULTURE_CERTIFICATIONS, OCEAN_CERTIFICATIONS } from "@/constants/serkom";
-import { UPT } from "@/constants/nomenclatures";
+import { ESELON_1, ESELON_2, ESELON_3, UPT } from "@/constants/nomenclatures";
 
 interface EditPelatihanActionProps {
     idPelatihan: string;
