@@ -69,15 +69,12 @@ const HistoryButton: React.FC<HistoryButtonProps> = ({ pelatihan }) => {
                       >
                         <div className="flex justify-between items-center text-sm text-gray-500 mb-2">
                           <span className="font-medium">
-                            {isLatest ? "Catatan Terbaru" : `Catatan ${arr.length - index}`}
+                            {item.role} {isLatest ? "- Terbaru" : ``}
                           </span>
                           <span className="text-xs">{item.created_at}</span>
                         </div>
                         <p>
                           <span className="font-semibold">Catatan:</span> {item.notes}
-                        </p>
-                        <p>
-                          <span className="font-semibold">Role:</span> {item.role}
                         </p>
                         <p>
                           <span className="font-semibold">Satuan Kerja:</span> {item.upt}

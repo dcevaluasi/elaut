@@ -255,6 +255,12 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 <InfoItem label="Harga" value={`Rp ${data.HargaPelatihan.toLocaleString()}`} />
                                 <InfoItem label="Pelaksanaan" value={data.PelaksanaanPelatihan} />
                             </SectionGrid>
+                            <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border mt-4 border-gray-100">
+                                <span className="text-xs font-medium text-gray-500">Penandatangan Sertifikat</span>
+                                <p className="text-sm font-semibold text-gray-800 mt-1">
+                                    {data?.TtdSertifikat}
+                                </p>
+                            </div>
                             {parseInt(data?.StatusPenerbitan) >= 5 && <>
                                 <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border mt-4 border-gray-100">
                                     <span className="text-xs font-medium text-gray-500">Surat Pemberitahuan</span>

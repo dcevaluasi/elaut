@@ -47,7 +47,6 @@ import { Checkbox } from "@radix-ui/react-checkbox";
 import Cookies from "js-cookie";
 import Toast from "@/components/toast";
 import { generatedStatusCertificate } from "@/utils/certificates";
-import { FiUploadCloud } from "react-icons/fi";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 
 interface UserPelatihanTableProps {
@@ -147,6 +146,59 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                 <div className={`w-full text-center uppercase`}>{row.index + 1}</div>
             ),
         },
+        ...(parseInt(pelatihan.StatusPenerbitan) >= 5
+            ? [
+                {
+                    accessorKey: "IsActice",
+                    header: ({ column }) => {
+                        return (
+                            <Button
+                                variant="ghost"
+                                className={`text-black font-semibold w-full p-0  text-center justify-center items-center flex`}
+                                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                            >
+                                <p className="leading-[105%]">Status <br /> Kelulusan</p>
+                                <IoMdCheckmarkCircleOutline className="ml-2 h-4 w-4" />
+                            </Button>
+                        );
+                    },
+                    cell: ({ row }) => (
+                        <div className="capitalize w-full flex items-center justify-center">
+                            {
+                                row.original.IsActice != "" && <label className="flex items-center gap-2 text-base font-semibold tracking-tight leading-none">
+                                    <label
+                                        htmlFor="isActice"
+                                        className="flex items-center gap-2 cursor-pointer font-semibold  disabled:cursor-not-allowed justify-center"
+                                    >
+                                        <Checkbox
+                                            disabled={row.original.StatusPenandatangan === "Done"}
+                                            id="isActice"
+                                            onCheckedChange={() => handleLulusDataPeserta(row.original)}
+                                            checked={
+                                                row.original.IsActice !== "{PESERTA}{TELAH MENGIKUTI}{Has Attended}"
+                                            }
+                                            className="h-6 w-8 rounded-md border border-gray-300 bg-white shadow-sm
+             data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500 
+             transition-all duration-200 ease-in-out
+             hover:border-blue-400 hover:shadow-md
+             focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 
+             disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
+                                        >
+                                            <Check className="h-4 w-4 text-white" />
+                                        </Checkbox>
+
+                                        {generatedStatusCertificate(row.original.IsActice).status_indo}
+                                    </label>
+
+                                </label>
+                            }
+
+                        </div>
+
+                    ),
+                } as ColumnDef<UserPelatihan>,
+            ]
+            : []),
         ...(parseInt(pelatihan.StatusPenerbitan) == 0
             ? [
                 {
@@ -194,6 +246,38 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                                 </label>
                             }
 
+                        </div>
+
+                    ),
+                } as ColumnDef<UserPelatihan>,
+            ]
+            : []),
+        ...(pelatihan.StatusPenerbitan == "1.5" || pelatihan.StatusPenerbitan == "11" || pelatihan.StatusPenerbitan == "15"
+            ? [
+                {
+                    accessorKey: "IsActice",
+                    header: ({ column }) => {
+                        return (
+                            <Button
+                                variant="ghost"
+                                className={`text-black font-semibold w-full p-0  text-center justify-center items-center flex`}
+                                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                            >
+                                <p className="leading-[105%]">STTPL</p>
+                                <IoMdCheckmarkCircleOutline className="ml-2 h-4 w-4" />
+                            </Button>
+                        );
+                    },
+                    cell: ({ row }) => (
+                        <div className="capitalize w-full flex items-center justify-center">
+                            <Link
+                                target="_blank"
+                                href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${row.original.FileSertifikat}`}
+                                className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 border "
+                            >
+                                <RiVerifiedBadgeFill className="h-4 w-4  " />
+                                <span className="text-sm"> STTPL</span>
+                            </Link>
                         </div>
 
                     ),
@@ -379,59 +463,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                 ),
             },
         ] : []),
-        ...(parseInt(pelatihan.StatusPenerbitan) >= 5
-            ? [
-                {
-                    accessorKey: "IsActice",
-                    header: ({ column }) => {
-                        return (
-                            <Button
-                                variant="ghost"
-                                className={`text-black font-semibold w-full p-0  text-center justify-center items-center flex`}
-                                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                            >
-                                <p className="leading-[105%]">Status <br /> Kelulusan</p>
-                                <IoMdCheckmarkCircleOutline className="ml-2 h-4 w-4" />
-                            </Button>
-                        );
-                    },
-                    cell: ({ row }) => (
-                        <div className="capitalize w-full flex items-center justify-center">
-                            {
-                                row.original.IsActice != "" && <label className="flex items-center gap-2 text-base font-semibold tracking-tight leading-none">
-                                    <label
-                                        htmlFor="isActice"
-                                        className="flex items-center gap-2 cursor-pointer font-semibold  disabled:cursor-not-allowed justify-center"
-                                    >
-                                        <Checkbox
-                                            disabled={row.original.StatusPenandatangan === "Done"}
-                                            id="isActice"
-                                            onCheckedChange={() => handleLulusDataPeserta(row.original)}
-                                            checked={
-                                                row.original.IsActice !== "{PESERTA}{TELAH MENGIKUTI}{Has Attended}"
-                                            }
-                                            className="h-6 w-8 rounded-md border border-gray-300 bg-white shadow-sm
-             data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500 
-             transition-all duration-200 ease-in-out
-             hover:border-blue-400 hover:shadow-md
-             focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 
-             disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
-                                        >
-                                            <Check className="h-4 w-4 text-white" />
-                                        </Checkbox>
 
-                                        {generatedStatusCertificate(row.original.IsActice).status_indo}
-                                    </label>
-
-                                </label>
-                            }
-
-                        </div>
-
-                    ),
-                } as ColumnDef<UserPelatihan>,
-            ]
-            : []),
     ];
 
     const table = useReactTable({
@@ -440,7 +472,6 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
-
     });
 
     return (
