@@ -31,6 +31,7 @@ import HistoryButton from "./Actions/HistoryButton";
 import { LuSignature } from "react-icons/lu";
 import { ValidateParticipantAction } from "./Actions/Lemdiklat/ValidateParticipantAction";
 import { countValidKeterangan } from "@/utils/counter";
+import { useFetchDataPusatById } from "@/hooks/elaut/pusat/useFetchDataPusatById";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -39,6 +40,8 @@ interface Props {
 
 const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
     const { label, color, icon } = getStatusInfo(data.StatusPenerbitan)
+    const { adminPusatData, loading, error, fetchAdminPusatData } = useFetchDataPusatById(data?.VerifikatorPelatihan)
+
 
     return (
         <div className="w-full space-y-6 py-5">
@@ -229,17 +232,20 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                     Harap mengupload surat pemberitahuan pelaksanaan pelatihan dan menunggu verifikasi pelaksanaan agar dapat melanjutkan tahapan berikutnya!
                                                 </p>
                                             </div> :
-                                            <div className="grid grid-cols-2 gap-4 mt-4 w-full text-sm">
+                                            <div className={`grid ${adminPusatData != null ? 'grid-cols-3' : 'grid-cols-2'} gap-4 mt-4 w-full text-sm`}>
                                                 <div className={`flex flex-col p-3 ${color} rounded-lg shadow-sm border border-gray-100 animate-pulse`}>
                                                     <span className="text-xs font-medium text-gray-100">Status</span>
                                                     <span className="flex items-center">{icon}{label}</span>
                                                 </div>
                                                 <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
                                                     <span className="text-xs font-medium text-gray-500">Surat Pemberitahuan</span>
-                                                    <Link target="_blank" href={`${urlFileSuratPemberitahuan}/${data?.SuratPemberitahuan}`} className="text-sm font-semibold text-gray-800 mt-1">
+                                                    <Link target="_blank" href={`${urlFileSuratPemberitahuan}/${data?.SuratPemberitahuan}`} className="text-sm font-semibold text-blue-500 mt-1 underline">
                                                         {urlFileSuratPemberitahuan}/{data?.SuratPemberitahuan != '' ? truncateText(data?.SuratPemberitahuan, 10, '...') : "-"}
                                                     </Link>
                                                 </div>
+                                                {
+                                                    adminPusatData != null && <InfoItem label="Verifikator" value={adminPusatData!.Nama} />
+                                                }
                                             </div>
                                     }
 
@@ -299,7 +305,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                             {parseInt(data?.StatusPenerbitan) >= 5 && <>
                                 <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border mt-4 border-gray-100">
                                     <span className="text-xs font-medium text-gray-500">Surat Pemberitahuan</span>
-                                    <Link target="_blank" href={`${urlFileSuratPemberitahuan}/${data?.SuratPemberitahuan}`} className="text-sm font-semibold text-gray-800 mt-1">
+                                    <Link target="_blank" href={`${urlFileSuratPemberitahuan}/${data?.SuratPemberitahuan}`} className="text-sm font-semibold text-blue-500 mt-1 underline">
                                         {urlFileSuratPemberitahuan}/{data?.SuratPemberitahuan != '' ? truncateText(data?.SuratPemberitahuan, 30, '...') : "-"}
                                     </Link>
                                 </div>

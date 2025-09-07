@@ -5,9 +5,9 @@ export type PusatDetailInfo = {
 
 export type PusatDetail = {
   IdAdminPusat: number
-  Nama: number
+  Nama: string
   Email: string
-  NoTelpon: number
+  NoTelpon: string
   Nip: string
   Status: string
   Passwords: string

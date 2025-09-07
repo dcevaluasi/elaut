@@ -28,6 +28,7 @@ import { PassedParticipantAction } from "./Actions/Lemdiklat/PassedParticipantAc
 import { countUserWithPassed } from "@/utils/counter";
 import TTDeDetail from "./TTDeDetail";
 import { ESELON1, ESELON_1 } from "@/constants/nomenclatures";
+import { useFetchDataPusatById } from "@/hooks/elaut/pusat/useFetchDataPusatById";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -36,6 +37,7 @@ interface Props {
 
 const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
     const { label, color, icon } = getStatusInfo(data.StatusPenerbitan)
+    const { adminPusatData, loading, error, fetchAdminPusatData } = useFetchDataPusatById(data?.VerifikatorPelatihan)
 
     return (
         <div className="w-full space-y-6 py-5">
@@ -262,7 +264,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 Harap mengupload surat pemberitahuan pelaksanaan pelatihan dan menunggu verifikasi pelaksanaan agar dapat melanjutkan tahapan berikutnya!
                                             </p>
                                         </div> :
-                                        <div className="grid grid-cols-3 gap-4 mt-4 w-full text-sm">
+                                        <div className={`grid ${adminPusatData != null ? "grid-cols-4" : 'grid-cols-3'} gap-4 mt-4 w-full text-sm`}>
 
                                             <div className={`flex flex-col p-3 ${color} rounded-lg shadow-sm border border-gray-100 animate-pulse`}>
                                                 <span className="text-xs font-medium text-gray-100">Status</span>
@@ -271,10 +273,13 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             <InfoItem label="Penandatangan" value={data?.TtdSertifikat} />
                                             <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
                                                 <span className="text-xs font-medium text-gray-500">Dokumen Penerbitan STTPL</span>
-                                                <Link target="_blank" href={`${urlFileBeritaAcara}/${data?.BeritaAcara}`} className="text-sm font-semibold text-gray-800 mt-1">
-                                                    {urlFileBeritaAcara}/{data?.BeritaAcara != '' ? truncateText(data?.BeritaAcara, 10, '...') : "-"}
+                                                <Link target="_blank" href={`${urlFileBeritaAcara}/${data?.BeritaAcara}`} className="text-sm font-semibold text-blue-500 mt-1 underline">
+                                                    Lihat Dokumen
                                                 </Link>
-                                            </div>
+                                            </div>{
+                                                adminPusatData != null && <InfoItem label="Verifikator" value={adminPusatData!.Nama} />
+                                            }
+
                                         </div>
                                 }
 
@@ -297,7 +302,8 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                     Cookies.get('Role')?.includes(data?.TtdSertifikat) && Cookies.get('Access')?.includes('isSigning') && (parseFloat(data.StatusPenerbitan) >= 1.4 && parseFloat(data.StatusPenerbitan) <= 1.6) && <TTDeDetail data={data} fetchData={fetchData} />
                 }
 
-                {!Cookies.get('Access')?.includes('isSigning') &&
+                {
+                    !Cookies.get('Access')?.includes('isSigning') &&
                     <>
                         <AccordionSection title="📑 Format Sertifikat">
                             <div className="flex flex-col w-full gap-4">
@@ -469,8 +475,9 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     </div>
                                 </div>
                             </div>
-                        </AccordionSection></>}
-            </Accordion>
+                        </AccordionSection></>
+                }
+            </Accordion >
         </div >
     );
 };
