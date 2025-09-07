@@ -21,7 +21,7 @@ import {
     SelectItem,
     SelectValue,
 } from "@/components/ui/select";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import Cookies from "js-cookie";
 import Toast from "@/components/toast";
 import { elautBaseUrl, urlFileBeritaAcara } from "@/constants/urls";
@@ -30,13 +30,6 @@ import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/service
 import { PelatihanMasyarakat } from "@/types/product";
 import { useFetchDataPusat } from "@/hooks/elaut/pusat/useFetchDataPusat";
 import { breakdownStatus } from "@/lib/utils";
-import { ESELON_1, ESELON_2, ESELON_3 } from "@/constants/nomenclatures";
-import { truncateText } from "@/utils";
-import { UK_ESELON_2 } from "@/constants/unitkerja";
-import { HiOutlineEyeOff } from "react-icons/hi";
-import { HiOutlineEye } from "react-icons/hi2";
-import { getDateInIndonesianFormat } from "@/utils/time";
-import { countUserWithTanggalSertifikat } from "@/utils/counter";
 
 interface SendNoteActionProps {
     idPelatihan: string;
@@ -66,15 +59,12 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
     const [message, setMessage] = useState("");
     const [verifikatorPelaksanaan, setVerifikatorPelaksanaan] = useState(pelatihan!.VerifikatorPelatihan)
     const [beritaAcaraFile, setBeritaAcaraFile] = useState<File | null>(null);
-    const [ttdSertifikat, setTtdSertifikat] = useState(pelatihan!.TtdSertifikat);
     const oldFileUrl = pelatihan!.BeritaAcara
-    const [tanggalSertifikat, setTanggalSertifikat] = useState('')
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             setBeritaAcaraFile(e.target.files[0]);
         }
     };
-
 
     const { adminPusatData, loading: loadingPusat, error, fetchAdminPusatData } =
         useFetchDataPusat();
@@ -122,13 +112,10 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
             setVerifikatorPelaksanaan("");
 
             setBeritaAcaraFile(null);
-            setTtdSertifikat("");
             setLoading(false);
             onSuccess();
-            console.log("SEND ACTION RESPONSE: ", response);
             setIsOpen(false);
         } catch (error) {
-            console.error("ERROR SEND ACTION: ", error);
             setLoading(false);
             setMessage("");
             Toast.fire({
@@ -160,7 +147,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
 
                 {/* Input Pesan */}
                 {
-                    (Cookies.get('Access')?.includes('supervisePelaksanaan') && (pelatihan?.StatusPenerbitan == "1" || pelatihan?.StatusPenerbitan == "6") && !pelatihan?.TtdSertifikat.includes('Kepala Balai')) && <div>
+                    (Cookies.get('Access')?.includes('supervisePelaksanaan') && (pelatihan?.StatusPenerbitan == "1") && !pelatihan?.TtdSertifikat.includes('Kepala Balai')) && <div>
                         <Select
                             value={verifikatorPelaksanaan}
                             onValueChange={setVerifikatorPelaksanaan}
@@ -184,7 +171,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                 }
 
                 {
-                    (pelatihan?.StatusPenerbitan == "5" || pelatihan?.StatusPenerbitan == "7" || pelatihan?.StatusPenerbitan == "9") && <>
+                    (pelatihan?.StatusPenerbitan == "1.5" || pelatihan?.StatusPenerbitan == "5" || pelatihan?.StatusPenerbitan == "7" || pelatihan?.StatusPenerbitan == "9") && <>
                         <div>
                             <label className="block text-sm font-semibold text-gray-800 mb-2">
                                 Upload Dokumen Penerbitan STTPL
@@ -227,8 +214,6 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                                 </div>
                             )}
                         </div>
-
-
                     </>
                 }
 
@@ -246,8 +231,6 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                         disabled={loading}
                     />
                 </div>
-
-
 
                 <AlertDialogFooter>
                     <AlertDialogCancel disabled={loading}>Batal</AlertDialogCancel>

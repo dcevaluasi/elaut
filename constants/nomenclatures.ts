@@ -15,7 +15,7 @@ export const ESELONS = {
     fullName:
       'Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan',
     fullNameEng:
-      'Chairman of The Agency for Marine and Fisheries Extension and Human Resources Development',
+      'Director General of The Agency for Marine and Fisheries Extension and Human Resources Development',
     abbrvEselon: 'BPPSDM KP',
     fullNameEselon:
       'Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan',

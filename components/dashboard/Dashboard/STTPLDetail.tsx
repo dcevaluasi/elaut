@@ -108,6 +108,22 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 pelatihan={data}
                                             />
                                         }
+
+                                        {/* (1.5) Operator : Send to Kabalai After Reject */}
+                                        {
+                                            (data.StatusPenerbitan == "1.5") &&
+                                            <SendNoteAction
+                                                idPelatihan={data.IdPelatihan.toString()}
+                                                title="Kirim ke Kabalai"
+                                                description="Perbaiki pengajuan penerbitan STTPL sesuai catatan Verifikator"
+                                                buttonLabel="Send to Kabalai"
+                                                icon={TbSend}
+                                                buttonColor="indigo"
+                                                onSuccess={fetchData}
+                                                status={"1.3"}
+                                                pelatihan={data}
+                                            />
+                                        }
                                     </>
                                 }
 
