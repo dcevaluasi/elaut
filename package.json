@@ -2,12 +2,12 @@
   "name": "e-laut",
   "version": "1.0.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev --turbo",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
+    "scripts": {
+      "dev": "next dev --turbo",
+      "build": "next build",
+      "start": "next start",
+      "lint": "next lint"
+    },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
     "@hookform/resolvers": "^3.3.4",

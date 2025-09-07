@@ -35,7 +35,7 @@ COPY --from=builder /app/node_modules ./node_modules
 RUN npm prune --production
 
 # Expose default Next.js port
-EXPOSE 3000
+EXPOSE 3030
 
 # Jalankan server
 CMD ["npm", "start"]
