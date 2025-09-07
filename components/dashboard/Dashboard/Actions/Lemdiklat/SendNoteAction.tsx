@@ -171,7 +171,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                 }
 
                 {
-                    (pelatihan?.StatusPenerbitan == "1.5" || pelatihan?.StatusPenerbitan == "5" || pelatihan?.StatusPenerbitan == "7" || pelatihan?.StatusPenerbitan == "9") && <>
+                    (pelatihan?.StatusPenerbitan == "1.25" || pelatihan?.StatusPenerbitan == "1.5" || pelatihan?.StatusPenerbitan == "5" || pelatihan?.StatusPenerbitan == "7" || pelatihan?.StatusPenerbitan == "9") && <>
                         <div>
                             <label className="block text-sm font-semibold text-gray-800 mb-2">
                                 Upload Dokumen Penerbitan STTPL
