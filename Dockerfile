@@ -1,41 +1,37 @@
-# =======================
-# Build Stage
-# =======================
-FROM node:22-alpine AS builder
+# Stage 1: Build
+FROM node:18-alpine AS builder
 
-# Set working directory
+# Install sistem dependencies buat canvas
+RUN apk add --no-cache build-base cairo-dev pango-dev giflib-dev jpeg-dev
+
 WORKDIR /app
 
-# Copy package.json & package-lock.json dulu → cache-friendly
+# Copy package.json & lockfile dulu, install dependencies
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
 
-# Copy seluruh source code
+# Copy semua source code
 COPY . .
 
-# Build Next.js app
+# Build Next.js
 RUN npm run build
 
-# =======================
-# Production Stage
-# =======================
-FROM node:22-alpine AS runner
+# Stage 2: Production image
+FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy build output & prod dependencies
+# Copy node_modules & build dari stage sebelumnya
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
 
-# Remove devDependencies
-RUN npm prune --production
+# Set environment
+ENV NODE_ENV=production
 
-# Expose default Next.js port
-EXPOSE 3030
+# Expose port
+EXPOSE 3000
 
-# Jalankan server
+# Start Next.js
 CMD ["npm", "start"]
