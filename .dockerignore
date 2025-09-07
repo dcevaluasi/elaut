@@ -1,0 +1,34 @@
+# Node modules lokal (install di container sendiri)
+node_modules
+
+# Logs & debug
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Docker files
+Dockerfile
+.dockerignore
+
+# Git & VCS
+.git
+.gitignore
+
+# Next.js build cache
+.next/cache
+
+# Environment local (rahasia)
+.env.local
+.env.development
+.env.test
+
+# Editor & OS files
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+
+# Optional: folder dev/testing
+tests/
+coverage/
