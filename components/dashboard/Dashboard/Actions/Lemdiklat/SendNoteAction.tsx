@@ -91,7 +91,6 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
         formData.append("VerifikatorPelatihan", verifikatorPelaksanaan);
         formData.append("VerifikatorSertifikat", verifikatorPelaksanaan);
         if (beritaAcaraFile) formData.append("BeritaAcara", beritaAcaraFile);
-        if (ttdSertifikat) formData.append("TtdSertifikat", ttdSertifikat);
 
         try {
             setLoading(true);
@@ -229,26 +228,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                             )}
                         </div>
 
-                        {/* Select Ttd Sertifikat */}
-                        <div className="">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Penandatangan Sertifikat
-                            </label>
-                            <Select
-                                value={ttdSertifikat}
-                                onValueChange={setTtdSertifikat}
-                                disabled={loading}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Pilih Penandatangan" />
-                                </SelectTrigger>
-                                <SelectContent position="popper" className="z-[9999999]">
-                                    <SelectItem value={ESELON_1.fullName}>{ESELON_1.abbrv}</SelectItem>
-                                    <SelectItem value={ESELON_2.fullName}>{ESELON_2.abbrv}</SelectItem>
-                                    <SelectItem value={ESELON_3.fullName}>{ESELON_3.abbrv}</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
+
                     </>
                 }
 

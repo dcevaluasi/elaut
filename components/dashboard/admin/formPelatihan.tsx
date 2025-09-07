@@ -359,9 +359,6 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
   const [formTab, setFormTab] = React.useState("FormDataPelatihan");
   const [indexFormTab, setIndexFormTab] = React.useState(0);
 
-  console.log({ indexFormTab });
-  console.log({ formTab });
-
   type Sarpras = {
     IdSarpras: number;
     IdLemdik: number;
@@ -377,8 +374,6 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
   const [konsumsi, setKonsumsi] = React.useState<Sarpras[]>([]);
 
   const [selectedSarpras, setSelectedSarpras] = React.useState<number[]>([]);
-  console.log({ selectedSarpras });
-
   const handleFetchingSarprasData = async () => {
     try {
       const response: AxiosResponse = await axios.get(
@@ -1172,6 +1167,25 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                             </SelectContent>
                           </Select>
                         </div>
+                      </div>
+
+                      <div className="flex mb-1 w-full flex-col gap-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Penandatangan Sertifikat
+                        </label>
+                        <Select
+                          value={ttdSertifikat}
+                          onValueChange={setTtdSertifikat}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih Penandatangan" />
+                          </SelectTrigger>
+                          <SelectContent position="popper" className="z-[9999999]">
+                            <SelectItem value={ESELON_1.fullName}>{ESELON_1.abbrv}</SelectItem>
+                            <SelectItem value={ESELON_2.fullName}>{ESELON_2.abbrv}</SelectItem>
+                            <SelectItem value={ESELON_3.fullName}>{ESELON_3.abbrv}</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
 
                       {
