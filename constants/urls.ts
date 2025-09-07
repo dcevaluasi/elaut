@@ -20,3 +20,6 @@ export const urlFileSuratPemberitahuan =
   process.env.NEXT_PUBLIC_BASE_URL + '/public/static/suratPemberitahuan'
 export const urlFileBeritaAcara =
   process.env.NEXT_PUBLIC_BASE_URL + '/public/static/BeritaAcara'
+
+export const urlPetunjukUploadMateriPelatihan =
+  'https://docs.google.com/spreadsheets/d/19RgM5KDqGp6CVVCJ8XJMSvgQm1jsj8PgiSecH2JC1yQ/edit?usp=sharing'

@@ -1076,309 +1076,307 @@ const TableDataPesertaPelatihan = () => {
           }
         </div>
         }
-        {
-          !Cookies.get('XSRF094') && <div className='w-full gap-0'>
-            <div className=" w-full">
-              <div className="w-full border border-gray-200 rounded-xl">
-                <div className="bg-gray-100 p-4 w-full ">
-                  <h2 className="font-calsans text-xl">
-                    Action/Information
-                  </h2>
-                </div>
-                <table className="w-full">
-                  <tr className="flex w-fit items-center justify-start p-2 gap-2">
-                    {/* Import Peserta Pelatihan */}
-                    {(Cookies.get('Access')?.includes('createCertificates') &&
-                      dataPelatihan?.StatusApproval != "Selesai" && dataPelatihan?.UserPelatihan.length == 0) && (
-                        <Button
-                          type="button"
-                          onClick={(e) => {
-                            if (dataPelatihan?.StatusApproval != "Selesai") {
-                              Toast.fire({
-                                icon: "error",
-                                title: 'Ups!!!',
-                                text: `Pelatihan sudah ditutup dan no sertifikat telah terbit, tidak dapat menambahkan lagi!`,
-                              });
-                            } else {
-                              setIsOpenFormPeserta(!isOpenFormPeserta);
-                            }
-                          }}
-                          className="flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border bg-indigo-500 text-white 
+        <div className='w-full gap-0'>
+          <div className=" w-full">
+            <div className="w-full border border-gray-200 rounded-xl">
+              <div className="bg-gray-100 p-4 w-full ">
+                <h2 className="font-calsans text-xl">
+                  Action/Information
+                </h2>
+              </div>
+              <table className="w-full">
+                <tr className="flex w-fit items-center justify-start p-2 gap-2">
+                  {/* Import Peserta Pelatihan */}
+                  {(Cookies.get('Access')?.includes('createCertificates') &&
+                    dataPelatihan?.StatusApproval != "Selesai" && dataPelatihan?.UserPelatihan.length == 0) && (
+                      <Button
+                        type="button"
+                        onClick={(e) => {
+                          if (dataPelatihan?.StatusApproval != "Selesai") {
+                            Toast.fire({
+                              icon: "error",
+                              title: 'Ups!!!',
+                              text: `Pelatihan sudah ditutup dan no sertifikat telah terbit, tidak dapat menambahkan lagi!`,
+                            });
+                          } else {
+                            setIsOpenFormPeserta(!isOpenFormPeserta);
+                          }
+                        }}
+                        className="flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border bg-indigo-500 text-white 
                      hover:bg-indigo-600 transition-colors w-fit shadow-sm flex-shrink-0"
-                        >
-                          <PiMicrosoftExcelLogoFill />
-                          Import Data Peserta
-                        </Button>
-                      )}
+                      >
+                        <PiMicrosoftExcelLogoFill />
+                        Import Data Peserta
+                      </Button>
+                    )}
 
-                    <AlertDialog open={isOpenFormPeserta}>
-                      <AlertDialogContent className="max-w-lg rounded-xl shadow-xl">
+                  <AlertDialog open={isOpenFormPeserta}>
+                    <AlertDialogContent className="max-w-lg rounded-xl shadow-xl">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+                          <HiMiniUserGroup className="h-5 w-5 text-blue-600" />
+                          Import Peserta Pelatihan
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-sm text-gray-600">
+                          Import peserta yang akan mengikuti pelatihan ini menggunakan template Excel.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+
+                      <form autoComplete="off" className="space-y-5 mt-3">
+                        {/* Upload Box */}
+                        <div>
+                          <label className="block text-gray-800 text-sm font-medium mb-2">
+                            Data By Name By Address <span className="text-red-500">*</span>
+                          </label>
+
+                          <div className="flex gap-3">
+                            {/* Modern File Upload */}
+                            <label
+                              htmlFor="file-upload"
+                              className="flex-1 flex flex-col items-center justify-center h-28 px-4 border-2 border-dashed rounded-lg cursor-pointer 
+                     bg-gray-50 hover:bg-gray-100 border-gray-300 hover:border-blue-500 
+                     transition group"
+                            >
+                              <FiUploadCloud className="w-8 h-8 text-gray-400 group-hover:text-blue-500 mb-1" />
+
+                              <span className="text-sm text-center text-gray-600 group-hover:text-blue-600">
+                                {
+                                  fileExcelPesertaPelatihan ? truncateText(fileExcelPesertaPelatihan.name, 25, '...') : 'Klik atau drag file untuk upload'
+                                }
+                              </span>
+                              <span className="text-xs text-gray-400">Format: .xlsx</span>
+                              <input
+                                id="file-upload"
+                                type="file"
+                                className="hidden"
+                                required
+                                onChange={handleFileChange}
+                              />
+                            </label>
+
+                            {/* Download Template */}
+                            <Link
+                              target="_blank"
+                              href="https://docs.google.com/spreadsheets/d/12t7l4bBjPBcxXpCPPOqYeTDoZxBi5aS7/export?format=xlsx"
+                              className="flex flex-col items-center justify-center w-36 h-28 rounded-lg bg-green-600 text-white text-sm font-medium shadow hover:bg-green-700 transition gap-2"
+                            >
+                              <PiMicrosoftExcelLogoFill className="h-6 w-6" />
+                              <span>Unduh Template</span>
+                            </Link>
+                          </div>
+
+                          <p className="text-xs text-gray-500 mt-2 leading-snug">
+                            *Download template terlebih dahulu, isi file Excel, lalu upload.
+                            Perlu diingat, import data hanya dapat dilakukan{" "}
+                            <span className="font-semibold">sekali</span>.
+                          </p>
+                        </div>
+
+                        {/* Footer */}
+                        <AlertDialogFooter className="pt-4 border-t border-gray-200">
+                          <AlertDialogCancel
+                            onClick={() => setIsOpenFormPeserta(false)}
+                            className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-gray-100"
+                          >
+                            Batal
+                          </AlertDialogCancel>
+                          <AlertDialogAction
+                            disabled={fileExcelPesertaPelatihan == null}
+                            onClick={handleUploadImportPesertaPelatihan}
+                            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700"
+                          >
+                            Upload
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </form>
+                    </AlertDialogContent>
+                  </AlertDialog>
+
+                  {/* Upload Zip Foto Participants And Before Draft All Certificates */}
+                  {(Cookies.get('Access')?.includes('createCertificates') && countUserWithCertificate(data) != data.length) && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <button
+                          type="button"
+                          className="flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border bg-blue-500 text-white 
+                     hover:bg-blue-600 transition-colors shadow-sm w-fit flex-shrink-0"
+                        >
+                          <HiMiniArrowUpTray className="w-4 h-4 inline" />
+                          <span>Upload Zip Foto</span>
+                        </button>
+                      </AlertDialogTrigger>
+
+                      <AlertDialogContent className="max-w-md rounded-2xl shadow-xl">
                         <AlertDialogHeader>
-                          <AlertDialogTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900">
-                            <HiMiniUserGroup className="h-5 w-5 text-blue-600" />
-                            Import Peserta Pelatihan
+                          <AlertDialogTitle className="text-lg font-semibold text-gray-800">
+                            Upload Folder Foto Peserta
                           </AlertDialogTitle>
-                          <AlertDialogDescription className="text-sm text-gray-600">
-                            Import peserta yang akan mengikuti pelatihan ini menggunakan template Excel.
+                          <AlertDialogDescription className="text-gray-500">
+                            Silakan pilih file <span className="font-medium">.zip</span> berisi foto peserta dengan format{" "}
+                            <code>IDPeserta.formatfile</code>.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
 
-                        <form autoComplete="off" className="space-y-5 mt-3">
-                          {/* Upload Box */}
-                          <div>
-                            <label className="block text-gray-800 text-sm font-medium mb-2">
-                              Data By Name By Address <span className="text-red-500">*</span>
-                            </label>
-
-                            <div className="flex gap-3">
-                              {/* Modern File Upload */}
-                              <label
-                                htmlFor="file-upload"
-                                className="flex-1 flex flex-col items-center justify-center h-28 px-4 border-2 border-dashed rounded-lg cursor-pointer 
-                     bg-gray-50 hover:bg-gray-100 border-gray-300 hover:border-blue-500 
-                     transition group"
-                              >
-                                <FiUploadCloud className="w-8 h-8 text-gray-400 group-hover:text-blue-500 mb-1" />
-
-                                <span className="text-sm text-center text-gray-600 group-hover:text-blue-600">
-                                  {
-                                    fileExcelPesertaPelatihan ? truncateText(fileExcelPesertaPelatihan.name, 25, '...') : 'Klik atau drag file untuk upload'
-                                  }
-                                </span>
-                                <span className="text-xs text-gray-400">Format: .xlsx</span>
-                                <input
-                                  id="file-upload"
-                                  type="file"
-                                  className="hidden"
-                                  required
-                                  onChange={handleFileChange}
-                                />
-                              </label>
-
-                              {/* Download Template */}
-                              <Link
-                                target="_blank"
-                                href="https://docs.google.com/spreadsheets/d/12t7l4bBjPBcxXpCPPOqYeTDoZxBi5aS7/export?format=xlsx"
-                                className="flex flex-col items-center justify-center w-36 h-28 rounded-lg bg-green-600 text-white text-sm font-medium shadow hover:bg-green-700 transition gap-2"
-                              >
-                                <PiMicrosoftExcelLogoFill className="h-6 w-6" />
-                                <span>Unduh Template</span>
-                              </Link>
-                            </div>
-
-                            <p className="text-xs text-gray-500 mt-2 leading-snug">
-                              *Download template terlebih dahulu, isi file Excel, lalu upload.
-                              Perlu diingat, import data hanya dapat dilakukan{" "}
-                              <span className="font-semibold">sekali</span>.
-                            </p>
-                          </div>
-
-                          {/* Footer */}
-                          <AlertDialogFooter className="pt-4 border-t border-gray-200">
-                            <AlertDialogCancel
-                              onClick={() => setIsOpenFormPeserta(false)}
-                              className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-gray-100"
-                            >
-                              Batal
-                            </AlertDialogCancel>
-                            <AlertDialogAction
-                              disabled={fileExcelPesertaPelatihan == null}
-                              onClick={handleUploadImportPesertaPelatihan}
-                              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700"
-                            >
-                              Upload
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </form>
-                      </AlertDialogContent>
-                    </AlertDialog>
-
-                    {/* Upload Zip Foto Participants And Before Draft All Certificates */}
-                    {(Cookies.get('Access')?.includes('createCertificates') && countUserWithCertificate(data) != data.length) && (
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <button
-                            type="button"
-                            className="flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border bg-blue-500 text-white 
-                     hover:bg-blue-600 transition-colors shadow-sm w-fit flex-shrink-0"
-                          >
-                            <HiMiniArrowUpTray className="w-4 h-4 inline" />
-                            <span>Upload Zip Foto</span>
-                          </button>
-                        </AlertDialogTrigger>
-
-                        <AlertDialogContent className="max-w-md rounded-2xl shadow-xl">
-                          <AlertDialogHeader>
-                            <AlertDialogTitle className="text-lg font-semibold text-gray-800">
-                              Upload Folder Foto Peserta
-                            </AlertDialogTitle>
-                            <AlertDialogDescription className="text-gray-500">
-                              Silakan pilih file <span className="font-medium">.zip</span> berisi foto peserta dengan format{" "}
-                              <code>IDPeserta.formatfile</code>.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-
-                          {/* File Upload Box */}
-                          <label
-                            htmlFor="zip-upload"
-                            className="mt-4 flex flex-col items-center justify-center w-full h-32 border-2 border-dashed 
+                        {/* File Upload Box */}
+                        <label
+                          htmlFor="zip-upload"
+                          className="mt-4 flex flex-col items-center justify-center w-full h-32 border-2 border-dashed 
                      border-gray-300 rounded-xl cursor-pointer hover:border-green-500 
                      transition-colors bg-gray-50"
+                        >
+                          <HiMiniArrowUpTray className="w-8 h-8 text-gray-400 mb-2 group-hover:text-green-500" />
+                          <span className="text-sm text-gray-600">
+                            {selectedFile ? selectedFile.name : "Klik untuk memilih file ZIP"}
+                          </span>
+                          <span className="text-xs text-gray-400">atau drag & drop di sini</span>
+                          <input
+                            id="zip-upload"
+                            type="file"
+                            accept=".zip"
+                            className="hidden"
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                              const file = e.target.files?.[0]
+                              if (file) setSelectedFile(file)
+                            }}
+                          />
+                        </label>
+
+                        <AlertDialogFooter className="mt-6">
+                          <AlertDialogCancel className="rounded-lg">Batal</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handleSubmitZipUpload}
+                            disabled={!selectedFile || isUploading}
+                            className="bg-green-500 hover:bg-green-600 text-white rounded-lg inline-flex items-center gap-2"
                           >
-                            <HiMiniArrowUpTray className="w-8 h-8 text-gray-400 mb-2 group-hover:text-green-500" />
-                            <span className="text-sm text-gray-600">
-                              {selectedFile ? selectedFile.name : "Klik untuk memilih file ZIP"}
-                            </span>
-                            <span className="text-xs text-gray-400">atau drag & drop di sini</span>
-                            <input
-                              id="zip-upload"
-                              type="file"
-                              accept=".zip"
-                              className="hidden"
-                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                const file = e.target.files?.[0]
-                                if (file) setSelectedFile(file)
-                              }}
-                            />
-                          </label>
-
-                          <AlertDialogFooter className="mt-6">
-                            <AlertDialogCancel className="rounded-lg">Batal</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={handleSubmitZipUpload}
-                              disabled={!selectedFile || isUploading}
-                              className="bg-green-500 hover:bg-green-600 text-white rounded-lg inline-flex items-center gap-2"
-                            >
-                              {isUploading ? (
-                                <span className="flex items-center gap-2">
-                                  <svg
-                                    className="animate-spin h-4 w-4 text-white"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <circle
-                                      className="opacity-25"
-                                      cx="12"
-                                      cy="12"
-                                      r="10"
-                                      stroke="currentColor"
-                                      strokeWidth="4"
-                                    ></circle>
-                                    <path
-                                      className="opacity-75"
-                                      fill="currentColor"
-                                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                                    ></path>
-                                  </svg>
-                                  Mengupload...
-                                </span>
-                              ) : (
-                                "Simpan"
-                              )}
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    )}
-
-                    {/* Delete Draft Certificates */}
-                    {(Cookies.get('Access')?.includes('deleteCertificates') &&
-                      (countUserWithDraftCertificate(data) > 0 && countUserWithDraftCertificate(data) <= data.length)) && (
-                        <div className="w-full flex justify-end gap-2">
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <button
-                                type="button"
-                                className="flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border bg-rose-500 text-white 
-              hover:bg-rose-600 transition-colors shadow-sm w-fit flex-shrink-0"
-                              >
-                                <HiTrash />
-                                Hapus Draft
-                              </button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Yakin ingin menghapus?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Tindakan ini akan menghapus semua draft sertifikat pada pelatihan ini. Proses ini tidak bisa dibatalkan.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Batal</AlertDialogCancel>
-                                <AlertDialogAction
-                                  className="bg-rose-500 text-white hover:bg-rose-600"
-                                  onClick={() => handleDeleteDraftCertificate(parseInt(id))}
+                            {isUploading ? (
+                              <span className="flex items-center gap-2">
+                                <svg
+                                  className="animate-spin h-4 w-4 text-white"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
                                 >
-                                  Hapus
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                      )}
+                                  <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                  ></circle>
+                                  <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                  ></path>
+                                </svg>
+                                Mengupload...
+                              </span>
+                            ) : (
+                              "Simpan"
+                            )}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
 
-                    {/* Download Zip Certificates After Signed */}
-                    {countUserWithCertificate(data) == data.length && <Button
-                      onClick={handleDownloadZip}
-                      disabled={isZipping}
-                      className={`flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border bg-teal-500 text-white 
-                     hover:bg-teal-600 transition-colors w-fit shadow-sm flex-shrink-0`}
-                    >
-                      <FaRegFolderOpen className="h-4 w-4" />
-                      <span className="text-sm">
-                        {isZipping ? 'Zipping & Downloading...' : 'Download Zip Sertifikat'}
-                      </span>
-                    </Button>
-                    }
-
-                    {/* Update Certificates */}
-                    {(Cookies.get('Access')?.includes('updateCertificates') && countUserWithCertificate(data) == data.length && dataPelatihan?.IsRevisi != "1") && (
+                  {/* Delete Draft Certificates */}
+                  {(Cookies.get('Access')?.includes('deleteCertificates') &&
+                    (countUserWithDraftCertificate(data) > 0 && countUserWithDraftCertificate(data) <= data.length)) && (
                       <div className="w-full flex justify-end gap-2">
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <button
                               type="button"
-                              className="flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border bg-gray-500 text-white 
-              hover:bg-gray-600 transition-colors shadow-sm w-fit flex-shrink-0"
+                              className="flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border bg-rose-500 text-white 
+              hover:bg-rose-600 transition-colors shadow-sm w-fit flex-shrink-0"
                             >
-                              <IoReload />
-                              Revisi Sertifikat
+                              <HiTrash />
+                              Hapus Draft
                             </button>
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Ada sertifikat yang perlu direvisi?</AlertDialogTitle>
+                              <AlertDialogTitle>Yakin ingin menghapus?</AlertDialogTitle>
                               <AlertDialogDescription>
-                                Langkah melakukan revisi,
-                                <div className="flex flex-col">
-                                  <span>1. Identifikasi Sertifikat Yang Dianggap Perlu Direvisi/Ditambahkan;</span>
-                                  <span>2. Lakukan Penambahan/Pengupdatean Data Sesuai Kebutuhan dan Pastikan Tersampaikan Secara Formal;</span>
-                                  <span>3. Hapus Terlebih Dahulu Sertifikat Yang Telah Terbit Sebelumnya</span>
-                                  <span>4. Ajukan Sertifikat Kembali;</span>
-                                </div>
+                                Tindakan ini akan menghapus semua draft sertifikat pada pelatihan ini. Proses ini tidak bisa dibatalkan.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                               <AlertDialogCancel>Batal</AlertDialogCancel>
                               <AlertDialogAction
-                                className="bg-gray-500 text-white hover:bg-gray-600"
-                                onClick={() => handleReviseCertificate(parseInt(id))}
+                                className="bg-rose-500 text-white hover:bg-rose-600"
+                                onClick={() => handleDeleteDraftCertificate(parseInt(id))}
                               >
-                                Lakukan Revisi
+                                Hapus
                               </AlertDialogAction>
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
                       </div>
                     )}
-                  </tr>
-                </table>
-              </div>
+
+                  {/* Download Zip Certificates After Signed */}
+                  {countUserWithCertificate(data) == data.length && <Button
+                    onClick={handleDownloadZip}
+                    disabled={isZipping}
+                    className={`flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border bg-teal-500 text-white 
+                     hover:bg-teal-600 transition-colors w-fit shadow-sm flex-shrink-0`}
+                  >
+                    <FaRegFolderOpen className="h-4 w-4" />
+                    <span className="text-sm">
+                      {isZipping ? 'Zipping & Downloading...' : 'Download Zip Sertifikat'}
+                    </span>
+                  </Button>
+                  }
+
+                  {/* Update Certificates */}
+                  {(Cookies.get('Access')?.includes('updateCertificates') && countUserWithCertificate(data) == data.length && dataPelatihan?.IsRevisi != "1") && (
+                    <div className="w-full flex justify-end gap-2">
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button
+                            type="button"
+                            className="flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border bg-gray-500 text-white 
+              hover:bg-gray-600 transition-colors shadow-sm w-fit flex-shrink-0"
+                          >
+                            <IoReload />
+                            Revisi Sertifikat
+                          </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Ada sertifikat yang perlu direvisi?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Langkah melakukan revisi,
+                              <div className="flex flex-col">
+                                <span>1. Identifikasi Sertifikat Yang Dianggap Perlu Direvisi/Ditambahkan;</span>
+                                <span>2. Lakukan Penambahan/Pengupdatean Data Sesuai Kebutuhan dan Pastikan Tersampaikan Secara Formal;</span>
+                                <span>3. Hapus Terlebih Dahulu Sertifikat Yang Telah Terbit Sebelumnya</span>
+                                <span>4. Ajukan Sertifikat Kembali;</span>
+                              </div>
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Batal</AlertDialogCancel>
+                            <AlertDialogAction
+                              className="bg-gray-500 text-white hover:bg-gray-600"
+                              onClick={() => handleReviseCertificate(parseInt(id))}
+                            >
+                              Lakukan Revisi
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  )}
+                </tr>
+              </table>
             </div>
-            <div className=" w-full mb-4"></div>
           </div>
-        }
+          <div className=" w-full mb-4"></div>
+        </div>
         <Tabs
           defaultValue="PESERTA"
           className="w-full"

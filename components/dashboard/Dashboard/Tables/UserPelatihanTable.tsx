@@ -85,7 +85,6 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
             });
             onSuccess()
         } catch (error) {
-            console.error("ERROR UPDATE PELATIHAN:", error);
             Toast.fire({
                 icon: "error",
                 title: 'Oopsss!',
@@ -117,7 +116,6 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
             });
             onSuccess()
         } catch (error) {
-            console.error("ERROR UPDATE PELATIHAN:", error);
             Toast.fire({
                 icon: "error",
                 title: 'Oopsss!',
@@ -570,7 +568,6 @@ const DetailPesertaDialog = ({ pesertaId, userPelatihanId }: { pesertaId: number
             );
             setPesertaPelatihan(filteredPelatihan[0]);
         } catch (error) {
-            console.error("LEMDIK INFO: ", error);
         }
     };
 

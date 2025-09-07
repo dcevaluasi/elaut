@@ -25,3 +25,14 @@ export function generatedStatusCertificate(input: string) {
 
   return { position, status_indo, status_eng }
 }
+
+export function generatedSignedCertificate(input: string) {
+  const matches = [...input.matchAll(/\{([^}]*)\}/g)].map((m) => m[1].trim())
+
+  const name = matches[0] || ''
+  const status_indo = matches[1] || ''
+  const status_eng = matches[2] || ''
+  const location = matches.length > 3 ? matches[3] : ''
+
+  return { name, status_indo, status_eng, location }
+}

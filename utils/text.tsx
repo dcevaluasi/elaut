@@ -122,6 +122,43 @@ export function getStatusInfo(
         color: "bg-amber-500 text-white",
         icon: <RiTimeLine className="w-4 h-4" />,
       };
+    case "1.1":
+      return {
+        label: "Approved Pelaksanaan",
+        color: "bg-green-500 text-white",
+        icon: <RiCheckboxCircleFill className="w-4 h-4" />,
+      };
+    case "1.2":
+      return {
+        label: "Reject SPV",
+        color: "bg-rose-500 text-white",
+        icon: <RiCloseCircleFill className="w-4 h-4" />,
+      };
+    case "1.3":
+      return {
+        label: "Pending Kabalai",
+        color: "bg-blue-500 text-white",
+        icon: <RiLockFill className="w-4 h-4" />,
+      };
+    case "1.4":
+      return {
+        label: "Approved Kabalai",
+        color: "bg-amber-500 text-white",
+        icon: <RiCheckboxCircleFill className="w-4 h-4" />,
+      };
+    case "1.5":
+      return {
+        label: "Reject Kabalai",
+        color: "bg-rose-500 text-white",
+        icon: <RiCloseCircleFill className="w-4 h-4" />,
+      };
+    case "1.6":
+      return {
+        label: "Signed Kabalai",
+        color: "bg-green-500 text-white",
+        icon: <RiCheckboxCircleFill className="w-4 h-4" />,
+      };
+
     case "2":
       return {
         label: "Pending Verifikator",
@@ -140,6 +177,7 @@ export function getStatusInfo(
         color: "bg-green-500 text-white",
         icon: <RiCheckboxCircleFill className="w-4 h-4" />,
       };
+    case "1.25":
     case "5":
       return {
         label: "Closed",

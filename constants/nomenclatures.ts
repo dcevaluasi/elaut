@@ -29,6 +29,14 @@ export const ESELONS = {
     fullNameEselon: 'Pusat Pelatihan Kelautan dan Perikanan',
     currentPerson: 'Dr. Lilly Aprilya Pregiwati, S.Pi., M.Si',
   },
+  'Kepala Balai Pelatihan dan Penyuluhan Perikanan': {
+    abbrv: 'Kepala BPPP',
+    fullName: 'Kepala Balai Pelatihan dan Penyuluhan Perikanan',
+    fullNameEng: 'Director for Fisheries Training and Extension Center',
+    abbrvEselon: 'BPPP',
+    fullNameEselon: 'Balai Pelatihan dan Penyuluhan Perikanan',
+    currentPerson: 'Nama Kepala Balai Pelatihan dan Penyuluhan Perikanan',
+  },
 } as const
 
 export type EselonKey = keyof typeof ESELONS

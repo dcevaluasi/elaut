@@ -147,7 +147,7 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
 
       {/* Trigger Button */}
       {Cookies.get("Access")?.includes("createPelatihan") &&
-        (pelatihan.StatusPenerbitan === "0" || pelatihan.StatusPenerbitan === "3") && (
+        (pelatihan.StatusPenerbitan === "0" || pelatihan.StatusPenerbitan === "3" || pelatihan.StatusPenerbitan === "1.2") && (
           <Button
             onClick={() => setIsOpen(true)}
             variant="outline"

@@ -14,13 +14,14 @@ import {
 import { FaBookOpen, FaGear } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
-import { elautBaseUrl } from "@/constants/urls";
+import { elautBaseUrl, urlPetunjukUploadMateriPelatihan } from "@/constants/urls";
 import Cookies from "js-cookie";
 import Toast from "@/components/toast";
 import Link from "next/link";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { urlTemplateMateriPelatihan } from "@/constants/templates";
 import { MateriPelatihan, PelatihanMasyarakat } from "@/types/product";
+import { truncateText } from "@/utils";
 
 // --- Dual Input Component ---
 const DualLangInput: React.FC<{
@@ -66,6 +67,11 @@ const DualLangInput: React.FC<{
                     className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-300"
                     rows={3}
                 />
+                <div className="flex flex-col gap-0">
+                    <p className="text-xs text-gray-500">
+                        *Apabila sertifikat yang akan dikeluarkan menggunakan format inggris, harap isi dan terjemahkan Deskripsi Indonesia menggunakan <Link target="_blank" className="!text-blue-500 underline" href="https://www.deepl.com/en/translator">https://www.deepl.com/en/translator</Link>. Apabila tidak, maka kosongkan
+                    </p>
+                </div>
             </div>
         </div>
     );
@@ -167,7 +173,7 @@ const FormatCertificateAction: React.FC<FormatCertificateActionProps> = ({
                             Tambah Materi Pelatihan
                         </AlertDialogTitle>
                         <AlertDialogDescription className="-mt-2">
-                            Daftarkan materi pelatihan yang diselenggarakan yang nantinya akan
+                            Daftarkan materi pelatihan dan deskripsi yang diselenggarakan yang nantinya akan
                             tercantum pada sertifikat peserta pelatihan!
                         </AlertDialogDescription>
                     </AlertDialogHeader>
@@ -194,7 +200,7 @@ const FormatCertificateAction: React.FC<FormatCertificateActionProps> = ({
                                             {asalSertifikat}
                                         </label>
                                         <p className="text-sm text-gray-400">
-                                            Apabila materi yang akan tampil pada sertifikat terdiri dari Inti dan Umum maka ceklist jika hanya Umum saja maka biarkan
+                                            Apabila materi yang akan tampil pada sertifikat terdiri dari Inti dan Umum maka ceklist jika tidak spesifik maka biarkan tidak terceklist
                                         </p>
                                     </div>
 
@@ -228,9 +234,14 @@ const FormatCertificateAction: React.FC<FormatCertificateActionProps> = ({
                                         </Link>
                                     </div>
 
-                                    <p className="text-xs text-gray-500">
-                                        *Download template, isi sesuai format lalu upload kembali.
-                                    </p>
+                                    <div className="flex flex-col gap-0">
+                                        <p className="text-xs text-gray-500">
+                                            *Download template, isi sesuai format lalu upload kembali.
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                            *Petunjuk pengisian format <Link href={urlPetunjukUploadMateriPelatihan} target="_blank" className='!text-blue-500 underline'>{truncateText(urlPetunjukUploadMateriPelatihan, 50, '...')}</Link>
+                                        </p>
+                                    </div>
                                 </div>
 
                                 {/* Dual Language Input */}

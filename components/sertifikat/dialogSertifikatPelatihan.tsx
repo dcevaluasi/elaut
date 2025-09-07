@@ -45,7 +45,7 @@ import { DESC_CERTIFICATE_COMPETENCE_FISHERIES } from "@/constants/serkom";
 import { ESELON1, ESELON2, ESELON_1, ESELON_2, EselonKey, ESELONS, KA_BPPSDM, KA_PUSLAT_KP } from "@/constants/nomenclatures";
 import html2canvas from "html2canvas";
 import { calculateTotalHoursCertificateBPPP } from "@/lib/utils";
-import { generatedCurriculumCertificate, generatedDescriptionCertificate, generatedStatusCertificate } from "@/utils/certificates";
+import { generatedCurriculumCertificate, generatedDescriptionCertificate, generatedSignedCertificate, generatedStatusCertificate } from "@/utils/certificates";
 
 const html2pdf = dynamic(() => import("html2pdf.js"), { ssr: false });
 
@@ -116,11 +116,13 @@ const SertifikatNonKepelautan = React.forwardRef(
       return { totalTheory, totalPractice };
     };
 
-    const totalHoursCertificateLvl2 = calculateTotalHoursWithMateri(pelatihan?.MateriPelatihan || []);
+    const totalHoursCertificateLvl = calculateTotalHoursWithMateri(pelatihan?.MateriPelatihan || []);
 
     React.useEffect(() => {
       handleFetchDetailPeserta();
     }, []);
+
+    const pimpinanLemdiklat = Cookies.get('PimpinanLemdiklat') || ""
 
     return (
       <div className=" flex-col gap-8 font-bos ">
@@ -166,7 +168,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                       MINISTRY OF MARINE AFFAIRS AND FISHERIES
                     </p>
                   </div>
-                  <div className="flex flex-col h-fit items-center justify-center space-y-0">
+                  <div className="flex flex-col h-fit items-center text-center justify-center space-y-0">
                     <h1 className="text-lg font-bosBold font-bold">
                       BADAN PENYULUHAN DAN PENGEMBANGAN SUMBER DAYA MANUSIA KELAUTAN
                       DAN PERIKANAN
@@ -269,21 +271,26 @@ const SertifikatNonKepelautan = React.forwardRef(
                     <span className="text-base leading-[115%] font-bosNormal max-w-6xl">
                       {generatedDescriptionCertificate(pelatihan!.DeskripsiSertifikat).desc_indo}, pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
                     </span>
-                    <span className="max-w-5xl mt-1 leading-none font-bos italic text-[0.85rem] mx-auto">
-                      {generatedDescriptionCertificate(pelatihan!.DeskripsiSertifikat).desc_eng} on {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
-                    </span>
+                    {
+                      (generatedDescriptionCertificate(pelatihan!.DeskripsiSertifikat).desc_eng) != "" && <span className="max-w-5xl mt-1 leading-none font-bos italic text-[0.85rem] mx-auto">
+                        {generatedDescriptionCertificate(pelatihan!.DeskripsiSertifikat).desc_eng} on {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
+                      </span>
+                    }
                   </div>
 
                   <div className="flex gap-2 items-center justify-center mt-2">
                     <div className="flex flex-col  space-y-0 font-bos text-center items-center justify-center">
                       <div className="flex w-full flex-col  space-y-0 items-center mt-2 text-center justify-center">
                         <span className="font-bosNormal text-base leading-[105%] w-full flex items-center gap-1">
-                          Jakarta,{" "}{userPelatihan?.TanggalSertifikat}
-                          <br /> {pelatihan?.TtdSertifikat}
+                          {
+                            !pelatihan?.TtdSertifikat.includes('Kepala Balai') ? 'Jakarta' : generatedSignedCertificate(pimpinanLemdiklat).location},{" "}{userPelatihan?.TanggalSertifikat}
+                          <br />   {
+                            !pelatihan?.TtdSertifikat.includes('Kepala Balai') ? pelatihan?.TtdSertifikat : generatedSignedCertificate(pimpinanLemdiklat).status_indo
+                          }
                         </span>
                         <span className="leading-none font-bosItalic text-[0.85rem]">
                           {
-                            ESELONS[pelatihan?.TtdSertifikat as EselonKey].fullNameEng
+                            !pelatihan?.TtdSertifikat.includes('Kepala Balai') ? ESELONS[pelatihan?.TtdSertifikat as EselonKey].fullNameEng : generatedSignedCertificate(pimpinanLemdiklat).status_eng
                           }
                         </span>
 
@@ -301,7 +308,7 @@ const SertifikatNonKepelautan = React.forwardRef(
 
                         <span className=" font-bosNormal font-bold text-lg -mt-3">
                           {
-                            ESELONS[pelatihan?.TtdSertifikat as EselonKey].currentPerson
+                            !pelatihan?.TtdSertifikat.includes('Kepala Balai') ? ESELONS[pelatihan?.TtdSertifikat as EselonKey].currentPerson : generatedSignedCertificate(pimpinanLemdiklat).name
                           }
                         </span>
                       </div>
@@ -498,8 +505,8 @@ const SertifikatNonKepelautan = React.forwardRef(
                         <span className="italic font-bos leading-none">Training Hours</span>
                       </div>
                     </div>
-                    <div className="w-2/12 text-lg px-1 mb-3 text-center">{totalHoursCertificateLvl2.totalTheory}</div>
-                    <div className="w-2/12 text-lg px-1 mb-3 text-center">{totalHoursCertificateLvl2.totalPractice}</div>
+                    <div className="w-2/12 text-lg px-1 mb-3 text-center">{totalHoursCertificateLvl.totalTheory}</div>
+                    <div className="w-2/12 text-lg px-1 mb-3 text-center">{totalHoursCertificateLvl.totalPractice}</div>
                   </div>
 
                   {/* Total Jam */}
@@ -511,7 +518,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                         <span className="italic font-bos leading-none">Total Hours</span>
                       </div>
                     </div>
-                    <div className="w-4/12 px-1 text-lg mb-3 text-center flex items-center justify-center">{totalHoursCertificateLvl2.totalTheory + totalHoursCertificateLvl2.totalPractice}</div>
+                    <div className="w-4/12 px-1 text-lg mb-3 text-center flex items-center justify-center">{totalHoursCertificateLvl.totalTheory + totalHoursCertificateLvl.totalPractice}</div>
                   </div>
                 </div>
               </div >

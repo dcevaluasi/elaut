@@ -62,7 +62,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
             setProgress(((i + 1) / refs.current.length) * 100);
             setCounter(i + 1)
         }
-
+        setOpen(true)
         setIsUploading(false);
     };
 
@@ -109,6 +109,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
     // TTDe Sertifikat
     const handleTTDe = async () => {
         setIsSigning(true);
+        const status = data?.StatusPenerbitan == "10" ? "11" : data?.StatusPenerbitan == "14" ? "15" : "1.6"
 
         if (!passphrase) {
             Toast.fire({
@@ -134,7 +135,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
             await axios.put(
                 `${elautBaseUrl}/lemdik/updatePelatihan?id=${data?.IdPelatihan}`,
                 {
-                    StatusPenerbitan: "11"
+                    StatusPenerbitan: status
                 },
                 {
                     headers: {
@@ -215,7 +216,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 </div>
                                             )}
 
-                                            {countUserWithDrafCertificate(data?.UserPelatihan) > 0 && (
+                                            {!isUploading &&
                                                 <fieldset>
                                                     <form autoComplete="off">
                                                         <div className="flex flex-col space-y-2">
@@ -254,7 +255,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                         </div>
                                                     </form>
                                                 </fieldset>
-                                            )}</>}
+                                            }</>}
 
                                 </div>
 
@@ -310,7 +311,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                         </AlertDialog>
 
                         {
-                            (Cookies.get('Role') == data?.TtdSertifikat && (data?.StatusPenerbitan == "10" || data?.StatusPenerbitan == "14")) && <Button
+                            (Cookies.get('Role')?.includes(data?.TtdSertifikat) && (data?.StatusPenerbitan == "10" || data?.StatusPenerbitan == "14")) && <Button
                                 onClick={() => {
                                     setOpen(!open);
                                     if (countUserWithDrafCertificate(data?.UserPelatihan) == 0) {
@@ -326,6 +327,23 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                             </Button>
                         }
 
+                        {
+                            (Cookies.get('Role')?.includes(data?.TtdSertifikat) && data?.StatusPenerbitan == "1.4") && <Button
+                                onClick={() => {
+                                    setOpen(true); // always open
+                                    if (countUserWithDrafCertificate(data?.UserPelatihan) == 0) {
+                                        handleUploadAll();
+                                    }
+                                }}
+                                variant="outline"
+                                className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
+                            >
+                                <TbPencilCheck className="h-5 w-5" />
+                                <span>TTDe STTPL</span>
+                            </Button>
+
+                        }
+
                     </div>
 
                     <div className="w-full ">
@@ -337,24 +355,27 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                             {data.UserPelatihan.map((item, i) => (
                                 <>
                                     <div className="flex gap-2 items-center justify-between">
-                                        <p className="font-semibold text-sm text-gray-600">{i + 1}. {item.Nama} - {item.NoRegistrasi}</p>  {
+                                        <p className="font-semibold text-sm text-gray-600 uppercase">{i + 1}. {item.Nama} - {item.NoRegistrasi}</p>  {
                                             item.FileSertifikat?.includes('signed') && <Link
                                                 target="_blank"
                                                 href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${item.FileSertifikat}`}
                                                 className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 border "
                                             >
                                                 <RiVerifiedBadgeFill className="h-4 w-4  " />
-                                                <span className="text-sm">Download Sertifikat</span>
+                                                <span className="text-sm">Lihat Sertifikat</span>
                                             </Link>}
                                     </div>
 
-                                    <DialogSertifikatPelatihan
-                                        key={item.IdUserPelatihan ?? i}
-                                        ref={refs.current[i]}                 // ✅ pass the ref object directly
-                                        pelatihan={data}
-                                        userPelatihan={item}
-                                        handleFetchingData={fetchData}
-                                    />
+                                    {
+                                        !item?.FileSertifikat.includes('signed') && <DialogSertifikatPelatihan
+                                            key={item.IdUserPelatihan ?? i}
+                                            ref={refs.current[i]}                 // ✅ pass the ref object directly
+                                            pelatihan={data}
+                                            userPelatihan={item}
+                                            handleFetchingData={fetchData}
+                                        />
+                                    }
+
 
                                 </>
                             ))}

@@ -57,13 +57,27 @@ export const formatDateRange = (start: string, end: string): string => {
   const startDate = parseDate(start)
   const endDate = parseDate(end)
 
+  // if same exact day
+  if (
+    startDate.getDate() === endDate.getDate() &&
+    startDate.getMonth() === endDate.getMonth() &&
+    startDate.getFullYear() === endDate.getFullYear()
+  ) {
+    return `${startDate.getDate()} ${getMonthName(
+      startDate.getMonth(),
+    )} ${startDate.getFullYear()}`
+  }
+
   const formattedStart = startDate.getDate()
   const formattedEnd = endDate.getDate()
   const startMonth = getMonthName(startDate.getMonth())
   const endMonth = getMonthName(endDate.getMonth())
   const year = endDate.getFullYear()
 
-  if (startDate.getMonth() === endDate.getMonth()) {
+  if (
+    startDate.getMonth() === endDate.getMonth() &&
+    startDate.getFullYear() === endDate.getFullYear()
+  ) {
     return `${formattedStart} - ${formattedEnd} ${endMonth} ${year}`
   } else {
     return `${formattedStart} ${startMonth} - ${formattedEnd} ${endMonth} ${year}`
@@ -128,14 +142,11 @@ export const formatDateRangeEnglish = (start: string, end: string): string => {
   // universal date parser
   const parseDate = (dateStr: string): Date => {
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-      // ISO format: 2025-07-29
-      return new Date(dateStr)
+      return new Date(dateStr) // ISO format
     } else if (/^\d{4}-\d{2}$/.test(dateStr)) {
-      // Year-Month only: 2025-08 → default to first day
-      return new Date(`${dateStr}-01`)
+      return new Date(`${dateStr}-01`) // Year-Month only
     } else {
-      // Indonesian format: 29 Juli 2025
-      const [day, monthName, year] = dateStr.split(' ')
+      const [day, monthName, year] = dateStr.split(' ') // Indonesian format
       return new Date(Number(year), getMonthNumber(monthName) - 1, Number(day))
     }
   }
@@ -143,17 +154,30 @@ export const formatDateRangeEnglish = (start: string, end: string): string => {
   const startDate = parseDate(start)
   const endDate = parseDate(end)
 
+  // if same exact day
+  if (
+    startDate.getDate() === endDate.getDate() &&
+    startDate.getMonth() === endDate.getMonth() &&
+    startDate.getFullYear() === endDate.getFullYear()
+  ) {
+    return `${getMonthName(startDate.getMonth())} ${getOrdinalSuffix(
+      startDate.getDate(),
+    )}, ${startDate.getFullYear()}`
+  }
+
   const formattedStart = getOrdinalSuffix(startDate.getDate())
   const formattedEnd = getOrdinalSuffix(endDate.getDate())
   const startMonth = getMonthName(startDate.getMonth())
   const endMonth = getMonthName(endDate.getMonth())
   const year = endDate.getFullYear()
 
-  // if same month
-  if (startDate.getMonth() === endDate.getMonth()) {
-    return `${endMonth} ${formattedStart} - ${formattedEnd} ${year}`
+  if (
+    startDate.getMonth() === endDate.getMonth() &&
+    startDate.getFullYear() === endDate.getFullYear()
+  ) {
+    return `${endMonth} ${formattedStart} - ${formattedEnd}, ${year}`
   } else {
-    return `${startMonth} ${formattedStart} - ${endMonth} ${formattedEnd} ${year}`
+    return `${startMonth} ${formattedStart} - ${endMonth} ${formattedEnd}, ${year}`
   }
 }
 
@@ -295,5 +319,5 @@ export function isMoreThanToday(dateString: string): boolean {
   today.setHours(0, 0, 0, 0)
   inputDate.setHours(0, 0, 0, 0)
 
-  return inputDate < today
+  return inputDate <= today
 }

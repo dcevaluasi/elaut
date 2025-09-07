@@ -160,7 +160,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
 
                 {/* Input Pesan */}
                 {
-                    (Cookies.get('Access')?.includes('supervisePelaksanaan') && (pelatihan?.StatusPenerbitan == "1" || pelatihan?.StatusPenerbitan == "6")) && <div>
+                    (Cookies.get('Access')?.includes('supervisePelaksanaan') && (pelatihan?.StatusPenerbitan == "1" || pelatihan?.StatusPenerbitan == "6") && !pelatihan?.TtdSertifikat.includes('Kepala Balai')) && <div>
                         <Select
                             value={verifikatorPelaksanaan}
                             onValueChange={setVerifikatorPelaksanaan}

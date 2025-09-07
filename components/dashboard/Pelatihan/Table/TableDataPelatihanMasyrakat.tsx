@@ -1,69 +1,53 @@
 import React, { useState } from "react";
 import Link from "next/link";
-import { RiCheckboxCircleFill, RiInformationFill, RiSendPlaneFill } from "react-icons/ri";
-import { BiPaperPlane } from "react-icons/bi";
+import { RiInformationFill } from "react-icons/ri";
 import { PelatihanMasyarakat } from "@/types/product";
-import UploadSuratButton from "../../Dashboard/Actions/UploadSuratButton";
 import { Button } from "@/components/ui/button";
 
 import {
-    Calendar,
-    MapPin,
     Users,
-    Tag,
-    Building,
-    FileText,
-    ClipboardList,
-    Award,
-    CheckCircle2,
-    Coins,
-    User,
-    Info,
     BookOpen
 } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import Cookies from "js-cookie";
-import { IoSend } from "react-icons/io5";
-import { HiUserGroup } from "react-icons/hi2";
-import { elautBaseUrl } from "@/constants/urls";
-import axios from "axios";
-import Toast from "@/components/toast";
-import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
 import { usePathname } from "next/navigation";
 import { getStatusInfo } from "@/utils/text";
-import { ApprovePelaksanaanSPV } from "../../admin/spv/ApprovalPelaksanaanSPV";
 
 interface TableDataPelatihanMasyarakatProps {
     data: PelatihanMasyarakat[];
-    isOperatorBalaiPelatihan?: boolean;
     generateTanggalPelatihan: (date: string) => string;
     encryptValue: (val: string) => string;
-    countUserWithDrafCertificate: (users: any[]) => number;
-    handleSendToSPVAboutCertificateIssueance: (
-        idPelatihan: string,
-        pelatihan: PelatihanMasyarakat
-    ) => void;
-    fetchDataPelatihanMasyarakat: () => void;
 }
 
 const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> = ({
     data,
-    isOperatorBalaiPelatihan,
     generateTanggalPelatihan,
     encryptValue,
-    countUserWithDrafCertificate,
-    handleSendToSPVAboutCertificateIssueance,
-    fetchDataPelatihanMasyarakat,
 }) => {
 
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
     const totalPages = Math.ceil(data.length / itemsPerPage);
 
-    const paginatedData = data.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
+    const paginatedData = data
+        .sort((a, b) => {
+            const aLabel = getStatusInfo(a.StatusPenerbitan).label.toLowerCase();
+            const bLabel = getStatusInfo(b.StatusPenerbitan).label.toLowerCase();
+
+            // Assign priority: pending = 1, draft = 2, others = 3
+            const getPriority = (label: string) => {
+                if (label.includes("pending")) return 1;
+                if (label.includes("draft")) return 2;
+                return 3;
+            };
+
+            const aPriority = getPriority(aLabel);
+            const bPriority = getPriority(bLabel);
+
+            if (aPriority < bPriority) return -1;
+            if (aPriority > bPriority) return 1;
+            return 0; // keep relative order if same priority
+        })
+        .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     const accessPermissions = Cookies.get('Access')
 

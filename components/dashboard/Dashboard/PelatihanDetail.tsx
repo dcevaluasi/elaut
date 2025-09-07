@@ -48,7 +48,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                 className="w-full space-y-3"
                 defaultValue="📌 Informasi Umum"
             >
-                {parseInt(data?.StatusPenerbitan) < 5 &&
+                {(!data?.TtdSertifikat?.includes("Kepala Balai") ? parseInt(data?.StatusPenerbitan) < 5 : parseFloat(data?.StatusPenerbitan) < 1.25) &&
                     <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm bg-white">
                         <div className="px-4 py-3 text-sm font-semibold text-gray-800 hover:bg-gray-50 transition">
                             ⚙️ Metadata
@@ -69,7 +69,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 handleFetchingData={fetchData}
                                             />
                                             {
-                                                (data.SuratPemberitahuan != "" && data.StatusPenerbitan == "0") &&
+                                                (data.SuratPemberitahuan != "" && (data.StatusPenerbitan == "0" || data.StatusPenerbitan == "1.2")) &&
                                                 <SendNoteAction
                                                     idPelatihan={data.IdPelatihan.toString()}
                                                     title="Kirim ke SPV"
@@ -101,7 +101,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
 
                                             {/* (4) Operator : Close Pelatihan */}
                                             {
-                                                (data.StatusPenerbitan == "4" && isMoreThanToday(data.TanggalBerakhirPelatihan)) &&
+                                                ((data.StatusPenerbitan == "4" || data.StatusPenerbitan == "1.1") && isMoreThanToday(data.TanggalBerakhirPelatihan)) &&
                                                 <SendNoteAction
                                                     idPelatihan={data.IdPelatihan.toString()}
                                                     title="Tutup Pelatihan"
@@ -133,20 +133,55 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         </>
                                     }
 
-                                    {/* (1) SPV : Pending Pilih Verifikator */}
+                                    {/* (1) SPV : Pending  */}
                                     {
-                                        (Cookies.get('Access')?.includes('supervisePelaksanaan') && data.StatusPenerbitan == "1") && <SendNoteAction
-                                            idPelatihan={data.IdPelatihan.toString()}
-                                            title="Pilih Verifikator"
-                                            description="Segera menunjuk verifikator dalam melalukan verifikasi pelaksanaan pelatihan"
-                                            buttonLabel="Pilih Verifikator"
-                                            icon={TbPencilCog}
-                                            buttonColor="teal"
-                                            onSuccess={fetchData}
-                                            status={"2"}
-                                            pelatihan={data}
-                                        />
+                                        data?.TtdSertifikat.includes('Kepala Balai') ?
+                                            <>
+                                                {/* (1) Verifikator : Pending for Reject */}
+                                                {
+                                                    (Cookies.get('Access')?.includes('supervisePelaksanaan') && data.StatusPenerbitan == "1") && <SendNoteAction
+                                                        idPelatihan={data.IdPelatihan.toString()}
+                                                        title="Reject Pelaksaan"
+                                                        description="Segera melakukan verifikasi pelaksanaan diklat, pastikan perangkat dan kelengkapan administrasi pelatihan sesuai dan lengkap"
+                                                        buttonLabel="Reject Pelaksanaan"
+                                                        icon={TbPencilX}
+                                                        buttonColor="rose"
+                                                        onSuccess={fetchData}
+                                                        status={"1.2"}
+                                                        pelatihan={data}
+                                                    />
+                                                }
+
+                                                {/* (1) Verifikator : Pending for Approve */}
+                                                {
+                                                    (Cookies.get('Access')?.includes('supervisePelaksanaan') && data.StatusPenerbitan == "1") && <SendNoteAction
+                                                        idPelatihan={data.IdPelatihan.toString()}
+                                                        title="Approve Pelaksanaan"
+                                                        description="Segera melakukan verifikasi pelaksanaan diklat, pastikan perangkat dan kelengkapan administrasi pelatihan sesuai dan lengkap"
+                                                        buttonLabel="Approve Pelaksanaan"
+                                                        icon={TbPencilCheck}
+                                                        buttonColor="green"
+                                                        onSuccess={fetchData}
+                                                        status={"1.1"}
+                                                        pelatihan={data}
+                                                    />
+                                                }</> : <>
+                                                {/* (1) SPV : Pending for Pilih Verifikator  */}
+                                                {
+                                                    (Cookies.get('Access')?.includes('supervisePelaksanaan') && data.StatusPenerbitan == "1") && <SendNoteAction
+                                                        idPelatihan={data.IdPelatihan.toString()}
+                                                        title="Pilih Verifikator"
+                                                        description="Segera menunjuk verifikator dalam melalukan verifikasi pelaksanaan pelatihan"
+                                                        buttonLabel="Pilih Verifikator"
+                                                        icon={TbPencilCog}
+                                                        buttonColor="teal"
+                                                        onSuccess={fetchData}
+                                                        status={"2"}
+                                                        pelatihan={data}
+                                                    />
+                                                }</>
                                     }
+
 
                                     {/* (2) Verifikator : Pending Verifikator for Reject */}
                                     {
@@ -432,7 +467,7 @@ const InfoItem = ({ label, value }: { label: string; value?: string }) => (
     <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
         <span className="text-xs font-medium text-gray-500">{label}</span>
         {
-            value?.includes('<p>') ?
+            value?.includes('</p>') ?
                 <div className="prose  text-gray-800 text-sm leading-relaxed max-w-none">
                     <div dangerouslySetInnerHTML={{ __html: value }} />
                 </div> : <span className="text-sm font-semibold text-gray-800 mt-1">
