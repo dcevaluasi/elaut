@@ -34,10 +34,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import TableDataSertifikatKeterampilan from "../Pelatihan/TableDataSertifikatKeterampilan";
 import { PelatihanMasyarakat } from "@/types/product";
 import { TrendingUp } from "lucide-react";
-import TableDataPelatihanSummary from "../Pelatihan/TableDataPelatihanSummary";
 import { UserPelatihan } from "@/types/user";
 import TableDataPelatihanMasyarakat from "../Tables/TableDataPelatihanMasyarakat";
 import TableDataPelatihanMasyarakatByProvinsi from "../Tables/TableDataPelatihanMasyarakatByProvinsi";

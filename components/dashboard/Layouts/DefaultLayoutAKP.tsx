@@ -1,10 +1,10 @@
 "use client";
 import React, { useState, ReactNode } from "react";
 import Sidebar from "../Sidebar";
-import Header from "../Header";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { LemdiklatDetailInfo } from "@/types/lemdiklat";
+import Header from "../Header";
 
 export default function DefaultLayoutAKP({
   children,

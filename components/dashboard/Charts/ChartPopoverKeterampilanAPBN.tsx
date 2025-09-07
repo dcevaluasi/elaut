@@ -38,7 +38,6 @@ import {
 } from "@/components/ui/chart";
 import TableDataBlankoKeluar from "../Pelatihan/TableDataBlankoKeluar";
 import { usePathname } from "next/navigation";
-import TableDataSertifikatKeterampilan from "../Pelatihan/TableDataSertifikatKeterampilan";
 export const description = "A bar chart with an active bar";
 
 const chartConfig = {

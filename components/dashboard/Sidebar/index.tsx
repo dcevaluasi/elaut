@@ -7,7 +7,6 @@ import SidebarLinkGroup from "./SidebarLinkGroup";
 import { FaBoxOpen, FaRupiahSign } from "react-icons/fa6";
 import { IoMdSchool } from "react-icons/io";
 import LogoFooter from "@/components/ui/logo-footer";
-import { RiQuillPenLine } from "react-icons/ri";
 
 import {
   RiFilePaperLine,
@@ -22,7 +21,6 @@ import {
   TbCalendarPin,
   TbDatabaseEdit,
   TbEditCircle,
-  TbFileCertificate,
   TbSchool,
 } from "react-icons/tb";
 import Cookies from "js-cookie";

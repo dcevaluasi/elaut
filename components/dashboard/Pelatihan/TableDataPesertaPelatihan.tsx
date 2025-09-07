@@ -88,7 +88,6 @@ import { elautBaseUrl } from "@/constants/urls";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { generateTanggalPelatihan } from "@/utils/text";
-import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import { DIALOG_TEXTS } from "@/constants/texts";
 import { countUserWithCertificate, countUserWithDraftCertificate, countUserWithNonELAUTCertificate, countUserWithNoSertifikat, countUserWithPassed, countUserWithSpesimenTTD, countUserWithTanggalSertifikat, countValidKeterangan } from "@/utils/counter";
 import { generateTimestamp, getDateInIndonesianFormat, getTodayInIndonesianFormat } from "@/utils/time";
@@ -874,7 +873,7 @@ const TableDataPesertaPelatihan = () => {
                   </p>
                 </div>
               </div>
-              {dataPelatihan != null && <ShowingBadge data={dataPelatihan} />}
+
             </div>
           </header>}
         </div>

@@ -105,7 +105,6 @@ import { FiEdit2, FiSettings } from "react-icons/fi";
 import { usePathname } from "next/navigation";
 import Toast from "@/components/toast";
 import { encryptValue } from "@/lib/utils";
-import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import { IoRefreshSharp } from "react-icons/io5";
 import { HashLoader } from "react-spinners";
 import { AiOutlineFieldNumber } from "react-icons/ai";
