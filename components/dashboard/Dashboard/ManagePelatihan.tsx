@@ -9,7 +9,6 @@ import {
     decryptValue,
     encryptValue,
 } from "@/lib/utils";
-import ShowingBadge from "@/components/elaut/dashboard/ShowingBadge";
 import HistoryButton from "./Actions/HistoryButton";
 import { MateriButton } from "./Actions";
 import { useFetchDataPelatihanMasyarakatDetail } from "@/hooks/elaut/pelatihan/useFetchDataPelatihanMasyarkatDetail";

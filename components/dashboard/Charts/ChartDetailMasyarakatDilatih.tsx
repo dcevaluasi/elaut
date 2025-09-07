@@ -34,7 +34,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import TableDataSertifikatKeterampilan from "../Pelatihan/TableDataSertifikatKeterampilan";
 import { PelatihanMasyarakat } from "@/types/product";
 import { TrendingUp } from "lucide-react";
 import { UserPelatihan } from "@/types/user";
