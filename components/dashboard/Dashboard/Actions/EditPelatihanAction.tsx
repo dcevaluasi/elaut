@@ -46,6 +46,7 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
 
     // controlled states
     const [program, setProgram] = useState(currentData?.Program || "");
+    const [ttdSertifikat, setTtdSertifikat] = useState(currentData?.TtdSertifikat || "");
     const [jenisProgram, setJenisProgram] = useState(currentData?.JenisProgram || "");
     const [jenisPelatihan, setJenisPelatihan] = useState(currentData?.JenisPelatihan || "");
     const [dukunganProgramTerobosan, setDukunganProgramTerobosan] = useState(
@@ -80,6 +81,7 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
             LokasiPelatihan: lokasiPelatihan,
             PelaksanaanPelatihan: pelaksanaanPelatihan,
             HargaPelatihan: hargaPelatihan,
+            TtdSertifikat: ttdSertifikat,
         };
 
         try {
