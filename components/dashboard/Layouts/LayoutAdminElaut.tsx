@@ -10,17 +10,14 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import DropdownUser from "../Header/DropdownUser";
-import { LucideBadgeCheck, LucideLayoutDashboard } from "lucide-react";
+import { LucideLayoutDashboard } from "lucide-react";
 import { IoBookOutline, IoSchoolOutline } from "react-icons/io5";
-import { GrInfo } from "react-icons/gr";
 import { FiMenu, FiLogOut, FiChevronDown, FiChevronRight } from "react-icons/fi";
-import { RoleAccess } from "@/types/access";
-import { HiOutlineCheckBadge, HiOutlineUserGroup } from "react-icons/hi2";
+import { HiOutlineUserGroup } from "react-icons/hi2";
 import { TbDatabaseEdit, TbSignature } from "react-icons/tb";
-import { MdOutlinePodcasts } from "react-icons/md";
 import Link from "next/link";
 import { breakdownStatus } from "@/lib/utils";
-import { generatedSignedCertificate, generatedStatusCertificate } from "@/utils/certificates";
+import { generatedSignedCertificate } from "@/utils/certificates";
 
 export default function LayoutAdminElaut({
   children,
