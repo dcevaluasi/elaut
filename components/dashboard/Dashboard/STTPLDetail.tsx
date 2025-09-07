@@ -8,12 +8,11 @@ import {
     AccordionContent,
 } from "@/components/ui/accordion";
 import { MateriPelatihan, PelatihanMasyarakat } from "@/types/product";
-import { getStatusInfo } from "@/utils/text";
+import { generateTanggalPelatihan, getStatusInfo } from "@/utils/text";
 import { MdLock } from "react-icons/md";
 import Cookies from "js-cookie";
-import { truncateText } from "@/utils";
 import Link from "next/link";
-import { urlFileBeritaAcara, urlFileSuratPemberitahuan } from "@/constants/urls";
+import { urlFileBeritaAcara } from "@/constants/urls";
 import SendNoteAction from "./Actions/Lemdiklat/SendNoteAction";
 import { TbPencilCheck, TbPencilX, TbSend } from "react-icons/tb";
 import HistoryButton from "./Actions/HistoryButton";
@@ -25,10 +24,12 @@ import { Button } from "@/components/ui/button";
 import { FaSearch } from "react-icons/fa";
 import UserPelatihanTable from "./Tables/UserPelatihanTable";
 import { PassedParticipantAction } from "./Actions/Lemdiklat/PassedParticipantAction";
-import { countUserWithPassed } from "@/utils/counter";
+import { countUserWithCertificate, countUserWithPassed } from "@/utils/counter";
 import TTDeDetail from "./TTDeDetail";
 import { ESELON1, ESELON_1 } from "@/constants/nomenclatures";
 import { useFetchDataPusatById } from "@/hooks/elaut/pusat/useFetchDataPusatById";
+import { downloadAndZipPDFs } from "@/utils/file";
+import { FaRegFolderOpen } from "react-icons/fa6";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -38,6 +39,24 @@ interface Props {
 const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
     const { label, color, icon } = getStatusInfo(data.StatusPenerbitan)
     const { adminPusatData, loading, error, fetchAdminPusatData } = useFetchDataPusatById(data?.VerifikatorPelatihan)
+
+    /**
+      * Zip Download Processing
+      */
+    const [isZipping, setIsZipping] = React.useState(false)
+    const handleDownloadZip = async () => {
+        setIsZipping(true)
+        try {
+            await downloadAndZipPDFs(
+                data.UserPelatihan,
+                `(${data!.Program}) ${data!.PenyelenggaraPelatihan} - ${generateTanggalPelatihan(data!.TanggalMulaiPelatihan)} - ${generateTanggalPelatihan(data!.TanggalBerakhirPelatihan)}`,
+            )
+        } catch (err) {
+            console.error('Download failed:', err)
+        } finally {
+            setIsZipping(false)
+        }
+    }
 
     return (
         <div className="w-full space-y-6 py-5">
@@ -458,6 +477,18 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
 
                                     {
                                         countUserWithPassed(data?.UserPelatihan) == 0 && <PassedParticipantAction data={data?.UserPelatihan} onSuccess={fetchData} />
+                                    }
+
+                                    {countUserWithCertificate(data.UserPelatihan) == data.UserPelatihan.length && <Button
+                                        onClick={handleDownloadZip}
+                                        disabled={isZipping}
+                                        className={`flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-indigo-500 text-indigo-500 hover:text-white hover:bg-indigo-500`}
+                                    >
+                                        <FaRegFolderOpen className="h-4 w-4" />
+                                        <span className="text-sm">
+                                            {isZipping ? 'Zipping & Downloading...' : 'Download Zip Sertifikat'}
+                                        </span>
+                                    </Button>
                                     }
 
                                 </div>
