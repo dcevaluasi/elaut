@@ -40,12 +40,7 @@ const DeletePelatihanAction: React.FC<DeletePelatihanActionProps> = ({
         title:
           "Ups, pelatihan tidak dapat dihapus karena sudah ada yang mendaftar!",
       });
-    } else if (sertifikat != "") {
-      Toast.fire({
-        icon: "error",
-        title:
-          "Ups, pelatihan sudah terbit nomor sertifikatnya, tidak dapat dihapus!",
-      });
+
     } else {
       try {
         const response = await axios.delete(
@@ -61,7 +56,7 @@ const DeletePelatihanAction: React.FC<DeletePelatihanActionProps> = ({
           icon: "success",
           title: "Berhasil menghapus pelatihan dari database, sobat elaut!",
         });
-        route.push('/admin/lemdik/pelatihan')
+        route.push('/admin/lemdiklat/pelatihan')
         setIsOpenFormDelete(!isOpenFormDelete);
       } catch (error) {
         setIsOpenFormDelete(!isOpenFormDelete);

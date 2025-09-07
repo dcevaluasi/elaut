@@ -378,6 +378,7 @@ export const PROGRAM_PERIKANAN = [
   "CPPIB",
   "HACCP",
   "CPOIB",
+  "MPM-CPIB",
   "SPI",
   "API",
   "Budidaya",
