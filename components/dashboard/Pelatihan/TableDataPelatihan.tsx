@@ -28,21 +28,23 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { useFetchDataPelatihanMasyarakat } from "@/hooks/elaut/pelatihan/useFetchDataPelatihanMasyarakat";
 import TabStatusPelatihanMasyarakat from "./TabStatusPelatihanMasyarakat";
 import TableDataPelatihanMasyarakat from "./Table/TableDataPelatihanMasyrakat";
+import { isPendingSigning, isSigned, isVerifyDiklat } from "@/utils/status";
 
 const TableDataPelatihan: React.FC = () => {
   const {
     data,
     isFetching,
     setIsFetching,
-    countOnProgress,
     countDone,
     countDiklatSPV,
-    countNotPublished,
+    countPublished,
     countVerifying,
+    countPendingSigning,
+    countSigned,
     refetch,
   } = useFetchDataPelatihanMasyarakat();
   const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
-
+  console.log({ data })
   const [selectedStatusFilter, setSelectedStatusFilter] =
     React.useState<string>("All");
   // STATUS FILTER
@@ -54,10 +56,12 @@ const TableDataPelatihan: React.FC = () => {
   const [searchQuery, setSearchQuery] = React.useState<string>("");
   const statusMapping: Record<string, (p: typeof data[number]) => boolean> = {
     "Proses Pengajuan Sertifikat": p => p.StatusPenerbitan === "On Progress",
-    "Belum Dipublish": p => p.Status !== "Publish",
     "Pending SPV": p => p.StatusPenerbitan === "1",
-    "Sudah Di TTD": p => p.StatusPenerbitan === "14" || p.StatusPenerbitan === "17",
-    "Verifikasi Pelaksanaan": p => p.StatusPenerbitan === "Verifikasi Pelaksanaan",
+    "Verifikasi Pelaksanaan": p => isVerifyDiklat(p.StatusPenerbitan),
+    "Pending Signing": p => isPendingSigning(p.StatusPenerbitan) && (Cookies.get('Role')?.includes(p.TtdSertifikat)! || Cookies.get('Role') == p.TtdSertifikat),
+    "Done": p => isSigned(p.StatusPenerbitan),
+    "Signed": p => isSigned(p.StatusPenerbitan) && (Cookies.get('Role')?.includes(p.TtdSertifikat)! || Cookies.get('Role') == p.TtdSertifikat),
+    "Published": p => p.Status === "Publish",
   };
 
   const searchQueryLower = searchQuery.toLowerCase();
@@ -88,11 +92,12 @@ const TableDataPelatihan: React.FC = () => {
     <div className="shadow-default -mt-10">
       <TabStatusPelatihanMasyarakat
         dataLength={data.length}
-        countNotPublished={countNotPublished}
+        countPublished={countPublished}
         countVerifying={countVerifying}
-        countOnProgress={countOnProgress}
         countDone={countDone}
         countDiklatSPV={countDiklatSPV}
+        countPendingSigning={countPendingSigning}
+        countSigned={countSigned}
         selectedStatusFilter={selectedStatusFilter}
         setSelectedStatusFilter={setSelectedStatusFilter}
         isOperatorBalaiPelatihan={isOperatorBalaiPelatihan}

@@ -8,6 +8,7 @@ import {
     ClipboardCheck,
     FileCheck2,
     CheckCircle2,
+    Eye,
 } from "lucide-react";
 
 interface StatusButtonProps {
@@ -48,15 +49,18 @@ const StatusButton = ({
 interface TabStatusPelatihanMasyarakatProps {
     // Common
     dataLength: number;
-    countNotPublished?: number;
+    countPublished?: number;
     countVerifying?: number;
-    countOnProgress?: number;
     countDone?: number;
     selectedStatusFilter: string;
     setSelectedStatusFilter: (status: string) => void;
     isOperatorBalaiPelatihan?: boolean;
 
     countDiklatSPV?: number
+
+    // for eselons
+    countSigned: number;
+    countPendingSigning: number;
 
     // Extra
     data?: any[];
@@ -77,15 +81,18 @@ interface TabStatusPelatihanMasyarakatProps {
 
 export default function TabStatusPelatihanMasyarakat({
     dataLength,
-    countNotPublished,
+    countPublished,
     countVerifying,
-    countOnProgress,
     countDone,
     selectedStatusFilter,
     setSelectedStatusFilter,
     isOperatorBalaiPelatihan,
 
     countDiklatSPV,
+
+    // for eselons
+    countSigned,
+    countPendingSigning,
 
     // Extra props
     data = [],
@@ -117,7 +124,6 @@ export default function TabStatusPelatihanMasyarakat({
             {/* Original Buttons */}
             <section aria-labelledby="ticket-statistics-tabs-label" className="overflow-x-auto">
                 <ul className="flex gap-2 min-w-max">
-
                     <StatusButton
                         label="Total"
                         count={dataLength}
@@ -125,39 +131,31 @@ export default function TabStatusPelatihanMasyarakat({
                         isSelected={selectedStatusFilter === "All"}
                         onClick={() => setSelectedStatusFilter("All")}
                     />
+
+                    {/* accessed by UPT and Operator Pusat */}
                     {Cookies.get('Access')?.includes('createPelatihan') && <>
-
                         <StatusButton
-                            label="Belum Dipublish"
-                            count={countNotPublished || 0}
-                            icon={<EyeOff size={16} />}
-                            isSelected={selectedStatusFilter === "Belum Dipublish"}
-                            onClick={() => setSelectedStatusFilter("Belum Dipublish")}
-                        />
-
-
-                        {/* <StatusButton
-                            label="Verifikasi"
+                            label="Verifikasi Pelaksanaan"
                             count={countVerifying || 0}
                             icon={<ClipboardCheck size={16} />}
                             isSelected={selectedStatusFilter === "Verifikasi Pelaksanaan"}
                             onClick={() => setSelectedStatusFilter("Verifikasi Pelaksanaan")}
-                        /> */}
-
-                        <StatusButton
-                            label="On Progress"
-                            count={countOnProgress || 0}
-                            icon={<FileCheck2 size={16} />}
-                            isSelected={selectedStatusFilter === "On Progress"}
-                            onClick={() => setSelectedStatusFilter("On Progress")}
                         />
 
                         <StatusButton
-                            label="Sudah Terbit"
+                            label="Done"
                             count={countDone || 0}
                             icon={<CheckCircle2 size={16} />}
-                            isSelected={selectedStatusFilter === "Sudah Di TTD"}
-                            onClick={() => setSelectedStatusFilter("Sudah Di TTD")}
+                            isSelected={selectedStatusFilter === "Done"}
+                            onClick={() => setSelectedStatusFilter("Done")}
+                        />
+
+                        <StatusButton
+                            label="Published"
+                            count={countPublished || 0}
+                            icon={<Eye size={16} />}
+                            isSelected={selectedStatusFilter === "Published"}
+                            onClick={() => setSelectedStatusFilter("Published")}
                         />
                     </>}
 
@@ -171,24 +169,22 @@ export default function TabStatusPelatihanMasyarakat({
                     )}
 
 
-
-                    {isPejabat && (
-                        <StatusButton
-                            label="Perlu Ditandatangani"
-                            count={isEselonI ? countSigningEselon1 : countSigning}
-                            isSelected={selectedStatusFilter === "Signing"}
-                            onClick={() => handleClickWithDelay("Signing")}
-                        />
-                    )}
-
-                    {isPejabat && (
-                        <StatusButton
-                            label="Sudah Ditandatangani"
-                            count={isEselonI ? countSignedEselon1 : countSignedEselon2}
-                            isSelected={selectedStatusFilter === "Signed"}
-                            onClick={() => handleClickWithDelay("Signed")}
-                        />
-                    )}
+                    {/* for eselons 1,2,3 */}
+                    {Cookies.get('Access')?.includes('isSigning') &&
+                        <>
+                            <StatusButton
+                                label="Pending Signing"
+                                count={countPendingSigning}
+                                isSelected={selectedStatusFilter === "Pending Signing"}
+                                onClick={() => handleClickWithDelay("Pending Signing")}
+                            />
+                            <StatusButton
+                                label="Signed"
+                                count={countSigned || 0}
+                                isSelected={selectedStatusFilter === "Signed"}
+                                onClick={() => handleClickWithDelay("Signed")}
+                            />
+                        </>}
 
                     {isSupervisor && (
                         <StatusButton

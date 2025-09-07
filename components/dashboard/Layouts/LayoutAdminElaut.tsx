@@ -41,6 +41,7 @@ export default function LayoutAdminElaut({
       });
       setPusatData(data);
       Cookies.set("NIK", data.data.Nip);
+      Cookies.set("IDLemdik", data.data.IdAdminPusat);
       Cookies.set("Status", data.data.Status);
       Cookies.set("Nama", data.data.Nama);
       Cookies.set("Satker", generatedSignedCertificate(data.data.NoTelpon).status_indo);

@@ -68,7 +68,7 @@ const DropdownUser = ({
         }
       );
       Cookies.set("Eselon", response.data.data.Nip);
-      Cookies.set('createPenandatanganan', response.data.data.Status.includes('Kepala') ? '1' : '0')
+
       setDataAdminPusat(response.data.data);
     } catch (error) {
       console.error({ error });
@@ -198,13 +198,22 @@ const DropdownUser = ({
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
 
-  const handleLogOut = async () => {
-    Cookies.remove("XSRF091");
-    Cookies.remove("XSRF092");
-    Cookies.remove("XSRF093");
-    Cookies.remove("IDLemdik");
-    Cookies.remove("Eselon");
-    Cookies.remove('createPenandatanganan')
+  const handleLogout = async () => {
+    [
+      "XSRF091",
+      "XSRF092",
+      "XSRF093",
+      "Satker",
+      "IDLemdik",
+      "Eselon",
+      "Status",
+      "Jabatan",
+      "Access",
+      "NIK",
+      "Nama",
+      "Role",
+      "PimpinanLemdiklat"
+    ].forEach((key) => Cookies.remove(key));
     Toast.fire({
       icon: "success",
       title: `Yeayyy!`,
@@ -665,7 +674,7 @@ const DropdownUser = ({
           </li>
         </ul>
         <button
-          onClick={(e) => handleLogOut()}
+          onClick={(e) => handleLogout()}
           className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
         >
           <svg
