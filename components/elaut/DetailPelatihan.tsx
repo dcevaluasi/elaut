@@ -163,12 +163,6 @@ const DetailPelatihan: React.FC<DetailPelatihanProps> = ({
           )}
         </div>
       </div>
-
-      {!isRegistrasi && (
-        <div className="mt-16">
-          <Features />
-        </div>
-      )}
     </div>
   );
 };

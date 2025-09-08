@@ -52,7 +52,6 @@ export default function Page() {
       <HeroLandingBPPP bppp={location} />
       <Layanan />
       <Keunggulan />
-      <Features />
       <Footer />
     </>
   );
