@@ -2,38 +2,18 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useFetchDataInstruktur } from "@/hooks/elaut/instruktur/useFetchDataInstruktur";
 
-interface Pelatih {
-    nama: string;
-    id_lemdik: string;
-    jenis_pelatih: string;
-    jenjang_jabatan: string;
-    bidang_keahlian: string;
-    metodologi_pelatihan: string;
-    pelatihan_pelatih: string;
-    kompetensi_teknis: string;
-    management_of_training: string;
-    training_officer_course: string;
-    link_data_dukung_sertifikat: string;
-    status: string;
-    pendidikkan_terakhir: string;
-    eselonI: string;
-    eselonII: string;
-    no_telpon: string;
-    email: string;
-    nip: string;
-}
+const TableDataPelatih = () => {
+    const { instrukturs, loading, error, fetchInstrukturData } = useFetchDataInstruktur()
 
-interface TableDataPelatihProps {
-    data: Pelatih[];
-}
+    console.log({ instrukturs })
 
-const TableDataPelatih: React.FC<TableDataPelatihProps> = ({ data }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
-    const totalPages = Math.ceil(data.length / itemsPerPage);
+    const totalPages = Math.ceil(instrukturs.length / itemsPerPage);
 
-    const paginatedData = data.slice(
+    const paginatedData = instrukturs.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
@@ -75,40 +55,40 @@ const TableDataPelatih: React.FC<TableDataPelatihProps> = ({ data }) => {
                                 <td className="px-4 py-2 border text-center text-gray-500">
                                     {(currentPage - 1) * itemsPerPage + index + 1}
                                 </td>
-                                <td className="px-4 py-2 border">{row.nama}</td>
+                                <td className="px-4 py-2 border">{row.Nama}</td>
                                 <td className="px-4 py-2 border text-center">
-                                    {row.id_lemdik}
+                                    {row.IdLemdik}
                                 </td>
-                                <td className="px-4 py-2 border">{row.jenis_pelatih}</td>
-                                <td className="px-4 py-2 border">{row.jenjang_jabatan}</td>
-                                <td className="px-4 py-2 border">{row.bidang_keahlian}</td>
-                                <td className="px-4 py-2 border">{row.metodologi_pelatihan}</td>
-                                <td className="px-4 py-2 border">{row.pelatihan_pelatih}</td>
-                                <td className="px-4 py-2 border">{row.kompetensi_teknis}</td>
+                                <td className="px-4 py-2 border">{row.JenisPelatih}</td>
+                                <td className="px-4 py-2 border">{row.JenjangJabatan}</td>
+                                <td className="px-4 py-2 border">{row.BidangKeahlian}</td>
+                                <td className="px-4 py-2 border">{row.MetodologiPelatihan}</td>
+                                <td className="px-4 py-2 border">{row.PelatihanPelatih}</td>
+                                <td className="px-4 py-2 border">{row.KompetensiTeknis}</td>
                                 <td className="px-4 py-2 border">
-                                    {row.management_of_training}
+                                    {row.ManagementOfTraining}
                                 </td>
                                 <td className="px-4 py-2 border">
-                                    {row.training_officer_course}
+                                    {row.TrainingOfficerCourse}
                                 </td>
                                 <td className="px-4 py-2 border text-blue-600 underline">
                                     <a
-                                        href={row.link_data_dukung_sertifikat}
+                                        href={row.LinkDataDukungSertifikat}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                     >
                                         Link
                                     </a>
                                 </td>
-                                <td className="px-4 py-2 border text-center">{row.status}</td>
+                                <td className="px-4 py-2 border text-center">{row.Status}</td>
                                 <td className="px-4 py-2 border">
                                     {row.pendidikkan_terakhir}
                                 </td>
-                                <td className="px-4 py-2 border">{row.eselonI}</td>
-                                <td className="px-4 py-2 border">{row.eselonII}</td>
-                                <td className="px-4 py-2 border">{row.no_telpon}</td>
-                                <td className="px-4 py-2 border">{row.email}</td>
-                                <td className="px-4 py-2 border">{row.nip}</td>
+                                <td className="px-4 py-2 border">{row.EselonI}</td>
+                                <td className="px-4 py-2 border">{row.EselonII}</td>
+                                <td className="px-4 py-2 border">{row.NoTelpon}</td>
+                                <td className="px-4 py-2 border">{row.Email}</td>
+                                <td className="px-4 py-2 border">{row.Nip}</td>
                             </tr>
                         ))}
                     </tbody>

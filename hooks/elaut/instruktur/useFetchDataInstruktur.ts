@@ -4,15 +4,15 @@ import { useState, useCallback } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { elautBaseUrl } from '@/constants/urls'
-import { PusatDetail } from '@/types/pusat'
+import { Instruktur } from '@/types/instruktur'
 
-export function useFetchDataPusat() {
-  const [adminPusatData, setAdminPusatData] = useState<PusatDetail[]>([])
+export function useFetchDataInstruktur() {
+  const [instrukturs, setInstrukturs] = useState<Instruktur[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<unknown>(null)
   const token = Cookies.get('XSRF091')
 
-  const fetchAdminPusatData = useCallback(async () => {
+  const fetchInstrukturData = useCallback(async () => {
     if (token) {
       setError('Token is missing')
       return
@@ -26,7 +26,7 @@ export function useFetchDataPusat() {
         headers: { Authorization: `Bearer ${token}` },
       })
 
-      setAdminPusatData(response.data.data || [])
+      setInstrukturs(response.data.data || [])
       setLoading(false)
     } catch (err) {
       setError(err)
@@ -34,5 +34,5 @@ export function useFetchDataPusat() {
     }
   }, [])
 
-  return { adminPusatData, loading, error, fetchAdminPusatData }
+  return { instrukturs, loading, error, fetchInstrukturData }
 }

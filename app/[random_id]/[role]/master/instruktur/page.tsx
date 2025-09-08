@@ -1,6 +1,5 @@
 "use client";
 
-import Pelatihan from "@/components/dashboard/Dashboard/Pelatihan";
 import LayoutAdminElaut from "@/components/dashboard/Layouts/LayoutAdminElaut";
 import TableDataPelatih from "@/components/dashboard/Pelatihan/Table/TableDataPelatih";
 import React from "react";
@@ -30,7 +29,7 @@ export default function Page() {
                 </div>
                 <main className="w-full h-full">
                     <div className="mt-4 md:mt-6 2xl:mt-7.5">
-                        {/* <TableDataPelatih /> */}
+                        <TableDataPelatih />
                     </div>
                 </main>
             </section>
