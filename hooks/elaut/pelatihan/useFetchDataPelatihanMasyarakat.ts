@@ -14,7 +14,6 @@ export function useFetchDataPelatihanMasyarakat() {
 
   const [countDiklatSPV, setCountDiklatSPV] = useState(0)
 
-  const [countVerifyPelaksanaan, setCountVerifyPelaksanaan] = useState(0)
   const [countPendingSigning, setCountPendingSigning] = useState(0)
   const [countSigned, setCountSigned] = useState(0)
 
@@ -90,7 +89,7 @@ export function useFetchDataPelatihanMasyarakat() {
       }> = await axios.get(`${elautBaseUrl}/lemdik/getPelatihanAdmin`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      const items = response.data?.data || []
+      const items = personalizeData(response.data?.data) || []
 
       // verified diklat by verifikator
       setCountVerifying(
@@ -121,7 +120,7 @@ export function useFetchDataPelatihanMasyarakat() {
 
       setCountDiklatSPV(items.filter((i) => i.StatusPenerbitan === '1').length)
 
-      setData(personalizeData(items))
+      setData(items)
       setIsFetching(false)
     } catch (error) {
       setIsFetching(false)
