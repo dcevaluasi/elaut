@@ -17,6 +17,8 @@ export const translateText = async (text: string, target: string = 'en') => {
       },
     )
 
+    console.log({ response })
+
     return response.data.translations[0].translatedText // ✅ correct shape
   } catch (error) {
     console.error('Translation error:', error)
