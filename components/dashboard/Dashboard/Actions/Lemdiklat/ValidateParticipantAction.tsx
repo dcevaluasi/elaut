@@ -32,6 +32,7 @@ export function ValidateParticipantAction({
     const [isIteratingProcess, setIsIteratingProcess] = useState(false);
 
     const handleValidasiPeserta = async () => {
+        setOpen(true);
         setIsIteratingProcess(true);
         try {
             for (const user of data) {
@@ -96,7 +97,7 @@ export function ValidateParticipantAction({
                         <AlertDialogFooter className="mt-3">
                             {isIteratingProcess ? (
                                 <AlertDialogAction
-                                    className="bg-green-500 hover:bg-green-600"
+                                    className="bg-green-600 hover:bg-green-700"
                                     disabled
                                 >
                                     Sedang diproses...
@@ -107,7 +108,7 @@ export function ValidateParticipantAction({
                                         Cancel
                                     </AlertDialogCancel>
                                     <AlertDialogAction
-                                        className="bg-green-500 hover:bg-green-600"
+                                        className="bg-green-600 hover:bg-green-700"
                                         onClick={handleValidasiPeserta}
                                     >
                                         Validasi

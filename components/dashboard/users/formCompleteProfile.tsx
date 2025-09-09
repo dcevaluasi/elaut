@@ -1,7 +1,6 @@
 "use client";
 
 import Toast from "@/components/toast";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -10,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { usePathname, useRouter } from "next/navigation";
-import React, { FormEvent } from "react";
+import React from "react";
 
 import { TbFileStack, TbMapPinSearch, TbUserEdit } from "react-icons/tb";
 
@@ -20,24 +19,16 @@ import axios, { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
 import { User } from "@/types/user";
 import { HashLoader } from "react-spinners";
-import Image from "next/image";
 import { ALLOWED_EXTENSIONS, MAX_FILE_SIZE, MIN_FILE_SIZE } from "@/utils/file";
-import { SATUAN_PENDIDIKAN, SATUAN_PENDIDIKAN_KEAHLIAN } from "@/constants/pelatihan";
-import { wilayahIDUrl } from "@/constants/urls";
+import { SATUAN_PENDIDIKAN_KEAHLIAN } from "@/constants/pelatihan";
 import { KABUPATENS, PROVINCES } from "@/constants/regions";
 import { FaFileUpload } from "react-icons/fa";
 import { truncateText } from "@/utils";
-
-type Region = {
-  code: string;
-  name: string;
-}
 
 function FormCompleteProfile() {
   const router = useRouter();
 
   const pathname = usePathname();
-  const isEditProfile = pathname.includes("edit-profile");
 
   /* token user */
   const token = Cookies.get("XSRF081");
@@ -573,8 +564,8 @@ function FormCompleteProfile() {
                           <SelectValue placeholder="Pilih jenis kelamin" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Laki - Laki">Laki - Laki</SelectItem>
-                          <SelectItem value="Perempuan">Perempuan</SelectItem>
+                          <SelectItem value="L">Laki - Laki</SelectItem>
+                          <SelectItem value="P">Perempuan</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

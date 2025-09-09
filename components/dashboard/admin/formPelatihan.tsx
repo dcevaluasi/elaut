@@ -1,7 +1,6 @@
 "use client";
 
 import Toast from "@/components/toast";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -20,23 +19,13 @@ import { TbFileStack, TbListDetails, TbSchool } from "react-icons/tb";
 
 import { Progress } from "@/components/ui/progress";
 import { MdOutlineFastfood } from "react-icons/md";
-import { Editor } from "@tinymce/tinymce-react";
-import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import { HiMiniBookOpen, HiUserGroup } from "react-icons/hi2";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import axios, { AxiosResponse } from "axios";
-import { CheckedState } from "@radix-ui/react-checkbox";
-import { refresh } from "aos";
 import { extractLastSegment, generateRandomString } from "@/utils";
 import Cookies from "js-cookie";
-import { PelatihanMasyarakat } from "@/types/product";
-import Image from "next/image";
 import { convertIdSarpras } from "@/utils/pelatihan";
-import Link from "next/link";
-import { IoIosImages, IoMdInformationCircle } from "react-icons/io";
-import { FiBookOpen, FiFileText } from "react-icons/fi";
-import { LemdiklatDetailInfo } from "@/types/lemdiklat";
 import { RiVerifiedBadgeLine } from "react-icons/ri";
 import { HashLoader } from "react-spinners";
 import { AKP_CERTIFICATIONS, AQUACULTURE_CERTIFICATIONS, OCEAN_CERTIFICATIONS } from "@/constants/serkom";
@@ -53,8 +42,6 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
   const token = Cookies.get("XSRF091");
-
-  const pathname = usePathname();
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -151,13 +138,12 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
             'created_at': generateTimestamp(),
             id: kodePelatihan,
             notes: `Telah membuka kelas pelatihan ${namaPelatihan}`,
-            role: Cookies.get('Eselon'),
+            role: Cookies.get('Role'),
             upt: `${Cookies.get("Nama")} - ${Cookies.get("Satker")}`
           }
         ],
         status: 'On Progress'
       })
-      console.log({ result })
     } catch (error) {
       console.log({ error })
     }
@@ -644,92 +630,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                         </div>
                       </div>
 
-                      {
-                        isOperatorBalaiPelatihan && <div className="flex flex-col gap-2 w-full">
-                          <label
-                            className="block text-gray-800 text-sm font-medium"
-                            htmlFor="kodePelatihan"
-                          >
-                            Proses Pendaftaran
-                          </label>
-                          <div className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow -mt-1">
-                            <div>
-                              <Checkbox
-                                onCheckedChange={(e) =>
-                                  setProsesPendaftaran(!prosesPendaftaran)
-                                }
-                              />
-                            </div>
-                            <div className="space-y-1 leading-none">
-                              <label>Pendaftaran Peserta</label>
-                              <p className="text-xs text-gray-600">
-                                Checked jika terdapat proses pendaftaran dan
-                                tentukan tanggal Pendaftaran untuk pelatihan yang
-                                dibuka!
-                              </p>
-                            </div>
-                          </div>
-                          {prosesPendaftaran && (
-                            <div className="flex gap-2 w-full">
-                              <div className="flex flex-wrap -mx-3 mb-1 w-full">
-                                <div className="w-full px-3">
-                                  <label
-                                    className="block text-gray-800 text-sm font-medium mb-1"
-                                    htmlFor="kodePelatihan"
-                                  >
-                                    Tanggal Mulai Pendaftaran{" "}
-                                    <span className="text-red-600">*</span>
-                                  </label>
-                                  <input
-                                    id="tanggalMulaiPelatihan"
-                                    type="date"
-                                    className="form-input w-full text-black border-gray-300 rounded-md"
-                                    required
-                                    min={new Date().toISOString().split("T")[0]}
-                                    value={tanggalMulaiPendaftaran}
-                                    onChange={(
-                                      e: ChangeEvent<HTMLInputElement>
-                                    ) =>
-                                      setTanggalMulaiPendaftaran(e.target.value)
-                                    }
-                                  />
-                                </div>
-                              </div>
 
-                              <div className="flex flex-wrap -mx-3 mb-1 w-full">
-                                <div className="w-full px-3">
-                                  <label
-                                    className="block text-gray-800 text-sm font-medium mb-1"
-                                    htmlFor="namaPelatihan"
-                                  >
-                                    Tanggal Berakhir Pendaftaran{" "}
-                                    <span className="text-red-600">*</span>
-                                  </label>
-                                  <input
-                                    id="tanggalBerakhirPelatihan"
-                                    type="date"
-                                    className="form-input w-full text-black border-gray-300 rounded-md"
-                                    required
-                                    min={
-                                      tanggalMulaiPendaftaran ||
-                                      new Date().toISOString().split("T")[0]
-                                    }
-                                    value={tanggalBerakhirPendaftaran}
-                                    onChange={(
-                                      e: ChangeEvent<HTMLInputElement>
-                                    ) =>
-                                      setTanggalBerakhirPendaftaran(
-                                        e.target.value
-                                      )
-                                    }
-                                    disabled={!tanggalMulaiPendaftaran}
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      }
 
                       <div className="flex flex-col gap-2 w-full mt-2 mb-1">
                         <label
@@ -969,6 +870,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                                   PNBP/BLU
                                 </SelectItem>
                                 <SelectItem value="Reguler">Reguler</SelectItem>
+                                <SelectItem value="Kerja Sama">Kerja Sama</SelectItem>
                                 <SelectItem value="Satuan Pendidikan">Satuan Pendidikan</SelectItem>
                               </SelectContent>
                             </Select>

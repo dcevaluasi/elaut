@@ -49,7 +49,6 @@ export default function LayoutAdminElaut({
       Cookies.set("Role", breakdownStatus(data.data.Status)[0]);
       Cookies.set("Access", breakdownStatus(data.data.Status)[1]);
 
-
     } catch (error) {
       console.error(error);
     }

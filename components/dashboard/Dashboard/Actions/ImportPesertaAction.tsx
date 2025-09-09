@@ -20,6 +20,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import Link from "next/link";
 import Toast from "@/components/toast";
+import { downloadFormatPesertaPelatihan, urlPetunjukUploadPesertaPelatihan } from "@/constants/urls";
 
 interface ImportPesertaActionProps {
     idPelatihan: string;
@@ -81,7 +82,7 @@ const ImportPesertaAction: React.FC<ImportPesertaActionProps> = ({
             setFileExcel(null);
             if (onSuccess) onSuccess();
         } catch (error) {
-            console.error("FILE IMPORT PESERTA PELATIHAN:", error);
+
             Toast.fire({
                 icon: "error",
                 title: "Gagal!",
@@ -111,7 +112,7 @@ const ImportPesertaAction: React.FC<ImportPesertaActionProps> = ({
                         }
                     }}
                     className="flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border   
-            bg-transparent border-green-500 text-green-500 hover:text-white hover:bg-green-500 transition-colors w-fit shadow-sm"
+            bg-transparent border-green-600 text-green-600 hover:text-white hover:bg-green-600 transition-colors w-fit shadow-sm"
                 >
                     <PiMicrosoftExcelLogoFill className="h-5 w-5" />
                     Import Data Peserta
@@ -165,7 +166,7 @@ const ImportPesertaAction: React.FC<ImportPesertaActionProps> = ({
                             {/* Download Template */}
                             <Link
                                 target="_blank"
-                                href="https://docs.google.com/spreadsheets/d/12t7l4bBjPBcxXpCPPOqYeTDoZxBi5aS7/export?format=xlsx"
+                                href={downloadFormatPesertaPelatihan}
                                 className="flex flex-col items-center justify-center w-36 h-28 rounded-lg bg-green-600 text-white text-sm font-medium shadow hover:bg-green-700 transition gap-2"
                             >
                                 <PiMicrosoftExcelLogoFill className="h-6 w-6" />
@@ -173,11 +174,18 @@ const ImportPesertaAction: React.FC<ImportPesertaActionProps> = ({
                             </Link>
                         </div>
 
-                        <p className="text-xs text-gray-500 mt-2 leading-snug">
-                            *Download template terlebih dahulu, isi file Excel, lalu upload.
-                            Perlu diingat, import data hanya dapat dilakukan{" "}
-                            <span className="font-semibold">sekali</span>.
-                        </p>
+                        <div className="flex flex-col gap-0">
+                            <p className="text-xs text-gray-500 mt-2 leading-snug">
+                                *Download template terlebih dahulu, isi file Excel, lalu upload.
+                                Perlu diingat, input data melalui skema import hanya dapat dilakukan{" "}
+                                <span className="font-semibold">sekali</span>.
+                            </p>
+                            <p className="text-xs text-gray-500">
+                                *Petunjuk pengisian format <Link href={urlPetunjukUploadPesertaPelatihan} target="_blank" className='!text-blue-500 underline'>{truncateText(urlPetunjukUploadPesertaPelatihan, 50, '...')}</Link>
+                            </p>
+                        </div>
+
+
                     </div>
 
                     {/* Footer */}

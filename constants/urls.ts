@@ -21,5 +21,11 @@ export const urlFileSuratPemberitahuan =
 export const urlFileBeritaAcara =
   process.env.NEXT_PUBLIC_BASE_URL + '/public/static/BeritaAcara'
 
+export const downloadFormatPesertaPelatihan =
+  'https://docs.google.com/spreadsheets/d/1rjYQjMSX6U2Szk0H8GQV3D7qLPL0VrGD/export?format=xlsx'
+
 export const urlPetunjukUploadMateriPelatihan =
   'https://docs.google.com/spreadsheets/d/19RgM5KDqGp6CVVCJ8XJMSvgQm1jsj8PgiSecH2JC1yQ/edit?usp=sharing'
+
+export const urlPetunjukUploadPesertaPelatihan =
+  'https://docs.google.com/spreadsheets/d/1hhxCfNIwgXDt9KBm68wXB53ad_Ntqz8eME6mGD8rnGo/edit?usp=sharing'

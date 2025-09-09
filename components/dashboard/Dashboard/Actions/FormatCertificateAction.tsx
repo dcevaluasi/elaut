@@ -23,7 +23,6 @@ import { urlTemplateMateriPelatihan } from "@/constants/templates";
 import { MateriPelatihan, PelatihanMasyarakat } from "@/types/product";
 import { truncateText } from "@/utils";
 
-// --- Dual Input Component ---
 const DualLangInput: React.FC<{
     value?: string;
     onChange: (val: string) => void;

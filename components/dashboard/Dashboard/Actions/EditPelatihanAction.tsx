@@ -65,7 +65,7 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
     const [pelaksanaanPelatihan, setPelaksanaanPelatihan] = useState(
         currentData?.PelaksanaanPelatihan || ""
     );
-    const [hargaPelatihan, setHargaPelatihan] = useState(currentData?.HargaPelatihan || "");
+    const [hargaPelatihan, setHargaPelatihan] = useState(currentData?.HargaPelatihan || 0);
 
     const [loading, setLoading] = useState(false);
 
@@ -198,6 +198,7 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
                                 <SelectItem value="Aspirasi">Aspirasi</SelectItem>
                                 <SelectItem value="PNBP/BLU">PNBP/BLU</SelectItem>
                                 <SelectItem value="Reguler">Reguler</SelectItem>
+                                <SelectItem value="Kerja Sama">Kerja Sama</SelectItem>
                                 <SelectItem value="Satuan Pendidikan">Satuan Pendidikan</SelectItem>
                             </SelectContent>
                         </Select>
@@ -293,9 +294,10 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
                         <label className="text-sm font-medium text-gray-700">Harga Pelatihan</label>
                         <input
                             type="number"
+                            min={0}
                             className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
                             value={hargaPelatihan}
-                            onChange={(e) => setHargaPelatihan(e.target.value)}
+                            onChange={(e) => setHargaPelatihan(parseInt(e.target.value))}
                         />
                     </div>
                 </div>

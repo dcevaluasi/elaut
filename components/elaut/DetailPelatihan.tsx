@@ -18,6 +18,7 @@ import { HiOutlineUserGroup } from "react-icons/hi2";
 import { FiUploadCloud } from "react-icons/fi";
 import Link from "next/link";
 import AuthenticationDialog from "./reusable/AuthenticationDialog";
+import { isMoreThanToday } from "@/utils/time";
 
 interface DetailPelatihanProps {
   data: DetailPelatihanMasyarakat;
@@ -117,10 +118,8 @@ const DetailPelatihan: React.FC<DetailPelatihanProps> = ({
               <div dangerouslySetInnerHTML={{ __html: data.DetailPelatihan }} />
             </div>
 
-
-
             {/* Register Button */}
-            {data.StatusApproval !== "Selesai" && !isRegistrasi && (
+            {(!isRegistrasi && !isMoreThanToday(data?.TanggalAkhirPendaftaran)) && (
               <div className="mt-8">
                 {!Cookies.get("XSRF081") ? (
                   <>

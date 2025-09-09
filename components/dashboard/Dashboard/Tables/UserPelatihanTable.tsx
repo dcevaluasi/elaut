@@ -48,6 +48,8 @@ import Cookies from "js-cookie";
 import Toast from "@/components/toast";
 import { generatedStatusCertificate } from "@/utils/certificates";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
+import EditPesertaAction from "../Actions/EditPesertaAction";
+import { countUserWithNoSertifikat } from "@/utils/counter";
 
 interface UserPelatihanTableProps {
     pelatihan: PelatihanMasyarakat
@@ -215,34 +217,32 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                     },
                     cell: ({ row }) => (
                         <div className="capitalize w-full flex items-center justify-center">
-                            {
-                                row.original.Keterangan != "" && <label className="flex items-center gap-2 text-base font-semibold tracking-tight leading-none">
-                                    <label
-                                        htmlFor="keterangan"
-                                        className="flex items-center gap-2 cursor-pointer font-semibold  disabled:cursor-not-allowed justify-center"
-                                    >
-                                        <Checkbox
-                                            disabled={row.original.StatusPenandatangan === "Done"}
-                                            id="keterangan"
-                                            onCheckedChange={() => handleLulusValidPeserta(row.original)}
-                                            checked={
-                                                row.original.Keterangan === "Valid"
-                                            }
-                                            className="h-7 w-8 rounded-md border border-gray-300 bg-white shadow-sm
-             data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500 
+                            <label className="flex items-center gap-2 text-base font-semibold tracking-tight leading-none">
+                                <label
+                                    htmlFor="keterangan"
+                                    className="flex items-center gap-2 cursor-pointer font-semibold  disabled:cursor-not-allowed justify-center"
+                                >
+                                    <Checkbox
+                                        disabled={row.original.StatusPenandatangan === "Done"}
+                                        id="keterangan"
+                                        onCheckedChange={() => handleLulusValidPeserta(row.original)}
+                                        checked={
+                                            row.original.Keterangan === "Valid"
+                                        }
+                                        className="h-7 w-8 rounded-md border border-gray-300 bg-white shadow-sm
+             data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 
              transition-all duration-200 ease-in-out
              hover:border-green-400 hover:shadow-md
-             focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-500 
+             focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green-600 
              disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
-                                        >
-                                            <Check className="h-4 w-4 text-white" />
-                                        </Checkbox>
+                                    >
+                                        <Check className="h-4 w-4 text-white" />
+                                    </Checkbox>
 
-                                        {row.original.Keterangan}
-                                    </label>
-
+                                    {row.original.Keterangan == "" ? "Tidak Valid" : row.original.Keterangan}
                                 </label>
-                            }
+
+                            </label>
 
                         </div>
 
@@ -297,7 +297,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                 );
             },
             cell: ({ row }) => (
-                <div className="w-full flex items-center justify-center">
+                <div className="w-full flex items-center gap-3 justify-center">
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
                             <Button
@@ -313,6 +313,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                             userPelatihanId={row.original.IdUserPelatihan}
                         />
                     </AlertDialog>
+                    <EditPesertaAction idPelatihan={row.original.IdPelatihan.toString()} onSuccess={onSuccess} idPeserta={row.original.IdUsers.toString()} />
                 </div>
 
             ),
@@ -340,30 +341,30 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                 </div>
             ),
         },
-        {
-            accessorKey: "NoRegistrasi",
-            header: ({ column }) => {
-                return (
-                    <Button
-                        variant="ghost"
-                        className={`text-black font-semibold w-full p-0 flex justify-center items-center`}
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    >
-                        <p className="leading-[105%]">No STTPL</p>
+        ...(countUserWithNoSertifikat(pelatihan?.UserPelatihan) != 0
+            ? [{
+                accessorKey: "NoRegistrasi",
+                header: ({ column }: { column: any }) => {
+                    return (
+                        <Button
+                            variant="ghost"
+                            className={`text-black font-semibold w-full p-0 flex justify-center items-center`}
+                            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        >
+                            <p className="leading-[105%]">No STTPL</p>
 
-                        <AiOutlineFieldNumber className="ml-2 h-4 w-4" />
-                    </Button>
-                );
-            },
-            cell: ({ row }) => (
-                <div className={`${"ml-0"} text-center capitalize `}>
-                    <p className="text-base font-semibold tracking-tight leading-none">
-                        {row.original.NoRegistrasi}
-                    </p>
-                </div>
-            ),
-        },
-
+                            <AiOutlineFieldNumber className="ml-2 h-4 w-4" />
+                        </Button>
+                    );
+                },
+                cell: ({ row }: { row: any }) => (
+                    <div className={`${"ml-0"} text-center capitalize `}>
+                        <p className="text-base font-semibold tracking-tight leading-none">
+                            {row.original.NoRegistrasi}
+                        </p>
+                    </div>
+                ),
+            },] : []),
         ...(parseInt(pelatihan.StatusPenerbitan) <= 5
             ? [
                 {
@@ -618,7 +619,7 @@ const DetailPesertaDialog = ({ pesertaId, userPelatihanId }: { pesertaId: number
                 <p>Loading...</p>
             )}
 
-            {peserta != null && (
+            {/* {peserta != null && (
                 <div className={`w-full flex items-center justify-center gap-1`}>
                     <VerifikasiPesertaAction
                         idUser={userPelatihanId.toString()}
@@ -626,10 +627,10 @@ const DetailPesertaDialog = ({ pesertaId, userPelatihanId }: { pesertaId: number
                         handleFetchingData={handleFetchDetailPeserta}
                     />
                 </div>
-            )}
+            )} */}
 
             <AlertDialogFooter>
-                <AlertDialogCancel>Tutup</AlertDialogCancel>
+                <AlertDialogCancel className="w-full">Tutup</AlertDialogCancel>
             </AlertDialogFooter>
         </AlertDialogContent>
     );

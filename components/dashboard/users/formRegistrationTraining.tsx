@@ -96,14 +96,14 @@ function FormRegistrationTraining({
         `${process.env.NEXT_PUBLIC_BASE_URL}/exportPesertaPelatihan`,
         formData
       );
-      console.log("FILE UPLOADED PESERTA : ", response);
+
       Toast.fire({
         icon: "success",
         title: `Selamat anda berhasil mengupload peserta pelatihan!`,
       });
       setIsOpenFormPeserta(!isOpenFormPeserta);
     } catch (error) {
-      console.log("FILE IMPORT PESERTA PELATIHAN : ", error);
+
       Toast.fire({
         icon: "error",
         title: `Gagal mengupload peserta pelatihan!`,

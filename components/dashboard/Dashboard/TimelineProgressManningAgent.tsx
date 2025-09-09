@@ -133,7 +133,7 @@ export const TimelineProgressManningAgent = ({
         }
       }
 
-      console.log("FILE IMPORT PESERTA PELATIHAN : ", error);
+
       setIsOpenFormPeserta(false);
     }
   };
@@ -156,22 +156,20 @@ export const TimelineProgressManningAgent = ({
             <div className="relative col-span-12 px-4 space-y-6 sm:col-span-9">
               <div className="col-span-12 space-y-12 relative px-4 sm:col-span-8 sm:space-y-8 sm:before:absolute sm:before:top-2 sm:before:bottom-0 sm:before:w-0.5 sm:before:-left-3 before:bg-gray-300">
                 <div
-                  className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${
-                    pelatihan?.ManningAgentUsers.length == 0
+                  className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${pelatihan?.ManningAgentUsers.length == 0
                       ? "before:bg-gray-700"
                       : pelatihan?.ManningAgentUsers.length > 0
-                      ? "before:bg-blue-500"
-                      : "before:bg-gray-700"
-                  } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer`}
+                        ? "before:bg-blue-500"
+                        : "before:bg-gray-700"
+                    } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer`}
                 >
                   <h3 className="text-lg font-semibold">Import Peserta </h3>
 
                   <time
-                    className={`text-sm font-medium ${
-                      pelatihan?.ManningAgentUsers.length == 0
+                    className={`text-sm font-medium ${pelatihan?.ManningAgentUsers.length == 0
                         ? "text-gray-700"
                         : "text-blue-500"
-                    }`}
+                      }`}
                   >
                     {pelatihan?.ManningAgentUsers.length == 0 ? (
                       <span className="flex items-start gap-1">
@@ -350,20 +348,18 @@ export const TimelineProgressManningAgent = ({
                 </div>
 
                 <div
-                  className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${
-                    pelatihan?.ManningAgentUsers.length > 0
+                  className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${pelatihan?.ManningAgentUsers.length > 0
                       ? "before:bg-blue-500"
                       : "before:bg-gray-700"
-                  } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer`}
+                    } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer`}
                 >
                   <h3 className="text-lg font-semibold">Validasi Peserta </h3>
 
                   <time
-                    className={`text-sm font-medium ${
-                      pelatihan?.ManningAgentUsers.length > 0
+                    className={`text-sm font-medium ${pelatihan?.ManningAgentUsers.length > 0
                         ? "text-blue-500"
                         : "text-gray-700"
-                    }`}
+                      }`}
                   >
                     <span className="flex items-center">
                       <RiVerifiedBadgeFill className="text" />
@@ -416,11 +412,10 @@ export const TimelineProgressManningAgent = ({
                 </div>
 
                 <div
-                  className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${
-                    detailPelatihan!.StatusApproval == "Selesai"
+                  className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${detailPelatihan!.StatusApproval == "Selesai"
                       ? "before:bg-blue-400"
                       : "before:bg-gray-700"
-                  } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer `}
+                    } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer `}
                 >
                   <h3 className="text-lg font-semibold">
                     Pelaksanaan Pelatihan {detailPelatihan!.NamaPelatihan}
@@ -471,12 +466,11 @@ export const TimelineProgressManningAgent = ({
                 </div>
 
                 <div
-                  className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${
-                    detailPelatihan!.StatusApproval == "Selesai" &&
-                    detailPelatihan.NoSertifikat != ""
+                  className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${detailPelatihan!.StatusApproval == "Selesai" &&
+                      detailPelatihan.NoSertifikat != ""
                       ? "before:bg-blue-500"
                       : "before:bg-gray-700"
-                  } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer `}
+                    } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer `}
                 >
                   <h3 className="text-lg font-semibold">
                     Sertifikat Pelatihan {pelatihan!.NamaPelatihan}
@@ -486,7 +480,7 @@ export const TimelineProgressManningAgent = ({
                   </time>
                   <span className="text-xs">
                     {detailPelatihan!.StatusApproval == "Selesai" &&
-                    detailPelatihan.NoSertifikat != ""
+                      detailPelatihan.NoSertifikat != ""
                       ? "Selamat, peserta-mu telah mengikuti dan menyelesaikan rangkaian pelatihan. Sertifikat pelatihan dapat diakses melalui akun masing - masing peserta!"
                       : "Harap mengikuti rangkaian pelaksanaan pelatihan untuk mendapatkan sertifikat serta pastikan peserta mu dapat mengikuti rangkaian pelatihan dengan baik."}
                   </span>

@@ -647,7 +647,7 @@ const TableDataPesertaPelatihan = () => {
       setIsOpenFormPeserta(!isOpenFormPeserta);
       handleFetchingPublicTrainingDataById();
     } catch (error) {
-      console.log("FILE IMPORT PESERTA PELATIHAN : ", error);
+
       Toast.fire({
         icon: "error",
         title: `Gagal mengupload peserta pelatihan!`,
@@ -1085,7 +1085,7 @@ const TableDataPesertaPelatihan = () => {
               </div>
               <table className="w-full">
                 <tr className="flex w-fit items-center justify-start p-2 gap-2">
-                  {/* Import Peserta Pelatihan */}
+
                   {(Cookies.get('Access')?.includes('createCertificates') &&
                     dataPelatihan?.StatusApproval != "Selesai" && dataPelatihan?.UserPelatihan.length == 0) && (
                       <Button

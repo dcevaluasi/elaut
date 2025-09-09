@@ -41,6 +41,7 @@ import { FiCalendar, FiSearch } from "react-icons/fi";
 import { generateTanggalPelatihan } from "@/utils/text";
 import { GrSend } from "react-icons/gr";
 import { AKP_CERTIFICATIONS, AQUACULTURE_CERTIFICATIONS, OCEAN_CERTIFICATIONS } from "@/constants/serkom";
+import { formatDateRange } from "@/utils/time";
 
 function PencarianPelatihan() {
   const [data, setData] = React.useState<PelatihanMasyarakat[] | null>(null);
@@ -368,8 +369,8 @@ function PencarianPelatihan() {
                   <div>Pelatihan</div>
                   <div>Penyelenggara</div>
                   <div></div>
-                  <div>Pelaksanaan</div>
-                  <div>Harga</div>
+                  <div>Waktu Pelaksanaan</div>
+                  <div>Biaya</div>
                 </div>
 
                 <div className=" gap-4 flex w-full mt-4">
@@ -412,19 +413,24 @@ function PencarianPelatihan() {
 const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
   return (
     <div className="bg-white shadow-custom text-black p-4 rounded-xl grid grid-cols-1 md:grid-cols-5 mb-4 items-center">
-      {/* Train Info */}
       <div className="max-w-xs leading-[115%]">
         <h3 className="text-xl font-bold">{pelatihan.NamaPelatihan}</h3>
-        <p className="text-sm">{pelatihan.BidangPelatihan} (S)</p>
+        <p className="text-sm">{pelatihan.BidangPelatihan}</p>
+        <p className="text-sm">
+          {pelatihan!.TanggalMulaiPendaftaran != "" && (
+            <span className="text-sm leading-[100%] block">
+              Waktu Pendaftaran :<br />
+              {formatDateRange(pelatihan!.TanggalMulaiPendaftaran, pelatihan!.TanggalBerakhirPendaftaran)}
+            </span>
+          )}
+        </p>
       </div>
 
-      {/* Departure Info */}
       <div className="text-left md:text-center">
-        <p className="font-bold">{pelatihan.PenyelenggaraPelatihan}</p>
+        <p className="font-bold leading-none">{pelatihan.PenyelenggaraPelatihan}</p>
         <p className="text-sm leading-[100%]">{pelatihan.LokasiPelatihan}</p>
       </div>
 
-      {/* Arrow and Duration */}
       <div className="hidden md:flex flex-col items-start md:items-center">
         <div className="bg-blue-500 p-2 rounded-full">
           <svg
@@ -445,27 +451,18 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
         </div>
       </div>
 
-      {/* Arrival Info */}
       <div className="text-left md:text-center">
         <p className="font-bold">{pelatihan.PelaksanaanPelatihan}</p>
-        {pelatihan!.TanggalMulaiPelatihan != "" ? (
+        {pelatihan!.TanggalMulaiPelatihan != "" && (
           <span className="text-sm leading-[100%] block">
-            {generateTanggalPelatihan(pelatihan.TanggalMulaiPelatihan)} -{" "}
-            {generateTanggalPelatihan(pelatihan.TanggalBerakhirPelatihan)}
-          </span>
-        ) : (
-          <span className="text-sm leading-[100%] block">
-            Waktu Pendaftaran <br />
-            {generateTanggalPelatihan(pelatihan.TanggalMulaiPendaftaran)} -{" "}
-            {generateTanggalPelatihan(pelatihan!.TanggalBerakhirPendaftaran)}
+            {formatDateRange(pelatihan.TanggalMulaiPelatihan, pelatihan.TanggalBerakhirPelatihan)}
           </span>
         )}
       </div>
 
-      {/* Price and Button */}
       <div className="text-center flex md:items-center md:justify-center flex-col">
         {pelatihan?.StatusApproval != "Selesai" && (
-          <p className="text-blue-500 text-left text-xl font-bold">
+          <p className="text-blue-500 text-left text-xl leading-none font-bold">
             {formatToRupiah(pelatihan.HargaPelatihan)}
           </p>
         )}
@@ -477,7 +474,7 @@ const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
           className={`${pelatihan?.StatusApproval == "Selesai"
             ? "bg-gray-500"
             : "bg-blue-500"
-            } text-white px-4 py-2 text-base rounded-md mb-1 mt-2 w-full md:w-fit block`}
+            } text-white px-4 py-2 text-sm rounded-full mb-1 mt-2 w-full md:w-fit block`}
         >
           {pelatihan.StatusApproval == "Selesai"
             ? "Sudah Selesai"

@@ -104,18 +104,17 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
 
             <AlertDialogContent className="max-w-3xl">
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Edit Informasi Pelatihan</AlertDialogTitle>
+                    <AlertDialogTitle>Edit Informasi Publish dan Promosi Pelatihan</AlertDialogTitle>
                     <AlertDialogDescription>
                         Perbarui detail deskripsi atau unggah foto baru untuk pelatihan ini.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 
                 <div className="space-y-4 py-2">
-
                     <div className="flex gap-2 w-full">
                         <div className="space-y-2 w-full">
                             <label className="text-sm font-medium text-gray-700">
-                                Tanggal Mulai Pelatihan
+                                Tanggal Mulai Pendaftaran
                             </label>
                             <input
                                 type="date"
@@ -125,10 +124,9 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
                             />
                         </div>
 
-                        {/* Tanggal Akhir Pelatihan */}
                         <div className="space-y-2 w-full">
                             <label className="text-sm font-medium text-gray-700">
-                                Tanggal Akhir Pelatihan
+                                Tanggal Akhir Pendaftaran
                             </label>
                             <input
                                 type="date"

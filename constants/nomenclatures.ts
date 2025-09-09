@@ -70,11 +70,11 @@ export const ESELON_3: ESELON = {
 
 export const UPT: string[] = [
   'Pusat Pelatihan Kelautan dan Perikanan',
-  'BPPP Medan',
-  'BPPP Tegal',
-  'BPPP Banyuwangi',
-  'BPPP Bitung',
-  'BPPP Ambon',
+  'Balai Pelatihan dan Penyuluhan Perikanan (BPPP) Medan',
+  'Balai Pelatihan dan Penyuluhan Perikanan (BPPP) Tegal',
+  'Balai Pelatihan dan Penyuluhan Perikanan (BPPP) Banyuwangi',
+  'Balai Pelatihan dan Penyuluhan Perikanan (BPPP) Bitung',
+  'Balai Pelatihan dan Penyuluhan Perikanan (BPPP) Ambon',
   'Politeknik KP Dumai',
   'Politeknik AUP Jakarta',
   'Politeknik KP Karawang',

@@ -42,14 +42,12 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
     const { label, color, icon } = getStatusInfo(data.StatusPenerbitan)
     const { adminPusatData, loading, error, fetchAdminPusatData } = useFetchDataPusatById(data?.VerifikatorPelatihan)
 
-
     return (
         <div className="w-full space-y-6 py-5">
             <Accordion
-                type="single"
-                collapsible
+                type="multiple"
                 className="w-full space-y-3"
-                defaultValue="📌 Informasi Umum"
+                defaultValue={["📌 Informasi Umum Pelatihan", "🌐 Publish Informasi dan Promosi", "👥 Peserta Pelatihan"]}
             >
                 {(!data?.TtdSertifikat?.includes("Kepala Balai") ? parseInt(data?.StatusPenerbitan) < 5 : parseFloat(data?.StatusPenerbitan) < 1.25) &&
                     <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm bg-white">
@@ -66,11 +64,13 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     {
                                         Cookies.get('Access')?.includes('createPelatihan') &&
                                         <>
+                                            {/* Upload Surat Pemberitahuan */}
                                             <UploadSuratButton
                                                 idPelatihan={String(data.IdPelatihan)}
                                                 pelatihan={data}
                                                 handleFetchingData={fetchData}
                                             />
+
                                             {
                                                 (data.SuratPemberitahuan != "" && (data.StatusPenerbitan == "0" || data.StatusPenerbitan == "1.2")) &&
                                                 <SendNoteAction
@@ -215,9 +215,6 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             pelatihan={data}
                                         />
                                     }
-
-
-
                                 </div>
 
                                 <div className="w-full ">
@@ -226,10 +223,10 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     </p>
                                     {
                                         data.SuratPemberitahuan == "" ?
-                                            <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">
+                                            <div className="py-10 w-full max-w-3xl mx-auto h-full flex items-center flex-col justify-center gap-1">
                                                 <MdLock className='w-14 h-14 text-gray-600' />
                                                 <p className="text-gray-500 font-normal text-center">
-                                                    Harap mengupload surat pemberitahuan pelaksanaan pelatihan dan menunggu verifikasi pelaksanaan agar dapat melanjutkan tahapan berikutnya!
+                                                    Harap mengupload surat pemberitahuan pelaksanaan pelatihan (Paling Lambat H-3 Pelaksaan) dan selanjutnya menunggu verifikasi pelaksanaan agar dapat melanjutkan tahapan berikutnya!
                                                 </p>
                                             </div> :
                                             <div className={`grid ${adminPusatData != null ? 'grid-cols-3' : 'grid-cols-2'} gap-4 mt-4 w-full text-sm`}>
@@ -260,7 +257,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                         </div>
                     </div>}
 
-                <AccordionSection title="📌 Informasi Umum">
+                <AccordionSection title="📌 Informasi Umum Pelatihan">
                     <div className="flex flex-col w-full gap-4">
                         <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
                             <p className="font-medium text-gray-600">
@@ -274,9 +271,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                             <DeletePelatihanAction
                                 idPelatihan={data!.IdPelatihan.toString()}
                                 pelatihan={data}
-                                handleFetchingData={
-                                    fetchData
-                                }
+                                handleFetchingData={fetchData}
                             />
                         </div>
                         <div className="w-full ">
@@ -295,13 +290,9 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 <InfoItem label="Lokasi" value={data.LokasiPelatihan} />
                                 <InfoItem label="Harga" value={`Rp ${data.HargaPelatihan.toLocaleString()}`} />
                                 <InfoItem label="Pelaksanaan" value={data.PelaksanaanPelatihan} />
+                                <InfoItem label="Penandatangan Sertifikat" value={data.TtdSertifikat} />
                             </SectionGrid>
-                            <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border mt-4 border-gray-100">
-                                <span className="text-xs font-medium text-gray-500">Penandatangan Sertifikat</span>
-                                <p className="text-sm font-semibold text-gray-800 mt-1">
-                                    {data?.TtdSertifikat}
-                                </p>
-                            </div>
+
                             {parseInt(data?.StatusPenerbitan) >= 5 && <>
                                 <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border mt-4 border-gray-100">
                                     <span className="text-xs font-medium text-gray-500">Surat Pemberitahuan</span>
@@ -318,82 +309,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                         </div>
                     </div>
                 </AccordionSection>
-                <AccordionSection title="🌐 Publish Informasi">
-                    <div className="flex flex-col w-full gap-4">
-                        <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
-                            <p className="font-medium text-gray-600">
-                                Action :
-                            </p>
-                            {
-                                data?.StatusPenerbitan == "0" && <>
-                                    <EditPublishAction
-                                        idPelatihan={data.IdPelatihan.toString()}
-                                        currentDetail={data.DetailPelatihan}
-                                        currentFoto={data.FotoPelatihan}
-                                        tanggalPendaftaran={[data.TanggalMulaiPendaftaran, data.TanggalAkhirPendaftaran!]}
-                                        onSuccess={fetchData} />
 
-                                </>
-                            }
-                            {
-                                data?.FotoPelatihan != "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" && <>
-                                    {
-                                        data!.Status == "Publish" ? (
-                                            <PublishButton
-                                                title="Take Down"
-                                                statusPelatihan={data?.Status ?? ""}
-                                                idPelatihan={data!.IdPelatihan.toString()}
-                                                handleFetchingData={
-                                                    fetchData
-                                                }
-                                            />
-                                        ) : (
-                                            <PublishButton
-                                                title="Publish"
-                                                statusPelatihan={data?.Status ?? ""}
-                                                idPelatihan={data!.IdPelatihan.toString()}
-                                                handleFetchingData={
-                                                    fetchData
-                                                }
-                                            />
-                                        )
-                                    }</>
-                            }
-                        </div>
-                        <div className="w-full ">
-                            <p className="font-medium text-gray-600 mb-2">
-                                Detail  :
-                            </p>
-                            {
-                                data?.FotoPelatihan != "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" ?
-                                    <div className="grid grid-cols-2 gap-4 text-sm">
-                                        <InfoItem label="Pendaftaran Dibuka" value={generateTanggalPelatihan(data.TanggalMulaiPendaftaran)} />
-                                        <InfoItem label="Pendaftaran Ditutup" value={generateTanggalPelatihan(data.TanggalAkhirPendaftaran!)} />
-                                        <div className="flex flex-shrink-0 flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100 h-fit">
-                                            <span className="text-xs font-medium text-gray-500">Flyer/Poster</span>
-                                            <span className="text-sm font-semibold text-gray-800 mt-1">
-                                                {
-                                                    data.FotoPelatihan == "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" ? <></> : <Image
-                                                        className="w-[400px] h-full object-cover mx-auto flex-shrink-0"
-                                                        alt={data.NamaPelatihan}
-                                                        src={replaceUrl(data.FotoPelatihan)}
-                                                        width={400}
-                                                        height={400}
-                                                    />
-                                                }
-                                            </span>
-                                        </div>
-                                        <InfoItem label="Deskripsi" value={data.DetailPelatihan} />
-                                    </div> : <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">
-                                        <MdLock className='w-14 h-14 text-gray-600' />
-                                        <p className="text-gray-500 font-normal text-center">
-                                            Harap Mengedit Informasi Publish Terlebih Dahulu Untuk Menampilkan Informasi Pelatihan Pada Halaman Pencarian E-LAUT Untuk Masyarakat
-                                        </p>
-                                    </div>
-                            }
-                        </div>
-                    </div>
-                </AccordionSection>
                 {
                     parseInt(data?.StatusPenerbitan) < 5 &&
                     <AccordionSection title="👥 Peserta Pelatihan">
@@ -403,7 +319,8 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     Action :
                                 </p>
                                 {
-                                    (data?.StatusPenerbitan == "0" || data?.StatusPenerbitan == "3") && <ImportPesertaAction
+                                    (data?.StatusPenerbitan == "0" && data?.UserPelatihan?.length == 0) &&
+                                    <ImportPesertaAction
                                         idPelatihan={data?.IdPelatihan.toString()}
                                         statusApproval={data?.StatusApproval}
                                         onSuccess={fetchData}
@@ -411,17 +328,16 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             handleAddHistoryTrainingInExisting(
                                                 data!,
                                                 msg,
-                                                Cookies.get("Eselon"),
-                                                Cookies.get("Satker")
+                                                Cookies.get("Role"),
+                                                `${Cookies.get("Nama")} - ${Cookies.get("Satker")}`
                                             )
                                         }
                                     />
                                 }
 
                                 {
-                                    (countValidKeterangan(data?.UserPelatihan) == 0 || countValidKeterangan(data?.UserPelatihan) < data?.UserPelatihan.length) && <ValidateParticipantAction data={data?.UserPelatihan} onSuccess={fetchData} />
+                                    (data?.UserPelatihan.length != 0 && countValidKeterangan(data?.UserPelatihan) < data?.UserPelatihan.length) && <ValidateParticipantAction data={data?.UserPelatihan} onSuccess={fetchData} />
                                 }
-
                             </div>
 
                             <div className="w-full ">
@@ -440,8 +356,85 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                     </AccordionSection>
                 }
 
+                {
+                    Cookies.get('Access')?.includes('createPelatihan') && <AccordionSection title="🌐 Publish Informasi dan Promosi">
+                        <div className="flex flex-col w-full gap-4">
+                            <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
+                                <p className="font-medium text-gray-600">
+                                    Action :
+                                </p>
+                                {
+                                    data?.StatusPenerbitan == "0" && <>
+                                        <EditPublishAction
+                                            idPelatihan={data.IdPelatihan.toString()}
+                                            currentDetail={data.DetailPelatihan}
+                                            currentFoto={data.FotoPelatihan}
+                                            tanggalPendaftaran={[data.TanggalMulaiPendaftaran, data.TanggalAkhirPendaftaran!]}
+                                            onSuccess={fetchData} />
+                                    </>
+                                }
+                                {
+                                    data?.FotoPelatihan != "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" && <>
+                                        {
+                                            data!.Status == "Publish" ? (
+                                                <PublishButton
+                                                    title="Take Down"
+                                                    statusPelatihan={data?.Status ?? ""}
+                                                    idPelatihan={data!.IdPelatihan.toString()}
+                                                    handleFetchingData={
+                                                        fetchData
+                                                    }
+                                                />
+                                            ) : (
+                                                <PublishButton
+                                                    title="Publish"
+                                                    statusPelatihan={data?.Status ?? ""}
+                                                    idPelatihan={data!.IdPelatihan.toString()}
+                                                    handleFetchingData={
+                                                        fetchData
+                                                    }
+                                                />
+                                            )
+                                        }</>
+                                }
+                            </div>
+                            <div className="w-full ">
+                                <p className="font-medium text-gray-600 mb-2">
+                                    Detail  :
+                                </p>
+                                {
+                                    data?.FotoPelatihan != "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" ?
+                                        <div className="grid grid-cols-2 gap-4 text-sm">
+                                            <InfoItem label="Pendaftaran Dibuka" value={generateTanggalPelatihan(data.TanggalMulaiPendaftaran)} />
+                                            <InfoItem label="Pendaftaran Ditutup" value={generateTanggalPelatihan(data.TanggalAkhirPendaftaran!)} />
+                                            <div className="flex flex-shrink-0 flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100 h-fit">
+                                                <span className="text-xs font-medium text-gray-500">Flyer/Poster</span>
+                                                <span className="text-sm font-semibold text-gray-800 mt-1">
+                                                    {
+                                                        data.FotoPelatihan == "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" ? <></> : <Image
+                                                            className="w-[400px] h-full object-cover mx-auto flex-shrink-0"
+                                                            alt={data.NamaPelatihan}
+                                                            src={replaceUrl(data.FotoPelatihan)}
+                                                            width={400}
+                                                            height={400}
+                                                        />
+                                                    }
+                                                </span>
+                                            </div>
+                                            <InfoItem label="Deskripsi" value={data.DetailPelatihan} />
+                                        </div> : <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">
+                                            <MdLock className='w-14 h-14 text-gray-600' />
+                                            <p className="text-gray-500 font-normal text-center">
+                                                Untuk Melakukan Promosi Melalui Kanal Utama Website E-LAUT, Terlebih Dahulu Untuk Mengatur Informasi Publish Pada Tombol "Edit Informasi Publish". Tahapan Ini Opsional, Apabila Proses Pencarian/Registrasi Peserta Melalui E-LAUT.
+                                            </p>
+                                        </div>
+                                }
+                            </div>
+                        </div>
+                    </AccordionSection>
+                }
             </Accordion>
-        </div>
+        </div >
     );
 };
 
