@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { elautBaseUrl } from '@/constants/urls'
@@ -13,7 +13,7 @@ export function useFetchDataPusat() {
   const token = Cookies.get('XSRF091')
 
   const fetchAdminPusatData = useCallback(async () => {
-    if (token) {
+    if (!token) {
       setError('Token is missing')
       return
     }
@@ -26,13 +26,20 @@ export function useFetchDataPusat() {
         headers: { Authorization: `Bearer ${token}` },
       })
 
-      setAdminPusatData(response.data.data || [])
-      setLoading(false)
+      // 🔎 Try adjusting based on actual API response shape
+      if (Array.isArray(response.data)) {
+        setAdminPusatData(response.data)
+      } else if (Array.isArray(response.data.data)) {
+        setAdminPusatData(response.data.data)
+      } else {
+        setAdminPusatData([])
+      }
     } catch (err) {
       setError(err)
+    } finally {
       setLoading(false)
     }
-  }, [])
+  }, [token])
 
   return { adminPusatData, loading, error, fetchAdminPusatData }
 }

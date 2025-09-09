@@ -25,8 +25,8 @@ import Link from "next/link";
 import UploadSuratButton from "./Actions/UploadSuratButton";
 import { urlFileSuratPemberitahuan } from "@/constants/urls";
 import SendNoteAction from "./Actions/Lemdiklat/SendNoteAction";
-import { TbCheck, TbClock, TbCursorOff, TbPencilCheck, TbPencilCog, TbPencilX, TbSend } from "react-icons/tb";
-import { isMoreThanToday, isToday } from "@/utils/time";
+import { TbClock, TbPencilCheck, TbPencilCog, TbPencilX, TbSend } from "react-icons/tb";
+import { isMoreThanToday } from "@/utils/time";
 import HistoryButton from "./Actions/HistoryButton";
 import { LuSignature } from "react-icons/lu";
 import { ValidateParticipantAction } from "./Actions/Lemdiklat/ValidateParticipantAction";
@@ -47,7 +47,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
             <Accordion
                 type="multiple"
                 className="w-full space-y-3"
-                defaultValue={["📌 Informasi Umum Pelatihan", "🌐 Publish Informasi dan Promosi", "👥 Peserta Pelatihan"]}
+                defaultValue={["📌 Informasi Umum Pelatihan", "🌐 Publish Informasi dan Promosi", "👥 Peserta Pelatihan", "📑 Modul dan Perangkat Pelatihan"]}
             >
                 {(!data?.TtdSertifikat?.includes("Kepala Balai") ? parseInt(data?.StatusPenerbitan) < 5 : parseFloat(data?.StatusPenerbitan) < 1.25) &&
                     <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm bg-white">
@@ -137,60 +137,38 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     }
 
                                     {/* (1) SPV : Pending  */}
+                                    {/* (1) SPV : Pending for Pilih Verifikator  */}
                                     {
-                                        data?.TtdSertifikat.includes('Kepala Balai') ?
-                                            <>
-                                                {/* (1) Verifikator : Pending for Reject */}
-                                                {
-                                                    (Cookies.get('Access')?.includes('supervisePelaksanaan') && data.StatusPenerbitan == "1") && <SendNoteAction
-                                                        idPelatihan={data.IdPelatihan.toString()}
-                                                        title="Reject Pelaksaan"
-                                                        description="Segera melakukan verifikasi pelaksanaan diklat, pastikan perangkat dan kelengkapan administrasi pelatihan sesuai dan lengkap"
-                                                        buttonLabel="Reject Pelaksanaan"
-                                                        icon={TbPencilX}
-                                                        buttonColor="rose"
-                                                        onSuccess={fetchData}
-                                                        status={"1.2"}
-                                                        pelatihan={data}
-                                                    />
-                                                }
-
-                                                {/* (1) Verifikator : Pending for Approve */}
-                                                {
-                                                    (Cookies.get('Access')?.includes('supervisePelaksanaan') && data.StatusPenerbitan == "1") && <SendNoteAction
-                                                        idPelatihan={data.IdPelatihan.toString()}
-                                                        title="Approve Pelaksanaan"
-                                                        description="Segera melakukan verifikasi pelaksanaan diklat, pastikan perangkat dan kelengkapan administrasi pelatihan sesuai dan lengkap"
-                                                        buttonLabel="Approve Pelaksanaan"
-                                                        icon={TbPencilCheck}
-                                                        buttonColor="green"
-                                                        onSuccess={fetchData}
-                                                        status={"1.1"}
-                                                        pelatihan={data}
-                                                    />
-                                                }</> : <>
-                                                {/* (1) SPV : Pending for Pilih Verifikator  */}
-                                                {
-                                                    (Cookies.get('Access')?.includes('supervisePelaksanaan') && data.StatusPenerbitan == "1") && <SendNoteAction
-                                                        idPelatihan={data.IdPelatihan.toString()}
-                                                        title="Pilih Verifikator"
-                                                        description="Segera menunjuk verifikator dalam melalukan verifikasi pelaksanaan pelatihan"
-                                                        buttonLabel="Pilih Verifikator"
-                                                        icon={TbPencilCog}
-                                                        buttonColor="teal"
-                                                        onSuccess={fetchData}
-                                                        status={"2"}
-                                                        pelatihan={data}
-                                                    />
-                                                }</>
+                                        (Cookies.get('Access')?.includes('supervisePelaksanaan') && data.StatusPenerbitan == "1") && <>
+                                            <SendNoteAction
+                                                idPelatihan={data.IdPelatihan.toString()}
+                                                title="Reject Pelaksanaan"
+                                                description="Segera menunjuk verifikator dalam melalukan verifikasi pelaksanaan pelatiha"
+                                                buttonLabel="Reject Pelaksanaan"
+                                                icon={TbPencilX}
+                                                buttonColor="rose"
+                                                onSuccess={fetchData}
+                                                status={"1.2"}
+                                                pelatihan={data}
+                                            />
+                                            <SendNoteAction
+                                                idPelatihan={data.IdPelatihan.toString()}
+                                                title="Pilih Verifikator"
+                                                description="Segera menunjuk verifikator dalam melalukan verifikasi pelaksanaan pelatihan"
+                                                buttonLabel="Pilih Verifikator"
+                                                icon={TbPencilCog}
+                                                buttonColor="teal"
+                                                onSuccess={fetchData}
+                                                status={"2"}
+                                                pelatihan={data}
+                                            /></>
                                     }
-
 
                                     {/* (2) Verifikator : Pending Verifikator for Reject */}
                                     {
                                         (Cookies.get('Access')?.includes('verifyPelaksanaan') && data.StatusPenerbitan == "2") && <SendNoteAction
                                             idPelatihan={data.IdPelatihan.toString()}
-                                            title="Reject Pelaksaan"
+                                            title="Reject Pelaksanaan"
                                             description="Segera melakukan verifikasi pelaksanaan diklat, pastikan perangkat dan kelengkapan administrasi pelatihan sesuai dan lengkap"
                                             buttonLabel="Reject Pelaksanaan"
                                             icon={TbPencilX}
@@ -309,6 +287,49 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                         </div>
                     </div>
                 </AccordionSection>
+
+                {/* <AccordionSection title="📑 Modul dan Perangkat Pelatihan">
+                    <div className="flex flex-col w-full gap-4">
+                        <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
+                            <p className="font-medium text-gray-600">
+                                Action :
+                            </p>
+                            {
+                                (data?.StatusPenerbitan == "0" && data?.UserPelatihan?.length == 0) &&
+                                <ImportPesertaAction
+                                    idPelatihan={data?.IdPelatihan.toString()}
+                                    statusApproval={data?.StatusApproval}
+                                    onSuccess={fetchData}
+                                    onAddHistory={(msg) =>
+                                        handleAddHistoryTrainingInExisting(
+                                            data!,
+                                            msg,
+                                            Cookies.get("Role"),
+                                            `${Cookies.get("Nama")} - ${Cookies.get("Satker")}`
+                                        )
+                                    }
+                                />
+                            }
+
+                            {
+                                (data?.UserPelatihan.length != 0 && countValidKeterangan(data?.UserPelatihan) < data?.UserPelatihan.length) && <ValidateParticipantAction data={data?.UserPelatihan} onSuccess={fetchData} />
+                            }
+                        </div>
+
+                        <div className="w-full ">
+                            <p className="font-medium text-gray-600 mb-2">
+                                Detail  :
+                            </p>
+                            <div className="flex flex-col gap-2 w-full">
+
+                                <div className="grid grid-cols-2 gap-4 text-sm">
+                                    <InfoItem label="Modul Pelatihan" value={data.KoutaPelatihan} />
+                                    <InfoItem label="Jumlah Peserta" value={data.UserPelatihan.length.toString()} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </AccordionSection> */}
 
                 {
                     parseInt(data?.StatusPenerbitan) < 5 &&

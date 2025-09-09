@@ -313,7 +313,9 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                             userPelatihanId={row.original.IdUserPelatihan}
                         />
                     </AlertDialog>
-                    <EditPesertaAction idPelatihan={row.original.IdPelatihan.toString()} onSuccess={onSuccess} idPeserta={row.original.IdUsers.toString()} />
+                    {
+                        Cookies.get('Access')?.includes('createPelatihan') && <EditPesertaAction idPelatihan={row.original.IdPelatihan.toString()} onSuccess={onSuccess} idPeserta={row.original.IdUsers.toString()} />
+                    }
                 </div>
 
             ),

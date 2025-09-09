@@ -70,10 +70,8 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
         useFetchDataPusat();
 
     useEffect(() => {
-        if (isOpen) {
-            fetchAdminPusatData();
-        }
-    }, [isOpen, fetchAdminPusatData]);
+        fetchAdminPusatData()
+    }, [fetchAdminPusatData])
 
     const handleSubmit = async () => {
         const formData = new FormData();
@@ -132,7 +130,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
             <AlertDialogTrigger asChild>
                 <Button
                     variant="outline"
-                    className={`flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-${buttonColor}-500 text-${buttonColor}-500 hover:text-white hover:bg-${buttonColor}-500`}
+                    className={`flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all border bg-transparent border-${buttonColor}-500 text-${buttonColor}-500 hover:text-white hover:bg-${buttonColor}-500`}
                 >
                     <Icon className="h-5 w-5" />
                     <span>{buttonLabel}</span>
@@ -147,7 +145,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
 
                 {/* Input Pesan */}
                 {
-                    (Cookies.get('Access')?.includes('supervisePelaksanaan') && (pelatihan?.StatusPenerbitan == "1") && !pelatihan?.TtdSertifikat.includes('Kepala Balai')) && <div>
+                    (Cookies.get('Access')?.includes('supervisePelaksanaan') && (pelatihan?.StatusPenerbitan == "1")) && <div>
                         <Select
                             value={verifikatorPelaksanaan}
                             onValueChange={setVerifikatorPelaksanaan}
@@ -157,14 +155,15 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                                 <SelectValue placeholder="Pilih Verifikator" />
                             </SelectTrigger>
                             <SelectContent position="popper" className="z-[9999999]">
-                                {adminPusatData.filter((item) => breakdownStatus(item.Status)[0] == "Verifikator").map((admin) => (
+                                {loadingPusat ? <></> : <> {adminPusatData.filter((item) => breakdownStatus(item.Status)[0] == "Verifikator").map((admin) => (
                                     <SelectItem
                                         key={admin.IdAdminPusat}
                                         value={admin.IdAdminPusat.toString()}
                                     >
                                         {admin.Nama}
                                     </SelectItem>
-                                ))}
+                                ))}</>}
+
                             </SelectContent>
                         </Select>
                     </div>
