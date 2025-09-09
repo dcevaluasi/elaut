@@ -79,6 +79,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
         formData.append("VerifikatorPelatihan", verifikatorPelaksanaan);
         formData.append("VerifikatorSertifikat", verifikatorPelaksanaan);
         if (beritaAcaraFile) formData.append("BeritaAcara", beritaAcaraFile);
+        if (status == "4") formData.append("PemberitahuanDiterima", "Active")
 
         try {
             setLoading(true);
@@ -129,7 +130,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
             <AlertDialogTrigger asChild>
                 <Button
-                    variant="outline"
+
                     className={`flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all border bg-transparent border-${buttonColor}-500 text-${buttonColor}-500 hover:text-white hover:bg-${buttonColor}-500`}
                 >
                     <Icon className="h-5 w-5" />

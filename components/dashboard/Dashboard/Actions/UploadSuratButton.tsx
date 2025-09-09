@@ -145,7 +145,7 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Trigger Button */}
+      {/* activated when status is in draft (0), reject spv (1.2) and reject verifikator (3) */}
       {Cookies.get("Access")?.includes("createPelatihan") &&
         (pelatihan.StatusPenerbitan === "0" || pelatihan.StatusPenerbitan === "3" || pelatihan.StatusPenerbitan === "1.2") && (
           <Button

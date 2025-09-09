@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { FaSearch } from "react-icons/fa";
 import UserPelatihanTable from "./Tables/UserPelatihanTable";
 import { PassedParticipantAction } from "./Actions/Lemdiklat/PassedParticipantAction";
-import { countUserWithCertificate, countUserWithPassed } from "@/utils/counter";
+import { countUserWithCertificate, countUserWithNoStatus, countUserWithPassed } from "@/utils/counter";
 import TTDeDetail from "./TTDeDetail";
 import { ESELON1, ESELON_1 } from "@/constants/nomenclatures";
 import { useFetchDataPusatById } from "@/hooks/elaut/pusat/useFetchDataPusatById";
@@ -79,38 +79,24 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 {
                                     Cookies.get('Access')?.includes('createPelatihan') &&
                                     <>
-                                        {
-                                            (data.SuratPemberitahuan != "" && data.StatusPenerbitan == "0") &&
-                                            <SendNoteAction
-                                                idPelatihan={data.IdPelatihan.toString()}
-                                                title="Kirim ke SPV"
-                                                description="Apakah Anda yakin ingin mengirim pelaksanaan ini ke SPV untuk proses verifikasi lebih lanjut?"
-                                                buttonLabel="Send to SPV"
-                                                icon={TbSend}
-                                                buttonColor="blue"
-                                                onSuccess={fetchData}
-                                                status={"1"}
-                                                pelatihan={data}
-                                            />
-                                        }
 
-                                        {/* (1.25 || 5) Operator : Send Penerbitan STTPL */}
-                                        {["5", "1.25"].includes(data.StatusPenerbitan) && data?.DeskripsiSertifikat !== "" && (
+                                        {/* (5) Operator : Send Penerbitan STTPL */}
+                                        {["5"].includes(data.StatusPenerbitan) && data?.DeskripsiSertifikat !== "" && (
                                             <SendNoteAction
                                                 idPelatihan={data.IdPelatihan.toString()}
                                                 title="Ajukan Penerbitan STTPL"
                                                 description="Ayoo! Segera ajukan penerbitan STTPL, siapkan dokumen kelengkapan sebelum proses pengajuan!"
                                                 buttonLabel="Ajukan Penerbitan STTPL"
                                                 icon={LuSignature}
-                                                buttonColor={data.StatusPenerbitan === "5" ? "blue" : "teal"}
+                                                buttonColor={"blue"}
                                                 onSuccess={fetchData}
-                                                status={data.StatusPenerbitan === "5" ? "6" : "1.3"}
+                                                status={"6"}
                                                 pelatihan={data}
                                             />
                                         )}
 
 
-                                        {((data.StatusPenerbitan == "5" || data.StatusPenerbitan == "1.25") && data?.DeskripsiSertifikat == "") && <p className="text-gray-600 text-sm">Harap Mengatur Format Sertifikat Terlebih Dahulu Untuk Melanjutkan Proses Berikutnya!</p>}
+                                        {(data.StatusPenerbitan == "5" && data?.DeskripsiSertifikat == "") && <p className="text-gray-600 text-sm">Harap Mengatur Format Sertifikat Terlebih Dahulu Untuk Melanjutkan Proses Berikutnya!</p>}
 
 
                                         {/* (7) | (9) Operator : Send to Verifikator After Reject */}
@@ -125,22 +111,6 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 buttonColor="teal"
                                                 onSuccess={fetchData}
                                                 status={"6"}
-                                                pelatihan={data}
-                                            />
-                                        }
-
-                                        {/* (1.5) Operator : Send to Kabalai After Reject */}
-                                        {
-                                            (data.StatusPenerbitan == "1.5") &&
-                                            <SendNoteAction
-                                                idPelatihan={data.IdPelatihan.toString()}
-                                                title="Kirim ke Kabalai"
-                                                description="Perbaiki pengajuan penerbitan STTPL sesuai catatan Verifikator"
-                                                buttonLabel="Send to Kabalai"
-                                                icon={TbSend}
-                                                buttonColor="indigo"
-                                                onSuccess={fetchData}
-                                                status={"1.3"}
                                                 pelatihan={data}
                                             />
                                         }
@@ -322,147 +292,121 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
 
                 {
                     !Cookies.get('Access')?.includes('isSigning') &&
-
                     <AccordionSection title="📑 Format Sertifikat">
                         <div className="flex flex-col w-full gap-4">
-                            {(() => {
-                                const isKepalaBalai = data?.TtdSertifikat?.includes("Kepala Balai");
-                                const status = parseFloat(data?.StatusPenerbitan ?? "0");
+                            <>
+                                <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
+                                    <p className="font-medium text-gray-600">Action :</p>
 
-                                const isAllowed = !isKepalaBalai ? status >= 5 : status < 1.6 && status >= 1.25;
+                                    {data?.StatusPenerbitan == "5" && (
+                                        <FormatCertificateAction
+                                            idPelatihan={data?.IdPelatihan.toString()}
+                                            handleFetchingData={fetchData}
+                                            data={data}
+                                        />
+                                    )}
+                                </div>
 
-                                if (!isAllowed) {
-                                    return (
+                                <div className="w-full ">
+                                    <p className="font-medium text-gray-600 mb-2">Detail :</p>
+
+                                    {data.DeskripsiSertifikat !== "" || data.MateriPelatihan.length !== 0 ? (
+                                        <>
+                                            <SectionGrid>
+                                                <InfoItem
+                                                    label="Deskripsi Indonesia"
+                                                    value={
+                                                        generatedDescriptionCertificate(data.DeskripsiSertifikat)
+                                                            .desc_indo
+                                                    }
+                                                />
+                                                <InfoItem
+                                                    label="Deskripsi Inggris"
+                                                    value={
+                                                        generatedDescriptionCertificate(data.DeskripsiSertifikat)
+                                                            .desc_eng
+                                                    }
+                                                />
+                                            </SectionGrid>
+
+                                            <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100 mt-4">
+                                                <span className="text-xs font-medium text-gray-500">
+                                                    Materi Sertifikat
+                                                </span>
+                                                <div className="overflow-x-auto !text-sm mt-4">
+                                                    <table className="min-w-full border border-gray-300">
+                                                        <thead className="bg-gray-100">
+                                                            <tr>
+                                                                <th className="border p-3 text-sm">No</th>
+                                                                <th className="border p-3 text-sm">Nama Materi</th>
+                                                                <th className="border p-3 text-sm">Tipe</th>
+                                                                <th className="border p-3 text-sm">Jam Teori</th>
+                                                                <th className="border p-3 text-sm">Jam Praktek</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {data.MateriPelatihan!.map(
+                                                                (item: MateriPelatihan, index: number) => (
+                                                                    <tr
+                                                                        key={item.IdMateriPelatihan}
+                                                                        className="odd:bg-white even:bg-gray-50"
+                                                                    >
+                                                                        <td className="border p-3 text-center">
+                                                                            {index + 1}
+                                                                        </td>
+                                                                        <td className="border p-3">
+                                                                            <div className="flex flex-col">
+                                                                                <p className="font-medium">
+                                                                                    {
+                                                                                        generatedCurriculumCertificate(item.NamaMateri)
+                                                                                            .curr_indo
+                                                                                    }
+                                                                                </p>
+                                                                                <span className="text-xs italic">
+                                                                                    {
+                                                                                        generatedCurriculumCertificate(item.NamaMateri)
+                                                                                            .curr_eng
+                                                                                    }
+                                                                                </span>
+                                                                            </div>
+                                                                        </td>
+                                                                        <td className="border p-3 text-center capitalize">
+                                                                            {item.Deskripsi}
+                                                                        </td>
+                                                                        <td className="border p-3 text-center">
+                                                                            {item.JamTeory}
+                                                                        </td>
+                                                                        <td className="border p-3 text-center">
+                                                                            {item.JamPraktek}
+                                                                        </td>
+                                                                    </tr>
+                                                                )
+                                                            )}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+                                            <DialogFormatSTTPL pelatihan={data}>
+                                                <Button
+                                                    variant="outline"
+                                                    title="Preview  Sertifikat"
+                                                    className="flex items-center w-full mt-4 rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
+                                                >
+                                                    <FaSearch className="h-4 w-4 mr-1" /> Preview Sertifikat
+                                                </Button>
+                                            </DialogFormatSTTPL>
+                                        </>
+                                    ) : (
                                         <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">
                                             <MdLock className="w-14 h-14 text-gray-600" />
                                             <p className="text-gray-500 font-normal text-center">
-                                                Oopsss! Dalam melakukan pengaturan format sertifikat, pengajuan
-                                                penerbitan STTPL untuk pelaksanaan pelatihan ini harus disetujui
-                                                pihak Pusat dulu, harap hub verifikator terkait untuk mempercepat
-                                                proses!
+                                                Harap atur format  sertifikat (materi, deskripsi) yang akan tampil di lembar sertifikat, Pastikan format yang diatur mengikuti petunjuk teknis yang telah diberikan. Kesesuaian akan diverifikasi lebih lanjut oleh Verifikator
                                             </p>
                                         </div>
-                                    );
-                                }
-
-                                return (
-                                    <>
-                                        <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
-                                            <p className="font-medium text-gray-600">Action :</p>
-
-                                            {isAllowed && data?.DeskripsiSertifikat === "" && (
-                                                <FormatCertificateAction
-                                                    idPelatihan={data?.IdPelatihan.toString()}
-                                                    handleFetchingData={fetchData}
-                                                    data={data}
-                                                />
-                                            )}
-                                        </div>
-
-                                        <div className="w-full ">
-                                            <p className="font-medium text-gray-600 mb-2">Detail :</p>
-
-                                            {data.DeskripsiSertifikat !== "" || data.MateriPelatihan.length !== 0 ? (
-                                                <>
-                                                    <SectionGrid>
-                                                        <InfoItem
-                                                            label="Deskripsi Indonesia"
-                                                            value={
-                                                                generatedDescriptionCertificate(data.DeskripsiSertifikat)
-                                                                    .desc_indo
-                                                            }
-                                                        />
-                                                        <InfoItem
-                                                            label="Deskripsi Inggris"
-                                                            value={
-                                                                generatedDescriptionCertificate(data.DeskripsiSertifikat)
-                                                                    .desc_eng
-                                                            }
-                                                        />
-                                                    </SectionGrid>
-
-                                                    <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100 mt-4">
-                                                        <span className="text-xs font-medium text-gray-500">
-                                                            Materi Sertifikat
-                                                        </span>
-                                                        <div className="overflow-x-auto !text-sm mt-4">
-                                                            <table className="min-w-full border border-gray-300">
-                                                                <thead className="bg-gray-100">
-                                                                    <tr>
-                                                                        <th className="border p-3 text-sm">No</th>
-                                                                        <th className="border p-3 text-sm">Nama Materi</th>
-                                                                        <th className="border p-3 text-sm">Tipe</th>
-                                                                        <th className="border p-3 text-sm">Jam Teori</th>
-                                                                        <th className="border p-3 text-sm">Jam Praktek</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    {data.MateriPelatihan!.map(
-                                                                        (item: MateriPelatihan, index: number) => (
-                                                                            <tr
-                                                                                key={item.IdMateriPelatihan}
-                                                                                className="odd:bg-white even:bg-gray-50"
-                                                                            >
-                                                                                <td className="border p-3 text-center">
-                                                                                    {index + 1}
-                                                                                </td>
-                                                                                <td className="border p-3">
-                                                                                    <div className="flex flex-col">
-                                                                                        <p className="font-medium">
-                                                                                            {
-                                                                                                generatedCurriculumCertificate(item.NamaMateri)
-                                                                                                    .curr_indo
-                                                                                            }
-                                                                                        </p>
-                                                                                        <span className="text-xs italic">
-                                                                                            {
-                                                                                                generatedCurriculumCertificate(item.NamaMateri)
-                                                                                                    .curr_eng
-                                                                                            }
-                                                                                        </span>
-                                                                                    </div>
-                                                                                </td>
-                                                                                <td className="border p-3 text-center capitalize">
-                                                                                    {item.Deskripsi}
-                                                                                </td>
-                                                                                <td className="border p-3 text-center">
-                                                                                    {item.JamTeory}
-                                                                                </td>
-                                                                                <td className="border p-3 text-center">
-                                                                                    {item.JamPraktek}
-                                                                                </td>
-                                                                            </tr>
-                                                                        )
-                                                                    )}
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-
-                                                    <DialogFormatSTTPL pelatihan={data}>
-                                                        <Button
-                                                            variant="outline"
-                                                            title="Preview  Sertifikat"
-                                                            className="flex items-center w-full mt-4 rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
-                                                        >
-                                                            <FaSearch className="h-4 w-4 mr-1" /> Preview Sertifikat
-                                                        </Button>
-                                                    </DialogFormatSTTPL>
-                                                </>
-                                            ) : (
-                                                <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">
-                                                    <MdLock className="w-14 h-14 text-gray-600" />
-                                                    <p className="text-gray-500 font-normal text-center">
-                                                        Harap upload materi yang akan tampil di lembar sertifikat serta
-                                                        deskripsi sertifikat, aksi ini hanya dilakukan sekali. Apabila
-                                                        terjadi kesalahan, tidak dapat melakukan perbaikan!
-                                                    </p>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </>
-                                );
-                            })()}
+                                    )}
+                                </div>
+                            </>
                         </div>
 
                     </AccordionSection>
@@ -476,7 +420,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                             </p>
 
                             {
-                                countUserWithPassed(data?.UserPelatihan) == 0 && <PassedParticipantAction data={data?.UserPelatihan} onSuccess={fetchData} />
+                                countUserWithNoStatus(data?.UserPelatihan) != 0 && <PassedParticipantAction data={data?.UserPelatihan} onSuccess={fetchData} />
                             }
 
                             {countUserWithCertificate(data.UserPelatihan) == data.UserPelatihan.length && <Button
@@ -499,9 +443,10 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 Detail  :
                             </p>
                             <div className="flex flex-col gap-2 w-full">
-                                <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div className="grid grid-cols-3 gap-4 text-sm">
                                     <InfoItem label="Kuota Peserta" value={data.KoutaPelatihan} />
                                     <InfoItem label="Jumlah Peserta" value={data.UserPelatihan.length.toString()} />
+                                    <InfoItem label="Jumlah Kelulusan" value={`${countUserWithPassed(data.UserPelatihan)}/${data.UserPelatihan.length}`} />
                                 </div>
                                 <UserPelatihanTable pelatihan={data} data={data.UserPelatihan} onSuccess={fetchData} />
                             </div>

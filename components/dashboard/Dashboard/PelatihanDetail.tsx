@@ -49,7 +49,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                 className="w-full space-y-3"
                 defaultValue={["📌 Informasi Umum Pelatihan", "🌐 Publish Informasi dan Promosi", "👥 Peserta Pelatihan", "📑 Modul dan Perangkat Pelatihan"]}
             >
-                {(!data?.TtdSertifikat?.includes("Kepala Balai") ? parseInt(data?.StatusPenerbitan) < 5 : parseFloat(data?.StatusPenerbitan) < 1.25) &&
+                {(parseInt(data?.StatusPenerbitan) < 5) &&
                     <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm bg-white">
                         <div className="px-4 py-3 text-sm font-semibold text-gray-800 hover:bg-gray-50 transition">
                             ⚙️ Metadata
@@ -164,34 +164,32 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             /></>
                                     }
 
-                                    {/* (2) Verifikator : Pending Verifikator for Reject */}
+                                    {/* (2) Verifikator : Pending Verifikator for Reject and Approve */}
                                     {
-                                        (Cookies.get('Access')?.includes('verifyPelaksanaan') && data.StatusPenerbitan == "2") && <SendNoteAction
-                                            idPelatihan={data.IdPelatihan.toString()}
-                                            title="Reject Pelaksanaan"
-                                            description="Segera melakukan verifikasi pelaksanaan diklat, pastikan perangkat dan kelengkapan administrasi pelatihan sesuai dan lengkap"
-                                            buttonLabel="Reject Pelaksanaan"
-                                            icon={TbPencilX}
-                                            buttonColor="rose"
-                                            onSuccess={fetchData}
-                                            status={"3"}
-                                            pelatihan={data}
-                                        />
-                                    }
-
-                                    {/* (2) Verifikator : Pending Verifikator for Approve */}
-                                    {
-                                        (Cookies.get('Access')?.includes('verifyPelaksanaan') && data.StatusPenerbitan == "2") && <SendNoteAction
-                                            idPelatihan={data.IdPelatihan.toString()}
-                                            title="Approve Pelaksanaan"
-                                            description="Segera melakukan verifikasi pelaksanaan diklat, pastikan perangkat dan kelengkapan administrasi pelatihan sesuai dan lengkap"
-                                            buttonLabel="Approve Pelaksanaan"
-                                            icon={TbPencilCheck}
-                                            buttonColor="green"
-                                            onSuccess={fetchData}
-                                            status={"4"}
-                                            pelatihan={data}
-                                        />
+                                        (Cookies.get('Access')?.includes('verifyPelaksanaan') && data.StatusPenerbitan == "2") &&
+                                        <>
+                                            <SendNoteAction
+                                                idPelatihan={data.IdPelatihan.toString()}
+                                                title="Reject Pelaksanaan"
+                                                description="Segera melakukan verifikasi pelaksanaan diklat, pastikan perangkat dan kelengkapan administrasi pelatihan sesuai dan lengkap"
+                                                buttonLabel="Reject Pelaksanaan"
+                                                icon={TbPencilX}
+                                                buttonColor="rose"
+                                                onSuccess={fetchData}
+                                                status={"3"}
+                                                pelatihan={data}
+                                            />
+                                            <SendNoteAction
+                                                idPelatihan={data.IdPelatihan.toString()}
+                                                title="Approve Pelaksanaan"
+                                                description="Segera melakukan verifikasi pelaksanaan diklat, pastikan perangkat dan kelengkapan administrasi pelatihan sesuai dan lengkap"
+                                                buttonLabel="Approve Pelaksanaan"
+                                                icon={TbPencilCheck}
+                                                buttonColor="teal"
+                                                onSuccess={fetchData}
+                                                status={"4"}
+                                                pelatihan={data}
+                                            /></>
                                     }
                                 </div>
 

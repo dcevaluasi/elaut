@@ -54,6 +54,10 @@ export const countUserWithPassed = (data: UserPelatihan[]): number => {
   ).length
 }
 
+export const countUserWithNoStatus = (data: UserPelatihan[]): number => {
+  return data.filter((item) => item.IsActice === '').length
+}
+
 export const countUserWithStatus = (data: UserPelatihan[]): number => {
   return data.filter((item) => item.IsActice !== '').length
 }

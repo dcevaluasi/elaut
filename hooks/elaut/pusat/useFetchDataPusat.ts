@@ -26,7 +26,6 @@ export function useFetchDataPusat() {
         headers: { Authorization: `Bearer ${token}` },
       })
 
-      // 🔎 Try adjusting based on actual API response shape
       if (Array.isArray(response.data)) {
         setAdminPusatData(response.data)
       } else if (Array.isArray(response.data.data)) {

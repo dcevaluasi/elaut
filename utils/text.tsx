@@ -174,7 +174,7 @@ export function getStatusInfo(
     case "4":
       return {
         label: "Approved Pelaksanaan",
-        color: "bg-green-500 text-white",
+        color: "bg-teal-500 text-white",
         icon: <RiCheckboxCircleFill className="w-4 h-4" />,
       };
     case "1.25":

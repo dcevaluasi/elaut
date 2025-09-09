@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -22,6 +22,7 @@ import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { urlTemplateMateriPelatihan } from "@/constants/templates";
 import { MateriPelatihan, PelatihanMasyarakat } from "@/types/product";
 import { truncateText } from "@/utils";
+import { translateText } from "@/utils/translate";
 
 const DualLangInput: React.FC<{
     value?: string;
@@ -33,6 +34,26 @@ const DualLangInput: React.FC<{
     const handleUpdate = (i: string, e: string) => {
         onChange(`{${i}}{${e}}`);
     };
+
+    useEffect(() => {
+        const delayDebounce = setTimeout(async () => {
+            if (indo.trim() === "") {
+                setEnglish("");
+                return;
+            }
+
+            try {
+                const translated = await translateText(indo, "en");
+                setEnglish(translated);
+                handleUpdate(indo, translated);
+            } catch (error) {
+                console.error("Translation error:", error);
+            }
+        }, 500);
+
+        return () => clearTimeout(delayDebounce);
+    }, [indo]);
+
 
     return (
         <div className="space-y-2 my-3">
@@ -58,10 +79,11 @@ const DualLangInput: React.FC<{
                 </label>
                 <textarea
                     value={english}
-                    onChange={(e) => {
-                        setEnglish(e.target.value);
-                        handleUpdate(indo, e.target.value);
-                    }}
+                    // onChange={(e) => {
+                    //     setEnglish(e.target.value);
+                    //     handleUpdate(indo, e.target.value);
+                    // }}
+                    readOnly
                     placeholder="Write text in English..."
                     className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-300"
                     rows={3}
@@ -92,7 +114,8 @@ const FormatCertificateAction: React.FC<FormatCertificateActionProps> = ({
         useState<boolean>(false);
     const [materiPelatihan, setMateriPelatihan] = useState<File | null>(null);
     const [dualLangText, setDualLangText] = useState("");
-    const [asalSertifikat, setAsalSertifikat] = useState("Not Specific");
+    const [asalSertifikat, setAsalSertifikat] = useState("No Specific");
+    const [jenisSertifikat, setJenisSertifikat] = useState("No Materi");
     const [loading, setLoading] = useState(false);
 
     const handleFileMateriChange = (e: any) => {
@@ -128,6 +151,7 @@ const FormatCertificateAction: React.FC<FormatCertificateActionProps> = ({
             const updateForm = new FormData();
             if (dualLangText) updateForm.append("DeskripsiSertifikat", dualLangText);
             if (asalSertifikat) updateForm.append("AsalSertifikat", asalSertifikat);
+            if (jenisSertifikat) updateForm.append("JenisSertifikat", jenisSertifikat);
 
             setLoading(true);
             await axios.put(
@@ -180,14 +204,13 @@ const FormatCertificateAction: React.FC<FormatCertificateActionProps> = ({
                     <fieldset>
                         <form autoComplete="off">
                             <div className="flex flex-col gap-4">
-                                {/* Specific / Not Specific Checkbox */}
                                 <div className="flex items-center gap-2">
                                     <input
                                         id="isSpecific"
                                         type="checkbox"
-                                        checked={asalSertifikat === "Specific"}
+                                        checked={jenisSertifikat === "Materi"}
                                         onChange={(e) =>
-                                            setAsalSertifikat(e.target.checked ? "Specific" : "Not Specific")
+                                            setJenisSertifikat(e.target.checked ? "Materi" : "No Materi")
                                         }
                                         className="h-4 w-4 rounded border-gray-300 text-navy-600 focus:ring-navy-500"
                                     />
@@ -196,52 +219,80 @@ const FormatCertificateAction: React.FC<FormatCertificateActionProps> = ({
                                             htmlFor="isSpecific"
                                             className="text-sm text-gray-800 font-medium cursor-pointer"
                                         >
-                                            {asalSertifikat}
+                                            {jenisSertifikat}
                                         </label>
                                         <p className="text-sm text-gray-400">
-                                            Apabila materi yang akan tampil pada sertifikat terdiri dari Inti dan Umum maka ceklist jika tidak spesifik maka biarkan tidak terceklist
+                                            Apabila tidak ada halaman kedua untuk menampilkan materi maka biarkan, jika ada maka harap checklist
                                         </p>
                                     </div>
 
                                 </div>
 
+                                {/* Specific / Not Specific Checkbox */}
+                                {jenisSertifikat == "Materi" &&
+                                    <>
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                id="isSpecific"
+                                                type="checkbox"
+                                                checked={asalSertifikat === "Specific"}
+                                                onChange={(e) =>
+                                                    setAsalSertifikat(e.target.checked ? "Specific" : "No Specific")
+                                                }
+                                                className="h-4 w-4 rounded border-gray-300 text-navy-600 focus:ring-navy-500"
+                                            />
+                                            <div className="flex flex-col">
+                                                <label
+                                                    htmlFor="isSpecific"
+                                                    className="text-sm text-gray-800 font-medium cursor-pointer"
+                                                >
+                                                    {asalSertifikat}
+                                                </label>
+                                                <p className="text-sm text-gray-400">
+                                                    Apabila materi yang akan tampil pada sertifikat terdiri dari Inti dan Umum maka ceklist jika tidak spesifik maka biarkan tidak terceklist
+                                                </p>
+                                            </div>
 
-                                {/* Upload File */}
-                                <div className="space-y-2">
-                                    <label className="block text-gray-800 text-sm font-medium">
-                                        Upload File Excel Materi
-                                    </label>
+                                        </div>
 
-                                    <div className="flex gap-3 items-center">
-                                        {/* File Input */}
-                                        <input
-                                            type="file"
-                                            accept=".xlsx,.xls"
-                                            onChange={handleFileMateriChange}
-                                            required
-                                            className="flex-1 cursor-pointer rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm transition focus:border-navy-400 focus:ring-2 focus:ring-navy-300 file:mr-4 file:rounded-md file:border-0 file:bg-navy-500 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-navy-600"
-                                        />
+                                        <div className="space-y-2">
+                                            <label className="block text-gray-800 text-sm font-medium">
+                                                Upload File Excel Materi
+                                            </label>
 
-                                        {/* Template Download Button */}
-                                        <Link
-                                            target="_blank"
-                                            href={urlTemplateMateriPelatihan}
-                                            className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400"
-                                        >
-                                            <PiMicrosoftExcelLogoFill className="h-4 w-4 flex-shrink-0" />
-                                            Unduh Template
-                                        </Link>
-                                    </div>
+                                            <div className="flex gap-3 items-center">
+                                                {/* File Input */}
+                                                <input
+                                                    type="file"
+                                                    accept=".xlsx,.xls"
+                                                    onChange={handleFileMateriChange}
+                                                    required
+                                                    className="flex-1 cursor-pointer rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm transition focus:border-navy-400 focus:ring-2 focus:ring-navy-300 file:mr-4 file:rounded-md file:border-0 file:bg-navy-500 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-navy-600"
+                                                />
 
-                                    <div className="flex flex-col gap-0">
-                                        <p className="text-xs text-gray-500">
-                                            *Download template, isi sesuai format lalu upload kembali.
-                                        </p>
-                                        <p className="text-xs text-gray-500">
-                                            *Petunjuk pengisian format <Link href={urlPetunjukUploadMateriPelatihan} target="_blank" className='!text-blue-500 underline'>{truncateText(urlPetunjukUploadMateriPelatihan, 50, '...')}</Link>
-                                        </p>
-                                    </div>
-                                </div>
+                                                {/* Template Download Button */}
+                                                <Link
+                                                    target="_blank"
+                                                    href={urlTemplateMateriPelatihan}
+                                                    className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400"
+                                                >
+                                                    <PiMicrosoftExcelLogoFill className="h-4 w-4 flex-shrink-0" />
+                                                    Unduh Template
+                                                </Link>
+                                            </div>
+
+                                            <div className="flex flex-col gap-0">
+                                                <p className="text-xs text-gray-500">
+                                                    *Download template, isi sesuai format lalu upload kembali.
+                                                </p>
+                                                <p className="text-xs text-gray-500">
+                                                    *Petunjuk pengisian format <Link href={urlPetunjukUploadMateriPelatihan} target="_blank" className='!text-blue-500 underline'>{truncateText(urlPetunjukUploadMateriPelatihan, 50, '...')}</Link>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </>}
+
+
 
                                 {/* Dual Language Input */}
                                 <DualLangInput

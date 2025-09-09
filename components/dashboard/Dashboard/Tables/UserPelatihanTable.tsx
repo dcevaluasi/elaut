@@ -164,35 +164,56 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                     },
                     cell: ({ row }) => (
                         <div className="capitalize w-full flex items-center justify-center">
-                            {
-                                row.original.IsActice != "" && <label className="flex items-center gap-2 text-base font-semibold tracking-tight leading-none">
-                                    <label
-                                        htmlFor="isActice"
-                                        className="flex items-center gap-2 cursor-pointer font-semibold  disabled:cursor-not-allowed justify-center"
-                                    >
-                                        <Checkbox
-                                            disabled={row.original.StatusPenandatangan === "Done"}
-                                            id="isActice"
-                                            onCheckedChange={() => handleLulusDataPeserta(row.original)}
-                                            checked={
-                                                row.original.IsActice !== "{PESERTA}{TELAH MENGIKUTI}{Has Attended}"
-                                            }
-                                            className="h-6 w-8 rounded-md border border-gray-300 bg-white shadow-sm
+                            <label className="flex items-center gap-2 text-base font-semibold tracking-tight leading-none">
+                                <label
+                                    htmlFor="isActice"
+                                    className="flex items-center gap-2 cursor-pointer font-semibold  disabled:cursor-not-allowed justify-center"
+                                >
+                                    <Checkbox
+                                        disabled={row.original.StatusPenandatangan === "Done"}
+                                        id="isActice"
+                                        onCheckedChange={() => handleLulusDataPeserta(row.original)}
+                                        checked={
+                                            row.original.IsActice === "{PESERTA}{TELAH LULUS}{Has Passed}"
+                                        }
+                                        className="h-6 w-9 rounded-md border border-gray-300 bg-white shadow-sm
              data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500 
              transition-all duration-200 ease-in-out
              hover:border-blue-400 hover:shadow-md
              focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 
              disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
-                                        >
-                                            <Check className="h-4 w-4 text-white" />
-                                        </Checkbox>
+                                    >
+                                        <Check className="h-4 w-4 text-white" />
+                                    </Checkbox>
 
-                                        {generatedStatusCertificate(row.original.IsActice).status_indo}
-                                    </label>
-
+                                    TELAH LULUS
                                 </label>
-                            }
 
+                                <label
+                                    htmlFor="isActice"
+                                    className="flex items-center gap-2 cursor-pointer font-semibold  disabled:cursor-not-allowed justify-center"
+                                >
+                                    <Checkbox
+                                        disabled={row.original.StatusPenandatangan === "Done"}
+                                        id="isActice"
+                                        onCheckedChange={() => handleLulusDataPeserta(row.original)}
+                                        checked={
+                                            row.original.IsActice === "{PESERTA}{TELAH MENGIKUTI}{Has Attended}"
+                                        }
+                                        className="h-6 w-8 rounded-md border border-gray-300 bg-white shadow-sm
+             data-[state=checked]:bg-teal-500 data-[state=checked]:border-teal-500 
+             transition-all duration-200 ease-in-out
+             hover:border-teal-400 hover:shadow-md
+             focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-teal-500 
+             disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
+                                    >
+                                        <Check className="h-4 w-4 text-white" />
+                                    </Checkbox>
+
+                                    TELAH MENGIKUTI
+                                </label>
+
+                            </label>
                         </div>
 
                     ),
@@ -472,7 +493,6 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
         columns,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
     });
 
     return (
@@ -524,31 +544,6 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                         )}
                     </TableBody>
                 </Table>
-
-                <div className="flex items-center justify-between border-t px-4 py-3">
-                    <div className="text-sm text-gray-600">
-                        Halaman {table.getState().pagination.pageIndex + 1} dari{" "}
-                        {table.getPageCount()}
-                    </div>
-                    <div className="flex gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => table.previousPage()}
-                            disabled={!table.getCanPreviousPage()}
-                        >
-                            Previous
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => table.nextPage()}
-                            disabled={!table.getCanNextPage()}
-                        >
-                            Next
-                        </Button>
-                    </div>
-                </div>
             </div>
         </div>
     );
