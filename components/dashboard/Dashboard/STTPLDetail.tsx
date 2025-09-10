@@ -95,9 +95,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             />
                                         )}
 
-
                                         {(data.StatusPenerbitan == "5" && data?.DeskripsiSertifikat == "") && <p className="text-gray-600 text-sm">Harap Mengatur Format Sertifikat Terlebih Dahulu Untuk Melanjutkan Proses Berikutnya!</p>}
-
 
                                         {/* (7) | (9) Operator : Send to Verifikator After Reject */}
                                         {
@@ -146,7 +144,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         </>
                                     )}
 
-                                {/* (8) Kapus : Pending Kabalai for Reject and Approve */}
+                                {/* (7A) Kabalai : Pending Kabalai for Reject and Approve */}
                                 {Cookies.get("Access")?.includes("approveKabalai") &&
                                     data.StatusPenerbitan == "7A" && (
                                         <>
@@ -176,7 +174,6 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             />
                                         </>
                                     )}
-
 
                                 {/* (8) Kapus : Pending Kapus for Reject and Approve */}
                                 {Cookies.get("Access")?.includes("approveKapus") &&
@@ -210,7 +207,6 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             />
                                         </>
                                     )}
-
 
                                 {/* (12) Kabadan : Pending Kabadan for Reject and Approve */}
                                 {
@@ -469,12 +465,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                             </div>
                         </AccordionSection>
                     </>
-
                 }
-
-
-
-
             </Accordion >
         </div >
     );

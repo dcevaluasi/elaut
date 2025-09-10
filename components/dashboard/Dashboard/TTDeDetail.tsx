@@ -66,7 +66,6 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
         setIsUploading(false);
     };
 
-    // Save tanggal penandatangan
     const handleTanggalSertifikat = async () => {
         const dataUserPelatihan = data?.UserPelatihan ?? [];
         setLoadingTanggal(true);
@@ -106,10 +105,9 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
         }
     };
 
-    // TTDe Sertifikat
     const handleTTDe = async () => {
         setIsSigning(true);
-        const status = data?.StatusPenerbitan == "10" ? "11" : data?.StatusPenerbitan == "14" ? "15" : "1.6"
+        const status = data?.StatusPenerbitan == "7B" ? "7D" : data?.StatusPenerbitan == "10" ? "11" : "15"
 
         if (!passphrase) {
             Toast.fire({
@@ -149,7 +147,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                 data,
                 "Telah menandatangani STTPL",
                 Cookies.get("Role"),
-                Cookies.get("Satker")
+                `${Cookies.get("Nama")} - ${Cookies.get("Satker")}`
             );
 
             Toast.fire({
@@ -161,7 +159,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
             setPassphrase("");
             setIsSigning(false);
             fetchData();
-            setOpen(false); // ✅ close after TTDe success
+            setOpen(false);
         } catch {
             Toast.fire({
                 icon: "error",
@@ -171,7 +169,6 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
             setIsSigning(false);
         }
     };
-
 
     return (
         <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm bg-white">
