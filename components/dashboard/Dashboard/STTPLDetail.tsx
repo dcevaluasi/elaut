@@ -24,12 +24,13 @@ import { Button } from "@/components/ui/button";
 import { FaSearch } from "react-icons/fa";
 import UserPelatihanTable from "./Tables/UserPelatihanTable";
 import { PassedParticipantAction } from "./Actions/Lemdiklat/PassedParticipantAction";
-import { countUserWithCertificate, countUserWithNoStatus, countUserWithPassed } from "@/utils/counter";
+import { countUserWithCertificate, countUserWithDraftCertificate, countUserWithNoStatus, countUserWithPassed } from "@/utils/counter";
 import TTDeDetail from "./TTDeDetail";
 import { ESELON1, ESELON_1 } from "@/constants/nomenclatures";
 import { useFetchDataPusatById } from "@/hooks/elaut/pusat/useFetchDataPusatById";
 import { downloadAndZipPDFs } from "@/utils/file";
 import { FaRegFolderOpen } from "react-icons/fa6";
+import ReviseCertificateAction from "./Actions/ReviseCertificateAction";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -250,10 +251,18 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         </div> :
                                         <div className={`grid ${data?.BeritaAcara != "" ? "grid-cols-4" : 'grid-cols-3'} gap-4 mt-4 w-full text-sm`}>
 
-                                            <div className={`flex flex-col p-3 ${color} rounded-lg shadow-sm border border-gray-100 animate-pulse`}>
-                                                <span className="text-xs font-medium text-gray-100">Status</span>
-                                                <span className="flex items-center">{icon}{label}</span>
-                                            </div>
+                                            {/* Status */}
+                                            {
+                                                data?.IsRevisi == "" || data?.IsRevisi == "No Active" ? <div className={`flex flex-col p-3 ${color} rounded-lg shadow-sm border border-gray-100 animate-pulse`}>
+                                                    <span className="text-xs font-medium text-gray-100">Status</span>
+                                                    <span className="flex items-center">{icon}{label}</span>
+                                                </div> : <div className={`flex flex-col p-3 text-white rounded-lg shadow-sm border border-gray-100 animate-pulse bg-neutral-800`}>
+                                                    <span className="text-xs font-medium text-gray-100">Status</span>
+                                                    <span className="flex items-center">Revisi STTPL</span>
+                                                </div>
+                                            }
+
+                                            {/* Pandandatangan */}
                                             <InfoItem label="Penandatangan" value={data?.TtdSertifikat} />
                                             {
                                                 data?.BeritaAcara != "" && <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
@@ -447,6 +456,13 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     </Button>
                                     }
 
+                                    {((data?.StatusPenerbitan == "7D" || data?.StatusPenerbitan == "11" || data?.StatusPenerbitan == "15") && Cookies.get('Access')?.includes('createPelatihan')) && (
+                                        <ReviseCertificateAction
+                                            idPelatihan={data?.IdPelatihan.toString()}
+                                            handleFetchingData={fetchData}
+                                            data={data}
+                                        />
+                                    )}
                                 </div>
 
                                 <div className="w-full ">
@@ -458,6 +474,18 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             <InfoItem label="Kuota Peserta" value={data.KoutaPelatihan} />
                                             <InfoItem label="Jumlah Peserta" value={data.UserPelatihan.length.toString()} />
                                             <InfoItem label="Jumlah Kelulusan" value={`${countUserWithPassed(data.UserPelatihan)}/${data.UserPelatihan.length}`} />
+                                            <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
+                                                <span className="text-xs font-medium text-gray-500">Jumlah Sertifikat Draft</span>
+                                                <span className="text-sm font-semibold text-gray-800 mt-1">
+                                                    {countUserWithDraftCertificate(data?.UserPelatihan)}/{data?.UserPelatihan.length}
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
+                                                <span className="text-xs font-medium text-gray-500">Jumlah Sertifikat TTDe</span>
+                                                <span className="text-sm font-semibold text-gray-800 mt-1">
+                                                    {countUserWithCertificate(data?.UserPelatihan)}/{data?.UserPelatihan.length}
+                                                </span>
+                                            </div>
                                         </div>
                                         <UserPelatihanTable pelatihan={data} data={data.UserPelatihan} onSuccess={fetchData} />
                                     </div>

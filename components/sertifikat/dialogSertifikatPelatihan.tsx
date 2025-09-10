@@ -1,53 +1,23 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogOverlay,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import React, { ChangeEvent, forwardRef, ReactElement, useImperativeHandle, useRef } from "react";
+
+import React, { forwardRef, useImperativeHandle, useRef } from "react";
 import QRCode from "react-qr-code";
-import { MdVerified } from "react-icons/md";
-import { Button } from "../ui/button";
-import {
-  TbCloudDownload,
-  TbCloudUpload,
-  TbLink,
-  TbWritingSign,
-} from "react-icons/tb";
 import { MateriPelatihan, PelatihanMasyarakat } from "@/types/product";
-import { useReactToPrint } from "react-to-print";
-
-import { getCurrentDate } from "@/utils/sertifikat";
-
 import axios from "axios";
 import { elautBaseUrl } from "@/constants/urls";
 import Cookies from "js-cookie";
 import Image from "next/image";
-import dynamic from "next/dynamic";
 import { User, UserPelatihan } from "@/types/user";
 import {
   formatName,
   generateTanggalPelatihan,
-  generateTanggalPelatihanWithoutDay,
 } from "@/utils/text";
-import jsPDF from "jspdf";
-import { BsFillPrinterFill } from "react-icons/bs";
-import { usePathname, useRouter } from "next/navigation";
-import Link from "next/link";
 import Toast from "../toast";
 import { capitalizeWords, CURRICULLUM_CERTIFICATE } from "@/constants/texts";
 import { formatDateRange, formatDateRangeEnglish } from "@/utils/time";
-import { DESC_CERTIFICATE_COMPETENCE_FISHERIES } from "@/constants/serkom";
-import { ESELON1, ESELON2, ESELON_1, ESELON_2, EselonKey, ESELONS, KA_BPPSDM, KA_PUSLAT_KP } from "@/constants/nomenclatures";
-import html2canvas from "html2canvas";
-import { calculateTotalHoursCertificateBPPP } from "@/lib/utils";
+import { ESELON_1, ESELON_2, EselonKey, ESELONS } from "@/constants/nomenclatures";
 import { generatedCurriculumCertificate, generatedDescriptionCertificate, generatedSignedCertificate, generatedStatusCertificate, isEnglishFormat } from "@/utils/certificates";
-
-const html2pdf = dynamic(() => import("html2pdf.js"), { ssr: false });
+import CertificateHeader from "../certificates/CertificateHeader";
+import CertificateDescription from "../certificates/CertificateDescription";
 
 const SertifikatNonKepelautan = React.forwardRef(
   (
@@ -61,7 +31,6 @@ const SertifikatNonKepelautan = React.forwardRef(
       refPage: any
     },
     ref: any,
-
   ) => {
     const [peserta, setPeserta] = React.useState<User | null>(null);
 
@@ -82,23 +51,6 @@ const SertifikatNonKepelautan = React.forwardRef(
         console.error("LEMDIK INFO: ", error);
       }
     };
-
-
-    const calculateTotalHours = (data: any) => {
-      let totalTheory = 0;
-      let totalPractice = 0;
-
-      Object.values(data).forEach((courses: any) => {
-        courses.forEach(({ theory, practice }: { theory: number, practice: number }) => {
-          totalTheory += theory;
-          totalPractice += practice;
-        });
-      })
-
-      return { totalTheory, totalPractice };
-    };
-
-    const totalHours = calculateTotalHours(CURRICULLUM_CERTIFICATE[pelatihan!.Program] || {});
 
     const calculateTotalHoursWithMateri = (data: MateriPelatihan[]) => {
       let totalTheory = 0;
@@ -155,56 +107,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                 src="/logo-kkp-2.png"
               />
 
-              <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-3">
-
-                <div className="flex flex-col h-fit items-center justify-center space-y-0">
-                  <h1 className="text-base font-bosBold font-bold">
-                    KEMENTERIAN KELAUTAN DAN PERIKANAN
-                  </h1>
-                  {
-                    isEnglishFormat(pelatihan?.DeskripsiSertifikat) && <p className="text-base font-bosItalic">
-                      MINISTRY OF MARINE AFFAIRS AND FISHERIES
-                    </p>
-                  }
-                </div>
-                <div className="flex flex-col h-fit items-center text-center justify-center space-y-0">
-                  <h1 className="text-lg font-bosBold font-bold">
-                    BADAN PENYULUHAN DAN PENGEMBANGAN SUMBER DAYA MANUSIA KELAUTAN
-                    DAN PERIKANAN
-                  </h1>
-                  {
-                    isEnglishFormat(pelatihan?.DeskripsiSertifikat) && <p className="text-sm font-bosItalic">
-                      THE AGENCY FOR MARINE AND FISHERIES EXTENSION AND HUMAN
-                      RESOURCES DEVELOPMENT
-                    </p>
-                  }
-                </div>
-
-                <div className="flex flex-col h-fit items-center justify-center space-y-1">
-                  <h1 className="text-3xl font-bosBold font-black leading-none">
-                    SERTIFIKAT
-                  </h1>
-                  {
-                    isEnglishFormat(pelatihan?.DeskripsiSertifikat) && <p className="text-lg font-bosItalic">CERTIFICATE</p>
-                  }
-                </div>
-              </div>
-
-              <div className="flex w-full flex-col space-y-0 max-w-5xl mx-auto items-start text-base  text-center font-bos h-fit mt-2">
-                <span className="text-base leading-none font-bosNormal">
-                  Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan berdasarkan Peraturan Pemerintah Nomor.62 Tahun 2014 tentang Penyelenggaraan Pendidikan, Pelatihan dan Penyuluhan Perikanan, serta ketentuan pelaksanaannya menyatakan bahwa :
-                </span>
-                {
-                  isEnglishFormat(pelatihan?.DeskripsiSertifikat) && <span className="max-w-4xl leading-none font-bosItalic text-[0.85rem] mx-auto">
-                    The Agency for Marine and Fisheries Extension and Human
-                    Resources Development based on Government Regulation Number 62
-                    of 2014 concerning the Implementation of Fisheries Education,
-                    Training and Extension as well as its implementing provisions
-                    States that :
-                  </span>
-                }
-
-              </div>
+              <CertificateHeader deskripsi={pelatihan?.DeskripsiSertifikat} />
 
               <div className="flex flex-col space-y-0 w-full h-fit -mt-1">
                 <table className="w-full h-fit" cellPadding={0} cellSpacing={0}>
@@ -286,16 +189,7 @@ const SertifikatNonKepelautan = React.forwardRef(
               </div>
 
               <>
-                <div className="flex w-full flex-col space-y-0 max-w-7xl mx-auto items-start text-sm -mt-2 text-center font-bos h-fit">
-                  <span className="text-base leading-[115%] font-bosNormal max-w-6xl">
-                    {generatedDescriptionCertificate(pelatihan!.DeskripsiSertifikat).desc_indo}, pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
-                  </span>
-                  {
-                    (generatedDescriptionCertificate(pelatihan!.DeskripsiSertifikat).desc_eng) != "" && <span className="max-w-5xl mt-1 leading-none font-bos italic text-[0.85rem] mx-auto">
-                      {generatedDescriptionCertificate(pelatihan!.DeskripsiSertifikat).desc_eng} on {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
-                    </span>
-                  }
-                </div>
+                <CertificateDescription pelatihan={pelatihan!} />
 
                 <div className="flex gap-2 items-center justify-center mt-2">
                   <div className="flex flex-col  space-y-0 font-bos text-center items-center justify-center">
@@ -827,7 +721,6 @@ const DialogSertifikatPelatihan = forwardRef<DialogSertifikatHandle, Props>(
     const componentRef = useRef<HTMLDivElement>(null);
     const componentRefPage = useRef<HTMLDivElement>(null);
     const html2pdfRef = useRef<any>(null);
-    // cache html2pdf
     let html2pdfInstance: any = null;
 
     const uploadPdf = async () => {

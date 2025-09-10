@@ -32,7 +32,7 @@ import {
 import { ArrowUpDown, Check, LucideInfo } from "lucide-react";
 import { PelatihanMasyarakat, UserPelatihan } from "@/types/product";
 import { AiOutlineFieldNumber } from "react-icons/ai";
-import { FaRegIdCard } from "react-icons/fa6";
+import { FaRegIdCard, FaTrash } from "react-icons/fa6";
 import Link from "next/link";
 import { TbDatabaseEdit } from "react-icons/tb";
 import { usePathname } from "next/navigation";
@@ -271,7 +271,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                 } as ColumnDef<UserPelatihan>,
             ]
             : []),
-        ...(pelatihan.StatusPenerbitan == "1.5" || pelatihan.StatusPenerbitan == "11" || pelatihan.StatusPenerbitan == "15"
+        ...(pelatihan.StatusPenerbitan == "7D" || pelatihan.StatusPenerbitan == "11" || pelatihan.StatusPenerbitan == "15"
             ? [
                 {
                     accessorKey: "IsActice",
@@ -288,82 +288,94 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                         );
                     },
                     cell: ({ row }) => (
-                        <div className="capitalize w-full flex items-center justify-center">
+                        <div className="w-full flex gap-3">
                             <Link
                                 target="_blank"
                                 href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${row.original.FileSertifikat}`}
-                                className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 border "
+                                className="flex items-center gap-2 w-full rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 border "
                             >
                                 <RiVerifiedBadgeFill className="h-4 w-4  " />
                                 <span className="text-sm"> STTPL</span>
                             </Link>
+                            {
+                                pelatihan?.IsRevisi == "Active" && <Link
+                                    target="_blank"
+                                    href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${row.original.FileSertifikat}`}
+                                    className="flex items-center gap-2  rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-rose-500 w-full  text-rose-500 hover:text-white hover:bg-rose-500 border "
+                                >
+                                    <FaTrash className="h-4 w-4  " />
+                                    <span className="text-sm"> Hapus</span>
+                                </Link>
+                            }
+
                         </div>
 
                     ),
                 } as ColumnDef<UserPelatihan>,
             ]
             : []),
-        {
-            accessorKey: "IdPelatihan",
-            header: ({ column }) => {
-                return (
-                    <Button
-                        variant="ghost"
-                        className={`flex items-center justify-center leading-[105%] p-0 w-full text-gray-900 font-semibold`}
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    >
-                        <span>Detail Peserta</span>
-                        <TbDatabaseEdit className="ml-1 h-4 w-4" />
-                    </Button>
-                );
-            },
-            cell: ({ row }) => (
-                <div className="w-full flex items-center gap-3 justify-center">
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button
-                                variant="outline"
-                                className=" gap-2 h-10 px-5 text-sm font-medium rounded-lg border text-neutral-500 hover:text-white hover:bg-neutral-500 transition-colors "
-                            >
-                                <LucideInfo className="h-4 w-4" />
-                                Detail
-                            </Button>
-                        </AlertDialogTrigger>
-                        <DetailPesertaDialog
-                            pesertaId={row.original.IdUsers}
-                            userPelatihanId={row.original.IdUserPelatihan}
-                        />
-                    </AlertDialog>
-                    {
-                        Cookies.get('Access')?.includes('createPelatihan') && <EditPesertaAction idPelatihan={row.original.IdPelatihan.toString()} onSuccess={onSuccess} idPeserta={row.original.IdUsers.toString()} />
-                    }
-                </div>
+        ...((pelatihan?.StatusPenerbitan != "7D" && pelatihan.StatusPenerbitan != "11" && pelatihan.StatusPenerbitan != "15") || pelatihan.IsRevisi == "Active" ? [
+            {
+                accessorKey: "IdPelatihan",
+                header: ({ column }: { column: any }) => {
+                    return (
+                        <Button
+                            variant="ghost"
+                            className={`flex items-center justify-center leading-[105%] p-0 w-full text-gray-900 font-semibold`}
+                            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        >
+                            <span>Detail Peserta</span>
+                            <TbDatabaseEdit className="ml-1 h-4 w-4" />
+                        </Button>
+                    );
+                },
+                cell: ({ row }: { row: any }) => (
+                    <div className="w-full flex items-center gap-3 justify-center">
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    className=" gap-2 h-10 px-5 text-sm font-medium rounded-lg border text-neutral-500 hover:text-white hover:bg-neutral-500 transition-colors "
+                                >
+                                    <LucideInfo className="h-4 w-4" />
+                                    Detail
+                                </Button>
+                            </AlertDialogTrigger>
+                            <DetailPesertaDialog
+                                pesertaId={row.original.IdUsers}
+                                userPelatihanId={row.original.IdUserPelatihan}
+                            />
+                        </AlertDialog>
+                        {
+                            Cookies.get('Access')?.includes('createPelatihan') && <EditPesertaAction idPelatihan={row.original.IdPelatihan.toString()} onSuccess={onSuccess} idPeserta={row.original.IdUsers.toString()} />
+                        }
+                    </div>
 
-            ),
-        },
-        {
-            accessorKey: "IdUserPelatihan",
-            header: ({ column }) => {
-                return (
-                    <Button
-                        variant="ghost"
-                        className={`text-black font-semibold w-full p-0 flex justify-center items-center`}
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    >
-                        <p className="leading-[105%]">No Registrasi</p>
+                ),
+            }, {
+                accessorKey: "IdUserPelatihan",
+                header: ({ column }: { column: any }) => {
+                    return (
+                        <Button
+                            variant="ghost"
+                            className={`text-black font-semibold w-full p-0 flex justify-center items-center`}
+                            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        >
+                            <p className="leading-[105%]">No Registrasi</p>
 
-                        <AiOutlineFieldNumber className="ml-2 h-4 w-4" />
-                    </Button>
-                );
-            },
-            cell: ({ row }) => (
-                <div className={`${"ml-0"} text-center capitalize `}>
-                    <p className="text-base font-semibold tracking-tight leading-none">
-                        {row.original.IdUserPelatihan}
-                    </p>
-                </div>
-            ),
-        },
+                            <AiOutlineFieldNumber className="ml-2 h-4 w-4" />
+                        </Button>
+                    );
+                },
+                cell: ({ row }: { row: any }) => (
+                    <div className={`${"ml-0"} text-center capitalize `}>
+                        <p className="text-base font-semibold tracking-tight leading-none">
+                            {row.original.IdUserPelatihan}
+                        </p>
+                    </div>
+                ),
+            },] : []),
+
         ...(countUserWithNoSertifikat(pelatihan?.UserPelatihan) != 0
             ? [{
                 accessorKey: "NoRegistrasi",
