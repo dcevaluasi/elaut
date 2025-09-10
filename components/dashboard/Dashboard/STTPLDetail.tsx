@@ -12,7 +12,7 @@ import { generateTanggalPelatihan, getStatusInfo } from "@/utils/text";
 import { MdLock } from "react-icons/md";
 import Cookies from "js-cookie";
 import Link from "next/link";
-import { urlFileBeritaAcara } from "@/constants/urls";
+import { urlFileBeritaAcara, urlFileLapwas } from "@/constants/urls";
 import SendNoteAction from "./Actions/Lemdiklat/SendNoteAction";
 import { TbPencilCheck, TbPencilX, TbSend } from "react-icons/tb";
 import HistoryButton from "./Actions/HistoryButton";
@@ -140,7 +140,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 icon={TbPencilCheck}
                                                 buttonColor="blue"
                                                 onSuccess={fetchData}
-                                                status="8"
+                                                status={data?.TtdSertifikat.includes("Kepala Balai") ? "7A" : "8"}
                                                 pelatihan={data}
                                             />
                                         </>
@@ -148,7 +148,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
 
                                 {/* (8) Kapus : Pending Kabalai for Reject and Approve */}
                                 {Cookies.get("Access")?.includes("approveKabalai") &&
-                                    data.StatusPenerbitan == "1.3" && (
+                                    data.StatusPenerbitan == "7A" && (
                                         <>
                                             <SendNoteAction
                                                 idPelatihan={data.IdPelatihan.toString()}
@@ -158,7 +158,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 icon={TbPencilX}
                                                 buttonColor="rose"
                                                 onSuccess={fetchData}
-                                                status="1.5"
+                                                status="7C"
                                                 pelatihan={data}
                                             />
                                             <SendNoteAction
@@ -169,9 +169,9 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 }
                                                 buttonLabel="Approve Penerbitan"
                                                 icon={TbPencilCheck}
-                                                buttonColor="green"
+                                                buttonColor="teal"
                                                 onSuccess={fetchData}
-                                                status={"1.4"}
+                                                status={"7B"}
                                                 pelatihan={data}
                                             />
                                         </>
@@ -252,19 +252,32 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 Harap mengupload surat pemberitahuan pelaksanaan pelatihan dan menunggu verifikasi pelaksanaan agar dapat melanjutkan tahapan berikutnya!
                                             </p>
                                         </div> :
-                                        <div className={`grid ${adminPusatData != null ? "grid-cols-4" : 'grid-cols-3'} gap-4 mt-4 w-full text-sm`}>
+                                        <div className={`grid ${data?.BeritaAcara != "" ? "grid-cols-4" : 'grid-cols-3'} gap-4 mt-4 w-full text-sm`}>
 
                                             <div className={`flex flex-col p-3 ${color} rounded-lg shadow-sm border border-gray-100 animate-pulse`}>
                                                 <span className="text-xs font-medium text-gray-100">Status</span>
                                                 <span className="flex items-center">{icon}{label}</span>
                                             </div>
                                             <InfoItem label="Penandatangan" value={data?.TtdSertifikat} />
-                                            <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
-                                                <span className="text-xs font-medium text-gray-500">Dokumen Penerbitan STTPL</span>
-                                                <Link target="_blank" href={`${urlFileBeritaAcara}/${data?.BeritaAcara}`} className="text-sm font-semibold text-blue-500 mt-1 underline">
-                                                    Lihat Dokumen
-                                                </Link>
-                                            </div>{
+                                            {
+                                                data?.BeritaAcara != "" && <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
+                                                    <span className="text-xs font-medium text-gray-500">Dokumen Penerbitan STTPL</span>
+                                                    <Link target="_blank" href={`${urlFileBeritaAcara}/${data?.BeritaAcara}`} className="text-sm font-semibold text-blue-500 mt-1 underline">
+                                                        Lihat Dokumen
+                                                    </Link>
+                                                </div>
+                                            }
+
+                                            {
+                                                data?.MemoPusat != "" && <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
+                                                    <span className="text-xs font-medium text-gray-500">Dokumen Pengawasan STTPL</span>
+                                                    <Link target="_blank" href={`${urlFileLapwas}/${data?.MemoPusat}`} className="text-sm font-semibold text-blue-500 mt-1 underline">
+                                                        Lihat Dokumen
+                                                    </Link>
+                                                </div>
+                                            }
+
+                                            {
                                                 adminPusatData != null && <InfoItem label="Verifikator" value={adminPusatData!.Nama} />
                                             }
 
@@ -287,172 +300,181 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                 }
 
                 {
-                    Cookies.get('Role')?.includes(data?.TtdSertifikat) && Cookies.get('Access')?.includes('isSigning') && (parseFloat(data.StatusPenerbitan) >= 1.4 && parseFloat(data.StatusPenerbitan) <= 1.6) && <TTDeDetail data={data} fetchData={fetchData} />
+                    Cookies.get('Role')?.includes(data?.TtdSertifikat) && Cookies.get('Access')?.includes('isSigning') && data?.StatusPenerbitan == "7B" && <TTDeDetail data={data} fetchData={fetchData} />
                 }
 
                 {
                     !Cookies.get('Access')?.includes('isSigning') &&
-                    <AccordionSection title="📑 Format Sertifikat">
-                        <div className="flex flex-col w-full gap-4">
-                            <>
-                                <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
-                                    <p className="font-medium text-gray-600">Action :</p>
+                    <>
+                        <AccordionSection title="📑 Format Sertifikat">
+                            <div className="flex flex-col w-full gap-4">
+                                <>
+                                    <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
+                                        <p className="font-medium text-gray-600">Action :</p>
 
-                                    {data?.StatusPenerbitan == "5" && (
-                                        <FormatCertificateAction
-                                            idPelatihan={data?.IdPelatihan.toString()}
-                                            handleFetchingData={fetchData}
-                                            data={data}
-                                        />
-                                    )}
+                                        {data?.StatusPenerbitan == "5" && (
+                                            <FormatCertificateAction
+                                                idPelatihan={data?.IdPelatihan.toString()}
+                                                handleFetchingData={fetchData}
+                                                data={data}
+                                            />
+                                        )}
+                                    </div>
+
+                                    <div className="w-full ">
+                                        <p className="font-medium text-gray-600 mb-2">Detail :</p>
+
+                                        {data.DeskripsiSertifikat !== "" || data.MateriPelatihan.length !== 0 ? (
+                                            <>
+                                                <SectionGrid>
+                                                    <InfoItem
+                                                        label="Deskripsi Indonesia"
+                                                        value={
+                                                            generatedDescriptionCertificate(data.DeskripsiSertifikat)
+                                                                .desc_indo
+                                                        }
+                                                    />
+                                                    <InfoItem
+                                                        label="Deskripsi Inggris"
+                                                        value={
+                                                            generatedDescriptionCertificate(data.DeskripsiSertifikat)
+                                                                .desc_eng
+                                                        }
+                                                    />
+                                                </SectionGrid>
+
+                                                {
+                                                    data?.JenisSertifikat == "Materi" && <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100 mt-4">
+                                                        <span className="text-xs font-medium text-gray-500">
+                                                            Materi Sertifikat
+                                                        </span>
+                                                        <div className="overflow-x-auto !text-sm mt-4">
+                                                            <table className="min-w-full border border-gray-300">
+                                                                <thead className="bg-gray-100">
+                                                                    <tr>
+                                                                        <th className="border p-3 text-sm">No</th>
+                                                                        <th className="border p-3 text-sm">Nama Materi</th>
+                                                                        <th className="border p-3 text-sm">Tipe</th>
+                                                                        <th className="border p-3 text-sm">Jam Teori</th>
+                                                                        <th className="border p-3 text-sm">Jam Praktek</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {data.MateriPelatihan!.map(
+                                                                        (item: MateriPelatihan, index: number) => (
+                                                                            <tr
+                                                                                key={item.IdMateriPelatihan}
+                                                                                className="odd:bg-white even:bg-gray-50"
+                                                                            >
+                                                                                <td className="border p-3 text-center">
+                                                                                    {index + 1}
+                                                                                </td>
+                                                                                <td className="border p-3">
+                                                                                    <div className="flex flex-col">
+                                                                                        <p className="font-medium">
+                                                                                            {
+                                                                                                generatedCurriculumCertificate(item.NamaMateri)
+                                                                                                    .curr_indo
+                                                                                            }
+                                                                                        </p>
+                                                                                        <span className="text-xs italic">
+                                                                                            {
+                                                                                                generatedCurriculumCertificate(item.NamaMateri)
+                                                                                                    .curr_eng
+                                                                                            }
+                                                                                        </span>
+                                                                                    </div>
+                                                                                </td>
+                                                                                <td className="border p-3 text-center capitalize">
+                                                                                    {item.Deskripsi}
+                                                                                </td>
+                                                                                <td className="border p-3 text-center">
+                                                                                    {item.JamTeory}
+                                                                                </td>
+                                                                                <td className="border p-3 text-center">
+                                                                                    {item.JamPraktek}
+                                                                                </td>
+                                                                            </tr>
+                                                                        )
+                                                                    )}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                }
+
+                                                <DialogFormatSTTPL pelatihan={data}>
+                                                    <Button
+                                                        variant="outline"
+                                                        title="Preview  Sertifikat"
+                                                        className="flex items-center w-full mt-4 rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
+                                                    >
+                                                        <FaSearch className="h-4 w-4 mr-1" /> Preview Sertifikat
+                                                    </Button>
+                                                </DialogFormatSTTPL>
+                                            </>
+                                        ) : (
+                                            <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">
+                                                <MdLock className="w-14 h-14 text-gray-600" />
+                                                <p className="text-gray-500 font-normal text-center">
+                                                    Harap atur format  sertifikat (materi, deskripsi) yang akan tampil di lembar sertifikat, Pastikan format yang diatur mengikuti petunjuk teknis yang telah diberikan. Kesesuaian akan diverifikasi lebih lanjut oleh Verifikator
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </>
+                            </div>
+
+                        </AccordionSection>
+
+                        <AccordionSection title="👥 Peserta Pelatihan">
+                            <div className="flex flex-col w-full gap-4">
+                                <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
+                                    <p className="font-medium text-gray-600">
+                                        Action :
+                                    </p>
+
+                                    {
+                                        countUserWithNoStatus(data?.UserPelatihan) != 0 && <PassedParticipantAction data={data?.UserPelatihan} onSuccess={fetchData} />
+                                    }
+
+                                    {countUserWithCertificate(data.UserPelatihan) == data.UserPelatihan.length && <Button
+                                        onClick={handleDownloadZip}
+                                        disabled={isZipping}
+                                        variant="outline"
+                                        className={`flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-indigo-500 text-indigo-500 hover:text-white hover:bg-indigo-500`}
+                                    >
+                                        <FaRegFolderOpen className="h-4 w-4" />
+                                        <span className="text-sm">
+                                            {isZipping ? 'Zipping & Downloading...' : 'Download Zip Sertifikat'}
+                                        </span>
+                                    </Button>
+                                    }
+
                                 </div>
 
                                 <div className="w-full ">
-                                    <p className="font-medium text-gray-600 mb-2">Detail :</p>
-
-                                    {data.DeskripsiSertifikat !== "" || data.MateriPelatihan.length !== 0 ? (
-                                        <>
-                                            <SectionGrid>
-                                                <InfoItem
-                                                    label="Deskripsi Indonesia"
-                                                    value={
-                                                        generatedDescriptionCertificate(data.DeskripsiSertifikat)
-                                                            .desc_indo
-                                                    }
-                                                />
-                                                <InfoItem
-                                                    label="Deskripsi Inggris"
-                                                    value={
-                                                        generatedDescriptionCertificate(data.DeskripsiSertifikat)
-                                                            .desc_eng
-                                                    }
-                                                />
-                                            </SectionGrid>
-
-                                            <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100 mt-4">
-                                                <span className="text-xs font-medium text-gray-500">
-                                                    Materi Sertifikat
-                                                </span>
-                                                <div className="overflow-x-auto !text-sm mt-4">
-                                                    <table className="min-w-full border border-gray-300">
-                                                        <thead className="bg-gray-100">
-                                                            <tr>
-                                                                <th className="border p-3 text-sm">No</th>
-                                                                <th className="border p-3 text-sm">Nama Materi</th>
-                                                                <th className="border p-3 text-sm">Tipe</th>
-                                                                <th className="border p-3 text-sm">Jam Teori</th>
-                                                                <th className="border p-3 text-sm">Jam Praktek</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {data.MateriPelatihan!.map(
-                                                                (item: MateriPelatihan, index: number) => (
-                                                                    <tr
-                                                                        key={item.IdMateriPelatihan}
-                                                                        className="odd:bg-white even:bg-gray-50"
-                                                                    >
-                                                                        <td className="border p-3 text-center">
-                                                                            {index + 1}
-                                                                        </td>
-                                                                        <td className="border p-3">
-                                                                            <div className="flex flex-col">
-                                                                                <p className="font-medium">
-                                                                                    {
-                                                                                        generatedCurriculumCertificate(item.NamaMateri)
-                                                                                            .curr_indo
-                                                                                    }
-                                                                                </p>
-                                                                                <span className="text-xs italic">
-                                                                                    {
-                                                                                        generatedCurriculumCertificate(item.NamaMateri)
-                                                                                            .curr_eng
-                                                                                    }
-                                                                                </span>
-                                                                            </div>
-                                                                        </td>
-                                                                        <td className="border p-3 text-center capitalize">
-                                                                            {item.Deskripsi}
-                                                                        </td>
-                                                                        <td className="border p-3 text-center">
-                                                                            {item.JamTeory}
-                                                                        </td>
-                                                                        <td className="border p-3 text-center">
-                                                                            {item.JamPraktek}
-                                                                        </td>
-                                                                    </tr>
-                                                                )
-                                                            )}
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-
-                                            <DialogFormatSTTPL pelatihan={data}>
-                                                <Button
-                                                    variant="outline"
-                                                    title="Preview  Sertifikat"
-                                                    className="flex items-center w-full mt-4 rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
-                                                >
-                                                    <FaSearch className="h-4 w-4 mr-1" /> Preview Sertifikat
-                                                </Button>
-                                            </DialogFormatSTTPL>
-                                        </>
-                                    ) : (
-                                        <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">
-                                            <MdLock className="w-14 h-14 text-gray-600" />
-                                            <p className="text-gray-500 font-normal text-center">
-                                                Harap atur format  sertifikat (materi, deskripsi) yang akan tampil di lembar sertifikat, Pastikan format yang diatur mengikuti petunjuk teknis yang telah diberikan. Kesesuaian akan diverifikasi lebih lanjut oleh Verifikator
-                                            </p>
+                                    <p className="font-medium text-gray-600 mb-2">
+                                        Detail  :
+                                    </p>
+                                    <div className="flex flex-col gap-2 w-full">
+                                        <div className="grid grid-cols-3 gap-4 text-sm">
+                                            <InfoItem label="Kuota Peserta" value={data.KoutaPelatihan} />
+                                            <InfoItem label="Jumlah Peserta" value={data.UserPelatihan.length.toString()} />
+                                            <InfoItem label="Jumlah Kelulusan" value={`${countUserWithPassed(data.UserPelatihan)}/${data.UserPelatihan.length}`} />
                                         </div>
-                                    )}
+                                        <UserPelatihanTable pelatihan={data} data={data.UserPelatihan} onSuccess={fetchData} />
+                                    </div>
                                 </div>
-                            </>
-                        </div>
+                            </div>
+                        </AccordionSection>
+                    </>
 
-                    </AccordionSection>
                 }
 
-                <AccordionSection title="👥 Peserta Pelatihan">
-                    <div className="flex flex-col w-full gap-4">
-                        <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
-                            <p className="font-medium text-gray-600">
-                                Action :
-                            </p>
 
-                            {
-                                countUserWithNoStatus(data?.UserPelatihan) != 0 && <PassedParticipantAction data={data?.UserPelatihan} onSuccess={fetchData} />
-                            }
 
-                            {countUserWithCertificate(data.UserPelatihan) == data.UserPelatihan.length && <Button
-                                onClick={handleDownloadZip}
-                                disabled={isZipping}
-                                variant="outline"
-                                className={`flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-indigo-500 text-indigo-500 hover:text-white hover:bg-indigo-500`}
-                            >
-                                <FaRegFolderOpen className="h-4 w-4" />
-                                <span className="text-sm">
-                                    {isZipping ? 'Zipping & Downloading...' : 'Download Zip Sertifikat'}
-                                </span>
-                            </Button>
-                            }
 
-                        </div>
-
-                        <div className="w-full ">
-                            <p className="font-medium text-gray-600 mb-2">
-                                Detail  :
-                            </p>
-                            <div className="flex flex-col gap-2 w-full">
-                                <div className="grid grid-cols-3 gap-4 text-sm">
-                                    <InfoItem label="Kuota Peserta" value={data.KoutaPelatihan} />
-                                    <InfoItem label="Jumlah Peserta" value={data.UserPelatihan.length.toString()} />
-                                    <InfoItem label="Jumlah Kelulusan" value={`${countUserWithPassed(data.UserPelatihan)}/${data.UserPelatihan.length}`} />
-                                </div>
-                                <UserPelatihanTable pelatihan={data} data={data.UserPelatihan} onSuccess={fetchData} />
-                            </div>
-                        </div>
-                    </div>
-                </AccordionSection>
             </Accordion >
         </div >
     );

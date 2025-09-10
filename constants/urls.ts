@@ -20,6 +20,8 @@ export const urlFileSuratPemberitahuan =
   process.env.NEXT_PUBLIC_BASE_URL + '/public/static/suratPemberitahuan'
 export const urlFileBeritaAcara =
   process.env.NEXT_PUBLIC_BASE_URL + '/public/static/BeritaAcara'
+export const urlFileLapwas =
+  process.env.NEXT_PUBLIC_BASE_URL + '/public/static/MemoPusat'
 
 export const downloadFormatPesertaPelatihan =
   'https://docs.google.com/spreadsheets/d/1rjYQjMSX6U2Szk0H8GQV3D7qLPL0VrGD/export?format=xlsx'

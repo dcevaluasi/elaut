@@ -170,7 +170,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                                     className="flex items-center gap-2 cursor-pointer font-semibold  disabled:cursor-not-allowed justify-center"
                                 >
                                     <Checkbox
-                                        disabled={row.original.StatusPenandatangan === "Done"}
+                                        disabled={row.original.StatusPenandatangan === "Done" || !Cookies.get('Access')?.includes('createPelatihan')}
                                         id="isActice"
                                         onCheckedChange={() => handleLulusDataPeserta(row.original)}
                                         checked={
@@ -194,7 +194,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                                     className="flex items-center gap-2 cursor-pointer font-semibold  disabled:cursor-not-allowed justify-center"
                                 >
                                     <Checkbox
-                                        disabled={row.original.StatusPenandatangan === "Done"}
+                                        disabled={row.original.StatusPenandatangan === "Done" || !Cookies.get('Access')?.includes('createPelatihan')}
                                         id="isActice"
                                         onCheckedChange={() => handleLulusDataPeserta(row.original)}
                                         checked={

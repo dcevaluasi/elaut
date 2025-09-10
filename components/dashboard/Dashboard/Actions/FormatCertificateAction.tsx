@@ -22,7 +22,6 @@ import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { urlTemplateMateriPelatihan } from "@/constants/templates";
 import { MateriPelatihan, PelatihanMasyarakat } from "@/types/product";
 import { truncateText } from "@/utils";
-import { translateText } from "@/utils/translate";
 
 const DualLangInput: React.FC<{
     value?: string;
@@ -30,33 +29,31 @@ const DualLangInput: React.FC<{
 }> = ({ value, onChange }) => {
     const [indo, setIndo] = useState("");
     const [english, setEnglish] = useState("");
+    const [isEnglish, setIsEnglish] = useState(false)
 
     const handleUpdate = (i: string, e: string) => {
         onChange(`{${i}}{${e}}`);
     };
 
-    useEffect(() => {
-        const delayDebounce = setTimeout(async () => {
-            if (indo.trim() === "") {
-                setEnglish("");
-                return;
-            }
-
-            try {
-                const translated = await translateText(indo, "en");
-                setEnglish(translated);
-                handleUpdate(indo, translated);
-            } catch (error) {
-                console.error("Translation error:", error);
-            }
-        }, 500);
-
-        return () => clearTimeout(delayDebounce);
-    }, [indo]);
-
-
     return (
         <div className="space-y-2 my-3">
+            <div className="flex items-center gap-2">
+                <input
+                    id="isSpecific"
+                    type="checkbox"
+                    checked={isEnglish}
+                    onChange={(e) =>
+                        setIsEnglish(isEnglish ? false : true)
+                    }
+                    className="h-4 w-4 rounded border-gray-300 text-navy-600 focus:ring-navy-500"
+                />
+                <div className="flex flex-col">
+                    <p className="text-sm text-gray-400">
+                        Apabila format sertifikat terdapat Bahasa Inggris maka ceklist, jika tidak biarkan
+                    </p>
+                </div>
+            </div>
+
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                     Deskripsi Sertifikat Bahasa Indonesia
@@ -73,32 +70,41 @@ const DualLangInput: React.FC<{
                 />
             </div>
 
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Deskripsi Sertifikat English
-                </label>
-                <textarea
-                    value={english}
-                    // onChange={(e) => {
-                    //     setEnglish(e.target.value);
-                    //     handleUpdate(indo, e.target.value);
-                    // }}
-                    readOnly
-                    placeholder="Write text in English..."
-                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-300"
-                    rows={3}
-                />
-                <div className="flex flex-col gap-0">
-                    <p className="text-xs text-gray-500">
-                        *Apabila sertifikat yang akan dikeluarkan menggunakan format inggris, harap isi dan terjemahkan Deskripsi Indonesia menggunakan <Link target="_blank" className="!text-blue-500 underline" href="https://www.deepl.com/en/translator">https://www.deepl.com/en/translator</Link>. Apabila tidak, maka kosongkan
-                    </p>
+            {
+                isEnglish && <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Deskripsi Sertifikat English
+                    </label>
+                    <textarea
+                        value={english}
+                        onChange={(e) => {
+                            setEnglish(e.target.value);
+                            handleUpdate(indo, e.target.value);
+                        }}
+                        placeholder="Write text in English..."
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-navy-400 focus:ring-2 focus:ring-navy-300"
+                        rows={3}
+                    />
+                    <div className="flex flex-col gap-0">
+                        <p className="text-xs text-gray-500">
+                            *Apabila sertifikat yang akan dikeluarkan menggunakan format
+                            inggris, harap isi dan terjemahkan Deskripsi Indonesia menggunakan{" "}
+                            <Link
+                                target="_blank"
+                                className="!text-blue-500 underline"
+                                href="https://www.deepl.com/en/translator"
+                            >
+                                https://www.deepl.com/en/translator
+                            </Link>
+                            . Apabila tidak, maka kosongkan
+                        </p>
+                    </div>
                 </div>
-            </div>
+            }
         </div>
     );
 };
 
-// --- Materi Pelatihan Button ---
 interface FormatCertificateActionProps {
     idPelatihan: string;
     handleFetchingData: () => void;
@@ -131,21 +137,24 @@ const FormatCertificateAction: React.FC<FormatCertificateActionProps> = ({
 
         try {
             // STEP 1: Upload Materi Pelatihan
-            const response = await axios.post(
-                `${elautBaseUrl}/lemdik/exportModulePelatihan`,
-                form,
-                {
-                    headers: {
-                        Authorization: `Bearer ${Cookies.get("XSRF091")}`,
-                    },
-                }
-            );
+            if (materiPelatihan != null) {
+                const response = await axios.post(
+                    `${elautBaseUrl}/lemdik/exportModulePelatihan`,
+                    form,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+                        },
+                    }
+                );
 
-            // Success Toast
-            Toast.fire({
-                icon: "success",
-                title: `Berhasil menambahkan materi pelatihan!`,
-            });
+                // Success Toast
+                Toast.fire({
+                    icon: "success",
+                    title: `Berhasil menambahkan materi pelatihan!`,
+                });
+            }
+
 
             // STEP 2: Update Pelatihan with BeritaAcara, TtdSertifikat, dll
             const updateForm = new FormData();
@@ -204,6 +213,12 @@ const FormatCertificateAction: React.FC<FormatCertificateActionProps> = ({
                     <fieldset>
                         <form autoComplete="off">
                             <div className="flex flex-col gap-4">
+                                {/* Dual Language Input */}
+                                <DualLangInput
+                                    value={dualLangText}
+                                    onChange={(val) => setDualLangText(val)}
+                                />
+
                                 <div className="flex items-center gap-2">
                                     <input
                                         id="isSpecific"
@@ -215,14 +230,8 @@ const FormatCertificateAction: React.FC<FormatCertificateActionProps> = ({
                                         className="h-4 w-4 rounded border-gray-300 text-navy-600 focus:ring-navy-500"
                                     />
                                     <div className="flex flex-col">
-                                        <label
-                                            htmlFor="isSpecific"
-                                            className="text-sm text-gray-800 font-medium cursor-pointer"
-                                        >
-                                            {jenisSertifikat}
-                                        </label>
                                         <p className="text-sm text-gray-400">
-                                            Apabila tidak ada halaman kedua untuk menampilkan materi maka biarkan, jika ada maka harap checklist
+                                            Apabila format sertifikat terdapat lembar kedua untuk menampilkan materi pelatihan maka ceklist, jika tidak biarkan
                                         </p>
                                     </div>
 
@@ -242,14 +251,8 @@ const FormatCertificateAction: React.FC<FormatCertificateActionProps> = ({
                                                 className="h-4 w-4 rounded border-gray-300 text-navy-600 focus:ring-navy-500"
                                             />
                                             <div className="flex flex-col">
-                                                <label
-                                                    htmlFor="isSpecific"
-                                                    className="text-sm text-gray-800 font-medium cursor-pointer"
-                                                >
-                                                    {asalSertifikat}
-                                                </label>
                                                 <p className="text-sm text-gray-400">
-                                                    Apabila materi yang akan tampil pada sertifikat terdiri dari Inti dan Umum maka ceklist jika tidak spesifik maka biarkan tidak terceklist
+                                                    Apabila materi yang ditampilkan terdiri dari materi Inti dan Umum maka ceklist, jika tidak biarkan
                                                 </p>
                                             </div>
 
@@ -294,11 +297,7 @@ const FormatCertificateAction: React.FC<FormatCertificateActionProps> = ({
 
 
 
-                                {/* Dual Language Input */}
-                                <DualLangInput
-                                    value={dualLangText}
-                                    onChange={(val) => setDualLangText(val)}
-                                />
+
                             </div>
 
                             <AlertDialogFooter className="mt-3">

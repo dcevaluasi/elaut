@@ -36,3 +36,7 @@ export function generatedSignedCertificate(input: string) {
 
   return { name, status_indo, status_eng, location }
 }
+
+export function isEnglishFormat(input: string) {
+  return generatedDescriptionCertificate(input).desc_eng !== ''
+}

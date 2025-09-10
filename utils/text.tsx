@@ -134,25 +134,25 @@ export function getStatusInfo(
         color: "bg-rose-500 text-white",
         icon: <RiCloseCircleFill className="w-4 h-4" />,
       };
-    case "1.3":
+    case "7A":
       return {
         label: "Pending Kabalai",
         color: "bg-blue-500 text-white",
-        icon: <RiLockFill className="w-4 h-4" />,
+        icon: <RiTimeLine className="w-4 h-4" />,
       };
-    case "1.4":
+    case "7B":
       return {
         label: "Approved Kabalai",
         color: "bg-amber-500 text-white",
         icon: <RiCheckboxCircleFill className="w-4 h-4" />,
       };
-    case "1.5":
+    case "7C":
       return {
         label: "Reject Kabalai",
         color: "bg-rose-500 text-white",
         icon: <RiCloseCircleFill className="w-4 h-4" />,
       };
-    case "1.6":
+    case "7D":
       return {
         label: "Signed Kabalai",
         color: "bg-green-500 text-white",

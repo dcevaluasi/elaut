@@ -12,7 +12,7 @@ import { getDateInIndonesianFormat } from "@/utils/time";
 import Toast from "@/components/toast";
 import { HiOutlineEyeOff } from "react-icons/hi";
 import { HiOutlineEye } from "react-icons/hi2";
-import { countUserWithDrafCertificate, countUserWithTanggalSertifikat } from "@/utils/counter";
+import { countUserWithCertificate, countUserWithDrafCertificate, countUserWithDraftCertificate, countUserWithTanggalSertifikat } from "@/utils/counter";
 
 import {
     AlertDialog,
@@ -185,10 +185,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                             Action :
                         </p>
 
-
-
                         <AlertDialog open={open} onOpenChange={setOpen}>
-                            {/* Content */}
                             <AlertDialogContent className="max-w-lg rounded-xl z-[999999999999]">
                                 <AlertDialogHeader>
                                     <AlertDialogTitle>TTD Sertifikat</AlertDialogTitle>
@@ -206,7 +203,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             </p>
                                         </div>
                                         : <>
-                                            {(isUploading) && (
+                                            {(isUploading || countUserWithDrafCertificate(data?.UserPelatihan) != data?.UserPelatihan.length) && (
                                                 <div className="w-full">
                                                     Memuat File STTPL
                                                     <Progress value={progress} className="w-full h-3 rounded-lg" />
@@ -216,7 +213,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 </div>
                                             )}
 
-                                            {!isUploading &&
+                                            {(!isUploading || countUserWithDrafCertificate(data?.UserPelatihan) == data?.UserPelatihan.length) &&
                                                 <fieldset>
                                                     <form autoComplete="off">
                                                         <div className="flex flex-col space-y-2">
@@ -311,11 +308,11 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                         </AlertDialog>
 
                         {
-                            (Cookies.get('Role')?.includes(data?.TtdSertifikat) && (data?.StatusPenerbitan == "10" || data?.StatusPenerbitan == "14")) && <Button
+                            (Cookies.get('Role')?.includes(data?.TtdSertifikat) && (data?.StatusPenerbitan == "7B" || data?.StatusPenerbitan == "10" || data?.StatusPenerbitan == "14")) && <Button
                                 onClick={() => {
                                     setOpen(!open);
-                                    if (countUserWithDrafCertificate(data?.UserPelatihan) == 0) {
-                                        handleUploadAll()
+                                    if (countUserWithDrafCertificate(data?.UserPelatihan) != data?.UserPelatihan.length) {
+                                        handleUploadAll();
                                     }
                                 }
                                 }
@@ -327,29 +324,32 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                             </Button>
                         }
 
-                        {
-                            (Cookies.get('Role')?.includes(data?.TtdSertifikat) && data?.StatusPenerbitan == "1.4") && <Button
-                                onClick={() => {
-                                    setOpen(true); // always open
-                                    if (countUserWithDrafCertificate(data?.UserPelatihan) == 0) {
-                                        handleUploadAll();
-                                    }
-                                }}
-                                variant="outline"
-                                className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
-                            >
-                                <TbPencilCheck className="h-5 w-5" />
-                                <span>TTDe STTPL</span>
-                            </Button>
-
-                        }
-
                     </div>
 
                     <div className="w-full ">
                         <p className="font-medium text-gray-600 mb-2 text-sm">
                             Detail  :
                         </p>
+                        <div className="grid-cols-3 grid w-full my-3 gap-4">
+                            <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
+                                <span className="text-xs font-medium text-gray-500">Jumlah Yang Perlu Di TTDe</span>
+                                <span className="text-sm font-semibold text-gray-800 mt-1">
+                                    {data?.UserPelatihan.length}
+                                </span>
+                            </div>
+                            <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
+                                <span className="text-xs font-medium text-gray-500">Jumlah Sertifikat Draft</span>
+                                <span className="text-sm font-semibold text-gray-800 mt-1">
+                                    {countUserWithDraftCertificate(data?.UserPelatihan)}/{data?.UserPelatihan.length}
+                                </span>
+                            </div>
+                            <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
+                                <span className="text-xs font-medium text-gray-500">Jumlah Sertifikat TTDe</span>
+                                <span className="text-sm font-semibold text-gray-800 mt-1">
+                                    {countUserWithCertificate(data?.UserPelatihan)}/{data?.UserPelatihan.length}
+                                </span>
+                            </div>
+                        </div>
 
                         <div className={`flex flex-col gap-3`}>
                             {data.UserPelatihan.map((item, i) => (
@@ -375,8 +375,6 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             handleFetchingData={fetchData}
                                         />
                                     }
-
-
                                 </>
                             ))}
                         </div>

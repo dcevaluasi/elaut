@@ -18,7 +18,7 @@ import {
 import { formatDateRange, formatDateRangeEnglish } from "@/utils/time";
 import { ESELON1, ESELON2, ESELON_1, ESELON_2, EselonKey, ESELONS, KA_BPPSDM, KA_PUSLAT_KP } from "@/constants/nomenclatures";
 
-import { generatedCurriculumCertificate, generatedDescriptionCertificate, generatedSignedCertificate } from "@/utils/certificates";
+import { generatedCurriculumCertificate, generatedDescriptionCertificate, generatedSignedCertificate, isEnglishFormat } from "@/utils/certificates";
 import Cookies from "js-cookie";
 
 
@@ -92,26 +92,28 @@ const SertifikatNonKepelautan = React.forwardRef(
                                         <h1 className="text-base font-bosBold font-bold">
                                             KEMENTERIAN KELAUTAN DAN PERIKANAN
                                         </h1>
-                                        <p className="text-base font-bosItalic">
+                                        {isEnglishFormat(pelatihan?.DeskripsiSertifikat) && <p className="text-base font-bosItalic">
                                             MINISTRY OF MARINE AFFAIRS AND FISHERIES
-                                        </p>
+                                        </p>}
                                     </div>
                                     <div className="flex flex-col h-fit items-center justify-center space-y-0">
                                         <h1 className="text-lg font-bosBold font-bold">
                                             BADAN PENYULUHAN DAN PENGEMBANGAN SUMBER DAYA MANUSIA KELAUTAN
                                             DAN PERIKANAN
                                         </h1>
-                                        <p className="text-sm font-bosItalic">
+                                        {isEnglishFormat(pelatihan?.DeskripsiSertifikat) && <p className="text-sm font-bosItalic">
                                             THE AGENCY FOR MARINE AND FISHERIES EXTENSION AND HUMAN
                                             RESOURCES DEVELOPMENT
-                                        </p>
+                                        </p>}
+
                                     </div>
 
                                     <div className="flex flex-col h-fit items-center justify-center space-y-1">
                                         <h1 className="text-3xl font-bosBold font-black leading-none">
                                             SERTIFIKAT
                                         </h1>
-                                        <p className="text-lg font-bosItalic">CERTIFICATE</p>
+                                        {isEnglishFormat(pelatihan?.DeskripsiSertifikat) && <p className="text-lg font-bosItalic">CERTIFICATE</p>}
+
                                     </div>
 
                                 </div>
@@ -120,13 +122,14 @@ const SertifikatNonKepelautan = React.forwardRef(
                                     <span className="text-base leading-none font-bosNormal">
                                         Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan berdasarkan Peraturan Pemerintah Nomor.62 Tahun 2014 tentang Penyelenggaraan Pendidikan, Pelatihan dan Penyuluhan Perikanan, serta ketentuan pelaksanaannya menyatakan bahwa :
                                     </span>
-                                    <span className="max-w-4xl leading-none font-bosItalic text-[0.85rem] mx-auto">
+                                    {isEnglishFormat(pelatihan?.DeskripsiSertifikat) && <span className="max-w-4xl leading-none font-bosItalic text-[0.85rem] mx-auto">
                                         The Agency for Marine and Fisheries Extension and Human
                                         Resources Development based on Government Regulation Number 62
                                         of 2014 concerning the Implementation of Fisheries Education,
                                         Training and Extension as well as its implementing provisions
                                         States that :
-                                    </span>
+                                    </span>}
+
                                 </div>
 
                                 <div className="flex flex-col space-y-0 w-full h-fit -mt-1">
@@ -134,7 +137,8 @@ const SertifikatNonKepelautan = React.forwardRef(
                                         <tr className="w-full">
                                             <td className="font-bos w-full flex flex-col space-y-0">
                                                 <span className="font-bosNormal text-base">Nama</span>
-                                                <span className="font-bos italic text-[0.85rem] -mt-2">Name</span>
+                                                {isEnglishFormat(pelatihan?.DeskripsiSertifikat) && <span className="font-bos italic text-[0.85rem] -mt-2">Name</span>}
+
                                             </td>
                                             <td className=" w-2/3 text-base font-bosNormal uppercase">: -</td>
                                         </tr>
@@ -143,10 +147,10 @@ const SertifikatNonKepelautan = React.forwardRef(
                                                 <span className="text-base font-bosNormal">
                                                     NIK/NIP/PASPOR
                                                 </span>
-                                                <span className="font-bos italic text-[0.85rem] -mt-2">
+                                                {isEnglishFormat(pelatihan?.DeskripsiSertifikat) && <span className="font-bos italic text-[0.85rem] -mt-2">
                                                     {" "}
                                                     Identification Number
-                                                </span>
+                                                </span>}
                                             </td>
                                             <td className=" w-2/3 text-base font-bosNormal">
                                                 : -
@@ -155,10 +159,11 @@ const SertifikatNonKepelautan = React.forwardRef(
                                         <tr className="w-full">
                                             <td className="font-bos w-full flex flex-col space-y-0">
                                                 <span className="text-base font-bosNormal">Tempat Tanggal Lahir</span>
-                                                <span className="font-bos italic text-[0.85rem] -mt-2">
+                                                {isEnglishFormat(pelatihan?.DeskripsiSertifikat) && <span className="font-bos italic text-[0.85rem] -mt-2">
                                                     {" "}
                                                     Place and date of birth
-                                                </span>
+                                                </span>}
+
                                             </td>
                                             <td className=" w-2/3 text-base font-bosNormal capitalize">
                                                 : -
@@ -167,10 +172,10 @@ const SertifikatNonKepelautan = React.forwardRef(
                                         <tr className="w-full">
                                             <td className="font-bos w-full flex flex-col space-y-0">
                                                 <span className="text-base font-bosNormal">Institusi/Organisasi</span>
-                                                <span className="font-bos italic text-[0.85rem] -mt-2">
+                                                {isEnglishFormat(pelatihan?.DeskripsiSertifikat) && <span className="font-bos italic text-[0.85rem] -mt-2">
                                                     {" "}
                                                     Institution/Organization
-                                                </span>
+                                                </span>}
                                             </td>
                                             <td className=" w-2/3 text-base font-bosNormal uppercase">
                                                 : -
@@ -183,9 +188,9 @@ const SertifikatNonKepelautan = React.forwardRef(
                                     <h1 className="font-bosBold font-black text-2xl leading-none">
                                         TELAH LULUS
                                     </h1>
-                                    <h3 className="font-bosNormal font-bold text-lg italic">
+                                    {isEnglishFormat(pelatihan?.DeskripsiSertifikat) && <h3 className="font-bosNormal font-bold text-lg italic">
                                         HAS PASSED
-                                    </h3>
+                                    </h3>}
                                 </div>
 
                                 <>
@@ -205,17 +210,18 @@ const SertifikatNonKepelautan = React.forwardRef(
                                         <div className="flex flex-col  space-y-0 font-bos text-center items-center justify-center">
                                             <div className="flex w-full flex-col  space-y-0 items-center mt-2 text-center justify-center">
                                                 <span className="font-bosNormal text-base leading-[105%] w-full flex items-center gap-1">
-                                                     {
+                                                    {
                                                         !pelatihan?.TtdSertifikat.includes('Kepala Balai') ? 'Jakarta' : generatedSignedCertificate(pimpinanLemdiklat).location},{" "}-
                                                     <br />   {
                                                         !pelatihan?.TtdSertifikat.includes('Kepala Balai') ? pelatihan?.TtdSertifikat : generatedSignedCertificate(pimpinanLemdiklat).status_indo
                                                     }
                                                 </span>
-                                                <span className="leading-none font-bosItalic text-[0.85rem]">
+                                                {isEnglishFormat(pelatihan?.DeskripsiSertifikat) && <span className="leading-none font-bosItalic text-[0.85rem]">
                                                     {
                                                         !pelatihan?.TtdSertifikat.includes('Kepala Balai') ? ESELONS[pelatihan?.TtdSertifikat as EselonKey].fullNameEng : generatedSignedCertificate(pimpinanLemdiklat).status_eng
                                                     }
-                                                </span>
+                                                </span>}
+
 
                                                 <Image
                                                     alt=""
@@ -239,7 +245,7 @@ const SertifikatNonKepelautan = React.forwardRef(
 
                         </div>
 
-                        <div className={`pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center ${pelatihan?.MateriPelatihan.length < 7 ? 'mt-72' : 'mt-48'} break-before-auto relative`}>
+                        {pelatihan?.JenisSertifikat == "Materi" && <div className={`pdf-page w-full flex flex-col  gap-4  h-full items-center justify-center ${pelatihan?.MateriPelatihan.length < 7 ? 'mt-72' : 'mt-48'} break-before-auto relative`}>
                             <div className="flex flex-row justify-center items-center mb-6">
                                 <div className="flex flex-row gap-2 items-center h-fit">
                                     <div className="flex flex-col text-center space-y-0 h-fit items-center justify-center w-full gap-0">
@@ -413,7 +419,8 @@ const SertifikatNonKepelautan = React.forwardRef(
                                     <div className="w-4/12 px-1 text-lg mb-3 text-center flex items-center justify-center">{totalHoursCertificateLvl.totalTheory + totalHoursCertificateLvl.totalPractice}</div>
                                 </div>
                             </div>
-                        </div >
+                        </div >}
+
 
                     </>
 

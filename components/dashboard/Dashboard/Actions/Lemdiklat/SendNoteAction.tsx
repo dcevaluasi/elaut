@@ -24,7 +24,7 @@ import {
 import axios from "axios";
 import Cookies from "js-cookie";
 import Toast from "@/components/toast";
-import { elautBaseUrl, urlFileBeritaAcara } from "@/constants/urls";
+import { elautBaseUrl, urlFileBeritaAcara, urlFileLapwas } from "@/constants/urls";
 import { IconType } from "react-icons";
 import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
 import { PelatihanMasyarakat } from "@/types/product";
@@ -59,10 +59,19 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
     const [message, setMessage] = useState("");
     const [verifikatorPelaksanaan, setVerifikatorPelaksanaan] = useState(pelatihan!.VerifikatorPelatihan)
     const [beritaAcaraFile, setBeritaAcaraFile] = useState<File | null>(null);
+    const [lapPengawasan, setLapPengawasan] = useState<File | null>(null);
+    const [isPengawas, setIsPengawas] = useState(false)
     const oldFileUrl = pelatihan!.BeritaAcara
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             setBeritaAcaraFile(e.target.files[0]);
+        }
+    };
+
+    const oldFileLapwasUrl = pelatihan!.MemoPusat
+    const handleFileChangeLapwas = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            setLapPengawasan(e.target.files[0]);
         }
     };
 
@@ -79,6 +88,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
         formData.append("VerifikatorPelatihan", verifikatorPelaksanaan);
         formData.append("VerifikatorSertifikat", verifikatorPelaksanaan);
         if (beritaAcaraFile) formData.append("BeritaAcara", beritaAcaraFile);
+        if (lapPengawasan) formData.append("MemoPusat", lapPengawasan);
         if (status == "4") formData.append("PemberitahuanDiterima", "Active")
 
         try {
@@ -214,6 +224,73 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                                 </div>
                             )}
                         </div>
+                    </>
+                }
+
+                {
+                    pelatihan?.StatusPenerbitan == "6" && <>
+                        <div className="flex items-center gap-2">
+                            <input
+                                id="isSpecific"
+                                type="checkbox"
+                                checked={isPengawas}
+                                onChange={(e) =>
+                                    setIsPengawas(isPengawas ? false : true)
+                                }
+                                className="h-4 w-4 rounded border-gray-300 text-navy-600 focus:ring-navy-500"
+                            />
+                            <div className="flex flex-col">
+                                <p className="text-sm text-gray-400">
+                                    Apabila terdapat pengawasan maka ceklist lalu upload file laporan pengawasan dari pengawas lapangan yang ditugaskans
+                                </p>
+                            </div>
+
+                        </div>
+                        {
+                            isPengawas && <div>
+                                <label className="block text-sm font-semibold text-gray-800 mb-2">
+                                    Upload Dokumen Pengawasan
+                                </label>
+
+                                <div className="relative">
+                                    <input
+                                        type="file"
+                                        accept=".pdf,.doc,.docx"
+                                        onChange={handleFileChangeLapwas}
+                                        disabled={loading}
+                                        className="peer block w-full cursor-pointer rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm transition 
+                 file:mr-4 file:cursor-pointer file:rounded-md file:border-0 
+                 file:bg-navy-500 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white 
+                 hover:file:bg-navy-600 
+                 focus:border-navy-400 focus:ring-2 focus:ring-navy-300 
+                 disabled:cursor-not-allowed disabled:opacity-60"
+                                    />
+                                </div>
+
+                                <p className="mt-1 text-xs text-gray-500">
+                                    Format file: <span className="font-medium">PDF, DOC, DOCX</span>
+                                </p>
+
+                                {/* Old file preview */}
+                                {oldFileLapwasUrl != "" && (
+                                    <div className="mt-3 flex items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm shadow-sm">
+                                        <div className="flex items-center gap-2 text-gray-700">
+                                            📄
+                                            <span className="truncate max-w-[200px]">Dokumen Pengawasan</span>
+                                        </div>
+                                        <a
+                                            href={`${urlFileLapwas}/${oldFileLapwasUrl}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-navy-600 hover:text-navy-800 font-medium transition"
+                                        >
+                                            Lihat
+                                        </a>
+                                    </div>
+                                )}
+                            </div>
+                        }
+
                     </>
                 }
 
