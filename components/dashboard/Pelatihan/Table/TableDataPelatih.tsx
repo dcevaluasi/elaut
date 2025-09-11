@@ -8,7 +8,7 @@ import { Instruktur } from "@/types/instruktur";
 import { Input } from "@/components/ui/input";
 import { truncateText } from "@/utils";
 import AddInstrukturAction from "../../Dashboard/Actions/Instruktur/AddInstrukturAction";
-import { Briefcase, GraduationCap, Layers, Rows3, ShieldCheck, Users } from "lucide-react";
+import { Briefcase, FileBadge, GraduationCap, Layers, Rows3, ShieldCheck, Users } from "lucide-react";
 import UpdateInstrukturAction from "../../Dashboard/Actions/Instruktur/UpdateInstrukturAction";
 import DeleteInstrukturAction from "../../Dashboard/Actions/Instruktur/DeleteInstrukturAction";
 import {
@@ -270,22 +270,25 @@ function InstrukturTable({ data, fetchData }: Props) {
     )
 }
 
-function StatsCards({ data, stats }: {
+function StatsCards({
+    data,
+    stats,
+}: {
     data: Instruktur[]
     stats: CountStats
 }) {
     return (
-        <div className="space-y-6 my-6">
-            {/* Breakdown Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="flex gap-6 flex-col">
-                    {/* Total Data */}
-                    <Card className="shadow-sm rounded-xl border border-gray-100 h-fit bg-white">
+        <div className="my-6 space-y-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                {/* --- Column 1 --- */}
+                <div className="flex flex-col gap-6">
+                    {/* Total Instruktur */}
+                    <Card className="h-fit rounded-xl border border-gray-100 bg-white shadow-sm">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-base font-medium text-gray-600">
                                 Total Instruktur
                             </CardTitle>
-                            <Users className="w-5 h-5 text-gray-400" />
+                            <Users className="h-5 w-5 text-gray-400" />
                         </CardHeader>
                         <CardContent>
                             <p className="text-2xl font-bold text-gray-800">{data.length}</p>
@@ -293,24 +296,25 @@ function StatsCards({ data, stats }: {
                         </CardContent>
                     </Card>
 
-                    <div className="flex gap-6">
+                    {/* Pendidikan & Status */}
+                    <div className="flex flex-col gap-6 md:flex-row">
                         {/* Pendidikan Terakhir */}
-                        <Card className="shadow-sm rounded-2xl border border-gray-100 hover:shadow-lg transition-all h-full w-full">
+                        <Card className="w-full h-full rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-lg">
                             <CardHeader className="flex items-center gap-2">
-                                <GraduationCap className="w-5 h-5 text-purple-500" />
+                                <GraduationCap className="h-5 w-5 text-purple-500" />
                                 <CardTitle className="text-lg font-semibold text-gray-800">
                                     Pendidikan Terakhir
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <ul className="gap-2 grid grid-cols-1">
+                                <ul className="grid grid-cols-1 gap-2">
                                     {Object.entries(stats.pendidikanTerakhir).map(([key, count]) => (
                                         <li
                                             key={key}
-                                            className="flex items-center justify-between bg-purple-50 px-3 py-2 rounded-lg text-sm hover:bg-purple-100 transition"
+                                            className="flex items-center justify-between rounded-lg bg-purple-50 px-3 py-2 text-sm transition hover:bg-purple-100"
                                         >
                                             <span className="font-medium text-gray-700">{key}</span>
-                                            <span className="text-purple-600 font-bold">{count}</span>
+                                            <span className="font-bold text-purple-600">{count}</span>
                                         </li>
                                     ))}
                                 </ul>
@@ -318,22 +322,22 @@ function StatsCards({ data, stats }: {
                         </Card>
 
                         {/* Status Instruktur */}
-                        <Card className="shadow-sm rounded-2xl border border-gray-100 hover:shadow-lg transition-all h-full w-full">
+                        <Card className="w-full h-full rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-lg">
                             <CardHeader className="flex items-center gap-2">
-                                <ShieldCheck className="w-5 h-5 text-teal-500" />
+                                <ShieldCheck className="h-5 w-5 text-teal-500" />
                                 <CardTitle className="text-lg font-semibold text-gray-800">
                                     Status Instruktur
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <ul className="gap-2 grid grid-cols-1">
+                                <ul className="grid grid-cols-1 gap-2">
                                     {Object.entries(stats.status).map(([key, count]) => (
                                         <li
                                             key={key}
-                                            className="flex items-center justify-between bg-teal-50 px-3 py-2 rounded-lg text-sm hover:bg-teal-100 transition"
+                                            className="flex items-center justify-between rounded-lg bg-teal-50 px-3 py-2 text-sm transition hover:bg-teal-100"
                                         >
                                             <span className="font-medium text-gray-700">{key}</span>
-                                            <span className="text-teal-600 font-bold">{count}</span>
+                                            <span className="font-bold text-teal-600">{count}</span>
                                         </li>
                                     ))}
                                 </ul>
@@ -342,46 +346,63 @@ function StatsCards({ data, stats }: {
                     </div>
                 </div>
 
-                {/* Bidang Keahlian */}
-                <Card className="shadow-sm rounded-2xl border border-gray-100 hover:shadow-lg transition-all">
-                    <CardHeader className="flex items-center gap-2">
-                        <Layers className="w-5 h-5 text-blue-500" />
-                        <CardTitle className="text-lg font-semibold text-gray-800">
-                            Bidang Keahlian
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <ul className="gap-2 grid grid-cols-1">
-                            {Object.entries(stats.bidangKeahlian).map(([key, count]) => (
-                                <li
-                                    key={key}
-                                    className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-lg text-sm hover:bg-blue-100 transition"
-                                >
-                                    <span className="font-medium text-gray-700">{key}</span>
-                                    <span className="text-blue-600 font-bold">{count}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </CardContent>
-                </Card>
+                {/* --- Column 2 --- */}
+                <div className="flex flex-col gap-6">
+                    {/* Total Instruktur */}
+                    <Card className="h-fit rounded-xl border border-gray-100 bg-white shadow-sm">
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                            <CardTitle className="text-base font-medium text-gray-600">
+                                Total ToT
+                            </CardTitle>
+                            <FileBadge className="h-5 w-5 text-gray-400" />
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-2xl font-bold text-gray-800">{stats.tot}</p>
+                            <p className="text-xs text-gray-500">Instruktur memiliki ToT</p>
+                        </CardContent>
+                    </Card>
 
-                {/* Jenjang Jabatan */}
-                <Card className="shadow-sm rounded-2xl border border-gray-100 hover:shadow-lg transition-all">
+                    {/* Bidang Keahlian */}
+                    <Card className="w-full h-full rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-lg">
+                        <CardHeader className="flex items-center gap-2">
+                            <Layers className="h-5 w-5 text-blue-500" />
+                            <CardTitle className="text-lg font-semibold text-gray-800">
+                                Bidang Keahlian
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ul className="grid grid-cols-2 gap-2">
+                                {Object.entries(stats.bidangKeahlian).map(([key, count]) => (
+                                    <li
+                                        key={key}
+                                        className="flex items-center justify-between rounded-lg bg-blue-50 px-3 py-2 text-sm transition hover:bg-blue-100"
+                                    >
+                                        <span className="font-medium text-gray-700">{key}</span>
+                                        <span className="font-bold text-blue-600">{count}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* --- Column 3 --- */}
+                <Card className="h-full rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-lg">
                     <CardHeader className="flex items-center gap-2">
-                        <Briefcase className="w-5 h-5 text-green-500" />
+                        <Briefcase className="h-5 w-5 text-green-500" />
                         <CardTitle className="text-lg font-semibold text-gray-800">
                             Jenjang Jabatan
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <ul className="gap-2 grid grid-cols-2">
+                        <ul className="grid grid-cols-2 gap-2">
                             {Object.entries(stats.jenjangJabatan).map(([key, count]) => (
                                 <li
                                     key={key}
-                                    className="flex items-center justify-between bg-green-50 px-3 py-2 rounded-lg text-sm hover:bg-green-100 transition"
+                                    className="flex items-center justify-between rounded-lg bg-green-50 px-3 py-2 text-sm transition hover:bg-green-100"
                                 >
                                     <span className="font-medium text-gray-700">{key}</span>
-                                    <span className="text-green-600 font-bold">{count}</span>
+                                    <span className="font-bold text-green-600">{count}</span>
                                 </li>
                             ))}
                         </ul>
@@ -391,6 +412,7 @@ function StatsCards({ data, stats }: {
         </div>
     )
 }
+
 
 function FilterDropdown({
     filterKeahlian,

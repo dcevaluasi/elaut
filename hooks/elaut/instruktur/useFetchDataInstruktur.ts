@@ -11,6 +11,7 @@ export type CountStats = {
   jenjangJabatan: Record<string, number>
   pendidikanTerakhir: Record<string, number>
   status: Record<string, number>
+  tot: number
 }
 
 export function useFetchDataInstruktur() {
@@ -53,6 +54,7 @@ export function useFetchDataInstruktur() {
       'No Active': 0,
       'Tugas Belajar': 0,
     }
+    let tot = 0
 
     instrukturs.forEach((i) => {
       if (i.bidang_keahlian) {
@@ -70,9 +72,12 @@ export function useFetchDataInstruktur() {
       if (i.status) {
         status[i.status] = (status[i.status] || 0) + 1
       }
+      if (i.training_officer_course != '') {
+        tot = tot + 1
+      }
     })
 
-    return { bidangKeahlian, jenjangJabatan, pendidikanTerakhir, status }
+    return { bidangKeahlian, jenjangJabatan, pendidikanTerakhir, status, tot }
   }, [instrukturs])
 
   return { instrukturs, loading, error, fetchInstrukturData, stats }
