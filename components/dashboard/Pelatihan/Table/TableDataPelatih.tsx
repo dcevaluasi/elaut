@@ -7,9 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Instruktur } from "@/types/instruktur";
 import { Input } from "@/components/ui/input";
 import { truncateText } from "@/utils";
-import AddInstrukturAction from "../../Dashboard/Actions/AddInstrukturAction";
-import { Briefcase, GraduationCap, Layers, Users } from "lucide-react";
-import UpdateInstrukturAction from "../../Dashboard/Actions/UpdateInstrukturAction";
+import AddInstrukturAction from "../../Dashboard/Actions/Instruktur/AddInstrukturAction";
+import { Briefcase, GraduationCap, Layers, Rows3, ShieldCheck, Users } from "lucide-react";
+import UpdateInstrukturAction from "../../Dashboard/Actions/Instruktur/UpdateInstrukturAction";
+import DeleteInstrukturAction from "../../Dashboard/Actions/Instruktur/DeleteInstrukturAction";
 
 
 const TableDataPelatih = () => {
@@ -104,7 +105,13 @@ function InstrukturTable({ data, fetchData }: Props) {
                                 <td className="px-3 py-2 border text-center text-gray-500">
                                     {(currentPage - 1) * itemsPerPage + index + 1}
                                 </td>
-                                <td className="px-3 py-2 border"><UpdateInstrukturAction onSuccess={fetchData} instruktur={row} /></td>
+                                <td className="px-3 py-4 border">
+                                    <div className="flex flex-row gap-2 h-full px-3 py-2">
+                                        <UpdateInstrukturAction onSuccess={fetchData} instruktur={row} />
+                                        <DeleteInstrukturAction onSuccess={fetchData} instruktur={row} />
+                                    </div>
+
+                                </td>
                                 <td
                                     className="px-3 py-2 border max-w-full"
                                     title={row.nama}
@@ -237,28 +244,53 @@ function StatsCards({ data, stats }: {
                         </CardContent>
                     </Card>
 
-                    {/* Pendidikan Terakhir */}
-                    <Card className="shadow-sm rounded-2xl border border-gray-100 hover:shadow-lg transition-all h-fit">
-                        <CardHeader className="flex items-center gap-2">
-                            <GraduationCap className="w-5 h-5 text-purple-500" />
-                            <CardTitle className="text-lg font-semibold text-gray-800">
-                                Pendidikan Terakhir
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <ul className="gap-2 grid grid-cols-2">
-                                {Object.entries(stats.pendidikanTerakhir).map(([key, count]) => (
-                                    <li
-                                        key={key}
-                                        className="flex items-center justify-between bg-purple-50 px-3 py-2 rounded-lg text-sm hover:bg-purple-100 transition"
-                                    >
-                                        <span className="font-medium text-gray-700">{key}</span>
-                                        <span className="text-purple-600 font-bold">{count}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </CardContent>
-                    </Card>
+                    <div className="flex gap-6">
+                        {/* Pendidikan Terakhir */}
+                        <Card className="shadow-sm rounded-2xl border border-gray-100 hover:shadow-lg transition-all h-full w-full">
+                            <CardHeader className="flex items-center gap-2">
+                                <GraduationCap className="w-5 h-5 text-purple-500" />
+                                <CardTitle className="text-lg font-semibold text-gray-800">
+                                    Pendidikan Terakhir
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <ul className="gap-2 grid grid-cols-1">
+                                    {Object.entries(stats.pendidikanTerakhir).map(([key, count]) => (
+                                        <li
+                                            key={key}
+                                            className="flex items-center justify-between bg-purple-50 px-3 py-2 rounded-lg text-sm hover:bg-purple-100 transition"
+                                        >
+                                            <span className="font-medium text-gray-700">{key}</span>
+                                            <span className="text-purple-600 font-bold">{count}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </CardContent>
+                        </Card>
+
+                        {/* Status Instruktur */}
+                        <Card className="shadow-sm rounded-2xl border border-gray-100 hover:shadow-lg transition-all h-full w-full">
+                            <CardHeader className="flex items-center gap-2">
+                                <ShieldCheck className="w-5 h-5 text-teal-500" />
+                                <CardTitle className="text-lg font-semibold text-gray-800">
+                                    Status Instruktur
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <ul className="gap-2 grid grid-cols-1">
+                                    {Object.entries(stats.status).map(([key, count]) => (
+                                        <li
+                                            key={key}
+                                            className="flex items-center justify-between bg-teal-50 px-3 py-2 rounded-lg text-sm hover:bg-teal-100 transition"
+                                        >
+                                            <span className="font-medium text-gray-700">{key}</span>
+                                            <span className="text-teal-600 font-bold">{count}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </CardContent>
+                        </Card>
+                    </div>
                 </div>
 
                 {/* Bidang Keahlian */}
@@ -270,7 +302,7 @@ function StatsCards({ data, stats }: {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <ul className="gap-2 grid grid-cols-2">
+                        <ul className="gap-2 grid grid-cols-1">
                             {Object.entries(stats.bidangKeahlian).map(([key, count]) => (
                                 <li
                                     key={key}

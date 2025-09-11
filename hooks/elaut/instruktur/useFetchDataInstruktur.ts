@@ -10,6 +10,7 @@ export type CountStats = {
   bidangKeahlian: Record<string, number>
   jenjangJabatan: Record<string, number>
   pendidikanTerakhir: Record<string, number>
+  status: Record<string, number>
 }
 
 export function useFetchDataInstruktur() {
@@ -47,6 +48,11 @@ export function useFetchDataInstruktur() {
     const bidangKeahlian: Record<string, number> = {}
     const jenjangJabatan: Record<string, number> = {}
     const pendidikanTerakhir: Record<string, number> = {}
+    const status: Record<string, number> = {
+      Active: 0,
+      'No Active': 0,
+      'Tugas Belajar': 0,
+    }
 
     instrukturs.forEach((i) => {
       if (i.bidang_keahlian) {
@@ -61,9 +67,12 @@ export function useFetchDataInstruktur() {
         pendidikanTerakhir[i.pendidikkan_terakhir] =
           (pendidikanTerakhir[i.pendidikkan_terakhir] || 0) + 1
       }
+      if (i.status) {
+        status[i.status] = (status[i.status] || 0) + 1
+      }
     })
 
-    return { bidangKeahlian, jenjangJabatan, pendidikanTerakhir }
+    return { bidangKeahlian, jenjangJabatan, pendidikanTerakhir, status }
   }, [instrukturs])
 
   return { instrukturs, loading, error, fetchInstrukturData, stats }
