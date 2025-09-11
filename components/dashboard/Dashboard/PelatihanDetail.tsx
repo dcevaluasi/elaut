@@ -241,7 +241,6 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                             </p>
                             <EditPelatihanAction
                                 idPelatihan={data.IdPelatihan.toString()}
-                                currentData={data}
                                 onSuccess={fetchData} />
 
                             <DeletePelatihanAction

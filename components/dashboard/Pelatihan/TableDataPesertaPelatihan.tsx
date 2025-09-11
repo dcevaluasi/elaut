@@ -611,49 +611,12 @@ const TableDataPesertaPelatihan = () => {
     }
   };
 
-  const [tanggalSertifikat, setTanggalSertifikat] = React.useState<string>('')
-
   const [isOpenFormPeserta, setIsOpenFormPeserta] =
     React.useState<boolean>(false);
   const [fileExcelPesertaPelatihan, setFileExcelPesertaPelatihan] =
     React.useState<File | null>(null);
   const handleFileChange = (e: any) => {
     setFileExcelPesertaPelatihan(e.target.files[0]);
-  };
-  const handleUploadImportPesertaPelatihan = async (e: any) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append("IdPelatihan", id);
-    if (fileExcelPesertaPelatihan != null) {
-      formData.append("file", fileExcelPesertaPelatihan);
-    }
-
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/exportPesertaPelatihan`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
-          },
-        }
-      );
-      handleAddHistoryTrainingInExisting(dataPelatihan!, 'Telah mengupload data peserta kelas', Cookies.get('Eselon'), Cookies.get('Satker'))
-      console.log("FILE UPLOADED PESERTA : ", response);
-      Toast.fire({
-        icon: "success",
-        title: `Selamat anda berhasil mengupload peserta pelatihan!`,
-      });
-      setIsOpenFormPeserta(!isOpenFormPeserta);
-      handleFetchingPublicTrainingDataById();
-    } catch (error) {
-
-      Toast.fire({
-        icon: "error",
-        title: `Gagal mengupload peserta pelatihan!`,
-      });
-      handleFetchingPublicTrainingDataById();
-    }
   };
 
   /**
@@ -1086,110 +1049,6 @@ const TableDataPesertaPelatihan = () => {
               <table className="w-full">
                 <tr className="flex w-fit items-center justify-start p-2 gap-2">
 
-                  {(Cookies.get('Access')?.includes('createCertificates') &&
-                    dataPelatihan?.StatusApproval != "Selesai" && dataPelatihan?.UserPelatihan.length == 0) && (
-                      <Button
-                        type="button"
-                        onClick={(e) => {
-                          if (dataPelatihan?.StatusApproval != "Selesai") {
-                            Toast.fire({
-                              icon: "error",
-                              title: 'Ups!!!',
-                              text: `Pelatihan sudah ditutup dan no sertifikat telah terbit, tidak dapat menambahkan lagi!`,
-                            });
-                          } else {
-                            setIsOpenFormPeserta(!isOpenFormPeserta);
-                          }
-                        }}
-                        className="flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border bg-indigo-500 text-white 
-                     hover:bg-indigo-600 transition-colors w-fit shadow-sm flex-shrink-0"
-                      >
-                        <PiMicrosoftExcelLogoFill />
-                        Import Data Peserta
-                      </Button>
-                    )}
-
-                  <AlertDialog open={isOpenFormPeserta}>
-                    <AlertDialogContent className="max-w-lg rounded-xl shadow-xl">
-                      <AlertDialogHeader>
-                        <AlertDialogTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900">
-                          <HiMiniUserGroup className="h-5 w-5 text-blue-600" />
-                          Import Peserta Pelatihan
-                        </AlertDialogTitle>
-                        <AlertDialogDescription className="text-sm text-gray-600">
-                          Import peserta yang akan mengikuti pelatihan ini menggunakan template Excel.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-
-                      <form autoComplete="off" className="space-y-5 mt-3">
-                        {/* Upload Box */}
-                        <div>
-                          <label className="block text-gray-800 text-sm font-medium mb-2">
-                            Data By Name By Address <span className="text-red-500">*</span>
-                          </label>
-
-                          <div className="flex gap-3">
-                            {/* Modern File Upload */}
-                            <label
-                              htmlFor="file-upload"
-                              className="flex-1 flex flex-col items-center justify-center h-28 px-4 border-2 border-dashed rounded-lg cursor-pointer 
-                     bg-gray-50 hover:bg-gray-100 border-gray-300 hover:border-blue-500 
-                     transition group"
-                            >
-                              <FiUploadCloud className="w-8 h-8 text-gray-400 group-hover:text-blue-500 mb-1" />
-
-                              <span className="text-sm text-center text-gray-600 group-hover:text-blue-600">
-                                {
-                                  fileExcelPesertaPelatihan ? truncateText(fileExcelPesertaPelatihan.name, 25, '...') : 'Klik atau drag file untuk upload'
-                                }
-                              </span>
-                              <span className="text-xs text-gray-400">Format: .xlsx</span>
-                              <input
-                                id="file-upload"
-                                type="file"
-                                className="hidden"
-                                required
-                                onChange={handleFileChange}
-                              />
-                            </label>
-
-                            {/* Download Template */}
-                            <Link
-                              target="_blank"
-                              href="https://docs.google.com/spreadsheets/d/12t7l4bBjPBcxXpCPPOqYeTDoZxBi5aS7/export?format=xlsx"
-                              className="flex flex-col items-center justify-center w-36 h-28 rounded-lg bg-green-600 text-white text-sm font-medium shadow hover:bg-green-700 transition gap-2"
-                            >
-                              <PiMicrosoftExcelLogoFill className="h-6 w-6" />
-                              <span>Unduh Template</span>
-                            </Link>
-                          </div>
-
-                          <p className="text-xs text-gray-500 mt-2 leading-snug">
-                            *Download template terlebih dahulu, isi file Excel, lalu upload.
-                            Perlu diingat, import data hanya dapat dilakukan{" "}
-                            <span className="font-semibold">sekali</span>.
-                          </p>
-                        </div>
-
-                        {/* Footer */}
-                        <AlertDialogFooter className="pt-4 border-t border-gray-200">
-                          <AlertDialogCancel
-                            onClick={() => setIsOpenFormPeserta(false)}
-                            className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-gray-100"
-                          >
-                            Batal
-                          </AlertDialogCancel>
-                          <AlertDialogAction
-                            disabled={fileExcelPesertaPelatihan == null}
-                            onClick={handleUploadImportPesertaPelatihan}
-                            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700"
-                          >
-                            Upload
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </form>
-                    </AlertDialogContent>
-                  </AlertDialog>
 
                   {/* Upload Zip Foto Participants And Before Draft All Certificates */}
                   {(Cookies.get('Access')?.includes('createCertificates') && countUserWithCertificate(data) != data.length) && (
@@ -1402,8 +1261,6 @@ const TableDataPesertaPelatihan = () => {
              transition mb-3"
             />
 
-
-
             {/* Pass filtered data */}
             <TableData
               isLoading={false}
@@ -1492,6 +1349,5 @@ const TTDRevisiButton = ({ row, handleTTDeSertifikat }: { row: any, handleTTDeSe
     </AlertDialog>
   )
 }
-
 
 export default TableDataPesertaPelatihan;

@@ -252,15 +252,10 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         <div className={`grid ${data?.BeritaAcara != "" ? "grid-cols-4" : 'grid-cols-3'} gap-4 mt-4 w-full text-sm`}>
 
                                             {/* Status */}
-                                            {
-                                                data?.IsRevisi == "" || data?.IsRevisi == "No Active" ? <div className={`flex flex-col p-3 ${color} rounded-lg shadow-sm border border-gray-100 animate-pulse`}>
-                                                    <span className="text-xs font-medium text-gray-100">Status</span>
-                                                    <span className="flex items-center">{icon}{label}</span>
-                                                </div> : <div className={`flex flex-col p-3 text-white rounded-lg shadow-sm border border-gray-100 animate-pulse bg-neutral-800`}>
-                                                    <span className="text-xs font-medium text-gray-100">Status</span>
-                                                    <span className="flex items-center">Revisi STTPL</span>
-                                                </div>
-                                            }
+                                            <div className={`flex flex-col p-3 ${color} rounded-lg shadow-sm border border-gray-100 animate-pulse`}>
+                                                <span className="text-xs font-medium text-gray-100">Status</span>
+                                                <span className="flex items-center">{icon}{label}</span>
+                                            </div>
 
                                             {/* Pandandatangan */}
                                             <InfoItem label="Penandatangan" value={data?.TtdSertifikat} />

@@ -18,7 +18,7 @@ export default function Page() {
                             <HiUserGroup className="text-3xl" />
                             <div className="flex flex-col">
                                 <h1 id="page-caption" className="font-semibold text-lg">
-                                    Manajemen Data Instruktur/Pelatih
+                                    Instruktur/Pelatih
                                 </h1>
                                 <p className="font-medium text-gray-400 text-base">
                                     Monitoring dan kelola data Instruktur/Pelatih pada Lembaga Diklat!

@@ -1,49 +1,162 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { useFetchDataInstruktur } from "@/hooks/elaut/instruktur/useFetchDataInstruktur";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Instruktur } from "@/types/instruktur";
+import { Input } from "@/components/ui/input";
+import { truncateText } from "@/utils";
+import AddInstrukturAction from "../../Dashboard/Actions/AddInstrukturAction";
+
 
 const TableDataPelatih = () => {
-    const { instrukturs, loading, error, fetchInstrukturData } = useFetchDataInstruktur()
+    const { instrukturs, loading, error, fetchInstrukturData, stats } = useFetchDataInstruktur()
 
-    console.log({ instrukturs })
-
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
-    const totalPages = Math.ceil(instrukturs.length / itemsPerPage);
-
-    const paginatedData = instrukturs.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
+    useEffect(() => {
+        fetchInstrukturData()
+    }, [fetchInstrukturData])
 
     return (
         <div>
             {/* Table */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-6">
+                {/* Bidang Keahlian */}
+                <Card className="shadow-sm rounded-2xl border border-gray-200">
+                    <CardHeader>
+                        <CardTitle className="text-lg font-semibold text-gray-800">
+                            Total by Bidang Keahlian
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <ul className="space-y-2">
+                            {Object.entries(stats.bidangKeahlian).map(([key, count]) => (
+                                <li
+                                    key={key}
+                                    className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg text-sm"
+                                >
+                                    <span className="font-medium text-gray-700">{key}</span>
+                                    <span className="text-blue-600 font-semibold">{count}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </CardContent>
+                </Card>
+
+                {/* Jenjang Jabatan */}
+                <Card className="shadow-sm rounded-2xl border border-gray-200">
+                    <CardHeader>
+                        <CardTitle className="text-lg font-semibold text-gray-800">
+                            Total by Jenjang Jabatan
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <ul className="space-y-2">
+                            {Object.entries(stats.jenjangJabatan).map(([key, count]) => (
+                                <li
+                                    key={key}
+                                    className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg text-sm"
+                                >
+                                    <span className="font-medium text-gray-700">{key}</span>
+                                    <span className="text-green-600 font-semibold">{count}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </CardContent>
+                </Card>
+
+                {/* Pendidikan Terakhir */}
+                <Card className="shadow-sm rounded-2xl border border-gray-200">
+                    <CardHeader>
+                        <CardTitle className="text-lg font-semibold text-gray-800">
+                            Total by Pendidikan Terakhir
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <ul className="space-y-2">
+                            {Object.entries(stats.pendidikanTerakhir).map(([key, count]) => (
+                                <li
+                                    key={key}
+                                    className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg text-sm"
+                                >
+                                    <span className="font-medium text-gray-700">{key}</span>
+                                    <span className="text-purple-600 font-semibold">{count}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </CardContent>
+                </Card>
+            </div>
+
+            <InstrukturTable data={instrukturs} fetchData={fetchInstrukturData} />
+        </div>
+    );
+};
+
+type Props = {
+    data: Instruktur[]
+    fetchData: any
+}
+
+function InstrukturTable({ data, fetchData }: Props) {
+    const [search, setSearch] = useState("")
+
+    // Filter data by search query
+    const filteredData = useMemo(() => {
+        if (!search) return data
+        return data.filter((row) =>
+            Object.values(row).some((val) =>
+                String(val).toLowerCase().includes(search.toLowerCase())
+            )
+        )
+    }, [data, search])
+
+    // Pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 15
+    const totalPages = Math.ceil(data.length / itemsPerPage);
+
+    const paginatedData = filteredData.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    )
+
+    return (
+        <div className="space-y-4">
+            {/* Search Input */}
+            <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-800">Daftar Instruktur</h2>
+                <div className="flex gap-2">
+                    <Input
+                        type="text"
+                        placeholder="Cari instruktur..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="w-64 py-0"
+                    />
+                    <AddInstrukturAction onSuccess={fetchData} />
+                </div>
+            </div>
+
+            {/* Table */}
             <div className="overflow-x-auto border border-gray-200 rounded-xl shadow-sm">
-                <table className="min-w-full text-sm border border-gray-200">
-                    <thead className="bg-gray-50 text-gray-700 text-xs uppercase">
+                <table className="min-w-full table-fixed text-sm">
+                    <thead className="bg-gray-100 text-gray-700 text-xs uppercase">
                         <tr>
-                            <th className="px-4 py-3 text-center">No</th>
-                            <th className="px-4 py-3 text-center">Nama</th>
-                            <th className="px-4 py-3 text-center">ID Lemdik</th>
-                            <th className="px-4 py-3 text-center">Jenis Pelatih</th>
-                            <th className="px-4 py-3 text-center">Jenjang Jabatan</th>
-                            <th className="px-4 py-3 text-center">Bidang Keahlian</th>
-                            <th className="px-4 py-3 text-center">Metodologi Pelatihan</th>
-                            <th className="px-4 py-3 text-center">Pelatihan Pelatih</th>
-                            <th className="px-4 py-3 text-center">Kompetensi Teknis</th>
-                            <th className="px-4 py-3 text-center">Management of Training</th>
-                            <th className="px-4 py-3 text-center">Training Officer Course</th>
-                            <th className="px-4 py-3 text-center">Data Dukung Sertifikat</th>
-                            <th className="px-4 py-3 text-center">Status</th>
-                            <th className="px-4 py-3 text-center">Pendidikan Terakhir</th>
-                            <th className="px-4 py-3 text-center">Eselon I</th>
-                            <th className="px-4 py-3 text-center">Eselon II</th>
-                            <th className="px-4 py-3 text-center">No. Telp</th>
-                            <th className="px-4 py-3 text-center">Email</th>
-                            <th className="px-4 py-3 text-center">NIP</th>
+                            <th className="w-12 px-3 py-3 text-center">No</th>
+                            <th className="w-40 px-3 py-3 text-center">Nama</th>
+                            <th className="w-28 px-3 py-3 text-center">No. Telp</th>
+                            <th className="w-40 px-3 py-3 text-center">Email</th>
+                            <th className="w-36 px-3 py-3 text-center">NIP</th>
+                            <th className="w-32 px-3 py-3 text-center">Jenjang Jabatan</th>
+                            <th className="w-32 px-3 py-3 text-center">Bidang Keahlian</th>
+                            <th className="w-40 px-3 py-3 text-center">Management of Training</th>
+                            <th className="w-40 px-3 py-3 text-center">Training Officer Course</th>
+                            <th className="w-28 px-3 py-3 text-center">Sertifikat</th>
+                            <th className="w-24 px-3 py-3 text-center">Status</th>
+                            <th className="w-28 px-3 py-3 text-center">Pendidikan Terakhir</th>
+                            <th className="w-40 px-3 py-3 text-center">Eselon I</th>
+                            <th className="w-40 px-3 py-3 text-center">Eselon II</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -52,50 +165,91 @@ const TableDataPelatih = () => {
                                 key={index}
                                 className="hover:bg-gray-50 transition-colors duration-150"
                             >
-                                <td className="px-4 py-2 border text-center text-gray-500">
+                                <td className="px-3 py-2 border text-center text-gray-500">
                                     {(currentPage - 1) * itemsPerPage + index + 1}
                                 </td>
-                                <td className="px-4 py-2 border">{row.Nama}</td>
-                                <td className="px-4 py-2 border text-center">
-                                    {row.IdLemdik}
+                                <td
+                                    className="px-3 py-2 border max-w-[150px] truncate"
+                                    title={row.nama}
+                                >
+                                    {row.nama}
                                 </td>
-                                <td className="px-4 py-2 border">{row.JenisPelatih}</td>
-                                <td className="px-4 py-2 border">{row.JenjangJabatan}</td>
-                                <td className="px-4 py-2 border">{row.BidangKeahlian}</td>
-                                <td className="px-4 py-2 border">{row.MetodologiPelatihan}</td>
-                                <td className="px-4 py-2 border">{row.PelatihanPelatih}</td>
-                                <td className="px-4 py-2 border">{row.KompetensiTeknis}</td>
-                                <td className="px-4 py-2 border">
-                                    {row.ManagementOfTraining}
+                                <td className="px-3 py-2 border">{row.no_telpon}</td>
+                                <td
+                                    className="px-3 py-2 border max-w-full"
+                                    title={row.email}
+                                >
+                                    {row.email}
                                 </td>
-                                <td className="px-4 py-2 border">
-                                    {row.TrainingOfficerCourse}
+                                <td
+                                    className="px-3 py-2 border max-w-[200px]"
+                                    title={row.nip}
+                                >
+                                    {row.nip}
                                 </td>
-                                <td className="px-4 py-2 border text-blue-600 underline">
+                                <td className="px-3 py-2 border text-center">{row.jenjang_jabatan}</td>
+                                <td className="px-3 py-2 border text-center">{row.bidang_keahlian}</td>
+
+                                <td
+                                    className="px-3 py-2 border max-w-[200px] truncate"
+                                    title={row.management_of_training}
+                                >
+                                    {row.management_of_training}
+                                </td>
+                                <td
+                                    className="px-3 py-2 border max-w-[200px] text-blue-600 underline truncate"
+                                    title={row.training_officer_course}
+                                >
                                     <a
-                                        href={row.LinkDataDukungSertifikat}
+                                        href={row.link_data_dukung_sertifikat}
+                                        target="_blank"
+                                        rel="noopener noreferrer "
+                                        className="truncate"
+                                    >
+                                        {row.training_officer_course}
+                                    </a>
+
+                                </td>
+                                <td className="px-3 py-2 border text-blue-600 underline text-center truncate">
+                                    <a
+                                        href={row.link_data_dukung_sertifikat}
                                         target="_blank"
                                         rel="noopener noreferrer"
+                                        className="truncate"
                                     >
-                                        Link
+                                        {truncateText(row.link_data_dukung_sertifikat, 20, '...')}
                                     </a>
                                 </td>
-                                <td className="px-4 py-2 border text-center">{row.Status}</td>
-                                <td className="px-4 py-2 border">
-                                    {row.pendidikkan_terakhir}
+                                <td className="px-3 py-2 border text-center">{row.status}</td>
+                                <td className="px-3 py-2 border text-center">{row.pendidikkan_terakhir}</td>
+                                <td
+                                    className="px-3 py-2 border max-w-[200px] truncate"
+                                    title={row.eselon_1}
+                                >
+                                    {row.eselon_1}
                                 </td>
-                                <td className="px-4 py-2 border">{row.EselonI}</td>
-                                <td className="px-4 py-2 border">{row.EselonII}</td>
-                                <td className="px-4 py-2 border">{row.NoTelpon}</td>
-                                <td className="px-4 py-2 border">{row.Email}</td>
-                                <td className="px-4 py-2 border">{row.Nip}</td>
+                                <td
+                                    className="px-3 py-2 border max-w-[200px] truncate"
+                                    title={row.eselon_2}
+                                >
+                                    {row.eselon_2}
+                                </td>
                             </tr>
                         ))}
+                        {paginatedData.length === 0 && (
+                            <tr>
+                                <td
+                                    colSpan={18}
+                                    className="text-center py-6 text-gray-500 italic"
+                                >
+                                    Tidak ada data ditemukan
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
-            </div>
 
-            {/* Pagination */}
+            </div>
             <div className="flex justify-between items-center mt-4">
                 <p className="text-sm text-neutral-600">
                     Halaman {currentPage} dari {totalPages}
@@ -120,7 +274,7 @@ const TableDataPelatih = () => {
                 </div>
             </div>
         </div>
-    );
-};
+    )
+}
 
 export default TableDataPelatih;

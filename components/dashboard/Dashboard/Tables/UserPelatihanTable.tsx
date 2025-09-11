@@ -7,7 +7,6 @@ import {
     getSortedRowModel,
     flexRender,
     ColumnDef,
-    getPaginationRowModel,
 } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,29 +26,40 @@ import {
     AlertDialogDescription,
     AlertDialogFooter,
     AlertDialogCancel,
+    AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 
 import { ArrowUpDown, Check, LucideInfo } from "lucide-react";
 import { PelatihanMasyarakat, UserPelatihan } from "@/types/product";
 import { AiOutlineFieldNumber } from "react-icons/ai";
-import { FaRegIdCard, FaTrash } from "react-icons/fa6";
+import { FaRegIdCard } from "react-icons/fa6";
 import Link from "next/link";
 import { TbDatabaseEdit } from "react-icons/tb";
-import { usePathname } from "next/navigation";
 import { formatToRupiah } from "@/lib/utils";
 import { User } from "@/types/user";
 import axios from "axios";
 import { elautBaseUrl } from "@/constants/urls";
-import VerifikasiPesertaAction from "../Actions/VerifikasiPesertaAction";
 import { FaEdit } from "react-icons/fa";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { Checkbox } from "@radix-ui/react-checkbox";
 import Cookies from "js-cookie";
 import Toast from "@/components/toast";
-import { generatedStatusCertificate } from "@/utils/certificates";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 import EditPesertaAction from "../Actions/EditPesertaAction";
 import { countUserWithNoSertifikat } from "@/utils/counter";
+import { IoCalendarClear, IoReload } from "react-icons/io5";
+import { getDateInIndonesianFormat } from "@/utils/time";
+import DialogSertifikatPelatihan from "@/components/sertifikat/dialogSertifikatPelatihan";
 
 interface UserPelatihanTableProps {
     pelatihan: PelatihanMasyarakat
@@ -62,8 +72,21 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
     data,
     onSuccess
 }) => {
-    const pathName = usePathname();
-    const paths = pathName.split("/");
+
+    const handleDeleteCertificateById = async (id: number) => {
+        try {
+            const token = Cookies.get("XSRF091")
+            const response = await axios.delete(
+                `${elautBaseUrl}/deleteSertifikatTTde?id=${id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
+        } catch (error: any) {
+        }
+    }
 
     const handleLulusDataPeserta = async (user: UserPelatihan) => {
         try {
@@ -93,6 +116,95 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                 text: `Gagal meluluskan  peserta pelatihan!`,
             });
             onSuccess()
+        }
+    };
+
+    const handleRevisiDataPeserta = async (user: UserPelatihan) => {
+        try {
+            const formData = new FormData();
+            formData.append("StatusPenandatangan", user.StatusPenandatangan == 'No Revisi' || user.StatusPenandatangan == 'Done' ? 'Revisi' : 'No Revisi');
+            formData.append("TanggalSertifikat", '-')
+
+            await axios.put(
+                `${elautBaseUrl}/lemdik/updatePelatihanUsers?id=${user.IdUserPelatihan}`,
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+                    },
+                }
+            );
+
+            handleDeleteCertificateById(user.IdUserPelatihan)
+
+            Toast.fire({
+                icon: "success",
+                title: 'Yeayyy!',
+                text: `Silahkan melakukan revisi!`,
+            });
+            onSuccess()
+        } catch (error) {
+            Toast.fire({
+                icon: "error",
+                title: 'Oopsss!',
+                text: `Gagal melakukan revisi!`,
+            });
+            onSuccess()
+        }
+    };
+
+    const [selectedRow, setSelectedRow] = React.useState<UserPelatihan | null>(null);
+    const [openDialog, setOpenDialog] = React.useState(false);
+    const handleConfirmRevisi = () => {
+        if (selectedRow) {
+            handleRevisiDataPeserta(selectedRow);
+            setOpenDialog(false);
+            setSelectedRow(null);
+        }
+    };
+
+    const [openDialogTanggalSertifikatRevisi, setOpenDialogTanggalSertifikatRevisi] = React.useState(false);
+    const [tanggalSertifikatRevisi, setTanggalSertifikatRevisi] = React.useState('')
+    const [loadingTanggalSertifikatRevisi, setLoadingTanggalSertifikatRevisi] = React.useState(false)
+    const handleTanggalSertifikat = async (user: UserPelatihan) => {
+        setLoadingTanggalSertifikatRevisi(true);
+
+        try {
+            const formData = new FormData();
+            formData.append(
+                "TanggalSertifikat",
+                getDateInIndonesianFormat(tanggalSertifikatRevisi)
+            );
+
+            await axios.put(
+                `${elautBaseUrl}/lemdik/updatePelatihanUsers?id=${user.IdUserPelatihan}`,
+                formData,
+                { headers: { Authorization: `Bearer ${Cookies.get("XSRF091")}` } }
+            );
+
+            Toast.fire({
+                icon: "success",
+                title: "Yeayyy!",
+                text: `Revisi Tanggal penandatanganan berhasil ditentukan untuk STTPL.`,
+            });
+            setTanggalSertifikatRevisi("");
+            setLoadingTanggalSertifikatRevisi(false);
+            onSuccess()
+        } catch {
+            Toast.fire({
+                icon: "error",
+                title: "Oopsss!",
+                text: "Gagal merevisi tanggal penandatanganan.",
+            });
+            setLoadingTanggalSertifikatRevisi(false);
+        }
+    };
+
+    const handleSetTanggalRevisi = () => {
+        if (selectedRow) {
+            handleTanggalSertifikat(selectedRow);
+            setOpenDialog(false);
+            setSelectedRow(null);
         }
     };
 
@@ -220,6 +332,55 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                 } as ColumnDef<UserPelatihan>,
             ]
             : []),
+        ...(pelatihan?.IsRevisi == "Active"
+            ? [
+                {
+                    accessorKey: "StatusPenandatangan",
+                    header: ({ column }) => {
+                        return (
+                            <Button
+                                variant="ghost"
+                                className={`text-black font-semibold w-full p-0  text-center justify-center items-center flex`}
+                                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                            >
+                                <p className="leading-[105%]">Revisi</p>
+                                <IoReload className="ml-2 h-4 w-4" />
+                            </Button>
+                        );
+                    },
+                    cell: ({ row }) => (
+                        <div className="capitalize w-full flex items-center justify-center">
+                            <label className="flex items-center gap-2 text-base font-semibold tracking-tight leading-none">
+                                <label
+                                    htmlFor="isActice"
+                                    className="flex items-center gap-2 cursor-pointer font-semibold  disabled:cursor-not-allowed justify-center"
+                                >
+                                    <Checkbox
+                                        disabled={!Cookies.get("Access")?.includes("createPelatihan") || row.original.StatusPenandatangan === "Revisi"}
+                                        id="StatusPenandatangan"
+                                        onCheckedChange={() => {
+                                            setSelectedRow(row.original);
+                                            setOpenDialog(true);
+                                        }}
+                                        checked={row.original.StatusPenandatangan === "Revisi"}
+                                        className="h-6 w-6 rounded-md border border-gray-300 bg-white shadow-sm
+    data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500 
+    transition-all duration-200 ease-in-out
+    hover:border-amber-400 hover:shadow-md
+    focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-amber-500 
+    disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
+                                    >
+                                        <Check className="h-4 w-4 text-white" />
+                                    </Checkbox>
+                                    REVISI
+                                </label>
+                            </label>
+                        </div>
+
+                    ),
+                } as ColumnDef<UserPelatihan>,
+            ]
+            : []),
         ...(parseInt(pelatihan.StatusPenerbitan) == 0
             ? [
                 {
@@ -289,27 +450,28 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                     },
                     cell: ({ row }) => (
                         <div className="w-full flex gap-3">
-                            <Link
-                                target="_blank"
-                                href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${row.original.FileSertifikat}`}
-                                className="flex items-center gap-2 w-full rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 border "
-                            >
-                                <RiVerifiedBadgeFill className="h-4 w-4  " />
-                                <span className="text-sm"> STTPL</span>
-                            </Link>
                             {
-                                pelatihan?.IsRevisi == "Active" && <Link
-                                    target="_blank"
-                                    href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${row.original.FileSertifikat}`}
-                                    className="flex items-center gap-2  rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-rose-500 w-full  text-rose-500 hover:text-white hover:bg-rose-500 border "
-                                >
-                                    <FaTrash className="h-4 w-4  " />
-                                    <span className="text-sm"> Hapus</span>
+                                row.original.StatusPenandatangan == "Revisi" && row.original.FileSertifikat == "" ? row.original?.TanggalSertifikat == "-" ?
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            setSelectedRow(row.original)
+                                            setOpenDialogTanggalSertifikatRevisi(true)
+                                        }}
+                                        className={`flex items-center gap-2 w-full rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-neutral-600 text-neutral-600 hover:text-white hover:bg-neutral-600`}
+                                    >
+                                        <IoCalendarClear className="h-4 w-4" />
+                                        <span>Tanggal Revisi</span>
+                                    </Button> : <> REVISI BRO</> : <Link
+                                        target="_blank"
+                                        href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${row.original.FileSertifikat}`}
+                                        className="flex items-center justify-center gap-2 w-full rounded-lg px-4 text-center py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 border "
+                                    >
+                                    <RiVerifiedBadgeFill className="h-4 w-4  " />
+                                    <span className="text-sm"> STTPL</span>
                                 </Link>
                             }
-
-                        </div>
-
+                        </div >
                     ),
                 } as ColumnDef<UserPelatihan>,
             ]
@@ -557,6 +719,69 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                     </TableBody>
                 </Table>
             </div>
+
+            {/* Dialog : Revisi Sertifikat */}
+            <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Konfirmasi Revisi</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Apakah Anda yakin ingin menandai peserta ini sebagai <b>Revisi</b>?
+                            <br /><br />
+                            ⚠️ Sertifikat asli yang sudah ditandatangani secara elektronik akan <b>dihapus</b>.
+                            <br /><br />
+                            Pengaturan status ini hanya bisa dilakukan <b>sekali</b>.
+                            Harap pastikan peserta yang dipilih memang benar dan perlu perbaikan data pada STTPL sebelum melanjutkan.
+                        </AlertDialogDescription>
+
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setOpenDialog(false)}>Batal</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleConfirmRevisi}>Ya, Revisi</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Dialog : Tanggal Revisi Sertifikat */}
+            <AlertDialog open={openDialogTanggalSertifikatRevisi} onOpenChange={setOpenDialogTanggalSertifikatRevisi}>
+                <AlertDialogContent className="max-w-lg rounded-xl z-[999999999999]">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Tanggal Revisi TTDe</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Setting tanggal revisi penandatanganan, dan harap pengaturan tanggal menyesuaikan hari dilakukan revisi
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <div className="space-y-4">
+                        <div className="flex flex-col w-full space-y-2">
+                            <label className="text-sm font-medium text-gray-700">
+                                Tanggal Revisi
+                            </label>
+                            <input
+                                type="date"
+                                className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
+                                value={tanggalSertifikatRevisi}
+                                onChange={(e) => setTanggalSertifikatRevisi(e.target.value)}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => handleSetTanggalRevisi()}
+                                className="mt-2 px-4 py-2 h-fit bg-gray-600 text-white rounded-md hover:bg-gray-700 transition"
+                                disabled={loadingTanggalSertifikatRevisi || tanggalSertifikatRevisi == ""}
+                            >
+                                {loadingTanggalSertifikatRevisi ? "Menyimpan..." : "Simpan"}
+                            </button>
+                        </div>
+                    </div>
+
+                    <AlertDialogCancel
+                        className="mt-4"
+                        onClick={() => {
+                            setOpenDialogTanggalSertifikatRevisi(false)
+                            setSelectedRow(null)
+                        }}>Tutup</AlertDialogCancel>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 };
