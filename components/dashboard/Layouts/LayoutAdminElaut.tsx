@@ -211,12 +211,6 @@ export default function LayoutAdminElaut({
                       label="Modul Pelatihan"
                     />
                   }
-                  <NavItem
-                    href="/admin/lemdiklat/master/penandatangan"
-                    icon={<TbSignature className="text-xl" />}
-                    label="Penandatangan"
-                  />
-
                 </ul>
               )}
             </li>

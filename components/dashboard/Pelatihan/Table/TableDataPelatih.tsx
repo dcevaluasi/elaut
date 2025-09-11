@@ -11,7 +11,15 @@ import AddInstrukturAction from "../../Dashboard/Actions/Instruktur/AddInstruktu
 import { Briefcase, GraduationCap, Layers, Rows3, ShieldCheck, Users } from "lucide-react";
 import UpdateInstrukturAction from "../../Dashboard/Actions/Instruktur/UpdateInstrukturAction";
 import DeleteInstrukturAction from "../../Dashboard/Actions/Instruktur/DeleteInstrukturAction";
-
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+import { SlidersHorizontal } from "lucide-react"
 
 const TableDataPelatih = () => {
     const { instrukturs, loading, error, fetchInstrukturData, stats } = useFetchDataInstruktur()
@@ -35,41 +43,82 @@ type Props = {
 
 function InstrukturTable({ data, fetchData }: Props) {
     const [search, setSearch] = useState("")
+    const [filterKeahlian, setFilterKeahlian] = useState("")
+    const [filterStatus, setFilterStatus] = useState("")
+    const [filterPendidikan, setFilterPendidikan] = useState("")
+    const [filterJabatan, setFilterJabatan] = useState("")
 
-    // Filter data by search query
+    // ambil unique options biar select lebih dinamis
+    const bidangKeahlianOptions = [...new Set(data.map(d => d.bidang_keahlian).filter(Boolean))]
+    const statusOptions = [...new Set(data.map(d => d.status).filter(Boolean))]
+    const pendidikanOptions = [...new Set(data.map(d => d.pendidikkan_terakhir).filter(Boolean))]
+    const jabatanOptions = [...new Set(data.map(d => d.jenjang_jabatan).filter(Boolean))]
+
+    // Filtering logic
     const filteredData = useMemo(() => {
-        if (!search) return data
-        return data.filter((row) =>
-            Object.values(row).some((val) =>
+        return data.filter((row) => {
+            const matchesSearch = !search || Object.values(row).some((val) =>
                 String(val).toLowerCase().includes(search.toLowerCase())
             )
-        )
-    }, [data, search])
+            const matchesKeahlian = !filterKeahlian || row.bidang_keahlian === filterKeahlian
+            const matchesStatus = !filterStatus || row.status === filterStatus
+            const matchesPendidikan = !filterPendidikan || row.pendidikkan_terakhir === filterPendidikan
+            const matchesJabatan = !filterJabatan || row.jenjang_jabatan === filterJabatan
+
+            return matchesSearch && matchesKeahlian && matchesStatus && matchesPendidikan && matchesJabatan
+        })
+    }, [data, search, filterKeahlian, filterStatus, filterPendidikan, filterJabatan])
 
     // Pagination
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 15
-    const totalPages = Math.ceil(data.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage)
 
     const paginatedData = filteredData.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     )
 
+    const clearFilters = () => {
+        setFilterKeahlian("")
+        setFilterStatus("")
+        setFilterPendidikan("")
+        setFilterJabatan("")
+        setSearch("")
+    }
+
     return (
         <div className="space-y-4">
             {/* Search Input */}
             <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-800">Daftar Instruktur</h2>
-                <div className="flex gap-2">
+                <div className="flex flex-col md:flex-row items-center gap-2 w-full md:w-auto">
                     <Input
                         type="text"
                         placeholder="Cari instruktur..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-64 py-0 text-sm"
+                        className="w-full md:w-48  py-1 text-sm"
                     />
-                    <AddInstrukturAction onSuccess={fetchData} />
+
+                    <div className="flex flex-wrap gap-2">
+                        <FilterDropdown
+                            filterKeahlian={filterKeahlian}
+                            setFilterKeahlian={setFilterKeahlian}
+                            bidangKeahlianOptions={bidangKeahlianOptions}
+                            filterJabatan={filterJabatan}
+                            setFilterJabatan={setFilterJabatan}
+                            jabatanOptions={jabatanOptions}
+                            filterPendidikan={filterPendidikan}
+                            setFilterPendidikan={setFilterPendidikan}
+                            pendidikanOptions={pendidikanOptions}
+                            filterStatus={filterStatus}
+                            setFilterStatus={setFilterStatus}
+                            statusOptions={statusOptions}
+                            clearFilters={clearFilters}
+                        />
+                        <AddInstrukturAction onSuccess={fetchData} />
+                    </div>
                 </div>
             </div>
 
@@ -340,6 +389,119 @@ function StatsCards({ data, stats }: {
                 </Card>
             </div>
         </div>
+    )
+}
+
+function FilterDropdown({
+    filterKeahlian,
+    setFilterKeahlian,
+    bidangKeahlianOptions,
+    filterJabatan,
+    setFilterJabatan,
+    jabatanOptions,
+    filterPendidikan,
+    setFilterPendidikan,
+    pendidikanOptions,
+    filterStatus,
+    setFilterStatus,
+    statusOptions,
+    clearFilters,
+}: any) {
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex items-center py-4 gap-2">
+                    <SlidersHorizontal className="w-4 h-4" />
+                    Filter
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-64 p-3 space-y-3">
+                <DropdownMenuLabel className="text-sm font-semibold">Filter Data</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+
+                {/* Bidang Keahlian */}
+                <div className="space-y-1">
+                    <label className="text-xs font-medium text-gray-600">Bidang Keahlian</label>
+                    <Select value={filterKeahlian} onValueChange={setFilterKeahlian}>
+                        <SelectTrigger className="w-full text-sm">
+                            <SelectValue placeholder="Pilih bidang" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="-">Semua</SelectItem>
+                            {bidangKeahlianOptions.map((opt: any) => (
+                                <SelectItem key={opt} value={opt}>
+                                    {opt}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* Jenjang Jabatan */}
+                <div className="space-y-1">
+                    <label className="text-xs font-medium text-gray-600">Jenjang Jabatan</label>
+                    <Select value={filterJabatan} onValueChange={setFilterJabatan}>
+                        <SelectTrigger className="w-full text-sm">
+                            <SelectValue placeholder="Pilih jabatan" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="-">Semua</SelectItem>
+                            {jabatanOptions.map((opt: any) => (
+                                <SelectItem key={opt} value={opt}>
+                                    {opt}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* Pendidikan */}
+                <div className="space-y-1">
+                    <label className="text-xs font-medium text-gray-600">Pendidikan</label>
+                    <Select value={filterPendidikan} onValueChange={setFilterPendidikan}>
+                        <SelectTrigger className="w-full text-sm">
+                            <SelectValue placeholder="Pilih pendidikan" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="-">Semua</SelectItem>
+                            {pendidikanOptions.map((opt: any) => (
+                                <SelectItem key={opt} value={opt}>
+                                    {opt}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* Status */}
+                <div className="space-y-1">
+                    <label className="text-xs font-medium text-gray-600">Status</label>
+                    <Select value={filterStatus} onValueChange={setFilterStatus}>
+                        <SelectTrigger className="w-full text-sm">
+                            <SelectValue placeholder="Pilih status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="-">Semua</SelectItem>
+                            {statusOptions.map((opt: any) => (
+                                <SelectItem key={opt} value={opt}>
+                                    {opt}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* Clear Button */}
+                <Button
+                    onClick={clearFilters}
+                    size="sm"
+                    variant="outline"
+                    className="w-full mt-2 text-xs"
+                >
+                    Reset Filter
+                </Button>
+            </DropdownMenuContent>
+        </DropdownMenu>
     )
 }
 
