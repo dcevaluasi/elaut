@@ -6,7 +6,7 @@ import Cookies from 'js-cookie'
 import { elautBaseUrl } from '@/constants/urls'
 import { Instruktur } from '@/types/instruktur'
 
-type CountStats = {
+export type CountStats = {
   bidangKeahlian: Record<string, number>
   jenjangJabatan: Record<string, number>
   pendidikanTerakhir: Record<string, number>
