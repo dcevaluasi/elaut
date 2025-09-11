@@ -132,7 +132,7 @@ function InstrukturTable({ data, fetchData }: Props) {
                         placeholder="Cari instruktur..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-64 py-0"
+                        className="w-64 py-0 text-sm"
                     />
                     <AddInstrukturAction onSuccess={fetchData} />
                 </div>
@@ -149,9 +149,10 @@ function InstrukturTable({ data, fetchData }: Props) {
                             <th className="w-40 px-3 py-3 text-center">Email</th>
                             <th className="w-36 px-3 py-3 text-center">NIP</th>
                             <th className="w-32 px-3 py-3 text-center">Jenjang Jabatan</th>
+                            <th className="w-32 px-3 py-3 text-center">Pangkat/Golongan</th>
                             <th className="w-32 px-3 py-3 text-center">Bidang Keahlian</th>
                             <th className="w-40 px-3 py-3 text-center">Management of Training</th>
-                            <th className="w-40 px-3 py-3 text-center">Training Officer Course</th>
+                            <th className="w-40 px-3 py-3 text-center">Trainer of Training</th>
                             <th className="w-28 px-3 py-3 text-center">Sertifikat</th>
                             <th className="w-24 px-3 py-3 text-center">Status</th>
                             <th className="w-28 px-3 py-3 text-center">Pendidikan Terakhir</th>
@@ -188,8 +189,8 @@ function InstrukturTable({ data, fetchData }: Props) {
                                     {row.nip}
                                 </td>
                                 <td className="px-3 py-2 border text-center">{row.jenjang_jabatan}</td>
+                                <td className="px-3 py-2 border text-center">{row.pelatihan_pelatih}</td>
                                 <td className="px-3 py-2 border text-center">{row.bidang_keahlian}</td>
-
                                 <td
                                     className="px-3 py-2 border max-w-[200px] truncate"
                                     title={row.management_of_training}

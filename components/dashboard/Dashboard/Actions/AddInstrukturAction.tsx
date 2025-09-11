@@ -50,6 +50,24 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
 
     const [loading, setLoading] = useState(false);
 
+    const clearForm = () => {
+        setNama("");
+        setNoTelpon("");
+        setEmail("");
+        setNip("");
+        setJenisPelatih("");
+        setJenjangJabatan("");
+        setBidangKeahlian("");
+        setMetodologiPelatihan("");
+        setPelatihanPelatih("");
+        setKompetensiTeknis("");
+        setManagementOfTraining("");
+        setTrainingOfficerCourse("");
+        setLinkSertifikat("");
+        setStatus("Aktif");
+        setPendidikanTerakhir("");
+    };
+
     const handleSubmit = async () => {
         const form = {
             nama,
@@ -89,9 +107,11 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
             setLoading(false);
             if (onSuccess) onSuccess();
             console.log("CREATE INSTRUKTUR: ", response);
+            clearForm()
         } catch (error) {
             console.error("ERROR CREATE INSTRUKTUR: ", error);
             setLoading(false);
+            clearForm()
             Toast.fire({
                 icon: "error",
                 title: "Gagal!",
@@ -105,7 +125,7 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
             <AlertDialogTrigger asChild>
                 <Button
                     variant="outline"
-                    className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-green-500 text-green-500 hover:text-white hover:bg-green-500"
+                    className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
                 >
                     <TbPlus className="h-5 w-5" />
                     <span>Tambah Instruktur</span>
@@ -199,6 +219,7 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
                         />
                     </div>
 
+                    {/* Link */}
                     <div className="grid grid-cols-3 gap-2">
                         {/* Management of Training */}
                         <div className="space-y-1">
@@ -244,6 +265,7 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
                             <SelectContent position="popper" className="z-[9999999]">
                                 <SelectItem value="Active">Aktif</SelectItem>
                                 <SelectItem value="No Active">Nonaktif</SelectItem>
+                                <SelectItem value="Tugas Belajar">Tugas Belajar</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
