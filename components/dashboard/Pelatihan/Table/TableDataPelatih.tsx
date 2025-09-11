@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { truncateText } from "@/utils";
 import AddInstrukturAction from "../../Dashboard/Actions/AddInstrukturAction";
 import { Briefcase, GraduationCap, Layers, Users } from "lucide-react";
+import UpdateInstrukturAction from "../../Dashboard/Actions/UpdateInstrukturAction";
 
 
 const TableDataPelatih = () => {
@@ -77,6 +78,7 @@ function InstrukturTable({ data, fetchData }: Props) {
                     <thead className="bg-gray-100 text-gray-700 text-xs uppercase">
                         <tr>
                             <th className="w-12 px-3 py-3 text-center">No</th>
+                            <th className="w-12 px-3 py-3 text-center">Action</th>
                             <th className="w-40 px-3 py-3 text-center">Nama</th>
                             <th className="w-28 px-3 py-3 text-center">No. Telp</th>
                             <th className="w-40 px-3 py-3 text-center">Email</th>
@@ -102,8 +104,9 @@ function InstrukturTable({ data, fetchData }: Props) {
                                 <td className="px-3 py-2 border text-center text-gray-500">
                                     {(currentPage - 1) * itemsPerPage + index + 1}
                                 </td>
+                                <td className="px-3 py-2 border"><UpdateInstrukturAction onSuccess={fetchData} instruktur={row} /></td>
                                 <td
-                                    className="px-3 py-2 border max-w-[150px] truncate"
+                                    className="px-3 py-2 border max-w-full"
                                     title={row.nama}
                                 >
                                     {row.nama}
