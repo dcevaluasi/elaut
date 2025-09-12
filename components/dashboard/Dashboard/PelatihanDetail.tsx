@@ -32,6 +32,7 @@ import { LuSignature } from "react-icons/lu";
 import { ValidateParticipantAction } from "./Actions/Lemdiklat/ValidateParticipantAction";
 import { countValidKeterangan } from "@/utils/counter";
 import { useFetchDataPusatById } from "@/hooks/elaut/pusat/useFetchDataPusatById";
+import { useFetchDataInstruktur } from "@/hooks/elaut/instruktur/useFetchDataInstruktur";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -41,6 +42,11 @@ interface Props {
 const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
     const { label, color, icon } = getStatusInfo(data.StatusPenerbitan)
     const { adminPusatData, loading, error, fetchAdminPusatData } = useFetchDataPusatById(data?.VerifikatorPelatihan)
+    const { instrukturs, loading: loadingInstruktur, error: errorInstruktur, fetchInstrukturData, stats } = useFetchDataInstruktur()
+
+    React.useEffect(() => {
+        fetchInstrukturData()
+    }, [fetchInstrukturData])
 
     return (
         <div className="w-full space-y-6 py-5">

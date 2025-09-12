@@ -14,7 +14,7 @@ import { LucideLayoutDashboard } from "lucide-react";
 import { IoBookOutline, IoSchoolOutline } from "react-icons/io5";
 import { FiMenu, FiLogOut, FiChevronDown, FiChevronRight } from "react-icons/fi";
 import { HiOutlineUserGroup } from "react-icons/hi2";
-import { TbDatabaseEdit, TbSignature } from "react-icons/tb";
+import { TbBuildingSkyscraper, TbDatabaseEdit, TbSignature } from "react-icons/tb";
 import Link from "next/link";
 import { breakdownStatus } from "@/lib/utils";
 import { generatedSignedCertificate } from "@/utils/certificates";
@@ -62,12 +62,14 @@ export default function LayoutAdminElaut({
       });
       setLemdikData(data);
       Cookies.set("IDLemdik", data.data.IdLemdik);
+      Cookies.set("IDUnitKerja", data.data.IdUnitKerja)
       Cookies.set("Satker", generatedDetailInfoLemdiklat(data.data.NamaLemdik!).lemdiklat);
       Cookies.set("Nama", generatedDetailInfoLemdiklat(data.data.NamaLemdik!).name);
       Cookies.set("Role", breakdownStatus(data.data.Deskripsi)[0]);
       Cookies.set("Eselon", breakdownStatus(data.data.Deskripsi)[0]);
       Cookies.set("Access", breakdownStatus(data.data.Deskripsi)[1]);
       Cookies.set("PimpinanLemdiklat", data.data.NamaKaBalai);
+      console.log({ data })
     } catch (error) {
       console.error("LEMDIK INFO: ", error);
     }
@@ -79,11 +81,12 @@ export default function LayoutAdminElaut({
 
   const handleLogOut = () => {
     [
+      "IDLemdik",
+      "IDUnitKerja",
       "XSRF091",
       "XSRF092",
       "XSRF093",
       "Satker",
-      "IDLemdik",
       "Eselon",
       "Status",
       "Jabatan",
@@ -211,6 +214,11 @@ export default function LayoutAdminElaut({
                       label="Modul Pelatihan"
                     />
                   }
+                  <NavItem
+                    href="/admin/lemdiklat/master/unit-kerja"
+                    icon={<TbBuildingSkyscraper className="text-lg" />}
+                    label="Unit Kerja"
+                  />
                 </ul>
               )}
             </li>

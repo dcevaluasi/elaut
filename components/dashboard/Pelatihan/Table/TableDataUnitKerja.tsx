@@ -2,15 +2,11 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { CountStats, useFetchDataInstruktur } from "@/hooks/elaut/instruktur/useFetchDataInstruktur";
+import { CountStats } from "@/hooks/elaut/instruktur/useFetchDataInstruktur";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Instruktur } from "@/types/instruktur";
 import { Input } from "@/components/ui/input";
-import { truncateText } from "@/utils";
-import AddInstrukturAction from "../../Dashboard/Actions/Instruktur/AddInstrukturAction";
-import { Briefcase, FileBadge, GraduationCap, Layers, Rows3, ShieldCheck, Users } from "lucide-react";
-import UpdateInstrukturAction from "../../Dashboard/Actions/Instruktur/UpdateInstrukturAction";
-import DeleteInstrukturAction from "../../Dashboard/Actions/Instruktur/DeleteInstrukturAction";
+import { Briefcase, FileBadge, GraduationCap, Layers, ShieldCheck, Users } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -20,56 +16,69 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { SlidersHorizontal } from "lucide-react"
+import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
+import { UnitKerja } from "@/types/master";
+import { generatedSignedCertificate } from "@/utils/certificates";
+import AddUnitKerjaAction from "../../Dashboard/Actions/UnitKerja/AddUnitKerjaAction";
+import { useUnitKerja } from "@/context/UnitKerjaContext";
+import Cookies from "js-cookie";
+import UpdateUnitKerjaAction from "../../Dashboard/Actions/UnitKerja/UpdateUnitKerjaAction";
 
-const TableDataPelatih = () => {
-    const { instrukturs, loading, error, fetchInstrukturData, stats } = useFetchDataInstruktur()
+const TableDataUnitKerja = () => {
+    const { unitKerjas, loading: loadingUnitKerja, error: errorUnitKerja, fetchUnitKerjaData } = useFetchDataUnitKerja()
 
     useEffect(() => {
-        fetchInstrukturData()
-    }, [fetchInstrukturData])
+        fetchUnitKerjaData()
+    }, [fetchUnitKerjaData])
 
     return (
         <div>
-            <StatsCards data={instrukturs} stats={stats} />
-            <InstrukturTable data={instrukturs} fetchData={fetchInstrukturData} />
+
+            <UnitKerjaTable data={unitKerjas} fetchData={fetchUnitKerjaData} />
         </div>
     );
 };
 
 type Props = {
-    data: Instruktur[]
+    data: UnitKerja[]
     fetchData: any
 }
 
-function InstrukturTable({ data, fetchData }: Props) {
+function UnitKerjaTable({ data, fetchData }: Props) {
     const [search, setSearch] = useState("")
     const [filterKeahlian, setFilterKeahlian] = useState("")
     const [filterStatus, setFilterStatus] = useState("")
     const [filterPendidikan, setFilterPendidikan] = useState("")
     const [filterJabatan, setFilterJabatan] = useState("")
 
-    // ambil unique options biar select lebih dinamis
-    const bidangKeahlianOptions = [...new Set(data.map(d => d.bidang_keahlian).filter(Boolean))]
-    const statusOptions = [...new Set(data.map(d => d.status).filter(Boolean))]
-    const pendidikanOptions = [...new Set(data.map(d => d.pendidikkan_terakhir).filter(Boolean))]
-    const jabatanOptions = [...new Set(data.map(d => d.jenjang_jabatan).filter(Boolean))]
 
-    // Filtering logic
+    // const bidangKeahlianOptions = [...new Set(data.map(d => d.bidang_keahlian).filter(Boolean))]
+    // const statusOptions = [...new Set(data.map(d => d.status).filter(Boolean))]
+    // const pendidikanOptions = [...new Set(data.map(d => d.pendidikkan_terakhir).filter(Boolean))]
+    // const jabatanOptions = [...new Set(data.map(d => d.jenjang_jabatan).filter(Boolean))]
+
     const filteredData = useMemo(() => {
+        const cookieIdUnitKerja = Cookies.get("IDUnitKerja");
+
         return data.filter((row) => {
-            const matchesSearch = !search || Object.values(row).some((val) =>
-                String(val).toLowerCase().includes(search.toLowerCase())
-            )
-            const matchesKeahlian = !filterKeahlian || row.bidang_keahlian === filterKeahlian
-            const matchesStatus = !filterStatus || row.status === filterStatus
-            const matchesPendidikan = !filterPendidikan || row.pendidikkan_terakhir === filterPendidikan
-            const matchesJabatan = !filterJabatan || row.jenjang_jabatan === filterJabatan
+            // search filter
+            const matchesSearch =
+                !search ||
+                Object.values(row).some((val) =>
+                    String(val).toLowerCase().includes(search.toLowerCase())
+                );
 
-            return matchesSearch && matchesKeahlian && matchesStatus && matchesPendidikan && matchesJabatan
-        })
-    }, [data, search, filterKeahlian, filterStatus, filterPendidikan, filterJabatan])
+            // unit kerja filter (only if cookie exists)
+            const matchesUnitKerja =
+                cookieIdUnitKerja && cookieIdUnitKerja.toString() !== "0"
+                    ? String(row.id_unit_kerja ?? "") === cookieIdUnitKerja
+                    : true;
 
-    // Pagination
+            return matchesSearch && matchesUnitKerja;
+        });
+    }, [data, search]);
+
+
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 15
     const totalPages = Math.ceil(filteredData.length / itemsPerPage)
@@ -91,35 +100,24 @@ function InstrukturTable({ data, fetchData }: Props) {
         <div className="space-y-4">
             {/* Search Input */}
             <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-800">Daftar Instruktur</h2>
-                <div className="flex flex-col md:flex-row items-center gap-2 w-full md:w-auto">
-                    <Input
-                        type="text"
-                        placeholder="Cari instruktur..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="w-full md:w-48  py-1 text-sm"
-                    />
-
-                    <div className="flex flex-wrap gap-2">
-                        <FilterDropdown
-                            filterKeahlian={filterKeahlian}
-                            setFilterKeahlian={setFilterKeahlian}
-                            bidangKeahlianOptions={bidangKeahlianOptions}
-                            filterJabatan={filterJabatan}
-                            setFilterJabatan={setFilterJabatan}
-                            jabatanOptions={jabatanOptions}
-                            filterPendidikan={filterPendidikan}
-                            setFilterPendidikan={setFilterPendidikan}
-                            pendidikanOptions={pendidikanOptions}
-                            filterStatus={filterStatus}
-                            setFilterStatus={setFilterStatus}
-                            statusOptions={statusOptions}
-                            clearFilters={clearFilters}
+                <h2 className="text-lg font-semibold text-gray-800">Daftar Unit Kerja</h2>
+                {
+                    Cookies.get('Access')?.includes('superAdmin') && <div className="flex flex-col md:flex-row items-center gap-2 w-full md:w-auto">
+                        <Input
+                            type="text"
+                            placeholder="Cari unit kerja..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="w-full md:w-48  py-1 text-sm"
                         />
-                        <AddInstrukturAction onSuccess={fetchData} />
+
+                        <div className="flex flex-wrap gap-2">
+                            {
+                                Cookies.get('Access')?.includes('superAdmin') && <AddUnitKerjaAction onSuccess={fetchData} />
+                            }
+                        </div>
                     </div>
-                </div>
+                }
             </div>
 
             {/* Table */}
@@ -130,19 +128,11 @@ function InstrukturTable({ data, fetchData }: Props) {
                             <th className="w-12 px-3 py-3 text-center">No</th>
                             <th className="w-12 px-3 py-3 text-center">Action</th>
                             <th className="w-40 px-3 py-3 text-center">Nama</th>
-                            <th className="w-28 px-3 py-3 text-center">No. Telp</th>
-                            <th className="w-40 px-3 py-3 text-center">Email</th>
-                            <th className="w-36 px-3 py-3 text-center">NIP</th>
-                            <th className="w-32 px-3 py-3 text-center">Jenjang Jabatan</th>
-                            <th className="w-32 px-3 py-3 text-center">Pangkat/Golongan</th>
-                            <th className="w-32 px-3 py-3 text-center">Bidang Keahlian</th>
-                            <th className="w-40 px-3 py-3 text-center">Management of Training</th>
-                            <th className="w-40 px-3 py-3 text-center">Trainer of Training</th>
-                            <th className="w-28 px-3 py-3 text-center">Sertifikat</th>
-                            <th className="w-24 px-3 py-3 text-center">Status</th>
-                            <th className="w-28 px-3 py-3 text-center">Pendidikan Terakhir</th>
-                            <th className="w-40 px-3 py-3 text-center">Eselon I</th>
-                            <th className="w-40 px-3 py-3 text-center">Eselon II</th>
+                            <th className="w-28 px-3 py-3 text-center">Alamat</th>
+                            <th className="w-40 px-3 py-3 text-center">Pimpinan</th>
+                            <th className="w-36 px-3 py-3 text-center">Call Center</th>
+                            <th className="w-32 px-3 py-3 text-center">Tipe</th>
+                            <th className="w-32 px-3 py-3 text-center">Status</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -156,8 +146,8 @@ function InstrukturTable({ data, fetchData }: Props) {
                                 </td>
                                 <td className="px-3 py-4 border">
                                     <div className="flex flex-row gap-2 h-full px-3 py-2">
-                                        <UpdateInstrukturAction onSuccess={fetchData} instruktur={row} />
-                                        <DeleteInstrukturAction onSuccess={fetchData} instruktur={row} />
+                                        <UpdateUnitKerjaAction onSuccess={fetchData} unitKerja={row} />
+                                        {/* <DeleteUnitKerjaAction onSuccess={fetchData} unitKerja={row} /> */}
                                     </div>
 
                                 </td>
@@ -167,66 +157,21 @@ function InstrukturTable({ data, fetchData }: Props) {
                                 >
                                     {row.nama}
                                 </td>
-                                <td className="px-3 py-2 border">{row.no_telpon}</td>
+                                <td className="px-3 py-2 border">{row.alamat}</td>
                                 <td
                                     className="px-3 py-2 border max-w-full"
-                                    title={row.email}
+                                    title={row.pimpinan}
                                 >
-                                    {row.email}
+                                    {generatedSignedCertificate(row.pimpinan).name} - {generatedSignedCertificate(row.pimpinan).status_indo}
                                 </td>
                                 <td
                                     className="px-3 py-2 border max-w-[200px]"
-                                    title={row.nip}
+                                    title={row.call_center}
                                 >
-                                    {row.nip}
+                                    {row.call_center}
                                 </td>
-                                <td className="px-3 py-2 border text-center">{row.jenjang_jabatan}</td>
-                                <td className="px-3 py-2 border text-center">{row.pelatihan_pelatih}</td>
-                                <td className="px-3 py-2 border text-center">{row.bidang_keahlian}</td>
-                                <td
-                                    className="px-3 py-2 border max-w-[200px] truncate"
-                                    title={row.management_of_training}
-                                >
-                                    {row.management_of_training}
-                                </td>
-                                <td
-                                    className="px-3 py-2 border max-w-[200px] text-blue-600 underline truncate"
-                                    title={row.training_officer_course}
-                                >
-                                    <a
-                                        href={row.link_data_dukung_sertifikat}
-                                        target="_blank"
-                                        rel="noopener noreferrer "
-                                        className="truncate"
-                                    >
-                                        {row.training_officer_course}
-                                    </a>
-
-                                </td>
-                                <td className="px-3 py-2 border text-blue-600 underline text-center truncate">
-                                    <a
-                                        href={row.link_data_dukung_sertifikat}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="truncate"
-                                    >
-                                        {truncateText(row.link_data_dukung_sertifikat, 20, '...')}
-                                    </a>
-                                </td>
+                                <td className="px-3 py-2 border text-center">{row.tipe}</td>
                                 <td className="px-3 py-2 border text-center">{row.status}</td>
-                                <td className="px-3 py-2 border text-center">{row.pendidikkan_terakhir}</td>
-                                <td
-                                    className="px-3 py-2 border max-w-[200px] truncate"
-                                    title={row.eselon_1}
-                                >
-                                    {row.eselon_1}
-                                </td>
-                                <td
-                                    className="px-3 py-2 border max-w-[200px] truncate"
-                                    title={row.eselon_2}
-                                >
-                                    {row.eselon_2}
-                                </td>
                             </tr>
                         ))}
                         {paginatedData.length === 0 && (
@@ -527,4 +472,4 @@ function FilterDropdown({
     )
 }
 
-export default TableDataPelatih;
+export default TableDataUnitKerja;

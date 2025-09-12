@@ -47,7 +47,7 @@ const UpdateInstrukturAction: React.FC<{
     const [managementOfTraining, setManagementOfTraining] = useState(instruktur.management_of_training || "");
     const [trainingOfficerCourse, setTrainingOfficerCourse] = useState(instruktur.training_officer_course || "");
     const [linkSertifikat, setLinkSertifikat] = useState(instruktur.link_data_dukung_sertifikat || "");
-    const [status, setStatus] = useState(instruktur.status || "Aktif");
+    const [status, setStatus] = useState(instruktur.status || "Active");
     const [pendidikanTerakhir, setPendidikanTerakhir] = useState(instruktur.pendidikkan_terakhir || "");
 
     const [loading, setLoading] = useState(false);

@@ -8,6 +8,7 @@ import { Delius_Unicase, Inter, Plus_Jakarta_Sans } from "next/font/google";
 
 import localFont from "next/font/local";
 import { useRouter } from "next/navigation";
+import { UnitKerjaProvider } from "@/context/UnitKerjaContext";
 
 const myFont = localFont({
   src: "../font/calsans.ttf",
@@ -64,15 +65,19 @@ export default function RootLayout({
   }, []);
 
   return (
-    <html lang="en">
-      <body
-        suppressHydrationWarning={true}
-        className={`${inter.className} ${myFont.variable} ${bosNormal.variable} ${plusSansJakarta.variable} ${bos.variable} ${bosBold.variable} ${bosItalic.variable}  ${delius.variable} `}
-      >
-        <div className="h-screen max-h-screen overflow-y-hidden">
-          {loading ? <Loader /> : children}
-        </div>
-      </body>
-    </html>
+    <UnitKerjaProvider>
+      <html lang="en">
+        <body
+          suppressHydrationWarning={true}
+          className={`${inter.className} ${myFont.variable} ${bosNormal.variable} ${plusSansJakarta.variable} ${bos.variable} ${bosBold.variable} ${bosItalic.variable}  ${delius.variable} `}
+        >
+
+          <div className="h-screen max-h-screen overflow-y-hidden">
+            {loading ? <Loader /> : children}
+          </div>
+        </body>
+      </html>
+    </UnitKerjaProvider>
+
   );
 }
