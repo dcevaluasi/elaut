@@ -268,7 +268,7 @@ export default function DetailModulPelatihan() {
                                                 placeholder="Masukkan nama modul"
                                                 required
                                             />
-                                            <p className="text-xs text-gray-600">* Format : 1. (Video) Pengenalan Tugas Pokok dan Fungsi JFT</p>
+                                            <p className="text-xs text-gray-600">* Format : 1. Pengenalan Tugas Pokok dan Fungsi JFT</p>
                                         </div>
                                         <div className="space-y-2">
                                             <Label>Deskripsi Modul</Label>
@@ -598,7 +598,7 @@ export default function DetailModulPelatihan() {
                                                                     <Input
                                                                         value={nama}
                                                                         onChange={(e) => { setNama(e.target.value); setIdModul(row.IdModulPelatihan.toString()) }}
-                                                                        placeholder="Masukkan nama modul"
+                                                                        placeholder="Masukkan nama bahan tayang"
                                                                         required
                                                                     />
                                                                     <p className="text-xs text-gray-600">* Format : 1. (Video) Pengenalan Tugas Pokok dan Fungsi JFT</p>
@@ -608,7 +608,7 @@ export default function DetailModulPelatihan() {
                                                                     <Textarea
                                                                         value={deskripsi}
                                                                         onChange={(e) => setDeskripsi(e.target.value)}
-                                                                        placeholder="Masukkan deskripsi modul"
+                                                                        placeholder="Masukkan deskripsi bahan tayang"
                                                                     />
                                                                 </div>
                                                                 <div className="space-y-2">
