@@ -187,7 +187,7 @@ export default function DetailModulPelatihan() {
                 <div className="flex flex-row gap-2 items-center">
                     <header
                         aria-label="page caption"
-                        className="flex-row w-full justify-between flex h-24 items-center gap-2 bg-gray-100 border-t px-4"
+                        className="flex-row w-full justify-between flex h-36 items-center gap-2 bg-gray-100 border-t px-4"
                     >
                         <div className="flex gap-3 items-center">
                             <BookOpen className="text-3xl" />
@@ -199,6 +199,7 @@ export default function DetailModulPelatihan() {
                                     {materi?.BidangMateriPelatihan != "" && (
                                         <span>Bidang: {materi?.BidangMateriPelatihan}</span>
                                     )}
+                                    <span>Produsen: {materi?.DeskripsiMateriPelatihan}</span>
                                     <span>Diupload: {materi?.CreateAt}</span>
                                 </div>
                             </div>
