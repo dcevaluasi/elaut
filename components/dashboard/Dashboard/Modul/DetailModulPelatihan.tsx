@@ -522,7 +522,7 @@ export default function DetailModulPelatihan() {
                                                             className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-teal-500 text-teal-500 hover:text-white hover:bg-teal-500 border group"
                                                         >
                                                             <FiFolder className="h-5 w-5 text-teal-500 group-hover:text-white" />{" "}
-                                                            {expandedRow === row.IdModulPelatihan ? "Bahan" : "Bahan"}
+                                                            {expandedRow === row.IdModulPelatihan ? "Bahan ▲" : "Bahan ▼"}
                                                         </button>
                                                         <button
                                                             onClick={() => {
