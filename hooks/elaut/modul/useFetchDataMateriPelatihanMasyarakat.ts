@@ -1,7 +1,12 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import axios from 'axios'
 import { MateriPelatihan } from '@/types/module'
 import { moduleBaseUrl } from '@/constants/urls'
+
+export type CountStats = {
+  bidang: Record<string, number>
+  tahun: Record<string, number>
+}
 
 export const useFetchDataMateriPelatihanMasyarakat = () => {
   const [data, setData] = useState<MateriPelatihan[]>([])
@@ -28,7 +33,25 @@ export const useFetchDataMateriPelatihanMasyarakat = () => {
     fetchModulPelatihan()
   }, [])
 
-  return { data, loading, error, fetchModulPelatihan }
+  const stats: CountStats = useMemo(() => {
+    const tahun: Record<string, number> = {}
+    const bidang: Record<string, number> = {}
+
+    data.forEach((i) => {
+      if (i.NamaPenderitaMateriPelatihan) {
+        tahun[i.NamaPenderitaMateriPelatihan] =
+          (tahun[i.NamaPenderitaMateriPelatihan] || 0) + 1
+      }
+      if (i.BidangMateriPelatihan) {
+        bidang[i.BidangMateriPelatihan] =
+          (bidang[i.BidangMateriPelatihan] || 0) + 1
+      }
+    })
+
+    return { tahun, bidang }
+  }, [data])
+
+  return { data, loading, error, fetchModulPelatihan, stats }
 }
 
 export const useFetchDataMateriPelatihanMasyarakatById = (id: number) => {

@@ -389,9 +389,25 @@ export const PROGRAM_PERIKANAN = [
   "Wisata Bahari",
 ];
 
+export const PROGRAM_PERIKANAN_ADMIN = [
+  "Sistem Jaminan Mutu",
+  "Budidaya",
+  "Pengolahan dan Pemasaran",
+  "Mesin Perikanan",
+  "Penangkapan",
+  "SD Perikanan",
+  "Manajemen Perikanan",
+  "Wisata Bahari",
+  "Hukum Perikanan",
+  "Teknis",
+  "Fungsional",
+  "ASN"
+];
+
 export const PROGRAM_KELAUTAN = [
   "BCL",
   "Pengelolaan Sampah",
+  "Pengelolaan Ruang Laut",
   "Mitigasi Bencana",
   "Konservasi",
 ];

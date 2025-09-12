@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Book, BookOpen, File } from "lucide-react";
+import { Book, BookOpen, Calendar, File, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useFetchDataMateriPelatihanMasyarakat } from "@/hooks/elaut/modul/useFetchDataMateriPelatihanMasyarakat";
@@ -14,16 +14,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function TableModulPelatihan() {
     const [searchQuery, setSearchQuery] = useState<string>("");
-    const { data, loading, error, fetchModulPelatihan } = useFetchDataMateriPelatihanMasyarakat();
+    const { data, loading, error, fetchModulPelatihan, stats } = useFetchDataMateriPelatihanMasyarakat();
 
-    // Filtered & paginated data
-    const filteredData = useMemo(
-        () =>
-            data.filter((item) =>
+    console.log({ stats })
+
+    const filteredData = useMemo(() => {
+        return data
+            .filter((item) =>
                 item.NamaMateriPelatihan.toLowerCase().includes(searchQuery.toLowerCase())
-            ),
-        [data, searchQuery]
-    );
+            )
+            .sort((a, b) => {
+                const yearA = parseInt(a.NamaPenderitaMateriPelatihan, 10) || 0;
+                const yearB = parseInt(b.NamaPenderitaMateriPelatihan, 10) || 0;
+                return yearB - yearA; // descending
+            });
+    }, [data, searchQuery]);
+
+
 
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 15
@@ -47,31 +54,79 @@ export default function TableModulPelatihan() {
         <div className="space-y-6">
             {/* Metrics */}
             <div className="flex w-full gap-4">
-                <Card className="h-fit rounded-xl w-full border border-gray-200 bg-white shadow-sm">
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-base font-medium text-gray-600">
-                            Total Modul
+                <div className="w-full flex flex-col gap-4">
+                    <div className="flex w-full gap-4">
+                        <Card className="h-fit rounded-xl w-full border border-gray-200 bg-white shadow-sm">
+                            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                                <CardTitle className="text-base font-medium text-gray-600">
+                                    Total Modul
+                                </CardTitle>
+                                <Book className="h-5 w-5 text-gray-400" />
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-2xl font-bold text-gray-800">{totalMateri}</p>
+                                <p className="text-xs text-gray-500">Modul tersedia</p>
+                            </CardContent>
+                        </Card>
+                        <Card className="h-fit rounded-xl w-full border border-gray-200 bg-white shadow-sm">
+                            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                                <CardTitle className="text-base font-medium text-gray-600">
+                                    Total Materi
+                                </CardTitle>
+                                <File className="h-5 w-5 text-gray-400" />
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-2xl font-bold text-gray-800">{totalModul}</p>
+                                <p className="text-xs text-gray-500">Materi tersedia</p>
+                            </CardContent>
+                        </Card>
+                    </div>
+                    <Card className="w-full h-full rounded-2xl border border-gray-200 shadow-sm transition-all hover:shadow-lg">
+                        <CardHeader className="flex items-center">
+                            <Calendar className="h-5 w-5 text-teal-500" />
+                            <CardTitle className="text-lg font-semibold text-gray-800">
+                                Tahun
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ul className="grid grid-cols-4 gap-2">
+                                {Object.entries(stats.tahun).map(([key, count]) => (
+                                    <li
+                                        key={key}
+                                        className="flex items-center justify-between rounded-lg bg-teal-50 px-3 py-2 text-sm transition hover:bg-teal-100"
+                                    >
+                                        <span className="font-medium text-gray-700">{key}</span>
+                                        <span className="font-bold text-teal-600">{count}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <Card className="w-full h-full rounded-2xl border border-gray-200 shadow-sm transition-all hover:shadow-lg">
+                    <CardHeader className="flex items-center">
+                        <Layers className="h-5 w-5 text-blue-500" />
+                        <CardTitle className="text-lg font-semibold text-gray-800">
+                            Bidang
                         </CardTitle>
-                        <Book className="h-5 w-5 text-gray-400" />
                     </CardHeader>
                     <CardContent>
-                        <p className="text-2xl font-bold text-gray-800">{totalMateri}</p>
-                        <p className="text-xs text-gray-500">Modul tersedia</p>
-                    </CardContent>
-                </Card>
-                <Card className="h-fit rounded-xl w-full border border-gray-200 bg-white shadow-sm">
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-base font-medium text-gray-600">
-                            Total Materi
-                        </CardTitle>
-                        <File className="h-5 w-5 text-gray-400" />
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-2xl font-bold text-gray-800">{totalModul}</p>
-                        <p className="text-xs text-gray-500">Materi tersedia</p>
+                        <ul className="grid grid-cols-3 gap-2">
+                            {Object.entries(stats.bidang).map(([key, count]) => (
+                                <li
+                                    key={key}
+                                    className="flex items-center justify-between rounded-lg bg-blue-50 px-3 py-2 text-sm transition hover:bg-blue-100"
+                                >
+                                    <span className="font-medium text-gray-700">{key}</span>
+                                    <span className="font-bold text-blue-600">{count}</span>
+                                </li>
+                            ))}
+                        </ul>
                     </CardContent>
                 </Card>
             </div>
+
 
             <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-800">Daftar Modul Pelatihan</h2>
@@ -96,8 +151,9 @@ export default function TableModulPelatihan() {
                         <tr>
                             <th className="w-12 px-3 py-3 text-center">No</th>
                             <th className="w-12 px-3 py-3 text-center">Action</th>
-                            <th className="w-40 px-3 py-3 text-center">Nama Modul Pelatihan</th>
+                            <th className="w-40 px-3 py-3 text-center">Nama Modul</th>
                             <th className="w-28 px-3 py-3 text-center">Bidang</th>
+                            <th className="w-28 px-3 py-3 text-center">Tahun</th>
                             <th className="w-40 px-3 py-3 text-center">Jumlah Materi</th>
                             <th className="w-36 px-3 py-3 text-center">Diupload pada</th>
                         </tr>
@@ -135,11 +191,12 @@ export default function TableModulPelatihan() {
                                     {row.NamaMateriPelatihan}
                                 </td>
                                 <td
-                                    className="px-3 py-2 border max-w-full"
+                                    className="px-3 py-2 border max-w-full text-center"
                                     title={row.BidangMateriPelatihan}
                                 >
                                     {row.BidangMateriPelatihan}
                                 </td>
+                                <td className="px-3 py-2 border text-center">{row.NamaPenderitaMateriPelatihan}</td>
                                 <td className="px-3 py-2 border text-center">{row.ModulPelatihan.length}</td>
                                 <td
                                     className="px-3 py-2 border max-w-[200px]"

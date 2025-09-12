@@ -13,16 +13,14 @@ import {
     AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import Cookies from "js-cookie";
 import Toast from "@/components/toast";
-import { elautBaseUrl, moduleBaseUrl } from "@/constants/urls";
+import { moduleBaseUrl } from "@/constants/urls";
 import { TbPencil } from "react-icons/tb";
 import { MateriPelatihan } from "@/types/module";
-import { PROGRAM_AKP, PROGRAM_KELAUTAN, PROGRAM_PERIKANAN } from "@/constants/pelatihan";
-import { MdSchool } from "react-icons/md";
+import { PROGRAM_AKP, PROGRAM_KELAUTAN, PROGRAM_PERIKANAN_ADMIN } from "@/constants/pelatihan";
 
 const UpdateModulAction: React.FC<{
     materiPelatihan: MateriPelatihan;
@@ -36,6 +34,7 @@ const UpdateModulAction: React.FC<{
     const [berlakuSampai, setBerlakuSampai] = useState(materiPelatihan.BerlakuSampai || "");
     const [bidangMateriPelatihan, setBidangMateriPelatihan] = useState(materiPelatihan.BidangMateriPelatihan || "");
     const [jamPelajaran, setJamPelajaran] = useState(materiPelatihan.JamPelajaran || "");
+    const [tahun, setTahun] = useState(materiPelatihan.NamaPenderitaMateriPelatihan || "")
 
     const [loading, setLoading] = useState(false);
 
@@ -44,6 +43,7 @@ const UpdateModulAction: React.FC<{
             nama_materi_pelatihan: nama,
             deskripsi_materi_pelatihan: deskripsiMateriPelatihan,
             berlaku_sampai: berlakuSampai,
+            nama_penderita_materi_pelatihan: tahun,
             bidang_materi_pelatihan: bidangMateriPelatihan,
             jam_pelajaran: jamPelajaran,
         };
@@ -68,9 +68,7 @@ const UpdateModulAction: React.FC<{
             setIsOpen(false);
             setLoading(false);
             if (onSuccess) onSuccess();
-            console.log("UPDATE MODUL PELATIHAN: ", response);
         } catch (error) {
-            console.error("ERROR UPDATE MODUL PELATIHAN: ", error);
             setLoading(false);
             Toast.fire({
                 icon: "error",
@@ -142,7 +140,7 @@ const UpdateModulAction: React.FC<{
                                 </SelectGroup>
                                 <SelectGroup>
                                     <SelectLabel>Perikanan</SelectLabel>
-                                    {PROGRAM_PERIKANAN.map((item) => (
+                                    {PROGRAM_PERIKANAN_ADMIN.map((item) => (
                                         <SelectItem key={item} value={item}>
                                             {item}
                                         </SelectItem>
