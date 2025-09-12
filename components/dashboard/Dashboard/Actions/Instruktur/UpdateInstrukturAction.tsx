@@ -108,7 +108,7 @@ const UpdateInstrukturAction: React.FC<{
             <AlertDialogTrigger asChild>
                 <Button
                     variant="outline"
-                    className="flex items-center gap-2 w-fit rounded-lg px-3 py-1.5 shadow-sm text-sm border-gray-300 hover:bg-gray-100"
+                    className="flex items-center gap-2 w-fit rounded-lg px-3 py-1.5 shadow-sm text-sm text-gray-500 hover:text-white border-gray-500 hover:bg-gray-500"
                 >
                     <TbPencil className="h-4 w-4" />
                     Edit
