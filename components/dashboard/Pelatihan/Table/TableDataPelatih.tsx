@@ -133,7 +133,7 @@ function InstrukturTable({ data, fetchData }: Props) {
                             <th className="sticky top-0 left-0 z-30 bg-gray-100 w-12 px-3 py-3 text-center border">
                                 No
                             </th>
-                            <th className="sticky top-0 left-12 z-30 bg-gray-100 w-12 px-3 py-3 text-center border">
+                            <th className="sticky top-0 left-10 z-30 bg-gray-100 w-12 px-3 py-3 text-center border">
                                 Action
                             </th>
                             <th className="sticky top-0 left-64 z-30 bg-gray-100 w-40 px-3 py-3 text-center border">
@@ -191,7 +191,7 @@ function InstrukturTable({ data, fetchData }: Props) {
                                 <td className="sticky left-0 z-20 bg-white px-3 py-2 border text-center text-gray-500">
                                     {(currentPage - 1) * itemsPerPage + index + 1}
                                 </td>
-                                <td className="sticky left-12 z-20 bg-white px-3 py-4 border">
+                                <td className="sticky left-10 z-20 bg-white px-3 py-4 border">
                                     <div className="flex flex-row gap-2 h-full px-3 py-2">
                                         <UpdateInstrukturAction onSuccess={fetchData} instruktur={row} />
                                         <DeleteInstrukturAction onSuccess={fetchData} instruktur={row} />

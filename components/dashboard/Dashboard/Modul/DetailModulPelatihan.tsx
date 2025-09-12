@@ -17,6 +17,7 @@ import { FaRegFileLines, FaRegFolderOpen } from "react-icons/fa6"
 import JSZip from "jszip"
 import { saveAs } from 'file-saver'
 import { TbArrowLeft } from "react-icons/tb"
+import { truncateText } from "@/utils"
 
 
 export default function DetailModulPelatihan() {
@@ -26,10 +27,13 @@ export default function DetailModulPelatihan() {
         useFetchDataMateriPelatihanMasyarakatById(id);
 
     const [open, setOpen] = useState(false);
+    const [openBahanAjar, setOpenBahanAjar] = useState(false);
     const [expandedRow, setExpandedRow] = useState<number | null>(null);
+    const [idModul, setIdModul] = useState("")
     const [nama, setNama] = useState("");
     const [deskripsi, setDeskripsi] = useState("");
     const [file, setFile] = useState<File | null>(null);
+    const [produsen, setProdusen] = useState("")
     const [submitting, setSubmitting] = useState(false);
 
     const [editOpen, setEditOpen] = useState(false);
@@ -69,13 +73,6 @@ export default function DetailModulPelatihan() {
         formData.append("DeskripsiModulPelatihan", deskripsi)
         formData.append("IdMateriPelatihan", id.toString())
         formData.append("IdModulPelatihan", id.toString())
-
-
-        // console.log({ formData })
-        // console.log({ id })
-        // console.log({ nama })
-        // console.log({ deskripsi })
-        // console.log({ file })
 
         try {
             setSubmitting(true)
@@ -162,6 +159,40 @@ export default function DetailModulPelatihan() {
 
         setDownloading(false);
     };
+
+    const handleCreateBahanAjar = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!file || !nama) return
+        console.log({ idModul })
+
+        const formData = new FormData()
+        formData.append("file_bahan_tayang", file)
+        formData.append("NamaBahanTayang", nama)
+        formData.append("DeskripsiBahanTayang", deskripsi)
+        formData.append("IdModulPelatihan", idModul)
+        formData.append("creator", produsen)
+
+        try {
+            setSubmitting(true)
+            const response = await axios.post(`${moduleBaseUrl}/bahan-tayang/createBahanTayang`, formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            })
+            alert("✅ bahan tayang berhasil ditambahkan!")
+            setOpenBahanAjar(false)
+            setFile(null)
+            setNama("")
+            setDeskripsi("")
+            setIdModul("")
+            setProdusen("")
+            refetch()
+            console.log({ response })
+        } catch (err) {
+            console.error(err)
+            alert("❌ Gagal menambahkan bahan tayang")
+        } finally {
+            setSubmitting(false)
+        }
+    }
 
     if (loading) {
         return (
@@ -547,27 +578,176 @@ export default function DetailModulPelatihan() {
                                         <tr>
                                             <td colSpan={4} className="p-4 bg-gray-50 border">
                                                 <div className="flex w-full items-center justify-between mb-3">
-                                                    <h2 id="page-caption" className="font-semibold text-sm leading-none max-w-xl">
-                                                        Bahan Ajar/Tayang {row?.NamaModulPelatihan}
+                                                    <h2 id="page-caption" className="font-semibold text-base leading-none max-w-xl">
+                                                        Bahan Ajar/Tayang <br />{row?.NamaModulPelatihan}
                                                     </h2>
-                                                    <Button className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md">
-                                                        <Plus className="w-4 h-4" /> Tambah Bahan Ajar
-                                                    </Button>
+                                                    <Dialog open={openBahanAjar} onOpenChange={setOpenBahanAjar}>
+                                                        <DialogTrigger asChild>
+                                                            <Button className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md">
+                                                                <Plus className="w-4 h-4" /> Tambah Bahan Ajar/Tayang
+                                                            </Button>
+                                                        </DialogTrigger>
+                                                        <DialogContent className="sm:max-w-lg">
+                                                            <DialogHeader>
+                                                                <DialogTitle>Tambah Bahan Ajar/Tayang</DialogTitle>
+                                                            </DialogHeader>
+                                                            <form onSubmit={handleCreateBahanAjar} className="space-y-4">
+                                                                <div className="space-y-2">
+                                                                    <Label>Nama Bahan Ajar/Tayang</Label>
+
+                                                                    <Input
+                                                                        value={nama}
+                                                                        onChange={(e) => { setNama(e.target.value); setIdModul(row.IdModulPelatihan.toString()) }}
+                                                                        placeholder="Masukkan nama modul"
+                                                                        required
+                                                                    />
+                                                                    <p className="text-xs text-gray-600">* Format : 1. (Video) Pengenalan Tugas Pokok dan Fungsi JFT</p>
+                                                                </div>
+                                                                <div className="space-y-2">
+                                                                    <Label>Deskripsi Bahan Tayang</Label>
+                                                                    <Textarea
+                                                                        value={deskripsi}
+                                                                        onChange={(e) => setDeskripsi(e.target.value)}
+                                                                        placeholder="Masukkan deskripsi modul"
+                                                                    />
+                                                                </div>
+                                                                <div className="space-y-2">
+                                                                    <Label>Produsen</Label>
+                                                                    <Input
+                                                                        value={produsen}
+                                                                        onChange={(e) => setProdusen(e.target.value)}
+                                                                        placeholder="Masukkan produsen"
+                                                                        required
+                                                                    />
+                                                                </div>
+                                                                <div className="space-y-2">
+                                                                    <Label className="font-semibold text-gray-700">Upload File Bahan Ajar/Tayang</Label>
+                                                                    {!file && <div className="flex items-center justify-center w-full">
+                                                                        <label
+                                                                            htmlFor="file-upload"
+                                                                            className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-md text-sm cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
+                                                                        >
+                                                                            <svg
+                                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                                className="w-10 h-10 text-blue-500 mb-2"
+                                                                                fill="none"
+                                                                                viewBox="0 0 24 24"
+                                                                                stroke="currentColor"
+                                                                            >
+                                                                                <path
+                                                                                    strokeLinecap="round"
+                                                                                    strokeLinejoin="round"
+                                                                                    strokeWidth="2"
+                                                                                    d="M12 4v16m8-8H4"
+                                                                                />
+                                                                            </svg>
+                                                                            <span className="text-sm text-gray-600">
+                                                                                <span className="font-medium text-blue-600">Click to upload</span> or drag and drop
+                                                                            </span>
+                                                                            <span className="text-xs text-gray-400 mt-1">PDF, PPT, DOC, JPG, PNG, MP4 (max. 10MB)</span>
+                                                                            <Input
+                                                                                id="file-upload"
+                                                                                type="file"
+                                                                                className="hidden"
+                                                                                onChange={(e) => setFile(e.target.files?.[0]!)}
+                                                                                required
+                                                                            />
+                                                                        </label>
+                                                                    </div>}
+
+
+                                                                    {/* ✅ File selected indicator */}
+                                                                    {file && (
+                                                                        <div className="flex items-center gap-2 mt-2 text-sm font-medium text-green-600 bg-green-50 border border-green-200 px-3 py-2 rounded-lg">
+                                                                            <CheckCircle className="w-5 h-5" />
+                                                                            <span>{file.name}</span>
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() => setFile(null)}
+                                                                                className="ml-auto text-red-500 hover:text-red-600"
+                                                                            >
+                                                                                <XCircle className="w-5 h-5" />
+                                                                            </button>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+
+                                                                <Button
+                                                                    type="submit"
+                                                                    className="w-full rounded-md py-2 bg-blue-600 hover:bg-blue-700 text-white"
+                                                                    disabled={submitting}
+                                                                >
+                                                                    {submitting ? (
+                                                                        <Loader2 className="animate-spin w-4 h-4 mr-2" />
+                                                                    ) : (
+                                                                        "Submit"
+                                                                    )}
+                                                                </Button>
+                                                            </form>
+                                                        </DialogContent>
+                                                    </Dialog>
+
                                                 </div>
-                                                <table className="w-full text-xs text-left border">
+                                                <table className="w-full text-sm text-left border">
                                                     <thead className="bg-gray-100 text-gray-700 uppercase">
-                                                        <tr>
-                                                            <th className="px-3 py-2 border">Nama File</th>
-                                                            <th className="px-3 py-2 border">Deskripsi</th>
+                                                        <tr className="text-xs text-center">
+                                                            <th className="px-3 py-2 border">No</th>
+                                                            <th className="px-3 py-2 border">Action</th>
+                                                            <th className="px-3 py-2 border">Nama</th>
+                                                            <th className="px-3 py-2 border">File</th>
+                                                            <th className="px-3 py-2 border">Produsen</th>
                                                             <th className="px-3 py-2 border">Tanggal Upload</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr>
-                                                            <td className="px-3 py-2 border">{row.FileModule}</td>
-                                                            <td className="px-3 py-2 border">{row.DeskripsiModulPelatihan || "-"}</td>
-                                                            <td className="px-3 py-2 border">{row.CreateAt}</td>
-                                                        </tr>
+                                                        {
+                                                            row.BahanTayang.length == 0 ? <tr>
+                                                                <td colSpan={18} className="text-center py-6 text-gray-500 italic">
+                                                                    Tidak ada data ditemukan
+                                                                </td>
+                                                            </tr> : <>
+                                                                {row.BahanTayang.map((row_bt, index) => (
+                                                                    <tr key={row_bt.IdBahanTayang}>
+                                                                        <td className="px-3 py-2 border">{index + 1}</td>
+                                                                        <td className="px-3 py-2 border"> <button
+                                                                            onClick={async () => {
+                                                                                const confirmDelete = window.confirm("⚠️ Apakah Anda yakin ingin menghapus bahan tayang ini?");
+                                                                                if (!confirmDelete) return;
+
+                                                                                try {
+                                                                                    const res = await fetch(
+                                                                                        `${moduleBaseUrl}/bahan-tayang/deleteBahanTayang?id=${row_bt.IdBahanTayang}`,
+                                                                                        { method: "DELETE" }
+                                                                                    );
+                                                                                    if (!res.ok) throw new Error("Gagal menghapus bahan tayang");
+
+                                                                                    refetch();
+                                                                                    alert("✅ Bahan tayang berhasil dihapus");
+                                                                                } catch (error) {
+                                                                                    console.error(error);
+                                                                                    alert("❌ Gagal menghapus bahan tayang");
+                                                                                }
+                                                                            }}
+                                                                            className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-rose-500 text-rose-500 hover:text-white hover:bg-rose-500 border group"
+                                                                        >
+                                                                            <FiTrash2 className="h-5 w-5 text-rose-500 group-hover:text-white" />
+                                                                            Hapus
+                                                                        </button></td>
+                                                                        <td className="px-3 py-2 border">{row_bt.NamaBahanTayang}</td>
+                                                                        <td className="px-3 py-2 border"> <a
+                                                                            href={`${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${row_bt.BahanTayang}`}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            className="  text-blue-500  underline "
+                                                                        >
+                                                                            {truncateText(row_bt.BahanTayang, 50, '...')}
+                                                                        </a></td>
+                                                                        <td className="px-3 py-2 border">{row_bt.Creator || "-"}</td>
+                                                                        <td className="px-3 py-2 border">{row_bt.CreateAt}</td>
+                                                                    </tr>))}
+                                                            </>
+
+                                                        }
                                                     </tbody>
                                                 </table>
                                             </td>

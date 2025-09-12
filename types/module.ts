@@ -1,14 +1,3 @@
-export interface ModulPelatihan {
-  IdModulPelatihan: number
-  IdMateriPelatihan: number
-  NamaModulPelatihan: string
-  DeskripsiModulPelatihan: string
-  BahanTayang: string
-  FileModule: string
-  CreateAt: string
-  UpdateAt: string
-}
-
 export interface MateriPelatihan {
   IdMateriPelatihan: number
   NamaMateriPelatihan: string
@@ -20,4 +9,26 @@ export interface MateriPelatihan {
   UpdateAt: string
   JamPelajaran: string
   ModulPelatihan: ModulPelatihan[]
+}
+
+export interface ModulPelatihan {
+  IdModulPelatihan: number
+  IdMateriPelatihan: number
+  NamaModulPelatihan: string
+  DeskripsiModulPelatihan: string
+  BahanTayang: BahanTayang[]
+  FileModule: string
+  CreateAt: string
+  UpdateAt: string
+}
+
+export interface BahanTayang {
+  IdBahanTayang: number
+  IdModulPelatihan: number
+  NamaBahanTayang: string
+  DeskripsiBahanTayang: string
+  BahanTayang: string
+  Creator: string
+  CreateAt: string
+  UpdateAt: string
 }
