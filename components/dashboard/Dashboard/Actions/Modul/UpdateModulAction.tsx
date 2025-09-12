@@ -130,14 +130,7 @@ const UpdateModulAction: React.FC<{
                                 <SelectValue placeholder="Pilih bidang" />
                             </SelectTrigger>
                             <SelectContent position="popper" className="z-[9999999]">
-                                <SelectGroup>
-                                    <SelectLabel>AKP</SelectLabel>
-                                    {PROGRAM_AKP.map((item) => (
-                                        <SelectItem key={item} value={item}>
-                                            {item}
-                                        </SelectItem>
-                                    ))}
-                                </SelectGroup>
+
                                 <SelectGroup>
                                     <SelectLabel>Perikanan</SelectLabel>
                                     {PROGRAM_PERIKANAN_ADMIN.map((item) => (
