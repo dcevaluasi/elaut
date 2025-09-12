@@ -1,19 +1,20 @@
+
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { BookOpen, Calendar } from "lucide-react";
+import { Book, BookOpen, File } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { RiInformationFill } from "react-icons/ri";
 import { useFetchDataMateriPelatihanMasyarakat } from "@/hooks/elaut/modul/useFetchDataMateriPelatihanMasyarakat";
-import { FiSearch, FiX } from "react-icons/fi";
+import AddInstrukturAction from "../Actions/Instruktur/AddInstrukturAction";
+import UpdateModulAction from "../Actions/Modul/UpdateModulAction";
+import { TbBook } from "react-icons/tb";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
 
 export default function TableModulPelatihan() {
     const [searchQuery, setSearchQuery] = useState<string>("");
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const itemsPerPage = 10;
-
-    const { data, loading, error } = useFetchDataMateriPelatihanMasyarakat();
+    const { data, loading, error, fetchModulPelatihan } = useFetchDataMateriPelatihanMasyarakat();
 
     // Filtered & paginated data
     const filteredData = useMemo(
@@ -24,11 +25,14 @@ export default function TableModulPelatihan() {
         [data, searchQuery]
     );
 
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 15
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage)
+
     const paginatedData = filteredData.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
-    );
+    )
 
     // Metrics
     const totalModul = data.reduce((acc, m) => acc + m.ModulPelatihan.length, 0);
@@ -40,146 +44,149 @@ export default function TableModulPelatihan() {
         return <p className="text-center text-red-500 py-10">{error}</p>;
 
     return (
-        <div className="max-w-6xl mx-auto mt-8 space-y-6">
+        <div className="space-y-6">
             {/* Metrics */}
             <div className="flex w-full gap-4">
-                {/* Total Modul */}
-                <button
-                    className="flex items-center gap-2 px-4 py-2 rounded-full border text-sm transition-all duration-200 bg-white text-gray-700 border-gray-200 hover:bg-gray-50 shadow-sm"
-                >
-                    <BookOpen className="w-5 h-5 text-blue-500" />
-                    <span className="font-medium">Total Modul</span>
-                    <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">
-                        {totalMateri}
-                    </span>
-                </button>
+                <Card className="h-fit rounded-xl w-full border border-gray-200 bg-white shadow-sm">
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <CardTitle className="text-base font-medium text-gray-600">
+                            Total Modul
+                        </CardTitle>
+                        <Book className="h-5 w-5 text-gray-400" />
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-2xl font-bold text-gray-800">{totalMateri}</p>
+                        <p className="text-xs text-gray-500">Modul tersedia</p>
+                    </CardContent>
+                </Card>
+                <Card className="h-fit rounded-xl w-full border border-gray-200 bg-white shadow-sm">
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <CardTitle className="text-base font-medium text-gray-600">
+                            Total Materi
+                        </CardTitle>
+                        <File className="h-5 w-5 text-gray-400" />
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-2xl font-bold text-gray-800">{totalModul}</p>
+                        <p className="text-xs text-gray-500">Materi tersedia</p>
+                    </CardContent>
+                </Card>
+            </div>
 
-                {/* Total File Modul */}
-                <button
-                    className="flex items-center gap-2 px-4 py-2 rounded-full border text-sm transition-all duration-200 bg-white text-gray-700 border-gray-200 hover:bg-gray-50 shadow-sm"
-                >
-                    <BookOpen className="w-5 h-5 text-green-500" />
-                    <span className="font-medium">Total File Modul</span>
-                    <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700">
-                        {totalModul}
-                    </span>
-                </button>
-                {/* Search Input */}
-
-                <div className="relative w-full max-w-md">
-                    {/* Search Icon */}
-                    <span className="absolute inset-y-0 left-3 flex items-center text-gray-400">
-                        <FiSearch className="w-5 h-5" />
-                    </span>
-
-                    {/* Input Field */}
+            <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-800">Daftar Modul Pelatihan</h2>
+                <div className="flex flex-col md:flex-row items-center gap-2 w-full md:w-auto">
                     <Input
-                        placeholder="Cari modul pelatihan..."
+                        type="text"
+                        placeholder="Cari modul..."
                         value={searchQuery}
-                        onChange={(e) => {
-                            setSearchQuery(e.target.value);
-                            setCurrentPage(1);
-                        }}
-                        className="pl-10 pr-10 py-2 w-full rounded-full border border-gray-300 bg-white text-sm text-gray-700 shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full md:w-48  py-1 text-sm"
                     />
 
-                    {/* Clear Button */}
-                    {searchQuery && (
-                        <button
-                            onClick={() => {
-                                setSearchQuery("");
-                                setCurrentPage(1);
-                            }}
-                            className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
-                        >
-                            <FiX className="w-5 h-5" />
-                        </button>
-                    )}
+                    <div className="flex flex-wrap gap-2">
+                        <AddInstrukturAction onSuccess={fetchModulPelatihan} />
+                    </div>
                 </div>
             </div>
 
-
-
-
-            {/* Table */}
-            <div className="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
-                <table className="min-w-full text-sm">
-                    <thead className="bg-gray-50 text-gray-700 text-xs uppercase">
+            <div className="overflow-x-auto border border-gray-200 rounded-xl shadow-sm">
+                <table className="min-w-full table-fixed text-sm">
+                    <thead className="bg-gray-100 text-gray-700 text-xs uppercase">
                         <tr>
-                            <th className="px-4 py-3 text-center">No</th>
-                            <th className="px-4 py-3 text-left flex items-center gap-1">
-                                <BookOpen size={14} className="text-blue-500" /> Nama Modul
-                            </th>
-                            <th className="px-4 py-3 text-left">Bidang</th>
-                            <th className="px-4 py-3 text-center flex items-center justify-center gap-1">
-                                <Calendar size={14} className="text-indigo-500" /> Diupload
-                            </th>
-                            <th className="px-4 py-3 text-center">Jumlah Modul</th>
-                            <th className="px-4 py-3 text-center">Aksi</th>
+                            <th className="w-12 px-3 py-3 text-center">No</th>
+                            <th className="w-12 px-3 py-3 text-center">Action</th>
+                            <th className="w-40 px-3 py-3 text-center">Nama Modul Pelatihan</th>
+                            <th className="w-28 px-3 py-3 text-center">Bidang</th>
+                            <th className="w-40 px-3 py-3 text-center">Jumlah Materi</th>
+                            <th className="w-36 px-3 py-3 text-center">Diupload pada</th>
                         </tr>
                     </thead>
-
                     <tbody className="divide-y divide-gray-100">
-                        {paginatedData.map((materi, idx) => (
+                        {paginatedData.map((row, index) => (
                             <tr
-                                key={materi.IdMateriPelatihan}
+                                key={row.IdMateriPelatihan}
                                 className="hover:bg-gray-50 transition-colors duration-150"
                             >
-                                <td className="px-4 py-3 text-center text-gray-500">
-                                    {(currentPage - 1) * itemsPerPage + idx + 1}
+                                <td className="px-3 py-2 border text-center text-gray-500">
+                                    {(currentPage - 1) * itemsPerPage + index + 1}
                                 </td>
-                                <td className="px-4 py-3 font-medium">
-                                    {materi.NamaMateriPelatihan.replace(/-/g, " ")}
+                                <td className="px-3 py-4 border">
+                                    <div className="flex flex-row gap-2 h-full items-center justify-center py-2">
+                                        <UpdateModulAction onSuccess={fetchModulPelatihan} materiPelatihan={row} />
+                                        <Button
+                                            variant="outline"
+                                            onClick={() =>
+                                                (window.location.href = `/admin/lemdiklat/master/modul/${row.IdMateriPelatihan}`)
+                                            }
+                                            className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
+                                        >
+                                            <TbBook className="h-4 w-4" />
+                                            Detil Modul
+                                        </Button>
+                                        {/* <DeleteInstrukturAction onSuccess={fetchData} instruktur={row} /> */}
+                                    </div>
+
                                 </td>
-                                <td className="px-4 py-3">{materi.BidangMateriPelatihan || "-"}</td>
-                                <td className="px-4 py-3 text-center">{materi.CreateAt}</td>
-                                <td className="px-4 py-3 text-center">{materi.ModulPelatihan.length}</td>
-                                <td className="px-4 py-3 text-center">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() =>
-                                            (window.location.href = `/admin/lemdiklat/master/modul/${materi.IdMateriPelatihan}`)
-                                        }
-                                        className="inline-flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-full border border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900 transition-colors shadow-sm"
-                                    >
-                                        <RiInformationFill className="h-5 w-5 text-blue-500" /> Detail Modul
-                                    </Button>
+                                <td
+                                    className="px-3 py-2 border max-w-full"
+                                    title={row.NamaMateriPelatihan}
+                                >
+                                    {row.NamaMateriPelatihan}
+                                </td>
+                                <td
+                                    className="px-3 py-2 border max-w-full"
+                                    title={row.BidangMateriPelatihan}
+                                >
+                                    {row.BidangMateriPelatihan}
+                                </td>
+                                <td className="px-3 py-2 border text-center">{row.ModulPelatihan.length}</td>
+                                <td
+                                    className="px-3 py-2 border max-w-[200px]"
+                                    title={row.CreateAt}
+                                >
+                                    {row.CreateAt}
                                 </td>
                             </tr>
                         ))}
+                        {paginatedData.length === 0 && (
+                            <tr>
+                                <td
+                                    colSpan={18}
+                                    className="text-center py-6 text-gray-500 italic"
+                                >
+                                    Tidak ada data ditemukan
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
-            </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-2 mt-4">
+            </div>
+            <div className="flex justify-between items-center mt-4">
+                <p className="text-sm text-neutral-600">
+                    Halaman {currentPage} dari {totalPages}
+                </p>
+                <div className="flex gap-2">
                     <Button
                         variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                         disabled={currentPage === 1}
-                        onClick={() => setCurrentPage((prev) => prev - 1)}
                     >
                         Prev
                     </Button>
-                    {Array.from({ length: totalPages }, (_, i) => (
-                        <Button
-                            key={i}
-                            variant={currentPage === i + 1 ? "default" : "outline"}
-                            onClick={() => setCurrentPage(i + 1)}
-                        >
-                            {i + 1}
-                        </Button>
-                    ))}
                     <Button
                         variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
                         disabled={currentPage === totalPages}
-                        onClick={() => setCurrentPage((prev) => prev + 1)}
                     >
                         Next
                     </Button>
                 </div>
-            )}
+            </div>
+
         </div>
     );
 }

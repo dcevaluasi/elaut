@@ -1,7 +1,6 @@
 "use client"
 
 import { useParams } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2, FileText, Calendar, BookOpen, Plus, CheckCircle, XCircle } from "lucide-react"
 import { useFetchDataMateriPelatihanMasyarakatById } from "@/hooks/elaut/modul/useFetchDataMateriPelatihanMasyarakat"
 import { useState } from "react"
@@ -17,24 +16,47 @@ import { ModulPelatihan } from "@/types/module"
 import { FaRegFileLines, FaRegFolderOpen } from "react-icons/fa6"
 import JSZip from "jszip"
 import { saveAs } from 'file-saver'
-
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { TbArrowLeft } from "react-icons/tb"
 
 
 export default function DetailModulPelatihan() {
-    const params = useParams()
-    const id = Number(params?.id)
-    const { data, loading, error, refetch } = useFetchDataMateriPelatihanMasyarakatById(id)
+    const params = useParams();
+    const id = Number(params?.id);
+    const { data, loading, error, refetch } =
+        useFetchDataMateriPelatihanMasyarakatById(id);
+
+    const [open, setOpen] = useState(false);
+    const [nama, setNama] = useState("");
+    const [deskripsi, setDeskripsi] = useState("");
+    const [file, setFile] = useState<File | null>(null);
+    const [submitting, setSubmitting] = useState(false);
+
+    const [editOpen, setEditOpen] = useState(false);
+    const [editModul, setEditModul] = useState<ModulPelatihan | null>(null);
+    const [editNama, setEditNama] = useState("");
+    const [editDeskripsi, setEditDeskripsi] = useState("");
+    const [editFile, setEditFile] = useState<File | null>(null);
+    const [editSubmitting, setEditSubmitting] = useState(false);
+    const [editFileOld, setEditFileOld] = useState<string | null>(null)
+
+    const [downloading, setDownloading] = useState(false);
+
+    const materi = data?.[0];
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 15;
+    const totalPages = materi
+        ? Math.ceil(materi.ModulPelatihan.length / itemsPerPage)
+        : 1;
+
+    const paginatedData =
+        materi?.ModulPelatihan.slice(
+            (currentPage - 1) * itemsPerPage,
+            currentPage * itemsPerPage
+        ) || [];
 
     /**
      * Add new module features
      */
-    const [open, setOpen] = useState(false)
-    const [file, setFile] = useState<File | null>(null)
-    const [nama, setNama] = useState("")
-    const [deskripsi, setDeskripsi] = useState("")
-    const [submitting, setSubmitting] = useState(false)
-
     // Handle form submit
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -77,13 +99,6 @@ export default function DetailModulPelatihan() {
      * Update module features
      */
     // Edit modul states
-    const [editOpen, setEditOpen] = useState(false)
-    const [editModul, setEditModul] = useState<ModulPelatihan | null>(null)
-    const [editFile, setEditFile] = useState<File | null>(null)
-    const [editFileOld, setEditFileOld] = useState<string | null>(null)
-    const [editNama, setEditNama] = useState("")
-    const [editDeskripsi, setEditDeskripsi] = useState("")
-    const [editSubmitting, setEditSubmitting] = useState(false)
 
     const handleEditSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -118,8 +133,6 @@ export default function DetailModulPelatihan() {
     /**
      * Download modules as zip features
      */
-    const [downloading, setDownloading] = useState(false);
-
     const handleDownloadAll = async () => {
         if (!materi || !materi.ModulPelatihan) return;
 
@@ -149,8 +162,6 @@ export default function DetailModulPelatihan() {
         setDownloading(false);
     };
 
-
-
     if (loading) {
         return (
             <div className="flex justify-center items-center h-64">
@@ -167,7 +178,7 @@ export default function DetailModulPelatihan() {
         return <div className="text-center text-gray-500 py-10 font-medium">Materi tidak ditemukan.</div>
     }
 
-    const materi = data[0]
+
 
     return (
         <section className="flex-1 flex flex-col">
@@ -178,29 +189,36 @@ export default function DetailModulPelatihan() {
                         aria-label="page caption"
                         className="flex-row w-full justify-between flex h-24 items-center gap-2 bg-gray-100 border-t px-4"
                     >
-                        <div className="flex gap-1 items-center"> <BookOpen className="text-3xl" />
+                        <div className="flex gap-3 items-center">
+                            <BookOpen className="text-3xl" />
                             <div className="flex flex-col">
                                 <h1 id="page-caption" className="font-semibold text-lg">
-                                    {materi.NamaMateriPelatihan}
+                                    {materi?.NamaMateriPelatihan}
                                 </h1>
-                                <div className="flex flex-wrap gap-4 text-sm text-gray-400">
-                                    <div className="flex items-center gap-2">
-                                        <span>Diupload: {materi.CreateAt}</span>
-                                    </div>
-                                    {materi.BerlakuSampai && (
-                                        <div className="flex items-center gap-2">
-                                            <Calendar className="w-4 h-4" />
-                                            <span>Berlaku sampai: {materi.BerlakuSampai}</span>
-                                        </div>
+                                <div className="flex flex-col leading-none text-sm text-gray-400">
+                                    {materi?.BidangMateriPelatihan != "" && (
+                                        <span>Bidang: {materi?.BidangMateriPelatihan}</span>
                                     )}
+                                    <span>Diupload: {materi?.CreateAt}</span>
                                 </div>
-                            </div></div>
+                            </div>
+                        </div>
 
                         {/* Add Modul Button + Dialog */}
                         <div className="flex justify-end mb-4 gap-2">
+                            <Button
+                                variant="outline"
+                                onClick={() =>
+                                    (window.location.href = `/admin/lemdiklat/master/modul`)
+                                }
+                                className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-gray-500 text-gray-500 hover:text-white hover:bg-gray-500"
+                            >
+                                <TbArrowLeft className="h-4 w-4" />
+                                Kembali
+                            </Button>
                             <Dialog open={open} onOpenChange={setOpen}>
                                 <DialogTrigger asChild>
-                                    <Button className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full">
+                                    <Button className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md">
                                         <Plus className="w-4 h-4" /> Tambah Modul
                                     </Button>
                                 </DialogTrigger>
@@ -232,7 +250,7 @@ export default function DetailModulPelatihan() {
                                             {!file && <div className="flex items-center justify-center w-full">
                                                 <label
                                                     htmlFor="file-upload"
-                                                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
+                                                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-md text-sm cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
                                                 >
                                                     <svg
                                                         xmlns="http://www.w3.org/2000/svg"
@@ -281,7 +299,7 @@ export default function DetailModulPelatihan() {
 
                                         <Button
                                             type="submit"
-                                            className="w-full rounded-full py-2 bg-blue-600 hover:bg-blue-700 text-white"
+                                            className="w-full rounded-md py-2 bg-blue-600 hover:bg-blue-700 text-white"
                                             disabled={submitting}
                                         >
                                             {submitting ? (
@@ -295,7 +313,7 @@ export default function DetailModulPelatihan() {
                             </Dialog>
                             <Button
                                 onClick={handleDownloadAll}
-                                className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white rounded-full"
+                                className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white rounded-md"
                                 disabled={downloading}
                             >
                                 {downloading ? (
@@ -365,7 +383,7 @@ export default function DetailModulPelatihan() {
                                                     <div className="flex items-center justify-center w-full">
                                                         <label
                                                             htmlFor="edit-file-upload"
-                                                            className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
+                                                            className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-md text-sm cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
                                                         >
                                                             <svg
                                                                 xmlns="http://www.w3.org/2000/svg"
@@ -411,7 +429,7 @@ export default function DetailModulPelatihan() {
 
                                     <Button
                                         type="submit"
-                                        className="w-full rounded-full py-2 bg-amber-500 hover:bg-amber-600 text-white"
+                                        className="w-full rounded-md py-2 bg-amber-500 hover:bg-amber-600 text-white"
                                         disabled={editSubmitting}
                                     >
                                         {editSubmitting ? (
@@ -428,102 +446,148 @@ export default function DetailModulPelatihan() {
                 </div>
             </div>
 
-            <main className="w-full h-full">
-                <div className="mt-4 md:mt-6 2xl:mt-7.5">
-                    <div className="container mx-auto p-6 space-y-6">
-
-
-
-                        {/* Modul Pelatihan List */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {materi.ModulPelatihan.map((modul) => (
-                                <Card
-                                    key={modul.IdModulPelatihan}
-                                    className="shadow-sm hover:shadow-lg transition rounded-2xl border border-gray-200"
+            <div className="overflow-x-auto border border-gray-200 rounded-md text-sm shadow-sm">
+                <table className="min-w-full table-fixed text-sm">
+                    <thead className="bg-gray-100 text-gray-700 text-xs uppercase">
+                        <tr>
+                            <th className="w-12 px-3 py-3 text-center">No</th>
+                            <th className="w-12 px-3 py-3 text-center">Action</th>
+                            <th className="w-40 px-3 py-3 text-center">Nama Materi Modul Pelatihan</th>
+                            <th className="w-28 px-3 py-3 text-center">Diupload pada</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                        {materi?.ModulPelatihan
+                            ?.slice()
+                            .sort((a, b) => {
+                                const numA = parseInt(a.NamaModulPelatihan.split(".")[0], 10) || 0;
+                                const numB = parseInt(b.NamaModulPelatihan.split(".")[0], 10) || 0;
+                                return numA - numB;
+                            })
+                            .map((row, index) => (
+                                <tr
+                                    key={row.IdModulPelatihan}
+                                    className="hover:bg-gray-50 transition-colors duration-150"
                                 >
-                                    <CardHeader className="mb-0 pb-2">
-                                        <CardTitle className="text-lg font-semibold flex items-center gap-2 uppercase">
-                                            <span className="w-6 h-6 flex items-center justify-center">
-                                                <FileText className="w-5 h-5 text-blue-500" />
-                                            </span>
-                                            <span className="leading-tight">{modul.NamaModulPelatihan}</span>
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="space-y-1">
-                                        <p className="text-sm text-gray-600">
-                                            {modul.DeskripsiModulPelatihan || "Tidak ada deskripsi modul"}
-                                        </p>
-                                        <p className="text-xs text-gray-400 mb-2">Diupload: {modul.CreateAt}</p>
-                                        {modul.FileModule && (
-                                            <div className="flex gap-2">
-                                                <a
-                                                    href={`${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${modul.FileModule}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="inline-flex items-center gap-2 text-sm font-medium border text-neutral-700  border-blue-500 px-4 py-2 rounded-full hover:border-blue-500 transition group  hover:bg-blue-500 hover:text-white"
-                                                >
-                                                    <FaRegFileLines className="h-5 w-5 text-blue-500 group-hover:text-white" />  File
-                                                </a>
-                                                <a
-                                                    href={`${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${modul.FileModule}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="inline-flex items-center gap-2 text-sm font-medium border text-neutral-700  border-teal-500 px-4 py-2 rounded-full hover:border-teal-500 transition group  hover:bg-teal-500 hover:text-white"
-                                                >
-                                                    <FiFolder className="h-5 w-5 text-teal-500 group-hover:text-white" />  Bahan
-                                                </a>
+                                    <td className="px-3 py-2 border text-center text-gray-500">
+                                        {(currentPage - 1) * itemsPerPage + index + 1}
+                                    </td>
+                                    <td className="px-3 py-4 border">
+                                        <div className="flex flex-row gap-2 h-full items-center justify-center py-2">
+                                            {row.FileModule && (
+                                                <>
+                                                    <a
+                                                        href={`${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${row.FileModule}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 border group"
+                                                    >
+                                                        <FaRegFileLines className="h-5 w-5 text-blue-500 group-hover:text-white" />  File
+                                                    </a>
+                                                    <a
+                                                        href={`${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${row.FileModule}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-teal-500 text-teal-500 hover:text-white hover:bg-teal-500 border group"
+                                                    >
+                                                        <FiFolder className="h-5 w-5 text-teal-500 group-hover:text-white" />  Bahan
+                                                    </a>
+                                                    <button
+                                                        onClick={() => {
+                                                            setEditModul(row)
+                                                            setEditNama(row.NamaModulPelatihan)
+                                                            setEditDeskripsi(row.DeskripsiModulPelatihan || "")
+                                                            setEditFile(null)
+                                                            setEditFileOld(row.FileModule)
+                                                            setEditOpen(true)
+                                                        }}
+                                                        className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-amber-500 text-amber-500 hover:text-white hover:bg-amber-500 border group"
+                                                    >
+                                                        <FiEdit2 className="h-5 w-5 text-amber-500 group-hover:text-white" /> Edit
+                                                    </button>
+                                                    <button
+                                                        onClick={async () => {
+                                                            const confirmDelete = window.confirm("⚠️ Apakah Anda yakin ingin menghapus modul ini?");
+                                                            if (!confirmDelete) return; // stop if user cancels
 
-                                                <button
-                                                    onClick={() => {
-                                                        setEditModul(modul)
-                                                        setEditNama(modul.NamaModulPelatihan)
-                                                        setEditDeskripsi(modul.DeskripsiModulPelatihan || "")
-                                                        setEditFile(null)
-                                                        setEditFileOld(modul.FileModule)
-                                                        setEditOpen(true)
-                                                    }}
-                                                    className="inline-flex items-center gap-2 text-sm font-medium border text-neutral-700 border-amber-500 px-4 py-2 rounded-full hover:border-amber-500 transition group hover:bg-amber-500 hover:text-white"
-                                                >
-                                                    <FiEdit2 className="h-5 w-5 text-amber-500 group-hover:text-white" /> Edit
-                                                </button>
+                                                            try {
+                                                                const res = await fetch(
+                                                                    `${moduleBaseUrl}/modul-pelatihan/deleteModulPelatihan?id=${row.IdModulPelatihan}`,
+                                                                    { method: "DELETE" }
+                                                                );
 
+                                                                if (!res.ok) throw new Error("Gagal menghapus modul");
 
-                                                <button
-                                                    onClick={async () => {
-                                                        const confirmDelete = window.confirm("⚠️ Apakah Anda yakin ingin menghapus modul ini?");
-                                                        if (!confirmDelete) return; // stop if user cancels
+                                                                refetch();
+                                                                alert("✅ Modul berhasil dihapus");
+                                                            } catch (error) {
+                                                                console.error(error);
+                                                                alert("❌ Gagal menghapus modul");
+                                                            }
+                                                        }}
+                                                        className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-rose-500 text-rose-500 hover:text-white hover:bg-rose-500 border group"
+                                                    >
+                                                        <FiTrash2 className="h-5 w-5 text-rose-500 group-hover:text-white" />
+                                                        Hapus
+                                                    </button>
 
-                                                        try {
-                                                            const res = await fetch(
-                                                                `${moduleBaseUrl}/modul-pelatihan/deleteModulPelatihan?id=${modul.IdModulPelatihan}`,
-                                                                { method: "DELETE" }
-                                                            );
+                                                </>
+                                            )}
+                                        </div>
 
-                                                            if (!res.ok) throw new Error("Gagal menghapus modul");
-
-                                                            refetch();
-                                                            alert("✅ Modul berhasil dihapus");
-                                                        } catch (error) {
-                                                            console.error(error);
-                                                            alert("❌ Gagal menghapus modul");
-                                                        }
-                                                    }}
-                                                    className="inline-flex items-center gap-2 text-sm font-medium border text-neutral-700 border-rose-500 px-4 py-2 rounded-full hover:border-rose-500 transition group hover:bg-rose-500 hover:text-white"
-                                                >
-                                                    <FiTrash2 className="h-5 w-5 text-rose-500 group-hover:text-white" />
-                                                    Hapus
-                                                </button>
-
-                                            </div>
-                                        )}
-
-                                    </CardContent>
-                                </Card>
+                                    </td>
+                                    <td
+                                        className="px-3 py-2 border max-w-full"
+                                        title={row.NamaModulPelatihan}
+                                    >
+                                        {row.NamaModulPelatihan}
+                                    </td>
+                                    <td
+                                        className="px-3 py-2 border max-w-[200px]"
+                                        title={row.CreateAt}
+                                    >
+                                        {row.CreateAt}
+                                    </td>
+                                </tr>
                             ))}
-                        </div>
-                    </div>
+                        {paginatedData.length === 0 && (
+                            <tr>
+                                <td
+                                    colSpan={18}
+                                    className="text-center py-6 text-gray-500 italic"
+                                >
+                                    Tidak ada data ditemukan
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+
+            </div>
+            <div className="flex justify-between items-center mt-4">
+                <p className="text-sm text-neutral-600">
+                    Halaman {currentPage} dari {totalPages}
+                </p>
+                <div className="flex gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                        disabled={currentPage === 1}
+                    >
+                        Prev
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                    >
+                        Next
+                    </Button>
                 </div>
-            </main>
+            </div>
+
         </section>
     )
 }

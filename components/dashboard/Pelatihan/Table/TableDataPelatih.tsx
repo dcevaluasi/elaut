@@ -152,7 +152,7 @@ function InstrukturTable({ data, fetchData }: Props) {
                     <tbody className="divide-y divide-gray-100">
                         {paginatedData.map((row, index) => (
                             <tr
-                                key={index}
+                                key={row.IdInstruktur}
                                 className="hover:bg-gray-50 transition-colors duration-150"
                             >
                                 <td className="px-3 py-2 border text-center text-gray-500">

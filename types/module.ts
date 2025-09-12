@@ -18,5 +18,6 @@ export interface MateriPelatihan {
   BidangMateriPelatihan: string
   CreateAt: string
   UpdateAt: string
+  JamPelajaran: string
   ModulPelatihan: ModulPelatihan[]
 }

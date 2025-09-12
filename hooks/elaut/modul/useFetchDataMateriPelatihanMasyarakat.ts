@@ -8,24 +8,27 @@ export const useFetchDataMateriPelatihanMasyarakat = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get<MateriPelatihan[]>(
-          `${moduleBaseUrl}/materi-pelatihan/getMateriPelatihan`,
-        )
-        setData(res.data)
-      } catch (err) {
-        setError('Failed to fetch data')
-      } finally {
-        setLoading(false)
-      }
-    }
+  const fetchModulPelatihan = useCallback(async () => {
+    setLoading(true)
+    setError(null)
 
-    fetchData()
+    try {
+      const res = await axios.get<MateriPelatihan[]>(
+        `${moduleBaseUrl}/materi-pelatihan/getMateriPelatihan`,
+      )
+      setData(res.data)
+    } catch (err) {
+      setError('Failed to fetch data')
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
-  return { data, loading, error }
+  useEffect(() => {
+    fetchModulPelatihan()
+  }, [])
+
+  return { data, loading, error, fetchModulPelatihan }
 }
 
 export const useFetchDataMateriPelatihanMasyarakatById = (id: number) => {
