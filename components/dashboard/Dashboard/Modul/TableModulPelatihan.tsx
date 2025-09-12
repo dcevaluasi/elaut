@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Book, BookOpen, Calendar, File, Layers } from "lucide-react";
+import { Book, BookOpen, Calendar, File, Layers, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useFetchDataMateriPelatihanMasyarakat } from "@/hooks/elaut/modul/useFetchDataMateriPelatihanMasyarakat";
@@ -10,27 +10,45 @@ import AddInstrukturAction from "../Actions/Instruktur/AddInstrukturAction";
 import UpdateModulAction from "../Actions/Modul/UpdateModulAction";
 import { TbBook } from "react-icons/tb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export default function TableModulPelatihan() {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const { data, loading, error, fetchModulPelatihan, stats } = useFetchDataMateriPelatihanMasyarakat();
 
-    console.log({ stats })
+    const [filterBidang, setFilterBidang] = useState("")
+    const [filterTahun, setFilterTahun] = useState("")
+
+    const bidangOptions = [...new Set(data.map(d => d.BidangMateriPelatihan).filter(Boolean))]
+    const tahunOptions = [...new Set(data.map(d => d.NamaPenderitaMateriPelatihan).filter(Boolean))]
+
+    const clearFilters = () => {
+        setFilterBidang("")
+        setFilterTahun("")
+    }
 
     const filteredData = useMemo(() => {
-        return data
-            .filter((item) =>
-                item.NamaMateriPelatihan.toLowerCase().includes(searchQuery.toLowerCase())
+        return data.filter((row) => {
+            const matchesSearch = !searchQuery || Object.values(row).some((val) =>
+                String(val).toLowerCase().includes(searchQuery.toLowerCase())
             )
-            .sort((a, b) => {
-                const yearA = parseInt(a.NamaPenderitaMateriPelatihan, 10) || 0;
-                const yearB = parseInt(b.NamaPenderitaMateriPelatihan, 10) || 0;
-                return yearB - yearA; // descending
-            });
-    }, [data, searchQuery]);
+            const matchesBidang = !filterBidang || row.BidangMateriPelatihan === filterBidang
+            const matchesTahun = !filterTahun || row.NamaPenderitaMateriPelatihan === filterTahun
 
-
+            return matchesSearch && matchesBidang && matchesTahun
+        }).sort((a, b) => {
+            const yearA = parseInt(a.NamaPenderitaMateriPelatihan, 10) || 0;
+            const yearB = parseInt(b.NamaPenderitaMateriPelatihan, 10) || 0;
+            return yearB - yearA; // descending
+        });
+    }, [data, searchQuery, filterBidang, filterTahun]);
 
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 15
@@ -140,6 +158,15 @@ export default function TableModulPelatihan() {
                     />
 
                     <div className="flex flex-wrap gap-2">
+                        <FilterDropdown
+                            filterBidang={filterBidang}
+                            setFilterBidang={setFilterBidang}
+                            bidangOptions={bidangOptions}
+                            filterTahun={filterTahun}
+                            setFilterTahun={setFilterTahun}
+                            tahunOptions={tahunOptions}
+                            clearFilters={clearFilters}
+                        />
                         <AddInstrukturAction onSuccess={fetchModulPelatihan} />
                     </div>
                 </div>
@@ -246,4 +273,75 @@ export default function TableModulPelatihan() {
 
         </div>
     );
+}
+
+function FilterDropdown({
+    filterBidang,
+    setFilterBidang,
+    bidangOptions,
+    filterTahun,
+    setFilterTahun,
+    tahunOptions,
+    clearFilters,
+}: any) {
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex items-center py-4 gap-2">
+                    <SlidersHorizontal className="w-4 h-4" />
+                    Filter
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-64 p-3 space-y-3">
+                <DropdownMenuLabel className="text-sm font-semibold">Filter Data</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+
+                {/* Bidang */}
+                <div className="space-y-1">
+                    <label className="text-xs font-medium text-gray-600">Bidang</label>
+                    <Select value={filterBidang} onValueChange={setFilterBidang}>
+                        <SelectTrigger className="w-full text-sm">
+                            <SelectValue placeholder="Pilih bidang" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="-">Semua</SelectItem>
+                            {bidangOptions.map((opt: any) => (
+                                <SelectItem key={opt} value={opt}>
+                                    {opt}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* Tahun */}
+                <div className="space-y-1">
+                    <label className="text-xs font-medium text-gray-600">Tahun</label>
+                    <Select value={filterTahun} onValueChange={setFilterTahun}>
+                        <SelectTrigger className="w-full text-sm">
+                            <SelectValue placeholder="Pilih bidang" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="-">Semua</SelectItem>
+                            {tahunOptions.map((opt: any) => (
+                                <SelectItem key={opt} value={opt}>
+                                    {opt}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* Clear Button */}
+                <Button
+                    onClick={clearFilters}
+                    size="sm"
+                    variant="outline"
+                    className="w-full mt-2 text-xs"
+                >
+                    Reset Filter
+                </Button>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
 }
