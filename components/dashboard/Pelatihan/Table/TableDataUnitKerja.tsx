@@ -23,6 +23,7 @@ import AddUnitKerjaAction from "../../Dashboard/Actions/UnitKerja/AddUnitKerjaAc
 import { useUnitKerja } from "@/context/UnitKerjaContext";
 import Cookies from "js-cookie";
 import UpdateUnitKerjaAction from "../../Dashboard/Actions/UnitKerja/UpdateUnitKerjaAction";
+import DeleteUnitKerjaAction from "../../Dashboard/Actions/UnitKerja/DeleteUnitKerjaAction";
 
 const TableDataUnitKerja = () => {
     const { unitKerjas, loading: loadingUnitKerja, error: errorUnitKerja, fetchUnitKerjaData } = useFetchDataUnitKerja()
@@ -147,7 +148,7 @@ function UnitKerjaTable({ data, fetchData }: Props) {
                                 <td className="px-3 py-4 border">
                                     <div className="flex flex-row gap-2 h-full px-3 py-2">
                                         <UpdateUnitKerjaAction onSuccess={fetchData} unitKerja={row} />
-                                        {/* <DeleteUnitKerjaAction onSuccess={fetchData} unitKerja={row} /> */}
+                                        <DeleteUnitKerjaAction onSuccess={fetchData} unitKerja={row} />
                                     </div>
 
                                 </td>

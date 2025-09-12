@@ -26,13 +26,16 @@ export default function TableModulPelatihan() {
 
     const [filterBidang, setFilterBidang] = useState("")
     const [filterTahun, setFilterTahun] = useState("")
+    const [filterProdusen, setFilterProdusen] = useState("")
 
     const bidangOptions = [...new Set(data.map(d => d.BidangMateriPelatihan).filter(Boolean))]
     const tahunOptions = [...new Set(data.map(d => d.NamaPenderitaMateriPelatihan).filter(Boolean))]
+    const produsenOptions = [...new Set(data.map(d => d.DeskripsiMateriPelatihan).filter(Boolean))]
 
     const clearFilters = () => {
         setFilterBidang("")
         setFilterTahun("")
+        setFilterProdusen("")
     }
 
     const filteredData = useMemo(() => {
@@ -42,14 +45,15 @@ export default function TableModulPelatihan() {
             )
             const matchesBidang = !filterBidang || row.BidangMateriPelatihan === filterBidang
             const matchesTahun = !filterTahun || row.NamaPenderitaMateriPelatihan === filterTahun
+            const matchesProdusen = !filterProdusen || row.DeskripsiMateriPelatihan === filterProdusen
 
-            return matchesSearch && matchesBidang && matchesTahun
+            return matchesSearch && matchesBidang && matchesTahun && matchesProdusen
         }).sort((a, b) => {
             const yearA = parseInt(a.NamaPenderitaMateriPelatihan, 10) || 0;
             const yearB = parseInt(b.NamaPenderitaMateriPelatihan, 10) || 0;
             return yearB - yearA; // descending
         });
-    }, [data, searchQuery, filterBidang, filterTahun]);
+    }, [data, searchQuery, filterBidang, filterTahun, filterProdusen]);
 
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 15
@@ -166,6 +170,9 @@ export default function TableModulPelatihan() {
                             filterTahun={filterTahun}
                             setFilterTahun={setFilterTahun}
                             tahunOptions={tahunOptions}
+                            filterProdusen={filterProdusen}
+                            setFilterProdusen={setFilterProdusen}
+                            produsenOptions={produsenOptions}
                             clearFilters={clearFilters}
                         />
                         <AddModulAction onSuccess={fetchModulPelatihan} />
@@ -280,6 +287,9 @@ function FilterDropdown({
     filterTahun,
     setFilterTahun,
     tahunOptions,
+    filterProdusen,
+    setFilterProdusen,
+    produsenOptions,
     clearFilters,
 }: any) {
     return (
@@ -322,6 +332,24 @@ function FilterDropdown({
                         <SelectContent>
                             <SelectItem value="-">Semua</SelectItem>
                             {tahunOptions.map((opt: any) => (
+                                <SelectItem key={opt} value={opt}>
+                                    {opt}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* Produsen */}
+                <div className="space-y-1">
+                    <label className="text-xs font-medium text-gray-600">Produsen</label>
+                    <Select value={filterProdusen} onValueChange={setFilterProdusen}>
+                        <SelectTrigger className="w-full text-sm">
+                            <SelectValue placeholder="Pilih bidang" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="-">Semua</SelectItem>
+                            {produsenOptions.map((opt: any) => (
                                 <SelectItem key={opt} value={opt}>
                                     {opt}
                                 </SelectItem>

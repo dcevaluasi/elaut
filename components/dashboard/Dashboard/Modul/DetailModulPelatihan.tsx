@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation"
 import { Loader2, FileText, Calendar, BookOpen, Plus, CheckCircle, XCircle } from "lucide-react"
 import { useFetchDataMateriPelatihanMasyarakatById } from "@/hooks/elaut/modul/useFetchDataMateriPelatihanMasyarakat"
-import { useState } from "react"
+import React, { useState } from "react"
 import axios from "axios"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -26,6 +26,7 @@ export default function DetailModulPelatihan() {
         useFetchDataMateriPelatihanMasyarakatById(id);
 
     const [open, setOpen] = useState(false);
+    const [expandedRow, setExpandedRow] = useState<number | null>(null);
     const [nama, setNama] = useState("");
     const [deskripsi, setDeskripsi] = useState("");
     const [file, setFile] = useState<File | null>(null);
@@ -459,112 +460,131 @@ export default function DetailModulPelatihan() {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        {materi?.ModulPelatihan
-                            ?.slice()
+                        {materi?.ModulPelatihan?.slice()
                             .sort((a, b) => {
                                 const numA = parseInt(a.NamaModulPelatihan.split(".")[0], 10) || 0;
                                 const numB = parseInt(b.NamaModulPelatihan.split(".")[0], 10) || 0;
                                 return numA - numB;
                             })
                             .map((row, index) => (
-                                <tr
-                                    key={row.IdModulPelatihan}
-                                    className="hover:bg-gray-50 transition-colors duration-150"
-                                >
-                                    <td className="px-3 py-2 border text-center text-gray-500">
-                                        {(currentPage - 1) * itemsPerPage + index + 1}
-                                    </td>
-                                    <td className="px-3 py-4 border">
-                                        <div className="flex flex-row gap-2 h-full items-center justify-center py-2">
-                                            {row.FileModule && (
-                                                <>
-                                                    <a
-                                                        href={`${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${row.FileModule}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 border group"
-                                                    >
-                                                        <FaRegFileLines className="h-5 w-5 text-blue-500 group-hover:text-white" />  File
-                                                    </a>
-                                                    <a
-                                                        href={`${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${row.FileModule}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-teal-500 text-teal-500 hover:text-white hover:bg-teal-500 border group"
-                                                    >
-                                                        <FiFolder className="h-5 w-5 text-teal-500 group-hover:text-white" />  Bahan
-                                                    </a>
-                                                    <button
-                                                        onClick={() => {
-                                                            setEditModul(row)
-                                                            setEditNama(row.NamaModulPelatihan)
-                                                            setEditDeskripsi(row.DeskripsiModulPelatihan || "")
-                                                            setEditFile(null)
-                                                            setEditFileOld(row.FileModule)
-                                                            setEditOpen(true)
-                                                        }}
-                                                        className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-amber-500 text-amber-500 hover:text-white hover:bg-amber-500 border group"
-                                                    >
-                                                        <FiEdit2 className="h-5 w-5 text-amber-500 group-hover:text-white" /> Edit
-                                                    </button>
-                                                    <button
-                                                        onClick={async () => {
-                                                            const confirmDelete = window.confirm("⚠️ Apakah Anda yakin ingin menghapus modul ini?");
-                                                            if (!confirmDelete) return; // stop if user cancels
-
-                                                            try {
-                                                                const res = await fetch(
-                                                                    `${moduleBaseUrl}/modul-pelatihan/deleteModulPelatihan?id=${row.IdModulPelatihan}`,
-                                                                    { method: "DELETE" }
-                                                                );
-
-                                                                if (!res.ok) throw new Error("Gagal menghapus modul");
-
-                                                                refetch();
-                                                                alert("✅ Modul berhasil dihapus");
-                                                            } catch (error) {
-                                                                console.error(error);
-                                                                alert("❌ Gagal menghapus modul");
+                                <React.Fragment key={row.IdModulPelatihan}>
+                                    <tr className="hover:bg-gray-50 transition-colors duration-150">
+                                        <td className="px-3 py-2 border text-center text-gray-500">
+                                            {(currentPage - 1) * itemsPerPage + index + 1}
+                                        </td>
+                                        <td className="px-3 py-4 border">
+                                            <div className="flex flex-row gap-2 h-full items-center justify-center py-2">
+                                                {row.FileModule && (
+                                                    <>
+                                                        <a
+                                                            href={`${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${row.FileModule}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 border group"
+                                                        >
+                                                            <FaRegFileLines className="h-5 w-5 text-blue-500 group-hover:text-white" /> File
+                                                        </a>
+                                                        <button
+                                                            onClick={() =>
+                                                                setExpandedRow(expandedRow === row.IdModulPelatihan ? null : row.IdModulPelatihan)
                                                             }
-                                                        }}
-                                                        className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-rose-500 text-rose-500 hover:text-white hover:bg-rose-500 border group"
-                                                    >
-                                                        <FiTrash2 className="h-5 w-5 text-rose-500 group-hover:text-white" />
-                                                        Hapus
-                                                    </button>
+                                                            className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-teal-500 text-teal-500 hover:text-white hover:bg-teal-500 border group"
+                                                        >
+                                                            <FiFolder className="h-5 w-5 text-teal-500 group-hover:text-white" />{" "}
+                                                            {expandedRow === row.IdModulPelatihan ? "Bahan" : "Bahan"}
+                                                        </button>
+                                                        <button
+                                                            onClick={() => {
+                                                                setEditModul(row);
+                                                                setEditNama(row.NamaModulPelatihan);
+                                                                setEditDeskripsi(row.DeskripsiModulPelatihan || "");
+                                                                setEditFile(null);
+                                                                setEditFileOld(row.FileModule);
+                                                                setEditOpen(true);
+                                                            }}
+                                                            className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-amber-500 text-amber-500 hover:text-white hover:bg-amber-500 border group"
+                                                        >
+                                                            <FiEdit2 className="h-5 w-5 text-amber-500 group-hover:text-white" /> Edit
+                                                        </button>
+                                                        <button
+                                                            onClick={async () => {
+                                                                const confirmDelete = window.confirm("⚠️ Apakah Anda yakin ingin menghapus modul ini?");
+                                                                if (!confirmDelete) return;
 
-                                                </>
-                                            )}
-                                        </div>
+                                                                try {
+                                                                    const res = await fetch(
+                                                                        `${moduleBaseUrl}/modul-pelatihan/deleteModulPelatihan?id=${row.IdModulPelatihan}`,
+                                                                        { method: "DELETE" }
+                                                                    );
+                                                                    if (!res.ok) throw new Error("Gagal menghapus modul");
 
-                                    </td>
-                                    <td
-                                        className="px-3 py-2 border max-w-full"
-                                        title={row.NamaModulPelatihan}
-                                    >
-                                        {row.NamaModulPelatihan}
-                                    </td>
-                                    <td
-                                        className="px-3 py-2 border max-w-[200px]"
-                                        title={row.CreateAt}
-                                    >
-                                        {row.CreateAt}
-                                    </td>
-                                </tr>
+                                                                    refetch();
+                                                                    alert("✅ Modul berhasil dihapus");
+                                                                } catch (error) {
+                                                                    console.error(error);
+                                                                    alert("❌ Gagal menghapus modul");
+                                                                }
+                                                            }}
+                                                            className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-rose-500 text-rose-500 hover:text-white hover:bg-rose-500 border group"
+                                                        >
+                                                            <FiTrash2 className="h-5 w-5 text-rose-500 group-hover:text-white" />
+                                                            Hapus
+                                                        </button>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-3 py-2 border max-w-full" title={row.NamaModulPelatihan}>
+                                            {row.NamaModulPelatihan}
+                                        </td>
+                                        <td className="px-3 py-2 border max-w-[200px]" title={row.CreateAt}>
+                                            {row.CreateAt}
+                                        </td>
+                                    </tr>
+
+                                    {/* Collapsible row */}
+                                    {expandedRow === row.IdModulPelatihan && (
+                                        <tr>
+                                            <td colSpan={4} className="p-4 bg-gray-50 border">
+                                                <div className="flex w-full items-center justify-between mb-3">
+                                                    <h2 id="page-caption" className="font-semibold text-sm leading-none max-w-xl">
+                                                        Bahan Ajar/Tayang {row?.NamaModulPelatihan}
+                                                    </h2>
+                                                    <Button className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md">
+                                                        <Plus className="w-4 h-4" /> Tambah Bahan Ajar
+                                                    </Button>
+                                                </div>
+                                                <table className="w-full text-xs text-left border">
+                                                    <thead className="bg-gray-100 text-gray-700 uppercase">
+                                                        <tr>
+                                                            <th className="px-3 py-2 border">Nama File</th>
+                                                            <th className="px-3 py-2 border">Deskripsi</th>
+                                                            <th className="px-3 py-2 border">Tanggal Upload</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td className="px-3 py-2 border">{row.FileModule}</td>
+                                                            <td className="px-3 py-2 border">{row.DeskripsiModulPelatihan || "-"}</td>
+                                                            <td className="px-3 py-2 border">{row.CreateAt}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </React.Fragment>
                             ))}
+
                         {paginatedData.length === 0 && (
                             <tr>
-                                <td
-                                    colSpan={18}
-                                    className="text-center py-6 text-gray-500 italic"
-                                >
+                                <td colSpan={18} className="text-center py-6 text-gray-500 italic">
                                     Tidak ada data ditemukan
                                 </td>
                             </tr>
                         )}
                     </tbody>
                 </table>
-
             </div>
             <div className="flex justify-between items-center mt-4">
                 <p className="text-sm text-neutral-600">
