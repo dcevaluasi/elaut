@@ -13,45 +13,51 @@ import {
     AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import Cookies from "js-cookie";
 import Toast from "@/components/toast";
 import { moduleBaseUrl } from "@/constants/urls";
-import { TbPencil } from "react-icons/tb";
-import { MateriPelatihan } from "@/types/module";
+import { TbPlus } from "react-icons/tb";
 import { PROGRAM_AKP, PROGRAM_KELAUTAN, PROGRAM_PERIKANAN_ADMIN } from "@/constants/pelatihan";
 
-const UpdateModulAction: React.FC<{
-    materiPelatihan: MateriPelatihan;
-    onSuccess?: () => void;
-}> = ({ materiPelatihan, onSuccess }) => {
+const AddModulAction: React.FC<{ onSuccess?: () => void }> = ({
+    onSuccess,
+}) => {
     const [isOpen, setIsOpen] = useState(false);
 
-    // Controlled states (prefill data lama)
-    const [nama, setNama] = useState(materiPelatihan.NamaMateriPelatihan || "");
-    const [deskripsiMateriPelatihan, setDeskripsiMateriPelatihan] = useState(materiPelatihan.DeskripsiMateriPelatihan || "");
-    const [berlakuSampai, setBerlakuSampai] = useState(materiPelatihan.BerlakuSampai || "");
-    const [bidangMateriPelatihan, setBidangMateriPelatihan] = useState(materiPelatihan.BidangMateriPelatihan || "");
-    const [jamPelajaran, setJamPelajaran] = useState(materiPelatihan.JamPelajaran || "");
-    const [tahun, setTahun] = useState(materiPelatihan.NamaPenderitaMateriPelatihan || "")
+    const [nama, setNama] = useState("");
+    const [deskripsiMateriPelatihan, setDeskripsiMateriPelatihan] = useState("");
+    const [berlakuSampai, setBerlakuSampai] = useState("");
+    const [bidangMateriPelatihan, setBidangMateriPelatihan] = useState("");
+    const [jamPelajaran, setJamPelajaran] = useState("");
+    const [tahun, setTahun] = useState("")
 
     const [loading, setLoading] = useState(false);
 
-    const handleUpdate = async () => {
+    const clearForm = () => {
+        setNama("");
+        setDeskripsiMateriPelatihan("");
+        setBerlakuSampai("");
+        setBidangMateriPelatihan("");
+        setJamPelajaran("");
+        setTahun("");
+    };
+
+    const handleSubmit = async () => {
         const form = {
             nama_materi_pelatihan: nama,
             deskripsi_materi_pelatihan: deskripsiMateriPelatihan,
             berlaku_sampai: berlakuSampai,
-            nama_penderita_materi_pelatihan: tahun,
             bidang_materi_pelatihan: bidangMateriPelatihan,
             jam_pelajaran: jamPelajaran,
         };
 
         try {
             setLoading(true);
-            const response = await axios.put(
-                `${moduleBaseUrl}/materi-pelatihan/updateMateriPelatihan?id=${materiPelatihan.IdMateriPelatihan}`,
+            const response = await axios.post(
+                `${moduleBaseUrl}/materi-pelatihan/createMateriPelatihan`,
                 form,
                 {
                     headers: {
@@ -59,21 +65,24 @@ const UpdateModulAction: React.FC<{
                     },
                 }
             );
-
             Toast.fire({
                 icon: "success",
                 title: "Berhasil!",
-                text: "Data materi/modul pelatihan berhasil diperbarui.",
+                text: "Modul baru berhasil ditambahkan.",
             });
             setIsOpen(false);
             setLoading(false);
             if (onSuccess) onSuccess();
+            console.log("CREATE MODUL: ", response);
+            clearForm()
         } catch (error) {
+            console.error("ERROR CREATE MODUL: ", error);
             setLoading(false);
+            clearForm()
             Toast.fire({
                 icon: "error",
                 title: "Gagal!",
-                text: "Terjadi kesalahan saat memperbarui materi/modul pelatiha.",
+                text: "Terjadi kesalahan saat menambahkan modul.",
             });
         }
     };
@@ -83,18 +92,18 @@ const UpdateModulAction: React.FC<{
             <AlertDialogTrigger asChild>
                 <Button
                     variant="outline"
-                    className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-gray-500 text-gray-500 hover:text-white hover:bg-gray-500"
+                    className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
                 >
-                    <TbPencil className="h-4 w-4" />
-                    Edit
+                    <TbPlus className="h-5 w-5" />
+                    <span>Tambah Modul</span>
                 </Button>
             </AlertDialogTrigger>
 
             <AlertDialogContent className="max-w-3xl">
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Edit Data Modul Pelatihan</AlertDialogTitle>
+                    <AlertDialogTitle>Tambah Modul Baru</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Ubah data modul pelatihan berikut sesuai kebutuhan.
+                        Isi data berikut untuk menambahkan modul baru.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 
@@ -168,14 +177,15 @@ const UpdateModulAction: React.FC<{
                         />
                     </div>
                 </div>
+
                 <AlertDialogFooter>
                     <AlertDialogCancel disabled={loading}>Batal</AlertDialogCancel>
                     <AlertDialogAction
-                        onClick={handleUpdate}
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                        onClick={handleSubmit}
+                        className="bg-green-600 hover:bg-green-700 text-white"
                         disabled={loading}
                     >
-                        {loading ? "Menyimpan..." : "Update"}
+                        {loading ? "Menyimpan..." : "Simpan"}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
@@ -183,4 +193,4 @@ const UpdateModulAction: React.FC<{
     );
 };
 
-export default UpdateModulAction;
+export default AddModulAction;

@@ -311,22 +311,23 @@ export default function DetailModulPelatihan() {
                                     </form>
                                 </DialogContent>
                             </Dialog>
-                            <Button
-                                onClick={handleDownloadAll}
-                                className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white rounded-md"
-                                disabled={downloading}
-                            >
-                                {downloading ? (
-                                    <>
-                                        <Loader2 className="animate-spin w-4 h-4" /> Downloading...
-                                    </>
-                                ) : (
-                                    <>
-                                        <FaRegFolderOpen className="w-4 h-4" /> Download Modul
-                                    </>
-                                )}
-                            </Button>
-
+                            {
+                                materi?.ModulPelatihan.length != 0 && <Button
+                                    onClick={handleDownloadAll}
+                                    className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white rounded-md"
+                                    disabled={downloading}
+                                >
+                                    {downloading ? (
+                                        <>
+                                            <Loader2 className="animate-spin w-4 h-4" /> Downloading...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <FaRegFolderOpen className="w-4 h-4" /> Download Modul
+                                        </>
+                                    )}
+                                </Button>
+                            }
                         </div>
 
                         {/* Edit Modul Dialog */}

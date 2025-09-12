@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Book, BookOpen, Calendar, File, Layers, SlidersHorizontal } from "lucide-react";
+import { Book, Calendar, File, Layers, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useFetchDataMateriPelatihanMasyarakat } from "@/hooks/elaut/modul/useFetchDataMateriPelatihanMasyarakat";
@@ -10,7 +10,7 @@ import AddInstrukturAction from "../Actions/Instruktur/AddInstrukturAction";
 import UpdateModulAction from "../Actions/Modul/UpdateModulAction";
 import { TbBook } from "react-icons/tb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -18,6 +18,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import AddModulAction from "../Actions/Modul/AddModulAction";
 
 export default function TableModulPelatihan() {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -71,7 +72,7 @@ export default function TableModulPelatihan() {
     return (
         <div className="space-y-6">
             {/* Metrics */}
-            <div className="flex w-full gap-4">
+            <div className="grid grid-cols-2 w-full h-full gap-4">
                 <div className="w-full flex flex-col gap-4">
                     <div className="flex w-full gap-4">
                         <Card className="h-fit rounded-xl w-full border border-gray-200 bg-white shadow-sm">
@@ -167,7 +168,7 @@ export default function TableModulPelatihan() {
                             tahunOptions={tahunOptions}
                             clearFilters={clearFilters}
                         />
-                        <AddInstrukturAction onSuccess={fetchModulPelatihan} />
+                        <AddModulAction onSuccess={fetchModulPelatihan} />
                     </div>
                 </div>
             </div>
@@ -181,8 +182,9 @@ export default function TableModulPelatihan() {
                             <th className="w-40 px-3 py-3 text-center">Nama Modul</th>
                             <th className="w-28 px-3 py-3 text-center">Bidang</th>
                             <th className="w-28 px-3 py-3 text-center">Tahun</th>
+                            <th className="w-28 px-3 py-3 text-center">Produsen</th>
                             <th className="w-40 px-3 py-3 text-center">Jumlah Materi</th>
-                            <th className="w-36 px-3 py-3 text-center">Diupload pada</th>
+
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -205,7 +207,7 @@ export default function TableModulPelatihan() {
                                             className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
                                         >
                                             <TbBook className="h-4 w-4" />
-                                            Detil Modul
+                                            Detail Modul
                                         </Button>
                                         {/* <DeleteInstrukturAction onSuccess={fetchData} instruktur={row} /> */}
                                     </div>
@@ -224,13 +226,9 @@ export default function TableModulPelatihan() {
                                     {row.BidangMateriPelatihan}
                                 </td>
                                 <td className="px-3 py-2 border text-center">{row.NamaPenderitaMateriPelatihan}</td>
+                                <td className="px-3 py-2 border text-center">{row.DeskripsiMateriPelatihan}</td>
                                 <td className="px-3 py-2 border text-center">{row.ModulPelatihan.length}</td>
-                                <td
-                                    className="px-3 py-2 border max-w-[200px]"
-                                    title={row.CreateAt}
-                                >
-                                    {row.CreateAt}
-                                </td>
+
                             </tr>
                         ))}
                         {paginatedData.length === 0 && (
