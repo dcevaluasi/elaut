@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { SlidersHorizontal } from "lucide-react"
+import Cookies from "js-cookie";
 
 const TableDataPelatih = () => {
     const { instrukturs, loading, error, fetchInstrukturData, stats } = useFetchDataInstruktur()
@@ -56,6 +57,8 @@ function InstrukturTable({ data, fetchData }: Props) {
 
     // Filtering logic
     const filteredData = useMemo(() => {
+        const cookieIdUnitKerja = Cookies.get("IDUnitKerja");
+
         return data.filter((row) => {
             const matchesSearch = !search || Object.values(row).some((val) =>
                 String(val).toLowerCase().includes(search.toLowerCase())
@@ -68,6 +71,7 @@ function InstrukturTable({ data, fetchData }: Props) {
             return matchesSearch && matchesKeahlian && matchesStatus && matchesPendidikan && matchesJabatan
         })
     }, [data, search, filterKeahlian, filterStatus, filterPendidikan, filterJabatan])
+
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1)

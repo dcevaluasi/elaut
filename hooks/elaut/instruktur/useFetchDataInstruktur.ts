@@ -20,6 +20,7 @@ export function useFetchDataInstruktur() {
   const [error, setError] = useState<unknown>(null)
 
   const token = Cookies.get('XSRF091')
+  const cookieIdUnitKerja = Cookies.get('IDUnitKerja')
 
   const fetchInstrukturData = useCallback(async () => {
     if (!token) {
@@ -37,7 +38,13 @@ export function useFetchDataInstruktur() {
           headers: { Authorization: `Bearer ${token}` },
         },
       )
-      setInstrukturs(response.data || [])
+      const filtered = (response.data || []).filter((row) => {
+        return cookieIdUnitKerja && cookieIdUnitKerja.toString() !== '0'
+          ? String(row.id_lemdik ?? '') === cookieIdUnitKerja
+          : true
+      })
+
+      setInstrukturs(filtered)
     } catch (err) {
       setError(err)
     } finally {
