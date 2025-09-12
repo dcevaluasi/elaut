@@ -65,10 +65,10 @@ export default function DetailModulPelatihan() {
     // Handle form submit
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!file || !nama) return
+        if (!nama) return
 
         const formData = new FormData()
-        formData.append("file_bahan_tayang", file)
+        if (file) formData.append("file_bahan_tayang", file)
         formData.append("NamaModulPelatihan", nama)
         formData.append("DeskripsiModulPelatihan", deskripsi)
         formData.append("IdMateriPelatihan", id.toString())
@@ -268,7 +268,7 @@ export default function DetailModulPelatihan() {
                                                 placeholder="Masukkan nama modul"
                                                 required
                                             />
-                                            <p className="text-xs text-gray-600">* Format : 01.-PENGENALAN-TUGAS-POKOK-DAN-FUNGSI-JFT-ANALIS-AKUAKULTUR-OKE</p>
+                                            <p className="text-xs text-gray-600">* Format : 1. (Video) Pengenalan Tugas Pokok dan Fungsi JFT</p>
                                         </div>
                                         <div className="space-y-2">
                                             <Label>Deskripsi Modul</Label>
