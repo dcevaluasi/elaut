@@ -191,8 +191,8 @@ export default function DetailModulPelatihan() {
                     >
                         <div className="flex gap-3 items-center">
                             <BookOpen className="text-3xl" />
-                            <div className="flex flex-col">
-                                <h1 id="page-caption" className="font-semibold text-lg">
+                            <div className="flex flex-col gap-2">
+                                <h1 id="page-caption" className="font-semibold text-lg leading-none">
                                     {materi?.NamaMateriPelatihan}
                                 </h1>
                                 <div className="flex flex-col leading-none text-sm text-gray-400">
@@ -447,7 +447,7 @@ export default function DetailModulPelatihan() {
                 </div>
             </div>
 
-            <div className="overflow-x-auto border border-gray-200 rounded-md text-sm shadow-sm">
+            <div className="overflow-x-auto border border-gray-200 rounded-md text-sm mt-5 shadow-sm">
                 <table className="min-w-full table-fixed text-sm">
                     <thead className="bg-gray-100 text-gray-700 text-xs uppercase">
                         <tr>
