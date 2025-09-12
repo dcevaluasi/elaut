@@ -25,6 +25,8 @@ import {
     SelectItem,
 } from "@/components/ui/select";
 import { TbPlus } from "react-icons/tb";
+import { UK_ESELON_1, UK_ESELON_2 } from "@/constants/unitkerja";
+import { truncateText } from "@/utils";
 
 const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
     onSuccess,
@@ -46,6 +48,8 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
     const [trainingOfficerCourse, setTrainingOfficerCourse] = useState("");
     const [linkSertifikat, setLinkSertifikat] = useState("");
     const [status, setStatus] = useState("Aktif");
+    const [eselon1, setEselon1] = useState("")
+    const [eselon2, setEselon2] = useState("")
     const [pendidikanTerakhir, setPendidikanTerakhir] = useState("");
 
     const [loading, setLoading] = useState(false);
@@ -65,6 +69,8 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
         setTrainingOfficerCourse("");
         setLinkSertifikat("");
         setStatus("Aktif");
+        setEselon1("")
+        setEselon2("")
         setPendidikanTerakhir("");
     };
 
@@ -84,6 +90,8 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
             training_officer_course: trainingOfficerCourse,
             link_data_dukung_sertifikat: linkSertifikat,
             status,
+            eselon1,
+            eselon2,
             pendidikkan_terakhir: pendidikanTerakhir,
         };
 
@@ -317,6 +325,52 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
                             </SelectContent>
                         </Select>
                     </div>
+
+                    <div className="flex flex-col w-full gap-2">
+                        <div className="w-full">
+                            <label className="text-sm font-medium text-gray-700">Eselon I</label>
+                            <Select
+                                value={eselon1}
+                                onValueChange={(v) => setEselon1(v)}
+                            >
+                                <SelectTrigger >
+                                    <SelectValue placeholder="Pilih Eselon I" className="truncate" />
+                                </SelectTrigger>
+                                <SelectContent position="popper" className="z-[9999999] truncate">
+                                    {
+                                        UK_ESELON_1.map((eselon1, index) => (
+                                            <SelectItem className='truncate' value={eselon1.name} key={eselon1.id}>{eselon1.name}</SelectItem>
+                                        ))
+                                    }
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {
+                            eselon1 != '' && <div className="w-full">
+                                <label className="text-sm font-medium text-gray-700">Eselon II</label>
+                                <Select
+                                    value={eselon2}
+                                    onValueChange={(v) => setEselon2(v)}
+                                >
+                                    <SelectTrigger >
+                                        <SelectValue placeholder="Pilih Eselon II" className="truncate" />
+                                    </SelectTrigger>
+                                    <SelectContent position="popper" className="z-[9999999] truncate">
+                                        {UK_ESELON_2[eselon1 as keyof typeof UK_ESELON_2]?.map(
+                                            (eselon2: string, index: number) => (
+                                                <SelectItem className="truncate" value={eselon2} key={index}>
+                                                    {eselon2}
+                                                </SelectItem>
+                                            )
+                                        )}
+
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        }
+                    </div>
+
                 </div>
 
                 <AlertDialogFooter>

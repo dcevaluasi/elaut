@@ -126,72 +126,107 @@ function InstrukturTable({ data, fetchData }: Props) {
                 </div>
             </div>
 
-            {/* Table */}
             <div className="overflow-x-auto border border-gray-200 rounded-xl shadow-sm">
-                <table className="min-w-full table-fixed text-sm">
+                <table className="min-w-full table-fixed text-sm border-collapse">
                     <thead className="bg-gray-100 text-gray-700 text-xs uppercase">
                         <tr>
-                            <th className="w-12 px-3 py-3 text-center">No</th>
-                            <th className="w-12 px-3 py-3 text-center">Action</th>
-                            <th className="w-40 px-3 py-3 text-center">Nama</th>
-                            <th className="w-28 px-3 py-3 text-center">No. Telp</th>
-                            <th className="w-40 px-3 py-3 text-center">Email</th>
-                            <th className="w-36 px-3 py-3 text-center">NIP</th>
-                            <th className="w-32 px-3 py-3 text-center">Jenjang Jabatan</th>
-                            <th className="w-32 px-3 py-3 text-center">Pangkat/Golongan</th>
-                            <th className="w-32 px-3 py-3 text-center">Bidang Keahlian</th>
-                            <th className="w-40 px-3 py-3 text-center">Management of Training</th>
-                            <th className="w-40 px-3 py-3 text-center">Trainer of Training</th>
-                            <th className="w-28 px-3 py-3 text-center">Sertifikat</th>
-                            <th className="w-24 px-3 py-3 text-center">Status</th>
-                            <th className="w-28 px-3 py-3 text-center">Pendidikan Terakhir</th>
-                            <th className="w-40 px-3 py-3 text-center">Eselon I</th>
-                            <th className="w-40 px-3 py-3 text-center">Eselon II</th>
+                            <th className="sticky top-0 left-0 z-30 bg-gray-100 w-12 px-3 py-3 text-center border">
+                                No
+                            </th>
+                            <th className="sticky top-0 left-12 z-30 bg-gray-100 w-12 px-3 py-3 text-center border">
+                                Action
+                            </th>
+                            <th className="sticky top-0 left-64 z-30 bg-gray-100 w-40 px-3 py-3 text-center border">
+                                Nama
+                            </th>
+                            <th className="sticky top-0 z-20 bg-gray-100 w-28 px-3 py-3 text-center border">
+                                No. Telp
+                            </th>
+                            <th className="sticky top-0 z-20 bg-gray-100 w-40 px-3 py-3 text-center border">
+                                Email
+                            </th>
+                            <th className="sticky top-0 z-20 bg-gray-100 w-36 px-3 py-3 text-center border">
+                                NIP
+                            </th>
+                            <th className="sticky top-0 z-20 bg-gray-100 w-32 px-3 py-3 text-center border">
+                                Jenjang Jabatan
+                            </th>
+                            <th className="sticky top-0 z-20 bg-gray-100 w-32 px-3 py-3 text-center border">
+                                Pangkat/Golongan
+                            </th>
+                            <th className="sticky top-0 z-20 bg-gray-100 w-32 px-3 py-3 text-center border">
+                                Bidang Keahlian
+                            </th>
+                            <th className="sticky top-0 z-20 bg-gray-100 w-40 px-3 py-3 text-center border">
+                                Management of Training
+                            </th>
+                            <th className="sticky top-0 z-20 bg-gray-100 w-40 px-3 py-3 text-center border">
+                                Trainer of Training
+                            </th>
+                            <th className="sticky top-0 z-20 bg-gray-100 w-28 px-3 py-3 text-center border">
+                                Sertifikat
+                            </th>
+                            <th className="sticky top-0 z-20 bg-gray-100 w-24 px-3 py-3 text-center border">
+                                Status
+                            </th>
+                            <th className="sticky top-0 z-20 bg-gray-100 w-28 px-3 py-3 text-center border">
+                                Pendidikan Terakhir
+                            </th>
+                            <th className="sticky top-0 z-20 bg-gray-100 w-40 px-3 py-3 text-center border">
+                                Eselon I
+                            </th>
+                            <th className="sticky top-0 z-20 bg-gray-100 w-40 px-3 py-3 text-center border">
+                                Eselon II
+                            </th>
                         </tr>
                     </thead>
+
                     <tbody className="divide-y divide-gray-100">
                         {paginatedData.map((row, index) => (
                             <tr
                                 key={row.IdInstruktur}
                                 className="hover:bg-gray-50 transition-colors duration-150"
                             >
-                                <td className="px-3 py-2 border text-center text-gray-500">
+                                {/* Sticky Columns */}
+                                <td className="sticky left-0 z-20 bg-white px-3 py-2 border text-center text-gray-500">
                                     {(currentPage - 1) * itemsPerPage + index + 1}
                                 </td>
-                                <td className="px-3 py-4 border">
+                                <td className="sticky left-12 z-20 bg-white px-3 py-4 border">
                                     <div className="flex flex-row gap-2 h-full px-3 py-2">
                                         <UpdateInstrukturAction onSuccess={fetchData} instruktur={row} />
                                         <DeleteInstrukturAction onSuccess={fetchData} instruktur={row} />
                                     </div>
-
                                 </td>
                                 <td
-                                    className="px-3 py-2 border max-w-full"
+                                    className="sticky left-64 z-20 bg-white px-3 py-2 border max-w-full"
                                     title={row.nama}
                                 >
                                     {row.nama}
                                 </td>
+
+                                {/* Normal Columns */}
                                 <td className="px-3 py-2 border">{row.no_telpon}</td>
-                                <td
-                                    className="px-3 py-2 border max-w-full"
-                                    title={row.email}
-                                >
+                                <td className="px-3 py-2 border" title={row.email}>
                                     {row.email}
                                 </td>
-                                <td
-                                    className="px-3 py-2 border max-w-[200px]"
-                                    title={row.nip}
-                                >
+                                <td className="px-3 py-2 border" title={row.nip}>
                                     {row.nip}
                                 </td>
                                 <td className="px-3 py-2 border text-center">{row.jenjang_jabatan}</td>
                                 <td className="px-3 py-2 border text-center">{row.pelatihan_pelatih}</td>
                                 <td className="px-3 py-2 border text-center">{row.bidang_keahlian}</td>
                                 <td
-                                    className="px-3 py-2 border max-w-[200px] truncate"
+                                    className="px-3 py-2 border max-w-[200px] text-blue-600 underline truncate"
                                     title={row.management_of_training}
                                 >
-                                    {row.management_of_training}
+                                    <a
+                                        href={row.management_of_training}
+                                        target="_blank"
+                                        rel="noopener noreferrer "
+                                        className="truncate"
+                                    >
+                                        {row.management_of_training}
+                                    </a>
                                 </td>
                                 <td
                                     className="px-3 py-2 border max-w-[200px] text-blue-600 underline truncate"
@@ -205,7 +240,6 @@ function InstrukturTable({ data, fetchData }: Props) {
                                     >
                                         {row.training_officer_course}
                                     </a>
-
                                 </td>
                                 <td className="px-3 py-2 border text-blue-600 underline text-center truncate">
                                     <a
@@ -214,39 +248,30 @@ function InstrukturTable({ data, fetchData }: Props) {
                                         rel="noopener noreferrer"
                                         className="truncate"
                                     >
-                                        {truncateText(row.link_data_dukung_sertifikat, 20, '...')}
+                                        {truncateText(row.link_data_dukung_sertifikat, 20, "...")}
                                     </a>
                                 </td>
                                 <td className="px-3 py-2 border text-center">{row.status}</td>
                                 <td className="px-3 py-2 border text-center">{row.pendidikkan_terakhir}</td>
-                                <td
-                                    className="px-3 py-2 border max-w-[200px] truncate"
-                                    title={row.eselon_1}
-                                >
+                                <td className="px-3 py-2 border max-w-[200px] truncate" title={row.eselon_1}>
                                     {row.eselon_1}
                                 </td>
-                                <td
-                                    className="px-3 py-2 border max-w-[200px] truncate"
-                                    title={row.eselon_2}
-                                >
+                                <td className="px-3 py-2 border max-w-[200px] truncate" title={row.eselon_2}>
                                     {row.eselon_2}
                                 </td>
                             </tr>
                         ))}
                         {paginatedData.length === 0 && (
                             <tr>
-                                <td
-                                    colSpan={18}
-                                    className="text-center py-6 text-gray-500 italic"
-                                >
+                                <td colSpan={18} className="text-center py-6 text-gray-500 italic">
                                     Tidak ada data ditemukan
                                 </td>
                             </tr>
                         )}
                     </tbody>
                 </table>
-
             </div>
+
             <div className="flex justify-between items-center mt-4">
                 <p className="text-sm text-neutral-600">
                     Halaman {currentPage} dari {totalPages}
