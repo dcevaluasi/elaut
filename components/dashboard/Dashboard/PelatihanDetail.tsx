@@ -382,6 +382,42 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
 
                 {
                     parseInt(data?.StatusPenerbitan) < 5 &&
+                    <AccordionSection title="📑 Modul dan Perangkat Pelatihan">
+                        <div className="flex flex-col w-full gap-4">
+                            <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
+                                <p className="font-medium text-gray-600">
+                                    Action :
+                                </p>
+                                <ChooseModulAction
+                                    idPelatihan={data.IdPelatihan.toString()}
+                                    currentData={data}
+                                    onSuccess={fetchData} />
+                            </div>
+
+                            <div className="w-full ">
+                                <p className="font-medium text-gray-600 mb-2">
+                                    Detail  :
+                                </p>
+                                <div className="flex flex-col gap-2 w-full">
+                                    {
+                                        data.ModuleMateri == "" ?
+                                            <div className="py-10 w-full max-w-3xl mx-auto h-full flex items-center flex-col justify-center gap-1">
+                                                <MdLock className='w-14 h-14 text-gray-600' />
+                                                <p className="text-gray-500 font-normal text-center">
+                                                    Harap memilih modul pelatihan terlebih dahulu, lalu upload bahan ajar/tayang yang diperlukan, apabila tidak tersedia modul yang sesuai, maka pergi ke menu master modul pelatihan dan buat modulmu sendiri lalu upload bahan ajar/tayang mu
+                                                </p>
+                                            </div> :
+                                            <>ADA NIH MAU APA LU?!</>
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                    </AccordionSection>
+                }
+
+                {
+                    parseInt(data?.StatusPenerbitan) < 5 &&
                     <AccordionSection title="👥 Peserta Pelatihan">
                         <div className="flex flex-col w-full gap-4">
                             <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
@@ -426,41 +462,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                     </AccordionSection>
                 }
 
-                {
-                    parseInt(data?.StatusPenerbitan) < 5 &&
-                    <AccordionSection title="📑 Modul dan Perangkat Pelatihan">
-                        <div className="flex flex-col w-full gap-4">
-                            <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
-                                <p className="font-medium text-gray-600">
-                                    Action :
-                                </p>
-                                <ChooseModulAction
-                                    idPelatihan={data.IdPelatihan.toString()}
-                                    currentData={data}
-                                    onSuccess={fetchData} />
-                            </div>
 
-                            <div className="w-full ">
-                                <p className="font-medium text-gray-600 mb-2">
-                                    Detail  :
-                                </p>
-                                <div className="flex flex-col gap-2 w-full">
-                                    {
-                                        data.ModuleMateri == "" ?
-                                            <div className="py-10 w-full max-w-3xl mx-auto h-full flex items-center flex-col justify-center gap-1">
-                                                <MdLock className='w-14 h-14 text-gray-600' />
-                                                <p className="text-gray-500 font-normal text-center">
-                                                    Harap memilih modul pelatihan terlebih dahulu, lalu upload bahan ajar/tayang yang diperlukan, apabila tidak tersedia modul yang sesuai, maka pergi ke menu master modul pelatihan dan buat modulmu sendiri lalu upload bahan ajar/tayang mu
-                                                </p>
-                                            </div> :
-                                            <>ADA NIH MAU APA LU?!</>
-                                    }
-
-                                </div>
-                            </div>
-                        </div>
-                    </AccordionSection>
-                }
             </Accordion>
         </div >
     );

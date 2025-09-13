@@ -134,7 +134,7 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
                             className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
                         >
                         <TbBook className="h-5 w-5" />
-                        <span>Pilih Modul Pelatihan</span>
+                        <span>{currentData?.ModuleMateri != "" ? "Update" : "Pilih"} Modul Pelatihan</span>
                     </Button>
                 }
             </AlertDialogTrigger>
