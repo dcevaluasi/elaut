@@ -157,7 +157,7 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
                         />
                         {selectedModulPelatihan != null && <Button
                             variant="outline"
-                            onClick={() => setSelectedModulPelatihan(null)}
+                            onClick={() => { setSelectedModulPelatihan(null); setIdModulPelatihan("") }}
                             className="flex items-center gap-2 w-fit rounded-lg px-3 shadow-md transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 mt-2 text-xs"
                         >
                             <span>Kembali</span>
@@ -201,7 +201,7 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
                                                         onClick={() => { setSelectedModulPelatihan(item); setIdModulPelatihan(item.IdMateriPelatihan.toString()) }}
                                                         className="flex items-center gap-2 w-fit rounded-lg px-3 shadow-md transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 mt-2 text-xs"
                                                     >
-                                                        <span>Lihat Modul</span>
+                                                        <span>Pilih Modul</span>
                                                         <TbArrowRight className="h-2 w-2" />
                                                     </Button>
 
@@ -328,10 +328,10 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
                     <AlertDialogCancel disabled={loading}>Batal</AlertDialogCancel>
                     <AlertDialogAction
                         onClick={handleSubmit}
-                        className="bg-yellow-600 hover:bg-yellow-700 text-white"
-                        disabled={loading}
+                        className="bg-blue-500 hover:bg-blue-600 text-white"
+                        disabled={loading || idModulPelatihan == ""}
                     >
-                        {loading ? "Menyimpan..." : "Simpan Perubahan"}
+                        {loading ? "Menyimpan..." : "Pilih Modul"}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

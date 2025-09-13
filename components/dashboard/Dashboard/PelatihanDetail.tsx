@@ -25,7 +25,7 @@ import Link from "next/link";
 import UploadSuratButton from "./Actions/UploadSuratButton";
 import { urlFileSuratPemberitahuan } from "@/constants/urls";
 import SendNoteAction from "./Actions/Lemdiklat/SendNoteAction";
-import { TbClock, TbPencilCheck, TbPencilCog, TbPencilX, TbSend } from "react-icons/tb";
+import { TbChevronDown, TbChevronUp, TbClock, TbPencilCheck, TbPencilCog, TbPencilX, TbSend } from "react-icons/tb";
 import { isMoreThanToday } from "@/utils/time";
 import HistoryButton from "./Actions/HistoryButton";
 import { LuSignature } from "react-icons/lu";
@@ -33,8 +33,10 @@ import { ValidateParticipantAction } from "./Actions/Lemdiklat/ValidateParticipa
 import { countValidKeterangan } from "@/utils/counter";
 import { useFetchDataPusatById } from "@/hooks/elaut/pusat/useFetchDataPusatById";
 import { useFetchDataInstruktur } from "@/hooks/elaut/instruktur/useFetchDataInstruktur";
-import { useFetchDataMateriPelatihanMasyarakat } from "@/hooks/elaut/modul/useFetchDataMateriPelatihanMasyarakat";
+import { useFetchDataMateriPelatihanMasyarakat, useFetchDataMateriPelatihanMasyarakatById } from "@/hooks/elaut/modul/useFetchDataMateriPelatihanMasyarakat";
 import ChooseModulAction from "./Actions/Modul/ChooseModulAction";
+import { Badge } from "@/components/ui/badge";
+import { ModulPelatihan } from "@/types/module";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -49,10 +51,14 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
     /**
      * Modul Pelatihan 
      */
-    const { data: modulPelatihan, loading: loadingModulPelatihan, error: errorModulPelatihan, fetchModulPelatihan, stats: statsModulPelatihan } = useFetchDataMateriPelatihanMasyarakat();
+    const { data: modulPelatihans, loading: loadingModulPelatihan, error: errorModulPelatihan, fetchModulPelatihan, stats: statsModulPelatihan } = useFetchDataMateriPelatihanMasyarakat();
+    const { data: modulPelatihan, loading: loadingModulPelatihans, error: errorModulPelatihans, refetch: fetchModulPelatihans } = useFetchDataMateriPelatihanMasyarakatById(data?.ModuleMateri)
+    const [expanded, setExpanded] = React.useState<number | null>(null)
 
+    const toggleExpand = (id: number) => {
+        setExpanded(expanded === id ? null : id)
+    }
 
-    console.log({ data })
 
     React.useEffect(() => {
         fetchInstrukturData()
@@ -407,13 +413,131 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                     Harap memilih modul pelatihan terlebih dahulu, lalu upload bahan ajar/tayang yang diperlukan, apabila tidak tersedia modul yang sesuai, maka pergi ke menu master modul pelatihan dan buat modulmu sendiri lalu upload bahan ajar/tayang mu
                                                 </p>
                                             </div> :
-                                            <>ADA NIH MAU APA LU?!</>
+                                            <div className="space-y-4">
+                                                <div className="border rounded-xl p-4 bg-gray-50">
+                                                    <p className="text-sm font-semibold text-gray-700 mb-2">
+                                                        {modulPelatihan?.NamaMateriPelatihan}
+                                                    </p>
+                                                    <div className="flex flex-wrap gap-2 text-xs text-gray-600">
+                                                        <Badge className="bg-blue-500">{modulPelatihan?.BidangMateriPelatihan}</Badge>
+                                                        <div>
+                                                            <p className="text-xs text-gray-600 line-clamp-2">
+                                                                Tahun :  {modulPelatihan?.NamaPenderitaMateriPelatihan}
+                                                            </p>
+                                                            <p className="text-xs text-gray-600 line-clamp-2">
+                                                                Produsen :  {modulPelatihan?.DeskripsiMateriPelatihan}
+                                                            </p>
+                                                            <p className="text-xs text-gray-600 line-clamp-2">
+                                                                Jumlah Materi :  {modulPelatihan?.ModulPelatihan.length} Materi
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Daftar Modul */}
+                                                <div>
+                                                    <h4 className="font-medium text-sm mb-2 text-gray-700">
+                                                        Materi Pelatihan
+                                                    </h4>
+                                                    <div className="space-y-2">
+                                                        {modulPelatihan?.ModulPelatihan?.length || [].length > 0 ? (
+                                                            modulPelatihan?.ModulPelatihan.map((modul: ModulPelatihan) => (
+                                                                <div
+                                                                    key={modul.IdModulPelatihan}
+                                                                    onClick={() => toggleExpand(modul.IdModulPelatihan)}
+                                                                    className="border rounded-lg p-3 bg-white shadow-sm hover:bg-gray-50 transition cursor-pointer"
+                                                                >
+                                                                    {/* Header */}
+                                                                    <div className="flex justify-between items-center">
+                                                                        <div className="flex gap-0 flex-col leading-none">
+                                                                            <p className="text-sm font-medium text-gray-800">
+                                                                                {modul.NamaModulPelatihan}
+                                                                            </p>
+
+                                                                            <div className="flex flex-col gap-1 mt-2">
+                                                                                <div className="flex gap-1 items-center">
+                                                                                    <span className="text-gray-600 text-[0.75rem]">File : </span>
+                                                                                    <a
+                                                                                        href={`${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${modul.FileModule}`}
+                                                                                        target="_blank"
+                                                                                        rel="noopener noreferrer"
+                                                                                        className="text-[0.75rem]  text-blue-500 underline truncate"
+                                                                                    >
+                                                                                        {`${truncateText(process.env.NEXT_PUBLIC_MODULE_FILE_URL + '/' + modul.FileModule, 80, '...')}`}
+                                                                                    </a>
+                                                                                </div>
+                                                                            </div>
+
+                                                                        </div>
+
+                                                                        {expanded === modul.IdModulPelatihan ? (
+                                                                            <TbChevronUp className="w-4 h-4 text-gray-500" />
+                                                                        ) : (
+                                                                            <TbChevronDown className="w-4 h-4 text-gray-500" />
+                                                                        )}
+                                                                    </div>
+
+                                                                    {/* Expanded Content */}
+                                                                    {expanded === modul.IdModulPelatihan && (
+                                                                        <div className="mt-2 text-xs text-gray-600 space-y-1 animate-in fade-in-50 slide-in-from-top-1">
+                                                                            <p className="text-xs font-medium text-gray-600">
+                                                                                Bahan Tayang/Bahan Ajar
+                                                                            </p>
+                                                                            {
+                                                                                modul.BahanTayang.length == 0 ? <tr>
+                                                                                    <td colSpan={18} className="text-center py-6 text-gray-500 italic">
+                                                                                        Belum ada bahan tayang/bahan ajar tersedia
+                                                                                    </td>
+                                                                                </tr> : <>
+                                                                                    <table className="w-full text-xs text-left border">
+                                                                                        <thead className="bg-gray-100 text-gray-700 uppercase">
+                                                                                            <tr className="text-xs text-center">
+                                                                                                <th className="px-3 py-2 border text-xs">No</th>
+                                                                                                <th className="px-3 py-2 border text-xs">Action</th>
+                                                                                                <th className="px-3 py-2 border text-xs">Nama</th>
+                                                                                                <th className="px-3 py-2 border text-xs">File</th>
+                                                                                                <th className="px-3 py-2 border text-xs">Produsen</th>
+                                                                                                <th className="px-3 py-2 border text-xs">Tanggal Upload</th>
+                                                                                            </tr>
+                                                                                        </thead>
+                                                                                        <tbody>
+                                                                                            {modul.BahanTayang.map((row_bt, index) => (
+                                                                                                <tr key={row_bt.IdBahanTayang}>
+                                                                                                    <td className="px-3 py-2 border">{index + 1}</td>
+                                                                                                    <td className="px-3 py-2 border"></td>
+                                                                                                    <td className="px-3 py-2 border">{row_bt.NamaBahanTayang}</td>
+                                                                                                    <td className="px-3 py-2 border"> <a
+                                                                                                        href={`${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${row_bt.BahanTayang}`}
+                                                                                                        target="_blank"
+                                                                                                        rel="noopener noreferrer"
+                                                                                                        className="  text-blue-500  underline "
+                                                                                                    >
+                                                                                                        {truncateText(row_bt.BahanTayang, 50, '...')}
+                                                                                                    </a></td>
+                                                                                                    <td className="px-3 py-2 border">{row_bt.Creator || "-"}</td>
+                                                                                                    <td className="px-3 py-2 border">{row_bt.CreateAt}</td>
+                                                                                                </tr>))}
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </>
+
+                                                                            }
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            ))
+                                                        ) : (
+                                                            <p className="text-xs text-gray-500 italic">Belum ada modul.</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
                                     }
 
                                 </div>
-                            </div>
-                        </div>
-                    </AccordionSection>
+                            </div >
+                        </div >
+                    </AccordionSection >
                 }
 
                 {
@@ -463,7 +587,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                 }
 
 
-            </Accordion>
+            </Accordion >
         </div >
     );
 };

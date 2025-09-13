@@ -54,8 +54,10 @@ export const useFetchDataMateriPelatihanMasyarakat = () => {
   return { data, loading, error, fetchModulPelatihan, stats }
 }
 
-export const useFetchDataMateriPelatihanMasyarakatById = (id: number) => {
-  const [data, setData] = useState<MateriPelatihan[] | null>(null)
+export const useFetchDataMateriPelatihanMasyarakatById = (
+  id: number | string,
+) => {
+  const [data, setData] = useState<MateriPelatihan | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -64,10 +66,11 @@ export const useFetchDataMateriPelatihanMasyarakatById = (id: number) => {
     setLoading(true)
     setError(null)
     try {
-      const res = await axios.get<MateriPelatihan[]>(
+      const res = await axios.get(
         `${moduleBaseUrl}/materi-pelatihan/getMateriPelatihan?id=${id}`,
       )
-      setData(res.data)
+      console.log({ res })
+      setData(res.data[0])
     } catch (err) {
       setError('Failed to fetch data')
     } finally {

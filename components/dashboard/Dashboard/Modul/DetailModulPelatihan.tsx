@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { fileModuleBaseUrl, moduleBaseUrl } from "@/constants/urls"
 import { FiEdit, FiEdit2, FiFolder, FiTrash2 } from "react-icons/fi"
-import { ModulPelatihan } from "@/types/module"
+import { BahanTayang, MateriPelatihan, ModulPelatihan } from "@/types/module"
 import { FaRegFileLines, FaRegFolderOpen } from "react-icons/fa6"
 import JSZip from "jszip"
 import { saveAs } from 'file-saver'
@@ -46,7 +46,7 @@ export default function DetailModulPelatihan() {
 
     const [downloading, setDownloading] = useState(false);
 
-    const materi = data?.[0];
+    const materi = data;
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 15;
     const totalPages = materi
@@ -206,7 +206,7 @@ export default function DetailModulPelatihan() {
         return <div className="text-center text-red-500 py-10 font-medium">{error}</div>
     }
 
-    if (!data || data.length === 0) {
+    if (!data) {
         return <div className="text-center text-gray-500 py-10 font-medium">Materi tidak ditemukan.</div>
     }
 
@@ -492,12 +492,12 @@ export default function DetailModulPelatihan() {
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         {materi?.ModulPelatihan?.slice()
-                            .sort((a, b) => {
+                            .sort((a: ModulPelatihan, b: ModulPelatihan) => {
                                 const numA = parseInt(a.NamaModulPelatihan.split(".")[0], 10) || 0;
                                 const numB = parseInt(b.NamaModulPelatihan.split(".")[0], 10) || 0;
                                 return numA - numB;
                             })
-                            .map((row, index) => (
+                            .map((row: ModulPelatihan, index: number) => (
                                 <React.Fragment key={row.IdModulPelatihan}>
                                     <tr className="hover:bg-gray-50 transition-colors duration-150">
                                         <td className="px-3 py-2 border text-center text-gray-500">
@@ -706,7 +706,7 @@ export default function DetailModulPelatihan() {
                                                                     Tidak ada data ditemukan
                                                                 </td>
                                                             </tr> : <>
-                                                                {row.BahanTayang.map((row_bt, index) => (
+                                                                {row.BahanTayang.map((row_bt: BahanTayang, index: number) => (
                                                                     <tr key={row_bt.IdBahanTayang}>
                                                                         <td className="px-3 py-2 border">{index + 1}</td>
                                                                         <td className="px-3 py-2 border"> <button
