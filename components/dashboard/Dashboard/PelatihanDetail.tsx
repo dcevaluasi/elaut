@@ -437,7 +437,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 {/* Daftar Modul */}
                                                 <div>
                                                     <h4 className="font-medium text-sm mb-2 text-gray-700">
-                                                        Materi Pelatihan
+                                                        Materi Modul
                                                     </h4>
                                                     <div className="space-y-2">
                                                         {modulPelatihan?.ModulPelatihan?.length || [].length > 0 ? (
