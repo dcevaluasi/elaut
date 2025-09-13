@@ -33,6 +33,8 @@ import { ValidateParticipantAction } from "./Actions/Lemdiklat/ValidateParticipa
 import { countValidKeterangan } from "@/utils/counter";
 import { useFetchDataPusatById } from "@/hooks/elaut/pusat/useFetchDataPusatById";
 import { useFetchDataInstruktur } from "@/hooks/elaut/instruktur/useFetchDataInstruktur";
+import { useFetchDataMateriPelatihanMasyarakat } from "@/hooks/elaut/modul/useFetchDataMateriPelatihanMasyarakat";
+import ChooseModulAction from "./Actions/Modul/ChooseModulAction";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -43,6 +45,14 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
     const { label, color, icon } = getStatusInfo(data.StatusPenerbitan)
     const { adminPusatData, loading, error, fetchAdminPusatData } = useFetchDataPusatById(data?.VerifikatorPelatihan)
     const { instrukturs, loading: loadingInstruktur, error: errorInstruktur, fetchInstrukturData, stats } = useFetchDataInstruktur()
+
+    /**
+     * Modul Pelatihan 
+     */
+    const { data: modulPelatihan, loading: loadingModulPelatihan, error: errorModulPelatihan, fetchModulPelatihan, stats: statsModulPelatihan } = useFetchDataMateriPelatihanMasyarakat();
+
+
+    console.log({ data })
 
     React.useEffect(() => {
         fetchInstrukturData()
@@ -247,6 +257,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                             </p>
                             <EditPelatihanAction
                                 idPelatihan={data.IdPelatihan.toString()}
+                                currentData={data}
                                 onSuccess={fetchData} />
 
                             <DeletePelatihanAction
@@ -290,95 +301,6 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                         </div>
                     </div>
                 </AccordionSection>
-
-                {/* <AccordionSection title="📑 Modul dan Perangkat Pelatihan">
-                    <div className="flex flex-col w-full gap-4">
-                        <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
-                            <p className="font-medium text-gray-600">
-                                Action :
-                            </p>
-                            {
-                                (data?.StatusPenerbitan == "0" && data?.UserPelatihan?.length == 0) &&
-                                <ImportPesertaAction
-                                    idPelatihan={data?.IdPelatihan.toString()}
-                                    statusApproval={data?.StatusApproval}
-                                    onSuccess={fetchData}
-                                    onAddHistory={(msg) =>
-                                        handleAddHistoryTrainingInExisting(
-                                            data!,
-                                            msg,
-                                            Cookies.get("Role"),
-                                            `${Cookies.get("Nama")} - ${Cookies.get("Satker")}`
-                                        )
-                                    }
-                                />
-                            }
-
-                            {
-                                (data?.UserPelatihan.length != 0 && countValidKeterangan(data?.UserPelatihan) < data?.UserPelatihan.length) && <ValidateParticipantAction data={data?.UserPelatihan} onSuccess={fetchData} />
-                            }
-                        </div>
-
-                        <div className="w-full ">
-                            <p className="font-medium text-gray-600 mb-2">
-                                Detail  :
-                            </p>
-                            <div className="flex flex-col gap-2 w-full">
-
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                    <InfoItem label="Modul Pelatihan" value={data.KoutaPelatihan} />
-                                    <InfoItem label="Jumlah Peserta" value={data.UserPelatihan.length.toString()} />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </AccordionSection> */}
-
-                {
-                    parseInt(data?.StatusPenerbitan) < 5 &&
-                    <AccordionSection title="👥 Peserta Pelatihan">
-                        <div className="flex flex-col w-full gap-4">
-                            <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
-                                <p className="font-medium text-gray-600">
-                                    Action :
-                                </p>
-                                {
-                                    (data?.StatusPenerbitan == "0" && data?.UserPelatihan?.length == 0) &&
-                                    <ImportPesertaAction
-                                        idPelatihan={data?.IdPelatihan.toString()}
-                                        statusApproval={data?.StatusApproval}
-                                        onSuccess={fetchData}
-                                        onAddHistory={(msg) =>
-                                            handleAddHistoryTrainingInExisting(
-                                                data!,
-                                                msg,
-                                                Cookies.get("Role"),
-                                                `${Cookies.get("Nama")} - ${Cookies.get("Satker")}`
-                                            )
-                                        }
-                                    />
-                                }
-
-                                {
-                                    (data?.UserPelatihan.length != 0 && countValidKeterangan(data?.UserPelatihan) < data?.UserPelatihan.length) && <ValidateParticipantAction data={data?.UserPelatihan} onSuccess={fetchData} />
-                                }
-                            </div>
-
-                            <div className="w-full ">
-                                <p className="font-medium text-gray-600 mb-2">
-                                    Detail  :
-                                </p>
-                                <div className="flex flex-col gap-2 w-full">
-                                    <div className="grid grid-cols-2 gap-4 text-sm">
-                                        <InfoItem label="Kuota Peserta" value={data.KoutaPelatihan} />
-                                        <InfoItem label="Jumlah Peserta" value={data.UserPelatihan.length.toString()} />
-                                    </div>
-                                    <UserPelatihanTable pelatihan={data} data={data.UserPelatihan} onSuccess={fetchData} />
-                                </div>
-                            </div>
-                        </div>
-                    </AccordionSection>
-                }
 
                 {
                     Cookies.get('Access')?.includes('createPelatihan') && <AccordionSection title="🌐 Publish Informasi dan Promosi">
@@ -453,6 +375,88 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             </p>
                                         </div>
                                 }
+                            </div>
+                        </div>
+                    </AccordionSection>
+                }
+
+                {
+                    parseInt(data?.StatusPenerbitan) < 5 &&
+                    <AccordionSection title="👥 Peserta Pelatihan">
+                        <div className="flex flex-col w-full gap-4">
+                            <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
+                                <p className="font-medium text-gray-600">
+                                    Action :
+                                </p>
+                                {
+                                    (data?.StatusPenerbitan == "0" && data?.UserPelatihan?.length == 0) &&
+                                    <ImportPesertaAction
+                                        idPelatihan={data?.IdPelatihan.toString()}
+                                        statusApproval={data?.StatusApproval}
+                                        onSuccess={fetchData}
+                                        onAddHistory={(msg) =>
+                                            handleAddHistoryTrainingInExisting(
+                                                data!,
+                                                msg,
+                                                Cookies.get("Role"),
+                                                `${Cookies.get("Nama")} - ${Cookies.get("Satker")}`
+                                            )
+                                        }
+                                    />
+                                }
+
+                                {
+                                    (data?.UserPelatihan.length != 0 && countValidKeterangan(data?.UserPelatihan) < data?.UserPelatihan.length) && <ValidateParticipantAction data={data?.UserPelatihan} onSuccess={fetchData} />
+                                }
+                            </div>
+
+                            <div className="w-full ">
+                                <p className="font-medium text-gray-600 mb-2">
+                                    Detail  :
+                                </p>
+                                <div className="flex flex-col gap-2 w-full">
+                                    <div className="grid grid-cols-2 gap-4 text-sm">
+                                        <InfoItem label="Kuota Peserta" value={data.KoutaPelatihan} />
+                                        <InfoItem label="Jumlah Peserta" value={data.UserPelatihan.length.toString()} />
+                                    </div>
+                                    <UserPelatihanTable pelatihan={data} data={data.UserPelatihan} onSuccess={fetchData} />
+                                </div>
+                            </div>
+                        </div>
+                    </AccordionSection>
+                }
+
+                {
+                    parseInt(data?.StatusPenerbitan) < 5 &&
+                    <AccordionSection title="📑 Modul dan Perangkat Pelatihan">
+                        <div className="flex flex-col w-full gap-4">
+                            <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
+                                <p className="font-medium text-gray-600">
+                                    Action :
+                                </p>
+                                <ChooseModulAction
+                                    idPelatihan={data.IdPelatihan.toString()}
+                                    currentData={data}
+                                    onSuccess={fetchData} />
+                            </div>
+
+                            <div className="w-full ">
+                                <p className="font-medium text-gray-600 mb-2">
+                                    Detail  :
+                                </p>
+                                <div className="flex flex-col gap-2 w-full">
+                                    {
+                                        data.ModuleMateri == "" ?
+                                            <div className="py-10 w-full max-w-3xl mx-auto h-full flex items-center flex-col justify-center gap-1">
+                                                <MdLock className='w-14 h-14 text-gray-600' />
+                                                <p className="text-gray-500 font-normal text-center">
+                                                    Harap memilih modul pelatihan terlebih dahulu, lalu upload bahan ajar/tayang yang diperlukan, apabila tidak tersedia modul yang sesuai, maka pergi ke menu master modul pelatihan dan buat modulmu sendiri lalu upload bahan ajar/tayang mu
+                                                </p>
+                                            </div> :
+                                            <>ADA NIH MAU APA LU?!</>
+                                    }
+
+                                </div>
                             </div>
                         </div>
                     </AccordionSection>
