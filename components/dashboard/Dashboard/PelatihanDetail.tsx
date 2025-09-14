@@ -315,6 +315,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                             </AccordionSection>
                         </div>
                     </div>
+                    {/* Pubish dan Promosi Kelas Pelatihan */}
                     {
                         Cookies.get('Access')?.includes('createPelatihan') &&
                         <div data-value=":r15:" className="group flex gap-x-6">
@@ -323,7 +324,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                             </div>
                             <div className="-translate-y-1.5 pb-8 text-slate-600">
                                 <p className=" text-base font-bold text-slate-800 antialiased dark:text-white mt-2">🌐 Publish dan Promosi Kelas Pelatihan</p>
-                                <small className="my-2 pb-4 text-sm text-slate-600 antialiased">Dalam proses ini kamu dapat mempublish informasi kelas pelatihan ke website utama E-LAUT agara masyarakat dapat mendaftar secara mandiri kelas pelatihan yang dibuka. Dalam memenuhi proses ini, diharapkan dapat menguplaod <b>flyer, deskripsi, serta tanggal pendaftaran</b>. Apablila akan dipublish maka hanya tinggal mengklik tombol <b>Publish</b> dan dapat ditarik kembali informasi dengan mengklik tombol <b>Take Down</b>.</small>
+                                <small className="my-2 pb-4 text-sm text-slate-600 antialiased">Dalam proses ini kamu dapat mempublish informasi kelas pelatihan ke website utama E-LAUT agar masyarakat/publik dapat mendaftar secara mandiri kelas pelatihan yang dibuka. Dalam memenuhi proses ini, diharapkan dapat menguplaod <b>flyer, deskripsi, serta tanggal pendaftaran</b>. Apablila akan dipublish maka hanya tinggal mengklik tombol <b>Publish</b> dan dapat ditarik kembali informasi dengan mengklik tombol <b>Take Down</b>.</small>
 
                                 <AccordionSection title="Publish Informasi dan Promosi">
                                     <div className="flex flex-col w-full gap-4">
@@ -403,11 +404,12 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                             </div>
                         </div>
                     }
+                    {/* Modul dan Perangkat Pelatihan */}
                     <div data-value=":r16:" className="group flex gap-x-6">
                         <div className="relative"> <div className="absolute left-1/2 top-0 h-full w-0.5 -translate-x-1/2 bg-slate-200"></div><span className="relative z-10 grid h-10 w-10 place-items-center rounded-full bg-slate-200 text-slate-800"><svg width="1.5em" height="1.5em" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor" className="h-5 w-5"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15 8.5C14.315 7.81501 13.1087 7.33855 12 7.30872M9 15C9.64448 15.8593 10.8428 16.3494 12 16.391M12 7.30872C10.6809 7.27322 9.5 7.86998 9.5 9.50001C9.5 12.5 15 11 15 14C15 15.711 13.5362 16.4462 12 16.391M12 7.30872V5.5M12 16.391V18.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></div>
                         <div className="-translate-y-1.5 pb-8 text-slate-600">
                             <p className=" text-base font-bold text-slate-800 antialiased dark:text-white mt-2">📑 Modul dan Perangkat Pelatihan</p>
-                            <small className="my-2 pb-4 text-sm text-slate-600 antialiased">Dalam proses ini kamu dapat melihat informasi pelatihan yang akan diselenggarakan, pastikan data yang tertera sudah sesuai apabila terdapat penyesuaian, dapat mengklik tombol <b>Edit Informasi Pelatihan</b> untuk mengedit data. Dalam proses ini kamu juga dapat menghapus kelas pelatihan dengan mengklik tombol <b>Hapus Pelatihan</b> dengan kondisi kelas sedang tidak dipublish atau telah dikirimkan ke SPV.</small>
+                            <small className="my-2 pb-4 text-sm text-slate-600 antialiased">Dalam proses ini  <b>diwajibkan</b> untuk memilih modul sebagai perangkat dalam pelaksanaan pelatihan dengan mengklik tombol <b>Pilih Modul Pelatihan</b>. Pastikan modul yang dipilih sesuai, apabila tidak terdapat modul yang tersedia dapat melakukan pengelolaan data modul terlebih dahulu di menu modul serta pastikan mengupload bahan tayang/ajar jika diperlukan. Modul serta perangkat lainnya yang dipilih akan muncul di perangkat pengguna e-laut.</small>
                             <AccordionSection title="Modul dan Perangkat Pelatihan">
                                 <div className="flex flex-col w-full gap-4">
                                     <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
@@ -562,11 +564,12 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                             </AccordionSection >
                         </div>
                     </div>
+                    {/* Instruktur/Pelatih */}
                     <div data-value=":r17:" className="group flex gap-x-6">
                         <div className="relative"> <div className="absolute left-1/2 top-0 h-full w-0.5 -translate-x-1/2 bg-slate-200"></div><span className="relative z-10 grid h-10 w-10 place-items-center rounded-full bg-slate-200 text-slate-800"><svg width="1.5em" height="1.5em" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor" className="h-5 w-5"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15 8.5C14.315 7.81501 13.1087 7.33855 12 7.30872M9 15C9.64448 15.8593 10.8428 16.3494 12 16.391M12 7.30872C10.6809 7.27322 9.5 7.86998 9.5 9.50001C9.5 12.5 15 11 15 14C15 15.711 13.5362 16.4462 12 16.391M12 7.30872V5.5M12 16.391V18.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></div>
                         <div className="-translate-y-1.5 pb-8 text-slate-600">
                             <p className=" text-base font-bold text-slate-800 antialiased dark:text-white mt-2">🧩 Instruktur/Pelatih</p>
-                            <small className="my-2 pb-4 text-sm text-slate-600 antialiased">Dalam proses ini kamu dapat melihat informasi pelatihan yang akan diselenggarakan, pastikan data yang tertera sudah sesuai apabila terdapat penyesuaian, dapat mengklik tombol <b>Edit Informasi Pelatihan</b> untuk mengedit data. Dalam proses ini kamu juga dapat menghapus kelas pelatihan dengan mengklik tombol <b>Hapus Pelatihan</b> dengan kondisi kelas sedang tidak dipublish atau telah dikirimkan ke SPV.</small>
+                            <small className="my-2 pb-4 text-sm text-slate-600 antialiased">Dalam proses ini <b>diwajibkan</b> memilih instruktur/pelatih yang akan mengajar dalam pelaksanaan pelatihan, apabila data instruktur yang dimaksud tidak tertera maka dapat diabaikan untuk pengisian data instruktur/pelatih. Namun, dalam hal penyelenggarakan pelatihan akan ditandatangani oleh Kepala Pusat Pelatihan KP atau Ka BPPSDM KP maka penunjukkan instruktur akan dilakukan oleh tim verifikator pusat.</small>
 
                             <AccordionSection title="Instruktur/Pelatih">
                                 <div className="flex flex-col w-full gap-4 overflow-x-scroll">
@@ -636,12 +639,13 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
 
                         </div>
                     </div>
+                    {/* Peserta Pelatihan */}
                     {
                         parseInt(data?.StatusPenerbitan) < 5 && <div data-value=":r17:" className="group flex gap-x-6">
                             <div className="relative"> <div className="absolute left-1/2 top-0 h-full w-0.5 -translate-x-1/2 bg-slate-200"></div><span className="relative z-10 grid h-10 w-10 place-items-center rounded-full bg-slate-200 text-slate-800"><svg width="1.5em" height="1.5em" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor" className="h-5 w-5"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15 8.5C14.315 7.81501 13.1087 7.33855 12 7.30872M9 15C9.64448 15.8593 10.8428 16.3494 12 16.391M12 7.30872C10.6809 7.27322 9.5 7.86998 9.5 9.50001C9.5 12.5 15 11 15 14C15 15.711 13.5362 16.4462 12 16.391M12 7.30872V5.5M12 16.391V18.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></div>
                             <div className="-translate-y-1.5 pb-8 text-slate-600">
                                 <p className=" text-base font-bold text-slate-800 antialiased dark:text-white mt-2">👥 Peserta Pelatihan</p>
-                                <small className="my-2 pb-4 text-sm text-slate-600 antialiased">Dalam proses ini kamu dapat melihat informasi pelatihan yang akan diselenggarakan, pastikan data yang tertera sudah sesuai apabila terdapat penyesuaian, dapat mengklik tombol <b>Edit Informasi Pelatihan</b> untuk mengedit data. Dalam proses ini kamu juga dapat menghapus kelas pelatihan dengan mengklik tombol <b>Hapus Pelatihan</b> dengan kondisi kelas sedang tidak dipublish atau telah dikirimkan ke SPV.</small>
+                                <small className="my-2 pb-4 text-sm text-slate-600 antialiased">Dalam proses ini, data peserta pelatihan dapat dihasilkan dari dua jalur yakni pendaftaran mandiri peserta (dengan catatan informasi pelatihan telah dipublish di wesite e-laut) dan melalui import file yang berisikan data peserta dengan mengklik tombol <b>Import Data Peserta</b>, dalam hal import hanya dapat dilakukan sekali!</small>
 
                                 <AccordionSection title="Peserta Pelatihan">
                                     <div className="flex flex-col w-full gap-4">

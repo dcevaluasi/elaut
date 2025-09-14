@@ -85,6 +85,9 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
 
     const handleSubmit = async () => {
         setIsSubmitting(true)
+        setLoading(true);
+        setIsOpen(true)
+        setLoading(true)
         const formData = new FormData();
         formData.append("StatusPenerbitan", status);
         formData.append("VerifikatorPelatihan", verifikatorPelaksanaan);
@@ -94,9 +97,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
         if (status == "4") formData.append("PemberitahuanDiterima", "Active")
 
         try {
-            setLoading(true);
-            setIsOpen(true)
-            setLoading(true)
+
             const response = await axios.put(
                 `${elautBaseUrl}/lemdik/updatePelatihan?id=${idPelatihan}`,
                 formData,
