@@ -3,9 +3,6 @@
 import React from "react";
 import {
     Accordion,
-    AccordionItem,
-    AccordionTrigger,
-    AccordionContent,
 } from "@/components/ui/accordion";
 import { PelatihanMasyarakat } from "@/types/product";
 import { generateTanggalPelatihan, getStatusInfo } from "@/utils/text";
@@ -41,7 +38,6 @@ import ChooseInstrukturAction from "./Actions/Instruktur/ChooseInstrukturAction"
 import { stringToArray } from "@/utils/input";
 import AccordionSection from "@/components/reusables/AccordionSection";
 import InfoItem from "@/components/reusables/InfoItem";
-import InstrukturTable from "@/components/reusables/InstrukturTable";
 
 interface Props {
     data: PelatihanMasyarakat;

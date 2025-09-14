@@ -17,7 +17,7 @@ const AccordionSection = ({
 }) => (
     <AccordionItem
         value={title}
-        className="border border-gray-200 overflow-x-scroll rounded-xl mt-5 overflow-hidden shadow-sm bg-white"
+        className="border border-gray-200  rounded-xl mt-5 overflow-hidden shadow-sm bg-white"
     >
         <AccordionTrigger className="px-4 py-3 font-semibold text-gray-800 hover:bg-gray-50 transition">
             {title}
