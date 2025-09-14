@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
     AlertDialog,
     AlertDialogTrigger,
@@ -17,7 +17,7 @@ import { TbArrowLeft, TbArrowRight, TbBook, TbChevronDown, TbChevronUp } from "r
 import axios from "axios";
 import Cookies from "js-cookie";
 import Toast from "@/components/toast";
-import { elautBaseUrl, moduleBaseUrl } from "@/constants/urls";
+import { elautBaseUrl } from "@/constants/urls";
 import {
     Select,
     SelectTrigger,
@@ -34,22 +34,28 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { MateriPelatihan, ModulPelatihan } from "@/types/module";
 import { truncateText } from "@/utils";
+import { useFetchDataInstruktur } from "@/hooks/elaut/instruktur/useFetchDataInstruktur";
 
-interface ChooseModulActionProps {
+interface ChooseInstrukturActionProps {
     idPelatihan: string;
     currentData?: PelatihanMasyarakat;
     onSuccess?: () => void;
 }
 
-const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
+const ChooseInstrukturAction: React.FC<ChooseInstrukturActionProps> = ({
     idPelatihan,
     currentData,
     onSuccess,
 }) => {
     /**
-        * Modul Pelatihan 
+        * Instruktur Pelatihan 
         */
     const { data: modulPelatihan, loading: loadingModulPelatihan, error: errorModulPelatihan, fetchModulPelatihan, stats: statsModulPelatihan } = useFetchDataMateriPelatihanMasyarakat();
+    const { instrukturs, loading: loadingInstruktur, error: errorInstruktur, fetchInstrukturData, stats } = useFetchDataInstruktur()
+    console.log({ instrukturs })
+    useEffect(() => {
+        fetchInstrukturData()
+    }, [fetchInstrukturData])
 
     const [search, setSearch] = useState("")
 
@@ -69,6 +75,8 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
         setExpanded(expanded === id ? null : id)
     }
 
+
+    console.log({ modulPelatihan })
     const [isOpen, setIsOpen] = useState(false);
 
     const [idModulPelatihan, setIdModulPelatihan] = useState(currentData?.ModuleMateri || "")
@@ -105,7 +113,9 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
             setIdModulPelatihan("")
             setSelectedModulPelatihan(null)
             if (onSuccess) onSuccess();
+            console.log("UPDATE PELATIHAN: ", response);
         } catch (error) {
+            console.error("ERROR UPDATE PELATIHAN: ", error);
             setLoading(false);
             Toast.fire({
                 icon: "error",
@@ -335,4 +345,4 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
     );
 };
 
-export default ChooseModulAction;
+export default ChooseInstrukturAction;
