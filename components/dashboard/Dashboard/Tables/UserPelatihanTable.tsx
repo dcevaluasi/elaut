@@ -29,16 +29,6 @@ import {
     AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-
 import { ArrowUpDown, Check, LucideInfo } from "lucide-react";
 import { PelatihanMasyarakat, UserPelatihan } from "@/types/product";
 import { AiOutlineFieldNumber } from "react-icons/ai";
@@ -59,7 +49,6 @@ import EditPesertaAction from "../Actions/EditPesertaAction";
 import { countUserWithNoSertifikat } from "@/utils/counter";
 import { IoCalendarClear, IoReload } from "react-icons/io5";
 import { getDateInIndonesianFormat } from "@/utils/time";
-import DialogSertifikatPelatihan from "@/components/sertifikat/dialogSertifikatPelatihan";
 
 interface UserPelatihanTableProps {
     pelatihan: PelatihanMasyarakat
@@ -852,16 +841,6 @@ const DetailPesertaDialog = ({ pesertaId, userPelatihanId }: { pesertaId: number
             ) : (
                 <p>Loading...</p>
             )}
-
-            {/* {peserta != null && (
-                <div className={`w-full flex items-center justify-center gap-1`}>
-                    <VerifikasiPesertaAction
-                        idUser={userPelatihanId.toString()}
-                        peserta={pesertaPelatihan!}
-                        handleFetchingData={handleFetchDetailPeserta}
-                    />
-                </div>
-            )} */}
 
             <AlertDialogFooter>
                 <AlertDialogCancel className="w-full">Tutup</AlertDialogCancel>

@@ -67,6 +67,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
             setBeritaAcaraFile(e.target.files[0]);
         }
     };
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const oldFileLapwasUrl = pelatihan!.MemoPusat
     const handleFileChangeLapwas = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,6 +84,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
     }, [fetchAdminPusatData])
 
     const handleSubmit = async () => {
+        setIsSubmitting(true)
         const formData = new FormData();
         formData.append("StatusPenerbitan", status);
         formData.append("VerifikatorPelatihan", verifikatorPelaksanaan);
@@ -93,6 +95,8 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
 
         try {
             setLoading(true);
+            setIsOpen(true)
+            setLoading(true)
             const response = await axios.put(
                 `${elautBaseUrl}/lemdik/updatePelatihan?id=${idPelatihan}`,
                 formData,
@@ -121,17 +125,19 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
             setVerifikatorPelaksanaan("");
 
             setBeritaAcaraFile(null);
-            setLoading(false);
+
             onSuccess();
-            setIsOpen(false);
         } catch (error) {
-            setLoading(false);
             setMessage("");
             Toast.fire({
                 icon: "error",
                 title: "Gagal!",
                 text: "Terjadi kesalahan saat memproses tindakan.",
             });
+
+        } finally {
+            setLoading(false);
+            setIsSubmitting(false)
             setIsOpen(false);
         }
     };

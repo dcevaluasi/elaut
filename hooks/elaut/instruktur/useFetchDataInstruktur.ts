@@ -89,3 +89,45 @@ export function useFetchDataInstruktur() {
 
   return { instrukturs, loading, error, fetchInstrukturData, stats }
 }
+
+export function useFetchDataInstrukturSelected(ids: number[]) {
+  const [instrukturs, setInstrukturs] = useState<Instruktur[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<unknown>(null)
+
+  const token = Cookies.get('XSRF091')
+  const cookieIdUnitKerja = Cookies.get('IDUnitKerja')
+
+  const fetchInstrukturData = useCallback(async () => {
+    if (!token) {
+      setError('Token is missing')
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await axios.get<Instruktur[]>(
+        `${elautBaseUrl}/getInstrukturs`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      )
+      const filtered = (response.data || []).filter((row) => {
+        const matchInstruktur =
+          !ids || ids.length === 0 ? true : ids.includes(row.IdInstruktur)
+
+        return matchInstruktur
+      })
+
+      setInstrukturs(filtered)
+    } catch (err) {
+      setError(err)
+    } finally {
+      setLoading(false)
+    }
+  }, [token])
+
+  return { instrukturs, loading, error, fetchInstrukturData }
+}

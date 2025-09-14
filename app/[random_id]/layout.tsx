@@ -57,7 +57,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -68,7 +67,7 @@ export default function RootLayout({
     <UnitKerjaProvider>
       <html lang="en">
         <body
-          // suppressHydrationWarning={true}
+          suppressHydrationWarning={true}
           className={`${inter.className} ${myFont.variable} ${bosNormal.variable} ${plusSansJakarta.variable} ${bos.variable} ${bosBold.variable} ${bosItalic.variable}  ${delius.variable} `}
         >
 

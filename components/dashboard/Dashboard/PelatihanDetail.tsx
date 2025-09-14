@@ -32,12 +32,16 @@ import { LuSignature } from "react-icons/lu";
 import { ValidateParticipantAction } from "./Actions/Lemdiklat/ValidateParticipantAction";
 import { countValidKeterangan } from "@/utils/counter";
 import { useFetchDataPusatById } from "@/hooks/elaut/pusat/useFetchDataPusatById";
-import { useFetchDataInstruktur } from "@/hooks/elaut/instruktur/useFetchDataInstruktur";
-import { useFetchDataMateriPelatihanMasyarakat, useFetchDataMateriPelatihanMasyarakatById } from "@/hooks/elaut/modul/useFetchDataMateriPelatihanMasyarakat";
+import { useFetchDataInstrukturSelected } from "@/hooks/elaut/instruktur/useFetchDataInstruktur";
+import { useFetchDataMateriPelatihanMasyarakatById } from "@/hooks/elaut/modul/useFetchDataMateriPelatihanMasyarakat";
 import ChooseModulAction from "./Actions/Modul/ChooseModulAction";
 import { Badge } from "@/components/ui/badge";
 import { ModulPelatihan } from "@/types/module";
 import ChooseInstrukturAction from "./Actions/Instruktur/ChooseInstrukturAction";
+import { stringToArray } from "@/utils/input";
+import AccordionSection from "@/components/reusables/AccordionSection";
+import InfoItem from "@/components/reusables/InfoItem";
+import InstrukturTable from "@/components/reusables/InstrukturTable";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -47,12 +51,11 @@ interface Props {
 const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
     const { label, color, icon } = getStatusInfo(data.StatusPenerbitan)
     const { adminPusatData, loading, error, fetchAdminPusatData } = useFetchDataPusatById(data?.VerifikatorPelatihan)
-    const { instrukturs, loading: loadingInstruktur, error: errorInstruktur, fetchInstrukturData, stats } = useFetchDataInstruktur()
+    const { instrukturs, loading: loadingInstruktur, error: errorInstruktur, fetchInstrukturData } = useFetchDataInstrukturSelected(stringToArray(data?.Instruktur))
 
     /**
      * Modul Pelatihan 
      */
-    const { data: modulPelatihans, loading: loadingModulPelatihan, error: errorModulPelatihan, fetchModulPelatihan, stats: statsModulPelatihan } = useFetchDataMateriPelatihanMasyarakat();
     const { data: modulPelatihan, loading: loadingModulPelatihans, error: errorModulPelatihans, refetch: fetchModulPelatihans } = useFetchDataMateriPelatihanMasyarakatById(data?.ModuleMateri)
     const [expanded, setExpanded] = React.useState<number | null>(null)
 
@@ -60,18 +63,16 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
         setExpanded(expanded === id ? null : id)
     }
 
-
     React.useEffect(() => {
         fetchInstrukturData()
     }, [fetchInstrukturData])
 
     return (
         <div className="w-full space-y-6 py-5">
-
             <Accordion
                 type="multiple"
                 className="w-full space-y-3"
-                defaultValue={["Informasi Umum Pelatihan", "Publish Informasi dan Promosi", "Peserta Pelatihan", "Modul dan Perangkat Pelatihan"]}
+                defaultValue={["Informasi Umum Pelatihan", "Publish Informasi dan Promosi", "Peserta Pelatihan", "Modul dan Perangkat Pelatihan", "Instruktur/Pelatih"]}
             >
                 {(parseInt(data?.StatusPenerbitan) < 5) &&
                     <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm bg-white">
@@ -285,7 +286,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         <p className="font-medium text-gray-600 mb-2">
                                             Detail  :
                                         </p>
-                                        <SectionGrid>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                             <InfoItem label="Kode Pelatihan" value={data.KodePelatihan} />
                                             <InfoItem label="Bidang" value={data.JenisProgram} />
                                             <InfoItem label="Program" value={data.Program} />
@@ -298,7 +299,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             <InfoItem label="Harga" value={`Rp ${data.HargaPelatihan.toLocaleString()}`} />
                                             <InfoItem label="Pelaksanaan" value={data.PelaksanaanPelatihan} />
                                             <InfoItem label="Penandatangan Sertifikat" value={data.TtdSertifikat} />
-                                        </SectionGrid>
+                                        </div>
 
                                         {parseInt(data?.StatusPenerbitan) >= 5 && <>
                                             <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border mt-4 border-gray-100">
@@ -568,11 +569,11 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                     <div data-value=":r17:" className="group flex gap-x-6">
                         <div className="relative"> <div className="absolute left-1/2 top-0 h-full w-0.5 -translate-x-1/2 bg-slate-200"></div><span className="relative z-10 grid h-10 w-10 place-items-center rounded-full bg-slate-200 text-slate-800"><svg width="1.5em" height="1.5em" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="currentColor" className="h-5 w-5"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15 8.5C14.315 7.81501 13.1087 7.33855 12 7.30872M9 15C9.64448 15.8593 10.8428 16.3494 12 16.391M12 7.30872C10.6809 7.27322 9.5 7.86998 9.5 9.50001C9.5 12.5 15 11 15 14C15 15.711 13.5362 16.4462 12 16.391M12 7.30872V5.5M12 16.391V18.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></div>
                         <div className="-translate-y-1.5 pb-8 text-slate-600">
-                            <p className=" text-base font-bold text-slate-800 antialiased dark:text-white mt-2">🧩 Instruktur/Pelatih Pelatihan</p>
+                            <p className=" text-base font-bold text-slate-800 antialiased dark:text-white mt-2">🧩 Instruktur/Pelatih</p>
                             <small className="my-2 pb-4 text-sm text-slate-600 antialiased">Dalam proses ini kamu dapat melihat informasi pelatihan yang akan diselenggarakan, pastikan data yang tertera sudah sesuai apabila terdapat penyesuaian, dapat mengklik tombol <b>Edit Informasi Pelatihan</b> untuk mengedit data. Dalam proses ini kamu juga dapat menghapus kelas pelatihan dengan mengklik tombol <b>Hapus Pelatihan</b> dengan kondisi kelas sedang tidak dipublish atau telah dikirimkan ke SPV.</small>
 
-                            <AccordionSection title="Peserta Pelatihan">
-                                <div className="flex flex-col w-full gap-4">
+                            <AccordionSection title="Instruktur/Pelatih">
+                                <div className="flex flex-col w-full gap-4 overflow-x-scroll">
                                     <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
                                         <p className="font-medium text-gray-600">
                                             Action :
@@ -595,12 +596,42 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             <p className="text-gray-500 font-normal text-center">
                                                 {data?.TtdSertifikat?.includes('Kepala Balai') ? 'Instruktur/Pelatih belum ditentukan, pemilihan Instruktur ada pada Lembaga Diklat, harap segera menentukan dan mengisi data instruktur' : 'Instruktur/Pelatih belum ditentukan, pemilihan Instruktur ada pada Tim Verifikator Pusat, harap segera menentukan dan mengisi data instruktur'}
                                             </p>
-                                        </div> : <div className="flex flex-col gap-2 w-full">
-                                            <div className="grid grid-cols-2 gap-4 text-sm">
-                                                <InfoItem label="Kuota Peserta" value={data.KoutaPelatihan} />
-                                                <InfoItem label="Jumlah Peserta" value={data.UserPelatihan.length.toString()} />
-                                            </div>
-                                            <UserPelatihanTable pelatihan={data} data={data.UserPelatihan} onSuccess={fetchData} />
+                                        </div> : <div className="flex flex-col gap-2 w-full ">
+                                            {instrukturs.map((item) => <div
+                                                key={item.IdInstruktur}
+                                                className="border rounded-xl p-3 shadow-sm hover:shadow transition bg-white"
+                                            >
+                                                <div className="flex justify-between items-center mb-1">
+                                                    <h3 className="font-medium text-sm text-gray-800 truncate">
+                                                        {item.nama}
+                                                    </h3>
+                                                    <Badge variant="outline" className="text-xs">
+                                                        {item.bidang_keahlian}
+                                                    </Badge>
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs text-gray-600 line-clamp-2">
+                                                        NIP :  {item.nip}
+                                                    </p>
+                                                    <p className="text-xs text-gray-600 line-clamp-2">
+                                                        Email :  {item.email}
+                                                    </p>
+                                                    <p className="text-xs text-gray-600 line-clamp-2">
+                                                        No Telpon :  {item.no_telpon}
+                                                    </p>
+                                                    <p className="text-xs text-gray-600 line-clamp-2">
+                                                        Jabatan dan Pangkat/Golongan :  {item.jenjang_jabatan} - {item.pelatihan_pelatih}
+                                                    </p>
+                                                    <p className="text-xs text-gray-600 line-clamp-2">
+                                                        Eselon I :  {item.eselon_1}
+                                                    </p>
+                                                    <p className="text-xs text-gray-600 line-clamp-2">
+                                                        Eselon II :  {item.eselon_2}
+                                                    </p>
+                                                </div>
+
+
+                                            </div>)}
                                         </div>}
 
                                     </div>
@@ -668,43 +699,5 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
         </div >
     );
 };
-
-const AccordionSection = ({
-    title,
-    children,
-}: {
-    title: string;
-    children: React.ReactNode;
-}) => (
-    <AccordionItem
-        value={title}
-        className="border border-gray-200 rounded-xl mt-5 overflow-hidden shadow-sm bg-white"
-    >
-        <AccordionTrigger className="px-4 py-3 font-semibold text-gray-800 hover:bg-gray-50 transition">
-            {title}
-        </AccordionTrigger>
-        <AccordionContent className="px-6 py-4 bg-gray-50">
-            {children}
-        </AccordionContent>
-    </AccordionItem>
-);
-
-const SectionGrid = ({ children }: { children: React.ReactNode }) => (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">{children}</div>
-);
-
-const InfoItem = ({ label, value }: { label: string; value?: string }) => (
-    <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
-        <span className="text-xs font-medium text-gray-500">{label}</span>
-        {
-            value?.includes('</p>') ?
-                <div className="prose  text-gray-800 text-sm leading-relaxed max-w-none">
-                    <div dangerouslySetInnerHTML={{ __html: value }} />
-                </div> : <span className="text-sm font-semibold text-gray-800 mt-1">
-                    {value || "-"}
-                </span>
-        }
-    </div>
-);
 
 export default PelatihanDetail;
