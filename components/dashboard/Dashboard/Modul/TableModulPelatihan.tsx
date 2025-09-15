@@ -25,7 +25,13 @@ import { findNameUnitKerjaById, findUnitKerjaById } from "@/utils/unitkerja";
 export default function TableModulPelatihan() {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const { data, loading, error, fetchModulPelatihan, stats } = useFetchDataMateriPelatihanMasyarakat();
-    console.log({ data })
+
+    const idUnitKerja = Cookies.get('IdUnitKerja')
+    const { unitKerjas, loading: loadingUnitKerja, error: errorUnitKerja, fetchUnitKerjaData } = useFetchDataUnitKerja()
+    console.log({ unitKerjas })
+    useEffect(() => {
+        fetchUnitKerjaData()
+    }, [fetchUnitKerjaData])
 
     const [filterBidang, setFilterBidang] = useState("")
     const [filterTahun, setFilterTahun] = useState("")
@@ -34,7 +40,7 @@ export default function TableModulPelatihan() {
 
     const bidangOptions = [...new Set(data.map(d => d.BidangMateriPelatihan).filter(Boolean))]
     const tahunOptions = [...new Set(data.map(d => d.Tahun).filter(Boolean))]
-    const produsenOptions = [...new Set(data.map(d => d.DeskripsiMateriPelatihan).filter(Boolean))]
+    const produsenOptions = unitKerjas
     const verifiedOptions = [...new Set(data.map(d => d.IsVerified).filter(Boolean))]
 
     const clearFilters = () => {
@@ -44,6 +50,8 @@ export default function TableModulPelatihan() {
         setFilterVerified("")
     }
 
+    console.log({ filterProdusen })
+
     const filteredData = useMemo(() => {
         return data.filter((row) => {
             const matchesSearch = !searchQuery || Object.values(row).some((val) =>
@@ -51,7 +59,7 @@ export default function TableModulPelatihan() {
             )
             const matchesBidang = !filterBidang || row.BidangMateriPelatihan === filterBidang
             const matchesTahun = !filterTahun || row.Tahun === filterTahun
-            const matchesProdusen = !filterProdusen || row.DeskripsiMateriPelatihan === filterProdusen
+            const matchesProdusen = !filterProdusen || row.DeskripsiMateriPelatihan === filterProdusen.toString()
             const matchesVerified = !filterVerified || row.IsVerified === filterVerified
 
             return matchesSearch && matchesBidang && matchesTahun && matchesProdusen && matchesVerified
@@ -71,12 +79,7 @@ export default function TableModulPelatihan() {
         currentPage * itemsPerPage
     )
 
-    const idUnitKerja = Cookies.get('IdUnitKerja')
-    const { unitKerjas, loading: loadingUnitKerja, error: errorUnitKerja, fetchUnitKerjaData } = useFetchDataUnitKerja()
-    console.log({ unitKerjas })
-    useEffect(() => {
-        fetchUnitKerjaData()
-    }, [fetchUnitKerjaData])
+
 
     // Metrics
     const totalModul = data.reduce((acc, m) => acc + m.ModulPelatihan.length, 0);
@@ -374,7 +377,7 @@ function FilterDropdown({
                 </div>
 
                 {/* Produsen */}
-                {/* <div className="space-y-1">
+                <div className="space-y-1">
                     <label className="text-xs font-medium text-gray-600">Produsen</label>
                     <Select value={filterProdusen} onValueChange={setFilterProdusen}>
                         <SelectTrigger className="w-full text-sm">
@@ -382,13 +385,13 @@ function FilterDropdown({
                         </SelectTrigger>
                         <SelectContent>
                             {produsenOptions.map((opt: any) => (
-                                <SelectItem key={opt} value={opt}>
-                                    {opt}
+                                <SelectItem key={opt} value={opt.id_unit_kerja}>
+                                    {opt.nama}
                                 </SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
-                </div> */}
+                </div>
 
                 {/* Status Pengesahan */}
                 <div className="space-y-1">
