@@ -41,6 +41,7 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
     const [tanggalAkhir, setTanggalAkhir] = useState(tanggalPendaftaran![1] || "");
     const [detailPelatihan, setDetailPelatihan] = useState(currentDetail || "");
     const [fotoPelatihan, setFotoPelatihan] = useState<File | null>(null);
+    const [kuotaPelatihan, setKuotaPelatihan] = useState("")
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async () => {
@@ -58,6 +59,7 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
         if (tanggalAkhir) formData.append("TanggalAkhirPendaftaran", tanggalAkhir);
         if (detailPelatihan) formData.append("DetailPelatihan", detailPelatihan);
         if (fotoPelatihan) formData.append("photo_pelatihan", fotoPelatihan);
+        formData.append("KoutaPelatihan", kuotaPelatihan)
 
         try {
             setLoading(true);
@@ -133,6 +135,20 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
                                 className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                                 value={tanggalAkhir}
                                 onChange={(e) => setTanggalAkhir(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex gap-2 w-full">
+                        <div className="space-y-2 w-full">
+                            <label className="text-sm font-medium text-gray-700">
+                                Informasi Kuota Pelatihan
+                            </label>
+                            <input
+                                type="date"
+                                className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                                value={kuotaPelatihan}
+                                onChange={(e) => setKuotaPelatihan(e.target.value)}
                             />
                         </div>
                     </div>
