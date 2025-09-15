@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Book, Calendar, CheckCircle, File, Layers, SlidersHorizontal, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +18,9 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import AddModulAction from "../Actions/Modul/AddModulAction";
-import { RiVerifiedBadgeLine } from "react-icons/ri";
+import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
+import Cookies from "js-cookie";
+import { findNameUnitKerjaById, findUnitKerjaById } from "@/utils/unitkerja";
 
 export default function TableModulPelatihan() {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -69,13 +71,20 @@ export default function TableModulPelatihan() {
         currentPage * itemsPerPage
     )
 
+    const idUnitKerja = Cookies.get('IdUnitKerja')
+    const { unitKerjas, loading: loadingUnitKerja, error: errorUnitKerja, fetchUnitKerjaData } = useFetchDataUnitKerja()
+    console.log({ unitKerjas })
+    useEffect(() => {
+        fetchUnitKerjaData()
+    }, [fetchUnitKerjaData])
+
     // Metrics
     const totalModul = data.reduce((acc, m) => acc + m.ModulPelatihan.length, 0);
     const totalMateri = data.length;
 
-    if (loading)
+    if (loading && loadingUnitKerja)
         return <p className="text-center py-10 text-gray-500">Loading...</p>;
-    if (error)
+    if (error && errorUnitKerja)
         return <p className="text-center text-red-500 py-10">{error}</p>;
 
     return (
@@ -136,7 +145,7 @@ export default function TableModulPelatihan() {
                     <CardHeader className="flex items-center">
                         <Layers className="h-5 w-5 text-blue-500" />
                         <CardTitle className="text-lg font-semibold text-gray-800">
-                            Bidang
+                            Rumpun Pelatihan
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -157,7 +166,7 @@ export default function TableModulPelatihan() {
 
 
             <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-800">Daftar Modul Pelatihan</h2>
+                <h2 className="text-lg font-semibold text-gray-800">Daftar Modul/Perangkat Pelatihan</h2>
                 <div className="flex flex-col md:flex-row items-center gap-2 w-full md:w-auto">
                     <Input
                         type="text"
@@ -201,8 +210,10 @@ export default function TableModulPelatihan() {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        {paginatedData.map((row, index) => (
-                            <tr
+                        {paginatedData.map((row, index) => {
+                            const { isMatch, name } = findUnitKerjaById(unitKerjas, idUnitKerja)
+                            const { name: nameUK } = findNameUnitKerjaById(unitKerjas, row.DeskripsiMateriPelatihan)
+                            return <tr
                                 key={row.IdMateriPelatihan}
                                 className="hover:bg-gray-50 transition-colors duration-150"
                             >
@@ -211,7 +222,10 @@ export default function TableModulPelatihan() {
                                 </td>
                                 <td className="px-3 py-4 border">
                                     <div className="flex flex-row gap-2 h-full items-center justify-center py-2">
-                                        <UpdateModulAction onSuccess={fetchModulPelatihan} materiPelatihan={row} />
+                                        {
+                                            isMatch && <UpdateModulAction onSuccess={fetchModulPelatihan} materiPelatihan={row} />
+                                        }
+
                                         <Button
                                             variant="outline"
                                             onClick={() =>
@@ -224,7 +238,6 @@ export default function TableModulPelatihan() {
                                         </Button>
                                         {/* <DeleteInstrukturAction onSuccess={fetchData} instruktur={row} /> */}
                                     </div>
-
                                 </td>
                                 <td
                                     className="px-3 py-4 border max-w-full"
@@ -235,20 +248,20 @@ export default function TableModulPelatihan() {
                                     </p>
                                     <div className="flex flex-col !font-normal">
 
-                                        <span className="text-sm text-gray-400 leading-tight">Bidang : {row.BidangMateriPelatihan}</span>
+                                        <span className="text-sm text-gray-400 leading-tight">Rumpun Pelatihan : {row.BidangMateriPelatihan}</span>
                                         <span className="text-sm text-gray-400 leading-tight">Tahun Penyusunan : {row?.Tahun}</span>
-                                        <span className="text-sm text-gray-400 leading-tight">Produsen : {row?.DeskripsiMateriPelatihan}</span>
+                                        <span className="text-sm text-gray-400 leading-tight">Produsen : {isMatch ? name : nameUK}</span>
                                     </div>
                                 </td>
                                 <td className="px-3 py-2 border text-center">
                                     {row.IsVerified === "Verified" ? (
-                                        <span className="inline-flex items-center px-2 py-2 text-xs font-medium rounded-full leading-none bg-green-100 text-green-600">
-                                            <CheckCircle className="w-5 h-5 ml-2" />
+                                        <span className="inline-flex items-center px-2 gap-2 py-2 text-sm font-medium rounded-md leading-none bg-green-100 text-green-600">
+                                            <CheckCircle className="w-5 h-5 " />
                                             Telah Disahkan
                                         </span>
                                     ) : (
-                                        <span className="inline-flex items-center px-2 py-2 text-xs font-medium rounded-full leading-none bg-rose-100 text-rose-500">
-                                            <XCircle className="w-5 h-5 ml-2" />
+                                        <span className="inline-flex items-center px-2 gap-2 py-2 text-sm font-medium rounded-md leading-none bg-rose-100 text-rose-500">
+                                            <XCircle className="w-5 h-5 " />
                                             Belum Disahkan
                                         </span>
                                     )}
@@ -256,7 +269,7 @@ export default function TableModulPelatihan() {
                                 <td className="px-3 py-2 border text-center">{row.ModulPelatihan.length}</td>
 
                             </tr>
-                        ))}
+                        })}
                         {paginatedData.length === 0 && (
                             <tr>
                                 <td
@@ -328,13 +341,12 @@ function FilterDropdown({
 
                 {/* Bidang */}
                 <div className="space-y-1">
-                    <label className="text-xs font-medium text-gray-600">Bidang</label>
+                    <label className="text-xs font-medium text-gray-600">Rumpun Pelatihan</label>
                     <Select value={filterBidang} onValueChange={setFilterBidang}>
                         <SelectTrigger className="w-full text-sm">
-                            <SelectValue placeholder="Pilih bidang" />
+                            <SelectValue placeholder="Pilih rumpun" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="-">Semua</SelectItem>
                             {bidangOptions.map((opt: any) => (
                                 <SelectItem key={opt} value={opt}>
                                     {opt}
@@ -349,10 +361,9 @@ function FilterDropdown({
                     <label className="text-xs font-medium text-gray-600">Tahun</label>
                     <Select value={filterTahun} onValueChange={setFilterTahun}>
                         <SelectTrigger className="w-full text-sm">
-                            <SelectValue placeholder="Pilih bidang" />
+                            <SelectValue placeholder="Pilih tahun" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="-">Semua</SelectItem>
                             {tahunOptions.map((opt: any) => (
                                 <SelectItem key={opt} value={opt}>
                                     {opt}
@@ -363,14 +374,13 @@ function FilterDropdown({
                 </div>
 
                 {/* Produsen */}
-                <div className="space-y-1">
+                {/* <div className="space-y-1">
                     <label className="text-xs font-medium text-gray-600">Produsen</label>
                     <Select value={filterProdusen} onValueChange={setFilterProdusen}>
                         <SelectTrigger className="w-full text-sm">
-                            <SelectValue placeholder="Pilih bidang" />
+                            <SelectValue placeholder="Pilih produsen" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="-">Semua</SelectItem>
                             {produsenOptions.map((opt: any) => (
                                 <SelectItem key={opt} value={opt}>
                                     {opt}
@@ -378,7 +388,7 @@ function FilterDropdown({
                             ))}
                         </SelectContent>
                     </Select>
-                </div>
+                </div> */}
 
                 {/* Status Pengesahan */}
                 <div className="space-y-1">
@@ -388,7 +398,6 @@ function FilterDropdown({
                             <SelectValue placeholder="Pilih status" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="-">Semua</SelectItem>
                             {verifiedOptions.map((opt: any) => (
                                 <SelectItem key={opt} value={opt}>
                                     {opt}

@@ -20,7 +20,7 @@ import Cookies from "js-cookie";
 import Toast from "@/components/toast";
 import { moduleBaseUrl } from "@/constants/urls";
 import { TbPlus } from "react-icons/tb";
-import { PROGRAM_AKP, PROGRAM_KELAUTAN, PROGRAM_PERIKANAN_ADMIN } from "@/constants/pelatihan";
+import { PROGRAM_AKP, PROGRAM_KELAUTAN, PROGRAM_PERIKANAN_ADMIN, RUMPUN_PELATIHAN } from "@/constants/pelatihan";
 
 const AddModulAction: React.FC<{ onSuccess?: () => void }> = ({
     onSuccess,
@@ -95,13 +95,13 @@ const AddModulAction: React.FC<{ onSuccess?: () => void }> = ({
                     className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
                 >
                     <TbPlus className="h-5 w-5" />
-                    <span>Tambah Modul</span>
+                    <span>Tambah Modul/Perangkat</span>
                 </Button>
             </AlertDialogTrigger>
 
             <AlertDialogContent className="max-w-3xl">
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Tambah Modul Baru</AlertDialogTitle>
+                    <AlertDialogTitle>Tambah Modul/Perangkat Baru</AlertDialogTitle>
                     <AlertDialogDescription>
                         Isi data berikut untuk menambahkan modul baru.
                     </AlertDialogDescription>
@@ -110,7 +110,7 @@ const AddModulAction: React.FC<{ onSuccess?: () => void }> = ({
                 <div className="py-2 max-h-[70vh] flex flex-col gap-1 overflow-y-auto pr-2">
                     {/* Nama */}
                     <div className="col-span-2 space-y-1">
-                        <label className="text-sm font-medium text-gray-700">Nama Materi/Modul Pelatihan</label>
+                        <label className="text-sm font-medium text-gray-700">Nama Materi Modul/Perangkat Pelatihan</label>
                         <input
                             type="text"
                             className="w-full rounded-md border border-gray-300 p-2 text-sm"
@@ -139,23 +139,11 @@ const AddModulAction: React.FC<{ onSuccess?: () => void }> = ({
                                 <SelectValue placeholder="Pilih bidang" />
                             </SelectTrigger>
                             <SelectContent position="popper" className="z-[9999999]">
-
-                                <SelectGroup>
-                                    <SelectLabel>Perikanan</SelectLabel>
-                                    {PROGRAM_PERIKANAN_ADMIN.map((item) => (
-                                        <SelectItem key={item} value={item}>
-                                            {item}
-                                        </SelectItem>
-                                    ))}
-                                </SelectGroup>
-                                <SelectGroup>
-                                    <SelectLabel>Kelautan</SelectLabel>
-                                    {PROGRAM_KELAUTAN.map((item) => (
-                                        <SelectItem key={item} value={item}>
-                                            {item}
-                                        </SelectItem>
-                                    ))}
-                                </SelectGroup>
+                                {RUMPUN_PELATIHAN.map((item) => (
+                                    <SelectItem key={item} value={item}>
+                                        {item}
+                                    </SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                     </div>

@@ -21,7 +21,7 @@ export default function Home() {
                                 <BookOpen className="text-3xl" />
                                 <div className="flex flex-col">
                                     <h1 id="page-caption" className="font-semibold text-lg">
-                                        Modul Pelatihan
+                                        Modul/Perangkat Pelatihan
                                     </h1>
                                     <p className="font-medium text-gray-400 text-base">
                                         Monitoring pengelolaan perangkat, modul, serta kurikulum pelatihan kelautan dan perikanan!
