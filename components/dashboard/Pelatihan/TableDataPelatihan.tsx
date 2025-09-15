@@ -6,7 +6,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 
-import FormPelatihan from "../admin/formPelatihan";
+import FormPelatihan from "../admin/FormPelatihan";
 
 import Image from "next/image";
 import Cookies from "js-cookie";

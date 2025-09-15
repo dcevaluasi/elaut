@@ -38,6 +38,7 @@ import ChooseInstrukturAction from "./Actions/Instruktur/ChooseInstrukturAction"
 import { stringToArray } from "@/utils/input";
 import AccordionSection from "@/components/reusables/AccordionSection";
 import InfoItem from "@/components/reusables/InfoItem";
+import { JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN } from "@/constants/pelatihan";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -283,16 +284,19 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             Detail  :
                                         </p>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                                            <InfoItem label="Kode Pelatihan" value={data.KodePelatihan} />
-                                            <InfoItem label="Bidang" value={data.JenisProgram} />
-                                            <InfoItem label="Program" value={data.Program} />
-                                            <InfoItem label="Jenis Pelatihan" value={data.JenisPelatihan} />
-                                            <InfoItem label="Dukungan Program Terobosan" value={data.DukunganProgramTerobosan} />
+                                            <InfoItem label="Kode Kelas Pelatihan" value={data.KodePelatihan} />
+                                            <InfoItem label="Sektor Pelatihan" value={data.JenisProgram} />
+                                            {data?.BidangPelatihan == "Sistem Jaminan Mutu" ?
+                                                <InfoItem label="Rumpun Pelatihan - Program SISJAMU" value={`${data?.BidangPelatihan} - ${data.Program}`} /> : <InfoItem label="Rumpun Pelatihan" value={data.Program} />}
+                                            <InfoItem label="Sumber Pembiayaan/Pemenuhan IKU" value={data.JenisPelatihan} />
                                             <InfoItem label="Penyelenggara" value={data.PenyelenggaraPelatihan} />
-                                            <InfoItem label="Mulai Pelatihan" value={generateTanggalPelatihan(data.TanggalMulaiPelatihan)} />
-                                            <InfoItem label="Selesai Pelatihan" value={generateTanggalPelatihan(data.TanggalBerakhirPelatihan)} />
-                                            <InfoItem label="Lokasi" value={data.LokasiPelatihan} />
-                                            <InfoItem label="Harga" value={`Rp ${data.HargaPelatihan.toLocaleString()}`} />
+                                            <InfoItem label="Dukungan Program Terobosan" value={data.DukunganProgramTerobosan} />
+                                            <InfoItem label="Tanggal Mulai Pelatihan" value={generateTanggalPelatihan(data.TanggalMulaiPelatihan)} />
+                                            <InfoItem label="Tanggal Selesai Pelatihan" value={generateTanggalPelatihan(data.TanggalBerakhirPelatihan)} />
+                                            <InfoItem label="Lokasi Pelaksanaan" value={data.LokasiPelatihan} />
+                                            {
+                                                data?.JenisPelatihan == JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN[1] && <InfoItem label="Biaya Pelatihan" value={`Rp ${data.HargaPelatihan.toLocaleString()}`} />
+                                            }
                                             <InfoItem label="Pelaksanaan" value={data.PelaksanaanPelatihan} />
                                             <InfoItem label="Penandatangan Sertifikat" value={data.TtdSertifikat} />
                                         </div>

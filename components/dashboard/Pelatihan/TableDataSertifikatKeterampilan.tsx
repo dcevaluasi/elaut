@@ -65,7 +65,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { usePathname, useRouter } from "next/navigation";
 import { MdOutlineSaveAlt } from "react-icons/md";
-import FormPelatihan from "../admin/formPelatihan";
+import FormPelatihan from "../admin/FormPelatihan";
 import Toast from "@/components/toast";
 import { PiMicrosoftExcelLogoFill, PiStampLight } from "react-icons/pi";
 import Image from "next/image";
@@ -289,8 +289,8 @@ const TableDataSertifikatKeterampilan: React.FC = () => {
           <Button
             variant="ghost"
             className={` ${pathPublic == "/akp"
-                ? "hidden"
-                : "flex items-center justify-start"
+              ? "hidden"
+              : "flex items-center justify-start"
               } p-0 !text-center max-w-full  text-gray-900 font-semibold`}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
@@ -443,8 +443,8 @@ const TableDataSertifikatKeterampilan: React.FC = () => {
           <Button
             variant="ghost"
             className={`${pathPublic == "/akp"
-                ? "hidden"
-                : "flex items-center justify-start"
+              ? "hidden"
+              : "flex items-center justify-start"
               } p-0 !text-center max-w-full  text-gray-900 font-semibold`}
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >

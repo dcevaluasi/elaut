@@ -473,7 +473,46 @@ export const ASAL_PESERTA_PELATIHAN = [
   "Peserta Didik Sekolah Usaha Perikanan Menengah (SUPM)/Sederajat",
   "Peserta Didik Politeknik Kelautan dan Perikanan (Politeknik)/Sederajat",
   "Karyawan/Pegawai/Mining Agent",
-  "ASN",
   "Kelompok Pengawas",
   "Kelompok Penyuluh Perikanan",
+]
+
+export const JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN = [
+  "Aspirasi - APBN",
+  "PNBP/BLU - Berbayar",
+  "Reguler - APBN",
+  "Kerja Sama",
+]
+
+export const DUKUNGAN_PROGRAM_TEROBOSAN = [
+  "Non Terobosan",
+  "Konservasi",
+  "Kampung Nelayan Maju (Kalaju)",
+  "Kampung Nelayan Modern (Kalamo)",
+  "Budidaya",
+  "Pengawasan Pesisir",
+  "Penangkapan Ikan Terukur (PIT)",
+  "Bulan Cinta Laut (BCL)"
+]
+
+export const JENIS_PENILAIAN_PELATIHAN = [
+  "Ujian Pre-Test dan Post-Test",
+  "Tidak Ada Penilaian Teknis"
+]
+
+export const PROGRAM_SISJAMU = [
+  "Cara Pembenihan Ikan yang Baik (CPIB)",
+  "Cara Budi Daya Ikan yang Baik (CBIB)",
+  "Cara Pembuatan Pakan Ikan yang Baik (CPPIB)",
+  "Hazard Analysis and Critical Control Points (HACCP)",
+  "Cara Pembuatan Obat Ikan yang Baik (CPOIB)",
+  "Cara Distribusi Obat Ikan yang Baik (CDOIB)",
+  "Manager Pengendali Mutu  Cara Pembenihan Ikan Yang Baik (MPM-CPIB)",
+  "Sertifikasi Pengolah Ikan (SPI)",
+  "Asisten Pengolah Ikan (API)",
+]
+
+export const PENANDATANGAN_SERTIFIKAT = [
+  "Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan",
+  "Kepala Pusat Pelatihan Kelautan dan Perikanan",
 ]

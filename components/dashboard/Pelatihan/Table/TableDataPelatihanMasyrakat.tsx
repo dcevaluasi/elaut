@@ -65,7 +65,8 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                     <BookOpen size={14} className="text-blue-500" /> Nama Pelatihan
                                 </div>
                             </th>
-                            <th className="px-4 py-5 text-center">Program</th>
+                            <th className="px-4 py-5 text-center">Sektor Pelatihan</th>
+                            <th className="px-4 py-5 text-center">Rumpun Pelatihan</th>
                             <th className="px-4 py-5 text-center">
                                 <div className="flex items-center justify-center gap-1">
                                     <Users size={14} className="text-emerald-500" /> Peserta
@@ -102,16 +103,27 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                         <div className="flex flex-col w-full h-full ">
                                             <p className="text-base font-semibold leading-tight">{pelatihan.NamaPelatihan}</p>
                                             <div className="flex flex-col !font-normal">
-                                                <span className="text-sm text-gray-400 leading-tight">Pendaftaran : {waktuPendaftaran}</span>
-                                                <span className="text-sm text-gray-400 leading-tight">Pelaksanaan : {waktuPelaksanaan}</span>
-                                                <span className="text-sm text-gray-400 leading-tight">Lokasi : {pelatihan?.LokasiPelatihan}</span>
+                                                {
+                                                    pelatihan.TanggalMulaiPendaftaran != "" && <span className="text-sm text-gray-400 leading-tight">Pendaftaran : {waktuPendaftaran}</span>
+                                                }
+                                                {
+                                                    pelatihan?.BidangPelatihan == "Sistem Jaminan Mutu" && <span className="text-sm text-gray-400 leading-tight">Program SISJAMU : {pelatihan?.Program}</span>
+                                                }
+
+                                                <span className="text-sm text-gray-400 leading-tight">Waktu Pelaksanaan : {waktuPelaksanaan}</span>
+                                                <span className="text-sm text-gray-400 leading-tight">Lokasi Pelaksanaan : {pelatihan?.LokasiPelatihan}</span>
                                                 <span className="text-sm text-gray-400 leading-tight">Penyelenggara : {pelatihan?.PenyelenggaraPelatihan}</span>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="px-4 py-3 border border-gray-200 text-center">
                                         <div className="flex items-center justify-center w-full h-full">
-                                            <p className="font-semibold">{pelatihan.Program}</p>
+                                            <p className="font-semibold">{pelatihan.JenisProgram}</p>
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-3 border border-gray-200 text-center">
+                                        <div className="flex items-center justify-center w-full h-full">
+                                            <p className="font-semibold">{pelatihan.BidangPelatihan}</p>
                                         </div>
                                     </td>
 
