@@ -28,7 +28,7 @@ const AddModulAction: React.FC<{ onSuccess?: () => void }> = ({
     const [isOpen, setIsOpen] = useState(false);
 
     const [nama, setNama] = useState("");
-    const [deskripsiMateriPelatihan, setDeskripsiMateriPelatihan] = useState("");
+    const idUnitKerja = Cookies.get('IDUnitKerja');
     const [berlakuSampai, setBerlakuSampai] = useState("");
     const [bidangMateriPelatihan, setBidangMateriPelatihan] = useState("");
     const [jamPelajaran, setJamPelajaran] = useState("");
@@ -38,7 +38,6 @@ const AddModulAction: React.FC<{ onSuccess?: () => void }> = ({
 
     const clearForm = () => {
         setNama("");
-        setDeskripsiMateriPelatihan("");
         setBerlakuSampai("");
         setBidangMateriPelatihan("");
         setJamPelajaran("");
@@ -48,10 +47,11 @@ const AddModulAction: React.FC<{ onSuccess?: () => void }> = ({
     const handleSubmit = async () => {
         const form = {
             nama_materi_pelatihan: nama,
-            deskripsi_materi_pelatihan: deskripsiMateriPelatihan,
+            deskripsi_materi_pelatihan: idUnitKerja,
             berlaku_sampai: berlakuSampai,
             bidang_materi_pelatihan: bidangMateriPelatihan,
             jam_pelajaran: jamPelajaran,
+            tahun: tahun
         };
 
         try {
@@ -59,11 +59,6 @@ const AddModulAction: React.FC<{ onSuccess?: () => void }> = ({
             const response = await axios.post(
                 `${moduleBaseUrl}/materi-pelatihan/createMateriPelatihan`,
                 form,
-                {
-                    headers: {
-                        Authorization: `Bearer ${Cookies.get("XSRF091")}`,
-                    },
-                }
             );
             Toast.fire({
                 icon: "success",
@@ -155,6 +150,16 @@ const AddModulAction: React.FC<{ onSuccess?: () => void }> = ({
                             className="w-full rounded-md border border-gray-300 p-2 text-sm"
                             value={jamPelajaran}
                             onChange={(e) => setJamPelajaran(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="col-span-2 space-y-1">
+                        <label className="text-sm font-medium text-gray-700">Tahun</label>
+                        <input
+                            type="text"
+                            className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                            value={tahun}
+                            onChange={(e) => setTahun(e.target.value)}
                         />
                     </div>
                 </div>

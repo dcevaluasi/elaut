@@ -26,7 +26,7 @@ export default function TableModulPelatihan() {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const { data, loading, error, fetchModulPelatihan, stats } = useFetchDataMateriPelatihanMasyarakat();
 
-    const idUnitKerja = Cookies.get('IdUnitKerja')
+    const idUnitKerja = Cookies.get('IDUnitKerja')
     const { unitKerjas, loading: loadingUnitKerja, error: errorUnitKerja, fetchUnitKerjaData } = useFetchDataUnitKerja()
     console.log({ unitKerjas })
     useEffect(() => {
@@ -78,8 +78,6 @@ export default function TableModulPelatihan() {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     )
-
-
 
     // Metrics
     const totalModul = data.reduce((acc, m) => acc + m.ModulPelatihan.length, 0);
@@ -226,7 +224,7 @@ export default function TableModulPelatihan() {
                                 <td className="px-3 py-4 border">
                                     <div className="flex flex-row gap-2 h-full items-center justify-center py-2">
                                         {
-                                            isMatch && <UpdateModulAction onSuccess={fetchModulPelatihan} materiPelatihan={row} />
+                                            (isMatch && row.DeskripsiMateriPelatihan == idUnitKerja) && <UpdateModulAction onSuccess={fetchModulPelatihan} materiPelatihan={row} />
                                         }
 
                                         <Button
@@ -253,7 +251,7 @@ export default function TableModulPelatihan() {
 
                                         <span className="text-sm text-gray-400 leading-tight">Rumpun Pelatihan : {row.BidangMateriPelatihan}</span>
                                         <span className="text-sm text-gray-400 leading-tight">Tahun Penyusunan : {row?.Tahun}</span>
-                                        <span className="text-sm text-gray-400 leading-tight">Produsen : {isMatch ? name : nameUK}</span>
+                                        <span className="text-sm text-gray-400 leading-tight">Produsen : {isMatch && row.DeskripsiMateriPelatihan == idUnitKerja ? name : nameUK}</span>
                                     </div>
                                 </td>
                                 <td className="px-3 py-2 border text-center">
