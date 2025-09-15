@@ -26,6 +26,8 @@ import {
 } from "@/components/ui/select";
 import { TbPencil } from "react-icons/tb";
 import { Instruktur } from "@/types/instruktur";
+import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
+import { devNull } from "os";
 
 const UpdateInstrukturAction: React.FC<{
     instruktur: Instruktur;
@@ -49,6 +51,7 @@ const UpdateInstrukturAction: React.FC<{
     const [linkSertifikat, setLinkSertifikat] = useState(instruktur.link_data_dukung_sertifikat || "");
     const [status, setStatus] = useState(instruktur.status || "Active");
     const [pendidikanTerakhir, setPendidikanTerakhir] = useState(instruktur.pendidikkan_terakhir || "");
+    const [idLemdik, setIdLemdik] = useState(instruktur?.id_lemdik || null)
 
     const [loading, setLoading] = useState(false);
 
@@ -57,6 +60,7 @@ const UpdateInstrukturAction: React.FC<{
             nama,
             no_telpon: noTelpon,
             email,
+            id_lemdik: idLemdik,
             nip,
             jenis_pelatih: jenisPelatih,
             jenjang_jabatan: jenjangJabatan,
@@ -70,6 +74,8 @@ const UpdateInstrukturAction: React.FC<{
             status,
             pendidikkan_terakhir: pendidikanTerakhir,
         };
+
+        console.log({ idLemdik })
 
         try {
             setLoading(true);
@@ -103,6 +109,13 @@ const UpdateInstrukturAction: React.FC<{
         }
     };
 
+    const { unitKerjas, loading: loadingUnitKerja, error: errorUnitKerja, fetchUnitKerjaData } = useFetchDataUnitKerja()
+
+    React.useEffect(() => {
+        fetchUnitKerjaData()
+    }, [fetchUnitKerjaData])
+
+
     return (
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
             <AlertDialogTrigger asChild>
@@ -134,6 +147,22 @@ const UpdateInstrukturAction: React.FC<{
                             value={nama}
                             onChange={(e) => setNama(e.target.value)}
                         />
+                    </div>
+
+                    <div className="space-y-1">
+                        <label className="text-sm font-medium text-gray-700">Unit Kerja</label>
+                        <Select value={idLemdik?.toString()} onValueChange={(value) => setIdLemdik(parseInt(value))}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Pilih status" />
+                            </SelectTrigger>
+                            <SelectContent position="popper" className="z-[9999999]">
+                                {
+                                    unitKerjas?.map((item, index) => (
+                                        <SelectItem value={item.id_unit_kerja.toString()}>{item.nama}</SelectItem>
+                                    ))
+                                }
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     <div className="grid grid-cols-3 gap-2">

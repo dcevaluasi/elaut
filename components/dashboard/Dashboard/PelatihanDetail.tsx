@@ -446,7 +446,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                                 <Badge className="bg-blue-500">{modulPelatihan?.BidangMateriPelatihan}</Badge>
                                                                 <div>
                                                                     <p className="text-xs text-gray-600 line-clamp-2">
-                                                                        Tahun :  {modulPelatihan?.NamaPenderitaMateriPelatihan}
+                                                                        Tahun :  {modulPelatihan?.Tahun}
                                                                     </p>
                                                                     <p className="text-xs text-gray-600 line-clamp-2">
                                                                         Produsen :  {modulPelatihan?.DeskripsiMateriPelatihan}

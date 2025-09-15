@@ -2,6 +2,7 @@ export interface MateriPelatihan {
   IdMateriPelatihan: number
   NamaMateriPelatihan: string
   NamaPenderitaMateriPelatihan: string
+  Tahun: string
   DeskripsiMateriPelatihan: string
   BerlakuSampai: string
   BidangMateriPelatihan: string

@@ -43,7 +43,7 @@ const UpdateModulAction: React.FC<{
             nama_materi_pelatihan: nama,
             deskripsi_materi_pelatihan: deskripsiMateriPelatihan,
             berlaku_sampai: berlakuSampai,
-            nama_penderita_materi_pelatihan: tahun,
+            tahun: tahun,
             bidang_materi_pelatihan: bidangMateriPelatihan,
             jam_pelajaran: jamPelajaran,
         };

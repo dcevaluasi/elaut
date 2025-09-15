@@ -453,3 +453,27 @@ export const PELAKSANAAN_PELATIHAN: PelaksanaanPelatihan[] = [
       "Pelatihan yang menggabungkan metode daring (online) dan tatap muka (klasikal). Peserta dapat mengikuti sebagian materi secara online dan menyelesaikan bagian lain di tempat pelatihan fisik. Metode ini mengoptimalkan keunggulan kedua metode dengan memberikan fleksibilitas serta interaksi langsung.",
   },
 ];
+
+
+
+export const RUMPUN_PELATIHAN = [
+  "Sistem Jaminan Mutu",
+  "Teknologi Penangkapan dan Alat Tangkap",
+  "Teknologi Permesinan dan Mekanisasi",
+  "Budidaya",
+  "Pengolahan dan Pemasaran",
+  "Konservasi dan Kemitigasian",
+  "Teknologi Kelautan dan Kemaritiman (Garam, Oceanografi,Biologi, Iklim, Marine Debris)",
+  "Pengawasan dan Kepelabuhan Perikanan",
+  "Teknis Lainnya (Rekayasa Sosial, Enumerator, Dll)"
+]
+
+export const ASAL_PESERTA_PELATIHAN = [
+  "Masyarakat Umum",
+  "Peserta Didik Sekolah Usaha Perikanan Menengah (SUPM)/Sederajat",
+  "Peserta Didik Politeknik Kelautan dan Perikanan (Politeknik)/Sederajat",
+  "Karyawan/Pegawai/Mining Agent",
+  "ASN",
+  "Kelompok Pengawas",
+  "Kelompok Penyuluh Perikanan",
+]
