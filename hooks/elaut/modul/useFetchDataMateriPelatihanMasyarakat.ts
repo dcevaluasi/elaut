@@ -6,6 +6,7 @@ import { moduleBaseUrl } from '@/constants/urls'
 export type CountStats = {
   bidang: Record<string, number>
   tahun: Record<string, number>
+  verified: Record<string, number>
 }
 
 export const useFetchDataMateriPelatihanMasyarakat = () => {
@@ -36,19 +37,22 @@ export const useFetchDataMateriPelatihanMasyarakat = () => {
   const stats: CountStats = useMemo(() => {
     const tahun: Record<string, number> = {}
     const bidang: Record<string, number> = {}
+    const verified: Record<string, number> = {}
 
     data.forEach((i) => {
-      if (i.NamaPenderitaMateriPelatihan) {
-        tahun[i.NamaPenderitaMateriPelatihan] =
-          (tahun[i.NamaPenderitaMateriPelatihan] || 0) + 1
+      if (i.Tahun) {
+        tahun[i.Tahun] = (tahun[i.Tahun] || 0) + 1
       }
       if (i.BidangMateriPelatihan) {
         bidang[i.BidangMateriPelatihan] =
           (bidang[i.BidangMateriPelatihan] || 0) + 1
       }
+      if (i.IsVerified) {
+        verified[i.IsVerified] = (verified[i.IsVerified] || 0) + 1
+      }
     })
 
-    return { tahun, bidang }
+    return { tahun, bidang, verified }
   }, [data])
 
   return { data, loading, error, fetchModulPelatihan, stats }

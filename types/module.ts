@@ -10,6 +10,7 @@ export interface MateriPelatihan {
   UpdateAt: string
   JamPelajaran: string
   ModulPelatihan: ModulPelatihan[]
+  IsVerified: string
 }
 
 export interface ModulPelatihan {

@@ -2,11 +2,10 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Book, Calendar, File, Layers, SlidersHorizontal } from "lucide-react";
+import { Book, Calendar, CheckCircle, File, Layers, SlidersHorizontal, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useFetchDataMateriPelatihanMasyarakat } from "@/hooks/elaut/modul/useFetchDataMateriPelatihanMasyarakat";
-import AddInstrukturAction from "../Actions/Instruktur/AddInstrukturAction";
 import UpdateModulAction from "../Actions/Modul/UpdateModulAction";
 import { TbBook } from "react-icons/tb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -19,23 +18,28 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import AddModulAction from "../Actions/Modul/AddModulAction";
+import { RiVerifiedBadgeLine } from "react-icons/ri";
 
 export default function TableModulPelatihan() {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const { data, loading, error, fetchModulPelatihan, stats } = useFetchDataMateriPelatihanMasyarakat();
+    console.log({ data })
 
     const [filterBidang, setFilterBidang] = useState("")
     const [filterTahun, setFilterTahun] = useState("")
     const [filterProdusen, setFilterProdusen] = useState("")
+    const [filterVerified, setFilterVerified] = useState("")
 
     const bidangOptions = [...new Set(data.map(d => d.BidangMateriPelatihan).filter(Boolean))]
-    const tahunOptions = [...new Set(data.map(d => d.NamaPenderitaMateriPelatihan).filter(Boolean))]
+    const tahunOptions = [...new Set(data.map(d => d.Tahun).filter(Boolean))]
     const produsenOptions = [...new Set(data.map(d => d.DeskripsiMateriPelatihan).filter(Boolean))]
+    const verifiedOptions = [...new Set(data.map(d => d.IsVerified).filter(Boolean))]
 
     const clearFilters = () => {
         setFilterBidang("")
         setFilterTahun("")
         setFilterProdusen("")
+        setFilterVerified("")
     }
 
     const filteredData = useMemo(() => {
@@ -44,16 +48,17 @@ export default function TableModulPelatihan() {
                 String(val).toLowerCase().includes(searchQuery.toLowerCase())
             )
             const matchesBidang = !filterBidang || row.BidangMateriPelatihan === filterBidang
-            const matchesTahun = !filterTahun || row.NamaPenderitaMateriPelatihan === filterTahun
+            const matchesTahun = !filterTahun || row.Tahun === filterTahun
             const matchesProdusen = !filterProdusen || row.DeskripsiMateriPelatihan === filterProdusen
+            const matchesVerified = !filterVerified || row.IsVerified === filterVerified
 
-            return matchesSearch && matchesBidang && matchesTahun && matchesProdusen
+            return matchesSearch && matchesBidang && matchesTahun && matchesProdusen && matchesVerified
         }).sort((a, b) => {
-            const yearA = parseInt(a.NamaPenderitaMateriPelatihan, 10) || 0;
-            const yearB = parseInt(b.NamaPenderitaMateriPelatihan, 10) || 0;
+            const yearA = parseInt(a.Tahun, 10) || 0;
+            const yearB = parseInt(b.Tahun, 10) || 0;
             return yearB - yearA; // descending
         });
-    }, [data, searchQuery, filterBidang, filterTahun, filterProdusen]);
+    }, [data, searchQuery, filterBidang, filterTahun, filterProdusen, filterVerified]);
 
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 15
@@ -78,7 +83,7 @@ export default function TableModulPelatihan() {
             {/* Metrics */}
             <div className="grid grid-cols-2 w-full h-full gap-4">
                 <div className="w-full flex flex-col gap-4">
-                    <div className="flex w-full gap-4">
+                    <div className="grid grid-cols-2 w-full gap-4">
                         <Card className="h-fit rounded-xl w-full border border-gray-200 bg-white shadow-sm">
                             <CardHeader className="flex flex-row items-center justify-between pb-2">
                                 <CardTitle className="text-base font-medium text-gray-600">
@@ -173,6 +178,9 @@ export default function TableModulPelatihan() {
                             filterProdusen={filterProdusen}
                             setFilterProdusen={setFilterProdusen}
                             produsenOptions={produsenOptions}
+                            filterVerified={filterVerified}
+                            setFilterVerified={setFilterVerified}
+                            verifiedOptions={verifiedOptions}
                             clearFilters={clearFilters}
                         />
                         <AddModulAction onSuccess={fetchModulPelatihan} />
@@ -187,9 +195,7 @@ export default function TableModulPelatihan() {
                             <th className="w-12 px-3 py-3 text-center">No</th>
                             <th className="w-12 px-3 py-3 text-center">Action</th>
                             <th className="w-40 px-3 py-3 text-center">Nama Modul</th>
-                            <th className="w-28 px-3 py-3 text-center">Bidang</th>
-                            <th className="w-28 px-3 py-3 text-center">Tahun</th>
-                            <th className="w-28 px-3 py-3 text-center">Produsen</th>
+                            <th className="w-40 px-3 py-3 text-center">Status Pengesahan</th>
                             <th className="w-40 px-3 py-3 text-center">Jumlah Materi</th>
 
                         </tr>
@@ -221,19 +227,32 @@ export default function TableModulPelatihan() {
 
                                 </td>
                                 <td
-                                    className="px-3 py-2 border max-w-full"
+                                    className="px-3 py-4 border max-w-full"
                                     title={row.NamaMateriPelatihan}
                                 >
-                                    {row.NamaMateriPelatihan}
+                                    <p className="font-semibold text-base leading-none mb-2">
+                                        {row.NamaMateriPelatihan}
+                                    </p>
+                                    <div className="flex flex-col !font-normal">
+
+                                        <span className="text-sm text-gray-400 leading-tight">Bidang : {row.BidangMateriPelatihan}</span>
+                                        <span className="text-sm text-gray-400 leading-tight">Tahun Penyusunan : {row?.Tahun}</span>
+                                        <span className="text-sm text-gray-400 leading-tight">Produsen : {row?.DeskripsiMateriPelatihan}</span>
+                                    </div>
                                 </td>
-                                <td
-                                    className="px-3 py-2 border max-w-full text-center"
-                                    title={row.BidangMateriPelatihan}
-                                >
-                                    {row.BidangMateriPelatihan}
+                                <td className="px-3 py-2 border text-center">
+                                    {row.IsVerified === "Verified" ? (
+                                        <span className="inline-flex items-center px-2 py-2 text-xs font-medium rounded-full leading-none bg-green-100 text-green-600">
+                                            <CheckCircle className="w-5 h-5 ml-2" />
+                                            Telah Disahkan
+                                        </span>
+                                    ) : (
+                                        <span className="inline-flex items-center px-2 py-2 text-xs font-medium rounded-full leading-none bg-rose-100 text-rose-500">
+                                            <XCircle className="w-5 h-5 ml-2" />
+                                            Belum Disahkan
+                                        </span>
+                                    )}
                                 </td>
-                                <td className="px-3 py-2 border text-center">{row.NamaPenderitaMateriPelatihan}</td>
-                                <td className="px-3 py-2 border text-center">{row.DeskripsiMateriPelatihan}</td>
                                 <td className="px-3 py-2 border text-center">{row.ModulPelatihan.length}</td>
 
                             </tr>
@@ -290,6 +309,9 @@ function FilterDropdown({
     filterProdusen,
     setFilterProdusen,
     produsenOptions,
+    filterVerified,
+    setFilterVerified,
+    verifiedOptions,
     clearFilters,
 }: any) {
     return (
@@ -350,6 +372,24 @@ function FilterDropdown({
                         <SelectContent>
                             <SelectItem value="-">Semua</SelectItem>
                             {produsenOptions.map((opt: any) => (
+                                <SelectItem key={opt} value={opt}>
+                                    {opt}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* Status Pengesahan */}
+                <div className="space-y-1">
+                    <label className="text-xs font-medium text-gray-600">Status Pengesahan</label>
+                    <Select value={filterVerified} onValueChange={setFilterVerified}>
+                        <SelectTrigger className="w-full text-sm">
+                            <SelectValue placeholder="Pilih status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="-">Semua</SelectItem>
+                            {verifiedOptions.map((opt: any) => (
                                 <SelectItem key={opt} value={opt}>
                                     {opt}
                                 </SelectItem>
