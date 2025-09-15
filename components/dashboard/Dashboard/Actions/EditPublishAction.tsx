@@ -145,7 +145,7 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
                                 Informasi Kuota Pelatihan
                             </label>
                             <input
-                                type="date"
+                                type="text"
                                 className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                                 value={kuotaPelatihan}
                                 onChange={(e) => setKuotaPelatihan(e.target.value)}
