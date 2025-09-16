@@ -27,7 +27,7 @@ import { useFetchDataPelatihanMasyarakat } from "@/hooks/elaut/pelatihan/useFetc
 import TabStatusPelatihanMasyarakat from "./TabStatusPelatihanMasyarakat";
 import TableDataPelatihanMasyarakat from "./Table/TableDataPelatihanMasyrakat";
 import { isPendingSigning, isSigned, isVerifyDiklat } from "@/utils/status";
-import FormPelatihan from "../admin/FormPelatihan";
+import FormPelatihan from "@/components/form/FormPelatihan";
 
 const TableDataPelatihan: React.FC = () => {
   const {
