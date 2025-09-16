@@ -6,8 +6,6 @@ import {
   CardContent,
 } from "@/components/ui/card";
 
-import FormPelatihan from "../admin/FormPelatihan";
-
 import Image from "next/image";
 import Cookies from "js-cookie";
 
@@ -29,6 +27,7 @@ import { useFetchDataPelatihanMasyarakat } from "@/hooks/elaut/pelatihan/useFetc
 import TabStatusPelatihanMasyarakat from "./TabStatusPelatihanMasyarakat";
 import TableDataPelatihanMasyarakat from "./Table/TableDataPelatihanMasyrakat";
 import { isPendingSigning, isSigned, isVerifyDiklat } from "@/utils/status";
+import FormPelatihan from "../admin/FormPelatihan";
 
 const TableDataPelatihan: React.FC = () => {
   const {
