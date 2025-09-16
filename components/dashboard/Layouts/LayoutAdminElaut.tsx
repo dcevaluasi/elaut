@@ -131,58 +131,25 @@ export default function LayoutAdminElaut({
           </button>
         </div>
 
-        {/* Nav Items */}
+
         <ul className="flex-1 mt-4 space-y-1">
-          {/* ===== PUSAT NAVS ===== */}
-          {pathname.includes("pusat") && (
-            <>
-              {/* Dashboard */}
-              <li>
-                <a
-                  href="/admin/pusat/dashboard/"
-                  className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname === "/admin/pusat/dashboard/"
-                    ? "bg-blue-600 text-white"
-                    : "hover:bg-blue-500 hover:text-white"
-                    }`}
-                >
-                  <LucideLayoutDashboard />
-                  {sidebarOpen && <span className="text-sm">Dashboard</span>}
-                </a>
-              </li>
+          {/* Dashboard */}
+          <li>
+            <a
+              href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/dashboard/`}
+              className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname === `/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/dashboard/`
+                ? "bg-blue-600 text-white"
+                : "hover:bg-blue-500 hover:text-white"
+                }`}
+            >
+              <LucideLayoutDashboard />
+              {sidebarOpen && <span className="text-sm">Dashboard</span>}
+            </a>
+          </li>
 
-              {/* Penyelenggaraan Pelatihan */}
-              <li>
-                <a
-                  href="/admin/pusat/pelatihan"
-                  className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname === "/admin/pusat/pelatihan/"
-                    ? "bg-blue-600 text-white"
-                    : "hover:bg-blue-500 hover:text-white"
-                    }`}
-                >
-                  <IoSchoolOutline className="flex-shrink-0 w-6 h-6" />
-                  {sidebarOpen && <span className="text-sm">Penyelenggaraan Pelatihan</span>}
-                </a>
-              </li>
-            </>
-          )}
-
-          {pathname.includes("lemdiklat") && <>
-            {/* Dashboard */}
-            <li>
-              <a
-                href="/admin/lemdiklat/dashboard/"
-                className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname === "/admin/lemdiklat/dashboard/"
-                  ? "bg-blue-600 text-white"
-                  : "hover:bg-blue-500 hover:text-white"
-                  }`}
-              >
-                <LucideLayoutDashboard />
-                {sidebarOpen && <span className="text-sm">Dashboard</span>}
-              </a>
-            </li>
-
-            {/* Master Pelatihan */}
-            <li>
+          {/* Master Pelatihan */}
+          {
+            Cookies.get('Role')?.includes('Operator') && <li>
               <button
                 onClick={() => setSubmenuOpen((prev) => !prev)}
                 className={`flex items-center justify-between w-full px-4 py-2 transition-colors rounded-md ${pathname.includes("master")
@@ -202,43 +169,42 @@ export default function LayoutAdminElaut({
               {submenuOpen && sidebarOpen && (
                 <ul className="ml-10 mt-1 space-y-1">
                   <NavItem
-                    href="/admin/lemdiklat/master/instruktur"
+                    href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/instruktur`}
                     icon={<HiOutlineUserGroup className="text-xl" />}
                     label="Instruktur"
                   />
                   {
                     Cookies.get('Access')?.includes('viewModul') &&
                     <NavItem
-                      href="/admin/lemdiklat/master/modul"
+                      href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/modul`}
                       icon={<IoBookOutline className="text-lg" />}
                       label="Modul Pelatihan"
                     />
                   }
                   <NavItem
-                    href="/admin/lemdiklat/master/unit-kerja"
+                    href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/unit-kerja`}
                     icon={<TbBuildingSkyscraper className="text-lg" />}
                     label="Unit Kerja"
                   />
                 </ul>
               )}
             </li>
+          }
 
-            {/* Penyelenggaraan Pelatihan */}
-            <li>
-              <a
-                href="/admin/lemdiklat/pelatihan"
-                className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname === "/admin/lemdiklat/pelatihan/"
-                  ? "bg-blue-600 text-white"
-                  : "hover:bg-blue-500 hover:text-white"
-                  }`}
-              >
-                <IoSchoolOutline className="flex-shrink-0 w-6 h-6" />
-                {sidebarOpen && <span className="text-sm">Penyelenggaraan Pelatihan</span>}
-              </a>
-            </li>
-          </>}
+          {/* Penyelenggaraan Pelatihan */}
+          <li>
+            <a
+              href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/pelatihan`}
+              className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname === `/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/pelatihan/`
+                ? "bg-blue-600 text-white"
+                : "hover:bg-blue-500 hover:text-white"
+                }`}
+            >
+              <IoSchoolOutline className="flex-shrink-0 w-6 h-6" />
+              {sidebarOpen && <span className="text-sm">Penyelenggaraan Pelatihan</span>}
+            </a>
+          </li>
         </ul>
-
 
         {/* Logout */}
         <div className="p-4 border-t border-gray-700">
@@ -252,13 +218,10 @@ export default function LayoutAdminElaut({
         </div>
       </aside>
 
-      {/* Main Content */}
       <div className="flex-grow flex flex-col overflow-y-auto">
-        {/* Top Bar */}
         <header className="flex justify-end items-center bg-white h-20 px-6 py-2 border-b">
           <DropdownUser lemdiklatLoggedInInfo={lemdikData} pusatLoggedInInfo={pusatData} />
         </header>
-        {/* Page Content */}
         <main className="flex-grow p-4">{children}</main>
       </div>
     </div>
@@ -316,6 +279,5 @@ const NavItem: React.FC<NavItemProps> = ({ href, icon, label }) => {
         {label}
       </Link>
     </li>
-
   );
 };

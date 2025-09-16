@@ -9,9 +9,9 @@ export default function Page() {
     <LayoutAdminElaut>
       <section className="flex-1 flex flex-col">
         <HeaderPageLayoutAdminElaut title="Penyelenggaraan Pelatihan" description=" Monitoring dan kelola penyelenggaran pelatihan kelautan dan perikanan mulai buka kelas hingga penerbitan STTPL!" icon={<TbSchool className="text-3xl" />} />
-        <main className="w-full h-full">
+        <article className="w-full h-full">
           <Pelatihan />
-        </main>
+        </article>
       </section>
     </LayoutAdminElaut>
   );

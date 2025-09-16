@@ -9,9 +9,9 @@ export default function Page() {
         <LayoutAdminElaut>
             <section className="flex-1 flex flex-col">
                 <HeaderPageLayoutAdminElaut title="Modul/Perangkat Pelatihan" description=" Monitoring pengelolaan modul/perangkat pelatihan kelautan dan perikanan!" icon={<BookOpen className="text-3xl" />} />
-                <main className="w-full h-full">
+                <article className="w-full h-full">
                     <TableModulPelatihan />
-                </main>
+                </article>
             </section>
         </LayoutAdminElaut>
     );
