@@ -88,7 +88,7 @@ const TableDataPelatihan: React.FC = () => {
   });
 
   return (
-    <div className="shadow-default -mt-10">
+    <div className="shadow-default">
       <TabStatusPelatihanMasyarakat
         dataLength={data.length}
         countPublished={countPublished}
