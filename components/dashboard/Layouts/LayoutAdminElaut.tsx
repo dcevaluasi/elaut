@@ -8,7 +8,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import DropdownUser from "../Header/DropdownUser";
 import { LucideLayoutDashboard } from "lucide-react";
 import { IoBookOutline, IoSchoolOutline } from "react-icons/io5";
@@ -262,6 +262,33 @@ export default function LayoutAdminElaut({
         <main className="flex-grow p-4">{children}</main>
       </div>
     </div>
+  );
+}
+
+interface HeaderPageLayoutAdminElautProps {
+  icon: ReactNode;
+  title: string;
+  description: string;
+}
+
+export function HeaderPageLayoutAdminElaut({ icon, title, description }: HeaderPageLayoutAdminElautProps) {
+  return (
+    <article className="flex flex-row gap-2 items-center">
+      <header
+        aria-label="page caption"
+        className="flex-row w-full flex h-20 items-center gap-2 bg-gray-100 border-t px-4"
+      >
+        <div className="text-3xl">{icon}</div>
+        <div className="flex flex-col">
+          <h1 id="page-caption" className="font-semibold text-lg">
+            {title}
+          </h1>
+          <p className="font-medium text-gray-400 text-base">
+            {description}
+          </p>
+        </div>
+      </header>
+    </article>
   );
 }
 
