@@ -51,7 +51,8 @@ const AddModulAction: React.FC<{ onSuccess?: () => void }> = ({
             berlaku_sampai: berlakuSampai,
             bidang_materi_pelatihan: bidangMateriPelatihan,
             jam_pelajaran: jamPelajaran,
-            tahun: tahun
+            tahun: tahun,
+            is_verified: "No Verified",
         };
 
         try {
