@@ -21,6 +21,7 @@ import AddModulAction from "../Actions/Modul/AddModulAction";
 import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
 import Cookies from "js-cookie";
 import { findNameUnitKerjaById, findUnitKerjaById } from "@/utils/unitkerja";
+import { UnitKerja } from "@/types/master";
 
 export default function TableModulPelatihan() {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -382,8 +383,8 @@ function FilterDropdown({
                             <SelectValue placeholder="Pilih produsen" />
                         </SelectTrigger>
                         <SelectContent>
-                            {produsenOptions.map((opt: any) => (
-                                <SelectItem key={opt} value={opt.id_unit_kerja}>
+                            {produsenOptions.map((opt: UnitKerja) => (
+                                <SelectItem key={opt.id_unit_kerja} value={opt.id_unit_kerja.toString()}>
                                     {opt.nama}
                                 </SelectItem>
                             ))}

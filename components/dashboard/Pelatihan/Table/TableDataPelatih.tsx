@@ -8,7 +8,7 @@ import { Instruktur } from "@/types/instruktur";
 import { Input } from "@/components/ui/input";
 import { truncateText } from "@/utils";
 import AddInstrukturAction from "../../Dashboard/Actions/Instruktur/AddInstrukturAction";
-import { Briefcase, FileBadge, GraduationCap, Layers, Rows3, ShieldCheck, Users } from "lucide-react";
+import { Briefcase, FileBadge, GraduationCap, Layers, ShieldCheck, Users } from "lucide-react";
 import UpdateInstrukturAction from "../../Dashboard/Actions/Instruktur/UpdateInstrukturAction";
 import DeleteInstrukturAction from "../../Dashboard/Actions/Instruktur/DeleteInstrukturAction";
 import {
@@ -21,6 +21,9 @@ import {
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { SlidersHorizontal } from "lucide-react"
 import Cookies from "js-cookie";
+import { findNameUnitKerjaById } from "@/utils/unitkerja";
+import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
+import { UnitKerja } from "@/types/master";
 
 const TableDataPelatih = () => {
     const { instrukturs, loading, error, fetchInstrukturData, stats } = useFetchDataInstruktur()
@@ -43,22 +46,28 @@ type Props = {
 }
 
 function InstrukturTable({ data, fetchData }: Props) {
+    const { unitKerjas, loading: loadingUnitKerja, error: errorUnitKerja, fetchUnitKerjaData } = useFetchDataUnitKerja()
+
+    useEffect(() => {
+        fetchUnitKerjaData()
+    }, [fetchUnitKerjaData])
+
+
     const [search, setSearch] = useState("")
     const [filterKeahlian, setFilterKeahlian] = useState("")
     const [filterStatus, setFilterStatus] = useState("")
     const [filterPendidikan, setFilterPendidikan] = useState("")
     const [filterJabatan, setFilterJabatan] = useState("")
+    const [filterUnitKerja, setFilterUnitKerja] = useState("")
 
-    // ambil unique options biar select lebih dinamis
     const bidangKeahlianOptions = [...new Set(data.map(d => d.bidang_keahlian).filter(Boolean))]
     const statusOptions = [...new Set(data.map(d => d.status).filter(Boolean))]
     const pendidikanOptions = [...new Set(data.map(d => d.pendidikkan_terakhir).filter(Boolean))]
     const jabatanOptions = [...new Set(data.map(d => d.jenjang_jabatan).filter(Boolean))]
+    const unitKerjaOptions = unitKerjas
 
     // Filtering logic
     const filteredData = useMemo(() => {
-        const cookieIdUnitKerja = Cookies.get("IDUnitKerja");
-
         return data.filter((row) => {
             const matchesSearch = !search || Object.values(row).some((val) =>
                 String(val).toLowerCase().includes(search.toLowerCase())
@@ -67,10 +76,12 @@ function InstrukturTable({ data, fetchData }: Props) {
             const matchesStatus = !filterStatus || row.status === filterStatus
             const matchesPendidikan = !filterPendidikan || row.pendidikkan_terakhir === filterPendidikan
             const matchesJabatan = !filterJabatan || row.jenjang_jabatan === filterJabatan
+            const matchesUnitKerja = !filterUnitKerja || row.id_lemdik.toString() === filterUnitKerja
 
-            return matchesSearch && matchesKeahlian && matchesStatus && matchesPendidikan && matchesJabatan
+
+            return matchesSearch && matchesKeahlian && matchesStatus && matchesPendidikan && matchesJabatan && matchesUnitKerja
         })
-    }, [data, search, filterKeahlian, filterStatus, filterPendidikan, filterJabatan])
+    }, [data, search, filterKeahlian, filterStatus, filterPendidikan, filterJabatan, filterUnitKerja])
 
 
     // Pagination
@@ -88,6 +99,7 @@ function InstrukturTable({ data, fetchData }: Props) {
         setFilterStatus("")
         setFilterPendidikan("")
         setFilterJabatan("")
+        setFilterUnitKerja("")
         setSearch("")
     }
 
@@ -95,7 +107,7 @@ function InstrukturTable({ data, fetchData }: Props) {
         <div className="space-y-4">
             {/* Search Input */}
             <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-800">Daftar Instruktur</h2>
+                <h2 className="text-lg font-semibold text-gray-800">Daftar Instruktur/Pelatih</h2>
                 <div className="flex flex-col md:flex-row items-center gap-2 w-full md:w-auto">
                     <Input
                         type="text"
@@ -119,6 +131,9 @@ function InstrukturTable({ data, fetchData }: Props) {
                             filterStatus={filterStatus}
                             setFilterStatus={setFilterStatus}
                             statusOptions={statusOptions}
+                            filterUnitKerja={filterUnitKerja}
+                            setFilterUnitKerja={setFilterUnitKerja}
+                            unitKerjaOptions={unitKerjaOptions}
                             clearFilters={clearFilters}
                         />
                         <AddInstrukturAction onSuccess={fetchData} />
@@ -127,7 +142,7 @@ function InstrukturTable({ data, fetchData }: Props) {
             </div>
 
             <div className="overflow-x-auto border border-gray-200 rounded-xl shadow-sm">
-                <table className="min-w-full table-fixed text-sm border-collapse">
+                <table className=" table-fixed text-sm border-collapse">
                     <thead className="bg-gray-100 text-gray-700 text-xs uppercase">
                         <tr>
                             <th className="sticky top-0 left-0 z-30 bg-gray-100 w-12 px-3 py-3 text-center border">
@@ -136,26 +151,17 @@ function InstrukturTable({ data, fetchData }: Props) {
                             <th className="sticky top-0 left-10 z-30 bg-gray-100 w-12 px-3 py-3 text-center border">
                                 Action
                             </th>
-                            <th className="sticky top-0 left-64 z-30 bg-gray-100 w-40 px-3 py-3 text-center border">
-                                Nama
+                            <th className="sticky top-0 left-64 z-30 bg-gray-100  px-3 py-3 text-center border min-w-[20rem]">
+                                Informasi Instruktur/Pelatih
                             </th>
-                            <th className="sticky top-0 z-20 bg-gray-100 w-28 px-3 py-3 text-center border">
-                                No. Telp
-                            </th>
-                            <th className="sticky top-0 z-20 bg-gray-100 w-40 px-3 py-3 text-center border">
-                                Email
-                            </th>
-                            <th className="sticky top-0 z-20 bg-gray-100 w-36 px-3 py-3 text-center border">
-                                NIP
-                            </th>
-                            <th className="sticky top-0 z-20 bg-gray-100 w-32 px-3 py-3 text-center border">
-                                Jenjang Jabatan
-                            </th>
-                            <th className="sticky top-0 z-20 bg-gray-100 w-32 px-3 py-3 text-center border">
-                                Pangkat/Golongan
+                            <th className="sticky top-0 z-20 bg-gray-100  px-3 py-3 text-center border min-w-[20rem]">
+                                Satuan Kerja
                             </th>
                             <th className="sticky top-0 z-20 bg-gray-100 w-32 px-3 py-3 text-center border">
                                 Bidang Keahlian
+                            </th>
+                            <th className="sticky top-0 z-20 bg-gray-100 w-28 px-3 py-3 text-center border">
+                                Pendidikan Terakhir
                             </th>
                             <th className="sticky top-0 z-20 bg-gray-100 w-40 px-3 py-3 text-center border">
                                 Management of Training
@@ -169,98 +175,105 @@ function InstrukturTable({ data, fetchData }: Props) {
                             <th className="sticky top-0 z-20 bg-gray-100 w-24 px-3 py-3 text-center border">
                                 Status
                             </th>
-                            <th className="sticky top-0 z-20 bg-gray-100 w-28 px-3 py-3 text-center border">
-                                Pendidikan Terakhir
-                            </th>
-                            <th className="sticky top-0 z-20 bg-gray-100 w-40 px-3 py-3 text-center border">
-                                Eselon I
-                            </th>
-                            <th className="sticky top-0 z-20 bg-gray-100 w-40 px-3 py-3 text-center border">
-                                Eselon II
-                            </th>
                         </tr>
                     </thead>
 
                     <tbody className="divide-y divide-gray-100">
-                        {paginatedData.map((row, index) => (
-                            <tr
-                                key={row.IdInstruktur}
-                                className="hover:bg-gray-50 transition-colors duration-150"
-                            >
-                                {/* Sticky Columns */}
-                                <td className="sticky left-0 z-20 bg-white px-3 py-2 border text-center text-gray-500">
-                                    {(currentPage - 1) * itemsPerPage + index + 1}
-                                </td>
-                                <td className="sticky left-10 z-20 bg-white px-3 py-4 border">
-                                    <div className="flex flex-row gap-2 h-full px-3 py-2">
-                                        <UpdateInstrukturAction onSuccess={fetchData} instruktur={row} />
-                                        <DeleteInstrukturAction onSuccess={fetchData} instruktur={row} />
-                                    </div>
-                                </td>
-                                <td
-                                    className="sticky left-64 z-20 bg-white px-3 py-2 border max-w-full"
-                                    title={row.nama}
-                                >
-                                    {row.nama}
-                                </td>
+                        {paginatedData.map((row, index) => {
+                            const { name: nameUnitKerja } = findNameUnitKerjaById(unitKerjas, row.id_lemdik.toString())
 
-                                {/* Normal Columns */}
-                                <td className="px-3 py-2 border">{row.no_telpon}</td>
-                                <td className="px-3 py-2 border" title={row.email}>
-                                    {row.email}
-                                </td>
-                                <td className="px-3 py-2 border" title={row.nip}>
-                                    {row.nip}
-                                </td>
-                                <td className="px-3 py-2 border text-center">{row.jenjang_jabatan}</td>
-                                <td className="px-3 py-2 border text-center">{row.pelatihan_pelatih}</td>
-                                <td className="px-3 py-2 border text-center">{row.bidang_keahlian}</td>
-                                <td
-                                    className="px-3 py-2 border max-w-[200px] text-blue-600 underline truncate"
-                                    title={row.management_of_training}
+                            return (
+                                <tr
+                                    key={row.IdInstruktur}
+                                    className="hover:bg-gray-50 transition-colors duration-150"
                                 >
-                                    <a
-                                        href={row.management_of_training}
-                                        target="_blank"
-                                        rel="noopener noreferrer "
-                                        className="truncate"
+                                    {/* Sticky Columns */}
+                                    <td className="sticky left-0 z-20 bg-white px-3 py-2 border text-center text-gray-500">
+                                        {(currentPage - 1) * itemsPerPage + index + 1}
+                                    </td>
+                                    <td className="sticky left-10 z-20 bg-white px-3 py-4 border">
+                                        <div className="flex flex-row gap-2 h-full px-3 py-2">
+                                            <UpdateInstrukturAction onSuccess={fetchData} instruktur={row} />
+                                            <DeleteInstrukturAction onSuccess={fetchData} instruktur={row} />
+                                        </div>
+                                    </td>
+                                    <td
+                                        className="sticky left-64 z-20 bg-white px-3 py-2 border min-w-[20rem]"
+                                        title={row.nama}
                                     >
-                                        {row.management_of_training}
-                                    </a>
-                                </td>
-                                <td
-                                    className="px-3 py-2 border max-w-[200px] text-blue-600 underline truncate"
-                                    title={row.training_officer_course}
-                                >
-                                    <a
-                                        href={row.link_data_dukung_sertifikat}
-                                        target="_blank"
-                                        rel="noopener noreferrer "
-                                        className="truncate"
+                                        <p className="font-semibold leading-none mb-2">{row.nama}</p>
+                                        <div>
+                                            <p className="text-xs text-gray-600 line-clamp-2">
+                                                NIP :  {row.nip}
+                                            </p>
+                                            <p className="text-xs text-gray-600 line-clamp-2">
+                                                Email :  {row.email}
+                                            </p>
+                                            <p className="text-xs text-gray-600 line-clamp-2">
+                                                No Telpon :  {row.no_telpon}
+                                            </p>
+                                            <p className="text-xs text-gray-600 line-clamp-2">
+                                                Jabatan dan Pangkat/Golongan :  {row.jenjang_jabatan} - {row.pelatihan_pelatih}
+                                            </p>
+                                        </div>
+                                    </td>
+                                    <td
+                                        className=" bg-white px-3 py-2 border min-w-[20rem]"
+                                        title={nameUnitKerja}
                                     >
-                                        {row.training_officer_course}
-                                    </a>
-                                </td>
-                                <td className="px-3 py-2 border text-blue-600 underline text-center truncate">
-                                    <a
-                                        href={row.link_data_dukung_sertifikat}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="truncate"
+                                        <p className="font-semibold leading-none mb-2 uppercase">{nameUnitKerja}</p>
+                                        <div>
+                                            <p className="text-xs text-gray-600 line-clamp-2">
+                                                Eselon I :  {row.eselon_1}
+                                            </p>
+                                            <p className="text-xs text-gray-600 line-clamp-2">
+                                                Eselon II :  {row.eselon_2}
+                                            </p>
+                                        </div>
+                                    </td>
+                                    <td className="px-3 py-2 border text-center">{row.bidang_keahlian}</td>
+                                    <td className="px-3 py-2 border text-center">{row.pendidikkan_terakhir}</td>
+                                    <td
+                                        className="px-3 py-2 border max-w-[200px] text-blue-600 underline truncate"
+                                        title={row.management_of_training}
                                     >
-                                        {truncateText(row.link_data_dukung_sertifikat, 20, "...")}
-                                    </a>
-                                </td>
-                                <td className="px-3 py-2 border text-center">{row.status}</td>
-                                <td className="px-3 py-2 border text-center">{row.pendidikkan_terakhir}</td>
-                                <td className="px-3 py-2 border max-w-[200px] truncate" title={row.eselon_1}>
-                                    {row.eselon_1}
-                                </td>
-                                <td className="px-3 py-2 border max-w-[200px] truncate" title={row.eselon_2}>
-                                    {row.eselon_2}
-                                </td>
-                            </tr>
-                        ))}
+                                        <a
+                                            href={row.management_of_training}
+                                            target="_blank"
+                                            rel="noopener noreferrer "
+                                            className="truncate"
+                                        >
+                                            {row.management_of_training}
+                                        </a>
+                                    </td>
+                                    <td
+                                        className="px-3 py-2 border max-w-[200px] text-blue-600 underline truncate"
+                                        title={row.training_officer_course}
+                                    >
+                                        <a
+                                            href={row.link_data_dukung_sertifikat}
+                                            target="_blank"
+                                            rel="noopener noreferrer "
+                                            className="truncate"
+                                        >
+                                            {row.training_officer_course}
+                                        </a>
+                                    </td>
+                                    <td className="px-3 py-2 border text-blue-600 underline text-center truncate">
+                                        <a
+                                            href={row.link_data_dukung_sertifikat}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="truncate"
+                                        >
+                                            {truncateText(row.link_data_dukung_sertifikat, 20, "...")}
+                                        </a>
+                                    </td>
+                                    <td className="px-3 py-2 border text-center">{row.status}</td>
+
+                                </tr>
+                            )
+                        })}
                         {paginatedData.length === 0 && (
                             <tr>
                                 <td colSpan={18} className="text-center py-6 text-gray-500 italic">
@@ -312,7 +325,7 @@ function StatsCards({
                 {/* --- Column 1 --- */}
                 <div className="flex flex-col gap-6">
                     {/* Total Instruktur */}
-                    <Card className="h-fit rounded-xl border border-gray-100 bg-white shadow-sm">
+                    <Card className="h-fit rounded-xl border border-gray-200 bg-white shadow-sm">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-base font-medium text-gray-600">
                                 Total Instruktur
@@ -328,7 +341,7 @@ function StatsCards({
                     {/* Pendidikan & Status */}
                     <div className="flex flex-col gap-6 md:flex-row">
                         {/* Pendidikan Terakhir */}
-                        <Card className="w-full h-full rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-lg">
+                        <Card className="w-full h-full rounded-2xl border border-gray-200 shadow-sm transition-all hover:shadow-lg">
                             <CardHeader className="flex items-center gap-2">
                                 <GraduationCap className="h-5 w-5 text-purple-500" />
                                 <CardTitle className="text-lg font-semibold text-center text-gray-800">
@@ -351,7 +364,7 @@ function StatsCards({
                         </Card>
 
                         {/* Status Instruktur */}
-                        <Card className="w-full h-full rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-lg">
+                        <Card className="w-full h-full rounded-2xl border border-gray-200 shadow-sm transition-all hover:shadow-lg">
                             <CardHeader className="flex items-center gap-2">
                                 <ShieldCheck className="h-5 w-5 text-teal-500" />
                                 <CardTitle className="text-lg font-semibold text-center text-gray-800">
@@ -378,7 +391,7 @@ function StatsCards({
                 {/* --- Column 2 --- */}
                 <div className="flex flex-col gap-6">
                     {/* Total Instruktur */}
-                    <Card className="h-fit rounded-xl border border-gray-100 bg-white shadow-sm">
+                    <Card className="h-fit rounded-xl border border-gray-200 bg-white shadow-sm">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-base font-medium text-gray-600">
                                 Total ToT
@@ -392,7 +405,7 @@ function StatsCards({
                     </Card>
 
                     {/* Bidang Keahlian */}
-                    <Card className="w-full h-full rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-lg">
+                    <Card className="w-full h-full rounded-2xl border border-gray-200 shadow-sm transition-all hover:shadow-lg">
                         <CardHeader className="flex items-center gap-2">
                             <Layers className="h-5 w-5 text-blue-500" />
                             <CardTitle className="text-lg font-semibold text-gray-800">
@@ -416,7 +429,7 @@ function StatsCards({
                 </div>
 
                 {/* --- Column 3 --- */}
-                <Card className="h-full rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-lg">
+                <Card className="h-full rounded-2xl border border-gray-200 shadow-sm transition-all hover:shadow-lg">
                     <CardHeader className="flex items-center gap-2">
                         <Briefcase className="h-5 w-5 text-green-500" />
                         <CardTitle className="text-lg font-semibold text-gray-800">
@@ -456,6 +469,9 @@ function FilterDropdown({
     filterStatus,
     setFilterStatus,
     statusOptions,
+    filterUnitKerja,
+    setFilterUnitKerja,
+    unitKerjaOptions,
     clearFilters,
 }: any) {
     return (
@@ -478,7 +494,6 @@ function FilterDropdown({
                             <SelectValue placeholder="Pilih bidang" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="-">Semua</SelectItem>
                             {bidangKeahlianOptions.map((opt: any) => (
                                 <SelectItem key={opt} value={opt}>
                                     {opt}
@@ -496,7 +511,6 @@ function FilterDropdown({
                             <SelectValue placeholder="Pilih jabatan" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="-">Semua</SelectItem>
                             {jabatanOptions.map((opt: any) => (
                                 <SelectItem key={opt} value={opt}>
                                     {opt}
@@ -514,7 +528,6 @@ function FilterDropdown({
                             <SelectValue placeholder="Pilih pendidikan" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="-">Semua</SelectItem>
                             {pendidikanOptions.map((opt: any) => (
                                 <SelectItem key={opt} value={opt}>
                                     {opt}
@@ -532,10 +545,26 @@ function FilterDropdown({
                             <SelectValue placeholder="Pilih status" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="-">Semua</SelectItem>
                             {statusOptions.map((opt: any) => (
                                 <SelectItem key={opt} value={opt}>
                                     {opt}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                {/* Unit Kerja */}
+                <div className="space-y-1">
+                    <label className="text-xs font-medium text-gray-600">Unit Kerja</label>
+                    <Select value={filterUnitKerja} onValueChange={setFilterUnitKerja}>
+                        <SelectTrigger className="w-full text-sm">
+                            <SelectValue placeholder="Pilih unit kerja" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {unitKerjaOptions.map((opt: UnitKerja) => (
+                                <SelectItem key={opt.id_unit_kerja} value={opt.id_unit_kerja.toString()}>
+                                    {opt.nama}
                                 </SelectItem>
                             ))}
                         </SelectContent>

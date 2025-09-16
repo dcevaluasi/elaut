@@ -24,7 +24,7 @@ export function findNameUnitKerjaById(
   idUnitKerja: string | undefined,
 ) {
   if (!idUnitKerja) {
-    return { isMatch: false, name: null }
+    return { name: '' }
   }
 
   const match = unitKerjas.find(
