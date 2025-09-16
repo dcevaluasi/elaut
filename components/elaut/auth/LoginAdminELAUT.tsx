@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-import { HiMiniUserGroup, HiOutlineEye } from "react-icons/hi2";
+import { HiOutlineEye } from "react-icons/hi2";
 import ReCAPTCHA from "react-google-recaptcha";
 import { generateRandomId } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -77,7 +77,7 @@ export const LoginAdminELAUT = () => {
 
     try {
       const response: AxiosResponse = await axios.post(
-        `${baseUrl}/${email.includes('elaut.go.id') ? "lemdik" : "adminPusat"
+        `${baseUrl}/${role == "upt" ? "lemdik" : "adminPusat"
         }/login`,
         JSON.stringify({ email, password }),
         { headers: { "Content-Type": "application/json" } }
@@ -93,7 +93,7 @@ export const LoginAdminELAUT = () => {
       Cookies.set("XSRF092", "true", { expires: 1 });
       Cookies.set(
         "XSRF093",
-        email.includes('elaut.go.id')
+        role == "upt"
           ? "balai"
           : "adminPusat",
         { expires: 1 }
@@ -103,7 +103,7 @@ export const LoginAdminELAUT = () => {
       setIsLoadingLogin(false);
 
       const dashboardPath =
-        email.includes('elaut.go.id')
+        role == "upt"
           ? `/${generateRandomId()}/lemdiklat/dashboard`
           : "/admin/pusat/dashboard";
       setIsRedirecting(true)
@@ -113,7 +113,7 @@ export const LoginAdminELAUT = () => {
       if (error instanceof AxiosError) {
         const errorMessage =
           error.response?.status === 401
-            ? "Email atau password yang dimasukkan salah, harap periksa kembali!"
+            ? "Email atau password yang dimasukkan salah atau role yang kamu pilih tidak sesuai, harap periksa kembali!"
             : error.response?.status === 500
               ? "Proses login gagal dikarenakan terjadi gangguan pada server, hubungi admin pusat melalui call center!"
               : "Periksa jaringan internetmu, sistem tidak terhubung ke internet!";
@@ -156,16 +156,14 @@ export const LoginAdminELAUT = () => {
                 E-LAUT
               </div>
 
-              <h1 className="font-bold font-calsans text-gray-200 text-4xl -mt-2">
+              <h1 className="font-calsans text-gray-200 text-4xl -mt-2">
                 Login Admin{" "}
-                <span className=" bg-clip-text text-transparent bg-gradient-to-r leading-none pt-0 from-blue-500 to-teal-400">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r leading-none pt-0 from-blue-500 to-teal-400">
                   E-LAUT
                 </span>
               </h1>
-              <p className="font-jakarta max-w-[42rem] leading-[115%] text-gray-300  sm:text-base -mt-3">
-                Selamat datang kembali, silahkan login untuk mengakses dashboard
-                admin Elektronik Layanan Pelatihan Kelautan dan Perikanan Utama
-                Terpadu!
+              <p className="font-jakarta max-w-[42rem] leading-[115%] text-gray-300  sm:text-base -mt-1">
+                Selamat datang kembali, silahkan melakukan login untuk mengelola penyelenggaran pelatihan, perangkat pelatihan, instruktur, hinga melakukan penerbitan STTPL!
               </p>
             </div>
               <div className="flex flex-col gap-2 w-full max-w-md mx-auto z-50">
@@ -205,8 +203,31 @@ export const LoginAdminELAUT = () => {
                   </span>
                 </div>
 
+                <div className="flex flex-col gap-1">
+                  <p className="font-jakarta leading-[100%] text-gray-300 sm:text-sm sm:leading-8">
+                    Akses Sebagai
+                  </p>
+                  <select
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    className="border rounded-xl text-white border-blue-500 bg-transparent w-full placeholder:text-gray-300 px-3 py-2"
+                  >
+                    <option value="" disabled>
+                      Pilih akses
+                    </option>
+                    <option value="upt" className="text-black">
+                      Pengelola UPT
+                    </option>
+                    <option value="pusat" className="text-black">
+                      Pengelola Pusat
+                    </option>
+                    <option value="pimpinan" className="text-black">
+                      Pimpinan
+                    </option>
+                  </select>
+                </div>
 
-                {password != "" && (
+                {(email != "" && password != "" && role != "") && (
                   <div
                     className="flex flex-wrap w-full -mx-3 mb-2"
                     style={{ width: "100% !important" }}
@@ -249,9 +270,9 @@ export const LoginAdminELAUT = () => {
                   </Button>
                 )}
                 <div className="text-sm text-gray-200 text-center mt-2">
-                  By logging to the system, you agree to the{" "}
-                  <span className="underline">terms & conditions</span>, and our{" "}
-                  <span className="underline">privacy policy</span>.
+                  Dengan login ke e-laut, anda menyetujui{" "}
+                  <span className="underline">ketentuan serta peraturan yang berlaku</span>, dan {" "}
+                  <span className="underline">kebijakan keamanan</span>.
                 </div>
               </div></>
           }

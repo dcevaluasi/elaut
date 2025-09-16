@@ -26,7 +26,6 @@ import { HiMiniUserGroup } from "react-icons/hi2";
 import { elautBaseUrl } from "@/constants/urls";
 import { PusatDetailInfo } from "@/types/pusat";
 import { breakdownStatus } from "@/lib/utils";
-import { generatedDetailInfoLemdiklat } from "@/utils/lemdiklat";
 const DropdownUser = ({
   lemdiklatLoggedInInfo,
   pusatLoggedInInfo
@@ -592,7 +591,7 @@ const DropdownUser = ({
         <span className="hidden md:flex md:justify-end md:flex-col">
           <span className="block text-sm font-medium text-black text-right">
             {pathname.includes("lemdiklat")
-              ? generatedDetailInfoLemdiklat(lemdiklatLoggedInInfo?.data?.NamaLemdik! || "").lemdiklat
+              ? Cookies.get('Satker')
               : dataAdminPusat && pathname.includes("pusat")
                 ? dataAdminPusat!.Nama
                 : ""}
@@ -600,7 +599,7 @@ const DropdownUser = ({
           <span className=" gap-1 text-xs text-right">
 
             {pathname.includes("lemdiklat")
-              ? `${generatedDetailInfoLemdiklat(lemdiklatLoggedInInfo?.data?.NamaLemdik! || "").name} - ${Cookies.get('Eselon')}`
+              ? `${Cookies.get('Nama')} - ${Cookies.get('Eselon')}`
               : dataAdminPusat && pathname.includes("pusat")
                 ? `${breakdownStatus(Cookies.get('Status')!)[0]}`
                 : ""}

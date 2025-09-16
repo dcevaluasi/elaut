@@ -22,10 +22,10 @@ export function useFetchDataPelatihanMasyarakat() {
 
   const isLemdiklat =
     Cookies.get('Access')?.includes('createPelatihan') &&
-    Cookies.get('Role') != 'Operator Pusat'
+    Cookies.get('Role') != 'Pengelola Pusat'
   const isPusat =
     Cookies.get('Access')?.includes('createPelatihan') &&
-    Cookies.get('Role') == 'Operator Pusat'
+    Cookies.get('Role') == 'Pengelola Pusat'
   const isVerificator =
     Cookies.get('Access')?.includes('verifyPelaksanaan') &&
     Cookies.get('Access')?.includes('verifyCertificate')

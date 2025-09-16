@@ -18,7 +18,6 @@ import { TbBuildingSkyscraper, TbDatabaseEdit, TbSignature } from "react-icons/t
 import Link from "next/link";
 import { breakdownStatus } from "@/lib/utils";
 import { generatedSignedCertificate } from "@/utils/certificates";
-import { generatedDetailInfoLemdiklat } from "@/utils/lemdiklat";
 
 export default function LayoutAdminElaut({
   children,
@@ -60,20 +59,36 @@ export default function LayoutAdminElaut({
       const { data } = await axios.get(`${elautBaseUrl}/lemdik/getLemdik`, {
         headers: { Authorization: `Bearer ${Cookies.get("XSRF091")}` },
       });
+
       setLemdikData(data);
+
+      // set basic cookies
       Cookies.set("IDLemdik", data.data.IdLemdik);
-      Cookies.set("IDUnitKerja", data.data.IdUnitKerja)
-      Cookies.set("Satker", generatedDetailInfoLemdiklat(data.data.NamaLemdik!).lemdiklat);
-      Cookies.set("Nama", generatedDetailInfoLemdiklat(data.data.NamaLemdik!).name);
+      Cookies.set("IDUnitKerja", data.data.IdUnitKerja);
+      Cookies.set("Nama", data.data.NamaLemdik);
       Cookies.set("Role", breakdownStatus(data.data.Deskripsi)[0]);
       Cookies.set("Eselon", breakdownStatus(data.data.Deskripsi)[0]);
       Cookies.set("Access", breakdownStatus(data.data.Deskripsi)[1]);
       Cookies.set("PimpinanLemdiklat", data.data.NamaKaBalai);
-      console.log({ data })
+
+      // 🔑 fetch Unit Kerja by ID and set Satker = unitKerjas.nama
+      const token = Cookies.get("XSRF091");
+      const unitResponse = await axios.get(
+        `${elautBaseUrl}/unit-kerja/getUnitKerjaById?id=${data.data.IdUnitKerja}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const unitData = unitResponse.data.data;
+      if (unitData?.nama) {
+        Cookies.set("Satker", unitData.nama);
+      }
+
+      console.log({ data, unitData });
     } catch (error) {
       console.error("LEMDIK INFO: ", error);
     }
   };
+
 
   useEffect(() => {
     isLemdiklatLevel ? fetchInformationLemdiklat() : fetchInformationPusat();
@@ -149,7 +164,7 @@ export default function LayoutAdminElaut({
 
           {/* Master Pelatihan */}
           {
-            Cookies.get('Role')?.includes('Operator') && <li>
+            Cookies.get('Role')?.includes('Pengelola') && <li>
               <button
                 onClick={() => setSubmenuOpen((prev) => !prev)}
                 className={`flex items-center justify-between w-full px-4 py-2 transition-colors rounded-md ${pathname.includes("master")
