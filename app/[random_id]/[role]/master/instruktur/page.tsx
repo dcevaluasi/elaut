@@ -21,7 +21,7 @@ export default function Page() {
                                     Instruktur/Pelatih
                                 </h1>
                                 <p className="font-medium text-gray-400 text-base">
-                                    Monitoring dan kelola data Instruktur/Pelatih pada Lembaga Diklat!
+                                    Monitoring dan kelola data Instruktur/Pelatih pada Lembaga Diklat, Internal Pusat, atau Lintas Eselon!
                                 </p>
                             </div>
                         </header>

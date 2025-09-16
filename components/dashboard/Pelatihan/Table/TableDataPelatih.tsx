@@ -327,13 +327,13 @@ function StatsCards({
                     <Card className="h-fit rounded-xl border border-gray-200 bg-white shadow-sm">
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-base font-medium text-gray-600">
-                                Total Instruktur
+                                Total Instruktur/Pelatih
                             </CardTitle>
                             <Users className="h-5 w-5 text-gray-400" />
                         </CardHeader>
                         <CardContent>
                             <p className="text-2xl font-bold text-gray-800">{data.length}</p>
-                            <p className="text-xs text-gray-500">Instruktur terdaftar</p>
+                            <p className="text-xs text-gray-500">Instruktur/pelatih terdaftar</p>
                         </CardContent>
                     </Card>
 
@@ -344,7 +344,7 @@ function StatsCards({
                             <CardHeader className="flex items-center gap-2">
                                 <GraduationCap className="h-5 w-5 text-purple-500" />
                                 <CardTitle className="text-lg font-semibold text-center text-gray-800">
-                                    Pendidikan Terakhir
+                                    Pendidikan
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
@@ -367,7 +367,7 @@ function StatsCards({
                             <CardHeader className="flex items-center gap-2">
                                 <ShieldCheck className="h-5 w-5 text-teal-500" />
                                 <CardTitle className="text-lg font-semibold text-center text-gray-800">
-                                    Status Instruktur
+                                    Status
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
@@ -399,7 +399,7 @@ function StatsCards({
                         </CardHeader>
                         <CardContent>
                             <p className="text-2xl font-bold text-gray-800">{stats.tot}</p>
-                            <p className="text-xs text-gray-500">Instruktur memiliki ToT</p>
+                            <p className="text-xs text-gray-500">Instruktur/pelatih memiliki ToT</p>
                         </CardContent>
                     </Card>
 
