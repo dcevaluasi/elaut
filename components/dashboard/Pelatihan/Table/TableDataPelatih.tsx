@@ -78,7 +78,6 @@ function InstrukturTable({ data, fetchData }: Props) {
             const matchesJabatan = !filterJabatan || row.jenjang_jabatan === filterJabatan
             const matchesUnitKerja = !filterUnitKerja || row.id_lemdik.toString() === filterUnitKerja
 
-
             return matchesSearch && matchesKeahlian && matchesStatus && matchesPendidikan && matchesJabatan && matchesUnitKerja
         })
     }, [data, search, filterKeahlian, filterStatus, filterPendidikan, filterJabatan, filterUnitKerja])

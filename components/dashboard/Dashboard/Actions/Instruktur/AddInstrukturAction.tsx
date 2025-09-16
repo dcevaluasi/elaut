@@ -47,7 +47,7 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
     const [managementOfTraining, setManagementOfTraining] = useState("");
     const [trainingOfficerCourse, setTrainingOfficerCourse] = useState("");
     const [linkSertifikat, setLinkSertifikat] = useState("");
-    const [status, setStatus] = useState("Aktif");
+    const [status, setStatus] = useState("Active");
     const [eselon1, setEselon1] = useState("")
     const [eselon2, setEselon2] = useState("")
     const [pendidikanTerakhir, setPendidikanTerakhir] = useState("");
@@ -68,7 +68,7 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
         setManagementOfTraining("");
         setTrainingOfficerCourse("");
         setLinkSertifikat("");
-        setStatus("Aktif");
+        setStatus("Active");
         setEselon1("")
         setEselon2("")
         setPendidikanTerakhir("");
@@ -271,8 +271,8 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
                                 <SelectValue placeholder="Pilih status" />
                             </SelectTrigger>
                             <SelectContent position="popper" className="z-[9999999]">
-                                <SelectItem value="Active">Aktif</SelectItem>
-                                <SelectItem value="No Active">Nonaktif</SelectItem>
+                                <SelectItem value="Active">Active</SelectItem>
+                                <SelectItem value="No Active">Non Active</SelectItem>
                                 <SelectItem value="Tugas Belajar">Tugas Belajar</SelectItem>
                             </SelectContent>
                         </Select>

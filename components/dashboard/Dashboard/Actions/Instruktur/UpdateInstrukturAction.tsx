@@ -28,6 +28,7 @@ import { TbPencil } from "react-icons/tb";
 import { Instruktur } from "@/types/instruktur";
 import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
 import { devNull } from "os";
+import { UK_ESELON_1, UK_ESELON_2 } from "@/constants/unitkerja";
 
 const UpdateInstrukturAction: React.FC<{
     instruktur: Instruktur;
@@ -52,6 +53,8 @@ const UpdateInstrukturAction: React.FC<{
     const [status, setStatus] = useState(instruktur.status || "Active");
     const [pendidikanTerakhir, setPendidikanTerakhir] = useState(instruktur.pendidikkan_terakhir || "");
     const [idLemdik, setIdLemdik] = useState(instruktur?.id_lemdik || null)
+    const [eselon1, setEselon1] = useState(instruktur.eselon_1 || "");
+    const [eselon2, setEselon2] = useState(instruktur.eselon_2 || "");
 
     const [loading, setLoading] = useState(false);
 
@@ -72,6 +75,8 @@ const UpdateInstrukturAction: React.FC<{
             training_officer_course: trainingOfficerCourse,
             link_data_dukung_sertifikat: linkSertifikat,
             status,
+            eselon_1: eselon1,
+            eselon_2: eselon2,
             pendidikkan_terakhir: pendidikanTerakhir,
         };
 
@@ -330,6 +335,52 @@ const UpdateInstrukturAction: React.FC<{
                             </SelectContent>
                         </Select>
                     </div>
+
+                    <div className="flex flex-col w-full gap-2">
+                        <div className="w-full">
+                            <label className="text-sm font-medium text-gray-700">Eselon I</label>
+                            <Select
+                                value={eselon1}
+                                onValueChange={(v) => setEselon1(v)}
+                            >
+                                <SelectTrigger >
+                                    <SelectValue placeholder="Pilih Eselon I" className="truncate" />
+                                </SelectTrigger>
+                                <SelectContent position="popper" className="z-[9999999] truncate">
+                                    {
+                                        UK_ESELON_1.map((eselon1, index) => (
+                                            <SelectItem className='truncate' value={eselon1.name} key={eselon1.id}>{eselon1.name}</SelectItem>
+                                        ))
+                                    }
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {
+                            eselon1 != '' && <div className="w-full">
+                                <label className="text-sm font-medium text-gray-700">Eselon II</label>
+                                <Select
+                                    value={eselon2}
+                                    onValueChange={(v) => setEselon2(v)}
+                                >
+                                    <SelectTrigger >
+                                        <SelectValue placeholder="Pilih Eselon II" className="truncate" />
+                                    </SelectTrigger>
+                                    <SelectContent position="popper" className="z-[9999999] truncate">
+                                        {UK_ESELON_2[eselon1 as keyof typeof UK_ESELON_2]?.map(
+                                            (eselon2: string, index: number) => (
+                                                <SelectItem className="truncate" value={eselon2} key={index}>
+                                                    {eselon2}
+                                                </SelectItem>
+                                            )
+                                        )}
+
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        }
+                    </div>
+
                 </div>
 
                 <AlertDialogFooter>
