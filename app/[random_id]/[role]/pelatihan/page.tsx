@@ -1,7 +1,7 @@
 "use client";
 
 import Pelatihan from "@/components/dashboard/Dashboard/Pelatihan";
-import LayoutAdminElaut from "@/components/dashboard/Layouts/LayoutAdminElaut";
+import LayoutAdminElaut, { HeaderPageLayoutAdminElaut } from "@/components/dashboard/Layouts/LayoutAdminElaut";
 import { elautBaseUrl } from "@/constants/urls";
 import { LemdiklatDetailInfo } from "@/types/lemdiklat";
 import axios from "axios";
@@ -15,24 +15,7 @@ export default function Home() {
     <>
       <LayoutAdminElaut>
         <section className="flex-1 flex flex-col">
-          <div className="flex flex-col w-full">
-            <div className="flex flex-row gap-2 items-center">
-              <header
-                aria-label="page caption"
-                className="flex-row w-full flex h-20 items-center gap-2 bg-gray-100 border-t px-4"
-              >
-                <TbSchool className="text-3xl" />
-                <div className="flex flex-col">
-                  <h1 id="page-caption" className="font-semibold text-lg">
-                    Penyelenggaraan Pelatihan
-                  </h1>
-                  <p className="font-medium text-gray-400 text-base">
-                    Monitoring pelaksanaan pelatihan kelautan dan perikanan!
-                  </p>
-                </div>
-              </header>
-            </div>
-          </div>
+          <HeaderPageLayoutAdminElaut title="Penyelenggaraan Pelatihan" description=" Monitoring dan kelola penyelenggaran pelatihan kelautan dan perikanan mulai buka kelas hingga penerbitan STTPL!" icon={<TbSchool className="text-3xl" />} />
           <main className="w-full h-full">
             <Pelatihan />
           </main>
