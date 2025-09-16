@@ -3,7 +3,6 @@
 import TableModulPelatihan from "@/components/dashboard/Dashboard/Modul/TableModulPelatihan";
 import LayoutAdminElaut, { HeaderPageLayoutAdminElaut } from "@/components/dashboard/Layouts/LayoutAdminElaut";
 import { BookOpen } from "lucide-react";
-import React from "react";
 
 export default function Page() {
     return (
