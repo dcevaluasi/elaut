@@ -512,6 +512,18 @@ export const PROGRAM_SISJAMU = [
   "Asisten Pengolah Ikan (API)",
 ]
 
+export const PROGRAM_SISJAMU_2 = [
+  "Cara Pembenihan Ikan yang Baik (CPIB)",
+  "Cara Budi Daya Ikan yang Baik (CBIB)",
+  "Cara Pembuatan Pakan Ikan yang Baik (CPPIB)",
+  "Hazard Analysis and Critical Control Points (HACCP)",
+  "Cara Pembuatan Obat Ikan yang Baik (CPOIB)",
+  "Cara Distribusi Obat Ikan yang Baik (CDOIB)",
+  "Manager Pengendali Mutu  Cara Pembenihan Ikan Yang Baik (MPM-CPIB)",
+  "Sertifikasi Pengolah Ikan (SPI)",
+  "Asisten Pengolah Ikan (API)",
+]
+
 export const PENANDATANGAN_SERTIFIKAT = [
   "Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan",
   "Kepala Pusat Pelatihan Kelautan dan Perikanan",
