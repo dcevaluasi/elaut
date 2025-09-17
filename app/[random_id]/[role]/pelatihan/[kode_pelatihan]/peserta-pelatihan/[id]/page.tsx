@@ -1,4 +1,3 @@
-import Pelatihan from "@/components/dashboard/Dashboard/Pelatihan";
 import LayoutAdminElaut from "@/components/dashboard/Layouts/LayoutAdminElaut";
 
 import { Metadata } from "next";

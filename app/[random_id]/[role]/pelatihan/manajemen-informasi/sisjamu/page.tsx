@@ -1,6 +1,5 @@
 "use client";
 
-import Pelatihan from "@/components/dashboard/Dashboard/Pelatihan";
 import LayoutAdminElaut from "@/components/dashboard/Layouts/LayoutAdminElaut";
 import { elautBaseUrl } from "@/constants/urls";
 import { LemdiklatDetailInfo } from "@/types/lemdiklat";

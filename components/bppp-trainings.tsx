@@ -37,7 +37,6 @@ import FeaturesPelatihanBbalai from "./features-pelatihan-balai";
 import FeaturesPelatihanBalai from "./features-pelatihan-balai";
 import { Slide } from "react-awesome-reveal";
 import Image from "next/image";
-import Pelatihan from "./dashboard/Dashboard/Pelatihan";
 
 export default function BPPPTrainings({
   data,
