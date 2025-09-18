@@ -2,18 +2,18 @@
 import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import axios, { AxiosResponse } from "axios";
-import { LemdiklatDetailInfo } from "@/types/lemdiklat";
 import { PelatihanMasyarakat } from "@/types/product";
-import ChartMasyarakatDilatihMonthly from "../../Charts/ChartMasyarakatDilatihMonthly";
-import ChartDetailMasyarakatDilatih from "../../Charts/ChartDetailMasyarakatDilatih";
+import ChartMasyarakatDilatihMonthly from "./Charts/ChartMasyarakatDilatihMonthly";
+import ChartDetailMasyarakatDilatih from "./Charts/ChartDetailMasyarakatDilatih";
 import { HashLoader } from "react-spinners";
 import Image from "next/image";
 import { User, UserPelatihan } from "@/types/user";
 import useFetchDataDukung from "@/hooks/elaut/useFetchDataDukung";
 import { exportDataDukungToExcel } from "@/lib/exportToExcel";
 import { Button } from "@/components/ui/button";
+import MetricsSummaryPelatihan from "./MetricsSummaryPelatihan";
 
-const SummaryELAUT: React.FC = () => {
+const SummaryPelatihan: React.FC = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const token = Cookies.get("XSRF091");
 
@@ -92,6 +92,8 @@ const SummaryELAUT: React.FC = () => {
             {isFetchingDataDukung ? 'Mengunduh...' : 'Download Data Dukung'}
           </Button>
 
+          {/* <MetricsSummaryPelatihan /> */}
+
           <ChartMasyarakatDilatihMonthly data={data} dataUser={dataUser} />
           <ChartDetailMasyarakatDilatih data={data} dataUser={dataUser} />
         </>
@@ -122,4 +124,4 @@ const SummaryELAUT: React.FC = () => {
   );
 };
 
-export default SummaryELAUT;
+export default SummaryPelatihan;

@@ -1,4 +1,4 @@
-import SummaryELAUT from "@/components/dashboard/Dashboard/Summary/SummaryELAUT";
+import { SummaryPelatihan } from "@/components/dashboard";
 import LayoutAdminElaut from "@/components/dashboard/Layouts/LayoutAdminElaut";
 
 import { Metadata } from "next";
@@ -11,7 +11,7 @@ export default function Page() {
   return (
     <LayoutAdminElaut>
       <section className="p-10 w-full mt-1">
-        <SummaryELAUT />
+        <SummaryPelatihan />
       </section>
     </LayoutAdminElaut>
   );
