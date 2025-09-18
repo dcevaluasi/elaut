@@ -1,7 +1,6 @@
 import LayoutAdminElaut from "@/components/dashboard/Layouts/LayoutAdminElaut";
 
 import { Metadata } from "next";
-import { HiUserGroup } from "react-icons/hi2";
 
 export const metadata: Metadata = {
   title: "Peserta Pelatihan",
