@@ -88,10 +88,6 @@ const SummaryPelatihan: React.FC = () => {
         </div>
       ) : data != null ? (
         <>
-          <Button onClick={handleDownloadExcel} className="bg-blue-500 text-white mb-2 hover:bg-blue-600">
-            {isFetchingDataDukung ? 'Mengunduh...' : 'Download Data Dukung'}
-          </Button>
-
           {/* <MetricsSummaryPelatihan /> */}
 
           <ChartMasyarakatDilatihMonthly data={data} dataUser={dataUser} />
