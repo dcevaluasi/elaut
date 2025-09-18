@@ -30,9 +30,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import ChartPopover from "../Charts/ChartPopover";
+import ChartPopover from "../charts/ChartPopover";
 import { formatDateTime } from "@/utils";
-import ChartBlankoAwal from "../Charts/ChartBlankoAwal";
+import ChartBlankoAwal from "../charts/ChartBlankoAwal";
 import useFetchSertifikatByTypeBlanko from "@/hooks/blanko/useFetchSertifikatByTypeBlanko";
 import useFetchSertifikatByLemdiklat from "@/hooks/blanko/useFetchSertifikatByLemdiklat";
 

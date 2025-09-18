@@ -4,7 +4,7 @@ import CardDataStats from "../CardDataStats";
 import { HiCheckBadge, HiMiniUserGroup, HiTrash } from "react-icons/hi2";
 import { GiBattery75, GiPapers, GiReceiveMoney } from "react-icons/gi";
 import { MdSchool } from "react-icons/md";
-import ChartFour from "../Charts/ChartFour";
+import ChartFour from "../charts/ChartFour";
 import Cookies from "js-cookie";
 import axios, { AxiosResponse } from "axios";
 import { LemdiklatDetailInfo } from "@/types/lemdiklat";
@@ -23,16 +23,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import ChartPopover from "../Charts/ChartPopover";
-import ChartPopoverKeluar from "../Charts/ChartPopoverKeluar";
+import ChartPopover from "../charts/ChartPopover";
+import ChartPopoverKeluar from "../charts/ChartPopoverKeluar";
 import { formatDateTime } from "@/utils";
-import ChartPopoverKeahlian from "../Charts/ChartPopoverKeahlian";
+import ChartPopoverKeahlian from "../charts/ChartPopoverKeahlian";
 import TableDataBlankoKeluarPublic from "../Pelatihan/TableDataBlankoKeluarPublic";
-import ChartBlankoAwal from "../Charts/ChartBlankoAwal";
-import ChartPopoverKeterampilan from "../Charts/ChartPopoverKeterampilan";
-import ChartCertificatesMonthly from "../Charts/ChartCertificatesMonthly";
-import ChartPopoverPelatihan from "../Charts/ChartPopoverPelatihan";
-import ChartPopoverSertifikasi from "../Charts/ChartPopoverSertifikasi";
+import ChartBlankoAwal from "../charts/ChartBlankoAwal";
+import ChartPopoverKeterampilan from "../charts/ChartPopoverKeterampilan";
+import ChartCertificatesMonthly from "../charts/ChartCertificatesMonthly";
+import ChartPopoverPelatihan from "../charts/ChartPopoverPelatihan";
+import ChartPopoverSertifikasi from "../charts/ChartPopoverSertifikasi";
 
 const Dashboard: React.FC = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;

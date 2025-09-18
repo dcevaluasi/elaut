@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import TableData from "../Tables/TableData";
+import TableData from "../tables/TableData";
 
 import {
   ColumnDef,
@@ -632,8 +632,8 @@ const TableDataBlankoRusak: React.FC = () => {
                     {selectedTipeBlanko == " "
                       ? "All"
                       : selectedTipeBlanko != ""
-                      ? selectedTipeBlanko
-                      : "Tipe Blanko"}
+                        ? selectedTipeBlanko
+                        : "Tipe Blanko"}
                   </div>
                 </SelectTrigger>
                 <SelectContent>

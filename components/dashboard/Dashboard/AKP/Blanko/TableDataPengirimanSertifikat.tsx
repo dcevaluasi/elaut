@@ -32,7 +32,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { BlankoKeluar, PengirimanSertifikat } from "@/types/blanko";
 import { generateTanggalPelatihan } from "@/utils/text";
-import TableData from "@/components/dashboard/Tables/TableData";
+import TableData from "@/components/dashboard/tables/TableData";
 import { GrSend } from "react-icons/gr";
 import { blankoAkapiBaseUrl } from "@/constants/urls";
 import { formatToRupiah } from "@/lib/utils";

@@ -30,13 +30,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import ChartPopover from "../Charts/ChartPopover";
-import ChartPopoverKeluar from "../Charts/ChartPopoverKeluar";
+import ChartPopover from "../charts/ChartPopover";
+import ChartPopoverKeluar from "../charts/ChartPopoverKeluar";
 import { formatDateTime } from "@/utils";
-import ChartPopoverKeahlian from "../Charts/ChartPopoverKeahlian";
-import ChartBlankoAwal from "../Charts/ChartBlankoAwal";
-import ChartPopoverKeterampilan from "../Charts/ChartPopoverKeterampilan";
-import ChartCertificatesMonthly from "../Charts/ChartCertificatesMonthly";
+import ChartPopoverKeahlian from "../charts/ChartPopoverKeahlian";
+import ChartBlankoAwal from "../charts/ChartBlankoAwal";
+import ChartPopoverKeterampilan from "../charts/ChartPopoverKeterampilan";
+import ChartCertificatesMonthly from "../charts/ChartCertificatesMonthly";
 import useFetchSertifikatByTypeBlanko from "@/hooks/blanko/useFetchSertifikatByTypeBlanko";
 import useFetchSertifikatByLemdiklat from "@/hooks/blanko/useFetchSertifikatByLemdiklat";
 import { ChartSertifikatByLemdiklat } from "../akp";

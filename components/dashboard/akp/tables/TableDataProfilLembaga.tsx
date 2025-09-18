@@ -30,7 +30,7 @@ import useFetchBlankoByNameByAddress from "@/hooks/blanko/useFetchBlankoByNameBy
 import { DataBlankoByNameByAddress, DataLembaga, DataProfilLembaga } from "@/types/akapi";
 import { HashLoader } from "react-spinners";
 import useFetchProfilLembaga from "@/hooks/akapi/useFetchProfilLembaga";
-import TableData from "../../Tables/TableData";
+import TableData from "../../tables/TableData";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { FaInfo } from "react-icons/fa6";
 import Link from "next/link";

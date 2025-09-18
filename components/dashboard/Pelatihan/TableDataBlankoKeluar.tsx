@@ -1,5 +1,5 @@
 import React from "react";
-import TableData from "../Tables/TableData";
+import TableData from "../tables/TableData";
 
 import {
   ColumnDef,

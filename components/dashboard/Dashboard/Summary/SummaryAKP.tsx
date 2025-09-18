@@ -22,11 +22,11 @@ import {
 import { formatDateTime } from "@/utils";
 import useFetchSertifikatByTypeBlanko from "@/hooks/blanko/useFetchSertifikatByTypeBlanko";
 import CardDataStats from "../../CardDataStats";
-import ChartBlankoAwal from "../../Charts/ChartBlankoAwal";
-import ChartPopover from "../../Charts/ChartPopover";
-import ChartCertificatesMonthly from "../../Charts/ChartCertificatesMonthly";
-import ChartPopoverKeahlian from "../../Charts/ChartPopoverKeahlian";
-import ChartPopoverKeterampilan from "../../Charts/ChartPopoverKeterampilan";
+import ChartBlankoAwal from "../../charts/ChartBlankoAwal";
+import ChartPopover from "../../charts/ChartPopover";
+import ChartCertificatesMonthly from "../../charts/ChartCertificatesMonthly";
+import ChartPopoverKeahlian from "../../charts/ChartPopoverKeahlian";
+import ChartPopoverKeterampilan from "../../charts/ChartPopoverKeterampilan";
 import { blankoAkapiBaseUrl, elautBaseUrl } from "@/constants/urls";
 
 const SummaryAKP: React.FC = () => {
@@ -152,12 +152,12 @@ const SummaryAKP: React.FC = () => {
       </div>
       <div className="grid grid-cols-1 gap-4 h-fit max-h-fit w-full md:grid-cols-3 md:gap-3 xl:grid-cols-3 2xl:gap-3">
         {isFetchingSertifikatByTypeBlankoCoC &&
-        isFetchingSertifikatByTypeBlankoCoP ? (
+          isFetchingSertifikatByTypeBlankoCoP ? (
           <></>
         ) : dataSertifikatByTypeBlankoCoC != null &&
           dataSertifikatByTypeBlankoCoP != null ? (
           dataSertifikatByTypeBlankoCoC.data != null &&
-          dataSertifikatByTypeBlankoCoP.data != null ? (
+            dataSertifikatByTypeBlankoCoP.data != null ? (
             <>
               <Popover>
                 <PopoverTrigger asChild>
@@ -335,12 +335,12 @@ const SummaryAKP: React.FC = () => {
       </div>
 
       {isFetchingSertifikatByTypeBlankoCoC &&
-      isFetchingSertifikatByTypeBlankoCoP ? (
+        isFetchingSertifikatByTypeBlankoCoP ? (
         <></>
       ) : dataSertifikatByTypeBlankoCoC != null &&
         dataSertifikatByTypeBlankoCoP != null ? (
         dataSertifikatByTypeBlankoCoC.data != null &&
-        dataSertifikatByTypeBlankoCoP.data != null ? (
+          dataSertifikatByTypeBlankoCoP.data != null ? (
           <div className="w-full mt-8">
             <ChartCertificatesMonthly
               data={data!}

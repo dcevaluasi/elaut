@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useState } from "react";
-import TableData from "../Tables/TableData";
+import TableData from "../tables/TableData";
 import {
   AlertDialog,
   AlertDialogAction,

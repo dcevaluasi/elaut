@@ -3,8 +3,8 @@ import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import axios, { AxiosResponse } from "axios";
 import { PelatihanMasyarakat } from "@/types/product";
-import ChartMasyarakatDilatihMonthly from "./Charts/ChartMasyarakatDilatihMonthly";
-import ChartDetailMasyarakatDilatih from "./Charts/ChartDetailMasyarakatDilatih";
+import ChartMasyarakatDilatihMonthly from "./charts/ChartMasyarakatDilatihMonthly";
+import ChartDetailMasyarakatDilatih from "./charts/ChartDetailMasyarakatDilatih";
 import { HashLoader } from "react-spinners";
 import Image from "next/image";
 import { User, UserPelatihan } from "@/types/user";
@@ -12,6 +12,7 @@ import useFetchDataDukung from "@/hooks/elaut/useFetchDataDukung";
 import { exportDataDukungToExcel } from "@/lib/exportToExcel";
 import { Button } from "@/components/ui/button";
 import MetricsSummaryPelatihan from "./MetricsSummaryPelatihan";
+import TableDataIndikatorKinerjaUtama from "./tables/TableDataIndikatorKinerjaUtama";
 
 const SummaryIKUPelatihan: React.FC = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -94,7 +95,7 @@ const SummaryIKUPelatihan: React.FC = () => {
 
           {/* <MetricsSummaryPelatihan /> */}
 
-          <ChartDetailMasyarakatDilatih data={data} dataUser={dataUser} />
+          <TableDataIndikatorKinerjaUtama data={data} dataUser={dataUser} />
         </>
       ) : (
         <div className="relative max-w-7xl w-full mx-auto mt-20">

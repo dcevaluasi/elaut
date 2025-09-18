@@ -28,7 +28,7 @@ export default function LayoutAdminElaut({
   const router = useRouter();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [submenuOpen, setSubmenuOpen] = useState(false);
+  const [submenuOpen, setSubmenuOpen] = useState(true);
   const [pusatData, setPusatData] = useState<PusatDetailInfo | null>(null);
   const [lemdikData, setLemdikData] = useState<LemdiklatDetailInfo | null>(null);
 
@@ -167,7 +167,7 @@ export default function LayoutAdminElaut({
           {
             Cookies.get('Role')?.includes('Pengelola') && <li>
               <button
-                onClick={() => setSubmenuOpen((prev) => !prev)}
+
                 className={`flex items-center justify-between w-full px-4 py-2 transition-colors rounded-md ${pathname.includes("master")
                   ? "bg-blue-600 text-white"
                   : "hover:bg-blue-500 hover:text-white"
@@ -186,20 +186,20 @@ export default function LayoutAdminElaut({
                 <ul className="ml-10 mt-1 space-y-1">
                   <NavItem
                     href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/instruktur`}
-                    icon={<HiOutlineUserGroup className="text-xl" />}
-                    label="Instruktur"
+                    icon={<HiOutlineUserGroup className="flex-shrink-0 w-6 h-6" />}
+                    label="Instruktur/Pelatih"
                   />
                   {
                     Cookies.get('Access')?.includes('viewModul') &&
                     <NavItem
                       href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/modul`}
-                      icon={<IoBookOutline className="text-lg" />}
+                      icon={<IoBookOutline className="flex-shrink-0 w-6 h-6" />}
                       label="Modul Pelatihan"
                     />
                   }
                   <NavItem
                     href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/unit-kerja`}
-                    icon={<TbBuildingSkyscraper className="text-lg" />}
+                    icon={<TbBuildingSkyscraper className="flex-shrink-0 w-6 h-6" />}
                     label="Unit Kerja"
                   />
                 </ul>

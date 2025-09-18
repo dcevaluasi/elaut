@@ -37,12 +37,12 @@ import {
 import { PelatihanMasyarakat } from "@/types/product";
 import { TrendingUp } from "lucide-react";
 import { UserPelatihan } from "@/types/user";
-import TableDataPelatihanMasyarakat from "../Tables/TableDataPelatihanMasyarakat";
-import TableDataPelatihanMasyarakatByProvinsi from "../Tables/TableDataPelatihanMasyarakatByProvinsi";
-import TableDataPelatihanMasyrakatByProgramPrioritas from "../Tables/TableDataPelatihanMasyrakatByProgramPrioritas";
-import TableDataPelatihanMasyrakatByGender from "../Tables/TableDataPelatihanMasyrakatByGender";
-import TableDataPelatihanMasyrakatByPendidikan from "../Tables/TableDataPelatihanMasyrakatByPendidikan";
-import TableDataPelatihanMasyarakatByWilker from "../Tables/TableDataPelatihanMasyarakatByWilker";
+import TableDataPelatihanMasyarakat from "../tables/TableDataPelatihanMasyarakat";
+import TableDataPelatihanMasyarakatByProvinsi from "../tables/TableDataPelatihanMasyarakatByProvinsi";
+import TableDataPelatihanMasyrakatByProgramPrioritas from "../tables/TableDataPelatihanMasyrakatByProgramPrioritas";
+import TableDataPelatihanMasyrakatByGender from "../tables/TableDataPelatihanMasyrakatByGender";
+import TableDataPelatihanMasyrakatByPendidikan from "../tables/TableDataPelatihanMasyrakatByPendidikan";
+import TableDataPelatihanMasyarakatByWilker from "../tables/TableDataPelatihanMasyarakatByWilker";
 import Cookies from "js-cookie";
 import { getFilteredDataByBalai, getFilteredDataPelatihanByBalai } from "@/lib/training";
 import { isSigned, isUnsigned } from "@/lib/sign";
