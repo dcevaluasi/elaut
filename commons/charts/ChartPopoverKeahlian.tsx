@@ -9,7 +9,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import CountUp from "react-countup";
 
-import TableDataBlankoKeluarPublic from "../Pelatihan/TableDataBlankoKeluarPublic";
 
 import { TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from "recharts";
@@ -32,6 +31,7 @@ import {
   SATUAN_PENDIDIKAN_KEAHLIAN,
 } from "@/constants/pelatihan";
 import { PILIHAN_SUMMARY_KEAHLIAN_AKP } from "@/constants/akp";
+import TableDataBlankoKeluarPublic from "@/components/dashboard/Pelatihan/TableDataBlankoKeluarPublic";
 export const description = "A bar chart with an active bar";
 
 const chartConfigLemdiklat = {

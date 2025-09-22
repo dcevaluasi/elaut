@@ -3,7 +3,6 @@ import { formatDateTime } from "@/utils";
 import { ApexOptions } from "apexcharts";
 import React, { useState } from "react";
 import ReactApexChart from "react-apexcharts";
-import { IoMdArrowDropdown } from "react-icons/io";
 
 interface ChartThreeState {
   series: number[];

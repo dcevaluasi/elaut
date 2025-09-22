@@ -8,7 +8,6 @@ import ReactApexChart from "react-apexcharts";
 
 import CountUp from "react-countup";
 
-import TableDataBlankoKeluarPublic from "../Pelatihan/TableDataBlankoKeluarPublic";
 
 import { TrendingUp } from "lucide-react";
 import {
@@ -36,8 +35,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import TableDataBlankoKeluar from "../Pelatihan/TableDataBlankoKeluar";
-import { usePathname } from "next/navigation";
 export const description = "A bar chart with an active bar";
 
 const chartConfig = {

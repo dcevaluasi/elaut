@@ -31,7 +31,6 @@ import {
 } from "@/types/akapi";
 import { FaBuilding, FaGraduationCap, FaShip } from "react-icons/fa6";
 import { TrendingUp } from "lucide-react";
-import { ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 export default function ChartSertifikatKeterampilanByLemdiklat({
   dataLembaga,

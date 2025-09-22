@@ -23,9 +23,9 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import TableDataSertifikatKeterampilan from "../Pelatihan/TableDataSertifikatKeterampilan";
 import { BALAI_PELATIHAN, SATUAN_PENDIDIKAN } from "@/constants/pelatihan";
 import { PELABUHAN_PERIKANAN, PILIHAN_SUMMARY_AKP } from "@/constants/akp";
+import TableDataSertifikatKeterampilan from "@/components/dashboard/Pelatihan/TableDataSertifikatKeterampilan";
 
 export const description = "A bar chart with an active bar";
 

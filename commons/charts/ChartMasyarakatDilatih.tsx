@@ -4,13 +4,11 @@ import { BlankoKeluar } from "@/types/blanko";
 import { formatDateTime } from "@/utils";
 import { ApexOptions } from "apexcharts";
 import React, { useEffect, useState } from "react";
-import ReactApexChart from "react-apexcharts";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import CountUp from "react-countup";
 
-import TableDataBlankoKeluarPublic from "../Pelatihan/TableDataBlankoKeluarPublic";
 
 import { TrendingUp } from "lucide-react";
 import {
@@ -39,6 +37,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { BALAI_PELATIHAN } from "@/constants/pelatihan";
+import TableDataBlankoKeluarPublic from "@/components/dashboard/Pelatihan/TableDataBlankoKeluarPublic";
 export const description = "A bar chart with an active bar";
 
 const chartConfig = {
