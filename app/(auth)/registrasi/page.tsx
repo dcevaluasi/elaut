@@ -83,7 +83,6 @@ export const metadata = {
     canonical: "https://elaut-bppsdm.kkp.go.id/registrasi",
     languages: {
       "id-ID": "https://elaut-bppsdm.kkp.go.id/registrasi",
-      "en-US": "https://elaut-bppsdm.kkp.go.id/en/registration",
     },
   },
   openGraph: {

@@ -86,7 +86,6 @@ export const metadata = {
     canonical: "https://elaut-bppsdm.kkp.go.id/login",
     languages: {
       "id-ID": "https://elaut-bppsdm.kkp.go.id/login",
-      "en-US": "https://elaut-bppsdm.kkp.go.id/en/login",
     },
   },
   openGraph: {
