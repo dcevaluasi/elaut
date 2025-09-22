@@ -27,12 +27,12 @@ import { UserPelatihan } from "@/types/user";
 import Cookies from "js-cookie";
 import { getFilteredDataByBalai, getFilteredDataPelatihanByBalai } from "@/lib/training";
 import { isSigned, isUnsigned } from "@/lib/sign";
-import TableDataPelatihanMasyrakatByGender from "@/components/dashboard/tables/TableDataPelatihanMasyrakatByGender";
-import TableDataPelatihanMasyarakatByWilker from "@/components/dashboard/tables/TableDataPelatihanMasyarakatByWilker";
-import TableDataPelatihanMasyarakatByProgramPrioritas from "@/components/dashboard/tables/TableDataPelatihanMasyrakatByProgramPrioritas";
-import TableDataPelatihanMasyarakatByProvinsi from "@/components/dashboard/tables/TableDataPelatihanMasyarakatByProvinsi";
-import TableDataPelatihanMasyarakat from "@/components/dashboard/tables/TableDataPelatihanMasyarakat";
-import TableDataPelatihanMasyarakatByPendidikan from "@/components/dashboard/tables/TableDataPelatihanMasyrakatByPendidikan";
+import TableDataPelatihanMasyrakatByGender from "@/components/dashboard/Tables/TableDataPelatihanMasyrakatByGender";
+import TableDataPelatihanMasyarakatByWilker from "@/components/dashboard/Tables/TableDataPelatihanMasyarakatByWilker";
+import TableDataPelatihanMasyarakatByProgramPrioritas from "@/components/dashboard/Tables/TableDataPelatihanMasyrakatByProgramPrioritas";
+import TableDataPelatihanMasyarakatByProvinsi from "@/components/dashboard/Tables/TableDataPelatihanMasyarakatByProvinsi";
+import TableDataPelatihanMasyarakat from "@/components/dashboard/Tables/TableDataPelatihanMasyarakat";
+import TableDataPelatihanMasyarakatByPendidikan from "@/components/dashboard/Tables/TableDataPelatihanMasyrakatByPendidikan";
 
 const chartConfigJenisPelatihan = {
   visitors: {
