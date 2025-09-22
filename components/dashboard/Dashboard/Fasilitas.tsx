@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import TableDataFasilitas from "../Fasilitas/TableDataFasilitas";
+import TableDataFasilitas from "../fasilitas/TableDataFasilitas";
 import { BiBed } from "react-icons/bi";
 
 const Fasilitas: React.FC = () => {
