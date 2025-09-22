@@ -39,6 +39,8 @@ import { ValidateParticipantAction } from "@/commons/actions/lemdiklat/ValidateP
 import EditPublishAction from "@/commons/actions/EditPublishAction";
 import HistoryButton from "@/commons/actions/HistoryButton";
 import PublishButton from "@/commons/actions/PublishButton";
+import { Button } from "@/components/ui/button";
+import Toast from "@/commons/Toast";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -93,20 +95,51 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 handleFetchingData={fetchData}
                                             />
 
-                                            {
-                                                (data.SuratPemberitahuan != "" && (data.StatusPenerbitan == "0" || data.StatusPenerbitan == "1.2")) &&
-                                                <SendNoteAction
-                                                    idPelatihan={data.IdPelatihan.toString()}
-                                                    title="Kirim ke SPV"
-                                                    description="Apakah Anda yakin ingin mengirim pelaksanaan ini ke SPV untuk proses verifikasi lebih lanjut?"
-                                                    buttonLabel="Send to SPV"
-                                                    icon={TbSend}
-                                                    buttonColor="blue"
-                                                    onSuccess={fetchData}
-                                                    status={"1"}
-                                                    pelatihan={data}
-                                                />
-                                            }
+                                            {/* 
+                                             data?.ModuleMateri != ""
+                                             data?.UserPelatihan.length != 0
+                                             data?.SuratPemberitahuan != ""
+                                             */}
+
+                                            {data.SuratPemberitahuan !== "" && (data.StatusPenerbitan === "0" || data.StatusPenerbitan === "1.2") ? (
+                                                data?.ModuleMateri !== "" && data?.UserPelatihan?.length !== 0 && data?.SuratPemberitahuan !== "" ? (
+                                                    <SendNoteAction
+                                                        idPelatihan={data.IdPelatihan.toString()}
+                                                        title="Kirim ke SPV"
+                                                        description="Apakah Anda yakin ingin mengirim pelaksanaan ini ke SPV untuk proses verifikasi lebih lanjut?"
+                                                        buttonLabel="Send to SPV"
+                                                        icon={TbSend}
+                                                        buttonColor="blue"
+                                                        onSuccess={fetchData}
+                                                        status={"1"}
+                                                        pelatihan={data}
+                                                    />
+                                                ) : <Button
+                                                    variant="outline"
+                                                    className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
+                                                    onClick={() => {
+                                                        Toast.fire({
+                                                            icon: "warning",
+                                                            title: "Lengkapi Data Terlebih Dahulu",
+                                                            html: `
+          <ul style="text-align:left; margin-top:8px;">
+            ${data?.ModuleMateri === "" ? "<li>Module Materi belum diisi</li>" : ""}
+            ${!data?.UserPelatihan || data?.UserPelatihan.length === 0
+                                                                    ? "<li>Peserta pelatihan belum ditambahkan</li>"
+                                                                    : ""
+                                                                }
+            ${data?.SuratPemberitahuan === "" ? "<li>Surat Pemberitahuan belum tersedia</li>" : ""}
+          </ul>
+        `,
+                                                        });
+                                                    }}
+                                                >
+                                                    <TbSend className="h-5 w-5" />
+                                                    Send to SPV TT
+                                                </Button>
+
+                                            ) : null}
+
 
                                             {/* (3) Operator : Send to Verifikator After Reject */}
                                             {
@@ -421,7 +454,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             Action :
                                         </p>
                                         {
-                                            (data?.StatusPenerbitan == "0" || data?.StatusPenerbitan == "1.2" || data?.StatusPenerbitan == "3") &&
+                                            ((data?.StatusPenerbitan == "0" || data?.StatusPenerbitan == "1.2" || data?.StatusPenerbitan == "3") && Cookies.get('Access')?.includes('createPelatihan')) &&
                                             <ChooseModulAction
                                                 idPelatihan={data.IdPelatihan.toString()}
                                                 currentData={data}
@@ -464,9 +497,6 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
 
                                                         {/* Daftar Modul */}
                                                         <div>
-                                                            <h4 className="font-medium text-sm mb-2 text-gray-700">
-                                                                Materi Modul
-                                                            </h4>
                                                             <div className="space-y-2">
                                                                 {modulPelatihan?.ModulPelatihan?.length || [].length > 0 ? (
                                                                     modulPelatihan?.ModulPelatihan.map((modul: ModulPelatihan) => (
@@ -508,23 +538,23 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                                             {/* Expanded Content */}
                                                                             {expanded === modul.IdModulPelatihan && (
                                                                                 <div className="mt-2 text-xs text-gray-600 space-y-1 animate-in fade-in-50 slide-in-from-top-1">
-                                                                                    <p className="text-xs font-medium text-gray-600">
-                                                                                        Bahan Tayang/Bahan Ajar
+                                                                                    <p className="text-xs text-gray-600">
+                                                                                        Bahan Lainnya
                                                                                     </p>
                                                                                     {
                                                                                         modul.BahanTayang.length == 0 ? <tr>
                                                                                             <td colSpan={18} className="text-center py-6 text-gray-500 italic">
-                                                                                                Belum ada bahan tayang/bahan ajar tersedia
+                                                                                                Belum bahan lainnya yang tersedia
                                                                                             </td>
                                                                                         </tr> : <>
                                                                                             <table className="w-full text-xs text-left border">
                                                                                                 <thead className="bg-gray-100 text-gray-700 uppercase">
                                                                                                     <tr className="text-xs text-center">
                                                                                                         <th className="px-3 py-2 border text-xs">No</th>
-                                                                                                        <th className="px-3 py-2 border text-xs">Action</th>
+
                                                                                                         <th className="px-3 py-2 border text-xs">Nama</th>
                                                                                                         <th className="px-3 py-2 border text-xs">File</th>
-                                                                                                        <th className="px-3 py-2 border text-xs">Produsen</th>
+
                                                                                                         <th className="px-3 py-2 border text-xs">Tanggal Upload</th>
                                                                                                     </tr>
                                                                                                 </thead>
@@ -532,17 +562,23 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                                                                     {modul.BahanTayang.map((row_bt, index) => (
                                                                                                         <tr key={row_bt.IdBahanTayang}>
                                                                                                             <td className="px-3 py-2 border">{index + 1}</td>
-                                                                                                            <td className="px-3 py-2 border"></td>
+
                                                                                                             <td className="px-3 py-2 border">{row_bt.NamaBahanTayang}</td>
-                                                                                                            <td className="px-3 py-2 border"> <a
-                                                                                                                href={`${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${row_bt.BahanTayang}`}
-                                                                                                                target="_blank"
-                                                                                                                rel="noopener noreferrer"
-                                                                                                                className="  text-blue-500  underline "
-                                                                                                            >
-                                                                                                                {truncateText(row_bt.BahanTayang, 50, '...')}
-                                                                                                            </a></td>
-                                                                                                            <td className="px-3 py-2 border">{row_bt.Creator || "-"}</td>
+                                                                                                            <td className="px-3 py-2 border">
+                                                                                                                <a
+                                                                                                                    href={
+                                                                                                                        row_bt.BahanTayang
+                                                                                                                            ? `${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${row_bt.BahanTayang}`
+                                                                                                                            : row_bt.LinkVideo
+                                                                                                                    }
+                                                                                                                    target="_blank"
+                                                                                                                    rel="noopener noreferrer"
+                                                                                                                    className="text-blue-500 underline"
+                                                                                                                >
+
+                                                                                                                    {row_bt.BahanTayang == "" ? truncateText(row_bt.LinkVideo, 30, '...') : truncateText(row_bt.BahanTayang, 30, '...')}
+                                                                                                                </a></td>
+
                                                                                                             <td className="px-3 py-2 border">{row_bt.CreateAt}</td>
                                                                                                         </tr>))}
                                                                                                 </tbody>
@@ -559,6 +595,10 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                                 )}
                                                             </div>
                                                         </div>
+
+                                                        <p className="text-gray-600 text-xs mt-1">
+                                                            *Untuk dapat menambahkan bahan lainnya sebagai penunjang pada tiap materi, silahkan menuju menu <span className="font-semibold">Bahan Ajar</span> jika perangkat yang digunakan versi Lembaga Diklat mu atau ke <span className="font-semibold">Modul Pelatihan</span> jika menggunakan modul
+                                                        </p>
                                                     </div>
                                             }
 

@@ -127,6 +127,7 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
                         <TbEditCircle className="h-5 w-5" />
                         <span>Edit Informasi Pelatihan</span>
                     </Button>
+
                 }
             </AlertDialogTrigger>
 

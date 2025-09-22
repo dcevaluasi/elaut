@@ -12,20 +12,25 @@ import {
     AlertDialogCancel,
     AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button";
 import { TbArrowLeft, TbArrowRight, TbBook, TbChevronDown, TbChevronUp } from "react-icons/tb";
 import axios from "axios";
 import Cookies from "js-cookie";
 import Toast from "@/commons/Toast";
-import { elautBaseUrl, moduleBaseUrl } from "@/constants/urls";
+import { elautBaseUrl } from "@/constants/urls";
 import {
     Select,
     SelectTrigger,
     SelectValue,
     SelectContent,
     SelectItem,
-    SelectGroup,
-    SelectLabel,
 } from "@/components/ui/select";
 import { PelatihanMasyarakat } from "@/types/product";
 import { useFetchDataMateriPelatihanMasyarakat } from "@/hooks/elaut/modul/useFetchDataMateriPelatihanMasyarakat";
@@ -34,6 +39,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { MateriPelatihan, ModulPelatihan } from "@/types/module";
 import { truncateText } from "@/utils";
+import Link from "next/link";
+import { SlidersHorizontal } from "lucide-react";
 
 interface ChooseModulActionProps {
     idPelatihan: string;
@@ -51,17 +58,26 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
         */
     const { data: modulPelatihan, loading: loadingModulPelatihan, error: errorModulPelatihan, fetchModulPelatihan, stats: statsModulPelatihan } = useFetchDataMateriPelatihanMasyarakat();
 
+    const [filterBidang, setFilterBidang] = useState("");
+    const [filterType, setFilterType] = useState("");
+    const bidangOptions = Array.from(new Set(modulPelatihan.map(item => item.BidangMateriPelatihan)));
+    const typeOptions = ["Modul", "Bahan Ajar"]
+
     const [search, setSearch] = useState("")
 
     const filtered = useMemo(() => {
-        return modulPelatihan.filter(item =>
-            item.NamaMateriPelatihan.toLowerCase().includes(search.toLowerCase())
-        ).sort((a, b) => {
-            const yearA = parseInt(a.NamaPenderitaMateriPelatihan, 10) || 0;
-            const yearB = parseInt(b.NamaPenderitaMateriPelatihan, 10) || 0;
-            return yearB - yearA; // descending
-        })
-    }, [search, modulPelatihan])
+        return modulPelatihan
+            .filter(item => item.NamaMateriPelatihan.toLowerCase().includes(search.toLowerCase()))
+            .filter(item => filterBidang === "" || item.BidangMateriPelatihan === filterBidang)
+            .filter(item => filterType === "" || item.BerlakuSampai === (filterType === "Modul" ? "1" : "2"))
+
+            .sort((a, b) => {
+                const yearA = parseInt(a.NamaPenderitaMateriPelatihan, 10) || 0;
+                const yearB = parseInt(b.NamaPenderitaMateriPelatihan, 10) || 0;
+                return yearB - yearA; // 
+            });
+    }, [search, filterBidang, filterType, modulPelatihan]);
+
 
     const [expanded, setExpanded] = useState<number | null>(null)
 
@@ -69,18 +85,23 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
         setExpanded(expanded === id ? null : id)
     }
 
+    const clearFilters = () => {
+        setFilterBidang("")
+        setFilterType("")
+        setSearch("")
+    }
+
+
     const [isOpen, setIsOpen] = useState(false);
 
     const [idModulPelatihan, setIdModulPelatihan] = useState(currentData?.ModuleMateri || "")
     const [selectedModulPelatihan, setSelectedModulPelatihan] = useState<MateriPelatihan | null>(null)
-    const [hargaPelatihan, setHargaPelatihan] = useState(currentData?.HargaPelatihan || 0);
 
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async () => {
         const form = {
             ModuleMateri: idModulPelatihan,
-            HargaPelatihan: hargaPelatihan,
         };
 
         try {
@@ -130,38 +151,98 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
                             className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
                         >
                         <TbBook className="h-5 w-5" />
-                        <span>{currentData?.ModuleMateri != "" ? "Update" : "Pilih"} Modul Pelatihan</span>
+                        <span>{currentData?.ModuleMateri != "" ? "Update" : "Pilih"} Perangkat Pelatihan</span>
                     </Button>
                 }
             </AlertDialogTrigger>
 
             <AlertDialogContent className="max-w-3xl !max-h-[60vh]">
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Cari dan Pilih Modul Pelatihan</AlertDialogTitle>
+                    <AlertDialogTitle>Cari dan Pilih Perangkat Pelatihan</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Modul yang dipilih akan menjadi perangkat pelatihan yang muncul di halaman pengguna (Masyarakat) sehingga mereka dapat mengakses modul, bahan ajar atau bahan tayang dengan mudah
+                        Modul yang dipilih akan menjadi perangkat pelatihan yang muncul di halaman pengguna (Masyarakat) sehingga mereka dapat mengakses modul. Dalam hal penambahan bahan lainnya kamu dapat melakukannya setelah memilih modul, apabila tidak tersedia modul yang dicari maka silahkan menuju <Link target="_blank" className="underline text-blue-500" href={`/admin/lemdiklat/master/bahan-ajar`}>Menu Bahan Ajar</Link> untuk mengupload bahan ajar versi Lembaga Diklat mu!
                     </AlertDialogDescription>
                 </AlertDialogHeader>
+                <div className="flex w-full gap-2 items-end">
+                    {
+                        selectedModulPelatihan == null && <>
+                            <Input
+                                placeholder="Cari perangkat pelatihan..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="mt-2 text-sm flex-1"
+                            />
 
-                <ScrollArea className="py-2 max-h-[60vh] gap-3  pr-2 grid grid-cols-1">
-                    <div className="flex w-full gap-2">
-                        <Input
-                            placeholder="Cari modul pelatihan..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="mt-2 text-sm"
-                        />
-                        {selectedModulPelatihan != null && <Button
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" className="flex items-center py-4 gap-2">
+                                        <SlidersHorizontal className="w-4 h-4" />
+                                        Filter
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-64 p-3 space-y-3 z-[999999]" >
+                                    <DropdownMenuLabel className="text-sm font-semibold">Filter Data</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-medium text-gray-600">Bidang</label>
+                                        <Select value={filterBidang} onValueChange={setFilterBidang}>
+                                            <SelectTrigger className="w-48 text-sm mt-2 py-5">
+                                                <SelectValue placeholder="Filter Bidang" />
+                                            </SelectTrigger>
+                                            <SelectContent className="z-[999999]" position="popper">
+                                                {bidangOptions.map(opt => (
+                                                    <SelectItem key={opt} value={opt}>
+                                                        {opt}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-medium text-gray-600">Tipe Perangkat</label>
+                                        <Select value={filterType} onValueChange={setFilterType}>
+                                            <SelectTrigger className="w-48 text-sm mt-2 py-5">
+                                                <SelectValue placeholder="Filter Bidang" />
+                                            </SelectTrigger>
+                                            <SelectContent className="z-[999999]" position="popper">
+                                                {typeOptions.map(opt => (
+                                                    <SelectItem key={opt} value={opt}>
+                                                        {opt}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    {/* Clear Button */}
+                                    <Button
+                                        onClick={clearFilters}
+                                        size="sm"
+                                        variant="outline"
+                                        className="w-full mt-2 text-xs"
+                                    >
+                                        Reset Filter
+                                    </Button>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </>
+                    }
+
+                    {selectedModulPelatihan != null && (
+                        <Button
                             variant="outline"
                             onClick={() => { setSelectedModulPelatihan(null); setIdModulPelatihan("") }}
-                            className="flex items-center gap-2 w-fit rounded-lg px-3 shadow-md transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 mt-2 text-xs"
+                            className="flex items-center gap-2 py-5 w-fit rounded-lg px-3 shadow-md transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 mt-2 text-sm"
                         >
                             <span>Kembali</span>
-                            <TbArrowLeft className="h-2 w-2" />
-                        </Button>}
-                    </div>
-
-                    <div className="flex-1 mt-3 pr-2" >
+                            <TbArrowLeft className="h-4 w-4 flex-shrink-0" />
+                        </Button>
+                    )}
+                </div>
+                <ScrollArea className="py-2 gap-3  pr-2 grid grid-cols-1 h-[50vh]">
+                    <div className="flex-1 pr-2" >
                         <div className="space-y-3">
                             {
                                 selectedModulPelatihan == null ? <>
@@ -210,7 +291,7 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
                                         ))
                                     ) : (
                                         <p className="text-center text-gray-500 text-sm py-6">
-                                            Tidak ada materi ditemukan
+                                            Tidak ada perangkat ditemukan
                                         </p>
                                     )}</> : <>
                                     <div className="space-y-4">
@@ -237,7 +318,7 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
                                         {/* Daftar Modul */}
                                         <div>
                                             <h4 className="font-medium text-sm mb-2 text-gray-700">
-                                                Materi Modul
+                                                Materi
                                             </h4>
                                             <div className="space-y-2">
                                                 {selectedModulPelatihan.ModulPelatihan.length > 0 ? (
@@ -275,10 +356,10 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
                                                                                 <thead className="bg-gray-100 text-gray-700 uppercase">
                                                                                     <tr className="text-xs text-center">
                                                                                         <th className="px-3 py-2 border text-xs">No</th>
-                                                                                        <th className="px-3 py-2 border text-xs">Action</th>
+
                                                                                         <th className="px-3 py-2 border text-xs">Nama</th>
                                                                                         <th className="px-3 py-2 border text-xs">File</th>
-                                                                                        <th className="px-3 py-2 border text-xs">Produsen</th>
+
                                                                                         <th className="px-3 py-2 border text-xs">Tanggal Upload</th>
                                                                                     </tr>
                                                                                 </thead>
@@ -286,17 +367,22 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
                                                                                     {modul.BahanTayang.map((row_bt, index) => (
                                                                                         <tr key={row_bt.IdBahanTayang}>
                                                                                             <td className="px-3 py-2 border">{index + 1}</td>
-                                                                                            <td className="px-3 py-2 border"></td>
+
                                                                                             <td className="px-3 py-2 border">{row_bt.NamaBahanTayang}</td>
                                                                                             <td className="px-3 py-2 border"> <a
-                                                                                                href={`${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${row_bt.BahanTayang}`}
+                                                                                                href={
+                                                                                                    row_bt.BahanTayang
+                                                                                                        ? `${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${row_bt.BahanTayang}`
+                                                                                                        : row_bt.LinkVideo
+                                                                                                }
                                                                                                 target="_blank"
                                                                                                 rel="noopener noreferrer"
-                                                                                                className="  text-blue-500  underline "
+                                                                                                className="text-blue-500 underline"
                                                                                             >
-                                                                                                {truncateText(row_bt.BahanTayang, 50, '...')}
+
+                                                                                                {row_bt.BahanTayang == "" ? truncateText(row_bt.LinkVideo, 30, '...') : truncateText(row_bt.BahanTayang, 30, '...')}
                                                                                             </a></td>
-                                                                                            <td className="px-3 py-2 border">{row_bt.Creator || "-"}</td>
+
                                                                                             <td className="px-3 py-2 border">{row_bt.CreateAt}</td>
                                                                                         </tr>))}
                                                                                 </tbody>
@@ -309,7 +395,7 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
                                                         </div>
                                                     ))
                                                 ) : (
-                                                    <p className="text-xs text-gray-500 italic">Belum ada modul.</p>
+                                                    <p className="text-xs text-gray-500 italic">Belum ada perangkat.</p>
                                                 )}
                                             </div>
                                         </div>
@@ -321,7 +407,11 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
                 </ScrollArea>
 
                 <AlertDialogFooter>
-                    <AlertDialogCancel disabled={loading}>Batal</AlertDialogCancel>
+                    <AlertDialogCancel disabled={loading} onClick={() => {
+                        setIdModulPelatihan("")
+                        setSelectedModulPelatihan(null)
+                        setFilterBidang("")
+                    }}>Batal</AlertDialogCancel>
                     <AlertDialogAction
                         onClick={handleSubmit}
                         className="bg-blue-500 hover:bg-blue-600 text-white"
