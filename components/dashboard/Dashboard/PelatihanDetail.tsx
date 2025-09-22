@@ -11,7 +11,7 @@ import { replaceUrl } from "@/lib/utils";
 import { MdLock } from "react-icons/md";
 import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
 import Cookies from "js-cookie";
-import UserPelatihanTable from "./Tables/UserPelatihanTable";
+import UserPelatihanTable from "./tables/UserPelatihanTable";
 import { truncateText } from "@/utils";
 import Link from "next/link";
 import { urlFileSuratPemberitahuan } from "@/constants/urls";

@@ -1,7 +1,7 @@
 "use client";
 
 import LayoutAdminElaut, { HeaderPageLayoutAdminElaut } from "@/components/dashboard/Layouts/LayoutAdminElaut";
-import TableDataPelatih from "@/components/dashboard/Pelatihan/Table/TableDataPelatih";
+import TableDataPelatih from "@/components/dashboard/Pelatihan/table/TableDataPelatih";
 import { HiUserGroup } from "react-icons/hi2";
 
 export default function Page() {

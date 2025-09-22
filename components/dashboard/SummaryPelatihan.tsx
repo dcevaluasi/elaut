@@ -61,14 +61,6 @@ const SummaryPelatihan: React.FC = () => {
     refetch: refetchDataDukung,
   } = useFetchDataDukung();
 
-  const handleDownloadExcel = () => {
-    if (dataDukung.length > 0) {
-      exportDataDukungToExcel(dataDukung)
-    } else {
-      alert('Tidak ada data untuk diunduh.')
-    }
-  }
-
   React.useEffect(() => {
     const fetchAllData = () => {
       handleFetchingUserPelatihan();
@@ -86,8 +78,6 @@ const SummaryPelatihan: React.FC = () => {
         </div>
       ) : data != null ? (
         <>
-          {/* <MetricsSummaryPelatihan /> */}
-
           <ChartMasyarakatDilatihMonthly data={data} dataUser={dataUser} />
           <ChartDetailMasyarakatDilatih data={data} dataUser={dataUser} />
         </>
