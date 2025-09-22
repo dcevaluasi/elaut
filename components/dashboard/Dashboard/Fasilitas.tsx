@@ -12,7 +12,7 @@ const Fasilitas: React.FC = () => {
           <BiBed className="text-4xl" />
           <div className="flex flex-col">
             <h1 className="text-3xl font-medium leading-[100%] font-calsans">
-              Database Fasilitas Penginapan
+              Database Fasilitas Penginapan TESTING
             </h1>
             <p className="font-medium text-gray-400 text-base">
               Tambahkan data fasilitas penginapan untuk penyelenggaran pelatihan
