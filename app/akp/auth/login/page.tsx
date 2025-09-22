@@ -1,6 +1,6 @@
 "use client";
 
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import axios, { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
 import Image from "next/image";

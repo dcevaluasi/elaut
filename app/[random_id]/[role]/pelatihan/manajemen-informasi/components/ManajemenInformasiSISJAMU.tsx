@@ -103,7 +103,7 @@ import { MdClear } from "react-icons/md";
 import { GrSend } from "react-icons/gr";
 import { FiEdit2, FiSettings } from "react-icons/fi";
 import { usePathname } from "next/navigation";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import { encryptValue } from "@/lib/utils";
 import { IoRefreshSharp } from "react-icons/io5";
 import { HashLoader } from "react-spinners";

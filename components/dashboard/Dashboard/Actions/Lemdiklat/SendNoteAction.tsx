@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/select";
 import axios from "axios";
 import Cookies from "js-cookie";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import { elautBaseUrl, urlFileBeritaAcara, urlFileLapwas } from "@/constants/urls";
 import { IconType } from "react-icons";
 import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";

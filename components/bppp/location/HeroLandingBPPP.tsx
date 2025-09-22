@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import React from "react";
-import ScrollDown from "../../scroll-down";
 import { capitalize } from "@/utils/text";
 
 export default function HeroLandingBPPP({ bppp }: { bppp: string }) {
@@ -114,7 +113,7 @@ export default function HeroLandingBPPP({ bppp }: { bppp: string }) {
             {bppp != "sukamandi" ? (
               <h1
                 className="text-4xl md:text-[3.9rem] font-normal leading-tighter tracking-tighter mb-3 -mt-2 text-white font-calsans"
-                // data-aos="zoom-y-out"
+              // data-aos="zoom-y-out"
               >
                 Balai Pelatihan dan Penyuluhan <br />
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">
@@ -124,7 +123,7 @@ export default function HeroLandingBPPP({ bppp }: { bppp: string }) {
             ) : (
               <h1
                 className="text-4xl md:text-[3.9rem] font-normal leading-tighter tracking-tighter mb-3 -mt-2 text-white font-calsans"
-                // data-aos="zoom-y-out"
+              // data-aos="zoom-y-out"
               >
                 Balai Pendidikan dan Pelatihan <br />
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">
@@ -136,16 +135,14 @@ export default function HeroLandingBPPP({ bppp }: { bppp: string }) {
             <div className="max-w-3xl mx-auto">
               <p
                 className="text-lg text-gray-200 mb-8"
-                // data-aos="zoom-y-out"
-                // data-aos-delay="150"
+              // data-aos="zoom-y-out"
+              // data-aos-delay="150"
               >
                 Aplikasi Pelatihan serta sertifikasi KP yang dikembangkan oleh
                 BPPSDMKP untuk menjaring masyarakat KP, aparatur KP, dll untuk
                 meningkatkan kompetensi di bidang KP
               </p>
-              <div className="flex items-center justify-center w-full">
-                <ScrollDown />
-              </div>
+
             </div>
           </div>
         </div>

@@ -15,7 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { elautBaseUrl } from "@/constants/urls";
 import axios from "axios";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import Cookies from "js-cookie";
 import { HiLockClosed } from "react-icons/hi2";
 import { PelatihanMasyarakat } from "@/types/product";

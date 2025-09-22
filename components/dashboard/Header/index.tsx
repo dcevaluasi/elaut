@@ -7,7 +7,7 @@ import { FiUploadCloud } from "react-icons/fi";
 import React from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import { UserInformationDPKAKP } from "@/types/dpkakp";
 
 const Header = (props: {

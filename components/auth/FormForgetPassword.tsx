@@ -5,25 +5,16 @@ import Image from "next/image";
 import Link from "next/link";
 
 import React, { FormEvent } from "react";
-import Toast from "../toast";
 import { useRouter } from "next/navigation";
 import axios, { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
 
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectLabel,
-} from "@/components/ui/select";
 
 // RECAPTCHA
 import ReCAPTCHA from "react-google-recaptcha";
-import { HiMiniUserGroup, HiOutlineEye } from "react-icons/hi2";
+import { HiOutlineEye } from "react-icons/hi2";
 import { HiOutlineEyeOff } from "react-icons/hi";
+import Toast from "@/commons/Toast";
 
 function FormForgetPassword() {
   /* state variable to store basic user information to register */
@@ -359,8 +350,8 @@ function FormForgetPassword() {
                     <button
                       type="submit"
                       className={`btn text-white ${captcha
-                          ? "bg-blue-500 hover:bg-blue-600"
-                          : "bg-gray-500 hover:bg-gray-600"
+                        ? "bg-blue-500 hover:bg-blue-600"
+                        : "bg-gray-500 hover:bg-gray-600"
                         } w-full`}
                       disabled={captcha ? false : true}
                     >
@@ -452,8 +443,8 @@ function FormForgetPassword() {
                     <button
                       type="submit"
                       className={`btn text-white ${captcha
-                          ? "bg-blue-500 hover:bg-blue-600"
-                          : "bg-gray-500 hover:bg-gray-600"
+                        ? "bg-blue-500 hover:bg-blue-600"
+                        : "bg-gray-500 hover:bg-gray-600"
                         } w-full`}
                       disabled={captcha ? false : true}
                     >

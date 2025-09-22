@@ -14,7 +14,7 @@ import {
   convertDate,
   extractLastSegment,
 } from "@/utils";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import { decryptValue } from "@/lib/utils";
 import { elautBaseUrl } from "@/constants/urls";
 import DetailPelatihan from "@/components/elaut/DetailPelatihan";

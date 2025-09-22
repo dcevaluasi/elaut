@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 import React, { FormEvent } from "react";
-import Toast from "../toast";
 import { useRouter } from "next/navigation";
 import axios, { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
@@ -43,6 +42,7 @@ import {
   validateIsDangerousChars,
 } from "@/utils/input";
 import { handlePasswordCriteria } from "@/utils/security";
+import Toast from "@/commons/Toast";
 
 function FormLogin() {
   const [formData, setFormData] = React.useState<{ [key: string]: string }>({

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import Cookies from "js-cookie";
 import { elautBaseUrl } from "@/constants/urls";
 import axios from "axios";

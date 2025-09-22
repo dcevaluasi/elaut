@@ -17,7 +17,7 @@ import { TbEditCircle } from "react-icons/tb";
 import { FiUploadCloud } from "react-icons/fi";
 import axios from "axios";
 import Cookies from "js-cookie";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import { elautBaseUrl } from "@/constants/urls";
 import { Editor } from "@tinymce/tinymce-react";
 

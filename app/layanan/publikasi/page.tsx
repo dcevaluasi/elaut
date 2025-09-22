@@ -1,6 +1,5 @@
 'use client'
 
-import ScrollDown from "@/components/scroll-down";
 import Footer from "@/components/ui/footer";
 import { devBaseUrl } from "@/constants/urls";
 import useFetchAllPublication from "@/hooks/elaut/publication/useFetchAllPublication";
@@ -98,9 +97,7 @@ function HeroPublication() {
                             >
                                 Menyajikan dokumen pendukung, peraturan teknis, serta publikasi resmi terkait pelatihan kelautan dan perikanan. Dirancang untuk membantu peserta, penyelenggara, dan pemangku kepentingan dalam memahami regulasi yang berlaku.
                             </p>
-                            <div className="flex items-center justify-center w-full">
-                                <ScrollDown />
-                            </div>
+
                         </div>
                     </div>
                 </div>

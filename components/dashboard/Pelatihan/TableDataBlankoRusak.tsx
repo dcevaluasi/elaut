@@ -28,7 +28,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import axios, { AxiosResponse } from "axios";
 import { FaBookOpen, FaRupiahSign } from "react-icons/fa6";
 import { Input } from "@/components/ui/input";

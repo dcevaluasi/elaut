@@ -1,6 +1,6 @@
 "use client";
 
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import { Input } from "@/components/ui/input";
 import {
   Select,

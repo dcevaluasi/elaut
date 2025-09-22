@@ -25,7 +25,7 @@ import Cookies from "js-cookie";
 import { createSlug, truncateText } from "@/utils";
 import { Pelatihan } from "@/types/pelatihan";
 import Logo from "./ui/logo";
-import Toast from "./toast";
+import Toast from "@/commons/Toast";
 import { generateTanggalPelatihan } from "@/utils/text";
 import { elautBaseUrl } from "@/constants/urls";
 import Image from "next/image";

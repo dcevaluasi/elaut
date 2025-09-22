@@ -49,7 +49,7 @@ import { extractLastSegment } from "@/utils";
 import { RiFilePaper2Line, RiVerifiedBadgeFill } from "react-icons/ri";
 import Link from "next/link";
 import { FaRegPaperPlane, FaRupiahSign } from "react-icons/fa6";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import Cookies from "js-cookie";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { elautBaseUrl } from "@/constants/urls";

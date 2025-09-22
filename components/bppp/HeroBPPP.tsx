@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import React from "react";
-import ScrollDown from "../scroll-down";
 
 export default function HeroBPPP() {
   const [imageIndex, setImageIndex] = React.useState(0);
@@ -72,7 +71,7 @@ export default function HeroBPPP() {
           <div className="text-center pb-12 md:pb-16 flex flex-col items-center justify-center ">
             <h1
               className="text-4xl md:text-[3.9rem] font-normal leading-tighter tracking-tighter mb-3 -mt-2 text-white font-calsans"
-              // data-aos="zoom-y-out"
+            // data-aos="zoom-y-out"
             >
               Balai Pelatihan dan Sertifikasi <br />
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">
@@ -82,16 +81,14 @@ export default function HeroBPPP() {
             <div className="max-w-3xl mx-auto">
               <p
                 className="text-lg text-gray-200 mb-8"
-                // data-aos="zoom-y-out"
-                // data-aos-delay="150"
+              // data-aos="zoom-y-out"
+              // data-aos-delay="150"
               >
                 Aplikasi Pelatihan serta sertifikasi KP yang dikembangkan oleh
                 BPPSDMKP untuk menjaring masyarakat KP, aparatur KP, dll untuk
                 meningkatkan kompetensi di bidang KP
               </p>
-              <div className="flex items-center justify-center w-full">
-                <ScrollDown />
-              </div>
+
             </div>
           </div>
         </div>

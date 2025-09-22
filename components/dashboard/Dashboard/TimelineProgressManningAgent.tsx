@@ -39,7 +39,7 @@ import {
   PelatihanMasyarakat,
 } from "@/types/product";
 import { HiMiniUserGroup, HiUserGroup } from "react-icons/hi2";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import axios, { AxiosError } from "axios";
 import TableDataPesertaPelatihan from "../Pelatihan/TableDataPesertaPelatihan";
 import TablelDataPesertaPelatihanManningAgent from "../Pelatihan/TablelDataPesertaPelatihanManningAgent";
@@ -157,18 +157,18 @@ export const TimelineProgressManningAgent = ({
               <div className="col-span-12 space-y-12 relative px-4 sm:col-span-8 sm:space-y-8 sm:before:absolute sm:before:top-2 sm:before:bottom-0 sm:before:w-0.5 sm:before:-left-3 before:bg-gray-300">
                 <div
                   className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${pelatihan?.ManningAgentUsers.length == 0
-                      ? "before:bg-gray-700"
-                      : pelatihan?.ManningAgentUsers.length > 0
-                        ? "before:bg-blue-500"
-                        : "before:bg-gray-700"
+                    ? "before:bg-gray-700"
+                    : pelatihan?.ManningAgentUsers.length > 0
+                      ? "before:bg-blue-500"
+                      : "before:bg-gray-700"
                     } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer`}
                 >
                   <h3 className="text-lg font-semibold">Import Peserta </h3>
 
                   <time
                     className={`text-sm font-medium ${pelatihan?.ManningAgentUsers.length == 0
-                        ? "text-gray-700"
-                        : "text-blue-500"
+                      ? "text-gray-700"
+                      : "text-blue-500"
                       }`}
                   >
                     {pelatihan?.ManningAgentUsers.length == 0 ? (
@@ -349,16 +349,16 @@ export const TimelineProgressManningAgent = ({
 
                 <div
                   className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${pelatihan?.ManningAgentUsers.length > 0
-                      ? "before:bg-blue-500"
-                      : "before:bg-gray-700"
+                    ? "before:bg-blue-500"
+                    : "before:bg-gray-700"
                     } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer`}
                 >
                   <h3 className="text-lg font-semibold">Validasi Peserta </h3>
 
                   <time
                     className={`text-sm font-medium ${pelatihan?.ManningAgentUsers.length > 0
-                        ? "text-blue-500"
-                        : "text-gray-700"
+                      ? "text-blue-500"
+                      : "text-gray-700"
                       }`}
                   >
                     <span className="flex items-center">
@@ -413,8 +413,8 @@ export const TimelineProgressManningAgent = ({
 
                 <div
                   className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${detailPelatihan!.StatusApproval == "Selesai"
-                      ? "before:bg-blue-400"
-                      : "before:bg-gray-700"
+                    ? "before:bg-blue-400"
+                    : "before:bg-gray-700"
                     } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer `}
                 >
                   <h3 className="text-lg font-semibold">
@@ -467,9 +467,9 @@ export const TimelineProgressManningAgent = ({
 
                 <div
                   className={`flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full sm:before:left-[-35px] sm:before:z-[1] ${detailPelatihan!.StatusApproval == "Selesai" &&
-                      detailPelatihan.NoSertifikat != ""
-                      ? "before:bg-blue-500"
-                      : "before:bg-gray-700"
+                    detailPelatihan.NoSertifikat != ""
+                    ? "before:bg-blue-500"
+                    : "before:bg-gray-700"
                     } bg-white shadow-custom p-4 rounded-xl duration-700 cursor-pointer `}
                 >
                   <h3 className="text-lg font-semibold">

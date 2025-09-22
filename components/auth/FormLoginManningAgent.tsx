@@ -5,13 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 
 import React, { FormEvent } from "react";
-import Toast from "../toast";
 import { useRouter } from "next/navigation";
 import axios, { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
 
 // RECAPTCHA
 import ReCAPTCHA from "react-google-recaptcha";
+import Toast from "@/commons/Toast";
 
 function FormLoginManningAgent() {
   /* state variable to store basic user information to register */
@@ -224,8 +224,8 @@ function FormLoginManningAgent() {
                   <button
                     type="submit"
                     className={`btn text-white ${captcha
-                        ? "bg-blue-500 hover:bg-blue-600"
-                        : "bg-gray-500 hover:bg-gray-600"
+                      ? "bg-blue-500 hover:bg-blue-600"
+                      : "bg-gray-500 hover:bg-gray-600"
                       } w-full`}
                     disabled={captcha ? false : true}
                   >

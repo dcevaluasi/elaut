@@ -1,20 +1,17 @@
 'use client'
 
-import ScrollDown from "@/components/scroll-down";
 import Footer from "@/components/ui/footer";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import { FaArrowRight } from "react-icons/fa6";
 import { FiInfo } from "react-icons/fi";
-import { MdOutlineCheckCircleOutline } from "react-icons/md";
 import { TbDownload } from "react-icons/tb";
 
 import { Viewer, Worker } from "@react-pdf-viewer/core";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import useFetchDetailPublication from "@/hooks/elaut/publication/useFetchDetailPublication";
 import { devBaseUrl } from "@/constants/urls";
 import { HashLoader } from "react-spinners";

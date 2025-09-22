@@ -1,6 +1,6 @@
 "use client";
 
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import { elautBaseUrl } from "@/constants/urls";
 import { LemdiklatDetailInfo } from "@/types/lemdiklat";
 import { PusatDetailInfo } from "@/types/pusat";

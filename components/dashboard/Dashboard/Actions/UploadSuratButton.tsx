@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { elautBaseUrl, urlFileSuratPemberitahuan } from "@/constants/urls";
 import axios from "axios";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import Cookies from "js-cookie";
 import { FiUploadCloud } from "react-icons/fi";
 import Link from "next/link";

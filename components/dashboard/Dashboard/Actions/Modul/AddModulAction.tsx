@@ -17,7 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import Cookies from "js-cookie";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import { moduleBaseUrl } from "@/constants/urls";
 import { TbPlus } from "react-icons/tb";
 import { PROGRAM_AKP, PROGRAM_KELAUTAN, PROGRAM_PERIKANAN_ADMIN, RUMPUN_PELATIHAN } from "@/constants/pelatihan";

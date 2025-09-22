@@ -1,9 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import ScrollDown from "./scroll-down";
 import React from "react";
-import { useSearchParams } from "next/navigation";
 import { capitalize } from "@/utils/text";
 
 export default function HeroBPPP({ bppp }: { bppp?: string }) {

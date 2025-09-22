@@ -19,7 +19,7 @@ import { HiMiniUserGroup } from "react-icons/hi2";
 import axios from "axios";
 import Cookies from "js-cookie";
 import Link from "next/link";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import { downloadFormatPesertaPelatihan, urlPetunjukUploadPesertaPelatihan } from "@/constants/urls";
 
 interface ImportPesertaActionProps {

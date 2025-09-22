@@ -22,7 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { TbEditCircle } from "react-icons/tb";
 import axios from "axios";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import { elautBaseUrl } from "@/constants/urls";
 import { User } from "@/types/user";
 import { Input } from "@/components/ui/input";

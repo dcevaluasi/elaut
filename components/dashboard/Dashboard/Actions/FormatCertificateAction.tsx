@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { elautBaseUrl, urlPetunjukUploadMateriPelatihan } from "@/constants/urls";
 import Cookies from "js-cookie";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import Link from "next/link";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { urlTemplateMateriPelatihan } from "@/constants/templates";

@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { TbArrowLeft, TbArrowRight, TbBook, TbChevronDown, TbChevronUp } from "react-icons/tb";
 import axios from "axios";
 import Cookies from "js-cookie";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import { elautBaseUrl, moduleBaseUrl } from "@/constants/urls";
 import {
     Select,

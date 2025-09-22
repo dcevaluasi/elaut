@@ -43,7 +43,7 @@ import { FaEdit } from "react-icons/fa";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { Checkbox } from "@radix-ui/react-checkbox";
 import Cookies from "js-cookie";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 import EditPesertaAction from "../Actions/EditPesertaAction";
 import { countUserWithNoSertifikat } from "@/utils/counter";

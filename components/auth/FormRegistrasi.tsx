@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { FormEvent, MouseEventHandler } from "react";
-import Toast from "../toast";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { error } from "console";
 import Cookies from "js-cookie";
@@ -45,6 +44,7 @@ import { elautBaseUrl, manningAgentDevUrl } from "@/constants/urls";
 import { sanitizedDangerousChars, validateIsDangerousChars } from "@/utils/input";
 import { HiOutlineEyeOff } from "react-icons/hi";
 import { handlePasswordCriteria } from "@/utils/security";
+import Toast from "@/commons/Toast";
 
 function FormRegistrasi() {
   const router = useRouter();

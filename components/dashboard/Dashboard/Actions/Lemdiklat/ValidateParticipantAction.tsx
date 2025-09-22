@@ -13,7 +13,7 @@ import {
 import axios from "axios";
 import Cookies from "js-cookie";
 import { elautBaseUrl } from "@/constants/urls";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import { DIALOG_TEXTS } from "@/constants/texts";
 import { Button } from "@/components/ui/button";
 import { UserPelatihan } from "@/types/product";

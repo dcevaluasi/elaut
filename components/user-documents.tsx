@@ -31,7 +31,7 @@ import { BiDonateBlood } from "react-icons/bi";
 import { createSlug, truncateText } from "@/utils";
 
 import Cookies from "js-cookie";
-import Toast from "./toast";
+import Toast from "@/commons/Toast";
 import { capitalize } from "@/utils/text";
 
 export default function UserDocuments({ user }: { user: User | null }) {

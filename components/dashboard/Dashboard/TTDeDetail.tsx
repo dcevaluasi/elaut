@@ -9,7 +9,7 @@ import DialogSertifikatPelatihan, { DialogSertifikatHandle } from "@/components/
 import { elautBaseUrl } from "@/constants/urls";
 import axios from "axios";
 import { getDateInIndonesianFormat } from "@/utils/time";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import { HiOutlineEyeOff } from "react-icons/hi";
 import { HiOutlineEye } from "react-icons/hi2";
 import { countUserWithCertificate, countUserWithDrafCertificate, countUserWithDraftCertificate, countUserWithTanggalSertifikat } from "@/utils/counter";

@@ -17,7 +17,7 @@ import { TbBroadcast, TbWorldCancel } from "react-icons/tb";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { elautBaseUrl } from "@/constants/urls";
 import axios from "axios";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import Cookies from "js-cookie";
 import { FiUploadCloud } from "react-icons/fi";
 

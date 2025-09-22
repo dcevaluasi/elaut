@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import Cookies from "js-cookie";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import { elautBaseUrl } from "@/constants/urls";
 import { TbTrash } from "react-icons/tb";
 import { UnitKerja } from "@/types/master";

@@ -19,7 +19,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { createSlug } from "@/utils";

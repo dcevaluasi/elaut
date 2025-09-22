@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { elautBaseUrl } from "@/constants/urls";
 import Cookies from "js-cookie";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import { PelatihanMasyarakat } from "@/types/product";
 import { IoReload } from "react-icons/io5";
 

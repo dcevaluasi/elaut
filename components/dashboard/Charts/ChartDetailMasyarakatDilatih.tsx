@@ -27,11 +27,12 @@ import TableDataPelatihanMasyarakat from "../tables/TableDataPelatihanMasyarakat
 import TableDataPelatihanMasyarakatByProvinsi from "../tables/TableDataPelatihanMasyarakatByProvinsi";
 import TableDataPelatihanMasyrakatByProgramPrioritas from "../tables/TableDataPelatihanMasyrakatByProgramPrioritas";
 import TableDataPelatihanMasyrakatByGender from "../tables/TableDataPelatihanMasyrakatByGender";
-import TableDataPelatihanMasyrakatByPendidikan from "../tables/TableDataPelatihanMasyrakatByPendidikan";
+
 import TableDataPelatihanMasyarakatByWilker from "../tables/TableDataPelatihanMasyarakatByWilker";
 import Cookies from "js-cookie";
 import { getFilteredDataByBalai, getFilteredDataPelatihanByBalai } from "@/lib/training";
 import { isSigned, isUnsigned } from "@/lib/sign";
+import TableDataPelatihanMasyarakatByPendidikan from "../tables/TableDataPelatihanMasyrakatByPendidikan";
 
 const chartConfigJenisPelatihan = {
   visitors: {
@@ -613,7 +614,7 @@ const ChartDetailMasyarakatDilatih: React.FC<{
         <TableDataPelatihanMasyrakatByProgramPrioritas dataPelatihan={isAdminBalaiPelatihan ? data.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan! == nameBalaiPelatihan)) : data} />
         <TableDataPelatihanMasyarakatByWilker dataUserPelatihan={isAdminBalaiPelatihan ? dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan! == nameBalaiPelatihan)) : dataUser} />
         <TableDataPelatihanMasyrakatByGender dataUserPelatihan={isAdminBalaiPelatihan ? dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan! == nameBalaiPelatihan)) : dataUser} />
-        <TableDataPelatihanMasyrakatByPendidikan dataUserPelatihan={isAdminBalaiPelatihan ? dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan! == nameBalaiPelatihan)) : dataUser} />
+        <TableDataPelatihanMasyarakatByPendidikan dataUserPelatihan={isAdminBalaiPelatihan ? dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan! == nameBalaiPelatihan)) : dataUser} />
       </div>
     );
   };

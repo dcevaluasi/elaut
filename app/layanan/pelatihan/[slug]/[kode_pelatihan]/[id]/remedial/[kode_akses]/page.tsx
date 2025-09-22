@@ -5,7 +5,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import Countdown from "react-countdown";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import { Button } from "@/components/ui/button";
 import { TbClock } from "react-icons/tb";
 import { IoMdCloseCircle } from "react-icons/io";
@@ -196,11 +196,10 @@ function Page() {
               <div
                 key={index}
                 onClick={() => setSelectedIdSoal(index)}
-                className={`flex cursor-pointer items-center justify-center rounded-full w-14 h-14 border border-white ${
-                  answeredQuestions.includes(soal.IdSoalUjian)
-                    ? "bg-blue-500"
-                    : "bg-transparent"
-                }`}
+                className={`flex cursor-pointer items-center justify-center rounded-full w-14 h-14 border border-white ${answeredQuestions.includes(soal.IdSoalUjian)
+                  ? "bg-blue-500"
+                  : "bg-transparent"
+                  }`}
               >
                 {index + 1}
               </div>

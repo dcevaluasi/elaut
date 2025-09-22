@@ -31,7 +31,7 @@ import {
 
 import { usePathname, useRouter } from "next/navigation";
 import { MdBed, MdOutlineSaveAlt } from "react-icons/md";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import axios, { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
 import { Input } from "@/components/ui/input";

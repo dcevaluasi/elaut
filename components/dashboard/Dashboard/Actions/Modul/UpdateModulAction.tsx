@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import Cookies from "js-cookie";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import { moduleBaseUrl } from "@/constants/urls";
 import { TbPencil } from "react-icons/tb";
 import { MateriPelatihan } from "@/types/module";

@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { TbBroadcast, TbEditCircle } from "react-icons/tb";
 import { elautBaseUrl } from "@/constants/urls";
 import axios from "axios";
-import Toast from "@/components/toast";
+import Toast from "@/commons/Toast";
 import Cookies from "js-cookie";
 import { PelatihanMasyarakat, UserPelatihan } from "@/types/product";
 import { Editor } from "@tinymce/tinymce-react";
