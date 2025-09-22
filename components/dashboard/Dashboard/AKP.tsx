@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import CardDataStats from "../CardDataStats";
 import { GiBattery75, GiPapers } from "react-icons/gi";
 import { MdSchool } from "react-icons/md";
 import Cookies from "js-cookie";
@@ -30,17 +29,18 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import ChartPopover from "../charts/ChartPopover";
 import { formatDateTime } from "@/utils";
-import ChartBlankoAwal from "../charts/ChartBlankoAwal";
 import useFetchSertifikatByTypeBlanko from "@/hooks/blanko/useFetchSertifikatByTypeBlanko";
 import useFetchSertifikatByLemdiklat from "@/hooks/blanko/useFetchSertifikatByLemdiklat";
 
-import ChartSertifikatKeterampilanByLemdiklat from "../akp/sertifikat/ChartSertifikatKeterampilanByLemdiklat";
-import ChartSertifikatKeahlianByLemdiklat from "../akp/sertifikat/ChartSertifikatKeahlianByLemdiklat";
 import useFetchSertifikatByProgram from "@/hooks/blanko/useFetchSertifikatByProgram";
 
 import { HashLoader } from "react-spinners";
+import CardDataStats from "@/commons/cards/CardDataStats";
+import ChartBlankoAwal from "@/commons/charts/ChartBlankoAwal";
+import ChartPopover from "@/commons/charts/ChartPopover";
+import ChartSertifikatKeahlianByLemdiklat from "@/commons/charts/ChartSertifikatKeahlianByLemdiklat";
+import ChartSertifikatKeterampilanByLemdiklat from "@/commons/charts/ChartSertifikatKeterampilanByLemdiklat";
 
 const AKP: React.FC = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;

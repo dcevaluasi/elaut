@@ -1,7 +1,5 @@
 "use client";
 import React from "react";
-import CardDataStats from "../CardDataStats";
-import { HiCheckBadge } from "react-icons/hi2";
 import { GiBattery75, GiPapers } from "react-icons/gi";
 import { MdSchool } from "react-icons/md";
 import Cookies from "js-cookie";
@@ -30,22 +28,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import ChartPopover from "../charts/ChartPopover";
-import ChartPopoverKeluar from "../charts/ChartPopoverKeluar";
 import { formatDateTime } from "@/utils";
-import ChartPopoverKeahlian from "../charts/ChartPopoverKeahlian";
-import ChartBlankoAwal from "../charts/ChartBlankoAwal";
-import ChartPopoverKeterampilan from "../charts/ChartPopoverKeterampilan";
-import ChartCertificatesMonthly from "../charts/ChartCertificatesMonthly";
 import useFetchSertifikatByTypeBlanko from "@/hooks/blanko/useFetchSertifikatByTypeBlanko";
 import useFetchSertifikatByLemdiklat from "@/hooks/blanko/useFetchSertifikatByLemdiklat";
-import { ChartSertifikatByLemdiklat } from "../akp";
-import ChartSertifikatKeterampilanByLemdiklat from "../akp/sertifikat/ChartSertifikatKeterampilanByLemdiklat";
-import ChartSertifikatKeahlianByLemdiklat from "../akp/sertifikat/ChartSertifikatKeahlianByLemdiklat";
 import useFetchSertifikatByProgram from "@/hooks/blanko/useFetchSertifikatByProgram";
-import { FaGraduationCap } from "react-icons/fa6";
 import { HashLoader } from "react-spinners";
-import ChartSertifikatKeahlianByLemdiklatDark from "../akp/sertifikat/ChartSertifikatKeahlianByLemdiklatDark";
+import CardDataStats from "@/commons/cards/CardDataStats";
+import ChartBlankoAwal from "@/commons/charts/ChartBlankoAwal";
+import ChartPopover from "@/commons/charts/ChartPopover";
+import ChartSertifikatKeterampilanByLemdiklat from "@/commons/charts/ChartSertifikatKeterampilanByLemdiklat";
 
 const AKPPublic: React.FC = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -451,10 +442,7 @@ const AKPPublic: React.FC = () => {
                   </TabsList>
                   <TabsContent value="CoC">
                     <>
-                      <ChartSertifikatKeahlianByLemdiklatDark
-                        dataLembaga={dataSertifikatByLemdiklat}
-                        dataProgram={dataSertifikatByProgram!}
-                      />
+
                     </>
                   </TabsContent>
                   <TabsContent value="CoP">

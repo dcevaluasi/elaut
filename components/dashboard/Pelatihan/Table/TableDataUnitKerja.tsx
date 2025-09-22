@@ -19,11 +19,10 @@ import { SlidersHorizontal } from "lucide-react"
 import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
 import { UnitKerja } from "@/types/master";
 import { generatedSignedCertificate } from "@/utils/certificates";
-import AddUnitKerjaAction from "../../Dashboard/Actions/UnitKerja/AddUnitKerjaAction";
-import { useUnitKerja } from "@/context/UnitKerjaContext";
 import Cookies from "js-cookie";
-import UpdateUnitKerjaAction from "../../Dashboard/Actions/UnitKerja/UpdateUnitKerjaAction";
-import DeleteUnitKerjaAction from "../../Dashboard/Actions/UnitKerja/DeleteUnitKerjaAction";
+import UpdateUnitKerjaAction from "@/commons/actions/unit-kerja/UpdateUnitKerjaAction";
+import DeleteUnitKerjaAction from "@/commons/actions/unit-kerja/DeleteUnitKerjaAction";
+import AddUnitKerjaAction from "@/commons/actions/unit-kerja/AddUnitKerjaAction";
 
 const TableDataUnitKerja = () => {
     const { unitKerjas, loading: loadingUnitKerja, error: errorUnitKerja, fetchUnitKerjaData } = useFetchDataUnitKerja()

@@ -1,17 +1,15 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Cookies from "js-cookie";
 import axios, { AxiosResponse } from "axios";
 import { PelatihanMasyarakat } from "@/types/product";
-import ChartMasyarakatDilatihMonthly from "./charts/ChartMasyarakatDilatihMonthly";
-import ChartDetailMasyarakatDilatih from "./charts/ChartDetailMasyarakatDilatih";
 import { HashLoader } from "react-spinners";
 import Image from "next/image";
-import { User, UserPelatihan } from "@/types/user";
+import { UserPelatihan } from "@/types/user";
 import useFetchDataDukung from "@/hooks/elaut/useFetchDataDukung";
 import { exportDataDukungToExcel } from "@/lib/exportToExcel";
-import { Button } from "@/components/ui/button";
-import MetricsSummaryPelatihan from "./MetricsSummaryPelatihan";
+import ChartMasyarakatDilatihMonthly from "@/commons/charts/ChartMasyarakatDilatihMonthly";
+import ChartDetailMasyarakatDilatih from "@/commons/charts/ChartDetailMasyarakatDilatih";
 
 const SummaryPelatihan: React.FC = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;

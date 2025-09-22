@@ -160,7 +160,7 @@ function ItemPublication() {
                         dataPublication.map((publication: Publication, index: number) => (
                             <div className="bg-white shadow-custom flex items-center flex-col flex-1 rounded-md" key={index}>
                                 <div className="flex flex-col items-center justify-center text-ceneter p-6 gap-5">
-                                    <div className="flex flex-col gap-1 items-center justify-center text-center gap-3">
+                                    <div className="flex flex-col items-center justify-center text-center gap-3">
                                         <div className="flex flex-row items-center justify-center gap-1">
                                             <div className="bg-blue-500 text-white rounded-full py-1 px-3 flex items-center justify-center text-sm">
                                                 <MdOutlineCheckCircleOutline /> {publication.doc_type}

@@ -23,16 +23,16 @@ import {
 } from "@/components/ui/chart";
 import { PelatihanMasyarakat } from "@/types/product";
 import { UserPelatihan } from "@/types/user";
-import TableDataPelatihanMasyarakat from "../tables/TableDataPelatihanMasyarakat";
-import TableDataPelatihanMasyarakatByProvinsi from "../tables/TableDataPelatihanMasyarakatByProvinsi";
-import TableDataPelatihanMasyrakatByProgramPrioritas from "../tables/TableDataPelatihanMasyrakatByProgramPrioritas";
-import TableDataPelatihanMasyrakatByGender from "../tables/TableDataPelatihanMasyrakatByGender";
 
-import TableDataPelatihanMasyarakatByWilker from "../tables/TableDataPelatihanMasyarakatByWilker";
 import Cookies from "js-cookie";
 import { getFilteredDataByBalai, getFilteredDataPelatihanByBalai } from "@/lib/training";
 import { isSigned, isUnsigned } from "@/lib/sign";
-import TableDataPelatihanMasyarakatByPendidikan from "../tables/TableDataPelatihanMasyrakatByPendidikan";
+import TableDataPelatihanMasyrakatByGender from "@/components/dashboard/tables/TableDataPelatihanMasyrakatByGender";
+import TableDataPelatihanMasyarakatByWilker from "@/components/dashboard/tables/TableDataPelatihanMasyarakatByWilker";
+import TableDataPelatihanMasyarakatByProgramPrioritas from "@/components/dashboard/tables/TableDataPelatihanMasyrakatByProgramPrioritas";
+import TableDataPelatihanMasyarakatByProvinsi from "@/components/dashboard/tables/TableDataPelatihanMasyarakatByProvinsi";
+import TableDataPelatihanMasyarakat from "@/components/dashboard/tables/TableDataPelatihanMasyarakat";
+import TableDataPelatihanMasyarakatByPendidikan from "@/components/dashboard/tables/TableDataPelatihanMasyrakatByPendidikan";
 
 const chartConfigJenisPelatihan = {
   visitors: {
@@ -611,7 +611,7 @@ const ChartDetailMasyarakatDilatih: React.FC<{
 
         <TableDataPelatihanMasyarakat dataUserPelatihan={isAdminBalaiPelatihan ? dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan! == nameBalaiPelatihan)) : dataUser} />
         <TableDataPelatihanMasyarakatByProvinsi dataUserPelatihan={isAdminBalaiPelatihan ? dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan! == nameBalaiPelatihan)) : dataUser} />
-        <TableDataPelatihanMasyrakatByProgramPrioritas dataPelatihan={isAdminBalaiPelatihan ? data.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan! == nameBalaiPelatihan)) : data} />
+        <TableDataPelatihanMasyarakatByProgramPrioritas dataPelatihan={isAdminBalaiPelatihan ? data.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan! == nameBalaiPelatihan)) : data} />
         <TableDataPelatihanMasyarakatByWilker dataUserPelatihan={isAdminBalaiPelatihan ? dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan! == nameBalaiPelatihan)) : dataUser} />
         <TableDataPelatihanMasyrakatByGender dataUserPelatihan={isAdminBalaiPelatihan ? dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan! == nameBalaiPelatihan)) : dataUser} />
         <TableDataPelatihanMasyarakatByPendidikan dataUserPelatihan={isAdminBalaiPelatihan ? dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan! == nameBalaiPelatihan)) : dataUser} />

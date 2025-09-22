@@ -6,7 +6,6 @@ import { Book, Calendar, CheckCircle, File, Layers, SlidersHorizontal, XCircle }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useFetchDataMateriPelatihanMasyarakat } from "@/hooks/elaut/modul/useFetchDataMateriPelatihanMasyarakat";
-import UpdateModulAction from "../Actions/Modul/UpdateModulAction";
 import { TbBook } from "react-icons/tb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -17,11 +16,12 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import AddModulAction from "../Actions/Modul/AddModulAction";
 import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
 import Cookies from "js-cookie";
 import { findNameUnitKerjaById, findUnitKerjaById } from "@/utils/unitkerja";
 import { UnitKerja } from "@/types/master";
+import AddModulAction from "@/commons/actions/modul/AddModulAction";
+import UpdateModulAction from "@/commons/actions/modul/UpdateModulAction";
 
 export default function TableModulPelatihan() {
     const [searchQuery, setSearchQuery] = useState<string>("");

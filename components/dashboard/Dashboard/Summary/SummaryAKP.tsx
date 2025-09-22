@@ -21,13 +21,14 @@ import {
 } from "@/components/ui/popover";
 import { formatDateTime } from "@/utils";
 import useFetchSertifikatByTypeBlanko from "@/hooks/blanko/useFetchSertifikatByTypeBlanko";
-import CardDataStats from "../../CardDataStats";
-import ChartBlankoAwal from "../../charts/ChartBlankoAwal";
-import ChartPopover from "../../charts/ChartPopover";
-import ChartCertificatesMonthly from "../../charts/ChartCertificatesMonthly";
-import ChartPopoverKeahlian from "../../charts/ChartPopoverKeahlian";
-import ChartPopoverKeterampilan from "../../charts/ChartPopoverKeterampilan";
+
 import { blankoAkapiBaseUrl, elautBaseUrl } from "@/constants/urls";
+import ChartPopover from "@/commons/charts/ChartPopover";
+import CardDataStats from "@/commons/cards/CardDataStats";
+import ChartBlankoAwal from "@/commons/charts/ChartBlankoAwal";
+import ChartCertificatesMonthly from "@/commons/charts/ChartCertificatesMonthly";
+import ChartPopoverKeahlian from "@/commons/charts/ChartPopoverKeahlian";
+import ChartPopoverKeterampilan from "@/commons/charts/ChartPopoverKeterampilan";
 
 const SummaryAKP: React.FC = () => {
   const token = Cookies.get("XSRF091");

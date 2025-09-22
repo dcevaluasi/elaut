@@ -7,10 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Instruktur } from "@/types/instruktur";
 import { Input } from "@/components/ui/input";
 import { truncateText } from "@/utils";
-import AddInstrukturAction from "../../Dashboard/Actions/Instruktur/AddInstrukturAction";
 import { Briefcase, FileBadge, GraduationCap, Layers, ShieldCheck, Users } from "lucide-react";
-import UpdateInstrukturAction from "../../Dashboard/Actions/Instruktur/UpdateInstrukturAction";
-import DeleteInstrukturAction from "../../Dashboard/Actions/Instruktur/DeleteInstrukturAction";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -24,6 +21,9 @@ import Cookies from "js-cookie";
 import { findNameUnitKerjaById } from "@/utils/unitkerja";
 import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
 import { UnitKerja } from "@/types/master";
+import AddInstrukturAction from "@/commons/actions/instruktur/AddInstrukturAction";
+import UpdateInstrukturAction from "@/commons/actions/instruktur/UpdateInstrukturAction";
+import DeleteInstrukturAction from "@/commons/actions/instruktur/DeleteInstrukturAction";
 
 const TableDataPelatih = () => {
     const { instrukturs, loading, error, fetchInstrukturData, stats } = useFetchDataInstruktur()

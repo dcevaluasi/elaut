@@ -45,10 +45,10 @@ import { Checkbox } from "@radix-ui/react-checkbox";
 import Cookies from "js-cookie";
 import Toast from "@/commons/Toast";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
-import EditPesertaAction from "../Actions/EditPesertaAction";
 import { countUserWithNoSertifikat } from "@/utils/counter";
 import { IoCalendarClear, IoReload } from "react-icons/io5";
 import { getDateInIndonesianFormat } from "@/utils/time";
+import EditPesertaAction from "@/commons/actions/EditPesertaAction";
 
 interface UserPelatihanTableProps {
     pelatihan: PelatihanMasyarakat
