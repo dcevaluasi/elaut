@@ -294,10 +294,6 @@ const FormatCertificateAction: React.FC<FormatCertificateActionProps> = ({
                                             </div>
                                         </div>
                                     </>}
-
-
-
-
                             </div>
 
                             <AlertDialogFooter className="mt-3">

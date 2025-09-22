@@ -465,7 +465,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         Detail  :
                                     </p>
                                     <div className="flex flex-col gap-2 w-full">
-                                        <div className="grid grid-cols-3 gap-4 text-sm">
+                                        <div className="grid grid-cols-4 gap-4 text-sm">
                                             <InfoItem label="Kuota Peserta" value={data.KoutaPelatihan} />
                                             <InfoItem label="Jumlah Peserta" value={data.UserPelatihan.length.toString()} />
                                             <InfoItem label="Jumlah Kelulusan" value={`${countUserWithPassed(data.UserPelatihan)}/${data.UserPelatihan.length}`} />
@@ -477,6 +477,12 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             </div>
                                             <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
                                                 <span className="text-xs font-medium text-gray-500">Jumlah Sertifikat TTDe</span>
+                                                <span className="text-sm font-semibold text-gray-800 mt-1">
+                                                    {countUserWithCertificate(data?.UserPelatihan)}/{data?.UserPelatihan.length}
+                                                </span>
+                                            </div>
+                                            <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
+                                                <span className="text-xs font-medium text-gray-500">Jumlah Revisi</span>
                                                 <span className="text-sm font-semibold text-gray-800 mt-1">
                                                     {countUserWithCertificate(data?.UserPelatihan)}/{data?.UserPelatihan.length}
                                                 </span>

@@ -58,13 +58,21 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
         setProgress(0);
 
         for (let i = 0; i < refs.current.length; i++) {
-            await refs.current[i].current?.uploadPdf?.();
+            const userPel = data.UserPelatihan[i];
+
+            // ✅ Only upload if FileSertifikat is empty
+            if (!userPel.FileSertifikat || userPel.FileSertifikat === "") {
+                await refs.current[i].current?.uploadPdf?.();
+            }
+
             setProgress(((i + 1) / refs.current.length) * 100);
-            setCounter(i + 1)
+            setCounter(i + 1);
         }
-        setOpen(true)
+
+        setOpen(true);
         setIsUploading(false);
     };
+
 
     const handleTanggalSertifikat = async () => {
         const dataUserPelatihan = data?.UserPelatihan ?? [];
@@ -305,7 +313,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                         </AlertDialog>
 
                         {
-                            (Cookies.get('Role')?.includes(data?.TtdSertifikat) && (data?.StatusPenerbitan == "7B" || data?.StatusPenerbitan == "10" || data?.StatusPenerbitan == "14")) && <Button
+                            (Cookies.get('Role')?.includes(data?.TtdSertifikat) && (data?.StatusPenerbitan == "7B" || data?.StatusPenerbitan == "10" || data?.StatusPenerbitan == "14") || data?.IsRevisi == "Active") && <Button
                                 onClick={() => {
                                     setOpen(!open);
                                     if (countUserWithDrafCertificate(data?.UserPelatihan) != data?.UserPelatihan.length) {

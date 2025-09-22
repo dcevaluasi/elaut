@@ -116,16 +116,14 @@ const ReviseCertificateAction: React.FC<ReviseCertificateActionProps> = ({
                                 >
                                     Cancel
                                 </AlertDialogCancel>
-                                {data!.MateriPelatihan.length === 0 && (
-                                    <AlertDialogAction
-                                        onClick={() =>
-                                            handleUpdateStatusRevisi(idPelatihan)
-                                        }
-                                        disabled={loading}
-                                    >
-                                        {loading ? "Memproses..." : "Update Status"}
-                                    </AlertDialogAction>
-                                )}
+                                <AlertDialogAction
+                                    onClick={() =>
+                                        handleUpdateStatusRevisi(idPelatihan)
+                                    }
+                                    disabled={loading}
+                                >
+                                    {loading ? "Memproses..." : "Revisi"}
+                                </AlertDialogAction>
                             </AlertDialogFooter>
                         </form>
                     </fieldset>
