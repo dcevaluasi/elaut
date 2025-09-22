@@ -135,7 +135,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                     }}
                                                 >
                                                     <TbSend className="h-5 w-5" />
-                                                    Send to SPV TT
+                                                    Send to SPV
                                                 </Button>
 
                                             ) : null}
