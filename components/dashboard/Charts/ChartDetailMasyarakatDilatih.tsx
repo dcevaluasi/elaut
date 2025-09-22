@@ -1,29 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
-
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-import { BlankoKeluar } from "@/types/blanko";
 import { formatDateTime } from "@/utils";
-
-import CountUp from "react-countup";
-
 import {
   Bar,
   BarChart,
-  CartesianGrid,
-  LabelList,
   XAxis,
-  Label,
-  Pie,
-  PieChart,
   YAxis,
 } from "recharts";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -35,7 +22,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { PelatihanMasyarakat } from "@/types/product";
-import { TrendingUp } from "lucide-react";
 import { UserPelatihan } from "@/types/user";
 import TableDataPelatihanMasyarakat from "../tables/TableDataPelatihanMasyarakat";
 import TableDataPelatihanMasyarakatByProvinsi from "../tables/TableDataPelatihanMasyarakatByProvinsi";
@@ -46,8 +32,6 @@ import TableDataPelatihanMasyarakatByWilker from "../tables/TableDataPelatihanMa
 import Cookies from "js-cookie";
 import { getFilteredDataByBalai, getFilteredDataPelatihanByBalai } from "@/lib/training";
 import { isSigned, isUnsigned } from "@/lib/sign";
-
-export const description = "A bar chart with an active bar";
 
 const chartConfigJenisPelatihan = {
   visitors: {
@@ -116,39 +100,39 @@ const chartConfigProgramPelatihan = {
 const chartConfigProgramPrioritas = {
   visitors: {
     label: "Masyarakat Dilatih",
-    color: "#1487af", // Dark Blue (RGB: 20, 135, 175)
+    color: "#1487af",
   },
   other4: {
     label: "Non Terobosan",
-    color: "#073f51", // Deep Navy (RGB: 7, 63, 81)
+    color: "#073f51",
   },
   chrome: {
     label: "Konservasi",
-    color: "#47bdda", // Light Blue (RGB: 71, 189, 218)
+    color: "#47bdda",
   },
   safari: {
     label: "PIT",
-    color: "#97d7e2", // Soft Blue (RGB: 151, 215, 226)
+    color: "#97d7e2",
   },
   firefox: {
     label: "Kalaju/Kalamo",
-    color: "#f7fdfb", // Off-White (RGB: 247, 253, 251)
+    color: "#f7fdfb",
   },
   edge: {
     label: "KPB",
-    color: "#1487af", // Dark Blue (RGB: 20, 135, 175)
+    color: "#1487af",
   },
   other: {
     label: "Budidaya",
-    color: "#47bdda", // Light Blue (RGB: 71, 189, 218)
+    color: "#47bdda",
   },
   other2: {
     label: "Pengawasan Pesisir",
-    color: "#073f51", // Deep Navy (RGB: 7, 63, 81)
+    color: "#073f51",
   },
   other3: {
     label: "BCL",
-    color: "#97d7e2", // Soft Blue (RGB: 151, 215, 226)
+    color: "#97d7e2",
   },
 } satisfies ChartConfig;
 
