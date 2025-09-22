@@ -22,6 +22,7 @@ export interface ModulPelatihan {
   FileModule: string
   CreateAt: string
   UpdateAt: string
+  JamPelajaran: string
 }
 
 export interface BahanTayang {

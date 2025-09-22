@@ -190,7 +190,10 @@ export default function TableModulPelatihan() {
                             verifiedOptions={verifiedOptions}
                             clearFilters={clearFilters}
                         />
-                        <AddModulAction onSuccess={fetchModulPelatihan} />
+                        {
+                            Cookies.get('Access')?.includes('superAdmin') && <AddModulAction onSuccess={fetchModulPelatihan} />
+                        }
+
                     </div>
                 </div>
             </div>

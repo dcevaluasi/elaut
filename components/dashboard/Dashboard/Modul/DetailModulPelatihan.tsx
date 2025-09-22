@@ -1,9 +1,9 @@
 "use client"
 
 import { useParams, usePathname } from "next/navigation"
-import { Loader2, FileText, Calendar, BookOpen, Plus, CheckCircle, XCircle } from "lucide-react"
+import { Loader2, BookOpen, Plus, CheckCircle, XCircle } from "lucide-react"
 import { useFetchDataMateriPelatihanMasyarakatById } from "@/hooks/elaut/modul/useFetchDataMateriPelatihanMasyarakat"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import axios from "axios"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -11,8 +11,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { fileModuleBaseUrl, moduleBaseUrl } from "@/constants/urls"
-import { FiEdit, FiEdit2, FiFolder, FiTrash2 } from "react-icons/fi"
-import { BahanTayang, MateriPelatihan, ModulPelatihan } from "@/types/module"
+import { FiEdit2, FiFolder, FiTrash2 } from "react-icons/fi"
+import { BahanTayang, ModulPelatihan } from "@/types/module"
 import { FaRegFileLines, FaRegFolderOpen } from "react-icons/fa6"
 import JSZip from "jszip"
 import { saveAs } from 'file-saver'
@@ -21,12 +21,12 @@ import { truncateText } from "@/utils"
 import {
     Select,
     SelectContent,
-    SelectGroup,
     SelectItem,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import Cookies from "js-cookie"
+import { generateJPMateri } from "@/utils/module"
 
 export default function DetailModulPelatihan() {
     const pathname = usePathname();
@@ -46,6 +46,9 @@ export default function DetailModulPelatihan() {
     const [idModul, setIdModul] = useState("")
     const [nama, setNama] = useState("");
     const [deskripsi, setDeskripsi] = useState("");
+    const [jamPelajaran, setJamPelajaran] = useState("");
+    const [jamTeori, setJamTeori] = useState("");
+    const [jamPraktek, setJamPraktek] = useState("");
     const [file, setFile] = useState<File | null>(null);
     const [produsen, setProdusen] = useState("")
     const [linkVideo, setLinkVideo] = useState("");
@@ -54,12 +57,17 @@ export default function DetailModulPelatihan() {
     const [editOpen, setEditOpen] = useState(false);
     const [editModul, setEditModul] = useState<ModulPelatihan | null>(null);
     const [editNama, setEditNama] = useState("");
+    const [editJamPelajaran, setEditJamPelajaran] = useState("");
     const [editDeskripsi, setEditDeskripsi] = useState("");
     const [editFile, setEditFile] = useState<File | null>(null);
     const [editSubmitting, setEditSubmitting] = useState(false);
     const [editFileOld, setEditFileOld] = useState<string | null>(null)
 
     const [downloading, setDownloading] = useState(false);
+    useEffect(() => {
+        setJamPelajaran(`{${jamTeori}}{${jamPraktek}}`);
+        setEditJamPelajaran(`{${jamTeori}}{${jamPraktek}}`);
+    }, [jamTeori, jamPraktek]);
 
     const materi = data;
     const [currentPage, setCurrentPage] = useState(1);
@@ -88,6 +96,7 @@ export default function DetailModulPelatihan() {
         formData.append("DeskripsiModulPelatihan", deskripsi)
         formData.append("IdMateriPelatihan", id.toString())
         formData.append("IdModulPelatihan", id.toString())
+        formData.append("JamPelajaran", jamPelajaran)
 
         try {
             setSubmitting(true)
@@ -99,6 +108,9 @@ export default function DetailModulPelatihan() {
             setFile(null)
             setNama("")
             setDeskripsi("")
+            setJamPelajaran("")
+            setJamTeori("")
+            setJamPraktek("")
             refetch()
         } catch (err) {
             console.error(err)
@@ -124,6 +136,7 @@ export default function DetailModulPelatihan() {
         formData.append("NamaModulPelatihan", editNama)
         formData.append("DeskripsiModulPelatihan", editDeskripsi)
         formData.append("IdMateriPelatihan", id.toString())
+        formData.append("JamPelajaran", editJamPelajaran)
 
         try {
             setEditSubmitting(true)
@@ -134,6 +147,9 @@ export default function DetailModulPelatihan() {
             setEditOpen(false)
             setEditFile(null)
             setEditModul(null)
+            setJamTeori("")
+            setJamPraktek("")
+            setEditJamPelajaran("")
             refetch()
         } catch (err) {
             console.error(err)
@@ -265,11 +281,17 @@ export default function DetailModulPelatihan() {
                                 Kembali
                             </Button>
                             <Dialog open={open} onOpenChange={setOpen}>
-                                <DialogTrigger asChild>
-                                    <Button className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md">
-                                        <Plus className="w-4 h-4" /> Tambah Materi {label}
-                                    </Button>
-                                </DialogTrigger>
+                                {(
+                                    (materi?.BerlakuSampai === "2" && !Cookies.get("Access")?.includes("superAdmin")) ||
+                                    (materi?.BerlakuSampai === "1" && Cookies.get("Access")?.includes("superAdmin"))
+                                ) && (
+                                        <DialogTrigger asChild>
+                                            <Button className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md">
+                                                <Plus className="w-4 h-4" /> Tambah Materi {label}
+                                            </Button>
+                                        </DialogTrigger>
+                                    )}
+
                                 <DialogContent className="sm:max-w-lg">
                                     <DialogHeader>
                                         <DialogTitle>Tambah Materi {label} Pelatihan</DialogTitle>
@@ -293,6 +315,30 @@ export default function DetailModulPelatihan() {
                                                 onChange={(e) => setDeskripsi(e.target.value)}
                                                 placeholder={`Masukkan deskripsi ${label}`}
                                             />
+                                        </div>
+
+                                        <div className="flex gap-2">
+                                            <div className="space-y-2">
+                                                <Label>Jam Teori</Label>
+                                                <Input
+                                                    type="text"
+                                                    value={jamTeori}
+                                                    onChange={(e) => setJamTeori(e.target.value)}
+                                                    placeholder="Masukkan jam teori"
+                                                    required
+                                                />
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label>Jam Praktek</Label>
+                                                <Input
+                                                    type="text"
+                                                    value={jamPraktek}
+                                                    onChange={(e) => setJamPraktek(e.target.value)}
+                                                    placeholder="Masukkan jam praktek"
+                                                    required
+                                                />
+                                            </div>
                                         </div>
 
                                         <div className="space-y-2">
@@ -404,6 +450,29 @@ export default function DetailModulPelatihan() {
                                             placeholder={`Masukkan deskripsi ${label}`}
                                         />
                                     </div>
+                                    <div className="flex gap-2">
+                                        <div className="space-y-2">
+                                            <Label>Jam Teori</Label>
+                                            <Input
+                                                type="text"
+                                                value={jamTeori}
+                                                onChange={(e) => setJamTeori(e.target.value)}
+                                                placeholder="Masukkan jam teori"
+                                                required
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label>Jam Praktek</Label>
+                                            <Input
+                                                type="text"
+                                                value={jamPraktek}
+                                                onChange={(e) => setJamPraktek(e.target.value)}
+                                                placeholder="Masukkan jam praktek"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
                                     <div className="space-y-2">
                                         <Label className="font-semibold text-gray-700">Upload File {label}</Label>
 
@@ -503,7 +572,9 @@ export default function DetailModulPelatihan() {
                         <tr>
                             <th className="w-12 px-3 py-3 text-center">No</th>
                             <th className="w-12 px-3 py-3 text-center">Action</th>
-                            <th className="w-40 px-3 py-3 text-center">Nama Materi {label} Pelatihan</th>
+                            <th className="w-40 px-3 py-3 text-center">Nama Materi</th>
+                            <th className="w-40 px-3 py-3 text-center">JP Teori</th>
+                            <th className="w-40 px-3 py-3 text-center">JP Praktek</th>
                             <th className="w-28 px-3 py-3 text-center">Diupload pada</th>
                         </tr>
                     </thead>
@@ -514,320 +585,339 @@ export default function DetailModulPelatihan() {
                                 const numB = parseInt(b.NamaModulPelatihan.split(".")[0], 10) || 0;
                                 return numA - numB;
                             })
-                            .map((row: ModulPelatihan, index: number) => (
-                                <React.Fragment key={row.IdModulPelatihan}>
-                                    <tr className="hover:bg-gray-50 transition-colors duration-150">
-                                        <td className="px-3 py-2 border text-center text-gray-500">
-                                            {(currentPage - 1) * itemsPerPage + index + 1}
-                                        </td>
-                                        <td className="px-3 py-4 border">
-                                            <div className="flex flex-row gap-2 h-full items-center justify-center py-2">
-                                                {row.FileModule && (
-                                                    <>
-                                                        <a
-                                                            href={`${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${row.FileModule}`}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 border group"
-                                                        >
-                                                            <FaRegFileLines className="h-5 w-5 text-blue-500 group-hover:text-white" /> File
-                                                        </a>
-                                                        <button
-                                                            onClick={() =>
-                                                                setExpandedRow(expandedRow === row.IdModulPelatihan ? null : row.IdModulPelatihan)
-                                                            }
-                                                            className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-teal-500 text-teal-500 hover:text-white hover:bg-teal-500 border group"
-                                                        >
-                                                            <FiFolder className="h-5 w-5 text-teal-500 group-hover:text-white" />{" "}
-                                                            {expandedRow === row.IdModulPelatihan ? "Tutup Bahan" : "Lihat Bahan Lainnya"}
-                                                        </button>
-                                                        <button
-                                                            onClick={() => {
-                                                                setEditModul(row);
-                                                                setEditNama(row.NamaModulPelatihan);
-                                                                setEditDeskripsi(row.DeskripsiModulPelatihan || "");
-                                                                setEditFile(null);
-                                                                setEditFileOld(row.FileModule);
-                                                                setEditOpen(true);
-                                                            }}
-                                                            className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-amber-500 text-amber-500 hover:text-white hover:bg-amber-500 border group"
-                                                        >
-                                                            <FiEdit2 className="h-5 w-5 text-amber-500 group-hover:text-white" /> Edit
-                                                        </button>
-                                                        <button
-                                                            onClick={async () => {
-                                                                const confirmDelete = window.confirm("⚠️ Apakah Anda yakin ingin menghapus modul ini?");
-                                                                if (!confirmDelete) return;
-
-                                                                try {
-                                                                    const res = await fetch(
-                                                                        `${moduleBaseUrl}/modul-pelatihan/deleteModulPelatihan?id=${row.IdModulPelatihan}`,
-                                                                        { method: "DELETE" }
-                                                                    );
-                                                                    if (!res.ok) throw new Error("Gagal menghapus modul");
-
-                                                                    refetch();
-                                                                    alert("✅ Modul berhasil dihapus");
-                                                                } catch (error) {
-                                                                    console.error(error);
-                                                                    alert("❌ Gagal menghapus modul");
+                            .map((row: ModulPelatihan, index: number) => {
+                                const theory_jp = generateJPMateri(row.JamPelajaran).theory
+                                const practice_jp = generateJPMateri(row.JamPelajaran).practice
+                                return (
+                                    <React.Fragment key={row.IdModulPelatihan}>
+                                        <tr className="hover:bg-gray-50 transition-colors duration-150">
+                                            <td className="px-3 py-2 border text-center text-gray-500">
+                                                {(currentPage - 1) * itemsPerPage + index + 1}
+                                            </td>
+                                            <td className="px-3 py-4 border">
+                                                <div className="flex flex-row gap-2 h-full items-center justify-center py-2">
+                                                    {row.FileModule && (
+                                                        <>
+                                                            <a
+                                                                href={`${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${row.FileModule}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 border group"
+                                                            >
+                                                                <FaRegFileLines className="h-5 w-5 text-blue-500 group-hover:text-white" /> File
+                                                            </a>
+                                                            <button
+                                                                onClick={() =>
+                                                                    setExpandedRow(expandedRow === row.IdModulPelatihan ? null : row.IdModulPelatihan)
                                                                 }
-                                                            }}
-                                                            className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-rose-500 text-rose-500 hover:text-white hover:bg-rose-500 border group"
-                                                        >
-                                                            <FiTrash2 className="h-5 w-5 text-rose-500 group-hover:text-white" />
-                                                            Hapus
-                                                        </button>
-                                                    </>
-                                                )}
-                                            </div>
-                                        </td>
-                                        <td className="px-3 py-2 border max-w-full" title={row.NamaModulPelatihan}>
-                                            {row.NamaModulPelatihan}
-                                        </td>
-                                        <td className="px-3 py-2 border max-w-[200px]" title={row.CreateAt}>
-                                            {row.CreateAt}
-                                        </td>
-                                    </tr>
+                                                                className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-teal-500 text-teal-500 hover:text-white hover:bg-teal-500 border group"
+                                                            >
+                                                                <FiFolder className="h-5 w-5 text-teal-500 group-hover:text-white" />{" "}
+                                                                Bahan Lainnya
+                                                            </button>
 
-                                    {/* Collapsible row */}
-                                    {expandedRow === row.IdModulPelatihan && (
-                                        <tr>
-                                            <td colSpan={4} className="p-4 bg-gray-50 border">
-                                                <div className="flex w-full items-center justify-between mb-3">
-                                                    <h2 id="page-caption" className="font-semibold text-base leading-none max-w-xl">
-                                                        Bahan Lainnya  <br />Materi {row?.NamaModulPelatihan}
-                                                    </h2>
-                                                    <Dialog open={openBahanAjar} onOpenChange={setOpenBahanAjar}>
-                                                        <DialogTrigger asChild>
-                                                            <Button className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md">
-                                                                <Plus className="w-4 h-4" /> Tambah  Bahan Lainnya
-                                                            </Button>
-                                                        </DialogTrigger>
-                                                        <DialogContent className="sm:max-w-lg">
-                                                            <DialogHeader>
-                                                                <DialogTitle>Tambah Bahan Ajar/Tayang</DialogTitle>
-                                                            </DialogHeader>
-
-                                                            <form onSubmit={handleCreateBahanAjar} className="space-y-4">
-                                                                {/* Nama */}
-                                                                <div className="space-y-2">
-                                                                    <Label>Nama Bahan Ajar/Tayang</Label>
-                                                                    <Input
-                                                                        value={nama}
-                                                                        onChange={(e) => {
-                                                                            setNama(e.target.value);
-                                                                            setIdModul(row.IdModulPelatihan.toString());
-                                                                        }}
-                                                                        placeholder="Masukkan nama bahan tayang"
-                                                                        required
-                                                                    />
-                                                                </div>
-
-                                                                {/* Deskripsi */}
-                                                                <div className="space-y-2">
-                                                                    <Label>Deskripsi Bahan Tayang</Label>
-                                                                    <Textarea
-                                                                        value={deskripsi}
-                                                                        onChange={(e) => setDeskripsi(e.target.value)}
-                                                                        placeholder="Masukkan deskripsi bahan tayang"
-                                                                    />
-                                                                </div>
-
-                                                                {/* Produsen */}
-                                                                {!isBahanAjar && <div className="space-y-2">
-                                                                    <Label>Produsen</Label>
-                                                                    <Input
-                                                                        value={produsen}
-                                                                        onChange={(e) => setProdusen(e.target.value)}
-                                                                        placeholder="Masukkan produsen"
-                                                                        required
-                                                                    />
-                                                                </div>}
-
-
-                                                                {/* Jenis Bahan Ajar */}
-                                                                <div className="space-y-2">
-                                                                    <Label>Jenis Bahan</Label>
-                                                                    <Select value={jenis} onValueChange={setJenis}>
-                                                                        <SelectTrigger className="w-full">
-                                                                            <SelectValue placeholder="Pilih jenis bahan ajar" />
-                                                                        </SelectTrigger>
-                                                                        <SelectContent className="z-[9999999]" position="popper" side="top">
-                                                                            <SelectItem value="file">File</SelectItem>
-                                                                            <SelectItem value="video">Video/Link Referensi</SelectItem>
-                                                                        </SelectContent>
-                                                                    </Select>
-                                                                </div>
-
-                                                                {/* Kondisi jika File */}
-                                                                {jenis === "file" && (
-                                                                    <div className="space-y-2">
-                                                                        <Label className="font-semibold text-gray-700">
-                                                                            Upload File
-                                                                        </Label>
-                                                                        {!file && (
-                                                                            <div className="flex items-center justify-center w-full">
-                                                                                <label
-                                                                                    htmlFor="file-upload"
-                                                                                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-md text-sm cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
-                                                                                >
-                                                                                    <svg
-                                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                                        className="w-10 h-10 text-blue-500 mb-2"
-                                                                                        fill="none"
-                                                                                        viewBox="0 0 24 24"
-                                                                                        stroke="currentColor"
-                                                                                    >
-                                                                                        <path
-                                                                                            strokeLinecap="round"
-                                                                                            strokeLinejoin="round"
-                                                                                            strokeWidth="2"
-                                                                                            d="M12 4v16m8-8H4"
-                                                                                        />
-                                                                                    </svg>
-                                                                                    <span className="text-sm text-gray-600">
-                                                                                        <span className="font-medium text-blue-600">Click to upload</span>{" "}
-                                                                                        or drag and drop
-                                                                                    </span>
-                                                                                    <span className="text-xs text-gray-400 mt-1">
-                                                                                        PDF, PPT, DOC, JPG, PNG (max. 10MB)
-                                                                                    </span>
-                                                                                    <Input
-                                                                                        id="file-upload"
-                                                                                        type="file"
-                                                                                        className="hidden"
-                                                                                        onChange={(e) => setFile(e.target.files?.[0]!)}
-                                                                                        required
-                                                                                    />
-                                                                                </label>
-                                                                            </div>
-                                                                        )}
-
-                                                                        {file && (
-                                                                            <div className="flex items-center gap-2 mt-2 text-sm font-medium text-green-600 bg-green-50 border border-green-200 px-3 py-2 rounded-lg">
-                                                                                <CheckCircle className="w-5 h-5" />
-                                                                                <span>{file.name}</span>
-                                                                                <button
-                                                                                    type="button"
-                                                                                    onClick={() => setFile(null)}
-                                                                                    className="ml-auto text-red-500 hover:text-red-600"
-                                                                                >
-                                                                                    <XCircle className="w-5 h-5" />
-                                                                                </button>
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-                                                                )}
-
-                                                                {/* Kondisi jika Video */}
-                                                                {jenis === "video" && (
-                                                                    <div className="space-y-2">
-                                                                        <Label>Link Video/Referensi</Label>
-                                                                        <Input
-                                                                            type="url"
-                                                                            value={linkVideo}
-                                                                            onChange={(e) => setLinkVideo(e.target.value)}
-                                                                            placeholder="Masukkan link  (contoh: https://youtube.com/...)"
-                                                                            required
-                                                                            className='text-sm'
-                                                                        />
-                                                                    </div>
-                                                                )}
-
-                                                                {/* Submit */}
-                                                                <Button
-                                                                    type="submit"
-                                                                    className="w-full rounded-md py-2 bg-blue-600 hover:bg-blue-700 text-white"
-                                                                    disabled={submitting}
-                                                                >
-                                                                    {submitting ? (
-                                                                        <Loader2 className="animate-spin w-4 h-4 mr-2" />
-                                                                    ) : (
-                                                                        "Submit"
-                                                                    )}
-                                                                </Button>
-                                                            </form>
-                                                        </DialogContent>
-
-                                                    </Dialog>
-
-                                                </div>
-                                                <table className="w-full text-sm text-left border">
-                                                    <thead className="bg-gray-100 text-gray-700 uppercase">
-                                                        <tr className="text-xs text-center">
-                                                            <th className="px-3 py-2 border">No</th>
-                                                            <th className="px-3 py-2 border">Action</th>
-                                                            <th className="px-3 py-2 border">Nama</th>
-                                                            <th className="px-3 py-2 border">Deskripsi</th>
-                                                            <th className="px-3 py-2 border">File/Link</th>
-                                                            {!isBahanAjar && <th className="px-3 py-2 border">Produsen</th>}
-                                                            <th className="px-3 py-2 border">Tanggal Upload</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {
-                                                            row.BahanTayang.length == 0 ? <tr>
-                                                                <td colSpan={18} className="text-center py-6 text-gray-500 italic">
-                                                                    Tidak ada data ditemukan
-                                                                </td>
-                                                            </tr> : <>
-                                                                {row.BahanTayang.map((row_bt: BahanTayang, index: number) => (
-                                                                    <tr key={row_bt.IdBahanTayang}>
-                                                                        <td className="px-3 py-2 border">{index + 1}</td>
-                                                                        <td className="px-3 py-2 border"> <button
+                                                            {(
+                                                                (materi?.BerlakuSampai === "2" && !Cookies.get("Access")?.includes("superAdmin")) ||
+                                                                (materi?.BerlakuSampai === "1" && Cookies.get("Access")?.includes("superAdmin"))
+                                                            ) && (
+                                                                    <>
+                                                                        <button
+                                                                            onClick={() => {
+                                                                                setEditModul(row);
+                                                                                setEditNama(row.NamaModulPelatihan);
+                                                                                setEditDeskripsi(row.DeskripsiModulPelatihan || "");
+                                                                                setEditFile(null);
+                                                                                setEditFileOld(row.FileModule);
+                                                                                setEditOpen(true);
+                                                                            }}
+                                                                            className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-amber-500 text-amber-500 hover:text-white hover:bg-amber-500 border group"
+                                                                        >
+                                                                            <FiEdit2 className="h-5 w-5 text-amber-500 group-hover:text-white" /> Edit
+                                                                        </button>
+                                                                        <button
                                                                             onClick={async () => {
-                                                                                const confirmDelete = window.confirm("⚠️ Apakah Anda yakin ingin menghapus bahan tayang ini?");
+                                                                                const confirmDelete = window.confirm("⚠️ Apakah Anda yakin ingin menghapus materi ini?");
                                                                                 if (!confirmDelete) return;
 
                                                                                 try {
                                                                                     const res = await fetch(
-                                                                                        `${moduleBaseUrl}/bahan-tayang/deleteBahanTayang?id=${row_bt.IdBahanTayang}`,
+                                                                                        `${moduleBaseUrl}/modul-pelatihan/deleteModulPelatihan?id=${row.IdModulPelatihan}`,
                                                                                         { method: "DELETE" }
                                                                                     );
-                                                                                    if (!res.ok) throw new Error("Gagal menghapus bahan tayang");
+                                                                                    if (!res.ok) throw new Error("Gagal menghapus modul");
 
                                                                                     refetch();
-                                                                                    alert("✅ Bahan tayang berhasil dihapus");
+                                                                                    alert("✅ Modul berhasil dihapus");
                                                                                 } catch (error) {
                                                                                     console.error(error);
-                                                                                    alert("❌ Gagal menghapus bahan tayang");
+                                                                                    alert("❌ Gagal menghapus modul");
                                                                                 }
                                                                             }}
                                                                             className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-rose-500 text-rose-500 hover:text-white hover:bg-rose-500 border group"
                                                                         >
                                                                             <FiTrash2 className="h-5 w-5 text-rose-500 group-hover:text-white" />
                                                                             Hapus
-                                                                        </button></td>
-                                                                        <td className="px-3 py-2 border">{row_bt.NamaBahanTayang}</td>
-                                                                        <td className="px-3 py-2 border">{row_bt.DeskripsiBahanTayang}</td>
-                                                                        <td className="px-3 py-2 border"> <a
-                                                                            href={
-                                                                                row_bt.BahanTayang
-                                                                                    ? `${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${row_bt.BahanTayang}`
-                                                                                    : row_bt.LinkVideo
-                                                                            }
-                                                                            target="_blank"
-                                                                            rel="noopener noreferrer"
-                                                                            className="text-blue-500 underline"
-                                                                        >
+                                                                        </button></>
+                                                                )}
 
-                                                                            {row_bt.BahanTayang == "" ? truncateText(row_bt.LinkVideo, 30, '...') : truncateText(row_bt.BahanTayang, 30, '...')}
-                                                                        </a></td>
 
-                                                                        {!isBahanAjar && <td className="px-3 py-2 border">{row_bt.Creator || "-"}</td>}
-                                                                        <td className="px-3 py-2 border">{row_bt.CreateAt}</td>
-                                                                    </tr>))}
-                                                            </>
-
-                                                        }
-                                                    </tbody>
-                                                </table>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td className="px-3 py-2 border max-w-full" title={row.NamaModulPelatihan}>
+                                                {row.NamaModulPelatihan}
+                                            </td>
+                                            <td className="px-2 py-2 border w-fit text-center" >
+                                                {theory_jp}
+                                            </td>
+                                            <td className="px-2 py-2 border w-fit text-center" >
+                                                {practice_jp}
+                                            </td>
+                                            <td className="px-3 py-2 border max-w-[200px]" title={row.CreateAt}>
+                                                {row.CreateAt}
                                             </td>
                                         </tr>
-                                    )}
-                                </React.Fragment>
-                            ))}
+
+                                        {/* Collapsible row */}
+                                        {expandedRow === row.IdModulPelatihan && (
+                                            <tr>
+                                                <td colSpan={6} className="p-4 bg-gray-50 border">
+                                                    <div className="flex w-full items-center justify-between mb-3">
+                                                        <h2 id="page-caption" className="font-semibold text-base leading-none max-w-xl">
+                                                            Bahan Lainnya  <br />Materi {row?.NamaModulPelatihan}
+                                                        </h2>
+                                                        <Dialog open={openBahanAjar} onOpenChange={setOpenBahanAjar}>
+                                                            <DialogTrigger asChild>
+                                                                <Button className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md">
+                                                                    <Plus className="w-4 h-4" /> Tambah  Bahan Lainnya
+                                                                </Button>
+                                                            </DialogTrigger>
+                                                            <DialogContent className="sm:max-w-lg">
+                                                                <DialogHeader>
+                                                                    <DialogTitle>Tambah Bahan Ajar/Tayang</DialogTitle>
+                                                                </DialogHeader>
+
+                                                                <form onSubmit={handleCreateBahanAjar} className="space-y-4">
+                                                                    {/* Nama */}
+                                                                    <div className="space-y-2">
+                                                                        <Label>Nama Bahan Ajar/Tayang</Label>
+                                                                        <Input
+                                                                            value={nama}
+                                                                            onChange={(e) => {
+                                                                                setNama(e.target.value);
+                                                                                setIdModul(row.IdModulPelatihan.toString());
+                                                                            }}
+                                                                            placeholder="Masukkan nama bahan tayang"
+                                                                            required
+                                                                        />
+                                                                    </div>
+
+                                                                    {/* Deskripsi */}
+                                                                    <div className="space-y-2">
+                                                                        <Label>Deskripsi Bahan Tayang</Label>
+                                                                        <Textarea
+                                                                            value={deskripsi}
+                                                                            onChange={(e) => setDeskripsi(e.target.value)}
+                                                                            placeholder="Masukkan deskripsi bahan tayang"
+                                                                        />
+                                                                    </div>
+
+                                                                    {/* Produsen */}
+                                                                    {!isBahanAjar && <div className="space-y-2">
+                                                                        <Label>Produsen</Label>
+                                                                        <Input
+                                                                            value={produsen}
+                                                                            onChange={(e) => setProdusen(e.target.value)}
+                                                                            placeholder="Masukkan produsen"
+                                                                            required
+                                                                        />
+                                                                    </div>}
+
+
+                                                                    {/* Jenis Bahan Ajar */}
+                                                                    <div className="space-y-2">
+                                                                        <Label>Jenis Bahan</Label>
+                                                                        <Select value={jenis} onValueChange={setJenis}>
+                                                                            <SelectTrigger className="w-full">
+                                                                                <SelectValue placeholder="Pilih jenis bahan ajar" />
+                                                                            </SelectTrigger>
+                                                                            <SelectContent className="z-[9999999]" position="popper" side="top">
+                                                                                <SelectItem value="file">File</SelectItem>
+                                                                                <SelectItem value="video">Video/Link Referensi</SelectItem>
+                                                                            </SelectContent>
+                                                                        </Select>
+                                                                    </div>
+
+                                                                    {/* Kondisi jika File */}
+                                                                    {jenis === "file" && (
+                                                                        <div className="space-y-2">
+                                                                            <Label className="font-semibold text-gray-700">
+                                                                                Upload File
+                                                                            </Label>
+                                                                            {!file && (
+                                                                                <div className="flex items-center justify-center w-full">
+                                                                                    <label
+                                                                                        htmlFor="file-upload"
+                                                                                        className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-md text-sm cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
+                                                                                    >
+                                                                                        <svg
+                                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                                            className="w-10 h-10 text-blue-500 mb-2"
+                                                                                            fill="none"
+                                                                                            viewBox="0 0 24 24"
+                                                                                            stroke="currentColor"
+                                                                                        >
+                                                                                            <path
+                                                                                                strokeLinecap="round"
+                                                                                                strokeLinejoin="round"
+                                                                                                strokeWidth="2"
+                                                                                                d="M12 4v16m8-8H4"
+                                                                                            />
+                                                                                        </svg>
+                                                                                        <span className="text-sm text-gray-600">
+                                                                                            <span className="font-medium text-blue-600">Click to upload</span>{" "}
+                                                                                            or drag and drop
+                                                                                        </span>
+                                                                                        <span className="text-xs text-gray-400 mt-1">
+                                                                                            PDF, PPT, DOC, JPG, PNG (max. 10MB)
+                                                                                        </span>
+                                                                                        <Input
+                                                                                            id="file-upload"
+                                                                                            type="file"
+                                                                                            className="hidden"
+                                                                                            onChange={(e) => setFile(e.target.files?.[0]!)}
+                                                                                            required
+                                                                                        />
+                                                                                    </label>
+                                                                                </div>
+                                                                            )}
+
+                                                                            {file && (
+                                                                                <div className="flex items-center gap-2 mt-2 text-sm font-medium text-green-600 bg-green-50 border border-green-200 px-3 py-2 rounded-lg">
+                                                                                    <CheckCircle className="w-5 h-5" />
+                                                                                    <span>{file.name}</span>
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        onClick={() => setFile(null)}
+                                                                                        className="ml-auto text-red-500 hover:text-red-600"
+                                                                                    >
+                                                                                        <XCircle className="w-5 h-5" />
+                                                                                    </button>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    )}
+
+                                                                    {/* Kondisi jika Video */}
+                                                                    {jenis === "video" && (
+                                                                        <div className="space-y-2">
+                                                                            <Label>Link Video/Referensi</Label>
+                                                                            <Input
+                                                                                type="url"
+                                                                                value={linkVideo}
+                                                                                onChange={(e) => setLinkVideo(e.target.value)}
+                                                                                placeholder="Masukkan link  (contoh: https://youtube.com/...)"
+                                                                                required
+                                                                                className='text-sm'
+                                                                            />
+                                                                        </div>
+                                                                    )}
+
+                                                                    {/* Submit */}
+                                                                    <Button
+                                                                        type="submit"
+                                                                        className="w-full rounded-md py-2 bg-blue-600 hover:bg-blue-700 text-white"
+                                                                        disabled={submitting}
+                                                                    >
+                                                                        {submitting ? (
+                                                                            <Loader2 className="animate-spin w-4 h-4 mr-2" />
+                                                                        ) : (
+                                                                            "Submit"
+                                                                        )}
+                                                                    </Button>
+                                                                </form>
+                                                            </DialogContent>
+
+                                                        </Dialog>
+
+                                                    </div>
+                                                    <table className="w-full text-sm text-left border">
+                                                        <thead className="bg-gray-100 text-gray-700 uppercase">
+                                                            <tr className="text-xs text-center">
+                                                                <th className="px-3 py-2 border">No</th>
+                                                                <th className="px-3 py-2 border">Action</th>
+                                                                <th className="px-3 py-2 border">Nama</th>
+                                                                <th className="px-3 py-2 border">Deskripsi</th>
+                                                                <th className="px-3 py-2 border">File/Link</th>
+                                                                {!isBahanAjar && <th className="px-3 py-2 border">Produsen</th>}
+                                                                <th className="px-3 py-2 border">Tanggal Upload</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {
+                                                                row.BahanTayang.length == 0 ? <tr>
+                                                                    <td colSpan={18} className="text-center py-6 text-gray-500 italic">
+                                                                        Tidak ada data ditemukan
+                                                                    </td>
+                                                                </tr> : <>
+                                                                    {row.BahanTayang.map((row_bt: BahanTayang, index: number) => (
+                                                                        <tr key={row_bt.IdBahanTayang}>
+                                                                            <td className="px-3 py-2 border">{index + 1}</td>
+                                                                            <td className="px-3 py-2 border"> <button
+                                                                                onClick={async () => {
+                                                                                    const confirmDelete = window.confirm("⚠️ Apakah Anda yakin ingin menghapus bahan tayang ini?");
+                                                                                    if (!confirmDelete) return;
+
+                                                                                    try {
+                                                                                        const res = await fetch(
+                                                                                            `${moduleBaseUrl}/bahan-tayang/deleteBahanTayang?id=${row_bt.IdBahanTayang}`,
+                                                                                            { method: "DELETE" }
+                                                                                        );
+                                                                                        if (!res.ok) throw new Error("Gagal menghapus bahan tayang");
+
+                                                                                        refetch();
+                                                                                        alert("✅ Bahan tayang berhasil dihapus");
+                                                                                    } catch (error) {
+                                                                                        console.error(error);
+                                                                                        alert("❌ Gagal menghapus bahan tayang");
+                                                                                    }
+                                                                                }}
+                                                                                className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-rose-500 text-rose-500 hover:text-white hover:bg-rose-500 border group"
+                                                                            >
+                                                                                <FiTrash2 className="h-5 w-5 text-rose-500 group-hover:text-white" />
+                                                                                Hapus
+                                                                            </button></td>
+                                                                            <td className="px-3 py-2 border">{row_bt.NamaBahanTayang}</td>
+                                                                            <td className="px-3 py-2 border">{row_bt.DeskripsiBahanTayang}</td>
+                                                                            <td className="px-3 py-2 border"> <a
+                                                                                href={
+                                                                                    row_bt.BahanTayang
+                                                                                        ? `${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${row_bt.BahanTayang}`
+                                                                                        : row_bt.LinkVideo
+                                                                                }
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                                className="text-blue-500 underline"
+                                                                            >
+
+                                                                                {row_bt.BahanTayang == "" ? truncateText(row_bt.LinkVideo, 30, '...') : truncateText(row_bt.BahanTayang, 30, '...')}
+                                                                            </a></td>
+
+                                                                            {!isBahanAjar && <td className="px-3 py-2 border">{row_bt.Creator || "-"}</td>}
+                                                                            <td className="px-3 py-2 border">{row_bt.CreateAt}</td>
+                                                                        </tr>))}
+                                                                </>
+
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </React.Fragment>
+                                )
+                            })}
 
                         {paginatedData.length === 0 && (
                             <tr>

@@ -20,7 +20,7 @@ import Toast from "@/commons/Toast";
 import Link from "next/link";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { urlTemplateMateriPelatihan } from "@/constants/templates";
-import { MateriPelatihan, PelatihanMasyarakat } from "@/types/product";
+import { PelatihanMasyarakat } from "@/types/product";
 import { truncateText } from "@/utils";
 
 const DualLangInput: React.FC<{

@@ -154,7 +154,7 @@ export default function LayoutAdminElaut({
           <li>
             <a
               href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/dashboard/`}
-              className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname === `/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/dashboard/`
+              className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname.includes(`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/dashboard/`)
                 ? "bg-blue-600 text-white"
                 : "hover:bg-blue-500 hover:text-white"
                 }`}
@@ -238,7 +238,7 @@ export default function LayoutAdminElaut({
           <li>
             <a
               href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/pelatihan`}
-              className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname === `/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/pelatihan/`
+              className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname.includes(`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/pelatihan/`)
                 ? "bg-blue-600 text-white"
                 : "hover:bg-blue-500 hover:text-white"
                 }`}

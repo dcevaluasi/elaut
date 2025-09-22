@@ -581,13 +581,11 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         <p className="font-medium text-gray-600">
                                             Action :
                                         </p>
-                                        {
-                                            ((Cookies.get('Access')?.includes('verifyPelaksanaan') && !data?.TtdSertifikat.includes('Kepala Balai') && data?.StatusPenerbitan == "2") || (Cookies.get('Access')?.includes('createPelatihan') && data?.TtdSertifikat.includes('Kepala Balai') && data?.StatusPenerbitan == "0")) &&
-                                            <ChooseInstrukturAction
-                                                idPelatihan={data.IdPelatihan.toString()}
-                                                currentData={data}
-                                                onSuccess={fetchData} />
-                                        }
+                                        <ChooseInstrukturAction
+                                            idPelatihan={data.IdPelatihan.toString()}
+                                            currentData={data}
+                                            onSuccess={fetchData} />
+
                                     </div>
 
                                     <div className="w-full ">

@@ -18,15 +18,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import Toast from "@/commons/Toast";
 import { elautBaseUrl } from "@/constants/urls";
-import {
-    Select,
-    SelectTrigger,
-    SelectValue,
-    SelectContent,
-    SelectItem,
-    SelectGroup,
-    SelectLabel,
-} from "@/components/ui/select";
+
 import { PelatihanMasyarakat } from "@/types/product";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
@@ -118,7 +110,7 @@ const ChooseInstrukturAction: React.FC<ChooseInstrukturActionProps> = ({
                     className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-teal-500 text-teal-500 hover:text-white hover:bg-teal-500"
                 >
                     <TbUser className="h-5 w-5" />
-                    <span>{currentData?.ModuleMateri != "" ? "Update" : "Pilih"} Instruktur/Pelatih</span>
+                    <span>{currentData?.Instruktur != "" ? "Update" : "Pilih"} Instruktur/Pelatih</span>
                 </Button>
             </AlertDialogTrigger>
 
@@ -130,7 +122,7 @@ const ChooseInstrukturAction: React.FC<ChooseInstrukturActionProps> = ({
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 
-                <ScrollArea className="py-2 max-h-[65vh] gap-3  pr-2 grid grid-cols-1">
+                <ScrollArea className="py-2 gap-3  pr-2 grid grid-cols-1 h-[50vh]">
                     <div className="flex w-full gap-2">
                         <Input
                             placeholder="Cari instruktur/pelatih..."
@@ -141,7 +133,7 @@ const ChooseInstrukturAction: React.FC<ChooseInstrukturActionProps> = ({
                     </div>
 
                     <div className="flex-1 mt-3 pr-2" >
-                        <div className={`space-y-3 ${selectedInstruktur.length != 0 ? "max-h-[35vh] overflow-y-auto" : "h-full"}`}>
+                        <div className={`space-y-3 ${selectedInstruktur.length != 0 ? "h-[20vh] overflow-y-scroll" : "max-h-[40vh] overflow-y-scroll"}`}>
                             {filtered.length > 0 ? (
                                 filtered.map((item) => (
                                     <div
@@ -188,73 +180,79 @@ const ChooseInstrukturAction: React.FC<ChooseInstrukturActionProps> = ({
                             )}
 
                         </div>
-
-                        {
-                            selectedInstruktur.length == 0 ? <>
-                            </> : <>
-                                <div className="space-y-4 mt-10">
-                                    <div>
-                                        <h4 className="font-medium text-sm mb-2 text-gray-700">
-                                            Instruktur Terpilih
-                                        </h4>
-                                        <div className="space-y-2">
-                                            <table className="w-full text-xs text-left border">
-                                                <thead className="bg-gray-100 text-gray-700 uppercase">
-                                                    <tr className="text-xs text-center">
-                                                        <th className="px-3 py-2 border text-xs">No</th>
-                                                        <th className="px-3 py-2 border text-xs">Action</th>
-                                                        <th className="px-3 py-2 border text-xs">Nama</th>
-                                                        <th className="px-3 py-2 border text-xs">Informasi</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {selectedInstruktur.map((instruktur: Instruktur, index: number) => (
-                                                        <tr key={instruktur.IdInstruktur}>
-                                                            <td className="px-2 py-2 border text-center">{index + 1}</td>
-                                                            <td className="px-2 py-2 border">
-                                                                <div className="flex items-center justify-center w-full">
-                                                                    <Button
-                                                                        variant="outline"
-                                                                        onClick={() => { setSelectedInstruktur((prev) => prev.filter((i) => i.IdInstruktur !== instruktur.IdInstruktur)); setSelectedIdInstruktur((prev) => prev.filter((i) => i !== instruktur.IdInstruktur)) }}
-                                                                        className="flex items-center gap-2 w-fit rounded-lg px-3 shadow-md transition-all bg-transparent border-rose-500 text-rose-500 hover:text-white hover:bg-rose-500 text-xs"
-                                                                    >
-                                                                        <span>Urungkan</span>
-                                                                        <TbTrash className="h-4 w-4" />
-                                                                    </Button>
-                                                                </div>
-                                                            </td>
-                                                            <td className="px-2 py-2 border">{instruktur.nama}</td>
-                                                            <td className="px-2 py-2 border">
-                                                                <div>
-                                                                    <p className="text-xs text-gray-600 line-clamp-2">
-                                                                        Email :  {instruktur.email}
-                                                                    </p>
-                                                                    <p className="text-xs text-gray-600 line-clamp-2">
-                                                                        No Telpon :  {instruktur.no_telpon}
-                                                                    </p>
-                                                                    <p className="text-xs text-gray-600 line-clamp-2">
-                                                                        Bidang Keahlian :  {instruktur.bidang_keahlian}
-                                                                    </p>
-                                                                    <p className="text-xs text-gray-600 line-clamp-2">
-                                                                        Jabatan dan Pangkat/Golongan :  {instruktur.jenjang_jabatan} - {instruktur.pelatihan_pelatih}
-                                                                    </p>
-                                                                </div>
-                                                            </td>
-                                                        </tr>))}
-                                                </tbody>
-                                            </table>
-
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </>
-                        }
                     </div>
                 </ScrollArea>
 
+
+                {
+                    selectedInstruktur.length == 0 ? <>
+                    </> : <ScrollArea className="py-2 gap-3  pr-2 grid grid-cols-1 h-40">
+                        <div className="space-y-4">
+                            <div>
+                                <h4 className="font-medium text-sm mb-2 text-gray-700">
+                                    Instruktur Terpilih ({selectedInstruktur.length})
+                                </h4>
+                                <div className="space-y-2">
+                                    <table className="w-full text-xs text-left border">
+                                        <thead className="bg-gray-100 text-gray-700 uppercase">
+                                            <tr className="text-xs text-center">
+                                                <th className="px-3 py-2 border text-xs">No</th>
+                                                <th className="px-3 py-2 border text-xs">Action</th>
+                                                <th className="px-3 py-2 border text-xs">Nama</th>
+                                                <th className="px-3 py-2 border text-xs">Informasi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {selectedInstruktur.map((instruktur: Instruktur, index: number) => (
+                                                <tr key={instruktur.IdInstruktur}>
+                                                    <td className="px-2 py-2 border text-center">{index + 1}</td>
+                                                    <td className="px-2 py-2 border">
+                                                        <div className="flex items-center justify-center w-full">
+                                                            <Button
+                                                                variant="outline"
+                                                                onClick={() => { setSelectedInstruktur((prev) => prev.filter((i) => i.IdInstruktur !== instruktur.IdInstruktur)); setSelectedIdInstruktur((prev) => prev.filter((i) => i !== instruktur.IdInstruktur)) }}
+                                                                className="flex items-center gap-2 w-fit rounded-lg px-3 shadow-md transition-all bg-transparent border-rose-500 text-rose-500 hover:text-white hover:bg-rose-500 text-xs"
+                                                            >
+                                                                <span>Urungkan</span>
+                                                                <TbTrash className="h-4 w-4" />
+                                                            </Button>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-2 py-2 border">{instruktur.nama}</td>
+                                                    <td className="px-2 py-2 border">
+                                                        <div>
+                                                            <p className="text-xs text-gray-600 line-clamp-2">
+                                                                Email :  {instruktur.email}
+                                                            </p>
+                                                            <p className="text-xs text-gray-600 line-clamp-2">
+                                                                No Telpon :  {instruktur.no_telpon}
+                                                            </p>
+                                                            <p className="text-xs text-gray-600 line-clamp-2">
+                                                                Bidang Keahlian :  {instruktur.bidang_keahlian}
+                                                            </p>
+                                                            <p className="text-xs text-gray-600 line-clamp-2">
+                                                                Jabatan dan Pangkat/Golongan :  {instruktur.jenjang_jabatan} - {instruktur.pelatihan_pelatih}
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                </tr>))}
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </ScrollArea>
+                }
+
+
+
                 <AlertDialogFooter>
-                    <AlertDialogCancel disabled={loading}>Batal</AlertDialogCancel>
+                    <AlertDialogCancel disabled={loading} onClick={() => {
+                        setSelectedIdInstruktur([])
+                        setSelectedInstruktur([])
+                    }}>Batal</AlertDialogCancel>
                     <AlertDialogAction
                         onClick={handleSubmit}
                         className="bg-blue-500 hover:bg-blue-600 text-white"
