@@ -11,7 +11,6 @@ import { TrendingUp } from "lucide-react";
 import { utils, writeFile } from "xlsx";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PelatihanMasyarakat } from "@/types/product";
 import { UserPelatihan } from "@/types/user";
 import { getCurrentQuarter, getCurrentYear, getQuarterForFiltering, parseIndonesianDate } from "@/utils/time";
 

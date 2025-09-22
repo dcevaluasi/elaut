@@ -1,11 +1,7 @@
 "use client";
 
-import LayoutAdminElaut from "@/components/dashboard/Layouts/LayoutAdminElaut";
-import { elautBaseUrl } from "@/constants/urls";
-import { LemdiklatDetailInfo } from "@/types/lemdiklat";
-import axios from "axios";
-import Cookies from "js-cookie";
 import React from "react";
+import LayoutAdminElaut from "@/components/dashboard/Layouts/LayoutAdminElaut";
 
 import { TbSchool } from "react-icons/tb";
 import ManajemenInformasiSISJAMU from "../components/ManajemenInformasiSISJAMU";
