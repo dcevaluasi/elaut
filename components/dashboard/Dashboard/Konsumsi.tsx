@@ -2,7 +2,7 @@
 
 import React from "react";
 import { MdOutlineFastfood } from "react-icons/md";
-import TableDataKonsumsi from "../fasilitas/TableDataKonsumsi";
+import TableDataKonsumsi from "../Fasilitas/TableDataKonsumsi";
 
 const Konsumsi: React.FC = () => {
   return (

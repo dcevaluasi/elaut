@@ -19,7 +19,7 @@ import { generatedCurriculumCertificate, generatedDescriptionCertificate } from 
 import { DialogFormatSTTPL } from "@/components/sertifikat/dialogFormatSTTPL";
 import { Button } from "@/components/ui/button";
 import { FaSearch } from "react-icons/fa";
-import UserPelatihanTable from "./tables/UserPelatihanTable";
+import UserPelatihanTable from "./Tables/UserPelatihanTable";
 import { countUserWithCertificate, countUserWithDraftCertificate, countUserWithNoStatus, countUserWithPassed } from "@/utils/counter";
 import TTDeDetail from "./TTDeDetail";
 import { ESELON1, ESELON_1 } from "@/constants/nomenclatures";

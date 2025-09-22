@@ -1,7 +1,7 @@
 "use client";
 
 import LayoutAdminElaut from "@/components/dashboard/Layouts/LayoutAdminElaut";
-import TableDataUnitKerja from "@/components/dashboard/Pelatihan/table/TableDataUnitKerja";
+import TableDataUnitKerja from "@/components/dashboard/Pelatihan/Table/TableDataUnitKerja";
 import React from "react";
 import { TbBuildingSkyscraper } from "react-icons/tb";
 

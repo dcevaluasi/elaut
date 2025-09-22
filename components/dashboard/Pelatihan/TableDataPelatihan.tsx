@@ -25,7 +25,7 @@ import { UPT } from "@/constants/nomenclatures";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useFetchDataPelatihanMasyarakat } from "@/hooks/elaut/pelatihan/useFetchDataPelatihanMasyarakat";
 import TabStatusPelatihanMasyarakat from "./TabStatusPelatihanMasyarakat";
-import TableDataPelatihanMasyarakat from "./table/TableDataPelatihanMasyrakat";
+import TableDataPelatihanMasyarakat from "./Table/TableDataPelatihanMasyrakat";
 import { isPendingSigning, isSigned, isVerifyDiklat } from "@/utils/status";
 import FormPelatihan from "@/components/form/FormPelatihan";
 
