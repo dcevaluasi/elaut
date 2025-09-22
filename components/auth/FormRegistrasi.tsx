@@ -37,8 +37,7 @@ import { IoMdCloseCircle } from "react-icons/io";
 
 // RECAPTCHA
 import ReCAPTCHA from "react-google-recaptcha";
-import { Slide } from "react-awesome-reveal";
-import Footer from "../ui/footer";
+
 import { HiMiniUserGroup, HiOutlineEye } from "react-icons/hi2";
 import { elautBaseUrl, manningAgentDevUrl } from "@/constants/urls";
 import { sanitizedDangerousChars, validateIsDangerousChars } from "@/utils/input";

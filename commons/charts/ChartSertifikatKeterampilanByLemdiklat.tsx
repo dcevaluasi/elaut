@@ -24,10 +24,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  DataSertifikasiSummary,
   SummarySertifikatByLemdiklat,
   SummarySertifikatByProgram,
-  SummarySertifikatItem,
 } from "@/types/akapi";
 import { FaBuilding, FaGraduationCap, FaShip } from "react-icons/fa6";
 import { TrendingUp } from "lucide-react";
