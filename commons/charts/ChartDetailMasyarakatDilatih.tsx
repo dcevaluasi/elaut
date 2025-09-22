@@ -168,7 +168,7 @@ const chartConfigBidangPelatihan = {
   },
   other2: {
     label: "Budidaya",
-    color: "#073f51", // Deep Navy (RGB: 7, 63, 81)
+    color: "#073f51",
   },
 } satisfies ChartConfig;
 
