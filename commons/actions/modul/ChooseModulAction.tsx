@@ -135,7 +135,7 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
                 }
             </AlertDialogTrigger>
 
-            <AlertDialogContent className="max-w-3xl">
+            <AlertDialogContent className="max-w-3xl !max-h-[60vh]">
                 <AlertDialogHeader>
                     <AlertDialogTitle>Cari dan Pilih Modul Pelatihan</AlertDialogTitle>
                     <AlertDialogDescription>
@@ -143,7 +143,7 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 
-                <ScrollArea className="py-2 max-h-[65vh] gap-3  pr-2 grid grid-cols-1">
+                <ScrollArea className="py-2 max-h-[60vh] gap-3  pr-2 grid grid-cols-1">
                     <div className="flex w-full gap-2">
                         <Input
                             placeholder="Cari modul pelatihan..."

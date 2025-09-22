@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { usePathname } from "next/navigation";
 import {
     AlertDialog,
     AlertDialogTrigger,
@@ -12,7 +13,15 @@ import {
     AlertDialogCancel,
     AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -20,21 +29,42 @@ import Toast from "@/commons/Toast";
 import { moduleBaseUrl } from "@/constants/urls";
 import { TbPencil } from "react-icons/tb";
 import { MateriPelatihan } from "@/types/module";
-import { PROGRAM_AKP, PROGRAM_KELAUTAN, PROGRAM_PERIKANAN_ADMIN } from "@/constants/pelatihan";
+import {
+    PROGRAM_KELAUTAN,
+    PROGRAM_PERIKANAN_ADMIN,
+    RUMPUN_PELATIHAN,
+} from "@/constants/pelatihan";
 
 const UpdateModulAction: React.FC<{
     materiPelatihan: MateriPelatihan;
     onSuccess?: () => void;
 }> = ({ materiPelatihan, onSuccess }) => {
+    const pathname = usePathname();
+    const isBahanAjar = pathname.includes("bahan-ajar");
+    const label = isBahanAjar ? "Bahan Ajar" : "Modul";
+
     const [isOpen, setIsOpen] = useState(false);
 
     // Controlled states (prefill data lama)
     const [nama, setNama] = useState(materiPelatihan.NamaMateriPelatihan || "");
-    const [deskripsiMateriPelatihan, setDeskripsiMateriPelatihan] = useState(materiPelatihan.DeskripsiMateriPelatihan || "");
-    const [berlakuSampai, setBerlakuSampai] = useState(materiPelatihan.BerlakuSampai || "");
-    const [bidangMateriPelatihan, setBidangMateriPelatihan] = useState(materiPelatihan.BidangMateriPelatihan || "");
-    const [jamPelajaran, setJamPelajaran] = useState(materiPelatihan.JamPelajaran || "");
-    const [tahun, setTahun] = useState(materiPelatihan.NamaPenderitaMateriPelatihan || "")
+    const [deskripsiMateriPelatihan, setDeskripsiMateriPelatihan] = useState(
+        materiPelatihan.DeskripsiMateriPelatihan || ""
+    );
+    const [berlakuSampai, setBerlakuSampai] = useState(
+        materiPelatihan.BerlakuSampai || ""
+    );
+    const [isVerified, setIsVerified] = useState(
+        materiPelatihan.IsVerified || "No Verified"
+    );
+    const [bidangMateriPelatihan, setBidangMateriPelatihan] = useState(
+        materiPelatihan.BidangMateriPelatihan || ""
+    );
+    const [jamPelajaran, setJamPelajaran] = useState(
+        materiPelatihan.JamPelajaran || ""
+    );
+    const [tahun, setTahun] = useState(
+        materiPelatihan.NamaPenderitaMateriPelatihan || ""
+    );
 
     const [loading, setLoading] = useState(false);
 
@@ -46,6 +76,7 @@ const UpdateModulAction: React.FC<{
             tahun: tahun,
             bidang_materi_pelatihan: bidangMateriPelatihan,
             jam_pelajaran: jamPelajaran,
+            is_verified: isVerified
         };
 
         try {
@@ -53,17 +84,12 @@ const UpdateModulAction: React.FC<{
             const response = await axios.put(
                 `${moduleBaseUrl}/materi-pelatihan/updateMateriPelatihan?id=${materiPelatihan.IdMateriPelatihan}`,
                 form,
-                {
-                    headers: {
-                        Authorization: `Bearer ${Cookies.get("XSRF091")}`,
-                    },
-                }
             );
 
             Toast.fire({
                 icon: "success",
                 title: "Berhasil!",
-                text: "Data materi/modul pelatihan berhasil diperbarui.",
+                text: `Data materi/${label.toLowerCase()} pelatihan berhasil diperbarui.`,
             });
             setIsOpen(false);
             setLoading(false);
@@ -73,7 +99,7 @@ const UpdateModulAction: React.FC<{
             Toast.fire({
                 icon: "error",
                 title: "Gagal!",
-                text: "Terjadi kesalahan saat memperbarui materi/modul pelatiha.",
+                text: `Terjadi kesalahan saat memperbarui materi/${label.toLowerCase()} pelatihan.`,
             });
         }
     };
@@ -92,16 +118,18 @@ const UpdateModulAction: React.FC<{
 
             <AlertDialogContent className="max-w-3xl">
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Edit Data Modul Pelatihan</AlertDialogTitle>
+                    <AlertDialogTitle>Edit Data {label} Pelatihan</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Ubah data modul pelatihan berikut sesuai kebutuhan.
+                        Ubah data {label.toLowerCase()} pelatihan berikut sesuai kebutuhan.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 
                 <div className="py-2 max-h-[70vh] flex flex-col gap-1 overflow-y-auto pr-2">
                     {/* Nama */}
                     <div className="col-span-2 space-y-1">
-                        <label className="text-sm font-medium text-gray-700">Nama Materi/Modul Pelatihan</label>
+                        <label className="text-sm font-medium text-gray-700">
+                            Nama Materi/{label} Pelatihan
+                        </label>
                         <input
                             type="text"
                             className="w-full rounded-md border border-gray-300 p-2 text-sm"
@@ -110,18 +138,21 @@ const UpdateModulAction: React.FC<{
                         />
                     </div>
 
+                    {/* Deskripsi */}
                     {/* <div className="col-span-2 space-y-1">
-                        <label className="text-sm font-medium text-gray-700">Deskripsi</label>
-                        <textarea
-                            rows={3}
-                            className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                            value={deskripsiMateriPelatihan}
-                            onChange={(e) => setDeskripsiMateriPelatihan(e.target.value)}
-                        />
-                    </div> */}
+            <label className="text-sm font-medium text-gray-700">Deskripsi</label>
+            <textarea
+              rows={3}
+              className="w-full rounded-md border border-gray-300 p-2 text-sm"
+              value={deskripsiMateriPelatihan}
+              onChange={(e) => setDeskripsiMateriPelatihan(e.target.value)}
+            />
+          </div> */}
 
                     <div className="col-span-2 space-y-1">
-                        <label className="text-sm font-medium text-gray-700">Bidang Pelatihan</label>
+                        <label className="text-sm font-medium text-gray-700">
+                            Bidang Pelatihan
+                        </label>
                         <Select
                             value={bidangMateriPelatihan}
                             onValueChange={(value) => setBidangMateriPelatihan(value)}
@@ -130,29 +161,19 @@ const UpdateModulAction: React.FC<{
                                 <SelectValue placeholder="Pilih bidang" />
                             </SelectTrigger>
                             <SelectContent position="popper" className="z-[9999999]">
-
-                                <SelectGroup>
-                                    <SelectLabel>Perikanan</SelectLabel>
-                                    {PROGRAM_PERIKANAN_ADMIN.map((item) => (
-                                        <SelectItem key={item} value={item}>
-                                            {item}
-                                        </SelectItem>
-                                    ))}
-                                </SelectGroup>
-                                <SelectGroup>
-                                    <SelectLabel>Kelautan</SelectLabel>
-                                    {PROGRAM_KELAUTAN.map((item) => (
-                                        <SelectItem key={item} value={item}>
-                                            {item}
-                                        </SelectItem>
-                                    ))}
-                                </SelectGroup>
+                                {RUMPUN_PELATIHAN.map((item) => (
+                                    <SelectItem key={item} value={item}>
+                                        {item}
+                                    </SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                     </div>
 
                     <div className="col-span-2 space-y-1">
-                        <label className="text-sm font-medium text-gray-700">Jam Pelajaran</label>
+                        <label className="text-sm font-medium text-gray-700">
+                            Jam Pelajaran
+                        </label>
                         <input
                             type="text"
                             className="w-full rounded-md border border-gray-300 p-2 text-sm"

@@ -99,7 +99,6 @@ const ImportPesertaAction: React.FC<ImportPesertaActionProps> = ({
             {/* Trigger Button */}
             <AlertDialogTrigger asChild>
                 <Button
-                    type="button"
                     onClick={() => {
                         if (statusApproval === "Selesai") {
                             Toast.fire({
@@ -111,7 +110,8 @@ const ImportPesertaAction: React.FC<ImportPesertaActionProps> = ({
                             setIsOpen(true);
                         }
                     }}
-                    className="flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border   
+                    variant="outline"
+                    className="flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg !border   
             bg-transparent border-green-600 text-green-600 hover:text-white hover:bg-green-600 transition-colors w-fit shadow-sm"
                 >
                     <PiMicrosoftExcelLogoFill className="h-5 w-5" />

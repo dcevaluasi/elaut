@@ -1,6 +1,6 @@
 "use client"
 
-import { useParams } from "next/navigation"
+import { useParams, usePathname } from "next/navigation"
 import { Loader2, FileText, Calendar, BookOpen, Plus, CheckCircle, XCircle } from "lucide-react"
 import { useFetchDataMateriPelatihanMasyarakatById } from "@/hooks/elaut/modul/useFetchDataMateriPelatihanMasyarakat"
 import React, { useState } from "react"
@@ -18,13 +18,27 @@ import JSZip from "jszip"
 import { saveAs } from 'file-saver'
 import { TbArrowLeft } from "react-icons/tb"
 import { truncateText } from "@/utils"
-
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 export default function DetailModulPelatihan() {
+    const pathname = usePathname();
+    const isBahanAjar = pathname.includes("bahan-ajar");
+    const label = isBahanAjar ? "Bahan Ajar" : "Modul";
+
     const params = useParams();
     const id = Number(params?.id);
     const { data, loading, error, refetch } =
         useFetchDataMateriPelatihanMasyarakatById(id);
+
+    const [jenis, setJenis] = useState("")
 
     const [open, setOpen] = useState(false);
     const [openBahanAjar, setOpenBahanAjar] = useState(false);
@@ -34,6 +48,7 @@ export default function DetailModulPelatihan() {
     const [deskripsi, setDeskripsi] = useState("");
     const [file, setFile] = useState<File | null>(null);
     const [produsen, setProdusen] = useState("")
+    const [linkVideo, setLinkVideo] = useState("");
     const [submitting, setSubmitting] = useState(false);
 
     const [editOpen, setEditOpen] = useState(false);
@@ -79,7 +94,7 @@ export default function DetailModulPelatihan() {
             await axios.post(`${moduleBaseUrl}/modul-pelatihan/createModulPelatihan`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             })
-            alert("✅ Modul berhasil ditambahkan!")
+            alert("✅ materi berhasil ditambahkan!")
             setOpen(false)
             setFile(null)
             setNama("")
@@ -162,11 +177,11 @@ export default function DetailModulPelatihan() {
 
     const handleCreateBahanAjar = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!file || !nama) return
-        console.log({ idModul })
+        if (!nama) return
 
         const formData = new FormData()
-        formData.append("file_bahan_tayang", file)
+        if (file) formData.append("file_bahan_tayang", file)
+        if (linkVideo != "") formData.append("LinkVideo", linkVideo)
         formData.append("NamaBahanTayang", nama)
         formData.append("DeskripsiBahanTayang", deskripsi)
         formData.append("IdModulPelatihan", idModul)
@@ -177,7 +192,7 @@ export default function DetailModulPelatihan() {
             const response = await axios.post(`${moduleBaseUrl}/bahan-tayang/createBahanTayang`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             })
-            alert("✅ bahan tayang berhasil ditambahkan!")
+            alert("✅ bahan lainnya berhasil ditambahkan!")
             setOpenBahanAjar(false)
             setFile(null)
             setNama("")
@@ -188,7 +203,7 @@ export default function DetailModulPelatihan() {
             console.log({ response })
         } catch (err) {
             console.error(err)
-            alert("❌ Gagal menambahkan bahan tayang")
+            alert("❌ Gagal menambahkan bahan lainnya")
         } finally {
             setSubmitting(false)
         }
@@ -242,7 +257,7 @@ export default function DetailModulPelatihan() {
                             <Button
                                 variant="outline"
                                 onClick={() =>
-                                    (window.location.href = `/admin/lemdiklat/master/modul`)
+                                    (window.location.href = isBahanAjar ? `/admin/lemdiklat/master/bahan-ajar` : `/admin/lemdiklat/master/modul`)
                                 }
                                 className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-gray-500 text-gray-500 hover:text-white hover:bg-gray-500"
                             >
@@ -252,34 +267,36 @@ export default function DetailModulPelatihan() {
                             <Dialog open={open} onOpenChange={setOpen}>
                                 <DialogTrigger asChild>
                                     <Button className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md">
-                                        <Plus className="w-4 h-4" /> Tambah Modul
+                                        <Plus className="w-4 h-4" /> Tambah Materi {label}
                                     </Button>
                                 </DialogTrigger>
                                 <DialogContent className="sm:max-w-lg">
                                     <DialogHeader>
-                                        <DialogTitle>Tambah Modul Pelatihan</DialogTitle>
+                                        <DialogTitle>Tambah Materi {label} Pelatihan</DialogTitle>
                                     </DialogHeader>
                                     <form onSubmit={handleSubmit} className="space-y-4">
                                         <div className="space-y-2">
-                                            <Label>Nama Modul</Label>
+                                            <Label>Nama Materi {label}</Label>
                                             <Input
                                                 value={nama}
                                                 onChange={(e) => setNama(e.target.value)}
-                                                placeholder="Masukkan nama modul"
+                                                placeholder={`Masukkan nama materi ${label}`}
                                                 required
                                             />
                                             <p className="text-xs text-gray-600">* Format : 1. Pengenalan Tugas Pokok dan Fungsi JFT</p>
                                         </div>
+
                                         <div className="space-y-2">
-                                            <Label>Deskripsi Modul</Label>
+                                            <Label>Deskripsi {label}</Label>
                                             <Textarea
                                                 value={deskripsi}
                                                 onChange={(e) => setDeskripsi(e.target.value)}
-                                                placeholder="Masukkan deskripsi modul"
+                                                placeholder={`Masukkan deskripsi ${label}`}
                                             />
                                         </div>
+
                                         <div className="space-y-2">
-                                            <Label className="font-semibold text-gray-700">Upload File Modul</Label>
+                                            <Label className="font-semibold text-gray-700">Upload File {label}</Label>
                                             {!file && <div className="flex items-center justify-center w-full">
                                                 <label
                                                     htmlFor="file-upload"
@@ -356,7 +373,7 @@ export default function DetailModulPelatihan() {
                                         </>
                                     ) : (
                                         <>
-                                            <FaRegFolderOpen className="w-4 h-4" /> Download Modul
+                                            <FaRegFolderOpen className="w-4 h-4" /> Download {label}
                                         </>
                                     )}
                                 </Button>
@@ -367,28 +384,28 @@ export default function DetailModulPelatihan() {
                         <Dialog open={editOpen} onOpenChange={setEditOpen}>
                             <DialogContent className="sm:max-w-lg">
                                 <DialogHeader>
-                                    <DialogTitle>Edit Modul Pelatihan</DialogTitle>
+                                    <DialogTitle>Edit {label} Pelatihan</DialogTitle>
                                 </DialogHeader>
                                 <form onSubmit={handleEditSubmit} className="space-y-4">
                                     <div className="space-y-2">
-                                        <Label>Nama Modul</Label>
+                                        <Label>Nama {label}</Label>
                                         <Input
                                             value={editNama}
                                             onChange={(e) => setEditNama(e.target.value)}
-                                            placeholder="Masukkan nama modul"
+                                            placeholder={`Masukkan nama ${label}`}
                                             required
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label>Deskripsi Modul</Label>
+                                        <Label>Deskripsi {label}</Label>
                                         <Textarea
                                             value={editDeskripsi}
                                             onChange={(e) => setEditDeskripsi(e.target.value)}
-                                            placeholder="Masukkan deskripsi modul"
+                                            placeholder={`Masukkan deskripsi ${label}`}
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="font-semibold text-gray-700">Upload File Modul</Label>
+                                        <Label className="font-semibold text-gray-700">Upload File {label}</Label>
 
                                         {/* Show old file if no new file is selected */}
                                         {editFileOld && editModul?.FileModule ? (
@@ -486,7 +503,7 @@ export default function DetailModulPelatihan() {
                         <tr>
                             <th className="w-12 px-3 py-3 text-center">No</th>
                             <th className="w-12 px-3 py-3 text-center">Action</th>
-                            <th className="w-40 px-3 py-3 text-center">Nama Materi Modul Pelatihan</th>
+                            <th className="w-40 px-3 py-3 text-center">Nama Materi {label} Pelatihan</th>
                             <th className="w-28 px-3 py-3 text-center">Diupload pada</th>
                         </tr>
                     </thead>
@@ -522,7 +539,7 @@ export default function DetailModulPelatihan() {
                                                             className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-teal-500 text-teal-500 hover:text-white hover:bg-teal-500 border group"
                                                         >
                                                             <FiFolder className="h-5 w-5 text-teal-500 group-hover:text-white" />{" "}
-                                                            {expandedRow === row.IdModulPelatihan ? "Tutup Bahan" : "Lihat Bahan"}
+                                                            {expandedRow === row.IdModulPelatihan ? "Tutup Bahan" : "Lihat Bahan Lainnya"}
                                                         </button>
                                                         <button
                                                             onClick={() => {
@@ -579,30 +596,35 @@ export default function DetailModulPelatihan() {
                                             <td colSpan={4} className="p-4 bg-gray-50 border">
                                                 <div className="flex w-full items-center justify-between mb-3">
                                                     <h2 id="page-caption" className="font-semibold text-base leading-none max-w-xl">
-                                                        Bahan Ajar/Tayang <br />{row?.NamaModulPelatihan}
+                                                        Bahan Lainnya  <br />Materi {row?.NamaModulPelatihan}
                                                     </h2>
                                                     <Dialog open={openBahanAjar} onOpenChange={setOpenBahanAjar}>
                                                         <DialogTrigger asChild>
                                                             <Button className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md">
-                                                                <Plus className="w-4 h-4" /> Tambah Bahan Ajar/Tayang
+                                                                <Plus className="w-4 h-4" /> Tambah  Bahan Lainnya
                                                             </Button>
                                                         </DialogTrigger>
                                                         <DialogContent className="sm:max-w-lg">
                                                             <DialogHeader>
                                                                 <DialogTitle>Tambah Bahan Ajar/Tayang</DialogTitle>
                                                             </DialogHeader>
+
                                                             <form onSubmit={handleCreateBahanAjar} className="space-y-4">
+                                                                {/* Nama */}
                                                                 <div className="space-y-2">
                                                                     <Label>Nama Bahan Ajar/Tayang</Label>
-
                                                                     <Input
                                                                         value={nama}
-                                                                        onChange={(e) => { setNama(e.target.value); setIdModul(row.IdModulPelatihan.toString()) }}
+                                                                        onChange={(e) => {
+                                                                            setNama(e.target.value);
+                                                                            setIdModul(row.IdModulPelatihan.toString());
+                                                                        }}
                                                                         placeholder="Masukkan nama bahan tayang"
                                                                         required
                                                                     />
-                                                                    <p className="text-xs text-gray-600">* Format : 1. (Video) Pengenalan Tugas Pokok dan Fungsi JFT</p>
                                                                 </div>
+
+                                                                {/* Deskripsi */}
                                                                 <div className="space-y-2">
                                                                     <Label>Deskripsi Bahan Tayang</Label>
                                                                     <Textarea
@@ -611,7 +633,9 @@ export default function DetailModulPelatihan() {
                                                                         placeholder="Masukkan deskripsi bahan tayang"
                                                                     />
                                                                 </div>
-                                                                <div className="space-y-2">
+
+                                                                {/* Produsen */}
+                                                                {!isBahanAjar && <div className="space-y-2">
                                                                     <Label>Produsen</Label>
                                                                     <Input
                                                                         value={produsen}
@@ -619,59 +643,99 @@ export default function DetailModulPelatihan() {
                                                                         placeholder="Masukkan produsen"
                                                                         required
                                                                     />
-                                                                </div>
+                                                                </div>}
+
+
+                                                                {/* Jenis Bahan Ajar */}
                                                                 <div className="space-y-2">
-                                                                    <Label className="font-semibold text-gray-700">Upload File Bahan Ajar/Tayang</Label>
-                                                                    {!file && <div className="flex items-center justify-center w-full">
-                                                                        <label
-                                                                            htmlFor="file-upload"
-                                                                            className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-md text-sm cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
-                                                                        >
-                                                                            <svg
-                                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                                className="w-10 h-10 text-blue-500 mb-2"
-                                                                                fill="none"
-                                                                                viewBox="0 0 24 24"
-                                                                                stroke="currentColor"
-                                                                            >
-                                                                                <path
-                                                                                    strokeLinecap="round"
-                                                                                    strokeLinejoin="round"
-                                                                                    strokeWidth="2"
-                                                                                    d="M12 4v16m8-8H4"
-                                                                                />
-                                                                            </svg>
-                                                                            <span className="text-sm text-gray-600">
-                                                                                <span className="font-medium text-blue-600">Click to upload</span> or drag and drop
-                                                                            </span>
-                                                                            <span className="text-xs text-gray-400 mt-1">PDF, PPT, DOC, JPG, PNG, MP4 (max. 10MB)</span>
-                                                                            <Input
-                                                                                id="file-upload"
-                                                                                type="file"
-                                                                                className="hidden"
-                                                                                onChange={(e) => setFile(e.target.files?.[0]!)}
-                                                                                required
-                                                                            />
-                                                                        </label>
-                                                                    </div>}
-
-
-                                                                    {/* ✅ File selected indicator */}
-                                                                    {file && (
-                                                                        <div className="flex items-center gap-2 mt-2 text-sm font-medium text-green-600 bg-green-50 border border-green-200 px-3 py-2 rounded-lg">
-                                                                            <CheckCircle className="w-5 h-5" />
-                                                                            <span>{file.name}</span>
-                                                                            <button
-                                                                                type="button"
-                                                                                onClick={() => setFile(null)}
-                                                                                className="ml-auto text-red-500 hover:text-red-600"
-                                                                            >
-                                                                                <XCircle className="w-5 h-5" />
-                                                                            </button>
-                                                                        </div>
-                                                                    )}
+                                                                    <Label>Jenis Bahan</Label>
+                                                                    <Select value={jenis} onValueChange={setJenis}>
+                                                                        <SelectTrigger className="w-full">
+                                                                            <SelectValue placeholder="Pilih jenis bahan ajar" />
+                                                                        </SelectTrigger>
+                                                                        <SelectContent className="z-[9999999]" position="popper" side="top">
+                                                                            <SelectItem value="file">File</SelectItem>
+                                                                            <SelectItem value="video">Video/Link Referensi</SelectItem>
+                                                                        </SelectContent>
+                                                                    </Select>
                                                                 </div>
 
+                                                                {/* Kondisi jika File */}
+                                                                {jenis === "file" && (
+                                                                    <div className="space-y-2">
+                                                                        <Label className="font-semibold text-gray-700">
+                                                                            Upload File
+                                                                        </Label>
+                                                                        {!file && (
+                                                                            <div className="flex items-center justify-center w-full">
+                                                                                <label
+                                                                                    htmlFor="file-upload"
+                                                                                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-md text-sm cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
+                                                                                >
+                                                                                    <svg
+                                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                                        className="w-10 h-10 text-blue-500 mb-2"
+                                                                                        fill="none"
+                                                                                        viewBox="0 0 24 24"
+                                                                                        stroke="currentColor"
+                                                                                    >
+                                                                                        <path
+                                                                                            strokeLinecap="round"
+                                                                                            strokeLinejoin="round"
+                                                                                            strokeWidth="2"
+                                                                                            d="M12 4v16m8-8H4"
+                                                                                        />
+                                                                                    </svg>
+                                                                                    <span className="text-sm text-gray-600">
+                                                                                        <span className="font-medium text-blue-600">Click to upload</span>{" "}
+                                                                                        or drag and drop
+                                                                                    </span>
+                                                                                    <span className="text-xs text-gray-400 mt-1">
+                                                                                        PDF, PPT, DOC, JPG, PNG (max. 10MB)
+                                                                                    </span>
+                                                                                    <Input
+                                                                                        id="file-upload"
+                                                                                        type="file"
+                                                                                        className="hidden"
+                                                                                        onChange={(e) => setFile(e.target.files?.[0]!)}
+                                                                                        required
+                                                                                    />
+                                                                                </label>
+                                                                            </div>
+                                                                        )}
+
+                                                                        {file && (
+                                                                            <div className="flex items-center gap-2 mt-2 text-sm font-medium text-green-600 bg-green-50 border border-green-200 px-3 py-2 rounded-lg">
+                                                                                <CheckCircle className="w-5 h-5" />
+                                                                                <span>{file.name}</span>
+                                                                                <button
+                                                                                    type="button"
+                                                                                    onClick={() => setFile(null)}
+                                                                                    className="ml-auto text-red-500 hover:text-red-600"
+                                                                                >
+                                                                                    <XCircle className="w-5 h-5" />
+                                                                                </button>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                )}
+
+                                                                {/* Kondisi jika Video */}
+                                                                {jenis === "video" && (
+                                                                    <div className="space-y-2">
+                                                                        <Label>Link Video/Referensi</Label>
+                                                                        <Input
+                                                                            type="url"
+                                                                            value={linkVideo}
+                                                                            onChange={(e) => setLinkVideo(e.target.value)}
+                                                                            placeholder="Masukkan link  (contoh: https://youtube.com/...)"
+                                                                            required
+                                                                            className='text-sm'
+                                                                        />
+                                                                    </div>
+                                                                )}
+
+                                                                {/* Submit */}
                                                                 <Button
                                                                     type="submit"
                                                                     className="w-full rounded-md py-2 bg-blue-600 hover:bg-blue-700 text-white"
@@ -685,6 +749,7 @@ export default function DetailModulPelatihan() {
                                                                 </Button>
                                                             </form>
                                                         </DialogContent>
+
                                                     </Dialog>
 
                                                 </div>
@@ -694,8 +759,9 @@ export default function DetailModulPelatihan() {
                                                             <th className="px-3 py-2 border">No</th>
                                                             <th className="px-3 py-2 border">Action</th>
                                                             <th className="px-3 py-2 border">Nama</th>
-                                                            <th className="px-3 py-2 border">File</th>
-                                                            <th className="px-3 py-2 border">Produsen</th>
+                                                            <th className="px-3 py-2 border">Deskripsi</th>
+                                                            <th className="px-3 py-2 border">File/Link</th>
+                                                            {!isBahanAjar && <th className="px-3 py-2 border">Produsen</th>}
                                                             <th className="px-3 py-2 border">Tanggal Upload</th>
                                                         </tr>
                                                     </thead>
@@ -734,15 +800,22 @@ export default function DetailModulPelatihan() {
                                                                             Hapus
                                                                         </button></td>
                                                                         <td className="px-3 py-2 border">{row_bt.NamaBahanTayang}</td>
+                                                                        <td className="px-3 py-2 border">{row_bt.DeskripsiBahanTayang}</td>
                                                                         <td className="px-3 py-2 border"> <a
-                                                                            href={`${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${row_bt.BahanTayang}`}
+                                                                            href={
+                                                                                row_bt.BahanTayang
+                                                                                    ? `${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${row_bt.BahanTayang}`
+                                                                                    : row_bt.LinkVideo
+                                                                            }
                                                                             target="_blank"
                                                                             rel="noopener noreferrer"
-                                                                            className="  text-blue-500  underline "
+                                                                            className="text-blue-500 underline"
                                                                         >
-                                                                            {truncateText(row_bt.BahanTayang, 50, '...')}
+
+                                                                            {row_bt.BahanTayang == "" ? truncateText(row_bt.LinkVideo, 30, '...') : truncateText(row_bt.BahanTayang, 30, '...')}
                                                                         </a></td>
-                                                                        <td className="px-3 py-2 border">{row_bt.Creator || "-"}</td>
+
+                                                                        {!isBahanAjar && <td className="px-3 py-2 border">{row_bt.Creator || "-"}</td>}
                                                                         <td className="px-3 py-2 border">{row_bt.CreateAt}</td>
                                                                     </tr>))}
                                                             </>

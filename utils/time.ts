@@ -321,3 +321,8 @@ export function isMoreThanToday(dateString: string): boolean {
 
   return inputDate <= today
 }
+
+export const years = Array.from(
+  { length: 6 },
+  (_, i) => new Date().getFullYear() - i,
+)

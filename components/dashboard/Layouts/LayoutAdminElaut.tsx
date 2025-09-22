@@ -11,14 +11,13 @@ import { usePathname, useRouter } from "next/navigation";
 import React, { ReactNode, useEffect, useState } from "react";
 import DropdownUser from "../Header/DropdownUser";
 import { LucideLayoutDashboard } from "lucide-react";
-import { IoBookOutline, IoPieChartOutline, IoSchoolOutline } from "react-icons/io5";
+import { IoBookOutline, IoDocumentOutline, IoFolderOpenOutline, IoPieChartOutline, IoSchoolOutline } from "react-icons/io5";
 import { FiMenu, FiLogOut, FiChevronDown, FiChevronRight } from "react-icons/fi";
 import { HiOutlineUserGroup } from "react-icons/hi2";
-import { TbBuildingSkyscraper, TbDatabaseEdit, TbSignature } from "react-icons/tb";
+import { TbBuildingSkyscraper, TbDatabaseEdit } from "react-icons/tb";
 import Link from "next/link";
 import { breakdownStatus } from "@/lib/utils";
 import { generatedSignedCertificate } from "@/utils/certificates";
-import { GrPieChart } from "react-icons/gr";
 
 export default function LayoutAdminElaut({
   children,
@@ -29,6 +28,8 @@ export default function LayoutAdminElaut({
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [submenuOpen, setSubmenuOpen] = useState(true);
+  const [sidebarSubOpen, setSidebarSubOpen] = useState(true);
+  const [submenuSubOpen, setSubmenuSubOpen] = useState(true);
   const [pusatData, setPusatData] = useState<PusatDetailInfo | null>(null);
   const [lemdikData, setLemdikData] = useState<LemdiklatDetailInfo | null>(null);
 
@@ -167,7 +168,7 @@ export default function LayoutAdminElaut({
           {
             Cookies.get('Role')?.includes('Pengelola') && <li>
               <button
-
+                onClick={() => { setSubmenuOpen(!submenuOpen) }}
                 className={`flex items-center justify-between w-full px-4 py-2 transition-colors rounded-md ${pathname.includes("master")
                   ? "bg-blue-600 text-white"
                   : "hover:bg-blue-500 hover:text-white"
@@ -183,20 +184,46 @@ export default function LayoutAdminElaut({
                 {sidebarOpen && (submenuOpen ? <FiChevronDown /> : <FiChevronRight />)}
               </button>
               {submenuOpen && sidebarOpen && (
-                <ul className="ml-10 mt-1 space-y-1">
+                <ul className="ml-7 mt-1 space-y-1">
                   <NavItem
                     href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/instruktur`}
                     icon={<HiOutlineUserGroup className="flex-shrink-0 w-6 h-6" />}
                     label="Instruktur/Pelatih"
                   />
-                  {
-                    Cookies.get('Access')?.includes('viewModul') &&
-                    <NavItem
-                      href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/modul`}
-                      icon={<IoBookOutline className="flex-shrink-0 w-6 h-6" />}
-                      label="Modul Pelatihan"
-                    />
-                  }
+                  <button
+                    onClick={() => { setSubmenuSubOpen(!submenuSubOpen) }}
+                    className={`flex items-center justify-between w-full px-3 py-2 transition-colors rounded-md ${pathname.includes("master")
+                      ? "bg-blue-600 text-white"
+                      : "hover:bg-blue-500 hover:text-white"
+                      }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <IoBookOutline className="text-2xl" />
+                      {sidebarSubOpen && (
+                        <span className="text-sm text-left">Peragkat Pelatihan</span>
+                      )}
+                    </div>
+                    {sidebarSubOpen && (submenuSubOpen ? <FiChevronDown /> : <FiChevronRight />)}
+                  </button>
+                  {submenuSubOpen && sidebarSubOpen && (
+                    <ul className="ml-7 mt-1 space-y-1">
+                      {
+                        Cookies.get('Access')?.includes('viewModul') &&
+                        <NavItem
+                          href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/modul`}
+                          icon={<IoDocumentOutline className="flex-shrink-0 w-6 h-6" />}
+                          label="Modul Pelatihan"
+                        />
+                      }
+                      {
+                        Cookies.get('Access')?.includes('viewModul') &&
+                        <NavItem
+                          href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/bahan-ajar`}
+                          icon={<IoFolderOpenOutline className="flex-shrink-0 w-6 h-6" />}
+                          label="Bahan Ajar"
+                        />
+                      }
+                    </ul>)}
                   <NavItem
                     href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/unit-kerja`}
                     icon={<TbBuildingSkyscraper className="flex-shrink-0 w-6 h-6" />}
@@ -218,19 +245,6 @@ export default function LayoutAdminElaut({
             >
               <IoSchoolOutline className="flex-shrink-0 w-6 h-6" />
               {sidebarOpen && <span className="text-sm">Penyelenggaraan Pelatihan</span>}
-            </a>
-          </li>
-
-          <li>
-            <a
-              href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/indikator-kinerja-utama`}
-              className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname === `/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/pelatihan/`
-                ? "bg-blue-600 text-white"
-                : "hover:bg-blue-500 hover:text-white"
-                }`}
-            >
-              <IoPieChartOutline className="flex-shrink-0 w-6 h-6" />
-              {sidebarOpen && <span className="text-sm">Indikator Kinerja Utama (IKU)</span>}
             </a>
           </li>
         </ul>

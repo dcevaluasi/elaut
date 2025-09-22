@@ -33,4 +33,5 @@ export interface BahanTayang {
   Creator: string
   CreateAt: string
   UpdateAt: string
+  LinkVideo: string
 }

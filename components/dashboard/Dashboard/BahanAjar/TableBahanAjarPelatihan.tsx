@@ -19,16 +19,16 @@ import {
 import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
 import Cookies from "js-cookie";
 import { findNameUnitKerjaById, findUnitKerjaById } from "@/utils/unitkerja";
-import { UnitKerja } from "@/types/master";
 import AddModulAction from "@/commons/actions/modul/AddModulAction";
 import UpdateModulAction from "@/commons/actions/modul/UpdateModulAction";
 
-export default function TableModulPelatihan() {
-    const [searchQuery, setSearchQuery] = useState<string>("");
-    const { data, loading, error, fetchModulPelatihan, stats } = useFetchDataMateriPelatihanMasyarakat("Modul");
-
+export default function TableBahanAjarPelatihan() {
     const idUnitKerja = Cookies.get('IDUnitKerja')
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const { data, loading, error, fetchModulPelatihan, stats } = useFetchDataMateriPelatihanMasyarakat("Bahan Ajar", idUnitKerja!);
+
     const { unitKerjas, loading: loadingUnitKerja, error: errorUnitKerja, fetchUnitKerjaData } = useFetchDataUnitKerja()
+    console.log({ unitKerjas })
     useEffect(() => {
         fetchUnitKerjaData()
     }, [fetchUnitKerjaData])
@@ -49,6 +49,7 @@ export default function TableModulPelatihan() {
         setFilterProdusen("")
         setFilterVerified("")
     }
+
     const filteredData = useMemo(() => {
         return data.filter((row) => {
             const matchesSearch = !searchQuery || Object.values(row).some((val) =>
@@ -86,89 +87,13 @@ export default function TableModulPelatihan() {
         return <p className="text-center text-red-500 py-10">{error}</p>;
 
     return (
-        <div className="space-y-6">
-            {/* Metrics */}
-            <div className="grid grid-cols-2 w-full h-full gap-4">
-                <div className="w-full flex flex-col gap-4">
-                    <div className="grid grid-cols-2 w-full gap-4">
-                        <Card className="h-fit rounded-xl w-full border border-gray-200 bg-white shadow-sm">
-                            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                <CardTitle className="text-base font-medium text-gray-600">
-                                    Total Modul
-                                </CardTitle>
-                                <Book className="h-5 w-5 text-gray-400" />
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-2xl font-bold text-gray-800">{totalMateri}</p>
-                                <p className="text-xs text-gray-500">Modul tersedia</p>
-                            </CardContent>
-                        </Card>
-                        <Card className="h-fit rounded-xl w-full border border-gray-200 bg-white shadow-sm">
-                            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                <CardTitle className="text-base font-medium text-gray-600">
-                                    Total Materi
-                                </CardTitle>
-                                <File className="h-5 w-5 text-gray-400" />
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-2xl font-bold text-gray-800">{totalModul}</p>
-                                <p className="text-xs text-gray-500">Materi tersedia</p>
-                            </CardContent>
-                        </Card>
-                    </div>
-                    <Card className="w-full h-full rounded-2xl border border-gray-200 shadow-sm transition-all hover:shadow-lg">
-                        <CardHeader className="flex items-center">
-                            <Calendar className="h-5 w-5 text-teal-500" />
-                            <CardTitle className="text-lg font-semibold text-gray-800">
-                                Tahun
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <ul className="grid grid-cols-4 gap-2">
-                                {Object.entries(stats.tahun).map(([key, count]) => (
-                                    <li
-                                        key={key}
-                                        className="flex items-center justify-between rounded-lg bg-teal-50 px-3 py-2 text-sm transition hover:bg-teal-100"
-                                    >
-                                        <span className="font-medium text-gray-700">{key}</span>
-                                        <span className="font-bold text-teal-600">{count}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                <Card className="w-full h-full rounded-2xl border border-gray-200 shadow-sm transition-all hover:shadow-lg">
-                    <CardHeader className="flex items-center">
-                        <Layers className="h-5 w-5 text-blue-500" />
-                        <CardTitle className="text-lg font-semibold text-gray-800">
-                            Rumpun Pelatihan
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <ul className="grid grid-cols-3 gap-2">
-                            {Object.entries(stats.bidang).map(([key, count]) => (
-                                <li
-                                    key={key}
-                                    className="flex items-center justify-between rounded-lg bg-blue-50 px-3 py-2 text-sm transition hover:bg-blue-100"
-                                >
-                                    <span className="font-medium text-gray-700">{key}</span>
-                                    <span className="font-bold text-blue-600">{count}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </CardContent>
-                </Card>
-            </div>
-
-
+        <div className="space-y-6 mt-5">
             <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-800">Daftar Modul/Perangkat Pelatihan</h2>
+                <h2 className="text-lg font-semibold text-gray-800">Daftar Bahan Ajar Pelatihan</h2>
                 <div className="flex flex-col md:flex-row items-center gap-2 w-full md:w-auto">
                     <Input
                         type="text"
-                        placeholder="Cari modul..."
+                        placeholder="Cari bahan ajar..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full md:w-48  py-1 text-sm"
@@ -201,8 +126,7 @@ export default function TableModulPelatihan() {
                         <tr>
                             <th className="w-12 px-3 py-3 text-center">No</th>
                             <th className="w-12 px-3 py-3 text-center">Action</th>
-                            <th className="w-40 px-3 py-3 text-center">Nama Modul</th>
-                            <th className="w-40 px-3 py-3 text-center">Status Pengesahan</th>
+                            <th className="w-40 px-3 py-3 text-center">Nama Bahan Ajar</th>
                             <th className="w-40 px-3 py-3 text-center">Jumlah Materi</th>
 
                         </tr>
@@ -227,12 +151,12 @@ export default function TableModulPelatihan() {
                                         <Button
                                             variant="outline"
                                             onClick={() =>
-                                                (window.location.href = `/admin/lemdiklat/master/modul/${row.IdMateriPelatihan}`)
+                                                (window.location.href = `/admin/lemdiklat/master/bahan-ajar/${row.IdMateriPelatihan}`)
                                             }
                                             className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
                                         >
                                             <TbBook className="h-4 w-4" />
-                                            Detail Modul
+                                            Detail Bahan Ajar
                                         </Button>
                                         {/* <DeleteInstrukturAction onSuccess={fetchData} instruktur={row} /> */}
                                     </div>
@@ -247,23 +171,11 @@ export default function TableModulPelatihan() {
                                     <div className="flex flex-col !font-normal">
 
                                         <span className="text-sm text-gray-400 leading-tight">Rumpun Pelatihan : {row.BidangMateriPelatihan}</span>
-                                        <span className="text-sm text-gray-400 leading-tight">Tahun Penyusunan : {row?.Tahun}</span>
+                                        <span className="text-sm text-gray-400 leading-tight">Jumlah Jam Pelajaran : {row?.JamPelajaran} JP</span>
                                         <span className="text-sm text-gray-400 leading-tight">Produsen : {isMatch && row.DeskripsiMateriPelatihan == idUnitKerja ? name : nameUK}</span>
                                     </div>
                                 </td>
-                                <td className="px-3 py-2 border text-center">
-                                    {row.IsVerified === "Verified" ? (
-                                        <span className="inline-flex items-center px-2 gap-2 py-2 text-sm font-medium rounded-md leading-none bg-green-100 text-green-600">
-                                            <CheckCircle className="w-5 h-5 " />
-                                            Telah Disahkan
-                                        </span>
-                                    ) : (
-                                        <span className="inline-flex items-center px-2 gap-2 py-2 text-sm font-medium rounded-md leading-none bg-rose-100 text-rose-500">
-                                            <XCircle className="w-5 h-5 " />
-                                            Belum Disahkan
-                                        </span>
-                                    )}
-                                </td>
+
                                 <td className="px-3 py-2 border text-center">{row.ModulPelatihan.length}</td>
 
                             </tr>
@@ -363,40 +275,6 @@ function FilterDropdown({
                         </SelectTrigger>
                         <SelectContent>
                             {tahunOptions.map((opt: any) => (
-                                <SelectItem key={opt} value={opt}>
-                                    {opt}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                {/* Produsen */}
-                <div className="space-y-1">
-                    <label className="text-xs font-medium text-gray-600">Produsen</label>
-                    <Select value={filterProdusen} onValueChange={setFilterProdusen}>
-                        <SelectTrigger className="w-full text-sm">
-                            <SelectValue placeholder="Pilih produsen" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {produsenOptions.map((opt: UnitKerja) => (
-                                <SelectItem key={opt.id_unit_kerja} value={opt.id_unit_kerja.toString()}>
-                                    {opt.nama}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                {/* Status Pengesahan */}
-                <div className="space-y-1">
-                    <label className="text-xs font-medium text-gray-600">Status Pengesahan</label>
-                    <Select value={filterVerified} onValueChange={setFilterVerified}>
-                        <SelectTrigger className="w-full text-sm">
-                            <SelectValue placeholder="Pilih status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {verifiedOptions.map((opt: any) => (
                                 <SelectItem key={opt} value={opt}>
                                     {opt}
                                 </SelectItem>

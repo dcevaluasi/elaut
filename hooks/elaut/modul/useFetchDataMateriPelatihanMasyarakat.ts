@@ -9,7 +9,10 @@ export type CountStats = {
   verified: Record<string, number>
 }
 
-export const useFetchDataMateriPelatihanMasyarakat = () => {
+export const useFetchDataMateriPelatihanMasyarakat = (
+  type?: string,
+  idUnitKerja?: string,
+) => {
   const [data, setData] = useState<MateriPelatihan[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -22,7 +25,21 @@ export const useFetchDataMateriPelatihanMasyarakat = () => {
       const res = await axios.get<MateriPelatihan[]>(
         `${moduleBaseUrl}/materi-pelatihan/getMateriPelatihan`,
       )
-      setData(res.data)
+      let filteredData: MateriPelatihan[] = []
+
+      if (type === 'Modul') {
+        filteredData = res.data.filter((item) => item.BerlakuSampai === '1')
+      } else if (type === 'Bahan Ajar') {
+        filteredData = res.data.filter(
+          (item) =>
+            item.BerlakuSampai === '2' &&
+            item.DeskripsiMateriPelatihan == idUnitKerja,
+        )
+      } else {
+        filteredData = res.data
+      }
+
+      setData(filteredData)
     } catch (err) {
       setError('Failed to fetch data')
     } finally {
