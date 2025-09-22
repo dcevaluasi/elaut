@@ -1,7 +1,7 @@
 import { ApexOptions } from "apexcharts";
 import React, { useState } from "react";
 import ReactApexChart from "react-apexcharts";
-import TableData from "../tables/TableData";
+import TableData from "@/commons/TableData";
 import {
   ColumnDef,
   ColumnFiltersState,
