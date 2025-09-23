@@ -45,17 +45,9 @@ import {
   TbSignature,
   TbTargetArrow,
 } from "react-icons/tb";
-import { IoIosInformationCircle, IoMdCheckmarkCircleOutline, IoMdCloseCircle } from "react-icons/io";
-import { FiUploadCloud } from "react-icons/fi";
 
 import { usePathname, useRouter } from "next/navigation";
-import {
-  MdInfo,
-  MdOutlineNumbers,
-  MdOutlinePaid,
-  MdOutlinePayment,
-  MdSchool,
-} from "react-icons/md";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { Pelatihan, PelatihanMasyarakat, UserPelatihan } from "@/types/product";
 import axios, { AxiosResponse } from "axios";
@@ -70,40 +62,25 @@ import {
   HiTrash,
   HiUserGroup,
 } from "react-icons/hi2";
-import {
-  RiFileExcelLine,
-  RiProgress3Line,
-  RiShipLine,
-  RiVerifiedBadgeFill,
-} from "react-icons/ri";
 import Link from "next/link";
 import { FaRegFolderOpen, FaRegIdCard, FaRupiahSign, FaTrash } from "react-icons/fa6";
 import Toast from "@/commons/Toast";
-import { GiTakeMyMoney } from "react-icons/gi";
 import Cookies from "js-cookie";
 import { PiMicrosoftExcelLogoFill, PiSignature } from "react-icons/pi";
 import { User } from "@/types/user";
 import { decryptValue, encryptValue, formatToRupiah } from "@/lib/utils";
 import { elautBaseUrl } from "@/constants/urls";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { generateTanggalPelatihan } from "@/utils/text";
 import { DIALOG_TEXTS } from "@/constants/texts";
 import { countUserWithCertificate, countUserWithDraftCertificate, countUserWithNonELAUTCertificate, countUserWithNoSertifikat, countUserWithPassed, countUserWithSpesimenTTD, countUserWithTanggalSertifikat, countValidKeterangan } from "@/utils/counter";
-import { generateTimestamp, getDateInIndonesianFormat, getTodayInIndonesianFormat } from "@/utils/time";
-import { BiSolidCalendarAlt } from "react-icons/bi";
-import addData from "@/firebase/firestore/addData";
-import { doc, getDoc, getFirestore } from "firebase/firestore";
-import firebaseApp from "@/firebase/config";
+
 import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
-import { isSigned, isUnsigned } from "@/lib/sign";
 import { downloadAndZipPDFs } from "@/utils/file";
 import { AiOutlineFieldNumber } from "react-icons/ai";
 import JSZip from "jszip";
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { generatedStatusCertificate } from "@/utils/certificates";
-import { BsFileExcel } from "react-icons/bs";
 import { IoReload } from "react-icons/io5";
 import { Input } from "@/components/ui/input";
 import { HiOutlineEyeOff } from "react-icons/hi";
@@ -113,18 +90,12 @@ const TableDataPesertaPelatihan = () => {
   const pathname = usePathname();
   const id = decryptValue(extractLastSegment(pathname));
   const paths = pathname.split("/");
-  const [noSertifikatTerbitkan, setNoSertifikatTerbitkan] = React.useState("");
-
-  const [searchQuery, setSearchQuery] = React.useState<string>("");
-
 
   const [dataPelatihan, setDataPelatihan] =
     React.useState<PelatihanMasyarakat | null>(null);
   const [emptyFileSertifikatCount, setEmptyFileSertifikatCount] =
     React.useState<number>(0);
 
-  const [signedSertifikat, setSignedSertifikat] =
-    React.useState<number>(0);
 
   const [data, setData] = React.useState<UserPelatihan[] | []>([]);
 
@@ -226,40 +197,6 @@ const TableDataPesertaPelatihan = () => {
     []
   );
 
-  const handleUpdatePublishPelatihanToELAUT = async (
-    id: number,
-    status: string
-  ) => {
-    console.log({ id });
-    const formData = new FormData();
-    formData.append("NoSertifikat", status);
-    console.log({ status });
-    try {
-      const response = await axios.put(
-        `${baseUrl}/lemdik/updatePelatihanUsers?id=${id}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
-          },
-        }
-      );
-      Toast.fire({
-        icon: "success",
-        title: `Berhasil menyisipkan no sertifikat ke akun pesereta pelatihan!`,
-      });
-      console.log("UPDATE PELATIHAN: ", response);
-      handleFetchingPublicTrainingDataById();
-    } catch (error) {
-      console.error("ERROR UPDATE PELATIHAN: ", error);
-      Toast.fire({
-        icon: "error",
-        title: `Gagal menyisipkan no sertifikat ke akun pesereta pelatihan!`,
-      });
-      handleFetchingPublicTrainingDataById();
-    }
-  };
-
   const [isIteratingProcess, setIsIteratingProcess] = React.useState<boolean>(false)
   const handleValidDataPesertaPelatihan = async () => {
     setIsIteratingProcess(true)
@@ -345,12 +282,7 @@ const TableDataPesertaPelatihan = () => {
     setOpenFormValidasiDataPesertaPelatihan,
   ] = React.useState<boolean>(false);
 
-  const [
-    openFormKelulusanDataPesertaPelatihan,
-    setOpenFormKelulusanDataPesertaPelatihan,
-  ] = React.useState<boolean>(false);
 
-  const [openFormSematkanNoSertifikat, setOpenFormSematkanNoSertifikat] = React.useState<boolean>(false)
   const [openFormSematkanTanggalSertifikat, setOpenFormSematkanTanggalSertifikat] = React.useState<boolean>(false)
   const [openFormSematkanSpesimenSertifikat, setOpenFormSematkanSpesimenSertifikat] = React.useState<boolean>(false)
 
@@ -611,13 +543,9 @@ const TableDataPesertaPelatihan = () => {
     }
   };
 
-  const [isOpenFormPeserta, setIsOpenFormPeserta] =
-    React.useState<boolean>(false);
   const [fileExcelPesertaPelatihan, setFileExcelPesertaPelatihan] =
     React.useState<File | null>(null);
-  const handleFileChange = (e: any) => {
-    setFileExcelPesertaPelatihan(e.target.files[0]);
-  };
+
 
   /**
     * Zip Download Processing
@@ -643,45 +571,56 @@ const TableDataPesertaPelatihan = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const handleZipUpload = async (zipFile: File, users: UserPelatihan[]) => {
-    const zip = new JSZip()
-    const zipContent = await zip.loadAsync(zipFile)
+    const zip = new JSZip();
+    const zipContent = await zip.loadAsync(zipFile);
+
+    if (!zipFile.name.toLowerCase().endsWith(".zip")) {
+      alert("Please upload a valid .zip file");
+      return;
+    }
+
 
     for (const fileName of Object.keys(zipContent.files)) {
-      const baseName = fileName.split("/").pop()
-      if (!baseName) continue
+      const file = zipContent.files[fileName];
+      if (file.dir) continue; // ⬅️ skip directories
 
-      const ext = baseName.split(".").pop()?.toLowerCase()
-      if (!["jpg", "jpeg", "png"].includes(ext || "")) continue
+      const baseName = fileName.split("/").pop();
+      if (!baseName) continue;
 
-      const id = parseInt(baseName.replace(/\.[^/.]+$/, ""), 10)
-      if (isNaN(id)) continue
+      const ext = baseName.split(".").pop()?.toLowerCase();
+      if (!["jpg", "jpeg", "png"].includes(ext || "")) continue;
 
-      const matchedUser = users.find((user) => user.IdUsers === id)
+      const id = parseInt(baseName.replace(/\.[^/.]+$/, ""), 10);
+      if (isNaN(id)) continue;
+
+      const matchedUser = users.find((user) => user.IdUsers === id);
       if (!matchedUser) {
-        console.warn(`⚠️ No user matched for file: ${fileName}`)
-        continue
+        console.warn(`⚠️ No user matched for file: ${fileName}`);
+        continue;
       }
 
-      const fileBlob = await zipContent.files[fileName].async("blob")
-
-      const formData = new FormData()
-      formData.append("Fotos", fileBlob, baseName)
-      formData.append("Ktps", "")
-      formData.append("KKs", "")
-      formData.append("Ijazahs", "")
-      formData.append("SuratKesehatans", "")
-
       try {
+        // 👇 safer extraction
+        const fileBlob = await file.async("blob");
+
+        const formData = new FormData();
+        formData.append("Fotos", fileBlob, baseName);
+        formData.append("Ktps", "");
+        formData.append("KKs", "");
+        formData.append("Ijazahs", "");
+        formData.append("SuratKesehatans", "");
+
         const response = await axios.put(
           `${process.env.NEXT_PUBLIC_BASE_URL}/users/updateUsersNoJwt?id=${id}`,
           formData,
           { headers: { "Content-Type": "multipart/form-data" } }
-        )
-        console.log(`✅ Uploaded for user ID ${id}`, response.data)
-      } catch (error) {
-        console.error(`❌ Failed for user ID ${id}`, error)
+        );
+        console.log(`✅ Uploaded for user ID ${id}`, response.data);
+      } catch (err) {
+        console.error(`❌ Failed extracting file ${fileName}`, err);
       }
     }
+
   }
   const handleSubmitZipUpload = async () => {
     if (!selectedFile) return
