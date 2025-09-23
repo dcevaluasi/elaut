@@ -5,6 +5,17 @@ import {
     Accordion,
 } from "@/components/ui/accordion";
 import { PelatihanMasyarakat } from "@/types/product";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { generateTanggalPelatihan, getStatusInfo } from "@/utils/text";
 import Image from "next/image";
 import { replaceUrl } from "@/lib/utils";
@@ -41,6 +52,7 @@ import HistoryButton from "@/commons/actions/HistoryButton";
 import PublishButton from "@/commons/actions/PublishButton";
 import { Button } from "@/components/ui/button";
 import Toast from "@/commons/Toast";
+import { HiMiniArrowUpTray } from "react-icons/hi2";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -61,6 +73,9 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
     const toggleExpand = (id: number) => {
         setExpanded(expanded === id ? null : id)
     }
+
+    const [selectedFile, setSelectedFile] = React.useState<File | null>(null)
+    const [isUploading, setIsUploading] = React.useState<boolean>(false)
 
     React.useEffect(() => {
         fetchInstrukturData()
@@ -712,6 +727,92 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 />
                                             }
 
+                                            <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <button
+                                                        type="button"
+                                                        className="flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border bg-blue-500 text-white 
+                                                                 hover:bg-blue-600 transition-colors shadow-sm w-fit flex-shrink-0"
+                                                    >
+                                                        <HiMiniArrowUpTray className="w-4 h-4 inline" />
+                                                        <span>Upload Zip Foto</span>
+                                                    </button>
+                                                </AlertDialogTrigger>
+
+                                                <AlertDialogContent className="max-w-md rounded-2xl shadow-xl">
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle className="text-lg font-semibold text-gray-800">
+                                                            Upload Folder Foto Peserta
+                                                        </AlertDialogTitle>
+                                                        <AlertDialogDescription className="text-gray-500">
+                                                            Silakan pilih file <span className="font-medium">.zip</span> berisi foto peserta dengan format{" "}
+                                                            <code>IDPeserta.formatfile</code>.
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+
+                                                    {/* File Upload Box */}
+                                                    <label
+                                                        htmlFor="zip-upload"
+                                                        className="mt-4 flex flex-col items-center justify-center w-full h-32 border-2 border-dashed 
+                                                                 border-gray-300 rounded-xl cursor-pointer hover:border-green-500 
+                                                                 transition-colors bg-gray-50"
+                                                    >
+                                                        <HiMiniArrowUpTray className="w-8 h-8 text-gray-400 mb-2 group-hover:text-green-500" />
+                                                        <span className="text-sm text-gray-600">
+                                                            {selectedFile ? selectedFile.name : "Klik untuk memilih file ZIP"}
+                                                        </span>
+                                                        <span className="text-xs text-gray-400">atau drag & drop di sini</span>
+                                                        <input
+                                                            id="zip-upload"
+                                                            type="file"
+                                                            accept=".zip"
+                                                            className="hidden"
+                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                                                const file = e.target.files?.[0]
+                                                                if (file) setSelectedFile(file)
+                                                            }}
+                                                        />
+                                                    </label>
+
+                                                    <AlertDialogFooter className="mt-6">
+                                                        <AlertDialogCancel className="rounded-lg">Batal</AlertDialogCancel>
+                                                        <AlertDialogAction
+                                                            // onClick={handleSubmitZipUpload}
+                                                            // disabled={!selectedFile || isUploading}
+                                                            className="bg-green-500 hover:bg-green-600 text-white rounded-lg inline-flex items-center gap-2"
+                                                        >
+                                                            {isUploading ? (
+                                                                <span className="flex items-center gap-2">
+                                                                    <svg
+                                                                        className="animate-spin h-4 w-4 text-white"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        fill="none"
+                                                                        viewBox="0 0 24 24"
+                                                                    >
+                                                                        <circle
+                                                                            className="opacity-25"
+                                                                            cx="12"
+                                                                            cy="12"
+                                                                            r="10"
+                                                                            stroke="currentColor"
+                                                                            strokeWidth="4"
+                                                                        ></circle>
+                                                                        <path
+                                                                            className="opacity-75"
+                                                                            fill="currentColor"
+                                                                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                                                        ></path>
+                                                                    </svg>
+                                                                    Mengupload...
+                                                                </span>
+                                                            ) : (
+                                                                "Simpan"
+                                                            )}
+                                                        </AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
+
                                             {
                                                 (data?.UserPelatihan.length != 0 && countValidKeterangan(data?.UserPelatihan) < data?.UserPelatihan.length) && <ValidateParticipantAction data={data?.UserPelatihan} onSuccess={fetchData} />
                                             }
@@ -731,10 +832,8 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         </div>
                                     </div>
                                 </AccordionSection>
-
                             </div>
                         </div>}
-
                 </div>
 
             </Accordion >

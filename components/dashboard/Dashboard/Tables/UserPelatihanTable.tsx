@@ -61,7 +61,6 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
     data,
     onSuccess
 }) => {
-
     const handleDeleteCertificateById = async (id: number) => {
         try {
             const token = Cookies.get("XSRF091")

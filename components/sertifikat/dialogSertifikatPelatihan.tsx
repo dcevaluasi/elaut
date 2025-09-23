@@ -119,7 +119,7 @@ const SertifikatNonKepelautan = React.forwardRef(
                       }
 
                     </td>
-                    <td className=" w-2/3 text-base font-bosNormal uppercase">: {formatName(userPelatihan!.Nama)}</td>
+                    <td className=" w-2/3 text-base font-bosNormal ">: {formatName(userPelatihan!.Nama)}</td>
                   </tr>
                   <tr className="w-full">
                     <td className={`font-bos w-full flex flex-col ${isEnglishFormat(pelatihan?.DeskripsiSertifikat) ? 'space-y-0' : 'space-y-2 mb-2'}`}>
@@ -720,7 +720,6 @@ const DialogSertifikatPelatihan = forwardRef<DialogSertifikatHandle, Props>(
   ({ userPelatihan, pelatihan }, ref) => {
     const componentRef = useRef<HTMLDivElement>(null);
     const componentRefPage = useRef<HTMLDivElement>(null);
-    const html2pdfRef = useRef<any>(null);
     let html2pdfInstance: any = null;
 
     const uploadPdf = async () => {

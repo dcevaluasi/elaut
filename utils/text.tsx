@@ -258,11 +258,28 @@ export function formatName(name: string): string {
   const [beforeComma, ...afterComma] = name.split(",");
 
   if (afterComma.length > 0) {
-    return beforeComma.toUpperCase() + ", " + afterComma.join(",").trim();
+    const after = afterComma.join(",").trim();
+
+    const formattedAfter = after
+      .split(" ")
+      .map(word =>
+        word
+          .split(".")
+          .map(
+            part =>
+              part.charAt(0).toUpperCase() +
+              part.slice(1).toLowerCase()
+          )
+          .join(".")
+      )
+      .join(" ");
+
+    return beforeComma.toUpperCase() + ", " + formattedAfter;
   } else {
     return name.toUpperCase();
   }
 }
+
 
 export const parseDateFirebase = (dateStr: string): Date => {
   // format: "2/9/2025 10.31.59"
