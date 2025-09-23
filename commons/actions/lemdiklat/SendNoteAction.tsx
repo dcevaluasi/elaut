@@ -318,13 +318,13 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
 
                 <AlertDialogFooter>
                     <AlertDialogCancel disabled={loading}>Batal</AlertDialogCancel>
-                    <AlertDialogAction
+                    <Button
                         onClick={handleSubmit}
                         className={`bg-${buttonColor}-600 hover:bg-${buttonColor}-700 text-white`}
                         disabled={loading || !message}
                     >
                         {loading ? "Memproses..." : "Kirim"}
-                    </AlertDialogAction>
+                    </Button>
                 </AlertDialogFooter>
 
             </AlertDialogContent>

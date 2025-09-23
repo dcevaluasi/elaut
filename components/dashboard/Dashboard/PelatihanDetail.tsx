@@ -55,6 +55,7 @@ import Toast from "@/commons/Toast";
 import { HiMiniArrowUpTray } from "react-icons/hi2";
 import JSZip from "jszip";
 import axios from "axios";
+import ZipPhotoParticipantAction from "@/commons/actions/lemdiklat/ZipPhotoParticipantAction";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -726,6 +727,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 />
                                             }
 
+                                            <ZipPhotoParticipantAction users={data?.UserPelatihan} onSuccess={fetchData} />
 
                                             {
                                                 (data?.UserPelatihan.length != 0 && countValidKeterangan(data?.UserPelatihan) < data?.UserPelatihan.length) && <ValidateParticipantAction data={data?.UserPelatihan} onSuccess={fetchData} />

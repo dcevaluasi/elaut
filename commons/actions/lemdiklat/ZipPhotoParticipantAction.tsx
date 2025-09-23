@@ -10,7 +10,6 @@ import {
     AlertDialogDescription,
     AlertDialogFooter,
     AlertDialogCancel,
-    AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -28,10 +27,10 @@ type UserPelatihan = {
 
 type Props = {
     users: UserPelatihan[];
-    onSuccess: any
+    onSuccess: any;
 };
 
-export default function UploadZipFoto({ users, onSuccess }: Props) {
+export default function ZipPhotoParticipantAction({ users, onSuccess }: Props) {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadedCount, setUploadedCount] = useState(0);
@@ -39,12 +38,8 @@ export default function UploadZipFoto({ users, onSuccess }: Props) {
 
     const handleZipUpload = async (zipFile: File, users: UserPelatihan[]) => {
         const zip = new JSZip();
-        const zipContent = await zip.loadAsync(zipFile);
+        const zipContent = await zip.loadAsync(zipFile, { checkCRC32: true });
 
-        if (!zipFile.name.toLowerCase().endsWith(".zip")) {
-            alert("Please upload a valid .zip file");
-            return;
-        }
 
         const fileNames = Object.keys(zipContent.files);
         const imageFiles = fileNames.filter((f) => {
@@ -90,6 +85,10 @@ export default function UploadZipFoto({ users, onSuccess }: Props) {
                 setUploadedCount((prev) => prev + 1);
             } catch (err) {
                 console.error(`❌ Failed uploading ${fileName}`, err);
+                Toast.fire({
+                    icon: "error",
+                    title: `Gagal upload foto ${baseName}`,
+                });
             }
         }
     };
@@ -103,7 +102,7 @@ export default function UploadZipFoto({ users, onSuccess }: Props) {
                 icon: "success",
                 title: `Berhasil mengupload ${uploadedCount} dari ${totalFiles} foto peserta!`,
             });
-            onSuccess()
+            onSuccess();
         } finally {
             setIsUploading(false);
             setSelectedFile(null);
@@ -114,39 +113,42 @@ export default function UploadZipFoto({ users, onSuccess }: Props) {
 
     return (
         <AlertDialog>
-            {
-                Cookies.get('Access')?.includes('createPelatihan') && <AlertDialogTrigger asChild>
-                    <Button
-                        variant="outline"
-                        title="Upload Foto Peserta"
-                        className="flex items-center w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-gray-500 text-gray-500 hover:text-white hover:bg-gray-500"
-                    >
-                        <FaImages className="h-4 w-4 mr-1" /> Upload Zip Foto
-                    </Button>
-                </AlertDialogTrigger>
-            }
+            {(Cookies.get("Access")?.includes("createPelatihan") &&
+                users.length > 0) && (
+                    <AlertDialogTrigger asChild>
+                        <Button
+                            variant="outline"
+                            title="Upload Foto Peserta"
+                            className="flex items-center w-fit rounded-lg px-4 py-2 shadow-sm 
+                       bg-transparent border-gray-400 text-gray-600 
+                       hover:text-white hover:bg-gray-600 transition-all"
+                        >
+                            <FaImages className="h-4 w-4 mr-1" /> Upload Zip Foto
+                        </Button>
+                    </AlertDialogTrigger>
+                )}
 
-            <AlertDialogContent className="max-w-md rounded-2xl shadow-xl">
+            <AlertDialogContent className="max-w-md rounded-xl shadow-lg">
                 <AlertDialogHeader>
-                    <AlertDialogTitle className="text-lg font-semibold text-gray-800">
+                    <AlertDialogTitle className="text-base font-semibold text-gray-800">
                         Upload Folder Foto Peserta
                     </AlertDialogTitle>
-                    <AlertDialogDescription className="text-gray-500">
-                        Silakan pilih file <span className="font-medium">.zip</span> berisi
-                        foto peserta dengan format <code>IDPeserta.formatfile</code>.
+                    <AlertDialogDescription className="text-sm text-gray-500">
+                        Pilih file <span className="font-medium">.zip</span> berisi foto
+                        peserta dengan format <code>IDPeserta.formatfile</code>.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 
                 {/* File Upload Box */}
                 <label
                     htmlFor="zip-upload"
-                    className="mt-4 flex flex-col items-center justify-center w-full h-32 border-2 border-dashed 
-            border-gray-300 rounded-xl cursor-pointer hover:border-green-500 
-            transition-colors bg-gray-50"
+                    className="mt-4 flex flex-col items-center justify-center w-full h-28 
+                     border-2 border-dashed border-gray-300 rounded-lg cursor-pointer 
+                     hover:border-blue-500 transition-colors bg-gray-50"
                 >
-                    <HiMiniArrowUpTray className="w-8 h-8 text-gray-400 mb-2 group-hover:text-green-500" />
+                    <HiMiniArrowUpTray className="w-7 h-7 text-gray-400 mb-2 group-hover:text-blue-500" />
                     <span className="text-sm text-gray-600">
-                        {selectedFile ? selectedFile.name : "Klik untuk memilih file ZIP"}
+                        {selectedFile ? selectedFile.name : "Klik untuk pilih file ZIP"}
                     </span>
                     <span className="text-xs text-gray-400">atau drag & drop di sini</span>
                     <input
@@ -163,23 +165,25 @@ export default function UploadZipFoto({ users, onSuccess }: Props) {
 
                 {/* Progress bar */}
                 {isUploading && (
-                    <div className="mt-4">
+                    <div className="mt-4 space-y-1">
                         <Progress value={progress} />
-                        <p className="text-xs text-gray-500 mt-1 text-center">
+                        <p className="text-xs text-gray-500 text-center">
                             {uploadedCount} / {totalFiles} files uploaded
                         </p>
                     </div>
                 )}
 
-                <AlertDialogFooter className="mt-6">
-                    <AlertDialogCancel className="rounded-lg">Batal</AlertDialogCancel>
-                    <AlertDialogAction
+                <AlertDialogFooter className="mt-6 flex justify-between">
+                    <AlertDialogCancel className="rounded-lg px-4 py-2 text-sm border">
+                        Batal
+                    </AlertDialogCancel>
+                    <Button
                         onClick={handleSubmitZipUpload}
                         disabled={!selectedFile || isUploading}
-                        className="bg-green-500 hover:bg-green-600 text-white rounded-lg inline-flex items-center gap-2"
+                        className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 shadow-sm"
                     >
                         {isUploading ? "Mengupload..." : "Simpan"}
-                    </AlertDialogAction>
+                    </Button>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
