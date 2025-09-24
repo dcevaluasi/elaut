@@ -32,7 +32,6 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
 
   const { data: dataRumpunPelatihan, loading: loadingRumpunPelatihan, error: errorRumpunPelatihan, fetchRumpunPelatihan } = useFetchDataRumpunPelatihan();
 
-
   const token = Cookies.get("XSRF091");
 
   /*

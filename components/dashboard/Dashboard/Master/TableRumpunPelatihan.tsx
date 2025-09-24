@@ -10,6 +10,7 @@ import AddRumpunPelatihanAction from "@/commons/actions/master/rumpun-pelatihan/
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
 import { elautBaseUrl } from "@/constants/urls";
 import ManageRumpunPelatihanAction from "@/commons/actions/master/rumpun-pelatihan/ManageRumpunPelatihanAction";
+import { findNameRumpunPelatihanById } from "@/utils/programs";
 
 export default function TableRumpunPelatihan() {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -77,6 +78,7 @@ export default function TableRumpunPelatihan() {
                             <th className="w-12 px-3 py-3 text-center">No</th>
                             <th className="w-12 px-3 py-3 text-center">Action</th>
                             <th className="w-40 px-3 py-3 text-center">Nama Klaster</th>
+                            <th className="w-40 px-3 py-3 text-center">Jumlah Program Diklat</th>
                             <th className="w-40 px-3 py-3 text-center">Created At</th>
                             <th className="w-40 px-3 py-3 text-center">Updated At</th>
 
@@ -122,6 +124,7 @@ export default function TableRumpunPelatihan() {
                                     </div>
                                 </td>
                                 <td className="px-3 py-2 border text-center">{row.name}</td>
+                                <td className="px-3 py-2 border text-center">{row.programs.length}</td>
                                 <td className="px-3 py-2 border text-center">{row.created}</td>
                                 <td className="px-3 py-2 border text-center">{row.updated}</td>
 

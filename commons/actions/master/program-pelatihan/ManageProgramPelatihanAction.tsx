@@ -58,11 +58,13 @@ const ManageProgramPelatihanAction: React.FC<{
 
     const handleSubmit = async () => {
         const form = {
-            IDRumpunPelatihan: idRumpunPelatihan,
-            NameIndo: nama,
-            NameEnglish: namaEng,
-            AbbrvName: nameSingkatan,
-            Description: description,
+            id_rumpun_pelatihan: parseInt(idRumpunPelatihan),
+            name_indo: nama,
+            name_english: namaEng,
+            abbrv_name: nameSingkatan,
+            description: description,
+            created_at: '',
+            updated_at: ''
         };
 
         try {

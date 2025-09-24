@@ -7,10 +7,15 @@ import { Input } from "@/components/ui/input";
 import Cookies from "js-cookie";
 import { useFetchDataProgramPelatihan } from "@/hooks/elaut/master/useFetchDataProgramPelatihan";
 import ManageProgramPelatihanAction from "@/commons/actions/master/program-pelatihan/ManageProgramPelatihanAction";
+import { FiTrash2 } from "react-icons/fi";
+import { elautBaseUrl } from "@/constants/urls";
+import { findNameRumpunPelatihanById } from "@/utils/programs";
+import { useFetchDataRumpunPelatihan } from "@/hooks/elaut/master/useFetchDataRumpunPelatihan";
 
 export default function TableProgramPelatihan() {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const { data, loading, error, fetchProgramPelatihan } = useFetchDataProgramPelatihan();
+    const { data: dataRumpunPelatihan, loading: loadingRumpunPelatihan, error: errorRumpunPelatihan, fetchRumpunPelatihan } = useFetchDataRumpunPelatihan();
 
     const filteredData = useMemo(() => {
         if (!Array.isArray(data)) return [];
@@ -71,6 +76,7 @@ export default function TableProgramPelatihan() {
                         <tr>
                             <th className="w-12 px-3 py-3 text-center">No</th>
                             <th className="w-12 px-3 py-3 text-center">Action</th>
+                            <th className="w-40 px-3 py-3 text-center">Klaster Pelatihan</th>
                             <th className="w-40 px-3 py-3 text-center">Nama Indo</th>
                             <th className="w-40 px-3 py-3 text-center">Name English</th>
                             <th className="w-40 px-3 py-3 text-center">Singkatan</th>
@@ -79,7 +85,7 @@ export default function TableProgramPelatihan() {
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         {paginatedData.map((row, index) => {
-
+                            const rumpunPelatihan = findNameRumpunPelatihanById(dataRumpunPelatihan, row.id_rumpun_pelatihan.toString()).name
                             return <tr
                                 key={row.id_program_pelatihan}
                                 className="hover:bg-gray-50 transition-colors duration-150"
@@ -90,8 +96,33 @@ export default function TableProgramPelatihan() {
                                 <td className="px-3 py-4 border">
                                     <div className="flex flex-row gap-2 h-full items-center justify-center py-2">
                                         <ManageProgramPelatihanAction onSuccess={fetchProgramPelatihan} initialData={row} />
+                                        <button
+                                            onClick={async () => {
+                                                const confirmDelete = window.confirm("⚠️ Apakah Anda yakin ingin menghapus program pelatihan ini?");
+                                                if (!confirmDelete) return;
+
+                                                try {
+                                                    const res = await fetch(
+                                                        `${elautBaseUrl}/program_pelatihan/delete_program_pelatihan?id=${row.id_program_pelatihan}`,
+                                                        { method: "DELETE" }
+                                                    );
+                                                    if (!res.ok) throw new Error("Gagal menghapus bahan tayang");
+
+                                                    fetchProgramPelatihan();
+                                                    alert("✅ Program pelatihan berhasil dihapus");
+                                                } catch (error) {
+                                                    console.error(error);
+                                                    alert("❌ Gagal menghapus program pelatihan");
+                                                }
+                                            }}
+                                            className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-rose-500 text-rose-500 hover:text-white hover:bg-rose-500 border group"
+                                        >
+                                            <FiTrash2 className="h-5 w-5 text-rose-500 group-hover:text-white" />
+                                            Hapus
+                                        </button>
                                     </div>
                                 </td>
+                                <td className="px-3 py-2 border text-center">{rumpunPelatihan}</td>
                                 <td className="px-3 py-2 border text-center">{row.name_indo}</td>
                                 <td className="px-3 py-2 border text-center">{row.name_english}</td>
                                 <td className="px-3 py-2 border text-center">{row.abbrv_name}</td>
