@@ -251,7 +251,7 @@ function FilterDropdown({
 
                 {/* Bidang */}
                 <div className="space-y-1">
-                    <label className="text-xs font-medium text-gray-600">Rumpun Pelatihan</label>
+                    <label className="text-xs font-medium text-gray-600">Klaster Pelatihan</label>
                     <Select value={filterBidang} onValueChange={setFilterBidang}>
                         <SelectTrigger className="w-full text-sm">
                             <SelectValue placeholder="Pilih rumpun" />

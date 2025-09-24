@@ -98,7 +98,6 @@ export function useFetchDataInstrukturSelected(ids: number[]) {
   const [error, setError] = useState<unknown>(null)
 
   const token = Cookies.get('XSRF091')
-  const cookieIdUnitKerja = Cookies.get('IDUnitKerja')
 
   const fetchInstrukturData = useCallback(async () => {
     if (!token) {

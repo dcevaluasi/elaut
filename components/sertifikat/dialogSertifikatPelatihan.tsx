@@ -12,10 +12,10 @@ import {
   generateTanggalPelatihan,
 } from "@/utils/text";
 import Toast from "../toast";
-import { capitalizeWords, CURRICULLUM_CERTIFICATE } from "@/constants/texts";
+import { capitalizeWords } from "@/constants/texts";
 import { formatDateRange, formatDateRangeEnglish } from "@/utils/time";
 import { ESELON_1, ESELON_2, EselonKey, ESELONS } from "@/constants/nomenclatures";
-import { generatedCurriculumCertificate, generatedDescriptionCertificate, generatedSignedCertificate, generatedStatusCertificate, isEnglishFormat } from "@/utils/certificates";
+import { generatedCurriculumCertificate, generatedSignedCertificate, generatedStatusCertificate, isEnglishFormat } from "@/utils/certificates";
 import CertificateHeader from "../certificates/CertificateHeader";
 import CertificateDescription from "../certificates/CertificateDescription";
 

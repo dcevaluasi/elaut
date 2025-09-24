@@ -31,6 +31,7 @@ import FormatCertificateAction from "@/commons/actions/FormatCertificateAction";
 import { PassedParticipantAction } from "@/commons/actions/lemdiklat/PassedParticipantAction";
 import ReviseCertificateAction from "@/commons/actions/ReviseCertificateAction";
 import HistoryButton from "@/commons/actions/HistoryButton";
+import { DialogDevSTTPL } from "@/components/sertifikat/dialogDevSTTPL";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -412,6 +413,16 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                         <FaSearch className="h-4 w-4 mr-1" /> Preview Sertifikat
                                                     </Button>
                                                 </DialogFormatSTTPL>
+
+                                                <DialogDevSTTPL pelatihan={data}>
+                                                    <Button
+                                                        variant="outline"
+                                                        title="Preview  Sertifikat"
+                                                        className="flex items-center w-full mt-4 rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
+                                                    >
+                                                        <FaSearch className="h-4 w-4 mr-1" /> Preview Dev
+                                                    </Button>
+                                                </DialogDevSTTPL>
                                             </>
                                         ) : (
                                             <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">

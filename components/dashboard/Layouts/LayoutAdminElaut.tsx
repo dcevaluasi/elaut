@@ -13,11 +13,12 @@ import DropdownUser from "../Header/DropdownUser";
 import { LucideLayoutDashboard } from "lucide-react";
 import { IoBookOutline, IoDocumentOutline, IoFolderOpenOutline, IoPieChartOutline, IoSchoolOutline } from "react-icons/io5";
 import { FiMenu, FiLogOut, FiChevronDown, FiChevronRight } from "react-icons/fi";
-import { HiOutlineUserGroup } from "react-icons/hi2";
+import { HiOutlineInbox, HiOutlineUserGroup } from "react-icons/hi2";
 import { TbBuildingSkyscraper, TbDatabaseEdit } from "react-icons/tb";
 import Link from "next/link";
 import { breakdownStatus } from "@/lib/utils";
 import { generatedSignedCertificate } from "@/utils/certificates";
+import { RiQuillPenAiLine } from "react-icons/ri";
 
 export default function LayoutAdminElaut({
   children,
@@ -175,7 +176,7 @@ export default function LayoutAdminElaut({
                   }`}
               >
                 <div className="flex items-center gap-3">
-                  <TbDatabaseEdit className="text-2xl" />
+                  <TbDatabaseEdit className="w-6 h-6" />
 
                   {sidebarOpen && (
                     <span className="text-sm text-left">Master Pelatihan</span>
@@ -192,13 +193,13 @@ export default function LayoutAdminElaut({
                   />
                   <button
                     onClick={() => { setSubmenuSubOpen(!submenuSubOpen) }}
-                    className={`flex items-center justify-between w-full px-3 py-2 transition-colors rounded-md ${pathname.includes("master")
+                    className={`flex items-center justify-between w-full px-3 py-2 transition-colors rounded-md ${submenuSubOpen
                       ? "bg-blue-600 text-white"
                       : "hover:bg-blue-500 hover:text-white"
                       }`}
                   >
                     <div className="flex items-center gap-3">
-                      <IoBookOutline className="text-2xl" />
+                      <IoBookOutline className="w-6 h-6" />
                       {sidebarSubOpen && (
                         <span className="text-sm text-left">Peragkat Pelatihan</span>
                       )}
@@ -229,6 +230,21 @@ export default function LayoutAdminElaut({
                     icon={<TbBuildingSkyscraper className="flex-shrink-0 w-6 h-6" />}
                     label="Unit Kerja"
                   />
+                  {
+                    Cookies.get('Access')?.includes('superAdmin') &&
+                    <>
+                      <NavItem
+                        href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/klaster-pelatihan`}
+                        icon={<HiOutlineInbox className="flex-shrink-0 w-6 h-6" />}
+                        label="Klaster Pelatihan"
+                      />
+                      <NavItem
+                        href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/program-pelatihan`}
+                        icon={<RiQuillPenAiLine className="flex-shrink-0 w-6 h-6" />}
+                        label="Program Pelatihan"
+                      />
+                    </>
+                  }
                 </ul>
               )}
             </li>

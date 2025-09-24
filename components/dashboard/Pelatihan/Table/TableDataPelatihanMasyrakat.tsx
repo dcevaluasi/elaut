@@ -66,7 +66,7 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                 </div>
                             </th>
                             <th className="px-4 py-5 text-center">Sektor Pelatihan</th>
-                            <th className="px-4 py-5 text-center">Rumpun Pelatihan</th>
+                            <th className="px-4 py-5 text-center">Klaster Pelatihan</th>
                             <th className="px-4 py-5 text-center">
                                 <div className="flex items-center justify-center gap-1">
                                     <Users size={14} className="text-emerald-500" /> Peserta

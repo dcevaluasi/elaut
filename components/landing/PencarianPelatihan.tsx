@@ -1,25 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import React, { FormEvent } from "react";
+import React from "react";
 import {
   BALAI_PELATIHAN,
-  BIDANG_PELATIHAN,
-  SATUAN_PENDIDIKAN_KEAHLIAN,
+  JENIS_PELAKSANAAN,
 } from "@/constants/pelatihan";
 import { elautBaseUrl } from "@/constants/urls";
 import { PelatihanMasyarakat } from "@/types/product";
-import { convertDate, createSlug, truncateText } from "@/utils";
+import { createSlug } from "@/utils";
 import axios, { AxiosResponse } from "axios";
 import Link from "next/link";
-import { Bounce, Slide } from "react-awesome-reveal";
-import { MdClear, MdKeyboardArrowRight } from "react-icons/md";
-
+import { MdClear } from "react-icons/md";
 import { HiViewGrid } from "react-icons/hi";
-
 import { Button } from "@/components/ui/button";
-
-import { RiSchoolLine, RiShipLine } from "react-icons/ri";
+import { RiSchoolLine } from "react-icons/ri";
 import {
   Select,
   SelectContent,
@@ -28,20 +23,17 @@ import {
   SelectLabel,
   SelectTrigger,
 } from "@/components/ui/select";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Cookies from "js-cookie";
 import { HashLoader } from "react-spinners";
 import {
   encryptValue,
   formatToRupiah,
   getMonthName,
-  replaceUrl,
 } from "@/lib/utils";
 import { FiCalendar, FiSearch } from "react-icons/fi";
-import { generateTanggalPelatihan } from "@/utils/text";
-import { GrSend } from "react-icons/gr";
-import { AKP_CERTIFICATIONS, AQUACULTURE_CERTIFICATIONS, OCEAN_CERTIFICATIONS } from "@/constants/serkom";
 import { formatDateRange } from "@/utils/time";
+import { HiClock } from "react-icons/hi2";
 
 function PencarianPelatihan() {
   const [data, setData] = React.useState<PelatihanMasyarakat[] | null>(null);
@@ -62,7 +54,7 @@ function PencarianPelatihan() {
     }
     try {
       const response: AxiosResponse = await axios.get(
-        `${elautBaseUrl}/lemdik/getPelatihan?${jenisProgram}&penyelenggara_pelatihan=${selectedBalaiPelatihan}&bidang_pelatihan=${selectedBidangPelatihan}&jenis_pelatihan=${selectedJenisPelatihan}&tanggal_mulai_pelatihan=${bulanMulaiPelatihan}&program=${selectedProgramPelatihan}`
+        `${elautBaseUrl}/lemdik/getPelatihan?${jenisProgram}&penyelenggara_pelatihan=${selectedBalaiPelatihan}&bidang_pelatihan=${selectedBidangPelatihan}&&tanggal_mulai_pelatihan=${bulanMulaiPelatihan}&program=${selectedProgramPelatihan}`
       );
       setLoading(false);
       setShowResult(true);
@@ -71,7 +63,7 @@ function PencarianPelatihan() {
         const filteredAndSortedData = response.data.data
           .filter(
             (item: PelatihanMasyarakat) =>
-              item.JenisProgram === jenisProgram && item.Status == "Publish"
+              item.JenisProgram === jenisProgram && item.Status == "Publish" || item.JenisPelatihan === jenisPembayaran || item.PelaksanaanPelatihan === jenisPelaksanaan
           )
           .sort((a: PelatihanMasyarakat, b: PelatihanMasyarakat) => {
             const dateA = new Date(a.TanggalMulaiPelatihan);
@@ -95,7 +87,6 @@ function PencarianPelatihan() {
             return dateA.getTime() - dateB.getTime(); // Ascending order
           });
 
-        console.log(response);
         setData(filteredAndSortedData);
       } else {
         setData(null);
@@ -107,7 +98,9 @@ function PencarianPelatihan() {
     }
   };
 
-  const [selectedJenisPelatihan, setSelectedJenisPelatihan] =
+  const [jenisPembayaran, setJenisPembayaran] =
+    React.useState<string>("");
+  const [jenisPelaksanaan, setJenisPelaksanaan] =
     React.useState<string>("");
   const [selectedProgramPelatihan, setSelectedProgramPelatihan] =
     React.useState<string>("");
@@ -120,15 +113,12 @@ function PencarianPelatihan() {
   const [selectedBulanPelatihan, setSelectedBulanPelatihan] =
     React.useState<string>("");
 
-  const [showOnlyPelatihan, setShowOnlyPelatihan] =
-    React.useState<boolean>(false);
-
   const [showResult, setShowResult] = React.useState<boolean>(false);
 
   const handleClearFilter = () => {
     setSelectedProgramPelatihan("");
     setSelectedBidangPelatihan("");
-    setSelectedJenisPelatihan("");
+    setJenisPembayaran("");
     setSelectedBalaiPelatihan("");
     setSelectedBiayaPelatihan("");
     setSelectedBulanPelatihan("");
@@ -164,30 +154,29 @@ function PencarianPelatihan() {
                   Filter dan Cari Pelatihan
                 </h3>
                 <div className="grid grid-cols-2 md:flex w-fit gap-2 py-5 items-center justify-center">
+                  {/* Jenis Pembayaran */}
                   <Select
-                    value={selectedJenisPelatihan}
-                    onValueChange={(value) => setSelectedJenisPelatihan(value)}
+                    value={jenisPembayaran}
+                    onValueChange={(value) => setJenisPembayaran(value)}
                   >
                     <SelectTrigger className="w-[180px] border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
                       <div className="inline-flex gap-2 px-3 w-full text-sm items-center rounded-md bg-white p-1.5  cursor-pointer border border-gray-300">
                         <HiViewGrid />
-                        {selectedJenisPelatihan == ""
+                        {jenisPembayaran == ""
                           ? "Jenis Pelatihan"
-                          : selectedJenisPelatihan}
+                          : jenisPembayaran}
                       </div>
                     </SelectTrigger>
                     <SelectContent className="z-[10000]">
                       <SelectGroup>
                         <SelectLabel>Pilih Jenis Pelatihan</SelectLabel>
-                        <SelectItem value={"Aspirasi"}>Aspirasi</SelectItem>
-                        <SelectItem value={"PNBP/BLU"}>PNBP/BLU</SelectItem>
-                        <SelectItem value={"Reguler"}>Reguler</SelectItem>
-                        <SelectItem value={"Satuan Pendidikan"}>
-                          Satuan Pendidikan
-                        </SelectItem>
+                        <SelectItem value="Gratis">Gratis</SelectItem>
+                        <SelectItem value="Berbayar">Berbayar</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
+
+                  {/* Lembaga Pelatihan */}
                   <Select
                     value={selectedBalaiPelatihan}
                     onValueChange={(value) => setSelectedBalaiPelatihan(value)}
@@ -201,120 +190,48 @@ function PencarianPelatihan() {
                       </div>
                     </SelectTrigger>
                     <SelectContent className="z-[10000]">
-                      {selectedJenisPelatihan == "Satuan Pendidikan" ? (
-                        <SelectGroup>
-                          <SelectLabel>Satuan Pendidikan KP</SelectLabel>
-                          {SATUAN_PENDIDIKAN_KEAHLIAN.map(
-                            (balaiPelatihan, index) => (
-                              <SelectItem
-                                key={index}
-                                value={balaiPelatihan.FullName}
-                              >
-                                {balaiPelatihan.FullName}
-                              </SelectItem>
-                            )
-                          )}
-                        </SelectGroup>
-                      ) : (
-                        <SelectGroup>
-                          <SelectLabel>Balai Pelatihan KP</SelectLabel>
-                          {BALAI_PELATIHAN.map((balaiPelatihan, index) => (
-                            <SelectItem key={index} value={balaiPelatihan.Name}>
-                              {balaiPelatihan.Name}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      )}
+                      <SelectGroup>
+                        <SelectLabel>Balai Pelatihan KP</SelectLabel>
+                        {BALAI_PELATIHAN.map((balaiPelatihan, index) => (
+                          <SelectItem key={index} value={balaiPelatihan.Name}>
+                            {balaiPelatihan.Name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
                     </SelectContent>
                   </Select>
 
+                  {/* Jenis Pelaksanaan */}
                   <Select
-                    value={selectedProgramPelatihan}
-                    onValueChange={(value) =>
-                      setSelectedProgramPelatihan(value)
-                    }
+                    value={jenisPembayaran}
+                    onValueChange={(value) => setJenisPembayaran(value)}
                   >
                     <SelectTrigger className="w-[180px] border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
                       <div className="inline-flex gap-2 px-3 w-full text-sm items-center rounded-md bg-white p-1.5  cursor-pointer border border-gray-300">
-                        <RiShipLine />
-                        {selectedProgramPelatihan == ""
-                          ? "Program Pelatihan"
-                          : selectedProgramPelatihan}
+                        <HiClock />
+                        {jenisPembayaran == ""
+                          ? "Jenis Pelaksanaan"
+                          : jenisPembayaran}
                       </div>
                     </SelectTrigger>
                     <SelectContent className="z-[10000]">
                       <SelectGroup>
-                        <SelectLabel>Pilih Program Pelatihan</SelectLabel>
-                        {usePathname().includes("akp") && (
-                          <>
-                            {AKP_CERTIFICATIONS.map((item: string, index: number) => (
-                              <SelectItem key={index} value={item}>
-                                {item}
-                              </SelectItem>
-                            ))}
-                          </>
-                        )}
-
-                        {usePathname().includes("perikanan") && (
-                          <>
-                            {AQUACULTURE_CERTIFICATIONS.map((item: string, index: number) => (
-                              <SelectItem key={index} value={item}>
-                                {item}
-                              </SelectItem>
-                            ))}
-                          </>
-                        )}
-
-                        {usePathname().includes("kelautan") && (
-                          <>
-                            {OCEAN_CERTIFICATIONS.map((item: string, index: number) => (
-                              <SelectItem key={index} value={item}>
-                                {item}
-                              </SelectItem>
-                            ))}
-                          </>
-                        )}
+                        <SelectLabel>Pilih Jenis Pelaksanaan</SelectLabel>
+                        {
+                          JENIS_PELAKSANAAN.map((item) => (
+                            <SelectItem value={item}>{item}</SelectItem>
+                          ))
+                        }
                       </SelectGroup>
                     </SelectContent>
                   </Select>
 
-                  <Select
-                    value={selectedBulanPelatihan}
-                    onValueChange={(value) => setSelectedBulanPelatihan(value)}
-                  >
-                    <SelectTrigger className="w-[180px] border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
-                      <div className="inline-flex gap-2 w-full px-3 text-sm items-center rounded-md bg-white p-1.5  cursor-pointer border border-gray-300">
-                        <FiCalendar />
-                        {selectedBulanPelatihan == ""
-                          ? "Pilih Waktu"
-                          : getMonthName(selectedBulanPelatihan)}
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent className="z-[10000]">
-                      <SelectGroup>
-                        <SelectLabel>Bulan Pelatihan</SelectLabel>
-                        <SelectItem value={"01"}>Januari</SelectItem>
-                        <SelectItem value={"02"}>Februari</SelectItem>
-                        <SelectItem value={"03"}>Maret</SelectItem>
-                        <SelectItem value={"04"}>April</SelectItem>
-                        <SelectItem value={"05"}>Mei</SelectItem>
-                        <SelectItem value={"06"}>Juni</SelectItem>
-                        <SelectItem value={"07"}>Juli</SelectItem>
-                        <SelectItem value={"08"}>Agustus</SelectItem>
-                        <SelectItem value={"09"}>September</SelectItem>
-                        <SelectItem value={"10"}>Oktober</SelectItem>
-                        <SelectItem value={"11"}>November</SelectItem>
-                        <SelectItem value={"12"}>Desember</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-
-                  {(selectedJenisPelatihan !== "" ||
+                  {(jenisPembayaran !== "" ||
                     selectedBalaiPelatihan !== "" ||
                     selectedBiayaPelatihan !== "" ||
                     selectedBidangPelatihan !== "" ||
-                    selectedProgramPelatihan !== "" ||
-                    selectedBulanPelatihan != "") && (
+                    selectedProgramPelatihan !== ""
+                  ) && (
                       <div
                         onClick={() => handleClearFilter()}
                         className="inline-flex gap-2 w-full px-3 text-sm items-center rounded-md bg-white p-1.5 cursor-pointer border border-gray-300"

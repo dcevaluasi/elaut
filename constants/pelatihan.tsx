@@ -454,28 +454,25 @@ export const PELAKSANAAN_PELATIHAN: PelaksanaanPelatihan[] = [
   },
 ];
 
-
+export const SEKTOR_PELATIHAN = [
+  "Perikanan",
+  "Kelautan",
+  "Awak Kapal Perikanan"
+]
 
 export const RUMPUN_PELATIHAN = [
   "Sistem Jaminan Mutu",
-  "Teknologi Penangkapan dan Alat Tangkap",
-  "Teknologi Permesinan dan Mekanisasi",
+  "Penangkapan dan Alat Tangkap",
+  "Permesinan dan Mekanisasi",
   "Budidaya",
   "Pengolahan dan Pemasaran",
   "Konservasi dan Kemitigasian",
-  "Teknologi Kelautan dan Kemaritiman (Garam, Oceanografi,Biologi, Iklim, Marine Debris)",
+  "Kelautan dan Kemaritiman (Garam, Oceanografi,Biologi, Iklim, Marine Debris)",
   "Pengawasan dan Kepelabuhan Perikanan",
-  "Teknis Lainnya (Rekayasa Sosial, Enumerator, Dll)"
+  "Teknis Lainnya (Rekayasa Sosial, Enumerator, Koperasi, Dll)"
 ]
 
-export const ASAL_PESERTA_PELATIHAN = [
-  "Masyarakat Umum",
-  "Peserta Didik Sekolah Usaha Perikanan Menengah (SUPM)/Sederajat",
-  "Peserta Didik Politeknik Kelautan dan Perikanan (Politeknik)/Sederajat",
-  "Karyawan/Pegawai/Mining Agent",
-  "Kelompok Pengawas",
-  "Kelompok Penyuluh Perikanan",
-]
+
 
 export const JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN = [
   "Aspirasi - APBN",
@@ -486,13 +483,14 @@ export const JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN = [
 
 export const DUKUNGAN_PROGRAM_TEROBOSAN = [
   "Non Terobosan",
-  "Konservasi",
-  "Kampung Nelayan Maju (Kalaju)",
-  "Kampung Nelayan Modern (Kalamo)",
-  "Budidaya",
-  "Pengawasan Pesisir",
+  "Perluasan Kawasan Konservasi",
+  "Kampung Nelayan Maju/Modern (Kalaju/Kalamo)",
+  "Pengembangan Budi Daya Bekerlanjutan",
+  "Pengawasan Pesisir dan Pulau-Pulau Kecil",
   "Penangkapan Ikan Terukur (PIT)",
-  "Bulan Cinta Laut (BCL)"
+  "Penanganan Sampah Pelastik/Bulan Cinta Laut (BCL)",
+  "Blue Economy",
+  "Koperasi Desa Merah Putih"
 ]
 
 export const JENIS_PENILAIAN_PELATIHAN = [
@@ -512,6 +510,16 @@ export const PROGRAM_SISJAMU = [
   "Asisten Pengolah Ikan (API)",
 ]
 
+export const PROGRAM_KEPELAUTAN = [
+  "Ahli Nautika Kapal Penangkap Ikan (ANKAPIN) Tingkat I",
+  "Ahli Nautika Kapal Penangkap Ikan (ANKAPIN) Tingkat II",
+  "Ahli Nautika Kapal Penangkap Ikan (ANKAPIN) Tingkat III",
+  "Ahli Teknika Kapal Penangkap Ikan (ANKAPIN) Tingkat I",
+  "Ahli Teknika Kapal Penangkap Ikan (ANKAPIN) Tingkat II",
+  "Ahli Teknika Kapal Penangkap Ikan (ANKAPIN) Tingkat III",
+  "",
+]
+
 export const PROGRAM_SISJAMU_2 = [
   "Cara Pembenihan Ikan yang Baik (CPIB)",
   "Cara Budi Daya Ikan yang Baik (CBIB)",
@@ -527,4 +535,8 @@ export const PROGRAM_SISJAMU_2 = [
 export const PENANDATANGAN_SERTIFIKAT = [
   "Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan",
   "Kepala Pusat Pelatihan Kelautan dan Perikanan",
+]
+
+export const JENIS_PELAKSANAAN = [
+  "Online/Daring", "Offline/Luring", "Blended (Daring dan Luring)", "Mandiri"
 ]

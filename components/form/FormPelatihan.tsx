@@ -22,7 +22,7 @@ import { HashLoader } from "react-spinners";
 import addData from "@/firebase/firestore/addData";
 import { generateTimestamp } from "@/utils/time";
 import { UPT } from "@/constants/nomenclatures";
-import { ASAL_PESERTA_PELATIHAN, DUKUNGAN_PROGRAM_TEROBOSAN, JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN, JENIS_PENILAIAN_PELATIHAN, PENANDATANGAN_SERTIFIKAT, PROGRAM_SISJAMU, RUMPUN_PELATIHAN } from "@/constants/pelatihan";
+import { DUKUNGAN_PROGRAM_TEROBOSAN, JENIS_PELAKSANAAN, JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN, JENIS_PENILAIAN_PELATIHAN, PENANDATANGAN_SERTIFIKAT, PROGRAM_SISJAMU, RUMPUN_PELATIHAN, SEKTOR_PELATIHAN } from "@/constants/pelatihan";
 
 function FormPelatihan({ edit = false }: { edit: boolean }) {
   const router = useRouter();
@@ -266,12 +266,11 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                             <SelectValue placeholder="Pilih sektor" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Perikanan">
-                              Perikanan
-                            </SelectItem>
-                            <SelectItem value="Kelautan">
-                              Kelautan
-                            </SelectItem>
+                            {
+                              SEKTOR_PELATIHAN.map((item) => <SelectItem value={item}>
+                                {item}
+                              </SelectItem>)
+                            }
                           </SelectContent>
                         </Select>
                       </div>
@@ -283,7 +282,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                           className="block text-gray-800 text-sm font-medium mb-1"
                           htmlFor="program"
                         >
-                          Rumpun Pelatihan<span className="text-red-600">*</span>
+                          Klaster Pelatihan<span className="text-red-600">*</span>
                         </label>
                         <Select
                           value={bidangPelatihan}
@@ -295,7 +294,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                           <SelectContent className="z-[10000]">
                             <SelectGroup>
                               <SelectLabel>
-                                Pilih Rumpun Pelatihan
+                                Pilih Klaster Pelatihan
                               </SelectLabel>
                               {RUMPUN_PELATIHAN.map((item: string, index: number) => (
                                 <SelectItem key={index} value={item}>
@@ -345,37 +344,6 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                   }
 
 
-                  {/* Asal Peserta Pelatihan */}
-                  <div className="flex w-full flex-wrap  mb-1">
-                    <div className="w-full">
-                      <label
-                        className="block text-gray-800 text-sm font-medium mb-1"
-                        htmlFor="asalPesertaPelatihan"
-                      >
-                        Asal Peserta Pelatihan{" "}
-                        <span className="text-red-600">*</span>
-                      </label>
-                      <Select
-                        value={asalPelatihan}
-                        onValueChange={(value: string) =>
-                          setAsalPelatihan(value)
-                        }
-                      >
-                        <SelectTrigger className="w-full text-base py-6">
-                          <SelectValue placeholder="Pilih asal peserta pelatihan" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {
-                            ASAL_PESERTA_PELATIHAN.map((item) => (
-                              <SelectItem value={item}>
-                                {item}
-                              </SelectItem>
-                            ))
-                          }
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
 
                   {/* Harga dan Jenis Pelaksanan Pelatihan */}
                   <div className="flex gap-2 w-full">
@@ -398,13 +366,11 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                             <SelectValue placeholder="Pilih pelaksanaan pelatihan" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Online">Online</SelectItem>
-                            <SelectItem value="Offline/Klasikal">
-                              Klasikal
-                            </SelectItem>
-                            <SelectItem value="Online+Offline/Blended">
-                              Blended
-                            </SelectItem>
+                            {
+                              JENIS_PELAKSANAAN.map((item) => (
+                                <SelectItem value={item}>{item} </SelectItem>
+                              ))
+                            }
                           </SelectContent>
                         </Select>
                       </div>

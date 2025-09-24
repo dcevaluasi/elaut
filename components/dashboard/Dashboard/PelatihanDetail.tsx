@@ -335,7 +335,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             <InfoItem label="Kode Kelas Pelatihan" value={data.KodePelatihan} />
                                             <InfoItem label="Sektor Pelatihan" value={data.JenisProgram} />
                                             {data?.BidangPelatihan == "Sistem Jaminan Mutu" ?
-                                                <InfoItem label="Rumpun Pelatihan - Program SISJAMU" value={`${data?.BidangPelatihan} - ${data.Program}`} /> : <InfoItem label="Rumpun Pelatihan" value={data.Program} />}
+                                                <InfoItem label="Klaster Pelatihan - Program SISJAMU" value={`${data?.BidangPelatihan} - ${data.Program}`} /> : <InfoItem label="Klaster Pelatihan" value={data.Program} />}
                                             <InfoItem label="Sumber Pembiayaan/Pemenuhan IKU" value={data.JenisPelatihan} />
                                             <InfoItem label="Penyelenggara" value={data.PenyelenggaraPelatihan} />
                                             <InfoItem label="Dukungan Program Terobosan" value={data.DukunganProgramTerobosan} />

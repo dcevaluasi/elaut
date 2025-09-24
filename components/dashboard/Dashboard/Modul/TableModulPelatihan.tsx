@@ -143,7 +143,7 @@ export default function TableModulPelatihan() {
                     <CardHeader className="flex items-center">
                         <Layers className="h-5 w-5 text-blue-500" />
                         <CardTitle className="text-lg font-semibold text-gray-800">
-                            Rumpun Pelatihan
+                            Klaster Pelatihan
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -249,7 +249,7 @@ export default function TableModulPelatihan() {
                                     </p>
                                     <div className="flex flex-col !font-normal">
 
-                                        <span className="text-sm text-gray-400 leading-tight">Rumpun Pelatihan : {row.BidangMateriPelatihan}</span>
+                                        <span className="text-sm text-gray-400 leading-tight">Klaster Pelatihan : {row.BidangMateriPelatihan}</span>
                                         <span className="text-sm text-gray-400 leading-tight">Tahun Penyusunan : {row?.Tahun}</span>
                                         <span className="text-sm text-gray-400 leading-tight">Produsen : {isMatch && row.DeskripsiMateriPelatihan == idUnitKerja ? name : nameUK}</span>
                                     </div>
