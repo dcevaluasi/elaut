@@ -24,12 +24,13 @@ import { generateTimestamp } from "@/utils/time";
 import { UPT } from "@/constants/nomenclatures";
 import { DUKUNGAN_PROGRAM_TEROBOSAN, JENIS_PELAKSANAAN, JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN, JENIS_PENILAIAN_PELATIHAN, PENANDATANGAN_SERTIFIKAT, PROGRAM_SISJAMU, RUMPUN_PELATIHAN, SEKTOR_PELATIHAN } from "@/constants/pelatihan";
 import { useFetchDataRumpunPelatihan } from "@/hooks/elaut/master/useFetchDataRumpunPelatihan";
-import { RumpunPelatihan } from "@/types/program";
+import { ProgramPelatihan, RumpunPelatihan } from "@/types/program";
 
 function FormPelatihan({ edit = false }: { edit: boolean }) {
   const router = useRouter();
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
+  const [selectedRumpunPelatihan, setSelectedRumpunPelatihan] = React.useState<RumpunPelatihan | null>(null)
   const { data: dataRumpunPelatihan, loading: loadingRumpunPelatihan, error: errorRumpunPelatihan, fetchRumpunPelatihan } = useFetchDataRumpunPelatihan();
 
   const token = Cookies.get("XSRF091");
@@ -127,6 +128,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
     data.append("Program", program);
     data.append("JenisProgram", jenisProgram);
     data.append("Status", status);
+    data.append("UjiKompetensi", ujiKompetensi);
     data.append("LokasiPelatihan", lokasiPelatihan);
     data.append("PelaksanaanPelatihan", pelaksanaanPelatihan);
     data.append("StatusPenerbitan", '0');
@@ -284,24 +286,27 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                       <div className="w-full">
                         <label
                           className="block text-gray-800 text-sm font-medium mb-1"
-                          htmlFor="program"
+                          htmlFor="jensiPelatihan"
                         >
-                          Klaster Pelatihan<span className="text-red-600">*</span>
+                          Klaster Pelatihan{" "}
+                          <span className="text-red-600">*</span>
                         </label>
                         <Select
                           value={bidangPelatihan}
-                          onValueChange={(value) => setBidangPelatihan(value)}
+                          onValueChange={(value) => {
+                            setBidangPelatihan(value)
+                            const selected = dataRumpunPelatihan.find((item) => item.name === value)
+                            setSelectedRumpunPelatihan(selected ?? null)
+                          }}
                         >
                           <SelectTrigger className="w-full text-base py-5">
                             <SelectValue placeholder="Pilih klaster" />
                           </SelectTrigger>
                           <SelectContent className="z-[10000]">
                             <SelectGroup>
-                              <SelectLabel>
-                                Pilih Klaster Pelatihan
-                              </SelectLabel>
-                              {dataRumpunPelatihan.map((item: RumpunPelatihan, index: number) => (
-                                <SelectItem key={index} value={item.name}>
+                              <SelectLabel>Pilih Klaster Pelatihan</SelectLabel>
+                              {dataRumpunPelatihan.map((item) => (
+                                <SelectItem key={item.id_rumpun_pelatihan} value={item.name}>
                                   {item.name}
                                 </SelectItem>
                               ))}
@@ -310,18 +315,20 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                         </Select>
                       </div>
                     </div>
+
+
                   </div>
 
                   {/* Program Pelatihan SISJAMU */}
                   {
-                    bidangPelatihan == "Sistem Jaminan Mutu" &&
+                    selectedRumpunPelatihan !== null &&
                     <div className="flex w-full flex-wrap  mb-1">
                       <div className="w-full">
                         <label
                           className="block text-gray-800 text-sm font-medium mb-1"
                           htmlFor="asalPesertaPelatihan"
                         >
-                          Program Pelatihan Sistem Jaminan Mutu (SISJAMU){" "}
+                          Program Pelatihan (Klaster {bidangPelatihan}){" "}
                           <span className="text-red-600">*</span>
                         </label>
                         <Select
@@ -331,13 +338,13 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                           }
                         >
                           <SelectTrigger className="w-full text-base py-6">
-                            <SelectValue placeholder="Pilih program SISJAMU" />
+                            <SelectValue placeholder={`Pilih program klaster ${bidangPelatihan})`} />
                           </SelectTrigger>
                           <SelectContent>
                             {
-                              PROGRAM_SISJAMU.map((item) => (
-                                <SelectItem value={item}>
-                                  {item}
+                              selectedRumpunPelatihan.programs.map((item: ProgramPelatihan) => (
+                                <SelectItem value={item.name_indo}>
+                                  {item.name_indo}
                                 </SelectItem>
                               ))
                             }

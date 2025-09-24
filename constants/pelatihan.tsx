@@ -473,7 +473,6 @@ export const RUMPUN_PELATIHAN = [
 ]
 
 
-
 export const JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN = [
   "Aspirasi - APBN",
   "PNBP/BLU - Berbayar",

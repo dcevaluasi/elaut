@@ -6,11 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Cookies from "js-cookie";
 import { useFetchDataRumpunPelatihan } from "@/hooks/elaut/master/useFetchDataRumpunPelatihan";
-import AddRumpunPelatihanAction from "@/commons/actions/master/rumpun-pelatihan/ManageRumpunPelatihanAction";
-import { FiEdit2, FiTrash2 } from "react-icons/fi";
+import { FiTrash2 } from "react-icons/fi";
 import { elautBaseUrl } from "@/constants/urls";
 import ManageRumpunPelatihanAction from "@/commons/actions/master/rumpun-pelatihan/ManageRumpunPelatihanAction";
-import { findNameRumpunPelatihanById } from "@/utils/programs";
 
 export default function TableRumpunPelatihan() {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -18,19 +16,19 @@ export default function TableRumpunPelatihan() {
     const filteredData = useMemo(() => {
         if (!Array.isArray(data)) return [];
 
-        return data.filter((row) => {
-            const matchesSearch =
-                !searchQuery ||
-                Object.values(row).some((val) =>
-                    String(val ?? "")
-                        .toLowerCase()
-                        .includes(searchQuery.toLowerCase())
-                );
+        const query = (searchQuery ?? "").toLowerCase();
 
-            return matchesSearch;
+        return data.filter((row) => {
+            return (
+                !query ||
+                Object.values(row).some((val) => {
+                    if (val == null) return false;
+                    if (typeof val === "object") return false;
+                    return String(val).toLowerCase().includes(query);
+                })
+            );
         });
     }, [data, searchQuery]);
-
 
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 15

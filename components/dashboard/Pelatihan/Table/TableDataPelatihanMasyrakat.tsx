@@ -107,7 +107,7 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                                     pelatihan.TanggalMulaiPendaftaran != "" && <span className="text-sm text-gray-400 leading-tight">Pendaftaran : {waktuPendaftaran}</span>
                                                 }
                                                 {
-                                                    pelatihan?.BidangPelatihan == "Sistem Jaminan Mutu" && <span className="text-sm text-gray-400 leading-tight">Program SISJAMU : {pelatihan?.Program}</span>
+                                                    pelatihan?.BidangPelatihan == "Sistem Jaminan Mutu" && <span className="text-sm text-gray-400 leading-tight">Program : {pelatihan?.Program}</span>
                                                 }
 
                                                 <span className="text-sm text-gray-400 leading-tight">Waktu Pelaksanaan : {waktuPelaksanaan}</span>

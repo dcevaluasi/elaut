@@ -20,19 +20,19 @@ export default function TableProgramPelatihan() {
     const filteredData = useMemo(() => {
         if (!Array.isArray(data)) return [];
 
-        return data.filter((row) => {
-            const matchesSearch =
-                !searchQuery ||
-                Object.values(row).some((val) =>
-                    String(val ?? "")
-                        .toLowerCase()
-                        .includes(searchQuery.toLowerCase())
-                );
+        const query = (searchQuery ?? "").toLowerCase();
 
-            return matchesSearch;
+        return data.filter((row) => {
+            return (
+                !query ||
+                Object.values(row).some((val) => {
+                    if (val == null) return false;
+                    if (typeof val === "object") return false;
+                    return String(val).toLowerCase().includes(query);
+                })
+            );
         });
     }, [data, searchQuery]);
-
 
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 15
