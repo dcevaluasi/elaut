@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { SlidersHorizontal } from "lucide-react"
-import Cookies from "js-cookie";
 import { findNameUnitKerjaById } from "@/utils/unitkerja";
 import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
 import { UnitKerja } from "@/types/master";

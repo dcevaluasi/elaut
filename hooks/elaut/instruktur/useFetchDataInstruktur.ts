@@ -39,7 +39,9 @@ export function useFetchDataInstruktur() {
         },
       )
       const filtered = (response.data || []).filter((row) => {
-        return cookieIdUnitKerja && cookieIdUnitKerja.toString() !== '0'
+        return cookieIdUnitKerja &&
+          cookieIdUnitKerja.toString() !== '0' &&
+          cookieIdUnitKerja.toString() !== '8'
           ? String(row.id_lemdik ?? '') === cookieIdUnitKerja
           : true
       })
