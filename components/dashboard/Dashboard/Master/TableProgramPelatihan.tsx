@@ -5,8 +5,8 @@ import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Cookies from "js-cookie";
-import AddProgramPelatihanAction from "@/commons/actions/master/program-pelatihan/AddProgramPelatihanAction";
 import { useFetchDataProgramPelatihan } from "@/hooks/elaut/master/useFetchDataProgramPelatihan";
+import ManageProgramPelatihanAction from "@/commons/actions/master/program-pelatihan/ManageProgramPelatihanAction";
 
 export default function TableProgramPelatihan() {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -46,11 +46,11 @@ export default function TableProgramPelatihan() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between mt-10">
-                <h2 className="text-lg font-semibold text-gray-800">Daftar Klaster Pelatihan</h2>
+                <h2 className="text-lg font-semibold text-gray-800">Daftar Program Pelatihan</h2>
                 <div className="flex flex-col md:flex-row items-center gap-2 w-full md:w-auto">
                     <Input
                         type="text"
-                        placeholder="Cari klaster..."
+                        placeholder="Cari program..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full md:w-48  py-1 text-sm"
@@ -58,7 +58,7 @@ export default function TableProgramPelatihan() {
 
                     <div className="flex flex-wrap gap-2">
                         {
-                            Cookies.get('Access')?.includes('superAdmin') && <AddProgramPelatihanAction onSuccess={fetchProgramPelatihan} />
+                            Cookies.get('Access')?.includes('superAdmin') && <ManageProgramPelatihanAction onSuccess={fetchProgramPelatihan} />
                         }
 
                     </div>
@@ -81,7 +81,7 @@ export default function TableProgramPelatihan() {
                         {paginatedData.map((row, index) => {
 
                             return <tr
-                                key={row.IdProgramPelatihan}
+                                key={row.id_program_pelatihan}
                                 className="hover:bg-gray-50 transition-colors duration-150"
                             >
                                 <td className="px-3 py-2 border text-center text-gray-500">
@@ -89,13 +89,13 @@ export default function TableProgramPelatihan() {
                                 </td>
                                 <td className="px-3 py-4 border">
                                     <div className="flex flex-row gap-2 h-full items-center justify-center py-2">
-                                        {/* <UpdateModulAction onSuccess={fetchProgramPelatihan} materiPelatihan={row} /> */}
+                                        <ManageProgramPelatihanAction onSuccess={fetchProgramPelatihan} initialData={row} />
                                     </div>
                                 </td>
-                                <td className="px-3 py-2 border text-center">{row.NameIndo}</td>
-                                <td className="px-3 py-2 border text-center">{row.NameEnglish}</td>
-                                <td className="px-3 py-2 border text-center">{row.AbbrvName}</td>
-                                <td className="px-3 py-2 border text-center">{row.Description}</td>
+                                <td className="px-3 py-2 border text-center">{row.name_indo}</td>
+                                <td className="px-3 py-2 border text-center">{row.name_english}</td>
+                                <td className="px-3 py-2 border text-center">{row.abbrv_name}</td>
+                                <td className="px-3 py-2 border text-center">{row.description}</td>
                             </tr>
                         })}
                         {paginatedData.length === 0 && (

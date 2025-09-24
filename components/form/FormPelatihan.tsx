@@ -23,10 +23,15 @@ import addData from "@/firebase/firestore/addData";
 import { generateTimestamp } from "@/utils/time";
 import { UPT } from "@/constants/nomenclatures";
 import { DUKUNGAN_PROGRAM_TEROBOSAN, JENIS_PELAKSANAAN, JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN, JENIS_PENILAIAN_PELATIHAN, PENANDATANGAN_SERTIFIKAT, PROGRAM_SISJAMU, RUMPUN_PELATIHAN, SEKTOR_PELATIHAN } from "@/constants/pelatihan";
+import { useFetchDataRumpunPelatihan } from "@/hooks/elaut/master/useFetchDataRumpunPelatihan";
+import { RumpunPelatihan } from "@/types/program";
 
 function FormPelatihan({ edit = false }: { edit: boolean }) {
   const router = useRouter();
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
+  const { data: dataRumpunPelatihan, loading: loadingRumpunPelatihan, error: errorRumpunPelatihan, fetchRumpunPelatihan } = useFetchDataRumpunPelatihan();
+
 
   const token = Cookies.get("XSRF091");
 
@@ -246,9 +251,9 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                   </div>
 
                   {/* Sektor dan Rumpun */}
-                  <div className="flex gap-2 w-full">
-                    <div className="flex flex-wrap -mx-3 mb-1 w-full">
-                      <div className="w-full px-3">
+                  <div className="flex flex-col gap-2 w-full">
+                    <div className="flex flex-wrap mb-1 w-full">
+                      <div className="w-full">
                         <label
                           className="block text-gray-800 text-sm font-medium mb-1"
                           htmlFor="jensiPelatihan"
@@ -276,8 +281,8 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap -mx-3 mb-1 w-full">
-                      <div className="w-full px-3">
+                    <div className="flex flex-wrap mb-1 w-full">
+                      <div className="w-full">
                         <label
                           className="block text-gray-800 text-sm font-medium mb-1"
                           htmlFor="program"
@@ -289,16 +294,16 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                           onValueChange={(value) => setBidangPelatihan(value)}
                         >
                           <SelectTrigger className="w-full text-base py-5">
-                            <SelectValue placeholder="Pilih rumpun" />
+                            <SelectValue placeholder="Pilih klaster" />
                           </SelectTrigger>
                           <SelectContent className="z-[10000]">
                             <SelectGroup>
                               <SelectLabel>
                                 Pilih Klaster Pelatihan
                               </SelectLabel>
-                              {RUMPUN_PELATIHAN.map((item: string, index: number) => (
-                                <SelectItem key={index} value={item}>
-                                  {item}
+                              {dataRumpunPelatihan.map((item: RumpunPelatihan, index: number) => (
+                                <SelectItem key={index} value={item.name}>
+                                  {item.name}
                                 </SelectItem>
                               ))}
                             </SelectGroup>
@@ -346,9 +351,9 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
 
 
                   {/* Harga dan Jenis Pelaksanan Pelatihan */}
-                  <div className="flex gap-2 w-full">
-                    <div className="flex flex-wrap -mx-3 mb-1 w-full">
-                      <div className="w-full px-3">
+                  <div className="flex flex-col gap-2 w-full">
+                    <div className="flex flex-wrap mb-1 w-full">
+                      <div className="w-full">
                         <label
                           className="block text-gray-800 text-sm font-medium mb-1"
                           htmlFor="pelaksanaanPelatihan"
@@ -409,9 +414,9 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                 </div>
 
                 {/* Jenis Pelatihan dan Dukungan Program Terobosan */}
-                <div className="flex gap-2 w-full mb-1">
-                  <div className="flex flex-wrap -mx-3 w-full">
-                    <div className="w-full px-3">
+                <div className="flex flex-col gap-2 w-full mb-1">
+                  <div className="flex flex-wrap w-full">
+                    <div className="w-full">
                       <label
                         className="block text-gray-800 text-sm font-medium mb-1"
                         htmlFor="jensiPelatihan"
@@ -441,8 +446,8 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap -mx-3  w-full">
-                    <div className="w-full px-3">
+                  <div className="flex flex-wrap   w-full">
+                    <div className="w-full">
                       <label
                         className="block text-gray-800 text-sm font-medium mb-1"
                         htmlFor="dukunganProgramTerobosan"

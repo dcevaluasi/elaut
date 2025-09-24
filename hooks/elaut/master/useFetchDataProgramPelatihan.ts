@@ -13,11 +13,11 @@ export const useFetchDataProgramPelatihan = () => {
     setError(null)
 
     try {
-      const res = await axios.get<ProgramPelatihan[]>(
+      const res = await axios.get(
         `${elautBaseUrl}/program_pelatihan/get_program_pelatihan`,
       )
-
-      setData(res.data)
+      console.log({ res })
+      setData(res.data.data)
     } catch (err) {
       setError('Failed to fetch data')
     } finally {
