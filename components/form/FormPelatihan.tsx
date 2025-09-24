@@ -207,11 +207,11 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                     <div className="flex flex-wrap -mx-3 mb-1 w-full">
                       <div className="w-full px-3">
                         <label
-                          className="block text-gray-800 text-sm font-medium mb-1"
+                          className="block text-gray-600 text-sm font-medium mb-1"
                           htmlFor="namaKegiatan"
                         >
                           Nama Kegiatan{" "}
-                          <span className="text-red-600">*</span>
+                          <span className="text-rose-600">*</span>
                         </label>
                         <input
                           id="namaKegiatan"
@@ -230,11 +230,11 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                     <div className="flex flex-wrap -mx-3 mb-1 w-full">
                       <div className="w-full px-3">
                         <label
-                          className="block text-gray-800 text-sm font-medium mb-1"
+                          className="block text-gray-600 text-sm font-medium mb-1"
                           htmlFor="lokasiPelatihan"
                         >
                           Lokasi Pelatihan{" "}
-                          <span className="text-red-600">*</span>
+                          <span className="text-rose-600">*</span>
                         </label>
                         <input
                           id="lokasiPelatihan"
@@ -256,11 +256,11 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                     <div className="flex flex-wrap mb-1 w-full">
                       <div className="w-full">
                         <label
-                          className="block text-gray-800 text-sm font-medium mb-1"
+                          className="block text-gray-600 text-sm font-medium mb-1"
                           htmlFor="jensiPelatihan"
                         >
                           Sektor Pelatihan{" "}
-                          <span className="text-red-600">*</span>
+                          <span className="text-rose-600">*</span>
                         </label>
                         <Select
                           value={jenisProgram}
@@ -285,11 +285,11 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                     <div className="flex flex-wrap mb-1 w-full">
                       <div className="w-full">
                         <label
-                          className="block text-gray-800 text-sm font-medium mb-1"
+                          className="block text-gray-600 text-sm font-medium mb-1"
                           htmlFor="jensiPelatihan"
                         >
                           Klaster Pelatihan{" "}
-                          <span className="text-red-600">*</span>
+                          <span className="text-rose-600">*</span>
                         </label>
                         <Select
                           value={bidangPelatihan}
@@ -325,11 +325,11 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                     <div className="flex w-full flex-wrap  mb-1">
                       <div className="w-full">
                         <label
-                          className="block text-gray-800 text-sm font-medium mb-1"
+                          className="block text-gray-600 text-sm font-medium mb-1"
                           htmlFor="asalPesertaPelatihan"
                         >
                           Program Pelatihan (Klaster {bidangPelatihan}){" "}
-                          <span className="text-red-600">*</span>
+                          <span className="text-rose-600">*</span>
                         </label>
                         <Select
                           value={program}
@@ -337,7 +337,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                             setProgram(value)
                           }
                         >
-                          <SelectTrigger className="w-full text-base py-6">
+                          <SelectTrigger className="w-full text-base py-5">
                             <SelectValue placeholder={`Pilih program klaster ${bidangPelatihan})`} />
                           </SelectTrigger>
                           <SelectContent>
@@ -361,11 +361,11 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                     <div className="flex flex-wrap mb-1 w-full">
                       <div className="w-full">
                         <label
-                          className="block text-gray-800 text-sm font-medium mb-1"
+                          className="block text-gray-600 text-sm font-medium mb-1"
                           htmlFor="pelaksanaanPelatihan"
                         >
                           Pelaksanaan Pelatihan{" "}
-                          <span className="text-red-600">*</span>
+                          <span className="text-rose-600">*</span>
                         </label>
                         <Select
                           value={pelaksanaanPelatihan}
@@ -389,11 +389,11 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                     <div className="flex flex-wrap  mb-1 w-full">
                       <div className="w-full ">
                         <label
-                          className="block text-gray-800 text-sm font-medium mb-1"
+                          className="block text-gray-600 text-sm font-medium mb-1"
                           htmlFor="penyelenggaraPelatihan"
                         >
                           Penyelenggara Pelatihan{" "}
-                          <span className="text-red-600">*</span>
+                          <span className="text-rose-600">*</span>
                         </label>
                         <Select
                           value={penyelenggaraPelatihan}
@@ -424,11 +424,11 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                   <div className="flex flex-wrap w-full">
                     <div className="w-full">
                       <label
-                        className="block text-gray-800 text-sm font-medium mb-1"
+                        className="block text-gray-600 text-sm font-medium mb-1"
                         htmlFor="jensiPelatihan"
                       >
                         Sumber Pembiayaan/Pemenuhan IKU{" "}
-                        <span className="text-red-600">*</span>
+                        <span className="text-rose-600">*</span>
                       </label>
                       <Select
                         value={jenisPelatihan}
@@ -455,11 +455,11 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                   <div className="flex flex-wrap   w-full">
                     <div className="w-full">
                       <label
-                        className="block text-gray-800 text-sm font-medium mb-1"
+                        className="block text-gray-600 text-sm font-medium mb-1"
                         htmlFor="dukunganProgramTerobosan"
                       >
                         Dukungan Program Prioritas{" "}
-                        <span className="text-red-600">*</span>
+                        <span className="text-rose-600">*</span>
                       </label>
                       <Select
                         value={dukunganProgramTerobosan}
@@ -489,11 +489,11 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                   jenisPelatihan == "PNBP/BLU - Berbayar" &&
                   <div className="w-full mb-1">
                     <label
-                      className="block text-gray-800 text-sm font-medium mb-1"
+                      className="block text-gray-600 text-sm font-medium mb-1"
                       htmlFor="hargaPelatihan"
                     >
                       Biaya Pelatihan{" "}
-                      <span className="text-red-600">*</span>
+                      <span className="text-rose-600">*</span>
                     </label>
                     <input
                       id="name"
@@ -519,10 +519,10 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                     <div className="flex flex-wrap -mx-3 mb-1 w-full">
                       <div className="w-full px-3">
                         <label
-                          className="block text-gray-800 text-sm font-medium mb-1"
+                          className="block text-gray-600 text-sm font-medium mb-1"
                           htmlFor="kodePelatihan"
                         >
-                          Tanggal Mulai Pelatihan <span className="text-red-600">*</span>
+                          Tanggal Mulai Pelatihan <span className="text-rose-600">*</span>
                         </label>
                         <input
                           id="tanggalMulaiPelatihan"
@@ -541,10 +541,10 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                     <div className="flex flex-wrap -mx-3 mb-1 w-full">
                       <div className="w-full px-3">
                         <label
-                          className="block text-gray-800 text-sm font-medium mb-1"
+                          className="block text-gray-600 text-sm font-medium mb-1"
                           htmlFor="tanggalBerakhirPelatihan"
                         >
-                          Tanggal Berakhir Pelatihan <span className="text-red-600">*</span>
+                          Tanggal Berakhir Pelatihan <span className="text-rose-600">*</span>
                         </label>
                         <input
                           id="tanggalBerakhirPelatihan"
@@ -574,11 +574,11 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                     <div className="flex flex-wrap mb-1 w-full">
                       <div className="w-full">
                         <label
-                          className="block text-gray-800 text-sm font-medium mb-1"
+                          className="block text-gray-600 text-sm font-medium mb-1"
                           htmlFor="jensiPelatihan"
                         >
                           Jenis Penilaian{" "}
-                          <span className="text-red-600">*</span>
+                          <span className="text-rose-600">*</span>
                         </label>
                         <Select
                           value={ujiKompetensi}

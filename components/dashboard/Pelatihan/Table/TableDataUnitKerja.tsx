@@ -2,27 +2,14 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { CountStats } from "@/hooks/elaut/instruktur/useFetchDataInstruktur";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Instruktur } from "@/types/instruktur";
 import { Input } from "@/components/ui/input";
-import { Briefcase, FileBadge, GraduationCap, Layers, ShieldCheck, Users } from "lucide-react";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
-import { SlidersHorizontal } from "lucide-react"
 import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
 import { UnitKerja } from "@/types/master";
 import { generatedSignedCertificate } from "@/utils/certificates";
 import Cookies from "js-cookie";
-import UpdateUnitKerjaAction from "@/commons/actions/unit-kerja/UpdateUnitKerjaAction";
-import DeleteUnitKerjaAction from "@/commons/actions/unit-kerja/DeleteUnitKerjaAction";
-import AddUnitKerjaAction from "@/commons/actions/unit-kerja/AddUnitKerjaAction";
+import ManageUnitKerjaAction from "@/commons/actions/unit-kerja/ManageUnitKerjaAction";
+import { elautBaseUrl } from "@/constants/urls";
+import { FiTrash2 } from "react-icons/fi";
 
 const TableDataUnitKerja = () => {
     const { unitKerjas, loading: loadingUnitKerja, error: errorUnitKerja, fetchUnitKerjaData } = useFetchDataUnitKerja()
@@ -33,7 +20,6 @@ const TableDataUnitKerja = () => {
 
     return (
         <div>
-
             <UnitKerjaTable data={unitKerjas} fetchData={fetchUnitKerjaData} />
         </div>
     );
@@ -46,38 +32,25 @@ type Props = {
 
 function UnitKerjaTable({ data, fetchData }: Props) {
     const [search, setSearch] = useState("")
-    const [filterKeahlian, setFilterKeahlian] = useState("")
-    const [filterStatus, setFilterStatus] = useState("")
-    const [filterPendidikan, setFilterPendidikan] = useState("")
-    const [filterJabatan, setFilterJabatan] = useState("")
-
-
-    // const bidangKeahlianOptions = [...new Set(data.map(d => d.bidang_keahlian).filter(Boolean))]
-    // const statusOptions = [...new Set(data.map(d => d.status).filter(Boolean))]
-    // const pendidikanOptions = [...new Set(data.map(d => d.pendidikkan_terakhir).filter(Boolean))]
-    // const jabatanOptions = [...new Set(data.map(d => d.jenjang_jabatan).filter(Boolean))]
 
     const filteredData = useMemo(() => {
         const cookieIdUnitKerja = Cookies.get("IDUnitKerja");
 
         return data.filter((row) => {
-            // search filter
             const matchesSearch =
                 !search ||
                 Object.values(row).some((val) =>
                     String(val).toLowerCase().includes(search.toLowerCase())
                 );
 
-            // unit kerja filter (only if cookie exists)
             const matchesUnitKerja =
-                cookieIdUnitKerja && cookieIdUnitKerja.toString() !== "0"
+                cookieIdUnitKerja && cookieIdUnitKerja.toString() !== "0" && cookieIdUnitKerja.toString() !== "8"
                     ? String(row.id_unit_kerja ?? "") === cookieIdUnitKerja
                     : true;
 
             return matchesSearch && matchesUnitKerja;
         });
     }, [data, search]);
-
 
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 15
@@ -87,14 +60,6 @@ function UnitKerjaTable({ data, fetchData }: Props) {
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     )
-
-    const clearFilters = () => {
-        setFilterKeahlian("")
-        setFilterStatus("")
-        setFilterPendidikan("")
-        setFilterJabatan("")
-        setSearch("")
-    }
 
     return (
         <div className="space-y-4">
@@ -113,14 +78,13 @@ function UnitKerjaTable({ data, fetchData }: Props) {
 
                         <div className="flex flex-wrap gap-2">
                             {
-                                Cookies.get('Access')?.includes('superAdmin') && <AddUnitKerjaAction onSuccess={fetchData} />
+                                Cookies.get('Access')?.includes('superAdmin') && <ManageUnitKerjaAction onSuccess={fetchData} />
                             }
                         </div>
                     </div>
                 }
             </div>
 
-            {/* Table */}
             <div className="overflow-x-auto border border-gray-200 rounded-xl shadow-sm">
                 <table className="min-w-full table-fixed text-sm">
                     <thead className="bg-gray-100 text-gray-700 text-xs uppercase">
@@ -146,8 +110,36 @@ function UnitKerjaTable({ data, fetchData }: Props) {
                                 </td>
                                 <td className="px-3 py-4 border">
                                     <div className="flex flex-row gap-2 h-full px-3 py-2">
-                                        <UpdateUnitKerjaAction onSuccess={fetchData} unitKerja={row} />
-                                        <DeleteUnitKerjaAction onSuccess={fetchData} unitKerja={row} />
+                                        <ManageUnitKerjaAction onSuccess={fetchData} unitKerja={row} />
+                                        <button
+                                            onClick={async () => {
+                                                const confirmDelete = window.confirm("⚠️ Apakah Anda yakin ingin menghapus unit kerja ini?");
+                                                if (!confirmDelete) return;
+
+                                                try {
+                                                    const res = await fetch(
+                                                        `${elautBaseUrl}/unit-kerja/deleteUnitKerja?id=${row.id_unit_kerja}`,
+                                                        {
+                                                            method: "DELETE", headers: {
+                                                                "Authorization": `Bearer ${Cookies.get("XSRF091")}`,
+                                                                "Content-Type": "application/json",
+                                                            },
+                                                        }
+                                                    );
+                                                    if (!res.ok) throw new Error("Gagal menghapus unit kerja");
+
+                                                    fetchData();
+                                                    alert("✅ Unit kerja berhasil dihapus");
+                                                } catch (error) {
+                                                    console.error(error);
+                                                    alert("❌ Gagal menghapus unit kerja");
+                                                }
+                                            }}
+                                            className="flex items-center gap-2 w-fit rounded-lg px-4 py-1 shadow-sm transition-all bg-transparent border-rose-500 text-rose-500 hover:text-white hover:bg-rose-500 border group"
+                                        >
+                                            <FiTrash2 className="h-5 w-5 text-rose-500 group-hover:text-white" />
+                                            Hapus
+                                        </button>
                                     </div>
 
                                 </td>
@@ -215,261 +207,5 @@ function UnitKerjaTable({ data, fetchData }: Props) {
     )
 }
 
-function StatsCards({
-    data,
-    stats,
-}: {
-    data: Instruktur[]
-    stats: CountStats
-}) {
-    return (
-        <div className="my-6 space-y-6">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                {/* --- Column 1 --- */}
-                <div className="flex flex-col gap-6">
-                    {/* Total Instruktur */}
-                    <Card className="h-fit rounded-xl border border-gray-100 bg-white shadow-sm">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-base font-medium text-gray-600">
-                                Total Instruktur
-                            </CardTitle>
-                            <Users className="h-5 w-5 text-gray-400" />
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-2xl font-bold text-gray-800">{data.length}</p>
-                            <p className="text-xs text-gray-500">Instruktur terdaftar</p>
-                        </CardContent>
-                    </Card>
-
-                    {/* Pendidikan & Status */}
-                    <div className="flex flex-col gap-6 md:flex-row">
-                        {/* Pendidikan Terakhir */}
-                        <Card className="w-full h-full rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-lg">
-                            <CardHeader className="flex items-center gap-2">
-                                <GraduationCap className="h-5 w-5 text-purple-500" />
-                                <CardTitle className="text-lg font-semibold text-center text-gray-800">
-                                    Pendidikan Terakhir
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <ul className="grid grid-cols-1 gap-2">
-                                    {Object.entries(stats.pendidikanTerakhir).map(([key, count]) => (
-                                        <li
-                                            key={key}
-                                            className="flex items-center justify-between rounded-lg bg-purple-50 px-3 py-2 text-sm transition hover:bg-purple-100"
-                                        >
-                                            <span className="font-medium text-gray-700">{key}</span>
-                                            <span className="font-bold text-purple-600">{count}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </CardContent>
-                        </Card>
-
-                        {/* Status Instruktur */}
-                        <Card className="w-full h-full rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-lg">
-                            <CardHeader className="flex items-center gap-2">
-                                <ShieldCheck className="h-5 w-5 text-teal-500" />
-                                <CardTitle className="text-lg font-semibold text-center text-gray-800">
-                                    Status Instruktur
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <ul className="grid grid-cols-1 gap-2">
-                                    {Object.entries(stats.status).map(([key, count]) => (
-                                        <li
-                                            key={key}
-                                            className="flex items-center justify-between rounded-lg bg-teal-50 px-3 py-2 text-sm transition hover:bg-teal-100"
-                                        >
-                                            <span className="font-medium text-gray-700">{key}</span>
-                                            <span className="font-bold text-teal-600">{count}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </div>
-
-                {/* --- Column 2 --- */}
-                <div className="flex flex-col gap-6">
-                    {/* Total Instruktur */}
-                    <Card className="h-fit rounded-xl border border-gray-100 bg-white shadow-sm">
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-base font-medium text-gray-600">
-                                Total ToT
-                            </CardTitle>
-                            <FileBadge className="h-5 w-5 text-gray-400" />
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-2xl font-bold text-gray-800">{stats.tot}</p>
-                            <p className="text-xs text-gray-500">Instruktur memiliki ToT</p>
-                        </CardContent>
-                    </Card>
-
-                    {/* Bidang Keahlian */}
-                    <Card className="w-full h-full rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-lg">
-                        <CardHeader className="flex items-center gap-2">
-                            <Layers className="h-5 w-5 text-blue-500" />
-                            <CardTitle className="text-lg font-semibold text-gray-800">
-                                Bidang Keahlian
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <ul className="grid grid-cols-2 gap-2">
-                                {Object.entries(stats.bidangKeahlian).map(([key, count]) => (
-                                    <li
-                                        key={key}
-                                        className="flex items-center justify-between rounded-lg bg-blue-50 px-3 py-2 text-sm transition hover:bg-blue-100"
-                                    >
-                                        <span className="font-medium text-gray-700">{key}</span>
-                                        <span className="font-bold text-blue-600">{count}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                {/* --- Column 3 --- */}
-                <Card className="h-full rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-lg">
-                    <CardHeader className="flex items-center gap-2">
-                        <Briefcase className="h-5 w-5 text-green-500" />
-                        <CardTitle className="text-lg font-semibold text-gray-800">
-                            Jenjang Jabatan
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <ul className="grid grid-cols-2 gap-2">
-                            {Object.entries(stats.jenjangJabatan).map(([key, count]) => (
-                                <li
-                                    key={key}
-                                    className="flex items-center justify-between rounded-lg bg-green-50 px-3 py-2 text-sm transition hover:bg-green-100"
-                                >
-                                    <span className="font-medium text-gray-700">{key}</span>
-                                    <span className="font-bold text-green-600">{count}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </CardContent>
-                </Card>
-            </div>
-        </div>
-    )
-}
-
-
-function FilterDropdown({
-    filterKeahlian,
-    setFilterKeahlian,
-    bidangKeahlianOptions,
-    filterJabatan,
-    setFilterJabatan,
-    jabatanOptions,
-    filterPendidikan,
-    setFilterPendidikan,
-    pendidikanOptions,
-    filterStatus,
-    setFilterStatus,
-    statusOptions,
-    clearFilters,
-}: any) {
-    return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex items-center py-4 gap-2">
-                    <SlidersHorizontal className="w-4 h-4" />
-                    Filter
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-64 p-3 space-y-3">
-                <DropdownMenuLabel className="text-sm font-semibold">Filter Data</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-
-                {/* Bidang Keahlian */}
-                <div className="space-y-1">
-                    <label className="text-xs font-medium text-gray-600">Bidang Keahlian</label>
-                    <Select value={filterKeahlian} onValueChange={setFilterKeahlian}>
-                        <SelectTrigger className="w-full text-sm">
-                            <SelectValue placeholder="Pilih bidang" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="-">Semua</SelectItem>
-                            {bidangKeahlianOptions.map((opt: any) => (
-                                <SelectItem key={opt} value={opt}>
-                                    {opt}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                {/* Jenjang Jabatan */}
-                <div className="space-y-1">
-                    <label className="text-xs font-medium text-gray-600">Jenjang Jabatan</label>
-                    <Select value={filterJabatan} onValueChange={setFilterJabatan}>
-                        <SelectTrigger className="w-full text-sm">
-                            <SelectValue placeholder="Pilih jabatan" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="-">Semua</SelectItem>
-                            {jabatanOptions.map((opt: any) => (
-                                <SelectItem key={opt} value={opt}>
-                                    {opt}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                {/* Pendidikan */}
-                <div className="space-y-1">
-                    <label className="text-xs font-medium text-gray-600">Pendidikan</label>
-                    <Select value={filterPendidikan} onValueChange={setFilterPendidikan}>
-                        <SelectTrigger className="w-full text-sm">
-                            <SelectValue placeholder="Pilih pendidikan" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="-">Semua</SelectItem>
-                            {pendidikanOptions.map((opt: any) => (
-                                <SelectItem key={opt} value={opt}>
-                                    {opt}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                {/* Status */}
-                <div className="space-y-1">
-                    <label className="text-xs font-medium text-gray-600">Status</label>
-                    <Select value={filterStatus} onValueChange={setFilterStatus}>
-                        <SelectTrigger className="w-full text-sm">
-                            <SelectValue placeholder="Pilih status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="-">Semua</SelectItem>
-                            {statusOptions.map((opt: any) => (
-                                <SelectItem key={opt} value={opt}>
-                                    {opt}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                {/* Clear Button */}
-                <Button
-                    onClick={clearFilters}
-                    size="sm"
-                    variant="outline"
-                    className="w-full mt-2 text-xs"
-                >
-                    Reset Filter
-                </Button>
-            </DropdownMenuContent>
-        </DropdownMenu>
-    )
-}
 
 export default TableDataUnitKerja;

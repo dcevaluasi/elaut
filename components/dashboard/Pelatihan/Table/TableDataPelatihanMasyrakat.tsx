@@ -33,7 +33,6 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
             const aLabel = getStatusInfo(a.StatusPenerbitan).label.toLowerCase();
             const bLabel = getStatusInfo(b.StatusPenerbitan).label.toLowerCase();
 
-            // Assign priority: pending = 1, draft = 2, others = 3
             const getPriority = (label: string) => {
                 if (label.includes("pending")) return 1;
                 if (label.includes("draft")) return 2;
@@ -45,16 +44,12 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
 
             if (aPriority < bPriority) return -1;
             if (aPriority > bPriority) return 1;
-            return 0; // keep relative order if same priority
+            return 0;
         })
         .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-    const accessPermissions = Cookies.get('Access')
-
     return (
         <div>
-
-            {/* Table */}
             <div className="overflow-x-auto border border-gray-200 rounded-xl shadow-sm">
                 <table className="min-w-full text-sm border border-gray-200">
                     <thead className="bg-gray-50 text-gray-700 text-xs uppercase">
