@@ -145,7 +145,7 @@ export default function Header() {
             >
               <ul className="flex grow justify-end items-center">
                 <NavLinkDefault href="/" name="Beranda" icon={<HiHome />} />
-                <NavDropDown name="Balai Pelatihan">
+                {/* <NavDropDown name="Balai Pelatihan">
                   <li>
                     <Link
                       href="https://bppptegal.id/tentang-kami"
@@ -164,7 +164,7 @@ export default function Header() {
                       <span>Balai Pelatihan Perikanan Bitung</span>
                     </Link>
                   </li>
-                </NavDropDown>
+                </NavDropDown> */}
                 <NavLinkDefault
                   href="/layanan/publikasi"
                   name="Publikasi"
