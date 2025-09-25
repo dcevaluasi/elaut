@@ -129,14 +129,27 @@ export default function TableProgramPelatihan() {
                                 <td className="px-3 py-2 border text-center">{row.abbrv_name}</td>
                                 <td className="px-3 py-2 border text-center">
                                     <div className="flex flex-row gap-2 h-full items-center justify-center py-2">
-                                        <Link
+                                        {Cookies.get('Access')?.includes('superAdmin') && (rumpunPelatihan == "Sistem Jaminan Mutu" || rumpunPelatihan == "Pembentukan Keahlian AKP" || rumpunPelatihan == "Peningkatan Keahlian AKP") && <Link
                                             href={`/admin/lemdiklat/master/program-pelatihan/materi/${row.name_indo}`}
                                             target="_blank"
                                             className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 border group"
                                         >
                                             <FiBookOpen className="h-5 w-5 text-blue-500 group-hover:text-white" />
                                             Materi
-                                        </Link>
+                                        </Link>}
+                                        {(rumpunPelatihan !== "Sistem Jaminan Mutu" &&
+                                            rumpunPelatihan !== "Pembentukan Keahlian AKP" &&
+                                            rumpunPelatihan !== "Peningkatan Keahlian AKP") && (
+                                                <Link
+                                                    href={`/admin/lemdiklat/master/program-pelatihan/materi/${row.name_indo}`}
+                                                    target="_blank"
+                                                    className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 border group"
+                                                >
+                                                    <FiBookOpen className="h-5 w-5 text-blue-500 group-hover:text-white" />
+                                                    Materi
+                                                </Link>
+                                            )}
+
                                     </div>
                                 </td>
                             </tr>

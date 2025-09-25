@@ -56,7 +56,6 @@ export default function LayoutAdminElaut({
     }
   };
 
-
   const fetchInformationLemdiklat = async () => {
     try {
       const { data } = await axios.get(`${elautBaseUrl}/lemdik/getLemdik`, {
@@ -65,7 +64,6 @@ export default function LayoutAdminElaut({
 
       setLemdikData(data);
 
-      // set basic cookies
       Cookies.set("IDLemdik", data.data.IdLemdik);
       Cookies.set("IDUnitKerja", data.data.IdUnitKerja);
       Cookies.set("Nama", data.data.NamaLemdik);
@@ -74,7 +72,6 @@ export default function LayoutAdminElaut({
       Cookies.set("Access", breakdownStatus(data.data.Deskripsi)[1]);
       Cookies.set("PimpinanLemdiklat", data.data.NamaKaBalai);
 
-      // 🔑 fetch Unit Kerja by ID and set Satker = unitKerjas.nama
       const token = Cookies.get("XSRF091");
       const unitResponse = await axios.get(
         `${elautBaseUrl}/unit-kerja/getUnitKerjaById?id=${data.data.IdUnitKerja}`,
@@ -238,13 +235,14 @@ export default function LayoutAdminElaut({
                         icon={<HiOutlineInbox className="flex-shrink-0 w-6 h-6" />}
                         label="Klaster Pelatihan"
                       />
-                      <NavItem
-                        href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/program-pelatihan`}
-                        icon={<RiQuillPenAiLine className="flex-shrink-0 w-6 h-6" />}
-                        label="Program Pelatihan"
-                      />
                     </>
                   }
+                  <NavItem
+                    href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/program-pelatihan`}
+                    icon={<RiQuillPenAiLine className="flex-shrink-0 w-6 h-6" />}
+                    label="Program Pelatihan"
+                  />
+
                 </ul>
               )}
             </li>
