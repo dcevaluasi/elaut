@@ -646,7 +646,7 @@ const DropdownUser = ({
           }`}
       >
         <ul className="flex flex-col gap-5 border-b border-stroke px-6 py-7.5 ">
-          <li>
+          {/* <li>
             <div
               onClick={(e) => setOpenDialogEditProfile(!openDialogEditProfile)}
               className="flex items-center gap-3.5 cursor-pointer text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
@@ -670,9 +670,9 @@ const DropdownUser = ({
               </svg>
               My Profile
             </div>
-          </li>
+          </li> */}
         </ul>
-        <button
+        {/* <button
           onClick={(e) => handleLogout()}
           className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
         >
@@ -694,7 +694,7 @@ const DropdownUser = ({
             />
           </svg>
           Log Out
-        </button>
+        </button> */}
       </div>
       {/* <!-- Dropdown End --> */}
     </div>
