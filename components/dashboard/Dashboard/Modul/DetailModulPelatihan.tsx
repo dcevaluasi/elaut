@@ -283,7 +283,7 @@ export default function DetailModulPelatihan() {
                             <Dialog open={open} onOpenChange={setOpen}>
                                 {(
                                     (materi?.BerlakuSampai === "2" && !Cookies.get("Access")?.includes("superAdmin")) ||
-                                    (materi?.BerlakuSampai === "1" && Cookies.get("Access")?.includes("superAdmin"))
+                                    ((materi?.BerlakuSampai === "1" || materi?.BerlakuSampai === "2") && Cookies.get("Access")?.includes("superAdmin"))
                                 ) && (
                                         <DialogTrigger asChild>
                                             <Button className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md">
