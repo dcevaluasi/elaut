@@ -147,7 +147,7 @@ const ManageProgramPelatihanAction: React.FC<{
                     {/* Pilih Rumpun Pelatihan */}
                     <div className="space-y-1">
                         <label className="text-sm font-medium text-gray-700">
-                            Rumpun Pelatihan
+                            Klaster Pelatihan
                         </label>
                         <select
                             className="w-full rounded-md border border-gray-300 p-2 text-sm"
@@ -155,7 +155,7 @@ const ManageProgramPelatihanAction: React.FC<{
                             onChange={(e) => setIdRumpunPelatihan(e.target.value)}
                             disabled={rumpunLoading}
                         >
-                            <option value="">-- Pilih Rumpun Pelatihan --</option>
+                            <option value="">-- Pilih Klaster Pelatihan --</option>
                             {rumpunData?.map((rumpun: RumpunPelatihan) => (
                                 <option
                                     key={rumpun.id_rumpun_pelatihan}

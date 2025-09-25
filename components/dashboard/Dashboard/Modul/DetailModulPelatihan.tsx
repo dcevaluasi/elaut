@@ -27,6 +27,8 @@ import {
 } from "@/components/ui/select";
 import Cookies from "js-cookie"
 import { generateJPMateri } from "@/utils/module"
+import { findNameUnitKerjaById } from "@/utils/unitkerja"
+import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja"
 
 export default function DetailModulPelatihan() {
     const pathname = usePathname();
@@ -37,6 +39,11 @@ export default function DetailModulPelatihan() {
     const id = Number(params?.id);
     const { data, loading, error, refetch } =
         useFetchDataMateriPelatihanMasyarakatById(id);
+    const { unitKerjas, loading: loadingUnitKerja, error: errorUnitKerja, fetchUnitKerjaData } = useFetchDataUnitKerja()
+    useEffect(() => {
+        fetchUnitKerjaData()
+    }, [fetchUnitKerjaData])
+
 
     const [jenis, setJenis] = useState("")
 
@@ -95,7 +102,6 @@ export default function DetailModulPelatihan() {
         formData.append("NamaModulPelatihan", nama)
         formData.append("DeskripsiModulPelatihan", deskripsi)
         formData.append("IdMateriPelatihan", id.toString())
-        formData.append("IdModulPelatihan", id.toString())
         formData.append("JamPelajaran", jamPelajaran)
 
         try {
@@ -114,7 +120,7 @@ export default function DetailModulPelatihan() {
             refetch()
         } catch (err) {
             console.error(err)
-            alert("❌ Gagal menambahkan modul")
+            alert("❌ Gagal menambahkan modul, harap ulangi kembali!")
         } finally {
             setSubmitting(false)
         }
@@ -215,6 +221,8 @@ export default function DetailModulPelatihan() {
             setDeskripsi("")
             setIdModul("")
             setProdusen("")
+            setLinkVideo("")
+            setJenis("")
             refetch()
             console.log({ response })
         } catch (err) {
@@ -262,7 +270,7 @@ export default function DetailModulPelatihan() {
                                     {materi?.BidangMateriPelatihan != "" && (
                                         <span>Bidang: {materi?.BidangMateriPelatihan}</span>
                                     )}
-                                    <span>Produsen: {materi?.DeskripsiMateriPelatihan}</span>
+                                    <span>Produsen: {findNameUnitKerjaById(unitKerjas, materi?.DeskripsiMateriPelatihan).name}</span>
                                     <span>Diupload: {materi?.CreateAt}</span>
                                 </div>
                             </div>
@@ -618,7 +626,7 @@ export default function DetailModulPelatihan() {
 
                                                             {(
                                                                 (materi?.BerlakuSampai === "2" && !Cookies.get("Access")?.includes("superAdmin")) ||
-                                                                (materi?.BerlakuSampai === "1" && Cookies.get("Access")?.includes("superAdmin"))
+                                                                ((materi?.BerlakuSampai === "1" || materi?.BerlakuSampai === "2") && Cookies.get("Access")?.includes("superAdmin"))
                                                             ) && (
                                                                     <>
                                                                         <button
@@ -864,46 +872,52 @@ export default function DetailModulPelatihan() {
                                                                     {row.BahanTayang.map((row_bt: BahanTayang, index: number) => (
                                                                         <tr key={row_bt.IdBahanTayang}>
                                                                             <td className="px-3 py-2 border">{index + 1}</td>
-                                                                            <td className="px-3 py-2 border"> <button
-                                                                                onClick={async () => {
-                                                                                    const confirmDelete = window.confirm("⚠️ Apakah Anda yakin ingin menghapus bahan tayang ini?");
-                                                                                    if (!confirmDelete) return;
+                                                                            <td className="px-3 py-2 border">
+                                                                                <div className="w-full flex items-center justify-center">
+                                                                                    <button
+                                                                                        onClick={async () => {
+                                                                                            const confirmDelete = window.confirm("⚠️ Apakah Anda yakin ingin menghapus bahan tayang ini?");
+                                                                                            if (!confirmDelete) return;
 
-                                                                                    try {
-                                                                                        const res = await fetch(
-                                                                                            `${moduleBaseUrl}/bahan-tayang/deleteBahanTayang?id=${row_bt.IdBahanTayang}`,
-                                                                                            { method: "DELETE" }
-                                                                                        );
-                                                                                        if (!res.ok) throw new Error("Gagal menghapus bahan tayang");
+                                                                                            try {
+                                                                                                const res = await fetch(
+                                                                                                    `${moduleBaseUrl}/bahan-tayang/deleteBahanTayang?id=${row_bt.IdBahanTayang}`,
+                                                                                                    { method: "DELETE" }
+                                                                                                );
+                                                                                                if (!res.ok) throw new Error("Gagal menghapus bahan tayang");
 
-                                                                                        refetch();
-                                                                                        alert("✅ Bahan tayang berhasil dihapus");
-                                                                                    } catch (error) {
-                                                                                        console.error(error);
-                                                                                        alert("❌ Gagal menghapus bahan tayang");
-                                                                                    }
-                                                                                }}
-                                                                                className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-rose-500 text-rose-500 hover:text-white hover:bg-rose-500 border group"
-                                                                            >
-                                                                                <FiTrash2 className="h-5 w-5 text-rose-500 group-hover:text-white" />
-                                                                                Hapus
-                                                                            </button></td>
+                                                                                                refetch();
+                                                                                                alert("✅ Bahan tayang berhasil dihapus");
+                                                                                            } catch (error) {
+                                                                                                console.error(error);
+                                                                                                alert("❌ Gagal menghapus bahan tayang");
+                                                                                            }
+                                                                                        }}
+                                                                                        className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-rose-500 text-rose-500 hover:text-white hover:bg-rose-500 border group"
+                                                                                    >
+                                                                                        <FiTrash2 className="h-5 w-5 text-rose-500 group-hover:text-white" />
+                                                                                        Hapus
+                                                                                    </button>
+                                                                                </div>
+                                                                            </td>
                                                                             <td className="px-3 py-2 border">{row_bt.NamaBahanTayang}</td>
                                                                             <td className="px-3 py-2 border">{row_bt.DeskripsiBahanTayang}</td>
-                                                                            <td className="px-3 py-2 border"> <a
-                                                                                href={
-                                                                                    row_bt.BahanTayang
-                                                                                        ? `${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${row_bt.BahanTayang}`
-                                                                                        : row_bt.LinkVideo
-                                                                                }
-                                                                                target="_blank"
-                                                                                rel="noopener noreferrer"
-                                                                                className="text-blue-500 underline"
-                                                                            >
-
-                                                                                {row_bt.BahanTayang == "" ? truncateText(row_bt.LinkVideo, 30, '...') : truncateText(row_bt.BahanTayang, 30, '...')}
-                                                                            </a></td>
-
+                                                                            <td className="px-3 py-2 border">
+                                                                                <div className="w-full flex items-center justify-center">
+                                                                                    <a
+                                                                                        href={
+                                                                                            row_bt.BahanTayang
+                                                                                                ? `${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${row_bt.BahanTayang}`
+                                                                                                : row_bt.LinkVideo
+                                                                                        }
+                                                                                        target="_blank"
+                                                                                        rel="noopener noreferrer"
+                                                                                        className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 border group"
+                                                                                    >
+                                                                                        <FaRegFileLines className="h-5 w-5 text-blue-500 group-hover:text-white" /> File
+                                                                                    </a>
+                                                                                </div>
+                                                                            </td>
                                                                             {!isBahanAjar && <td className="px-3 py-2 border">{row_bt.Creator || "-"}</td>}
                                                                             <td className="px-3 py-2 border">{row_bt.CreateAt}</td>
                                                                         </tr>))}
