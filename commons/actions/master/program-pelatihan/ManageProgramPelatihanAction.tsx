@@ -129,7 +129,7 @@ const ManageProgramPelatihanAction: React.FC<{
                 )}
             </AlertDialogTrigger>
 
-            <AlertDialogContent className="max-w-3xl">
+            <AlertDialogContent className="max-w-3xl z-[9999999]">
                 <AlertDialogHeader>
                     <AlertDialogTitle>
                         {isEditMode
@@ -207,7 +207,7 @@ const ManageProgramPelatihanAction: React.FC<{
                     </div>
 
                     {/* Deskripsi */}
-                    <div className="space-y-1">
+                    {/* <div className="space-y-1">
                         <label className="text-sm font-medium text-gray-700">
                             Deskripsi
                         </label>
@@ -217,7 +217,7 @@ const ManageProgramPelatihanAction: React.FC<{
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                         />
-                    </div>
+                    </div> */}
                 </div>
 
                 <AlertDialogFooter>

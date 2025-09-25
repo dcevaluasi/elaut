@@ -25,6 +25,7 @@ import { UPT } from "@/constants/nomenclatures";
 import { DUKUNGAN_PROGRAM_TEROBOSAN, JENIS_PELAKSANAAN, JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN, JENIS_PENILAIAN_PELATIHAN, PENANDATANGAN_SERTIFIKAT, PROGRAM_SISJAMU, RUMPUN_PELATIHAN, SEKTOR_PELATIHAN } from "@/constants/pelatihan";
 import { useFetchDataRumpunPelatihan } from "@/hooks/elaut/master/useFetchDataRumpunPelatihan";
 import { ProgramPelatihan, RumpunPelatihan } from "@/types/program";
+import ManageProgramPelatihanAction from "@/commons/actions/master/program-pelatihan/ManageProgramPelatihanAction";
 
 function FormPelatihan({ edit = false }: { edit: boolean }) {
   const router = useRouter();
@@ -328,33 +329,53 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                           className="block text-gray-600 text-sm font-medium mb-1"
                           htmlFor="asalPesertaPelatihan"
                         >
-                          Program Pelatihan (Klaster {bidangPelatihan}){" "}
+                          Judul/Program Pelatihan (Klaster {bidangPelatihan}){" "}
                           <span className="text-rose-600">*</span>
                         </label>
-                        <Select
-                          value={program}
-                          onValueChange={(value: string) =>
-                            setProgram(value)
-                          }
-                        >
-                          <SelectTrigger className="w-full text-base py-5">
-                            <SelectValue placeholder={`Pilih program klaster ${bidangPelatihan})`} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {
-                              selectedRumpunPelatihan.programs.map((item: ProgramPelatihan) => (
-                                <SelectItem value={item.name_indo}>
+                        <div className="flex flex-row gap-2">
+                          <Select
+                            value={program}
+                            onValueChange={(value: string) => {
+                              if (value === "__add_new__") {
+                                // open your modal instead of setting program
+                                document.getElementById("trigger-add-program")?.click();
+                              } else {
+                                setProgram(value);
+                              }
+                            }}
+                          >
+                            <SelectTrigger className="w-full text-base py-5">
+                              <SelectValue placeholder={`Pilih program klaster ${bidangPelatihan}`} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {selectedRumpunPelatihan.programs.map((item: ProgramPelatihan) => (
+                                <SelectItem
+                                  key={item.id_program_pelatihan}
+                                  value={item.name_indo}
+                                >
                                   {item.name_indo}
                                 </SelectItem>
-                              ))
-                            }
-                          </SelectContent>
-                        </Select>
+                              ))}
+                              {/* Divider */}
+                              <div className="border-t my-2"></div>
+                              {/* Tambah Program as SelectItem */}
+                              <SelectItem value="__add_new__" className="text-gray-500">
+                                ➕ Tambah Program Pelatihan (* Apabila tidak ditemukan program pelatihan yang sesuai)
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+
+                          <ManageProgramPelatihanAction
+                            onSuccess={() => {
+                              fetchRumpunPelatihan();
+                              alert("✅ Program pelatihan berhasil ditambahkan");
+                            }}
+                          />
+                        </div>
+
                       </div>
                     </div>
                   }
-
-
 
                   {/* Harga dan Jenis Pelaksanan Pelatihan */}
                   <div className="flex flex-col gap-2 w-full">
