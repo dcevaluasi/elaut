@@ -135,7 +135,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
     data.append("PemberitahuanDiterima", 'Proses Buka Kelas');
     data.append("AsalPelatihan", asalPelatihan);
     data.append("JenisSertifikat", jenisSertifikat);
-    data.append("TtdSertifikat", bidangPelatihan == "Sistem Jaminan Mutu" ? PENANDATANGAN_SERTIFIKAT[0] : PENANDATANGAN_SERTIFIKAT[1]);
+    data.append("TtdSertifikat", PENANDATANGAN_SERTIFIKAT[1]);
 
     try {
       const response: AxiosResponse = await axios.post(

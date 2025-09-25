@@ -7,10 +7,11 @@ import { Input } from "@/components/ui/input";
 import Cookies from "js-cookie";
 import { useFetchDataProgramPelatihan } from "@/hooks/elaut/master/useFetchDataProgramPelatihan";
 import ManageProgramPelatihanAction from "@/commons/actions/master/program-pelatihan/ManageProgramPelatihanAction";
-import { FiTrash2 } from "react-icons/fi";
+import { FiBookOpen, FiTrash2 } from "react-icons/fi";
 import { elautBaseUrl } from "@/constants/urls";
 import { findNameRumpunPelatihanById } from "@/utils/programs";
 import { useFetchDataRumpunPelatihan } from "@/hooks/elaut/master/useFetchDataRumpunPelatihan";
+import Link from "next/link";
 
 export default function TableProgramPelatihan() {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -80,7 +81,7 @@ export default function TableProgramPelatihan() {
                             <th className="w-40 px-3 py-3 text-center">Nama Indo</th>
                             <th className="w-40 px-3 py-3 text-center">Name English</th>
                             <th className="w-40 px-3 py-3 text-center">Singkatan</th>
-                            <th className="w-40 px-3 py-3 text-center">Description</th>
+                            <th className="w-40 px-3 py-3 text-center">Materi</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -126,7 +127,18 @@ export default function TableProgramPelatihan() {
                                 <td className="px-3 py-2 border text-center">{row.name_indo}</td>
                                 <td className="px-3 py-2 border text-center">{row.name_english}</td>
                                 <td className="px-3 py-2 border text-center">{row.abbrv_name}</td>
-                                <td className="px-3 py-2 border text-center">{row.description}</td>
+                                <td className="px-3 py-2 border text-center">
+                                    <div className="flex flex-row gap-2 h-full items-center justify-center py-2">
+                                        <Link
+                                            href={`/admin/lemdiklat/master/program-pelatihan/materi/${row.name_indo}`}
+                                            target="_blank"
+                                            className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 border group"
+                                        >
+                                            <FiBookOpen className="h-5 w-5 text-blue-500 group-hover:text-white" />
+                                            Materi
+                                        </Link>
+                                    </div>
+                                </td>
                             </tr>
                         })}
                         {paginatedData.length === 0 && (

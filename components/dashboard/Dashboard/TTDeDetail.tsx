@@ -28,6 +28,7 @@ import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/service
 import Link from "next/link";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { MdLock } from "react-icons/md";
+import DialogSertifikatPelatihanSISJAMU from "@/components/sertifikat/dialogSertifikatPelatihanSISJAMU";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -372,13 +373,20 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     </div>
 
                                     {
-                                        !item?.FileSertifikat.includes('signed') && <DialogSertifikatPelatihan
+                                        !item?.FileSertifikat.includes('signed') && data?.BidangPelatihan !== "Sistem Jaminan Mutu" ? <DialogSertifikatPelatihan
+                                            key={item.IdUserPelatihan ?? i}
+                                            ref={refs.current[i]}                 // ✅ pass the ref object directly
+                                            pelatihan={data}
+                                            userPelatihan={item}
+                                            handleFetchingData={fetchData}
+                                        /> : <DialogSertifikatPelatihanSISJAMU
                                             key={item.IdUserPelatihan ?? i}
                                             ref={refs.current[i]}                 // ✅ pass the ref object directly
                                             pelatihan={data}
                                             userPelatihan={item}
                                             handleFetchingData={fetchData}
                                         />
+
                                     }
                                 </>
                             ))}

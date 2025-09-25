@@ -52,9 +52,6 @@ import HistoryButton from "@/commons/actions/HistoryButton";
 import PublishButton from "@/commons/actions/PublishButton";
 import { Button } from "@/components/ui/button";
 import Toast from "@/commons/Toast";
-import { HiMiniArrowUpTray } from "react-icons/hi2";
-import JSZip from "jszip";
-import axios from "axios";
 import ZipPhotoParticipantAction from "@/commons/actions/lemdiklat/ZipPhotoParticipantAction";
 
 interface Props {
@@ -117,7 +114,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                              */}
 
                                             {data.SuratPemberitahuan !== "" && (data.StatusPenerbitan === "0" || data.StatusPenerbitan === "1.2") ? (
-                                                data?.ModuleMateri !== "" && data?.UserPelatihan?.length !== 0 && data?.SuratPemberitahuan !== "" ? (
+                                                data?.UserPelatihan?.length !== 0 && data?.SuratPemberitahuan !== "" ? (
                                                     <SendNoteAction
                                                         idPelatihan={data.IdPelatihan.toString()}
                                                         title="Kirim ke SPV"

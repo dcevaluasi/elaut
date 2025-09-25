@@ -326,3 +326,15 @@ export const years = Array.from(
   { length: 6 },
   (_, i) => new Date().getFullYear() - i,
 )
+
+export function addDays(dateStr: string, days: number): string {
+  const date = new Date(dateStr) // input "YYYY-MM-DD"
+  date.setDate(date.getDate() + days)
+
+  // format back to YYYY-MM-DD
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}

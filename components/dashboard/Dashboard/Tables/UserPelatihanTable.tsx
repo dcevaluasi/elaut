@@ -28,7 +28,14 @@ import {
     AlertDialogCancel,
     AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 import { ArrowUpDown, Check, LucideInfo } from "lucide-react";
 import { PelatihanMasyarakat, UserPelatihan } from "@/types/product";
 import { AiOutlineFieldNumber } from "react-icons/ai";
@@ -61,6 +68,8 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
     data,
     onSuccess
 }) => {
+    const [users, setUsers] = React.useState<UserPelatihan[]>(data);
+
     const handleDeleteCertificateById = async (id: number) => {
         try {
             const token = Cookies.get("XSRF091")
@@ -75,6 +84,46 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
         } catch (error: any) {
         }
     }
+
+    const handleUploadNilaiPeserta = async (
+        id: number,
+        nilaiPretest: string,
+        nilaiPosttest: string
+    ) => {
+        const formData = new FormData();
+        formData.append("PreTest", nilaiPretest);
+        formData.append("PostTest", nilaiPosttest);
+
+        try {
+            await axios.put(
+                `${elautBaseUrl}/lemdik/updatePelatihanUsers?id=${id}`,
+                formData,
+                { headers: { Authorization: `Bearer ${Cookies.get("XSRF091")}` } }
+            );
+
+            Toast.fire({
+                icon: "success",
+                title: "Yeayyy!",
+                text: `Berhasil mengupdate data penilaian!`,
+            });
+
+            setUsers((prev: any[]) =>
+                prev.map((u: any) =>
+                    u.IdUserPelatihan === id
+                        ? { ...u, PreTest: nilaiPretest, PostTest: nilaiPosttest }
+                        : u
+                )
+            );
+        } catch (error) {
+            console.error("ERROR UPDATE PELATIHAN: ", error);
+            Toast.fire({
+                icon: "error",
+                title: "Oopsss!",
+                text: `Gagal mengupdate data penilaian!`,
+            });
+        }
+    };
+
 
     const handleLulusDataPeserta = async (user: UserPelatihan) => {
         try {
@@ -96,14 +145,20 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                 title: 'Yeayyy!',
                 text: `Berhasil meluluskan peserta pelatihan!`,
             });
-            onSuccess()
+            setUsers((prev: any[]) =>
+                prev.map((u: any) =>
+                    u.IdUserPelatihan === user.IdUserPelatihan
+                        ? { ...u, IsActice: user.IsActice == '{PESERTA}{TELAH LULUS}{Has Passed}' ? '{PESERTA}{TELAH MENGIKUTI}{Has Attended}' : '{PESERTA}{TELAH LULUS}{Has Passed}' }
+                        : u
+                )
+            );
         } catch (error) {
             Toast.fire({
                 icon: "error",
                 title: 'Oopsss!',
                 text: `Gagal meluluskan  peserta pelatihan!`,
             });
-            onSuccess()
+
         }
     };
 
@@ -602,56 +657,89 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
         ...(parseInt(pelatihan.StatusPenerbitan) >= 4 ? [
             {
                 accessorKey: "PreTest",
-                header: ({ column }: { column: any }) => {
-                    return (
-                        <Button
-                            variant="ghost"
-                            className={`text-black font-semibold w-full p-0 flex justify-center items-center`}
-                            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                        >
-                            <p className="leading-[105%]"> PreTest</p>
+                header: ({ column }: { column: any }) => (
+                    <Button
+                        variant="ghost"
+                        className="text-black font-semibold w-full p-0 flex justify-center items-center"
+                        onClick={() =>
+                            column.toggleSorting(column.getIsSorted() === "asc")
+                        }
+                    >
+                        <p className="leading-[105%]">PreTest</p>
+                    </Button>
+                ),
+                cell: ({ row }: { row: any }) => {
+                    const user = row.original;
 
-                            <FaEdit className="ml-2 h-4 w-4" />
-                        </Button>
+                    return (
+                        <div className="flex justify-center items-center gap-2">
+                            <p className="text-base font-semibold tracking-tight leading-none">
+                                {user.PreTest}
+                            </p>
+
+                            {/* Dialog untuk edit nilai Pre/Post */}
+                            <UploadNilaiDialog
+                                user={user}
+                                defaultPre={user.PreTest || ""}
+                                defaultPost={user.PostTest || ""}
+                                onSubmit={handleUploadNilaiPeserta}
+                                trigger={
+                                    <Button size="icon" variant="ghost" className="h-6 w-6">
+                                        <FaEdit className="h-4 w-4 text-blue-600" />
+                                    </Button>
+                                }
+                            />
+
+                        </div>
                     );
                 },
-                cell: ({ row }: { row: any }) => (
-                    <div className={`${"ml-0"} text-center capitalize w-full`}>
-                        <p className="text-base font-semibold tracking-tight leading-none">
-                            {row.original.PreTest}
-                        </p>
-                    </div>
-                ),
             },
             {
                 accessorKey: "PostTest",
-                header: ({ column }: { column: any }) => {
-                    return (
-                        <Button
-                            variant="ghost"
-                            className={`text-black font-semibold w-full p-0 flex justify-center items-center`}
-                            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                        >
-                            <p className="leading-[105%]"> PostTest</p>
+                header: ({ column }: { column: any }) => (
+                    <Button
+                        variant="ghost"
+                        className="text-black font-semibold w-full p-0 flex justify-center items-center"
+                        onClick={() =>
+                            column.toggleSorting(column.getIsSorted() === "asc")
+                        }
+                    >
+                        <p className="leading-[105%]">PostTest</p>
+                    </Button>
+                ),
+                cell: ({ row }: { row: any }) => {
+                    const user = row.original;
 
-                            <FaEdit className="ml-2 h-4 w-4" />
-                        </Button>
+                    return (
+                        <div className="flex justify-center items-center gap-2">
+                            <p className="text-base font-semibold tracking-tight leading-none">
+                                {user.PostTest}
+                            </p>
+
+                            <UploadNilaiDialog
+                                user={user}
+                                defaultPre={user.PreTest || ""}
+                                defaultPost={user.PostTest || ""}
+                                onSubmit={handleUploadNilaiPeserta}
+                                trigger={
+                                    <Button size="icon" variant="ghost" className="h-6 w-6">
+                                        <FaEdit className="h-4 w-4 text-blue-600" />
+                                    </Button>
+                                }
+                            />
+
+
+                        </div>
                     );
                 },
-                cell: ({ row }: { row: any }) => (
-                    <div className={`${"ml-0"} text-center capitalize w-full`}>
-                        <p className="text-base font-semibold tracking-tight leading-none">
-                            {row.original.PostTest}
-                        </p>
-                    </div>
-                ),
             },
+
         ] : []),
 
     ];
 
     const table = useReactTable({
-        data,
+        data: users,
         columns,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
@@ -847,5 +935,78 @@ const DetailPesertaDialog = ({ pesertaId, userPelatihanId }: { pesertaId: number
         </AlertDialogContent>
     );
 }
+
+type UploadNilaiDialogProps = {
+    user: UserPelatihan;
+    defaultPre?: string;
+    defaultPost?: string;
+    onSubmit: (id: number, pre: string, post: string) => Promise<void>;
+    trigger: React.ReactNode;
+};
+
+const UploadNilaiDialog: React.FC<UploadNilaiDialogProps> = ({
+    user,
+    defaultPre = "",
+    defaultPost = "",
+    onSubmit,
+    trigger
+}) => {
+    const [pre, setPre] = React.useState(defaultPre);
+    const [post, setPost] = React.useState(defaultPost);
+    const [loading, setLoading] = React.useState(false);
+
+    const handleSave = async () => {
+        setLoading(true);
+        await onSubmit(user?.IdUserPelatihan, pre, post);
+        setLoading(false);
+    };
+
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                {trigger}
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Input Nilai {user?.Nama}</DialogTitle>
+                </DialogHeader>
+
+                <div className="flex flex-col gap-3">
+                    <div>
+                        <label className="text-sm font-medium">Pre Test</label>
+                        <input
+                            type="number"
+                            value={pre}
+                            onChange={(e) => setPre(e.target.value)}
+                            className="w-full rounded-md border p-2 text-sm"
+                            placeholder="Nilai PreTest"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="text-sm font-medium">Post Test</label>
+                        <input
+                            type="number"
+                            value={post}
+                            onChange={(e) => setPost(e.target.value)}
+                            className="w-full rounded-md border p-2 text-sm"
+                            placeholder="Nilai PostTest"
+                        />
+                    </div>
+                </div>
+
+                <DialogFooter>
+                    <Button
+                        onClick={handleSave}
+                        disabled={loading}
+                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                        {loading ? "Menyimpan..." : "Simpan"}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+};
 
 export default UserPelatihanTable;

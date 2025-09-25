@@ -32,6 +32,7 @@ import { PassedParticipantAction } from "@/commons/actions/lemdiklat/PassedParti
 import ReviseCertificateAction from "@/commons/actions/ReviseCertificateAction";
 import HistoryButton from "@/commons/actions/HistoryButton";
 import { DialogDevSTTPL } from "@/components/sertifikat/dialogDevSTTPL";
+import { truncateText } from "@/utils";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -42,9 +43,6 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
     const { label, color, icon } = getStatusInfo(data.StatusPenerbitan)
     const { adminPusatData, loading, error, fetchAdminPusatData } = useFetchDataPusatById(data?.VerifikatorPelatihan)
 
-    /**
-      * Zip Download Processing
-      */
     const [isZipping, setIsZipping] = React.useState(false)
     const handleDownloadZip = async () => {
         setIsZipping(true)
@@ -83,7 +81,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     <>
 
                                         {/* (5) Operator : Send Penerbitan STTPL */}
-                                        {["5"].includes(data.StatusPenerbitan) && data?.DeskripsiSertifikat !== "" && (
+                                        {["5"].includes(data.StatusPenerbitan) && (
                                             <SendNoteAction
                                                 idPelatihan={data.IdPelatihan.toString()}
                                                 title="Ajukan Penerbitan STTPL"
@@ -97,7 +95,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             />
                                         )}
 
-                                        {(data.StatusPenerbitan == "5" && data?.DeskripsiSertifikat == "") && <p className="text-gray-600 text-sm">Harap Mengatur Format Sertifikat Terlebih Dahulu Untuk Melanjutkan Proses Berikutnya!</p>}
+                                        {/* {(data.StatusPenerbitan == "5" && data?.DeskripsiSertifikat == "") && <p className="text-gray-600 text-sm">Harap Mengatur Format Sertifikat Terlebih Dahulu Untuk Melanjutkan Proses Berikutnya!</p>} */}
 
                                         {/* (7) | (9) Operator : Send to Verifikator After Reject */}
                                         {
@@ -202,7 +200,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 }
                                                 buttonLabel="Approve Penerbitan"
                                                 icon={TbPencilCheck}
-                                                buttonColor="green"
+                                                buttonColor="teal"
                                                 onSuccess={fetchData}
                                                 status={data?.TtdSertifikat == ESELON_1.fullName ? "12" : "10"}
                                                 pelatihan={data}
@@ -264,7 +262,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 data?.BeritaAcara != "" && <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
                                                     <span className="text-xs font-medium text-gray-500">Dokumen Penerbitan STTPL</span>
                                                     <Link target="_blank" href={`${urlFileBeritaAcara}/${data?.BeritaAcara}`} className="text-sm font-semibold text-blue-500 mt-1 underline">
-                                                        Lihat Dokumen
+                                                        {urlFileBeritaAcara}/{data?.BeritaAcara != '' ? truncateText(data?.BeritaAcara, 5, '...') : "-"}
                                                     </Link>
                                                 </div>
                                             }
@@ -297,7 +295,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                 </div>
 
                 {
-                    Cookies.get('Role')?.includes(data?.TtdSertifikat) && Cookies.get('Access')?.includes('isSigning') && (parseInt(data.StatusPenerbitan) >= 10 && parseInt(data.StatusPenerbitan) <= 15) && <TTDeDetail data={data} fetchData={fetchData} />
+                    Cookies.get('Role')?.includes(data?.TtdSertifikat) && Cookies.get('Access')?.includes('isSigning') && (parseInt(data.StatusPenerbitan) >= 7 && parseInt(data.StatusPenerbitan) <= 15) && <TTDeDetail data={data} fetchData={fetchData} />
                 }
 
                 {
@@ -307,7 +305,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                 {
                     !Cookies.get('Access')?.includes('isSigning') &&
                     <>
-                        <AccordionSection title="📑 Format Sertifikat">
+                        {/* <AccordionSection title="📑 Format Sertifikat">
                             <div className="flex flex-col w-full gap-4">
                                 <>
                                     <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
@@ -436,7 +434,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 </>
                             </div>
 
-                        </AccordionSection>
+                        </AccordionSection> */}
 
                         <AccordionSection title="👥 Peserta Pelatihan">
                             <div className="flex flex-col w-full gap-4">

@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { useState } from "react";
 import TableData from "@/commons/TableData";
 import {
   AlertDialog,
@@ -19,65 +19,43 @@ import {
   VisibilityState,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import {
   ArrowUpDown,
-  Edit3Icon,
   LucideInfo,
-  LucideListChecks,
-  Trash,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  TbBroadcast,
-  TbChartBubble,
-  TbChartDonut,
   TbDatabaseEdit,
   TbEditCircle,
-  TbFileCertificate,
-  TbFileExcel,
-  TbFileStack,
-  TbRubberStamp,
-  TbSchool,
   TbSignature,
-  TbTargetArrow,
 } from "react-icons/tb";
 
 import { usePathname, useRouter } from "next/navigation";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import { Pelatihan, PelatihanMasyarakat, UserPelatihan } from "@/types/product";
+import { PelatihanMasyarakat, UserPelatihan } from "@/types/product";
 import axios, { AxiosResponse } from "axios";
-import { extractLastSegment, truncateText } from "@/utils";
+import { extractLastSegment } from "@/utils";
 import {
-  HiMiniArrowUpTray,
-  HiMiniNewspaper,
   HiMiniUserGroup,
-  HiOutlineDocument,
   HiOutlineEye,
-  HiOutlineUserGroup,
-  HiTrash,
   HiUserGroup,
 } from "react-icons/hi2";
 import Link from "next/link";
-import { FaRegFolderOpen, FaRegIdCard, FaRupiahSign, FaTrash } from "react-icons/fa6";
+import { FaRegIdCard, } from "react-icons/fa6";
 import Toast from "@/commons/Toast";
 import Cookies from "js-cookie";
-import { PiMicrosoftExcelLogoFill, PiSignature } from "react-icons/pi";
+import { PiSignature } from "react-icons/pi";
 import { User } from "@/types/user";
 import { decryptValue, encryptValue, formatToRupiah } from "@/lib/utils";
 import { elautBaseUrl } from "@/constants/urls";
-import { generateTanggalPelatihan } from "@/utils/text";
 import { DIALOG_TEXTS } from "@/constants/texts";
-import { countUserWithCertificate, countUserWithDraftCertificate, countUserWithNonELAUTCertificate, countUserWithNoSertifikat, countUserWithPassed, countUserWithSpesimenTTD, countUserWithTanggalSertifikat, countValidKeterangan } from "@/utils/counter";
-
+import { countUserWithCertificate, countUserWithNoSertifikat, countUserWithPassed, countUserWithSpesimenTTD, countUserWithTanggalSertifikat, countValidKeterangan } from "@/utils/counter";
 import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
-import { downloadAndZipPDFs } from "@/utils/file";
 import { AiOutlineFieldNumber } from "react-icons/ai";
-import JSZip from "jszip";
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { generatedStatusCertificate } from "@/utils/certificates";
@@ -282,50 +260,8 @@ const TableDataPesertaPelatihan = () => {
     setOpenFormValidasiDataPesertaPelatihan,
   ] = React.useState<boolean>(false);
 
-
   const [openFormSematkanTanggalSertifikat, setOpenFormSematkanTanggalSertifikat] = React.useState<boolean>(false)
   const [openFormSematkanSpesimenSertifikat, setOpenFormSematkanSpesimenSertifikat] = React.useState<boolean>(false)
-
-  const handleTTDeById = async (idUserPelatihan: string, passphrase: string) => {
-    if (!passphrase) {
-      Toast.fire({
-        icon: "error",
-        text: "Harap memasukkan passphrase!",
-        title: `Tidak ada passphrase`,
-      });
-      return;
-    }
-
-    try {
-      const response = await axios.post(
-        elautBaseUrl + "/lemdik/sendSertifikatTtdeById",
-        {
-          id_user_pelatihan: idUserPelatihan.toString(),
-          kodeParafrase: passphrase,
-          nik: Cookies.get("NIK"),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
-          },
-        }
-      );
-
-      console.log({ response })
-
-      Toast.fire({
-        icon: "success",
-        text: "Berhasil melakukan penandatangan sertifikat revisi!",
-        title: `Berhasil TTDe`,
-      });
-
-      handleFetchingPublicTrainingDataById();
-    } catch (error) {
-      console.log({ error })
-      handleFetchingPublicTrainingDataById();
-    }
-  };
-
 
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -514,6 +450,7 @@ const TableDataPesertaPelatihan = () => {
   const handleUploadNilaiPeserta = async (id: number) => {
     const formData = new FormData();
     formData.append("PreTest", nilaiPretest);
+    formData.append("PostTest", nilaiPosttest);
 
     try {
       const response = await axios.put(
@@ -543,135 +480,6 @@ const TableDataPesertaPelatihan = () => {
     }
   };
 
-  const [fileExcelPesertaPelatihan, setFileExcelPesertaPelatihan] =
-    React.useState<File | null>(null);
-
-
-  /**
-    * Zip Download Processing
-    */
-  const [isZipping, setIsZipping] = React.useState(false)
-  const handleDownloadZip = async () => {
-    setIsZipping(true)
-    try {
-      await downloadAndZipPDFs(
-        data,
-        `(${dataPelatihan!.Program}) ${dataPelatihan!.PenyelenggaraPelatihan} - ${generateTanggalPelatihan(dataPelatihan!.TanggalMulaiPelatihan)} - ${generateTanggalPelatihan(dataPelatihan!.TanggalBerakhirPelatihan)}`,
-      )
-    } catch (err) {
-      console.error('Download failed:', err)
-    } finally {
-      setIsZipping(false)
-    }
-  }
-
-  /**
-   * Zip Uploading Processing
-   */
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [isUploading, setIsUploading] = useState(false)
-  const handleZipUpload = async (zipFile: File, users: UserPelatihan[]) => {
-    const zip = new JSZip();
-    const zipContent = await zip.loadAsync(zipFile);
-
-    if (!zipFile.name.toLowerCase().endsWith(".zip")) {
-      alert("Please upload a valid .zip file");
-      return;
-    }
-
-
-    for (const fileName of Object.keys(zipContent.files)) {
-      const file = zipContent.files[fileName];
-      if (file.dir) continue; // ⬅️ skip directories
-
-      const baseName = fileName.split("/").pop();
-      if (!baseName) continue;
-
-      const ext = baseName.split(".").pop()?.toLowerCase();
-      if (!["jpg", "jpeg", "png"].includes(ext || "")) continue;
-
-      const id = parseInt(baseName.replace(/\.[^/.]+$/, ""), 10);
-      if (isNaN(id)) continue;
-
-      const matchedUser = users.find((user) => user.IdUsers === id);
-      if (!matchedUser) {
-        console.warn(`⚠️ No user matched for file: ${fileName}`);
-        continue;
-      }
-
-      try {
-        // 👇 safer extraction
-        const fileBlob = await file.async("blob");
-
-        const formData = new FormData();
-        formData.append("Fotos", fileBlob, baseName);
-        formData.append("Ktps", "");
-        formData.append("KKs", "");
-        formData.append("Ijazahs", "");
-        formData.append("SuratKesehatans", "");
-
-        const response = await axios.put(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/users/updateUsersNoJwt?id=${id}`,
-          formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
-        );
-        console.log(`✅ Uploaded for user ID ${id}`, response.data);
-      } catch (err) {
-        console.error(`❌ Failed extracting file ${fileName}`, err);
-      }
-    }
-
-  }
-  const handleSubmitZipUpload = async () => {
-    if (!selectedFile) return
-    setIsUploading(true)
-    try {
-      await handleZipUpload(selectedFile, data)
-    } finally {
-      setIsUploading(false)
-      setSelectedFile(null)
-    }
-  }
-
-  /**
-  * Delete Draft Certificates
-  */
-  const handleDeleteDraftCertificate = async (id_pelatihan: number) => {
-    try {
-      const token = Cookies.get("XSRF091")
-      const response = await axios.put(
-        `${elautBaseUrl}/deleteSertifikatFiles`,
-        {},
-        {
-          params: { id_pelatihan },
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-
-
-      Toast.fire({
-        icon: "success",
-        title: "Yeayyy!!",
-        text: `Berhasil menghapus draft sertifikat!`,
-      });
-      handleFetchingPublicTrainingDataById()
-    } catch (error: any) {
-      console.error({ error })
-      console.error("Error deleting draft certificate:", error.response?.data || error.message)
-      Toast.fire({
-        icon: "error",
-        title: "Upsss!!",
-        text: `Gagal menghapus draft sertifikat!`,
-      });
-      handleFetchingPublicTrainingDataById()
-    }
-  }
-
-  /**
-  * Handling Revisi Sertifikat
-  */
   const handleReviseCertificate = async (id_pelatihan: number) => {
     try {
       const token = Cookies.get("XSRF091")
@@ -704,43 +512,6 @@ const TableDataPesertaPelatihan = () => {
       handleFetchingPublicTrainingDataById()
     }
   }
-
-  /**
- * Handling Delete Sertifikat
- */
-  const handleDeleteCertificateById = async (id: number) => {
-    try {
-      const token = Cookies.get("XSRF091")
-      const updateData = new FormData()
-      updateData.append('IsRevisi', '1')
-
-      const response = await axios.delete(
-        `${elautBaseUrl}/deleteSertifikatTTde?id=${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-
-      Toast.fire({
-        icon: "success",
-        title: "Yeayyy!!",
-        text: `Berhasil menghapus file sertifikat yang telah terbit, silahkan perbaiki kesalahan dan ajukan kembali draft sertifikat!`,
-      });
-      handleFetchingPublicTrainingDataById()
-    } catch (error: any) {
-      Toast.fire({
-        icon: "error",
-        title: "Upssss!!",
-        text: `Gagal menghapus file sertifikat yang telah terbit, silahkan perbaiki kesalahan dan ajukan kembali draft sertifikat!`,
-      });
-      handleFetchingPublicTrainingDataById()
-    }
-  }
-
-
-
   return (
     <div className="">
       <div className="flex flex-col w-full">
@@ -837,146 +608,11 @@ const TableDataPesertaPelatihan = () => {
               </fieldset>
             </AlertDialogContent>
           </AlertDialog>
-
-
-          <AlertDialog open={openFormValidasiDataPesertaPelatihan}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle className="flex items-center gap-2">
-                  {DIALOG_TEXTS['Validasi Grouping Peserta'].title}
-                </AlertDialogTitle>
-                <AlertDialogDescription className="-mt-2">
-                  {DIALOG_TEXTS['Validasi Grouping Peserta'].desc}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <fieldset>
-                <form autoComplete="off">
-                  <AlertDialogFooter className="mt-3">
-                    {
-                      isIteratingProcess ? <AlertDialogAction
-                        className="bg-green-500 hover:bg-green-600"
-                        disabled
-                      >
-                        Sedang diproses...
-                      </AlertDialogAction> : <>
-                        <AlertDialogCancel
-                          onClick={(e) =>
-                            setOpenFormValidasiDataPesertaPelatihan(
-                              !openFormValidasiDataPesertaPelatihan
-                            )
-                          }
-                        >
-                          Cancel
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                          className="bg-green-500 hover:bg-green-600"
-                          onClick={(e) =>
-                            handleValidDataPesertaPelatihan()
-                          }
-                        >
-                          Validasi
-                        </AlertDialogAction></>
-                    }
-                  </AlertDialogFooter>
-                </form>
-              </fieldset>
-            </AlertDialogContent>
-          </AlertDialog>
-
-          <AlertDialog open={openFormDeleteFileSertifikat}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle className="flex items-center gap-2">
-                  {DIALOG_TEXTS['Hapus File Sertifikat'].title}
-                </AlertDialogTitle>
-                <AlertDialogDescription className="-mt-2">
-                  {DIALOG_TEXTS['Hapus File Sertifikat'].desc}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <fieldset>
-                <form autoComplete="off">
-                  <AlertDialogFooter className="mt-3">
-                    {
-                      isDeletingFileSertifikat ? <AlertDialogAction
-                        className="bg-red-500 hover:bg-red-600"
-                        disabled
-                      >
-                        Sedang diproses...
-                      </AlertDialogAction> : <>
-                        <AlertDialogCancel
-                          onClick={(e) =>
-                            setOpenFormDeleteFileSertifikat(
-                              false
-                            )
-                          }
-                        >
-                          Cancel
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                          className="bg-red-500 hover:bg-red-600"
-                          onClick={(e) =>
-                            handleDeleteFileSertifikat()
-                          }
-                        >
-                          Hapus Draft File Sertifikat
-                        </AlertDialogAction></>
-                    }
-                  </AlertDialogFooter>
-                </form>
-              </fieldset>
-            </AlertDialogContent>
-          </AlertDialog>
         </>
       }
 
       <div className="w-full pb-8">
-        {(dataPelatihan !== null && data !== null) && <div className="flex w-full items-center mb-2">
 
-          {
-            usePathname().includes('lemdiklat') && data!.length > 0 && countValid != data!.length && <div className="w-full flex justify-end gap-2">
-              <div
-                onClick={(e) => {
-                  setOpenFormValidasiDataPesertaPelatihan(true)
-                }}
-                className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
-              >
-                <TbEditCircle />
-
-                Validasi Data Peserta
-              </div>
-            </div>
-          }
-
-          {
-            usePathname().includes('lemdiklat') && countPinnedCertificateDate != data!.length && dataPelatihan!.NoSertifikat != '' && countPinnedCertificateNumber == data!.length && <div className="w-full flex justify-end gap-2">
-              <div
-                onClick={(e) => {
-                  setOpenFormSematkanTanggalSertifikat(true)
-                }}
-                className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
-              >
-                <TbEditCircle />
-
-                Sematkan Tanggal Sertifikat Peserta
-              </div>
-            </div>
-          }
-
-          {
-            usePathname().includes('lemdiklat') && countPinnedCertificateSpesimen != data!.length && dataPelatihan!.NoSertifikat != '' && countPinnedCertificateDate == data!.length && <div className="w-full flex justify-end gap-2">
-              <div
-                onClick={(e) => {
-                  setOpenFormSematkanSpesimenSertifikat(true)
-                }}
-                className="inline-flex gap-2 px-3 text-sm items-center rounded-md bg-whiter p-1.5  cursor-pointer"
-              >
-                <PiSignature />
-                Sematkan Spesimen TTD
-              </div>
-            </div>
-          }
-        </div>
-        }
         <div className='w-full gap-0'>
           <div className=" w-full">
             <div className="w-full border border-gray-200 rounded-xl">
@@ -987,147 +623,6 @@ const TableDataPesertaPelatihan = () => {
               </div>
               <table className="w-full">
                 <tr className="flex w-fit items-center justify-start p-2 gap-2">
-
-
-                  {/* Upload Zip Foto Participants And Before Draft All Certificates */}
-                  {(Cookies.get('Access')?.includes('createCertificates') && countUserWithCertificate(data) != data.length) && (
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <button
-                          type="button"
-                          className="flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border bg-blue-500 text-white 
-                     hover:bg-blue-600 transition-colors shadow-sm w-fit flex-shrink-0"
-                        >
-                          <HiMiniArrowUpTray className="w-4 h-4 inline" />
-                          <span>Upload Zip Foto</span>
-                        </button>
-                      </AlertDialogTrigger>
-
-                      <AlertDialogContent className="max-w-md rounded-2xl shadow-xl">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle className="text-lg font-semibold text-gray-800">
-                            Upload Folder Foto Peserta
-                          </AlertDialogTitle>
-                          <AlertDialogDescription className="text-gray-500">
-                            Silakan pilih file <span className="font-medium">.zip</span> berisi foto peserta dengan format{" "}
-                            <code>IDPeserta.formatfile</code>.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-
-                        {/* File Upload Box */}
-                        <label
-                          htmlFor="zip-upload"
-                          className="mt-4 flex flex-col items-center justify-center w-full h-32 border-2 border-dashed 
-                     border-gray-300 rounded-xl cursor-pointer hover:border-green-500 
-                     transition-colors bg-gray-50"
-                        >
-                          <HiMiniArrowUpTray className="w-8 h-8 text-gray-400 mb-2 group-hover:text-green-500" />
-                          <span className="text-sm text-gray-600">
-                            {selectedFile ? selectedFile.name : "Klik untuk memilih file ZIP"}
-                          </span>
-                          <span className="text-xs text-gray-400">atau drag & drop di sini</span>
-                          <input
-                            id="zip-upload"
-                            type="file"
-                            accept=".zip"
-                            className="hidden"
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                              const file = e.target.files?.[0]
-                              if (file) setSelectedFile(file)
-                            }}
-                          />
-                        </label>
-
-                        <AlertDialogFooter className="mt-6">
-                          <AlertDialogCancel className="rounded-lg">Batal</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={handleSubmitZipUpload}
-                            disabled={!selectedFile || isUploading}
-                            className="bg-green-500 hover:bg-green-600 text-white rounded-lg inline-flex items-center gap-2"
-                          >
-                            {isUploading ? (
-                              <span className="flex items-center gap-2">
-                                <svg
-                                  className="animate-spin h-4 w-4 text-white"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <circle
-                                    className="opacity-25"
-                                    cx="12"
-                                    cy="12"
-                                    r="10"
-                                    stroke="currentColor"
-                                    strokeWidth="4"
-                                  ></circle>
-                                  <path
-                                    className="opacity-75"
-                                    fill="currentColor"
-                                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                                  ></path>
-                                </svg>
-                                Mengupload...
-                              </span>
-                            ) : (
-                              "Simpan"
-                            )}
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  )}
-
-                  {/* Delete Draft Certificates */}
-                  {(Cookies.get('Access')?.includes('deleteCertificates') &&
-                    (countUserWithDraftCertificate(data) > 0 && countUserWithDraftCertificate(data) <= data.length)) && (
-                      <div className="w-full flex justify-end gap-2">
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <button
-                              type="button"
-                              className="flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border bg-rose-500 text-white 
-              hover:bg-rose-600 transition-colors shadow-sm w-fit flex-shrink-0"
-                            >
-                              <HiTrash />
-                              Hapus Draft
-                            </button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Yakin ingin menghapus?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Tindakan ini akan menghapus semua draft sertifikat pada pelatihan ini. Proses ini tidak bisa dibatalkan.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Batal</AlertDialogCancel>
-                              <AlertDialogAction
-                                className="bg-rose-500 text-white hover:bg-rose-600"
-                                onClick={() => handleDeleteDraftCertificate(parseInt(id))}
-                              >
-                                Hapus
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    )}
-
-                  {/* Download Zip Certificates After Signed */}
-                  {countUserWithCertificate(data) == data.length && <Button
-                    onClick={handleDownloadZip}
-                    disabled={isZipping}
-                    className={`flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border bg-teal-500 text-white 
-                     hover:bg-teal-600 transition-colors w-fit shadow-sm flex-shrink-0`}
-                  >
-                    <FaRegFolderOpen className="h-4 w-4" />
-                    <span className="text-sm">
-                      {isZipping ? 'Zipping & Downloading...' : 'Download Zip Sertifikat'}
-                    </span>
-                  </Button>
-                  }
-
                   {/* Update Certificates */}
                   {(Cookies.get('Access')?.includes('updateCertificates') && countUserWithCertificate(data) == data.length && dataPelatihan?.IsRevisi != "1") && (
                     <div className="w-full flex justify-end gap-2">
@@ -1213,80 +708,5 @@ const TableDataPesertaPelatihan = () => {
     </div>
   );
 };
-
-const TTDRevisiButton = ({ row, handleTTDeSertifikat }: { row: any, handleTTDeSertifikat: any }) => {
-  const [passphrase, setPassphrase] = React.useState("")
-  const [isShowPassphrase, setIsShowPassphrase] = React.useState(false)
-
-  return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button className="w-full flex gap-2 items-center justify-center h-9 px-4 py-3 rounded-md text-sm font-medium transition-colors bg-teal-600 text-white border border-teal-600 shadow-sm hover:bg-teal-700 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-teal-500">
-          <TbSignature className="h-4 w-4" />
-          <span className="text-sm">TTDe Sertifikat</span>
-        </Button>
-      </AlertDialogTrigger>
-
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <div className="flex flex-col gap-1">
-            <AlertDialogTitle className="flex items-center gap-2">
-              <TbSignature className="text-3xl" />
-              Passphrase
-            </AlertDialogTitle>
-            <p className="-mt-1 text-gray-500 text-sm leading-[110%]">
-              Masukkan passphrase anda untuk melanjutkan proses
-              penandatanganan sertifikat revisi.
-            </p>
-          </div>
-        </AlertDialogHeader>
-
-        <fieldset>
-          <form autoComplete="off">
-            <div className="flex flex-wrap -mx-3 mb-1 -mt-2">
-              <div className="w-full px-3">
-                <label className="block text-gray-800 text-sm font-medium mb-1">
-                  Passphrase
-                </label>
-                <div className="flex gap-1">
-                  <span className="relative w-full h-fit">
-                    <input
-                      type={isShowPassphrase ? "text" : "password"}
-                      className="text-black h-10 text-base flex items-center w-full border border-neutral-200 rounded-md px-3"
-                      required
-                      autoComplete="off"
-                      value={passphrase}
-                      onChange={(e) => setPassphrase(e.target.value)}
-                    />
-                    <span
-                      onClick={() => setIsShowPassphrase(!isShowPassphrase)}
-                    >
-                      {isShowPassphrase ? (
-                        <HiOutlineEyeOff className="absolute right-3 top-2.5 text-gray-500 text-xl cursor-pointer" />
-                      ) : (
-                        <HiOutlineEye className="absolute right-3 top-2.5 text-gray-500 text-xl cursor-pointer" />
-                      )}
-                    </span>
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <AlertDialogFooter className="mt-3">
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() =>
-                  handleTTDeSertifikat(row.original.IdUserPelatihan, passphrase)
-                }
-              >
-                Tanda Tangan
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </form>
-        </fieldset>
-      </AlertDialogContent>
-    </AlertDialog>
-  )
-}
 
 export default TableDataPesertaPelatihan;
