@@ -134,6 +134,18 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
                 </Link>
               </p>
             )}
+            <p className="text-xs text-gray-500 mt-1">
+              Format Surat Pemberitahuan Pelatihan:{" "}
+              <Link
+                href={`https://drive.google.com/file/d/1UgueTM2mgScHViD7IZAXiNIyzSKYXTQo/view?usp=sharing`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 underline"
+              >
+                https://drive.google.com/file/d/1UgueTM2mgScHViD7IZAXiNIyzSKYXTQo/view?usp=sharing
+              </Link>
+            </p>
+
           </div>
 
           <AlertDialogFooter className="mt-4">
@@ -149,8 +161,7 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
         (pelatihan.StatusPenerbitan === "0" || pelatihan.StatusPenerbitan === "3" || pelatihan.StatusPenerbitan === "1.2") && (
           <Button
             onClick={() => setIsOpen(true)}
-            variant="outline"
-            className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-neutral-500 text-neutral-500 hover:text-white hover:bg-neutral-500"
+            className="flex items-center gap-2 border w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-neutral-600 text-neutral-500 hover:text-white hover:bg-neutral-500"
           >
             <FiUploadCloud className="h-5 w-5" /> {pelatihan?.SuratPemberitahuan != "" ? 'Edit' : 'Upload'} Surat Pemberitahuan
           </Button>

@@ -20,11 +20,13 @@ import Cookies from "js-cookie";
 import Toast from "@/commons/Toast";
 import { elautBaseUrl } from "@/constants/urls";
 import { Editor } from "@tinymce/tinymce-react";
+import { PelatihanMasyarakat } from "@/types/product";
 
 interface EditPublishActionProps {
     idPelatihan: string;
     currentDetail?: string;
     currentFoto?: string;
+    currentData?: PelatihanMasyarakat;
     tanggalPendaftaran?: string[];
     onSuccess?: () => void;
 }
@@ -33,6 +35,7 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
     idPelatihan,
     currentDetail,
     currentFoto,
+    currentData,
     tanggalPendaftaran,
     onSuccess,
 }) => {
@@ -41,7 +44,8 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
     const [tanggalAkhir, setTanggalAkhir] = useState(tanggalPendaftaran![1] || "");
     const [detailPelatihan, setDetailPelatihan] = useState(currentDetail || "");
     const [fotoPelatihan, setFotoPelatihan] = useState<File | null>(null);
-    const [kuotaPelatihan, setKuotaPelatihan] = useState("")
+    const [kuotaPelatihan, setKuotaPelatihan] = useState(currentData?.KoutaPelatihan || "")
+    const [asalPelatihan, setAsalPelatihan] = useState(currentData?.AsalPelatihan || "No Mandiri")
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async () => {
@@ -59,6 +63,7 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
         if (tanggalAkhir) formData.append("TanggalAkhirPendaftaran", tanggalAkhir);
         if (detailPelatihan) formData.append("DetailPelatihan", detailPelatihan);
         if (fotoPelatihan) formData.append("photo_pelatihan", fotoPelatihan);
+        formData.append("AsalPelatihan", asalPelatihan);
         formData.append("KoutaPelatihan", kuotaPelatihan)
 
         try {
@@ -97,7 +102,7 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
             <AlertDialogTrigger asChild>
                 <Button
                     variant="outline"
-                    className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-teal-500 text-teal-500 hover:text-white hover:bg-teal-500"
+                    className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-indigo-500 text-indigo-500 hover:text-white hover:bg-indigo-500"
                 >
                     <TbEditCircle className="h-5 w-5" />
                     <span>Edit Informasi Publish</span>
@@ -112,15 +117,15 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 
-                <div className="space-y-4 py-2">
-                    <div className="flex gap-2 w-full">
+                <div className="space-y-1">
+                    <div className=" gap-2 w-full grid grid-cols-3">
                         <div className="space-y-2 w-full">
                             <label className="text-sm font-medium text-gray-700">
                                 Tanggal Mulai Pendaftaran
                             </label>
                             <input
                                 type="date"
-                                className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                                className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                                 value={tanggalMulai}
                                 onChange={(e) => setTanggalMulai(e.target.value)}
                             />
@@ -132,27 +137,24 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
                             </label>
                             <input
                                 type="date"
-                                className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                                className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                                 value={tanggalAkhir}
                                 onChange={(e) => setTanggalAkhir(e.target.value)}
                             />
                         </div>
-                    </div>
 
-                    <div className="flex gap-2 w-full">
                         <div className="space-y-2 w-full">
                             <label className="text-sm font-medium text-gray-700">
                                 Informasi Kuota Pelatihan
                             </label>
                             <input
                                 type="text"
-                                className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                                className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                                 value={kuotaPelatihan}
                                 onChange={(e) => setKuotaPelatihan(e.target.value)}
                             />
                         </div>
                     </div>
-
                     {/* Detail Pelatihan */}
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-gray-700">
@@ -185,9 +187,9 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
                         </label>
                         <label
                             htmlFor="fileUpload"
-                            className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl p-6 cursor-pointer bg-gray-50 hover:border-teal-500 hover:bg-teal-50 transition"
+                            className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl p-6 cursor-pointer bg-gray-50 hover:border-indigo-500 hover:bg-indigo-50 transition"
                         >
-                            <FiUploadCloud className="h-10 w-10 text-teal-500 mb-2" />
+                            <FiUploadCloud className="h-10 w-10 text-indigo-500 mb-2" />
                             <span className="text-sm text-gray-700">
                                 {fotoPelatihan
                                     ? fotoPelatihan.name
@@ -213,7 +215,7 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
                                     href={currentFoto}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-teal-600 underline"
+                                    className="text-indigo-600 underline"
                                 >
                                     Lihat Foto
                                 </a>
@@ -222,15 +224,34 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
                     </div>
                 </div>
 
+                <div className="flex items-center gap-2">
+                    <input
+                        id="isSpecific"
+                        type="checkbox"
+                        checked={asalPelatihan === "Mandiri"}
+                        onChange={(e) =>
+                            setAsalPelatihan(e.target.checked ? "Mandiri" : "No Mandiri")
+                        }
+                        className="h-4 w-4 rounded border-gray-300 text-navy-600 focus:ring-navy-500"
+                    />
+                    <div className="flex flex-col">
+                        <p className="text-sm text-gray-400">
+                            Apabila proses pencarian calon peserta pelatihan tidak hanya dilakukan dengan mengimport data namun melalui kanal E-LAUT, maka ceklist
+                        </p>
+                    </div>
+
+                </div>
+
                 <AlertDialogFooter>
                     <AlertDialogCancel disabled={loading}>Batal</AlertDialogCancel>
-                    <AlertDialogAction
+                    <Button
                         onClick={handleSubmit}
-                        className="bg-teal-600 hover:bg-teal-700 text-white"
+                        variant="outline"
+                        className="bg-indigo-500 hover:bg-indigo-500 text-indigo-500 border-indigo-500 hover:text-white"
                         disabled={loading}
                     >
                         {loading ? "Menyimpan..." : "Simpan Perubahan"}
-                    </AlertDialogAction>
+                    </Button>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

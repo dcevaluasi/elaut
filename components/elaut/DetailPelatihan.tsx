@@ -119,7 +119,7 @@ const DetailPelatihan: React.FC<DetailPelatihanProps> = ({
             </div>
 
             {/* Register Button */}
-            {(!isRegistrasi && !isMoreThanToday(data?.TanggalAkhirPendaftaran)) && (
+            {(!isRegistrasi && !isMoreThanToday(data?.TanggalAkhirPendaftaran)) && data?.AsalPelatihan == "Mandiri" && (
               <div className="mt-8">
                 {!Cookies.get("XSRF081") ? (
                   <>

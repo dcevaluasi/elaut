@@ -307,7 +307,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                         </div>
                         <div className="-translate-y-1.5 pb-8 text-slate-600">
                             <p className=" text-base font-bold text-slate-800 antialiased dark:text-white mt-2">📌 Informasi Kelas Pelatihan</p>
-                            <small className="my-2 pb-4 text-sm text-slate-600 antialiased">Dalam proses ini kamu dapat melihat informasi pelatihan yang akan diselenggarakan, pastikan data yang tertera sudah sesuai apabila terdapat penyesuaian, dapat mengklik tombol <b>Edit Informasi Pelatihan</b> untuk mengedit data. Dalam proses ini kamu juga dapat menghapus kelas pelatihan dengan mengklik tombol <b>Hapus Pelatihan</b> dengan kondisi kelas sedang tidak dipublish atau telah dikirimkan ke SPV.</small><AccordionSection title="Informasi Umum Pelatihan">
+                            <small className="my-2 pb-4 text-sm text-slate-600 antialiased">Dalam proses ini kamu dapat melihat informasi pelatihan yang akan diselenggarakan, pastikan data yang tertera sudah sesuai apabila terdapat penyesuaian, dapat mengklik tombol <b>Edit Informasi Pelatihan</b> untuk mengedit data. Dalam proses ini kamu juga dapat menghapus kelas pelatihan dengan mengklik tombol <b>Hapus Pelatihan</b> dengan kondisi kelas sedang tidak dipublish, belum dikirimkan ke SPV, dan belum ada data peserta yang diinput.</small><AccordionSection title="Informasi Umum Pelatihan">
                                 <div className="flex flex-col w-full gap-4">
                                     <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
                                         <p className="font-medium text-gray-600">
@@ -373,7 +373,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                             </div>
                             <div className="-translate-y-1.5 pb-8 text-slate-600">
                                 <p className=" text-base font-bold text-slate-800 antialiased dark:text-white mt-2">🌐 Publish dan Promosi Kelas Pelatihan</p>
-                                <small className="my-2 pb-4 text-sm text-slate-600 antialiased">Dalam proses ini kamu dapat mempublish informasi kelas pelatihan ke website utama E-LAUT agar masyarakat/publik dapat mendaftar secara mandiri kelas pelatihan yang dibuka. Dalam memenuhi proses ini, diharapkan dapat menguplaod <b>flyer, deskripsi, serta tanggal pendaftaran</b>. Apablila akan dipublish maka hanya tinggal mengklik tombol <b>Publish</b> dan dapat ditarik kembali informasi dengan mengklik tombol <b>Take Down</b>.</small>
+                                <small className="my-2 pb-4 text-sm text-slate-600 antialiased">Dalam proses ini kamu dapat mempublish informasi kelas pelatihan ke website utama E-LAUT agar masyarakat/publik dapat mendaftar secara mandiri kelas pelatihan yang dibuka atau hanya sebagai informasi. Dalam memenuhi proses ini, diharapkan dapat menguplaod <b>flyer, deskripsi, serta tanggal pendaftaran</b>. Selanjutnya dapat mengklik tombol <b>Publish</b> dan dapat ditarik kembali informasi yang disebarkan dengan mengklik tombol <b>Take Down</b>.</small>
 
                                 <AccordionSection title="Publish Informasi dan Promosi">
                                     <div className="flex flex-col w-full gap-4">
@@ -388,6 +388,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                         currentDetail={data.DetailPelatihan}
                                                         currentFoto={data.FotoPelatihan}
                                                         tanggalPendaftaran={[data.TanggalMulaiPendaftaran, data.TanggalAkhirPendaftaran!]}
+                                                        currentData={data}
                                                         onSuccess={fetchData} />
                                                 </>
                                             }
@@ -397,6 +398,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                         data!.Status == "Publish" ? (
                                                             <PublishButton
                                                                 title="Take Down"
+
                                                                 statusPelatihan={data?.Status ?? ""}
                                                                 idPelatihan={data!.IdPelatihan.toString()}
                                                                 handleFetchingData={
@@ -406,6 +408,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                         ) : (
                                                             <PublishButton
                                                                 title="Publish"
+
                                                                 statusPelatihan={data?.Status ?? ""}
                                                                 idPelatihan={data!.IdPelatihan.toString()}
                                                                 handleFetchingData={
@@ -443,7 +446,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                     </div> : <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">
                                                         <MdLock className='w-14 h-14 text-gray-600' />
                                                         <p className="text-gray-500 font-normal text-center">
-                                                            Untuk Melakukan Promosi Melalui Kanal Utama Website E-LAUT, Terlebih Dahulu Untuk Mengatur Informasi Publish Pada Tombol "Edit Informasi Publish". Tahapan Ini Opsional, Apabila Proses Pencarian/Registrasi Peserta Melalui E-LAUT.
+                                                            Untuk Melakukan Promosi Melalui Kanal Utama Website E-LAUT, Terlebih Dahulu Untuk Mengatur Informasi Publish Pada Tombol "Edit Informasi Publish".
                                                         </p>
                                                     </div>
                                             }

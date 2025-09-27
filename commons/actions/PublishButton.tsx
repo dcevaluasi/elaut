@@ -131,10 +131,10 @@ const PublishButton: React.FC<PublishButtonProps> = ({
             <AlertDialogCancel className="rounded-lg border-gray-300">
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction
-              className={`rounded-lg shadow-sm transition-all ${statusPelatihan === "Publish"
-                ? "bg-gray-600 hover:bg-gray-700 text-white"
-                : "bg-purple-600 hover:bg-purple-700 text-white"
+            <Button
+              className={`rounded-lg shadow-sm border transition-all ${statusPelatihan === "Publish"
+                ? "bg-transparent hover:bg-gray-600 border-gray-600 text-gray-600 hover:text-white"
+                : "bg-transparent hover:bg-purple-600 border-purple-600 text-purple-600 hover:text-white"
                 }`}
               onClick={() =>
                 statusPelatihan === "Belum Publish"
@@ -143,21 +143,20 @@ const PublishButton: React.FC<PublishButtonProps> = ({
               }
             >
               {statusPelatihan === "Publish" ? "Take Down" : "Publish"}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      <Button
+      <button
         title={title}
         onClick={() => {
           setSelectedStatus(statusPelatihan);
           setIsOpenFormPublishedPelatihan(true);
         }}
-        variant="outline"
-        className={`flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all ${title === "Publish"
-          ? "bg-transparent border-purple-500 text-purple-500 hover:text-white hover:bg-purple-500"
-          : "bg-transparent border-gray-500 text-gray-500 hover:text-white hover:bg-gray-500"
+        className={`flex items-center gap-2 w-fit rounded-lg px-4 py-2 ${title === "Publish"
+          ? "bg-transparent border-purple-600 border text-purple-600 hover:text-white hover:bg-purple-600"
+          : "bg-transparent border-gray-600 border text-gray-600 hover:text-white hover:bg-gray-600"
           }`}
       >
         {title === "Publish" ? (
@@ -169,7 +168,7 @@ const PublishButton: React.FC<PublishButtonProps> = ({
             <TbWorldCancel className="h-5 w-5" /> <span>Takedown</span>
           </>
         )}
-      </Button>
+      </button>
     </>
   );
 };
