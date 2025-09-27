@@ -112,8 +112,6 @@ const DeletePelatihanAction: React.FC<DeletePelatihanActionProps> = ({
       >
         <Trash className="h-5 w-5" /> Hapus Pelatihan
       </Button>}
-
-
     </>
   );
 };

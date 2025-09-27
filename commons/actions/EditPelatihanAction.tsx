@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import {
     AlertDialog,
     AlertDialogTrigger,
@@ -30,6 +30,10 @@ import {
 import { PelatihanMasyarakat } from "@/types/product";
 import { AKP_CERTIFICATIONS, AQUACULTURE_CERTIFICATIONS, OCEAN_CERTIFICATIONS } from "@/constants/serkom";
 import { ESELON_1, ESELON_2, ESELON_3, UPT } from "@/constants/nomenclatures";
+import { DUKUNGAN_PROGRAM_TEROBOSAN, JENIS_PELAKSANAAN, JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN, PELAKSANAAN_PELATIHAN, SEKTOR_PELATIHAN } from "@/constants/pelatihan";
+import { useFetchDataRumpunPelatihan } from "@/hooks/elaut/master/useFetchDataRumpunPelatihan";
+import { ProgramPelatihan, RumpunPelatihan } from "@/types/program";
+import ManageProgramPelatihanAction from "./master/program-pelatihan/ManageProgramPelatihanAction";
 
 interface EditPelatihanActionProps {
     idPelatihan: string;
@@ -44,9 +48,30 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
 }) => {
     const [isOpen, setIsOpen] = useState(false);
 
-    // controlled states
+
+    const {
+        data: dataRumpunPelatihan,
+        loading: loadingRumpunPelatihan,
+        error: errorRumpunPelatihan,
+        fetchRumpunPelatihan
+    } = useFetchDataRumpunPelatihan();
+
     const [program, setProgram] = useState(currentData?.Program || "");
-    const [ttdSertifikat, setTtdSertifikat] = useState(currentData?.TtdSertifikat || "");
+    const [bidang, setBidang] = useState(currentData?.BidangPelatihan || "");
+
+    const [selectedRumpunPelatihan, setSelectedRumpunPelatihan] = useState<RumpunPelatihan | null>(null);
+
+    // update selected when data or bidang changes
+    React.useEffect(() => {
+        if (dataRumpunPelatihan && bidang) {
+            const found = dataRumpunPelatihan.find(item => item.name === bidang) || null;
+            setSelectedRumpunPelatihan(found);
+        }
+    }, [dataRumpunPelatihan, bidang]);
+
+
+    // controlled states
+    const [namaPelatihan, setNamaPelatihan] = useState(currentData?.NamaPelatihan || "");
     const [jenisProgram, setJenisProgram] = useState(currentData?.JenisProgram || "");
     const [jenisPelatihan, setJenisPelatihan] = useState(currentData?.JenisPelatihan || "");
     const [dukunganProgramTerobosan, setDukunganProgramTerobosan] = useState(
@@ -71,6 +96,7 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
 
     const handleSubmit = async () => {
         const form = {
+            NamaPelatihan: namaPelatihan,
             Program: program,
             JenisProgram: jenisProgram,
             JenisPelatihan: jenisPelatihan,
@@ -81,7 +107,7 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
             LokasiPelatihan: lokasiPelatihan,
             PelaksanaanPelatihan: pelaksanaanPelatihan,
             HargaPelatihan: hargaPelatihan,
-            TtdSertifikat: ttdSertifikat,
+            BidangPelatihan: bidang,
         };
 
         try {
@@ -140,53 +166,144 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
                 </AlertDialogHeader>
 
                 <div className="py-2 max-h-[70vh] gap-3 overflow-y-auto pr-2 grid grid-cols-2">
-                    {/* Jenis Program */}
+                    {/* Nama Kegiatan */}
                     <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-700">Bidang</label>
+                        <label
+                            className="block text-gray-600 text-sm font-medium mb-1"
+                            htmlFor="namaKegiatan"
+                        >
+                            Nama Kegiatan{" "}
+                            <span className="text-rose-600">*</span>
+                        </label>
+                        <input
+                            id="namaKegiatan"
+                            type="text"
+                            className="form-input w-full text-black border-gray-300 rounded-md"
+                            placeholder="Masukkan nama kegiatan"
+                            required
+                            value={namaPelatihan}
+                            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                setNamaPelatihan(e.target.value)
+                            }
+                        />
+                    </div>
+
+                    {/* Lokasi */}
+                    <div className="space-y-1 ">
+                        <label className="text-sm font-medium text-gray-700">Lokasi Pelatihan</label>
+                        <input
+                            type="text"
+                            className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
+                            value={lokasiPelatihan}
+                            onChange={(e) => setLokasiPelatihan(e.target.value)}
+                        />
+                    </div>
+
+                    {/* Sektor */}
+                    <div className="space-y-1">
+                        <label className="text-sm font-medium text-gray-700">Sektor</label>
                         <Select value={jenisProgram} onValueChange={setJenisProgram}>
                             <SelectTrigger className="w-full text-sm py-2">
-                                <SelectValue placeholder="Pilih bidang" />
+                                <SelectValue placeholder="Pilih sektor" />
                             </SelectTrigger>
                             <SelectContent position="popper" className="z-[999999]" sideOffset={5}>
-                                <SelectItem value="Awak Kapal Perikanan">Awak Kapal Perikanan</SelectItem>
-                                <SelectItem value="Perikanan">Perikanan</SelectItem>
-                                <SelectItem value="Kelautan">Kelautan</SelectItem>
+                                {
+                                    SEKTOR_PELATIHAN.map((item) => (
+                                        <SelectItem value={item}>{item}</SelectItem>
+                                    ))
+                                }
                             </SelectContent>
                         </Select>
                     </div>
 
-                    {/* Program */}
+                    {/* Klaster */}
                     <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-700">Program</label>
-                        <Select value={program} onValueChange={setProgram}>
-                            <SelectTrigger className="w-full text-sm py-2">
-                                <SelectValue placeholder="Pilih program" />
-                            </SelectTrigger>
-                            <SelectContent position="popper" className="z-[999999]" sideOffset={5} >
-                                <SelectGroup>
-                                    <SelectLabel>Pilih Program Pelatihan</SelectLabel>
-                                    {jenisProgram === "Awak Kapal Perikanan" &&
-                                        AKP_CERTIFICATIONS.map((item, idx) => (
-                                            <SelectItem key={idx} value={item}>
-                                                {item}
-                                            </SelectItem>
-                                        ))}
-                                    {jenisProgram === "Perikanan" &&
-                                        AQUACULTURE_CERTIFICATIONS.map((item, idx) => (
-                                            <SelectItem key={idx} value={item}>
-                                                {item}
-                                            </SelectItem>
-                                        ))}
-                                    {jenisProgram === "Kelautan" &&
-                                        OCEAN_CERTIFICATIONS.map((item, idx) => (
-                                            <SelectItem key={idx} value={item}>
-                                                {item}
-                                            </SelectItem>
-                                        ))}
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
+                        <div className="w-full">
+                            <label
+                                className="block text-gray-600 text-sm font-medium mb-1"
+                                htmlFor="jensiPelatihan"
+                            >
+                                Klaster Pelatihan{" "}
+                                <span className="text-rose-600">*</span>
+                            </label>
+                            <Select
+                                value={bidang}
+                                onValueChange={(value) => {
+                                    setBidang(value)
+                                    const selected = dataRumpunPelatihan.find((item) => item.name === value || item.name == bidang)
+                                    setSelectedRumpunPelatihan(selected ?? null)
+                                }}
+                            >
+                                <SelectTrigger className="w-full text-sm py-2">
+                                    <SelectValue placeholder="Pilih klaster" />
+                                </SelectTrigger>
+                                <SelectContent position="popper" className="z-[999999]" sideOffset={5}>
+                                    {dataRumpunPelatihan.map((item) => (
+                                        <SelectItem key={item.id_rumpun_pelatihan} value={item.name}>
+                                            {item.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
+
+                    {/* Program */}
+                    {
+                        (selectedRumpunPelatihan !== null || program !== "") &&
+                        <div className="space-y-1 col-span-2">
+                            <div className="w-full">
+                                <label
+                                    className="block text-gray-600 text-sm font-medium mb-1"
+                                    htmlFor="asalPesertaPelatihan"
+                                >
+                                    Judul/Program Pelatihan (Klaster {bidang}){" "}
+                                    <span className="text-rose-600">*</span>
+                                </label>
+                                <div className="flex flex-row gap-2">
+                                    <Select
+                                        value={program}
+                                        onValueChange={(value: string) => {
+                                            if (value === "__add_new__") {
+                                                // open your modal instead of setting program
+                                                document.getElementById("trigger-add-program")?.click();
+                                            } else {
+                                                setProgram(value);
+                                            }
+                                        }}
+                                    >
+                                        <SelectTrigger className="w-full text-base py-5">
+                                            <SelectValue placeholder={`Pilih program klaster ${bidang}`} />
+                                        </SelectTrigger>
+                                        <SelectContent position="popper" className="z-[999999]" sideOffset={5}>
+                                            {selectedRumpunPelatihan?.programs.map((item: ProgramPelatihan) => (
+                                                <SelectItem
+                                                    key={item.id_program_pelatihan}
+                                                    value={item.name_indo}
+                                                >
+                                                    {item.name_indo}
+                                                </SelectItem>
+                                            ))}
+                                            {/* Divider */}
+                                            <div className="border-t my-2"></div>
+                                            {/* Tambah Program as SelectItem */}
+                                            <SelectItem value="__add_new__" className="text-gray-500">
+                                                ➕ Tambah Program Pelatihan (* Apabila tidak ditemukan program pelatihan yang sesuai)
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+
+                                    <ManageProgramPelatihanAction
+                                        onSuccess={() => {
+                                            fetchRumpunPelatihan();
+                                            alert("✅ Program pelatihan berhasil ditambahkan");
+                                        }}
+                                    />
+                                </div>
+
+                            </div>
+                        </div>
+                    }
 
                     {/* Jenis Pelatihan */}
                     <div className="space-y-1">
@@ -196,11 +313,11 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
                                 <SelectValue placeholder="Pilih jenis pelatihan" />
                             </SelectTrigger>
                             <SelectContent position="popper" className="z-[999999]" sideOffset={5}>
-                                <SelectItem value="Aspirasi">Aspirasi</SelectItem>
-                                <SelectItem value="PNBP/BLU">PNBP/BLU</SelectItem>
-                                <SelectItem value="Reguler">Reguler</SelectItem>
-                                <SelectItem value="Kerja Sama">Kerja Sama</SelectItem>
-                                <SelectItem value="Satuan Pendidikan">Satuan Pendidikan</SelectItem>
+                                {
+                                    JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN.map((item) => (
+                                        <SelectItem value={item}>{item}</SelectItem>
+                                    ))
+                                }
                             </SelectContent>
                         </Select>
                     </div>
@@ -213,15 +330,13 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
                                 <SelectValue placeholder="Pilih dukungan program" />
                             </SelectTrigger>
                             <SelectContent position="popper" className="z-[999999]" sideOffset={5}>
-                                <SelectItem value="Non Terobosan">Non Terobosan</SelectItem>
-                                <SelectItem value="Konservasi">Konservasi</SelectItem>
-                                <SelectItem value="PIT">PIT</SelectItem>
-                                <SelectItem value="Kalaju/Kalamo">Kalaju/Kalamo</SelectItem>
-                                <SelectItem value="KPB">KPB</SelectItem>
-                                <SelectItem value="Budidaya">Budidaya</SelectItem>
-                                <SelectItem value="Pengawasan Pesisir">Pengawasan Pesisir</SelectItem>
-                                <SelectItem value="BCL">BCL</SelectItem>
+                                {
+                                    DUKUNGAN_PROGRAM_TEROBOSAN.map((item) => (
+                                        <SelectItem value={item}>{item}</SelectItem>
+                                    ))
+                                }
                             </SelectContent>
+
                         </Select>
                     </div>
 
@@ -250,10 +365,13 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
                                 <SelectValue placeholder="Pilih pelaksanaan pelatihan" />
                             </SelectTrigger>
                             <SelectContent position="popper" className="z-[999999]" sideOffset={5}>
-                                <SelectItem value="Online">Online</SelectItem>
-                                <SelectItem value="Offline/Klasikal">Klasikal</SelectItem>
-                                <SelectItem value="Online+Offline/Blended">Blended</SelectItem>
+                                {
+                                    JENIS_PELAKSANAAN.map((item) => (
+                                        <SelectItem value={item}>{item}</SelectItem>
+                                    ))
+                                }
                             </SelectContent>
+
                         </Select>
                     </div>
 
@@ -279,16 +397,7 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
                         />
                     </div>
 
-                    {/* Lokasi */}
-                    <div className="space-y-1 col-span-2">
-                        <label className="text-sm font-medium text-gray-700">Lokasi Pelatihan</label>
-                        <input
-                            type="text"
-                            className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
-                            value={lokasiPelatihan}
-                            onChange={(e) => setLokasiPelatihan(e.target.value)}
-                        />
-                    </div>
+
 
                     {/* Harga */}
                     <div className="space-y-1 col-span-2">
@@ -301,25 +410,6 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
                             onChange={(e) => setHargaPelatihan(parseInt(e.target.value))}
                         />
                     </div>
-                </div>
-
-                <div className="flex mb-1 w-full flex-col gap-1 -mt-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Penandatangan Sertifikat
-                    </label>
-                    <Select
-                        value={ttdSertifikat}
-                        onValueChange={setTtdSertifikat}
-                    >
-                        <SelectTrigger>
-                            <SelectValue placeholder="Pilih Penandatangan" />
-                        </SelectTrigger>
-                        <SelectContent position="popper" className="z-[9999999]">
-                            <SelectItem value={ESELON_1.fullName}>{ESELON_1.abbrv}</SelectItem>
-                            <SelectItem value={ESELON_2.fullName}>{ESELON_2.abbrv}</SelectItem>
-                            <SelectItem value={ESELON_3.fullName}>{ESELON_3.abbrv}</SelectItem>
-                        </SelectContent>
-                    </Select>
                 </div>
 
                 <AlertDialogFooter>

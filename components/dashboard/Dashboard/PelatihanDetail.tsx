@@ -331,8 +331,8 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                             <InfoItem label="Kode Kelas Pelatihan" value={data.KodePelatihan} />
                                             <InfoItem label="Sektor Pelatihan" value={data.JenisProgram} />
-                                            {data?.BidangPelatihan == "Sistem Jaminan Mutu" ?
-                                                <InfoItem label="Klaster Pelatihan - Program SISJAMU" value={`${data?.BidangPelatihan} - ${data.Program}`} /> : <InfoItem label="Klaster Pelatihan" value={data.Program} />}
+                                            <InfoItem label="Klaster Pelatihan" value={`${data?.BidangPelatihan}`} />
+                                            <InfoItem label="Jenis/Program Pelatihan" value={`${data.Program}`} />
                                             <InfoItem label="Sumber Pembiayaan/Pemenuhan IKU" value={data.JenisPelatihan} />
                                             <InfoItem label="Penyelenggara" value={data.PenyelenggaraPelatihan} />
                                             <InfoItem label="Dukungan Program Terobosan" value={data.DukunganProgramTerobosan} />
