@@ -7,6 +7,17 @@ export function generatedDescriptionCertificate(input: string) {
   return { desc_indo, desc_eng }
 }
 
+export function generatedDescriptionCertificateFull(input: string) {
+  const matches = [...input.matchAll(/\{([^}]*)\}/g)].map((m) => m[1].trim())
+
+  const desc_indo = matches[0] || ''
+  const desc_eng = matches[1] || ''
+  const body_indo = matches[2] || ''
+  const body_eng = matches.length > 3 ? matches[3] : ''
+
+  return { desc_indo, desc_eng, body_indo, body_eng }
+}
+
 export function generatedCurriculumCertificate(input: string) {
   const matches = [...input.matchAll(/\{([^}]*)\}/g)].map((m) => m[1].trim())
 

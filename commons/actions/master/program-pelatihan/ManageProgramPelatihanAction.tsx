@@ -19,6 +19,7 @@ import { elautBaseUrl } from "@/constants/urls";
 import { TbPlus, TbPencil } from "react-icons/tb";
 import { useFetchDataRumpunPelatihan } from "@/hooks/elaut/master/useFetchDataRumpunPelatihan";
 import { ProgramPelatihan, RumpunPelatihan } from "@/types/program";
+import Cookies from "js-cookie";
 
 const ManageProgramPelatihanAction: React.FC<{
     onSuccess?: () => void;
@@ -29,7 +30,13 @@ const ManageProgramPelatihanAction: React.FC<{
     const [nama, setNama] = useState("");
     const [namaEng, setNamaEng] = useState("");
     const [nameSingkatan, setNameSingkatan] = useState("");
-    const [description, setDescription] = useState("");
+    const [description, setDescription] = useState({
+        headerIndo: "",
+        headerEnglish: "",
+        bodyIndo: "",
+        bodyEnglish: "",
+    });
+
     const [loading, setLoading] = useState(false);
 
     const { data: rumpunData, loading: rumpunLoading, error } = useFetchDataRumpunPelatihan();
@@ -42,29 +49,48 @@ const ManageProgramPelatihanAction: React.FC<{
             setNama(initialData.name_indo);
             setNamaEng(initialData.name_english);
             setNameSingkatan(initialData.abbrv_name);
-            setDescription(initialData.description);
+
+            // Breakdown description if it has {…}{…}{…}{…}
+            if (initialData.description) {
+                const parts = initialData.description.match(/\{([^}]+)\}/g) || [];
+                setDescription({
+                    headerIndo: parts[0]?.replace(/[{}]/g, "") || "",
+                    headerEnglish: parts[1]?.replace(/[{}]/g, "") || "",
+                    bodyIndo: parts[2]?.replace(/[{}]/g, "") || "",
+                    bodyEnglish: parts[3]?.replace(/[{}]/g, "") || "",
+                });
+            }
         } else {
             clearForm();
         }
     }, [isEditMode, initialData, isOpen]);
+
 
     const clearForm = () => {
         setIdRumpunPelatihan("");
         setNama("");
         setNamaEng("");
         setNameSingkatan("");
-        setDescription("");
+        setDescription({
+            headerIndo: "",
+            headerEnglish: "",
+            bodyIndo: "",
+            bodyEnglish: "",
+        });
     };
 
+
     const handleSubmit = async () => {
+        const formattedDescription = `{${description.headerIndo}}{${description.headerEnglish}}{${description.bodyIndo}}{${description.bodyEnglish}}`;
+
         const form = {
             id_rumpun_pelatihan: parseInt(idRumpunPelatihan),
             name_indo: nama,
             name_english: namaEng,
             abbrv_name: nameSingkatan,
-            description: description,
-            created_at: '',
-            updated_at: ''
+            description: formattedDescription,
+            created_at: "",
+            updated_at: "",
         };
 
         try {
@@ -74,24 +100,11 @@ const ManageProgramPelatihanAction: React.FC<{
                     `${elautBaseUrl}/program_pelatihan/update_program_pelatihan?id=${initialData.id_program_pelatihan}`,
                     form
                 );
-                Toast.fire({
-                    icon: "success",
-                    title: "Berhasil!",
-                    text: "Program pelatihan berhasil diperbarui.",
-                });
+                Toast.fire({ icon: "success", title: "Berhasil!", text: "Program pelatihan berhasil diperbarui." });
             } else {
-                const res = await axios.post(
-                    `${elautBaseUrl}/program_pelatihan/create_program_pelatihan`,
-                    form
-                );
-                console.log({ res })
-                Toast.fire({
-                    icon: "success",
-                    title: "Berhasil!",
-                    text: "Program pelatihan baru berhasil ditambahkan.",
-                });
+                await axios.post(`${elautBaseUrl}/program_pelatihan/create_program_pelatihan`, form);
+                Toast.fire({ icon: "success", title: "Berhasil!", text: "Program pelatihan baru berhasil ditambahkan." });
             }
-
             setIsOpen(false);
             setLoading(false);
             if (onSuccess) onSuccess();
@@ -101,11 +114,11 @@ const ManageProgramPelatihanAction: React.FC<{
             Toast.fire({
                 icon: "error",
                 title: "Gagal!",
-                text: `Terjadi kesalahan saat ${isEditMode ? "memperbarui" : "menambahkan"
-                    } program pelatihan!`,
+                text: `Terjadi kesalahan saat ${isEditMode ? "memperbarui" : "menambahkan"} program pelatihan!`,
             });
         }
     };
+
 
     return (
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
@@ -129,7 +142,7 @@ const ManageProgramPelatihanAction: React.FC<{
                 )}
             </AlertDialogTrigger>
 
-            <AlertDialogContent className="max-w-3xl z-[9999999]">
+            <AlertDialogContent className="max-w-5xl z-[9999999]">
                 <AlertDialogHeader>
                     <AlertDialogTitle>
                         {isEditMode
@@ -167,30 +180,32 @@ const ManageProgramPelatihanAction: React.FC<{
                         </select>
                     </div>
 
-                    {/* Nama Indo */}
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-700">
-                            Nama (Indonesia)
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                            value={nama}
-                            onChange={(e) => setNama(e.target.value)}
-                        />
-                    </div>
+                    <div className="w-full flex gap-4">
+                        {/* Nama Indo */}
+                        <div className="space-y-1 w-full">
+                            <label className="text-sm font-medium text-gray-700">
+                                Nama (Indonesia)
+                            </label>
+                            <input
+                                type="text"
+                                className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                value={nama}
+                                onChange={(e) => setNama(e.target.value)}
+                            />
+                        </div>
 
-                    {/* Nama English */}
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-700">
-                            Nama (English)
-                        </label>
-                        <input
-                            type="text"
-                            className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                            value={namaEng}
-                            onChange={(e) => setNamaEng(e.target.value)}
-                        />
+                        {/* Nama English */}
+                        <div className="space-y-1 w-full">
+                            <label className="text-sm font-medium text-gray-700">
+                                Nama (English)
+                            </label>
+                            <input
+                                type="text"
+                                className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                value={namaEng}
+                                onChange={(e) => setNamaEng(e.target.value)}
+                            />
+                        </div>
                     </div>
 
                     {/* Singkatan */}
@@ -206,18 +221,57 @@ const ManageProgramPelatihanAction: React.FC<{
                         />
                     </div>
 
-                    {/* Deskripsi */}
-                    {/* <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-700">
-                            Deskripsi
-                        </label>
-                        <textarea
-                            className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                            rows={4}
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                        />
-                    </div> */}
+                    {
+                        Cookies.get('Access')?.includes('superAdmin') && <>
+                            <div className="w-full flex gap-4">
+                                <div className="space-y-1 w-full">
+                                    <label className="text-sm font-medium text-gray-700">Header STTPL (Indonesia)</label>
+                                    <textarea
+                                        className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                        rows={6}
+                                        value={description.headerIndo}
+                                        onChange={(e) => setDescription({ ...description, headerIndo: e.target.value })}
+                                    />
+                                </div>
+
+                                {/* Header English */}
+                                <div className="space-y-1 w-full">
+                                    <label className="text-sm font-medium text-gray-700">Header STTPL (English)</label>
+                                    <textarea
+                                        className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                        rows={6}
+                                        value={description.headerEnglish}
+                                        onChange={(e) => setDescription({ ...description, headerEnglish: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+
+                            <div className="w-full flex gap-4">
+                                <div className="space-y-1 w-full">
+                                    <label className="text-sm font-medium text-gray-700">Body STTPL (Indonesia)</label>
+                                    <textarea
+                                        className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                        rows={6}
+                                        value={description.bodyIndo}
+                                        onChange={(e) => setDescription({ ...description, bodyIndo: e.target.value })}
+                                    />
+                                </div>
+
+                                {/* Body English */}
+                                <div className="space-y-1 w-full">
+                                    <label className="text-sm font-medium text-gray-700">Body STTPL (English)</label>
+                                    <textarea
+                                        className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                        rows={6}
+                                        value={description.bodyEnglish}
+                                        onChange={(e) => setDescription({ ...description, bodyEnglish: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                        </>
+                    }
+
                 </div>
 
                 <AlertDialogFooter>

@@ -18,6 +18,8 @@ import {
 import firebaseApp from "@/firebase/config";
 import addData from "@/firebase/firestore/addData";
 import { HashLoader } from "react-spinners";
+import { FiTrash2 } from "react-icons/fi";
+import { TbEditCircle } from "react-icons/tb";
 
 const db = getFirestore(firebaseApp);
 
@@ -80,6 +82,19 @@ function Page() {
         if (decodedDocId) fetchDocuments();
     }, [decodedDocId]);
 
+    const [editIndex, setEditIndex] = useState<{ [key: string]: number | null }>({});
+    const handleUpdateMaterial = async (cat: string, index: number, updatedMat: any) => {
+        if (!selectedDoc) return;
+        setLoading(true);
+
+        const updatedCategories = { ...selectedDoc.categories };
+        updatedCategories[cat][index] = updatedMat;
+
+        await addData("documents", selectedDoc.id, { categories: updatedCategories });
+        setEditIndex((prev) => ({ ...prev, [cat]: null })); // close edit mode
+        await fetchDocuments();
+    };
+
     // Add category
     const handleAddCategory = async () => {
         if (!selectedDoc || !categoryName) return;
@@ -141,7 +156,7 @@ function Page() {
                     description="Kelola kategori & materi pelatihan berdasarkan dokumen"
                     icon={<RiQuillPenAiLine className="text-3xl" />}
                 />
-                <article className="w-full h-full">
+                <article className="w-full h-full mt-10">
                     {loading && (
                         <div className="py-32 w-full items-center flex justify-center">
                             <HashLoader color="#338CF5" size={50} />
@@ -165,194 +180,303 @@ function Page() {
                                 </div>
 
                                 {/* List categories */}
-                                {Object.keys(selectedDoc.categories || {}).map((cat) => (
-                                    <div key={cat} className="mb-6 border p-3 rounded-lg">
-                                        <div className="flex justify-between items-center mb-2">
-                                            <h3 className="font-bold">{cat}</h3>
-                                            <Button
-                                                variant="destructive"
-                                                size="sm"
-                                                onClick={() => handleDeleteCategory(cat)}
-                                            >
-                                                Hapus
-                                            </Button>
-                                        </div>
-
-                                        {/* Materials */}
-                                        <ul className="space-y-2 mb-3">
-                                            {selectedDoc.categories[cat]?.map(
-                                                (mat: any, index: number) => (
-                                                    <li
-                                                        key={index}
-                                                        className="p-2 border rounded flex justify-between items-center"
-                                                    >
-                                                        <div>
-                                                            <p className="font-medium">{mat.name_ind}</p>
-                                                            <p className="text-sm text-gray-500">
-                                                                {mat.name_eng}
-                                                            </p>
-                                                            <p className="text-xs">
-                                                                Theory: {mat.theory} | Practice: {mat.practice}
-                                                            </p>
-                                                        </div>
-                                                        <Button
-                                                            variant="destructive"
-                                                            size="sm"
-                                                            onClick={() => handleDeleteMaterial(cat, index)}
-                                                        >
-                                                            Hapus
-                                                        </Button>
-                                                    </li>
-                                                )
-                                            )}
-                                        </ul>
-
-                                        {/* Add Material */}
-                                        <div className="mt-3">
-                                            {!showForm[cat] ? (
+                                {Object.keys(selectedDoc.categories || {}).map((cat, index) => {
+                                    return (
+                                        <div key={cat} className="mb-6 border p-3 rounded-lg">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <h3 className="font-bold">{cat}</h3>
                                                 <Button
                                                     variant="outline"
-                                                    size="sm"
-                                                    onClick={() => toggleForm(cat)}
+                                                    title="Hapus Pelatihan"
+                                                    className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-rose-500 text-rose-500 hover:text-white hover:bg-rose-500"
+                                                    onClick={() => handleDeleteCategory(cat)}
                                                 >
-                                                    + Tambah Materi
+                                                    Hapus Kategori
                                                 </Button>
-                                            ) : (
+                                            </div>
 
-                                                <div className="mt-2 space-y-2">
-                                                    {
-                                                        isAwakKapalPerikanan ? <>
-                                                            <Input
-                                                                placeholder="Kelompok Materi (Indo)"
-                                                                value={newMaterialAKP.group_ind}
-                                                                onChange={(e) =>
-                                                                    setNewMaterialAKP({
-                                                                        ...newMaterialAKP,
-                                                                        group_ind: e.target.value,
-                                                                    })
-                                                                }
-                                                            />
-                                                            <Input
-                                                                placeholder="Kelompok Materi (Eng)"
-                                                                value={newMaterialAKP.group_eng}
-                                                                onChange={(e) =>
-                                                                    setNewMaterialAKP({
-                                                                        ...newMaterialAKP,
-                                                                        group_eng: e.target.value,
-                                                                    })
-                                                                }
-                                                            />
+                                            {/* Materials */}
+                                            <ul className="space-y-2 mb-3">
+                                                {selectedDoc.categories[cat]?.map(
+                                                    (mat: any, index: number) => {
+                                                        const isEditing = editIndex[cat] === index;
 
-                                                            <Input
-                                                                placeholder="Nama Materi (Indo)"
-                                                                value={newMaterialAKP.name_ind}
-                                                                onChange={(e) =>
-                                                                    setNewMaterialAKP({
-                                                                        ...newMaterialAKP,
-                                                                        name_ind: e.target.value,
-                                                                    })
-                                                                }
-                                                            />
-                                                            <Input
-                                                                placeholder="Nama Materi (Eng)"
-                                                                value={newMaterialAKP.name_eng}
-                                                                onChange={(e) =>
-                                                                    setNewMaterialAKP({
-                                                                        ...newMaterialAKP,
-                                                                        name_eng: e.target.value,
-                                                                    })
-                                                                }
-                                                            />
-                                                            <Input
-                                                                type="number"
-                                                                placeholder="Theory"
-                                                                value={newMaterialAKP.theory}
-                                                                onChange={(e) =>
-                                                                    setNewMaterialAKP({
-                                                                        ...newMaterialAKP,
-                                                                        theory: Number(e.target.value),
-                                                                    })
-                                                                }
-                                                            />
-                                                            <Input
-                                                                type="number"
-                                                                placeholder="Practice"
-                                                                value={newMaterialAKP.practice}
-                                                                onChange={(e) =>
-                                                                    setNewMaterialAKP({
-                                                                        ...newMaterialAKP,
-                                                                        practice: Number(e.target.value),
-                                                                    })
-                                                                }
-                                                            />
+                                                        return (
+                                                            <li
+                                                                key={index}
+                                                                className="p-2 border rounded flex flex-col gap-2"
+                                                            >
+                                                                {!isEditing ? (
+                                                                    // ---- Normal View ----
+                                                                    <div className="flex justify-between items-center">
+                                                                        <div className="max-w-4xl">
+                                                                            <p className="font-medium">
+                                                                                {mat?.group_ind ? `${mat.group_ind} - ` : ''}{mat.name_ind}
+                                                                            </p>
+                                                                            <p className="text-sm text-gray-500">{mat.name_eng}</p>
+                                                                            <p className="text-xs">
+                                                                                Theory: {mat.theory} | Practice: {mat.practice}
+                                                                            </p>
+                                                                        </div>
+                                                                        <div className="flex gap-2">
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500"
+                                                                                onClick={() =>
+                                                                                    setEditIndex((prev) => ({ ...prev, [cat]: index }))
+                                                                                }
+                                                                            >
+                                                                                <TbEditCircle />
+                                                                            </Button>
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-rose-500 text-rose-500 hover:text-white hover:bg-rose-500"
+                                                                                onClick={() => handleDeleteMaterial(cat, index)}
+                                                                            >
+                                                                                <FiTrash2 />
+                                                                            </Button>
+                                                                        </div>
+                                                                    </div>
+                                                                ) : (
+                                                                    // ---- Edit Mode ----
+                                                                    <div className="space-y-2">
+                                                                        {isAwakKapalPerikanan && (
+                                                                            <>
+                                                                                <Input
+                                                                                    placeholder="Kelompok Materi (Indo)"
+                                                                                    value={mat.group_ind}
+                                                                                    onChange={(e) => {
+                                                                                        const newMat = { ...mat, group_ind: e.target.value };
+                                                                                        const newCategories = { ...selectedDoc.categories };
+                                                                                        newCategories[cat][index] = newMat;
+                                                                                        setSelectedDoc({ ...selectedDoc, categories: newCategories });
+                                                                                    }}
+                                                                                />
+                                                                                <Input
+                                                                                    placeholder="Kelompok Materi (Eng)"
+                                                                                    value={mat.group_eng}
+                                                                                    onChange={(e) => {
+                                                                                        const newMat = { ...mat, group_eng: e.target.value };
+                                                                                        const newCategories = { ...selectedDoc.categories };
+                                                                                        newCategories[cat][index] = newMat;
+                                                                                        setSelectedDoc({ ...selectedDoc, categories: newCategories });
+                                                                                    }}
+                                                                                />
+                                                                            </>
+                                                                        )}
+                                                                        <Input
+                                                                            placeholder="Nama Materi (Indo)"
+                                                                            value={mat.name_ind}
+                                                                            onChange={(e) => {
+                                                                                const newMat = { ...mat, name_ind: e.target.value };
+                                                                                const newCategories = { ...selectedDoc.categories };
+                                                                                newCategories[cat][index] = newMat;
+                                                                                setSelectedDoc({ ...selectedDoc, categories: newCategories });
+                                                                            }}
+                                                                        />
+                                                                        <Input
+                                                                            placeholder="Nama Materi (Eng)"
+                                                                            value={mat.name_eng}
+                                                                            onChange={(e) => {
+                                                                                const newMat = { ...mat, name_eng: e.target.value };
+                                                                                const newCategories = { ...selectedDoc.categories };
+                                                                                newCategories[cat][index] = newMat;
+                                                                                setSelectedDoc({ ...selectedDoc, categories: newCategories });
+                                                                            }}
+                                                                        />
+                                                                        <Input
+                                                                            type="number"
+                                                                            placeholder="Theory"
+                                                                            value={mat.theory}
+                                                                            onChange={(e) => {
+                                                                                const newMat = { ...mat, theory: Number(e.target.value) };
+                                                                                const newCategories = { ...selectedDoc.categories };
+                                                                                newCategories[cat][index] = newMat;
+                                                                                setSelectedDoc({ ...selectedDoc, categories: newCategories });
+                                                                            }}
+                                                                        />
+                                                                        <Input
+                                                                            type="number"
+                                                                            placeholder="Practice"
+                                                                            value={mat.practice}
+                                                                            onChange={(e) => {
+                                                                                const newMat = { ...mat, practice: Number(e.target.value) };
+                                                                                const newCategories = { ...selectedDoc.categories };
+                                                                                newCategories[cat][index] = newMat;
+                                                                                setSelectedDoc({ ...selectedDoc, categories: newCategories });
+                                                                            }}
+                                                                        />
 
-                                                        </> : <>
-                                                            <Input
-                                                                placeholder="Nama Materi (Indo)"
-                                                                value={newMaterial.name_ind}
-                                                                onChange={(e) =>
-                                                                    setNewMaterial({
-                                                                        ...newMaterial,
-                                                                        name_ind: e.target.value,
-                                                                    })
-                                                                }
-                                                            />
-                                                            <Input
-                                                                placeholder="Nama Materi (Eng)"
-                                                                value={newMaterial.name_eng}
-                                                                onChange={(e) =>
-                                                                    setNewMaterial({
-                                                                        ...newMaterial,
-                                                                        name_eng: e.target.value,
-                                                                    })
-                                                                }
-                                                            />
-                                                            <Input
-                                                                type="number"
-                                                                placeholder="Theory"
-                                                                value={newMaterial.theory}
-                                                                onChange={(e) =>
-                                                                    setNewMaterial({
-                                                                        ...newMaterial,
-                                                                        theory: Number(e.target.value),
-                                                                    })
-                                                                }
-                                                            />
-                                                            <Input
-                                                                type="number"
-                                                                placeholder="Practice"
-                                                                value={newMaterial.practice}
-                                                                onChange={(e) =>
-                                                                    setNewMaterial({
-                                                                        ...newMaterial,
-                                                                        practice: Number(e.target.value),
-                                                                    })
-                                                                }
-                                                            />
-
-                                                        </>
+                                                                        <div className="flex gap-2">
+                                                                            <Button
+                                                                                onClick={() => handleUpdateMaterial(cat, index, mat)}
+                                                                            >
+                                                                                Simpan
+                                                                            </Button>
+                                                                            <Button
+                                                                                variant="secondary"
+                                                                                onClick={() =>
+                                                                                    setEditIndex((prev) => ({ ...prev, [cat]: null }))
+                                                                                }
+                                                                            >
+                                                                                Batal
+                                                                            </Button>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </li>
+                                                        )
                                                     }
+                                                )}
+                                            </ul>
 
-                                                    <div className="flex gap-2">
-                                                        <Button
-                                                            onClick={() => handleAddMaterial(cat)}
-                                                        >
-                                                            Simpan
-                                                        </Button>
-                                                        <Button
-                                                            variant="secondary"
-                                                            onClick={() => toggleForm(cat)}
-                                                        >
-                                                            Batal
-                                                        </Button>
+                                            {/* Add Material */}
+                                            <div className="mt-3">
+                                                {!showForm[cat] ? (
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => toggleForm(cat)}
+                                                    >
+                                                        + Tambah Materi
+                                                    </Button>
+                                                ) : (
+
+                                                    <div className="mt-2 space-y-2">
+                                                        {
+                                                            isAwakKapalPerikanan ? <>
+                                                                <Input
+                                                                    placeholder="Kelompok Materi (Indo)"
+                                                                    value={newMaterialAKP.group_ind}
+                                                                    onChange={(e) =>
+                                                                        setNewMaterialAKP({
+                                                                            ...newMaterialAKP,
+                                                                            group_ind: e.target.value,
+                                                                        })
+                                                                    }
+                                                                />
+                                                                <Input
+                                                                    placeholder="Kelompok Materi (Eng)"
+                                                                    value={newMaterialAKP.group_eng}
+                                                                    onChange={(e) =>
+                                                                        setNewMaterialAKP({
+                                                                            ...newMaterialAKP,
+                                                                            group_eng: e.target.value,
+                                                                        })
+                                                                    }
+                                                                />
+
+                                                                <Input
+                                                                    placeholder="Nama Materi (Indo)"
+                                                                    value={newMaterialAKP.name_ind}
+                                                                    onChange={(e) =>
+                                                                        setNewMaterialAKP({
+                                                                            ...newMaterialAKP,
+                                                                            name_ind: e.target.value,
+                                                                        })
+                                                                    }
+                                                                />
+                                                                <Input
+                                                                    placeholder="Nama Materi (Eng)"
+                                                                    value={newMaterialAKP.name_eng}
+                                                                    onChange={(e) =>
+                                                                        setNewMaterialAKP({
+                                                                            ...newMaterialAKP,
+                                                                            name_eng: e.target.value,
+                                                                        })
+                                                                    }
+                                                                />
+                                                                <Input
+                                                                    type="number"
+                                                                    placeholder="Theory"
+                                                                    value={newMaterialAKP.theory}
+                                                                    onChange={(e) =>
+                                                                        setNewMaterialAKP({
+                                                                            ...newMaterialAKP,
+                                                                            theory: Number(e.target.value),
+                                                                        })
+                                                                    }
+                                                                />
+                                                                <Input
+                                                                    type="number"
+                                                                    placeholder="Practice"
+                                                                    value={newMaterialAKP.practice}
+                                                                    onChange={(e) =>
+                                                                        setNewMaterialAKP({
+                                                                            ...newMaterialAKP,
+                                                                            practice: Number(e.target.value),
+                                                                        })
+                                                                    }
+                                                                />
+
+                                                            </> : <>
+                                                                <Input
+                                                                    placeholder="Nama Materi (Indo)"
+                                                                    value={newMaterial.name_ind}
+                                                                    onChange={(e) =>
+                                                                        setNewMaterial({
+                                                                            ...newMaterial,
+                                                                            name_ind: e.target.value,
+                                                                        })
+                                                                    }
+                                                                />
+                                                                <Input
+                                                                    placeholder="Nama Materi (Eng)"
+                                                                    value={newMaterial.name_eng}
+                                                                    onChange={(e) =>
+                                                                        setNewMaterial({
+                                                                            ...newMaterial,
+                                                                            name_eng: e.target.value,
+                                                                        })
+                                                                    }
+                                                                />
+                                                                <Input
+                                                                    type="number"
+                                                                    placeholder="Theory"
+                                                                    value={newMaterial.theory}
+                                                                    onChange={(e) =>
+                                                                        setNewMaterial({
+                                                                            ...newMaterial,
+                                                                            theory: Number(e.target.value),
+                                                                        })
+                                                                    }
+                                                                />
+                                                                <Input
+                                                                    type="number"
+                                                                    placeholder="Practice"
+                                                                    value={newMaterial.practice}
+                                                                    onChange={(e) =>
+                                                                        setNewMaterial({
+                                                                            ...newMaterial,
+                                                                            practice: Number(e.target.value),
+                                                                        })
+                                                                    }
+                                                                />
+
+                                                            </>
+                                                        }
+
+                                                        <div className="flex gap-2">
+                                                            <Button
+                                                                onClick={() => handleAddMaterial(cat)}
+                                                            >
+                                                                Simpan
+                                                            </Button>
+                                                            <Button
+                                                                variant="secondary"
+                                                                onClick={() => toggleForm(cat)}
+                                                            >
+                                                                Batal
+                                                            </Button>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            )}
+                                                )}
+                                            </div>
+
+
                                         </div>
-
-
-                                    </div>
-                                ))}
+                                    )
+                                })}
                             </CardContent>
                         </Card>
                     )}

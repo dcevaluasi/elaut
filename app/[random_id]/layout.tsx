@@ -67,7 +67,7 @@ export default function RootLayout({
     <UnitKerjaProvider>
       <html lang="en">
         <body
-          suppressHydrationWarning={true}
+          suppressHydrationWarning={false}
           className={`${inter.className} ${myFont.variable} ${bosNormal.variable} ${plusSansJakarta.variable} ${bos.variable} ${bosBold.variable} ${bosItalic.variable}  ${delius.variable} `}
         >
 
