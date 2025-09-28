@@ -24,6 +24,7 @@ const db = getFirestore(firebaseApp);
 function Page() {
     const { kode } = useParams();
     const docId = Array.isArray(kode) ? kode[0] : kode;
+    const isAwakKapalPerikanan = docId.includes('AKP') || docId.includes('Awak Kapal Perikanan')
     const decodedDocId = decodeURIComponent(docId || "");
     const [showForm, setShowForm] = useState<{ [key: string]: boolean }>({});
     const toggleForm = (cat: string) => {
@@ -35,6 +36,14 @@ function Page() {
     const [categoryName, setCategoryName] = useState("");
     const [loading, setLoading] = useState(false); // indikator progress
     const [newMaterial, setNewMaterial] = useState({
+        name_ind: "",
+        name_eng: "",
+        theory: 0,
+        practice: 0,
+    });
+    const [newMaterialAKP, setNewMaterialAKP] = useState({
+        group_ind: "",
+        group_eng: "",
         name_ind: "",
         name_eng: "",
         theory: 0,
@@ -99,9 +108,18 @@ function Page() {
         if (!selectedDoc) return;
         setLoading(true);
         const updatedCategories = { ...selectedDoc.categories };
-        updatedCategories[cat] = [...(updatedCategories[cat] || []), newMaterial];
+        if (isAwakKapalPerikanan) {
+            updatedCategories[cat] = [...(updatedCategories[cat] || []), newMaterialAKP];
+        } else {
+            updatedCategories[cat] = [...(updatedCategories[cat] || []), newMaterial];
+        }
+
         await addData("documents", selectedDoc.id, { categories: updatedCategories });
-        setNewMaterial({ name_ind: "", name_eng: "", theory: 0, practice: 0 });
+        if (isAwakKapalPerikanan) {
+            setNewMaterialAKP({ group_ind: "", group_eng: "", name_ind: "", name_eng: "", theory: 0, practice: 0 });
+        } else {
+            setNewMaterial({ name_ind: "", name_eng: "", theory: 0, practice: 0 });
+        }
         await fetchDocuments();
     };
 
@@ -200,49 +218,120 @@ function Page() {
                                                     + Tambah Materi
                                                 </Button>
                                             ) : (
+
                                                 <div className="mt-2 space-y-2">
-                                                    <Input
-                                                        placeholder="Nama (Indo)"
-                                                        value={newMaterial.name_ind}
-                                                        onChange={(e) =>
-                                                            setNewMaterial({
-                                                                ...newMaterial,
-                                                                name_ind: e.target.value,
-                                                            })
-                                                        }
-                                                    />
-                                                    <Input
-                                                        placeholder="Nama (Eng)"
-                                                        value={newMaterial.name_eng}
-                                                        onChange={(e) =>
-                                                            setNewMaterial({
-                                                                ...newMaterial,
-                                                                name_eng: e.target.value,
-                                                            })
-                                                        }
-                                                    />
-                                                    <Input
-                                                        type="number"
-                                                        placeholder="Theory"
-                                                        value={newMaterial.theory}
-                                                        onChange={(e) =>
-                                                            setNewMaterial({
-                                                                ...newMaterial,
-                                                                theory: Number(e.target.value),
-                                                            })
-                                                        }
-                                                    />
-                                                    <Input
-                                                        type="number"
-                                                        placeholder="Practice"
-                                                        value={newMaterial.practice}
-                                                        onChange={(e) =>
-                                                            setNewMaterial({
-                                                                ...newMaterial,
-                                                                practice: Number(e.target.value),
-                                                            })
-                                                        }
-                                                    />
+                                                    {
+                                                        isAwakKapalPerikanan ? <>
+                                                            <Input
+                                                                placeholder="Kelompok Materi (Indo)"
+                                                                value={newMaterialAKP.group_ind}
+                                                                onChange={(e) =>
+                                                                    setNewMaterialAKP({
+                                                                        ...newMaterialAKP,
+                                                                        group_ind: e.target.value,
+                                                                    })
+                                                                }
+                                                            />
+                                                            <Input
+                                                                placeholder="Kelompok Materi (Eng)"
+                                                                value={newMaterialAKP.group_eng}
+                                                                onChange={(e) =>
+                                                                    setNewMaterialAKP({
+                                                                        ...newMaterialAKP,
+                                                                        group_eng: e.target.value,
+                                                                    })
+                                                                }
+                                                            />
+
+                                                            <Input
+                                                                placeholder="Nama Materi (Indo)"
+                                                                value={newMaterialAKP.name_ind}
+                                                                onChange={(e) =>
+                                                                    setNewMaterialAKP({
+                                                                        ...newMaterialAKP,
+                                                                        name_ind: e.target.value,
+                                                                    })
+                                                                }
+                                                            />
+                                                            <Input
+                                                                placeholder="Nama Materi (Eng)"
+                                                                value={newMaterialAKP.name_eng}
+                                                                onChange={(e) =>
+                                                                    setNewMaterialAKP({
+                                                                        ...newMaterialAKP,
+                                                                        name_eng: e.target.value,
+                                                                    })
+                                                                }
+                                                            />
+                                                            <Input
+                                                                type="number"
+                                                                placeholder="Theory"
+                                                                value={newMaterialAKP.theory}
+                                                                onChange={(e) =>
+                                                                    setNewMaterialAKP({
+                                                                        ...newMaterialAKP,
+                                                                        theory: Number(e.target.value),
+                                                                    })
+                                                                }
+                                                            />
+                                                            <Input
+                                                                type="number"
+                                                                placeholder="Practice"
+                                                                value={newMaterialAKP.practice}
+                                                                onChange={(e) =>
+                                                                    setNewMaterialAKP({
+                                                                        ...newMaterialAKP,
+                                                                        practice: Number(e.target.value),
+                                                                    })
+                                                                }
+                                                            />
+
+                                                        </> : <>
+                                                            <Input
+                                                                placeholder="Nama Materi (Indo)"
+                                                                value={newMaterial.name_ind}
+                                                                onChange={(e) =>
+                                                                    setNewMaterial({
+                                                                        ...newMaterial,
+                                                                        name_ind: e.target.value,
+                                                                    })
+                                                                }
+                                                            />
+                                                            <Input
+                                                                placeholder="Nama Materi (Eng)"
+                                                                value={newMaterial.name_eng}
+                                                                onChange={(e) =>
+                                                                    setNewMaterial({
+                                                                        ...newMaterial,
+                                                                        name_eng: e.target.value,
+                                                                    })
+                                                                }
+                                                            />
+                                                            <Input
+                                                                type="number"
+                                                                placeholder="Theory"
+                                                                value={newMaterial.theory}
+                                                                onChange={(e) =>
+                                                                    setNewMaterial({
+                                                                        ...newMaterial,
+                                                                        theory: Number(e.target.value),
+                                                                    })
+                                                                }
+                                                            />
+                                                            <Input
+                                                                type="number"
+                                                                placeholder="Practice"
+                                                                value={newMaterial.practice}
+                                                                onChange={(e) =>
+                                                                    setNewMaterial({
+                                                                        ...newMaterial,
+                                                                        practice: Number(e.target.value),
+                                                                    })
+                                                                }
+                                                            />
+
+                                                        </>
+                                                    }
 
                                                     <div className="flex gap-2">
                                                         <Button

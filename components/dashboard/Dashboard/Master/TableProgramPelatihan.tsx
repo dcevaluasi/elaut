@@ -138,8 +138,8 @@ export default function TableProgramPelatihan() {
                                             Materi
                                         </Link>}
                                         {(rumpunPelatihan !== "Sistem Jaminan Mutu" &&
-                                            rumpunPelatihan !== "Pembentukan Keahlian AKP" &&
-                                            rumpunPelatihan !== "Peningkatan Keahlian AKP") && (
+                                            rumpunPelatihan !== "Pembentukan Keahlian Awak Kapal Perikanan (AKP)" &&
+                                            rumpunPelatihan !== "Peningkatan Keahlian Awak Kapal Perikanan (AKP)") && (
                                                 <Link
                                                     href={`/admin/lemdiklat/master/program-pelatihan/materi/${row.name_indo}`}
                                                     target="_blank"
