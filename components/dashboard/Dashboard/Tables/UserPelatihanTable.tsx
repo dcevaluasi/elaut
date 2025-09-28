@@ -508,10 +508,10 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                                     </Button> : <> </> : <Link
                                         target="_blank"
                                         href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${row.original.FileSertifikat}`}
-                                        className="flex items-center justify-center gap-2 w-full rounded-lg px-4 text-center py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 border "
+                                        className="flex items-center flex-shrink-0 justify-center gap-2 w-full rounded-lg px-4 text-center py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 border "
                                     >
                                     <RiVerifiedBadgeFill className="h-4 w-4  " />
-                                    <span className="text-sm"> STTPL</span>
+                                    <span className="text-sm">e-STTPL</span>
                                 </Link>
                             }
                         </div >

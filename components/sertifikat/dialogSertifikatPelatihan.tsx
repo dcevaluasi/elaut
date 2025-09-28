@@ -1,7 +1,7 @@
 
 import React, { forwardRef, useImperativeHandle, useRef } from "react";
 import QRCode from "react-qr-code";
-import { MateriPelatihan, PelatihanMasyarakat } from "@/types/product";
+import { PelatihanMasyarakat } from "@/types/product";
 import axios from "axios";
 import { elautBaseUrl } from "@/constants/urls";
 import Cookies from "js-cookie";
@@ -11,11 +11,10 @@ import {
     generateTanggalPelatihan,
 } from "@/utils/text";
 import Toast from "../toast";
-import { addDays, formatDateRange, formatDateRangeEnglish } from "@/utils/time";
-import { generatedCurriculumCertificate, generatedDescriptionCertificate, generatedDescriptionCertificateFull, generatedSignedCertificate, generatedStatusCertificate, isEnglishFormat } from "@/utils/certificates";
-import { collection, doc, getDoc, getDocs, getFirestore } from "firebase/firestore";
+import { formatDateRange, formatDateRangeEnglish } from "@/utils/time";
+import { generatedDescriptionCertificateFull, generatedSignedCertificate, generatedStatusCertificate } from "@/utils/certificates";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
 import firebaseApp from "@/firebase/config";
-import addData from "@/firebase/firestore/addData";
 import { useFetchDataProgramPelatihan } from "@/hooks/elaut/master/useFetchDataProgramPelatihan";
 import './styles/certificate.css'
 import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
@@ -26,14 +25,15 @@ const FormatSTTPL = React.forwardRef(
         {
             pelatihan,
             userPelatihan,
-            refPage
+            refPage,
+            isPrint,
         }: {
             pelatihan: PelatihanMasyarakat;
             userPelatihan: UserPelatihan;
-            refPage: any
+            refPage: any;
+            isPrint?: any
         },
         ref: any,
-
     ) => {
         const { data: dataProgramPelatihan, loading: loadingProgramPelatihan, error: errorProgramPelatihan, fetchProgramPelatihan } = useFetchDataProgramPelatihan(pelatihan?.Program);
 
@@ -166,20 +166,21 @@ const FormatSTTPL = React.forwardRef(
                 <div ref={refPage} className={`pdf-page w-full flex flex-col  gap-4 relative  items-center justify-center h-[49.63rem]`}>
                     <div className="flex flex-row  absolute top-0 right-0">
                         <p className="text-lg font-bosNormal">
-                            No. STTPL : {userPelatihan?.NoSertifikat}
+                            No. STTPL : {userPelatihan?.NoRegistrasi}
                         </p>
                     </div>
 
 
 
                     <div className="w-full flex flex-col space-y-0 px-10 mt-10 ">
-                        <Image
+                        {isPrint && pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan') ? <div className="mx-auto w-30 h-40"></div> : <Image
                             alt="Logo KKP"
                             className="mx-auto w-30"
                             width={0}
                             height={0}
                             src="/logo-kkp-2.png"
-                        />
+                        />}
+
 
                         <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-3">
 
@@ -365,7 +366,7 @@ const FormatSTTPL = React.forwardRef(
                         {/* Title */}
                         <div className={`flex flex-row justify-center items-center ${materiIntiCount >= 10 ? "-mb-20" : "mb-5"}`}>
                             <div className="flex flex-col text-center space-y-0 h-fit items-center justify-center w-full gap-0">
-                                <p className={`font-bosBold ${materiIntiCount >= 10 ? "text-xl" : "text-2xl max-w-7xl"} w-full uppercase leading-none mb-0`}>
+                                <p className={`font-bosBold ${materiIntiCount >= 10 ? "text-xl" : "text-2xl max-w-6xl"} w-full uppercase leading-none mb-0`}>
                                     Materi Pelatihan {dataProgramPelatihan[0]?.name_indo}, tanggal{" "}
                                     {formatDateRange(
                                         generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan),
@@ -386,7 +387,7 @@ const FormatSTTPL = React.forwardRef(
                         </div>
 
                         {/* Table */}
-                        <div className={`${scaleClass} ${(pelatihan?.BidangPelatihan?.includes('Sistem Jaminan Mutu') || pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? '-mb-26' : 'mb-0'} pb-0 w-full border border-gray-400 rounded-md overflow-hidden `}>
+                        <div className={`${scaleClass} ${(pelatihan?.BidangPelatihan?.includes('Sistem Jaminan Mutu') || pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? 'mb-0' : 'mb-0'} pb-0 w-full border border-gray-400 rounded-md overflow-hidden `}>
                             {/* Header Baris 1 */}
                             <div className="flex text-center font-bosNormal bg-gray-100 ">
                                 <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 leading-none relative">
@@ -593,16 +594,18 @@ const FormatSTTPL = React.forwardRef(
 
 export type DialogSertifikatHandle = {
     uploadPdf: () => Promise<void>;
+    downloadPdf?: () => Promise<void>;
 };
 
 type Props = {
     userPelatihan: UserPelatihan;
     pelatihan: PelatihanMasyarakat;
     handleFetchingData?: () => void;
+    isPrint?: boolean
 };
 
 const DialogSertifikatPelatihan = forwardRef<DialogSertifikatHandle, Props>(
-    ({ userPelatihan, pelatihan }, ref) => {
+    ({ userPelatihan, pelatihan, isPrint }, ref) => {
         const componentRef = useRef<HTMLDivElement>(null);
         const componentRefPage = useRef<HTMLDivElement>(null);
         let html2pdfInstance: any = null;
@@ -729,16 +732,17 @@ const DialogSertifikatPelatihan = forwardRef<DialogSertifikatHandle, Props>(
 
 
 
-        useImperativeHandle(ref, () => ({ uploadPdf }), []);
+        useImperativeHandle(ref, () => ({ uploadPdf, downloadPdf }), []);
 
         return (
             <div className="max-h-[700px] scale-95 bg-white flex flex-col gap-2 overflow-y-auto scroll-smooth">
-                <button onClick={() => downloadPdf()}>Download</button>
+
                 <FormatSTTPL
                     ref={componentRef}
                     refPage={componentRefPage}
                     pelatihan={pelatihan}
                     userPelatihan={userPelatihan}
+                    isPrint={isPrint}
                 />
             </div>
         );

@@ -367,7 +367,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 border "
                                             >
                                                 <RiVerifiedBadgeFill className="h-4 w-4  " />
-                                                <span className="text-sm">Lihat Sertifikat</span>
+                                                <span className="text-sm">Lihat e-STTPL</span>
                                             </Link>}
                                     </div>
 

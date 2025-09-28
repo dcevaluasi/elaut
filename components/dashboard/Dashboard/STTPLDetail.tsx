@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import {
     Accordion,
     AccordionItem,
@@ -18,7 +18,7 @@ import { LuSignature } from "react-icons/lu";
 import { generatedCurriculumCertificate, generatedDescriptionCertificate } from "@/utils/certificates";
 import { DialogFormatSTTPL } from "@/components/sertifikat/dialogFormatSTTPL";
 import { Button } from "@/components/ui/button";
-import { FaSearch } from "react-icons/fa";
+import { FaPrint, FaSearch } from "react-icons/fa";
 import UserPelatihanTable from "./Tables/UserPelatihanTable";
 import { countUserWithCertificate, countUserWithDraftCertificate, countUserWithNoStatus, countUserWithPassed } from "@/utils/counter";
 import TTDeDetail from "./TTDeDetail";
@@ -33,6 +33,9 @@ import ReviseCertificateAction from "@/commons/actions/ReviseCertificateAction";
 import HistoryButton from "@/commons/actions/HistoryButton";
 import { DialogDevSTTPL } from "@/components/sertifikat/dialogDevSTTPL";
 import { truncateText } from "@/utils";
+import { RiVerifiedBadgeFill } from "react-icons/ri";
+import DialogSertifikatPelatihan, { DialogSertifikatHandle } from "@/components/sertifikat/dialogSertifikatPelatihan";
+import { Progress } from "@radix-ui/react-progress";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -42,6 +45,30 @@ interface Props {
 const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
     const { label, color, icon } = getStatusInfo(data.StatusPenerbitan)
     const { adminPusatData, loading, error, fetchAdminPusatData } = useFetchDataPusatById(data?.VerifikatorPelatihan)
+    const [isPrinting, setIsPrinting] = React.useState(false)
+    const [progress, setProgress] = React.useState<number>(0);
+    const [counter, setCounter] = React.useState<number>(0);
+    const [isUploading, setIsUploading] = React.useState<boolean>(false);
+
+    const refs = useRef<React.RefObject<DialogSertifikatHandle>[]>([]);
+
+    if (refs.current.length !== data.UserPelatihan.length) {
+        refs.current = data.UserPelatihan.map((_, i) => refs.current[i] ?? React.createRef<DialogSertifikatHandle>());
+    }
+
+    const handleDownloadAll = async () => {
+        setIsUploading(true);
+        setProgress(0);
+
+        for (let i = 0; i < refs.current.length; i++) {
+            await refs.current[i].current?.downloadPdf?.();
+
+            setProgress(((i + 1) / refs.current.length) * 100);
+            setCounter(i + 1);
+        }
+        setIsUploading(false);
+    };
+
 
     const [isZipping, setIsZipping] = React.useState(false)
     const handleDownloadZip = async () => {
@@ -455,7 +482,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     >
                                         <FaRegFolderOpen className="h-4 w-4" />
                                         <span className="text-sm">
-                                            {isZipping ? 'Zipping & Downloading...' : 'Download Zip Sertifikat'}
+                                            {isZipping ? 'Zipping & Downloading...' : 'Download Zip e-STTPL'}
                                         </span>
                                     </Button>
                                     }
@@ -467,6 +494,19 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             data={data}
                                         />
                                     )}
+
+                                    {(countUserWithCertificate(data.UserPelatihan) == data.UserPelatihan.length && !data?.TtdSertifikat?.includes('Kepala Badan')) && <Button
+                                        onClick={() => setIsPrinting(!isPrinting)}
+                                        variant="outline"
+                                        className={`flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-neutral-800 text-neutral-800 hover:text-white hover:bg-neutral-800`}
+                                    >
+                                        <FaPrint className="h-4 w-4" />
+                                        <span className="text-sm">
+                                            {isPrinting ? 'Tutup Mode Print...' : 'Mode Print'}
+                                        </span>
+                                    </Button>
+                                    }
+
                                 </div>
 
                                 <div className="w-full ">
@@ -497,7 +537,54 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 </span>
                                             </div>
                                         </div>
-                                        <UserPelatihanTable pelatihan={data} data={data.UserPelatihan} onSuccess={fetchData} />
+                                        {
+                                            isPrinting ? <div className={`flex flex-col gap-3`}>
+                                                {
+                                                    isUploading && <>
+                                                        <Progress value={progress} className="w-full h-3 rounded-lg" />
+                                                        <p className="text-sm text-gray-600 mt-1">
+                                                            {Math.round(progress)}% ({counter}/{data.UserPelatihan.length}) STTPL selesai
+                                                        </p></>
+                                                }
+
+                                                <Button
+                                                    onClick={() => handleDownloadAll()}
+                                                    variant="outline"
+                                                    disabled={isUploading}
+                                                    className={`flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-neutral-800 text-neutral-800 hover:text-white hover:bg-neutral-800`}
+                                                >
+                                                    <FaPrint className="h-4 w-4" />
+                                                    <span className="text-sm">
+                                                        {isUploading ? 'Mendownload...' : 'Download File Print STTPL'}
+                                                    </span>
+                                                </Button>
+                                                {data.UserPelatihan.map((item, i) => (
+                                                    <>
+                                                        <div className="flex gap-2 items-center justify-between">
+                                                            <p className="font-semibold text-sm text-gray-600 uppercase">{i + 1}. {item.Nama} - {item.NoRegistrasi}</p>  {
+                                                                item.FileSertifikat?.includes('signed') && <Link
+                                                                    target="_blank"
+                                                                    href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${item.FileSertifikat}`}
+                                                                    className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 border "
+                                                                >
+                                                                    <RiVerifiedBadgeFill className="h-4 w-4  " />
+                                                                    <span className="text-sm">Lihat e-STTPL</span>
+                                                                </Link>}
+                                                        </div>
+
+                                                        <DialogSertifikatPelatihan
+                                                            key={item.IdUserPelatihan ?? i}
+                                                            ref={refs.current[i]}                 // ✅ pass the ref object directly
+                                                            pelatihan={data}
+                                                            userPelatihan={item}
+                                                            handleFetchingData={fetchData}
+                                                            isPrint={isPrinting}
+                                                        />
+                                                    </>
+                                                ))}
+                                            </div> : <UserPelatihanTable pelatihan={data} data={data.UserPelatihan} onSuccess={fetchData} />
+                                        }
+
                                     </div>
                                 </div>
                             </div>
