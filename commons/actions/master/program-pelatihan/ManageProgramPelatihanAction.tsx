@@ -31,8 +31,8 @@ const ManageProgramPelatihanAction: React.FC<{
     const [namaEng, setNamaEng] = useState("");
     const [nameSingkatan, setNameSingkatan] = useState("");
     const [description, setDescription] = useState({
-        headerIndo: "",
-        headerEnglish: "",
+        headerIndo: "Berdasarkan Peraturan Pemerintah Nomor 62 Tahun 2014 tentang Penyelenggaraan Pendidikan, Pelatihan, dan Penyuluhan Perikanan, serta ketentuan pelaksanaannya",
+        headerEnglish: "Based on Government Regulation Number 62 of 2014 concerning the Implementation of Fisheries Education, Training, and Extension as well as its implementing provisions",
         bodyIndo: "",
         bodyEnglish: "",
     });
@@ -72,8 +72,8 @@ const ManageProgramPelatihanAction: React.FC<{
         setNamaEng("");
         setNameSingkatan("");
         setDescription({
-            headerIndo: "",
-            headerEnglish: "",
+            headerIndo: "Berdasarkan Peraturan Pemerintah Nomor 62 Tahun 2014 tentang Penyelenggaraan Pendidikan, Pelatihan, dan Penyuluhan Perikanan, serta ketentuan pelaksanaannya",
+            headerEnglish: "Based on Government Regulation Number 62 of 2014 concerning the Implementation of Fisheries Education, Training, and Extension as well as its implementing provisions",
             bodyIndo: "",
             bodyEnglish: "",
         });

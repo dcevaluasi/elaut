@@ -213,7 +213,7 @@ const ManageUnitKerjaAction: React.FC<Props> = ({ unitKerja, onSuccess }) => {
                             />
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-gray-700">Lokasi</label>
+                            <label className="text-sm font-medium text-gray-700">Lokasi Penandatanganan (Contoh: Bitung, Ambon)</label>
                             <input
                                 type="text"
                                 value={lokasiPimpinan}

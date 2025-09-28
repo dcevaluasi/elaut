@@ -751,27 +751,6 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 </AccordionSection>
                             </div>
                         </div>}
-
-                    <AccordionSection title="👥 Peserta Pelatihan">
-                        <div className="flex flex-col w-full gap-4">
-                            <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
-                                <p className="font-medium text-gray-600">
-                                    Action :
-                                </p>
-
-                            </div>
-
-                            <div className="w-full ">
-                                <p className="font-medium text-gray-600 mb-2">
-                                    Detail  :
-                                </p>
-                                <div className="flex flex-col gap-2 w-full">
-
-                                    <TTDeDetail data={data} fetchData={fetchData} />
-                                </div>
-                            </div>
-                        </div>
-                    </AccordionSection>
                 </div>
 
             </Accordion >

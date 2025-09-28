@@ -18,6 +18,8 @@ import firebaseApp from "@/firebase/config";
 import addData from "@/firebase/firestore/addData";
 import { useFetchDataProgramPelatihan } from "@/hooks/elaut/master/useFetchDataProgramPelatihan";
 import './styles/certificate.css'
+import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
+import { findDataUnitKerjaById } from "@/utils/unitkerja";
 
 const FormatSTTPL = React.forwardRef(
     (
@@ -34,7 +36,14 @@ const FormatSTTPL = React.forwardRef(
 
     ) => {
         const { data: dataProgramPelatihan, loading: loadingProgramPelatihan, error: errorProgramPelatihan, fetchProgramPelatihan } = useFetchDataProgramPelatihan(pelatihan?.Program);
-        console.log({ dataProgramPelatihan })
+
+        const { unitKerjas, loading: loadingUnitKerja, error: errorUnitKerja, fetchUnitKerjaData } = useFetchDataUnitKerja()
+        const unitKerja = findDataUnitKerjaById(unitKerjas, Cookies.get('IDUnitKerja'))
+        console.log({ unitKerja })
+
+        React.useEffect(() => {
+            fetchUnitKerjaData()
+        }, [fetchUnitKerjaData])
 
         const [peserta, setPeserta] = React.useState<User | null>(null);
 
@@ -141,9 +150,9 @@ const FormatSTTPL = React.forwardRef(
             handleFetchDetailPeserta();
         }, []);
 
-        if (loadingProgramPelatihan)
+        if (loadingProgramPelatihan || loadingUnitKerja)
             return <p className="text-center py-10 text-gray-500">Loading...</p>;
-        if (errorProgramPelatihan)
+        if (errorProgramPelatihan || errorUnitKerja)
             return <p className="text-center text-red-500 py-10">{errorProgramPelatihan}</p>;
 
 
@@ -257,11 +266,14 @@ const FormatSTTPL = React.forwardRef(
                         <>
                             <div className="flex w-full flex-col space-y-1 max-w-7xl mx-auto items-start text-sm -mt-2 text-center font-bos h-fit">
                                 <span className="text-lg leading-[115%] font-bosNormal max-w-7xl">
-                                    Pelatihan <span className={`${pelatihan?.Program.includes('HACCP') ? 'font-bosItalic' : 'font-bosNormal'}`}>{dataProgramPelatihan[0]?.name_indo}</span> pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))} {dataProgramPelatihan[0]?.description == "" ? "dalam mendukung Sistem Jaminan Mutu berdasarkan Peraturan Menteri Kelautan dan Perikanan Republik Indonesia Nomor 8 Tahun 2024 tentang Pengendalian Pelaksanaan Sistem Jaminan Mutu dan Keamanan Hasil Kelautan dan Perikanan" : generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_indo}
+                                    Pelatihan <span className={`${pelatihan?.Program.includes('HACCP') ? 'font-bosItalic' : 'font-bosNormal'}`}>{dataProgramPelatihan[0]?.name_indo}</span> pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))} {generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_indo == "" ? `yang diselenggarakan oleh ${pelatihan?.PenyelenggaraPelatihan} di ${pelatihan?.LokasiPelatihan}. Yang merupakan bagian dari upaya peningkatan kapasitas dan kompetensi sumber daya manusia di sektor kelautan dan perikanan, sesuai dengan standar mutu atau ketentuan yang berlaku, sehingga peserta memperoleh pengetahuan, keterampilan, dan pemahaman yang relevan sesuai program pelatihan.` : generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_indo}
                                 </span>
-                                <span className="max-w-6xl mt-1 leading-none font-bosItalic text-[0.9rem] mx-auto">
-                                    {dataProgramPelatihan[0]?.name_english} training on {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))} {dataProgramPelatihan[0]?.description == "" ? "in support of the Quality Assurance System based on Regulation of the Minister of Marine Affairs and Fisheries of the Republic of Indonesia Number 8 of 2024 concerning Control of the Implementation of the Quality Assurance and Safety System for Marine and Fishery Product" : generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng}
-                                </span>
+                                {
+                                    generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng != "" && <span className="max-w-6xl mt-1 leading-none font-bosItalic text-[0.9rem] mx-auto">
+                                        {dataProgramPelatihan[0]?.name_english} training on {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))} {dataProgramPelatihan[0]?.description == "" ? "in support of the Quality Assurance System based on Regulation of the Minister of Marine Affairs and Fisheries of the Republic of Indonesia Number 8 of 2024 concerning Control of the Implementation of the Quality Assurance and Safety System for Marine and Fishery Product" : generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng}
+                                    </span>
+                                }
+
                             </div>
 
                             <div className="flex gap-2 items-center justify-center pt-4">
@@ -306,7 +318,7 @@ const FormatSTTPL = React.forwardRef(
                                     {/* Kolom 3 - Tanda Tangan & Pejabat */}
                                     <div className={`flex flex-col items-center justify-center text-center ${peserta?.Foto == "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/" ? "w-[140%]" : "w-[120%]"} mt-2 space-y-1 -ml-20`}>
                                         <div className="flex flex-col items-center gap-0.5 font-bosNormal text-sm leading-tight">
-                                            <span className='text-sm'>Jakarta, {generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan)}</span>
+                                            <span className='text-base'>Jakarta, {generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan)}</span>
                                             <span className="w-full font-bosBold text-base">
                                                 a.n. KEPALA BADAN PENYULUHAN DAN PENGEMBANGAN <br />
                                                 SUMBER DAYA MANUSIA KELAUTAN DAN PERIKANAN
@@ -347,31 +359,34 @@ const FormatSTTPL = React.forwardRef(
                 </div>
 
                 <div
-                    className={`pdf-page w-full flex flex-col gap-2 h-[49.63rem] items-center justify-center ${materiIntiCount >= 10 ? "mt-72" : "mt-36"} break-before-auto relative  mb-0 pb-0`}
+                    className={`pdf-page w-full flex flex-col gap-2 h-[52.74rem] items-center justify-center ${materiIntiCount >= 10 ? "mt-64" : "mt-36"} break-before-auto relative  mb-0 pb-0`}
                 >
                     <div className="w-full mb-0 pb-0">
                         {/* Title */}
                         <div className={`flex flex-row justify-center items-center ${materiIntiCount >= 10 ? "-mb-20" : "mb-5"}`}>
                             <div className="flex flex-col text-center space-y-0 h-fit items-center justify-center w-full gap-0">
-                                <p className={`font-bosBold ${materiIntiCount >= 10 ? "text-xl" : "text-2xl max-w-6xl"} w-full uppercase leading-none mb-0`}>
+                                <p className={`font-bosBold ${materiIntiCount >= 10 ? "text-xl" : "text-2xl max-w-7xl"} w-full uppercase leading-none mb-0`}>
                                     Materi Pelatihan {dataProgramPelatihan[0]?.name_indo}, tanggal{" "}
                                     {formatDateRange(
                                         generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan),
                                         generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan)
                                     )}
                                 </p>
-                                <span className={`font-bos ${materiIntiCount >= 10 ? "text-lg" : "text-xl"} leading-none -mt-5 pt-0`}>
-                                    Curriculum of {dataProgramPelatihan[0]?.name_english} Training,{" "}
-                                    {formatDateRangeEnglish(
-                                        generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan),
-                                        generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan)
-                                    )}
-                                </span>
+                                {
+                                    generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng != "" && <span className={`font-bos ${materiIntiCount >= 10 ? "text-lg" : "text-xl"} leading-none -mt-5 pt-0`}>
+                                        Curriculum of {dataProgramPelatihan[0]?.name_english} Training,{" "}
+                                        {formatDateRangeEnglish(
+                                            generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan),
+                                            generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan)
+                                        )}
+                                    </span>
+                                }
+
                             </div>
                         </div>
 
                         {/* Table */}
-                        <div className={`${scaleClass} mb-0 pb-0 w-full border border-gray-400 rounded-md overflow-hidden`}>
+                        <div className={`${scaleClass} ${(pelatihan?.BidangPelatihan?.includes('Sistem Jaminan Mutu') || pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? '-mb-26' : 'mb-0'} pb-0 w-full border border-gray-400 rounded-md overflow-hidden `}>
                             {/* Header Baris 1 */}
                             <div className="flex text-center font-bosNormal bg-gray-100 ">
                                 <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 leading-none relative">
@@ -401,7 +416,7 @@ const FormatSTTPL = React.forwardRef(
                             <div className="flex text-center font-bosNormal bg-gray-100 border-b border-gray-400">
                                 <div className="w-1/12 px-1 border-r border-gray-400"></div>
                                 <div className="w-7/12 px-1 border-r border-gray-400"></div>
-                                <div className="w-2/12 px-1 border-r border-gray-400">
+                                <div className="w-2/12 px-1 py-1 border-r border-gray-400">
                                     <div className="flex flex-row items-center justify-center mb-4">
                                         <span className="text-lg leading-none !font-bosBold">TEORI</span>/
                                         <span className="italic font-bos leading-none ">THEORY</span>
@@ -534,6 +549,39 @@ const FormatSTTPL = React.forwardRef(
                                 </div>
                             </div>
                         </div>
+
+                        {
+                            (pelatihan?.BidangPelatihan?.includes('Sistem Jaminan Mutu') || pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? <div className="w-full flex justify-center items-center">
+                                <p className="max-w-3xl text-center font-bosItalic leading-none">
+                                    Lampiran materi/kurikulum pelatihan disahkan sesuai dengan standar mutu yang berlaku dan diselenggarakan di <span className="font-bosBold uppercase">
+                                        {pelatihan?.PenyelenggaraPelatihan}
+                                    </span>
+                                </p>
+                            </div> :
+                                unitKerja != null ? <div className={`flex flex-col items-start justify-start text-left w-full mt-2 space-y-1 max-w-7xl`}>
+                                    <div className="flex flex-col items-start gap-0.5 font-bosNormal text-sm leading-tight">
+                                        <span className='text-base'> {generatedSignedCertificate(unitKerja?.pimpinan).location}, {generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan)}</span>
+                                        <span className='text-base'> Disahkan oleh,</span>
+
+                                        <span className="w-full font-bosBold uppercase text-base">
+                                            {generatedSignedCertificate(unitKerja?.pimpinan).status_indo}
+                                        </span>
+
+                                        <span className="leading-tight font-bosItalic text-sm">
+                                            {generatedSignedCertificate(unitKerja?.pimpinan).status_eng}
+                                        </span>
+                                    </div>
+
+                                    <span className="w-full font-bosNormal uppercase text-base py-3 my-3">
+                                        TTD
+                                    </span>
+
+                                    <span className="font-bosBold text-base -mt-2">
+                                        {generatedSignedCertificate(unitKerja?.pimpinan).name}
+                                    </span>
+                                </div> : <></>
+                        }
+
                     </div>
                 </div>
 

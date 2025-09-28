@@ -38,3 +38,22 @@ export function findNameUnitKerjaById(
     return { name: '' }
   }
 }
+
+export function findDataUnitKerjaById(
+  unitKerjas: UnitKerja[],
+  idUnitKerja: string | undefined,
+): UnitKerja | null {
+  if (!idUnitKerja) {
+    return null
+  }
+
+  const match = unitKerjas.find(
+    (uk) => uk.id_unit_kerja === parseInt(idUnitKerja),
+  )
+
+  if (match) {
+    return match
+  } else {
+    return null
+  }
+}
