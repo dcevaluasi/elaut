@@ -24,7 +24,7 @@ const db = getFirestore(firebaseApp);
 function Page() {
     const { kode } = useParams();
     const docId = Array.isArray(kode) ? kode[0] : kode;
-    const isAwakKapalPerikanan = docId.includes('AKP') || docId.includes('Awak Kapal Perikanan')
+    const isAwakKapalPerikanan = docId.includes('Keahlian')
     const decodedDocId = decodeURIComponent(docId || "");
     const [showForm, setShowForm] = useState<{ [key: string]: boolean }>({});
     const toggleForm = (cat: string) => {
