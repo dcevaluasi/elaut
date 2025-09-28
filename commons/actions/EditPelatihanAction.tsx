@@ -144,13 +144,17 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
     return (
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
             <AlertDialogTrigger asChild>
-                <Button
-                    variant="outline"
-                    className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500"
-                >
-                    <TbEditCircle className="h-5 w-5" />
-                    <span>Edit Informasi Pelatihan</span>
-                </Button>
+                {
+                    (Cookies.get("Access")?.includes("createPelatihan") &&
+                        (currentData?.StatusPenerbitan === "0" || currentData?.StatusPenerbitan === "3" || currentData?.StatusPenerbitan === "1.2")) && <Button
+                            variant="outline"
+                            className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500"
+                        >
+                        <TbEditCircle className="h-5 w-5" />
+                        <span>Edit Informasi Pelatihan</span>
+                    </Button>
+
+                }
             </AlertDialogTrigger>
 
             <AlertDialogContent className="max-w-3xl">
