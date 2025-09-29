@@ -160,7 +160,7 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
                 <AlertDialogHeader>
                     <AlertDialogTitle>Cari dan Pilih Perangkat Pelatihan</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Modul yang dipilih akan menjadi perangkat pelatihan yang muncul di halaman pengguna (Masyarakat) sehingga mereka dapat mengakses modul. Dalam hal penambahan bahan lainnya kamu dapat melakukannya setelah memilih modul, apabila tidak tersedia modul yang dicari maka silahkan menuju <Link target="_blank" className="underline text-blue-500" href={`/admin/lemdiklat/master/bahan-ajar`}>Menu Bahan Ajar</Link> untuk mengupload bahan ajar versi Lembaga Diklat mu!
+                        Perangkat pelatihan yang dipilih akan yang muncul di halaman pengguna (Masyarakat) sehingga mereka dapat mengakses. Dalam hal penambahan bahan lainnya kamu dapat melakukannya setelah memilih modul, apabila tidak tersedia modul yang dicari maka silahkan menuju <Link target="_blank" className="underline text-blue-500" href={`/admin/lemdiklat/master/bahan-ajar`}>Menu Bahan Ajar</Link> untuk mengupload bahan ajar versi Lembaga Diklat mu!
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <div className="flex w-full gap-2 items-end">
@@ -262,7 +262,7 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
                                                 </div>
                                                 <div>
                                                     <p className="text-xs text-gray-600 line-clamp-2">
-                                                        Tahun :  {item.NamaPenderitaMateriPelatihan}
+                                                        Tahun :  {item.Tahun}
                                                     </p>
                                                     <p className="text-xs text-gray-600 line-clamp-2">
                                                         Produsen :  {item.DeskripsiMateriPelatihan}
@@ -278,7 +278,7 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
                                                         onClick={() => { setSelectedModulPelatihan(item); setIdModulPelatihan(item.IdMateriPelatihan.toString()) }}
                                                         className="flex items-center gap-2 w-fit rounded-lg px-3 shadow-md transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 mt-2 text-xs"
                                                     >
-                                                        <span>Pilih Modul</span>
+                                                        <span>Pilih Perangkat</span>
                                                         <TbArrowRight className="h-2 w-2" />
                                                     </Button>
 
@@ -417,7 +417,7 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
                         className="bg-blue-500 hover:bg-blue-600 text-white"
                         disabled={loading || idModulPelatihan == ""}
                     >
-                        {loading ? "Menyimpan..." : "Pilih Modul"}
+                        {loading ? "Menyimpan..." : "Pilih Perangkat"}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

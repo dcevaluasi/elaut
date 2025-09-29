@@ -114,8 +114,6 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
     setIsUploading(true);
 
     const data = new FormData();
-
-    data.append("IdLemdik", idUnitKerja);
     data.append("KodePelatihan", kodePelatihan);
     data.append("NamaPelatihan", namaPelatihan);
     data.append("NamaPelathanInggris", namaPelatihanInggris);
