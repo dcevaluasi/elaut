@@ -36,6 +36,7 @@ import { truncateText } from "@/utils";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 import DialogSertifikatPelatihan, { DialogSertifikatHandle } from "@/components/sertifikat/dialogSertifikatPelatihan";
 import { Progress } from "@radix-ui/react-progress";
+import Toast from "@/commons/Toast";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -108,19 +109,46 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     <>
 
                                         {/* (5) Operator : Send Penerbitan STTPL */}
-                                        {["5"].includes(data.StatusPenerbitan) && (
-                                            <SendNoteAction
-                                                idPelatihan={data.IdPelatihan.toString()}
-                                                title="Ajukan Penerbitan STTPL"
-                                                description="Ayoo! Segera ajukan penerbitan STTPL, siapkan dokumen kelengkapan sebelum proses pengajuan!"
-                                                buttonLabel="Ajukan Penerbitan STTPL"
-                                                icon={LuSignature}
-                                                buttonColor={"blue"}
-                                                onSuccess={fetchData}
-                                                status={"6"}
-                                                pelatihan={data}
-                                            />
-                                        )}
+
+                                        {(data.StatusPenerbitan === "5") ? (
+                                            countUserWithNoStatus(data?.UserPelatihan) == 0 ? (
+                                                <SendNoteAction
+                                                    idPelatihan={data.IdPelatihan.toString()}
+                                                    title="Ajukan Penerbitan STTPL"
+                                                    description="Ayoo! Segera ajukan penerbitan STTPL, siapkan dokumen kelengkapan sebelum proses pengajuan!"
+                                                    buttonLabel="Ajukan Penerbitan STTPL"
+                                                    icon={LuSignature}
+                                                    buttonColor={"blue"}
+                                                    onSuccess={fetchData}
+                                                    status={"6"}
+                                                    pelatihan={data}
+                                                />
+                                            ) : <Button
+                                                variant="outline"
+                                                className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
+                                                onClick={() => {
+                                                    Toast.fire({
+                                                        icon: "warning",
+                                                        title: "Lengkapi Status Peserta Terlebih Dahulu",
+                                                        html: `
+                                                  <ul style="text-align:left; margin-top:8px;">
+                                                    ${data?.ModuleMateri === "" ? "<li>Module Materi belum diisi</li>" : ""}
+                                                    ${!data?.UserPelatihan || data?.UserPelatihan.length === 0
+                                                                ? "<li>Peserta pelatihan belum ditambahkan</li>"
+                                                                : ""
+                                                            }
+                                                    ${data?.SuratPemberitahuan === "" ? "<li>Surat Pemberitahuan belum tersedia</li>" : ""}
+                                                  </ul>
+                                                `,
+                                                    });
+                                                }}
+                                            >
+                                                <LuSignature className="h-5 w-5" />
+                                                Ajukan Penerbitan STTPL
+                                            </Button>
+
+                                        ) : null}
+
 
                                         {/* {(data.StatusPenerbitan == "5" && data?.DeskripsiSertifikat == "") && <p className="text-gray-600 text-sm">Harap Mengatur Format Sertifikat Terlebih Dahulu Untuk Melanjutkan Proses Berikutnya!</p>} */}
 

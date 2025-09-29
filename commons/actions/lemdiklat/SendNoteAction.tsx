@@ -251,13 +251,23 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
 
                 <AlertDialogFooter>
                     <AlertDialogCancel disabled={loading}>Batal</AlertDialogCancel>
-                    <Button
-                        onClick={handleSubmit}
-                        className={`bg-${buttonColor}-500 hover:bg-${buttonColor}-700 text-white`}
-                        disabled={loading || !message}
-                    >
-                        {loading ? "Memproses..." : "Kirim"}
-                    </Button>
+                    {
+                        title == "Ajukan Penerbitan STTPL" ? <Button
+                            onClick={handleSubmit}
+                            className={`bg-${buttonColor}-500 hover:bg-${buttonColor}-700 text-white`}
+                            disabled={loading || !message || !beritaAcaraFile}
+                        >
+                            {loading ? "Memproses..." : "Kirim"}
+                        </Button> : <Button
+                            onClick={handleSubmit}
+                            className={`bg-${buttonColor}-500 hover:bg-${buttonColor}-700 text-white`}
+                            disabled={loading || !message}
+                        >
+                            {loading ? "Memproses..." : "Kirim"}
+                        </Button>
+                    }
+
+
                 </AlertDialogFooter>
 
             </AlertDialogContent>
