@@ -281,15 +281,18 @@ export default function TableProgramPelatihan() {
                                                                                 <span className="font-semibold">Header STTPL Inggris:</span>{" "}
                                                                                 {generatedDescriptionCertificateFull(row.description).desc_eng}
                                                                             </p>
-                                                                            <p className="text-sm text-gray-700">
-                                                                                <span className="font-semibold">Deskripsi STTPL Indo:</span>{" "}
-                                                                                {generatedDescriptionCertificateFull(row.description).body_indo}
-                                                                            </p>
-                                                                            <p className="text-sm text-gray-700">
-                                                                                <span className="font-semibold">Deskripsi STTPL Inggris:</span>{" "}
-                                                                                {generatedDescriptionCertificateFull(row.description).body_eng}
-                                                                            </p>
-
+                                                                            {
+                                                                                generatedDescriptionCertificateFull(row.description).body_indo != "" && <p className="text-sm text-gray-700">
+                                                                                    <span className="font-semibold">Deskripsi STTPL Indo:</span>{" "}
+                                                                                    {generatedDescriptionCertificateFull(row.description).body_indo}
+                                                                                </p>
+                                                                            }
+                                                                            {
+                                                                                generatedDescriptionCertificateFull(row.description).body_eng != "" && <p className="text-sm text-gray-700">
+                                                                                    <span className="font-semibold">Deskripsi STTPL Inggris:</span>{" "}
+                                                                                    {generatedDescriptionCertificateFull(row.description).body_eng}
+                                                                                </p>
+                                                                            }
                                                                         </div>
                                                                     </motion.div>
                                                                 )}

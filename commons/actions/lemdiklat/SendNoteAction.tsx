@@ -163,7 +163,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
 
                 {/* Input Pesan */}
                 {
-                    (Cookies.get('Access')?.includes('supervisePelaksanaan') && (pelatihan?.StatusPenerbitan == "1")) && <div>
+                    (Cookies.get('Access')?.includes('supervisePelaksanaan') && (pelatihan?.StatusPenerbitan == "1") && title == "Pilih Verifikator") && <div>
                         <Select
                             value={verifikatorPelaksanaan}
                             onValueChange={setVerifikatorPelaksanaan}
@@ -253,7 +253,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                     <AlertDialogCancel disabled={loading}>Batal</AlertDialogCancel>
                     <Button
                         onClick={handleSubmit}
-                        className={`bg-${buttonColor}-600 hover:bg-${buttonColor}-700 text-white`}
+                        className={`bg-${buttonColor}-500 hover:bg-${buttonColor}-700 text-white`}
                         disabled={loading || !message}
                     >
                         {loading ? "Memproses..." : "Kirim"}

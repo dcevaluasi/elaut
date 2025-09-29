@@ -131,7 +131,7 @@ export function getStatusInfo(
     case "1.2":
       return {
         label: "Reject SPV",
-        color: "bg-rose-500 text-white",
+        color: "bg-rose-600 text-white",
         icon: <RiCloseCircleFill className="w-4 h-4" />,
       };
     case "7A":
@@ -149,7 +149,7 @@ export function getStatusInfo(
     case "7C":
       return {
         label: "Reject Kabalai",
-        color: "bg-rose-500 text-white",
+        color: "bg-rose-600 text-white",
         icon: <RiCloseCircleFill className="w-4 h-4" />,
       };
     case "7D":
@@ -168,7 +168,7 @@ export function getStatusInfo(
     case "3":
       return {
         label: "Reject Verifikator",
-        color: "bg-rose-500 text-white",
+        color: "bg-rose-600 text-white",
         icon: <RiCloseCircleFill className="w-4 h-4" />,
       };
     case "4":
@@ -193,7 +193,7 @@ export function getStatusInfo(
     case "7":
       return {
         label: "Reject STTPL Verifikator",
-        color: "bg-rose-500 text-white",
+        color: "bg-rose-600 text-white",
         icon: <RiCloseCircleFill className="w-4 h-4" />,
       };
     case "8":
@@ -205,7 +205,7 @@ export function getStatusInfo(
     case "9":
       return {
         label: "Reject Kapus",
-        color: "bg-rose-500 text-white",
+        color: "bg-rose-600 text-white",
         icon: <RiCloseCircleFill className="w-4 h-4" />,
       };
     case "10":
@@ -229,7 +229,7 @@ export function getStatusInfo(
     case "13":
       return {
         label: "Reject Kabadan",
-        color: "bg-rose-500 text-white",
+        color: "bg-rose-600 text-white",
         icon: <RiCloseCircleFill className="w-4 h-4" />,
       };
     case "14":

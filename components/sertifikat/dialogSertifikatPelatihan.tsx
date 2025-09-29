@@ -166,7 +166,7 @@ const FormatSTTPL = React.forwardRef(
                 <div ref={refPage} className={`pdf-page w-full flex flex-col  gap-4 relative  items-center justify-center h-[49.63rem]`}>
                     <div className="flex flex-row  absolute top-0 right-0">
                         <p className="text-lg font-bosNormal">
-                            No. STTPL : {userPelatihan?.NoRegistrasi}
+                            No. Sertifikat : {userPelatihan?.NoRegistrasi}
                         </p>
                     </div>
 
@@ -205,9 +205,10 @@ const FormatSTTPL = React.forwardRef(
 
                             <div className="flex flex-col h-fit items-center justify-center space-y-1">
                                 <h1 className="text-2xl font-bosBold leading-none">
-                                    SERTIFIKAT
+                                    SERTIFIKAT PELATIHAN
                                 </h1>
-                                <p className="text-xl font-bosItalic">CERTIFICATE</p>
+                                <p className="text-xl font-bosItalic">TRAINING CERTIFICATE</p>
+
                             </div>
 
                         </div>
@@ -247,6 +248,7 @@ const FormatSTTPL = React.forwardRef(
                                     <td className=" w-2/3 text-xl font-bosBold uppercase">
                                         : {peserta?.TempatLahir}, {peserta?.TanggalLahir}
                                     </td>
+
                                 </tr>
                             </table>
                         </div>
@@ -256,6 +258,7 @@ const FormatSTTPL = React.forwardRef(
                                 {
                                     userPelatihan?.IsActice == "" ? "-" : generatedStatusCertificate(userPelatihan?.IsActice).status_indo
                                 }
+                                TELAH LULUS
                             </h1>
                             <h3 className="font-bosNormal text-lg italic">
                                 {
@@ -387,7 +390,7 @@ const FormatSTTPL = React.forwardRef(
                         </div>
 
                         {/* Table */}
-                        <div className={`${scaleClass} ${(pelatihan?.BidangPelatihan?.includes('Sistem Jaminan Mutu') || pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? 'mb-0' : 'mb-0'} pb-0 w-full border border-gray-400 rounded-md overflow-hidden `}>
+                        <div className={`${scaleClass} ${(pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? '-mb-28' : 'mb-0'} pb-0 w-full border border-gray-400 rounded-md overflow-hidden `}>
                             {/* Header Baris 1 */}
                             <div className="flex text-center font-bosNormal bg-gray-100 ">
                                 <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 leading-none relative">
@@ -554,7 +557,7 @@ const FormatSTTPL = React.forwardRef(
                         {
                             (pelatihan?.BidangPelatihan?.includes('Sistem Jaminan Mutu') || pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? <div className="w-full flex justify-center items-center">
                                 <p className="max-w-3xl text-center font-bosItalic leading-none">
-                                    Lampiran materi/kurikulum pelatihan disahkan sesuai dengan standar mutu yang berlaku dan diselenggarakan di <span className="font-bosBold uppercase">
+                                    Lampiran materi/kurikulum pelatihan disahkan sesuai dengan standar mutu yang berlaku dan diselenggarakan oleh <span className="font-bosBold uppercase">
                                         {pelatihan?.PenyelenggaraPelatihan}
                                     </span>
                                 </p>
@@ -730,13 +733,10 @@ const DialogSertifikatPelatihan = forwardRef<DialogSertifikatHandle, Props>(
             }
         };
 
-
-
         useImperativeHandle(ref, () => ({ uploadPdf, downloadPdf }), []);
 
         return (
             <div className="max-h-[700px] scale-95 bg-white flex flex-col gap-2 overflow-y-auto scroll-smooth">
-
                 <FormatSTTPL
                     ref={componentRef}
                     refPage={componentRefPage}

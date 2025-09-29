@@ -752,7 +752,6 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                             </div>
                         </div>}
                 </div>
-
             </Accordion >
         </div >
     );
