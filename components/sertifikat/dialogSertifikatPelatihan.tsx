@@ -20,6 +20,56 @@ import './styles/certificate.css'
 import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
 import { findDataUnitKerjaById } from "@/utils/unitkerja";
 
+
+function QRCodeImage({ value }: { value: string }) {
+
+    const [imgUrl, setImgUrl] = React.useState("");
+
+    const wrapperRef = useRef<HTMLDivElement>(null);
+
+    React.useEffect(() => {
+        if (wrapperRef.current) {
+            const svg = wrapperRef.current.querySelector("svg");
+            if (svg) {
+                const serialized = new XMLSerializer().serializeToString(svg);
+                const svgBlob = new Blob([serialized], { type: "image/svg+xml;charset=utf-8" });
+                const url = URL.createObjectURL(svgBlob);
+
+                const img = document.createElement("img");
+                img.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    canvas.width = 300;
+                    canvas.height = 300;
+                    const ctx = canvas.getContext("2d")!;
+                    ctx.drawImage(img, 0, 0);
+                    setImgUrl(canvas.toDataURL("image/png"));
+                    URL.revokeObjectURL(url);
+                };
+                img.src = url;
+            }
+        }
+    }, [value]);
+
+    return (
+        <div className="w-30">
+            {/* Wrap QRCode with a ref-able div */}
+            <div ref={wrapperRef} style={{ display: "none" }}>
+                <QRCode value={value} size={300} />
+            </div>
+
+            {imgUrl && (
+                <img
+                    src={imgUrl}
+                    alt="QR Code"
+                    style={{ height: "300px", width: "300px", marginLeft: "8rem" }}
+                />
+            )}
+        </div>
+    );
+
+}
+
+
 const FormatSTTPL = React.forwardRef(
     (
         {
@@ -284,14 +334,7 @@ const FormatSTTPL = React.forwardRef(
                             <div className="flex gap-2 items-center justify-center pt-4">
                                 <div className="grid grid-cols-3 items-center">
                                     {/* Kolom 1 - QR Code */}
-                                    <div className="w-30 ">
-                                        <QRCode
-                                            size={300}
-                                            style={{ height: "auto", maxWidth: "100%", width: "100%", marginLeft: "8rem", }}
-                                            value={`https://elaut-bppsdm.kkp.go.id/layanan/cek-sertifikat/${userPelatihan?.NoRegistrasi}`}
-                                            viewBox={`0 0 300 300`}
-                                        />
-                                    </div>
+                                    <QRCodeImage value={userPelatihan?.NoRegistrasi} />
 
                                     {/* Kolom 2 - Foto */}
                                     {
@@ -321,7 +364,7 @@ const FormatSTTPL = React.forwardRef(
 
 
                                     {/* Kolom 3 - Tanda Tangan & Pejabat */}
-                                    <div className={`flex flex-col items-center justify-center text-center ${peserta?.Foto == "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/" ? "w-[140%]" : "w-[120%]"} mt-2 space-y-1 -ml-20`}>
+                                    <div className={`flex flex-col items-center justify-center text-center ${peserta?.Foto == "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/" ? "w-[120%]" : "w-[120%]"} mt-2 space-y-1 -ml-20`}>
                                         <div className="flex flex-col items-center gap-0.5 font-bosNormal text-sm leading-tight">
                                             <span className='text-base'>Jakarta, {generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan)}</span>
                                             <span className="w-full font-bosBold text-base">
@@ -364,7 +407,7 @@ const FormatSTTPL = React.forwardRef(
                 </div>
 
                 <div
-                    className={`pdf-page w-full flex flex-col gap-2 h-[53.74rem] items-center justify-center ${materiIntiCount >= 10 ? "mt-60" : "mt-36"} break-before-auto relative  mb-0 pb-0`}
+                    className={`pdf-page w-full flex flex-col gap-2 h-[53.74rem] items-center justify-center ${materiIntiCount >= 10 ? "mt-56" : "mt-36"} break-before-auto relative  mb-0 pb-0`}
                 >
                     <div className="w-full mb-0 pb-0">
                         {/* Title */}
