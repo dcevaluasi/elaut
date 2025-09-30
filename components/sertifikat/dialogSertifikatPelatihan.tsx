@@ -362,7 +362,7 @@ const FormatSTTPL = React.forwardRef(
                 </div>
 
                 <div
-                    className={`pdf-page w-full flex flex-col gap-2 h-[52.74rem] items-center justify-center ${materiIntiCount >= 10 ? "mt-64" : "mt-36"} break-before-auto relative  mb-0 pb-0`}
+                    className={`pdf-page w-full flex flex-col gap-2 h-[53.74rem] items-center justify-center ${materiIntiCount >= 10 ? "mt-60" : "mt-36"} break-before-auto relative  mb-0 pb-0`}
                 >
                     <div className="w-full mb-0 pb-0">
                         {/* Title */}
@@ -376,7 +376,7 @@ const FormatSTTPL = React.forwardRef(
                                     )}
                                 </p>
                                 {
-                                    generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng != "" && <span className={`font-bos ${materiIntiCount >= 10 ? "text-lg" : "text-xl"} leading-none -mt-5 pt-0`}>
+                                    generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng != "" && <span className={`font-bos ${materiIntiCount >= 10 ? "text-lg" : "text-xl"} leading-none max-w-4xl -mt-5 pt-0`}>
                                         Curriculum of {dataProgramPelatihan[0]?.name_english} Training,{" "}
                                         held by {pelatihan?.PenyelenggaraPelatihan} on {formatDateRangeEnglish(
                                             generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan),
