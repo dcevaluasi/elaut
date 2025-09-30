@@ -286,7 +286,7 @@ const FormatSTTPL = React.forwardRef(
                                         <QRCode
                                             size={300}
                                             style={{ height: "auto", maxWidth: "100%", width: "100%", marginLeft: "8rem", }}
-                                            value={`https://elaut-bppsdm.kkp.go.id/layanan/cek-sertifikat/-`}
+                                            value={`https://elaut-bppsdm.kkp.go.id/layanan/cek-sertifikat/${userPelatihan?.NoRegistrasi}`}
                                             viewBox={`0 0 300 300`}
                                         />
                                     </div>
