@@ -150,6 +150,8 @@ const FormatSTTPL = React.forwardRef(
             handleFetchDetailPeserta();
         }, []);
 
+
+
         if (loadingProgramPelatihan || loadingUnitKerja)
             return <p className="text-center py-10 text-gray-500">Loading...</p>;
         if (errorProgramPelatihan || errorUnitKerja)
@@ -640,6 +642,7 @@ const DialogSertifikatPelatihan = forwardRef<DialogSertifikatHandle, Props>(
                     html2canvas: {
                         scale: 1.5,
                         useCORS: true,
+                        allowTaint: true,
                         logging: false,
                         backgroundColor: "#fff",
                     },
@@ -714,6 +717,7 @@ const DialogSertifikatPelatihan = forwardRef<DialogSertifikatHandle, Props>(
                         scale: 1.5,
                         useCORS: true,
                         logging: false,
+                        allowTaint: true,
                         backgroundColor: "#fff",
                     },
                     jsPDF: {
