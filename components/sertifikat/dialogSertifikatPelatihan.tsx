@@ -258,7 +258,6 @@ const FormatSTTPL = React.forwardRef(
                                 {
                                     userPelatihan?.IsActice == "" ? "-" : generatedStatusCertificate(userPelatihan?.IsActice).status_indo
                                 }
-                                TELAH LULUS
                             </h1>
                             <h3 className="font-bosNormal text-lg italic">
                                 {
