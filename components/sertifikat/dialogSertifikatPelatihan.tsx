@@ -378,7 +378,7 @@ const FormatSTTPL = React.forwardRef(
                                     )}
                                 </p>
                                 {
-                                    generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng != "" && <span className={`font-bos ${materiIntiCount >= 10 ? "text-lg" : "text-xl"} leading-none max-w-4xl -mt-5 pt-0`}>
+                                    generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng != "" && <span className={`font-bos ${materiIntiCount >= 10 ? "text-lg" : "text-xl"} leading-none w-full -mt-5 pt-0`}>
                                         Curriculum of {dataProgramPelatihan[0]?.name_english} Training,{" "}
                                         held by {pelatihan?.PenyelenggaraPelatihan} on {formatDateRangeEnglish(
                                             generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan),
