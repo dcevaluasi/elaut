@@ -23,14 +23,20 @@ import {
     SelectValue,
     SelectContent,
     SelectItem,
+    SelectGroup,
+    SelectLabel,
 } from "@/components/ui/select";
 import { TbPlus } from "react-icons/tb";
 import { UK_ESELON_1, UK_ESELON_2 } from "@/constants/unitkerja";
-import { truncateText } from "@/utils";
+import { useFetchDataRumpunPelatihan } from "@/hooks/elaut/master/useFetchDataRumpunPelatihan";
+import { RumpunPelatihan } from "@/types/program";
+import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
 
 const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
     onSuccess,
 }) => {
+    const { data: dataRumpunPelatihan, loading: loadingRumpunPelatihan, error: errorRumpunPelatihan, fetchRumpunPelatihan } = useFetchDataRumpunPelatihan();
+
     const [isOpen, setIsOpen] = useState(false);
 
     // Controlled states (semua field dari JSON)
@@ -50,6 +56,7 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
     const [status, setStatus] = useState("Active");
     const [eselon1, setEselon1] = useState("")
     const [eselon2, setEselon2] = useState("")
+    const [idLemdik, setIdLemdik] = useState(0)
     const [pendidikanTerakhir, setPendidikanTerakhir] = useState("");
 
     const [loading, setLoading] = useState(false);
@@ -70,6 +77,7 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
         setLinkSertifikat("");
         setStatus("Active");
         setEselon1("")
+        setIdLemdik(0)
         setEselon2("")
         setPendidikanTerakhir("");
     };
@@ -77,6 +85,7 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
     const handleSubmit = async () => {
         const form = {
             nama,
+            id_lemdik: idLemdik,
             no_telpon: noTelpon,
             email: email,
             nip: nip,
@@ -127,6 +136,12 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
             });
         }
     };
+
+    const { unitKerjas, loading: loadingUnitKerja, error: errorUnitKerja, fetchUnitKerjaData } = useFetchDataUnitKerja()
+
+    React.useEffect(() => {
+        fetchUnitKerjaData()
+    }, [fetchUnitKerjaData])
 
     return (
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
@@ -195,6 +210,22 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
                         </div>
                     </div>
 
+                    <div className="space-y-1">
+                        <label className="text-sm font-medium text-gray-700">Unit Kerja</label>
+                        <Select value={idLemdik?.toString()} onValueChange={(value) => setIdLemdik(parseInt(value))}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Pilih status" />
+                            </SelectTrigger>
+                            <SelectContent position="popper" className="z-[9999999]">
+                                {
+                                    unitKerjas?.map((item, index) => (
+                                        <SelectItem value={item.id_unit_kerja.toString()}>{item.nama}</SelectItem>
+                                    ))
+                                }
+                            </SelectContent>
+                        </Select>
+                    </div>
+
                     {/* Jenjang Jabatan */}
                     <div className="space-y-1">
                         <label className="text-sm font-medium text-gray-700">Jenjang Jabatan</label>
@@ -219,19 +250,29 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
                     {/* Bidang Keahlian */}
                     <div className="col-span-2 space-y-1">
                         <label className="text-sm font-medium text-gray-700">Bidang Keahlian</label>
-                        <input
-                            type="text"
+                        <select
                             className="w-full rounded-md border border-gray-300 p-2 text-sm"
                             value={bidangKeahlian}
                             onChange={(e) => setBidangKeahlian(e.target.value)}
-                        />
+                            disabled={loadingRumpunPelatihan}
+                        >
+                            <option value="">-- Pilih Bidang Pelatihan --</option>
+                            {dataRumpunPelatihan?.map((rumpun: RumpunPelatihan) => (
+                                <option
+                                    key={rumpun.id_rumpun_pelatihan}
+                                    value={rumpun.name}
+                                >
+                                    {rumpun.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     {/* Link */}
                     <div className="grid grid-cols-3 gap-2">
                         {/* Management of Training */}
                         <div className="space-y-1">
-                            <label className="text-sm font-medium text-gray-700">Management of Training</label>
+                            <label className="text-sm font-medium text-gray-700">Link Management of Training (MoT)</label>
                             <input
                                 type="text"
                                 className="w-full rounded-md border border-gray-300 p-2 text-sm"
@@ -242,7 +283,7 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
 
                         {/* Training Officer Course */}
                         <div className="space-y-1">
-                            <label className="text-sm font-medium text-gray-700">Training Officer Course</label>
+                            <label className="text-sm font-medium text-gray-700">Link Trainer of Training (ToT)</label>
                             <input
                                 type="text"
                                 className="w-full rounded-md border border-gray-300 p-2 text-sm"
@@ -253,7 +294,7 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
 
                         {/* Link Sertifikat */}
                         <div className="space-y-1">
-                            <label className="text-sm font-medium text-gray-700">Link Sertifikat</label>
+                            <label className="text-sm font-medium text-gray-700">Link Sertifikat Lainnya</label>
                             <input
                                 type="url"
                                 className="w-full rounded-md border border-gray-300 p-2 text-sm"
