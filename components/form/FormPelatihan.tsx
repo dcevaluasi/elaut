@@ -511,7 +511,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
                       className="block text-gray-600 text-sm font-medium mb-1"
                       htmlFor="hargaPelatihan"
                     >
-                      Biaya Pelatihan{" "}
+                      Biaya Pelatihan{" "} (Perorang Hanya Biaya Pelatihan)
                       <span className="text-rose-600">*</span>
                     </label>
                     <input
