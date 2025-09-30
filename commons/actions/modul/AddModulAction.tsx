@@ -28,11 +28,15 @@ import { moduleBaseUrl } from "@/constants/urls";
 import { TbPlus } from "react-icons/tb";
 import { RUMPUN_PELATIHAN } from "@/constants/pelatihan";
 import { years } from "@/utils/time";
+import { useFetchDataRumpunPelatihan } from "@/hooks/elaut/master/useFetchDataRumpunPelatihan";
+import { RumpunPelatihan } from "@/types/program";
 
 const AddModulAction: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
     const pathname = usePathname();
     const isBahanAjar = pathname.includes("bahan-ajar");
     const label = isBahanAjar ? "Bahan Ajar" : "Modul";
+
+    const { data: dataRumpunPelatihan, loading: loadingRumpunPelatihan, error: errorRumpunPelatihan, fetchRumpunPelatihan } = useFetchDataRumpunPelatihan();
 
     const [isOpen, setIsOpen] = useState(false);
     const [nama, setNama] = useState("");
@@ -131,21 +135,22 @@ const AddModulAction: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => 
                         <label className="text-sm font-medium text-gray-700">
                             Bidang Pelatihan
                         </label>
-                        <Select
+                        <select
+                            className="w-full rounded-md border border-gray-300 p-2 text-sm"
                             value={bidangMateriPelatihan}
-                            onValueChange={(value) => setBidangMateriPelatihan(value)}
+                            onChange={(e) => setBidangMateriPelatihan(e.target.value)}
+                            disabled={loadingRumpunPelatihan}
                         >
-                            <SelectTrigger className="w-full text-base py-4">
-                                <SelectValue placeholder="Pilih bidang" />
-                            </SelectTrigger>
-                            <SelectContent position="popper" className="z-[9999999]">
-                                {RUMPUN_PELATIHAN.map((item) => (
-                                    <SelectItem key={item} value={item}>
-                                        {item}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                            <option value="">-- Pilih Bidang Pelatihan --</option>
+                            {dataRumpunPelatihan?.map((rumpun: RumpunPelatihan) => (
+                                <option
+                                    key={rumpun.id_rumpun_pelatihan}
+                                    value={rumpun.name}
+                                >
+                                    {rumpun.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className="flex gap-2 w-full">
