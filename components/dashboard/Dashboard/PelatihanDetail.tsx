@@ -712,7 +712,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 Action :
                                             </p>
                                             {
-                                                (data?.StatusPenerbitan == "0" && data?.UserPelatihan?.length == 0) &&
+                                                (data?.StatusPenerbitan == "0" || data?.StatusPenerbitan == "1.2" || data?.StatusPenerbitan == "3") &&
                                                 <ImportPesertaAction
                                                     idPelatihan={data?.IdPelatihan.toString()}
                                                     statusApproval={data?.StatusApproval}
