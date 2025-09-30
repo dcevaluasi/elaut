@@ -16,14 +16,14 @@ export default function Hero() {
       description:
         "Pelatihan perikanan meliputi penangkapan ikan, budidaya, serta inovasi sumber daya laut berkelanjutan.",
     },
-    // {
-    //   id: "002",
-    //   name: "Awak Kapal Perikanan",
-    //   icon: "/icons/icawak.png",
-    //   slug: "akp",
-    //   description:
-    //     "Membekali keterampilan penangkapan ikan, navigasi, dan keselamatan di laut.",
-    // },
+    {
+      id: "002",
+      name: "Awak Kapal Perikanan",
+      icon: "/icons/icawak.png",
+      slug: "akp",
+      description:
+        "Membekali keterampilan penangkapan ikan, navigasi, dan keselamatan di laut.",
+    },
     {
       id: "003",
       name: "Kelautan",

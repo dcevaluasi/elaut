@@ -50,6 +50,8 @@ const DeleteInstrukturAction: React.FC<{
             if (onSuccess) onSuccess();
         } catch (error) {
             setLoading(false);
+            setIsOpen(false);
+
             Toast.fire({
                 icon: "error",
                 title: "Gagal!",
@@ -80,13 +82,14 @@ const DeleteInstrukturAction: React.FC<{
 
                 <AlertDialogFooter>
                     <AlertDialogCancel disabled={loading}>Batal</AlertDialogCancel>
-                    <AlertDialogAction
+                    <Button
+                        variant="default"
                         onClick={handleUpdate}
-                        className="bg-rose-500 hover:bg-rose-600 text-white"
+                        className="bg-rose-600 hover:bg-rose-600 text-white"
                         disabled={loading}
                     >
                         {loading ? "Menghapus..." : "Hapus"}
-                    </AlertDialogAction>
+                    </Button>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

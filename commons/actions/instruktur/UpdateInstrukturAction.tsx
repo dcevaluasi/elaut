@@ -29,11 +29,15 @@ import { Instruktur } from "@/types/instruktur";
 import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
 import { devNull } from "os";
 import { UK_ESELON_1, UK_ESELON_2 } from "@/constants/unitkerja";
+import { useFetchDataRumpunPelatihan } from "@/hooks/elaut/master/useFetchDataRumpunPelatihan";
+import { RumpunPelatihan } from "@/types/program";
 
 const UpdateInstrukturAction: React.FC<{
     instruktur: Instruktur;
     onSuccess?: () => void;
 }> = ({ instruktur, onSuccess }) => {
+    const { data: dataRumpunPelatihan, loading: loadingRumpunPelatihan, error: errorRumpunPelatihan, fetchRumpunPelatihan } = useFetchDataRumpunPelatihan();
+
     const [isOpen, setIsOpen] = useState(false);
 
     // Controlled states (prefill data lama)
@@ -133,7 +137,7 @@ const UpdateInstrukturAction: React.FC<{
                 </Button>
             </AlertDialogTrigger>
 
-            <AlertDialogContent className="max-w-3xl">
+            <AlertDialogContent className="max-w-5xl">
                 <AlertDialogHeader>
                     <AlertDialogTitle>Edit Data Instruktur</AlertDialogTitle>
                     <AlertDialogDescription>
@@ -205,36 +209,49 @@ const UpdateInstrukturAction: React.FC<{
                         </div>
                     </div>
 
-                    {/* Jenjang Jabatan */}
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-700">Jenjang Jabatan</label>
-                        <input
-                            type="text"
-                            className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                            value={jenjangJabatan}
-                            onChange={(e) => setJenjangJabatan(e.target.value)}
-                        />
+                    <div className="w-full flex gap-4">
+                        {/* Jenjang Jabatan */}
+                        <div className="space-y-1 w-full">
+                            <label className="text-sm font-medium text-gray-700">Jenjang Jabatan</label>
+                            <input
+                                type="text"
+                                className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                value={jenjangJabatan}
+                                onChange={(e) => setJenjangJabatan(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="space-y-1 w-full">
+                            <label className="text-sm font-medium text-gray-700">Pangkat/Golongan</label>
+                            <input
+                                type="text"
+                                className="w-full rounded-md border border-gray-300 p-2 text-sm"
+                                value={pelatihanPelatih}
+                                onChange={(e) => setPelatihanPelatih(e.target.value)}
+                            />
+                        </div>
                     </div>
 
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-700">Pangkat/Golongan</label>
-                        <input
-                            type="text"
-                            className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                            value={pelatihanPelatih}
-                            onChange={(e) => setPelatihanPelatih(e.target.value)}
-                        />
-                    </div>
 
                     {/* Bidang Keahlian */}
                     <div className="col-span-2 space-y-1">
                         <label className="text-sm font-medium text-gray-700">Bidang Keahlian</label>
-                        <input
-                            type="text"
+                        <select
                             className="w-full rounded-md border border-gray-300 p-2 text-sm"
                             value={bidangKeahlian}
                             onChange={(e) => setBidangKeahlian(e.target.value)}
-                        />
+                            disabled={loadingRumpunPelatihan}
+                        >
+                            <option value="">-- Pilih Bidang Pelatihan --</option>
+                            {dataRumpunPelatihan?.map((rumpun: RumpunPelatihan) => (
+                                <option
+                                    key={rumpun.id_rumpun_pelatihan}
+                                    value={rumpun.name}
+                                >
+                                    {rumpun.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     {/* Link */}
@@ -273,68 +290,71 @@ const UpdateInstrukturAction: React.FC<{
                         </div>
                     </div>
 
-                    {/* Status */}
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-700">Status</label>
-                        <Select value={status} onValueChange={setStatus}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Pilih status" />
-                            </SelectTrigger>
-                            <SelectContent position="popper" className="z-[9999999]">
-                                <SelectItem value="Active">Aktif</SelectItem>
-                                <SelectItem value="No Active">Nonaktif</SelectItem>
-                                <SelectItem value="Tugas Belajar">Tugas Belajar</SelectItem>
-                            </SelectContent>
-                        </Select>
+                    <div className="w-full flex gap-4">
+                        {/* Status */}
+                        <div className="w-full space-y-1">
+                            <label className="text-sm font-medium text-gray-700">Status</label>
+                            <Select value={status} onValueChange={setStatus}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Pilih status" />
+                                </SelectTrigger>
+                                <SelectContent position="popper" className="z-[9999999]">
+                                    <SelectItem value="Active">Aktif</SelectItem>
+                                    <SelectItem value="No Active">Nonaktif</SelectItem>
+                                    <SelectItem value="Tugas Belajar">Tugas Belajar</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {/* Pendidikan Terakhir */}
+                        <div className="w-full space-y-1">
+                            <label className="text-sm font-medium text-gray-700">Pendidikan Terakhir</label>
+                            <Select
+                                value={pendidikanTerakhir}
+                                onValueChange={(value) => setPendidikanTerakhir(value)}
+                            >
+                                <SelectTrigger className="w-full text-base py-4">
+                                    <SelectValue placeholder="Pilih pendidikan terakhir" />
+                                </SelectTrigger>
+                                <SelectContent position="popper" className="z-[9999999999]">
+                                    <SelectItem value="Tidak/Belum Sekolah">
+                                        Tidak/Belum Sekolah
+                                    </SelectItem>
+                                    <SelectItem value="SD">
+                                        SD
+                                    </SelectItem>
+                                    <SelectItem value="SMP">
+                                        SMP
+                                    </SelectItem>
+                                    <SelectItem value="SMA">
+                                        SMA/SMK
+                                    </SelectItem>
+                                    <SelectItem value="D1">
+                                        D1
+                                    </SelectItem>
+                                    <SelectItem value="D2">
+                                        D2
+                                    </SelectItem>
+                                    <SelectItem value="D3">
+                                        D3
+                                    </SelectItem>
+                                    <SelectItem value="D4">
+                                        D4
+                                    </SelectItem>
+                                    <SelectItem value="S1">
+                                        S1
+                                    </SelectItem>
+                                    <SelectItem value="S2">
+                                        S2
+                                    </SelectItem>
+                                    <SelectItem value="S3">
+                                        S3
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
 
-                    {/* Pendidikan Terakhir */}
-                    <div className="col-span-2 space-y-1">
-                        <label className="text-sm font-medium text-gray-700">Pendidikan Terakhir</label>
-                        <Select
-                            value={pendidikanTerakhir}
-                            onValueChange={(value) => setPendidikanTerakhir(value)}
-                        >
-                            <SelectTrigger className="w-full text-base py-4">
-                                <SelectValue placeholder="Pilih pendidikan terakhir" />
-                            </SelectTrigger>
-                            <SelectContent position="popper" className="z-[9999999999]">
-                                <SelectItem value="Tidak/Belum Sekolah">
-                                    Tidak/Belum Sekolah
-                                </SelectItem>
-                                <SelectItem value="SD">
-                                    SD
-                                </SelectItem>
-                                <SelectItem value="SMP">
-                                    SMP
-                                </SelectItem>
-                                <SelectItem value="SMA">
-                                    SMA/SMK
-                                </SelectItem>
-                                <SelectItem value="D1">
-                                    D1
-                                </SelectItem>
-                                <SelectItem value="D2">
-                                    D2
-                                </SelectItem>
-                                <SelectItem value="D3">
-                                    D3
-                                </SelectItem>
-                                <SelectItem value="D4">
-                                    D4
-                                </SelectItem>
-                                <SelectItem value="S1">
-                                    S1
-                                </SelectItem>
-                                <SelectItem value="S2">
-                                    S2
-                                </SelectItem>
-                                <SelectItem value="S3">
-                                    S3
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
 
                     <div className="flex flex-col w-full gap-2">
                         <div className="w-full">
