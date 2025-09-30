@@ -369,7 +369,7 @@ const FormatSTTPL = React.forwardRef(
                         <div className={`flex flex-row justify-center items-center ${materiIntiCount >= 10 ? "-mb-20" : "mb-5"}`}>
                             <div className="flex flex-col text-center space-y-0 h-fit items-center justify-center w-full gap-0">
                                 <p className={`font-bosBold ${materiIntiCount >= 10 ? "text-xl" : "text-2xl max-w-6xl"} w-full uppercase leading-none mb-0`}>
-                                    Materi Pelatihan {dataProgramPelatihan[0]?.name_indo}, tanggal{" "}
+                                    Materi Pelatihan {dataProgramPelatihan[0]?.name_indo}, Diselenggarakan oleh {pelatihan?.PenyelenggaraPelatihan} pada tanggal{" "}
                                     {formatDateRange(
                                         generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan),
                                         generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan)
@@ -378,7 +378,7 @@ const FormatSTTPL = React.forwardRef(
                                 {
                                     generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng != "" && <span className={`font-bos ${materiIntiCount >= 10 ? "text-lg" : "text-xl"} leading-none -mt-5 pt-0`}>
                                         Curriculum of {dataProgramPelatihan[0]?.name_english} Training,{" "}
-                                        {formatDateRangeEnglish(
+                                        held by {pelatihan?.PenyelenggaraPelatihan} on {formatDateRangeEnglish(
                                             generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan),
                                             generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan)
                                         )}
@@ -555,11 +555,11 @@ const FormatSTTPL = React.forwardRef(
 
                         {
                             (pelatihan?.BidangPelatihan?.includes('Sistem Jaminan Mutu') || pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? <div className="w-full flex justify-center items-center">
-                                <p className="max-w-3xl text-center font-bosItalic leading-none">
+                                {/* <p className="max-w-3xl text-center font-bosItalic leading-none">
                                     Lampiran materi/kurikulum pelatihan disahkan sesuai dengan standar mutu yang berlaku dan diselenggarakan oleh <span className="font-bosBold uppercase">
                                         {pelatihan?.PenyelenggaraPelatihan}
                                     </span>
-                                </p>
+                                </p> */}
                             </div> :
                                 unitKerja != null ? <div className={`flex flex-col items-start justify-start text-left w-full mt-2 space-y-1 max-w-7xl`}>
                                     <div className="flex flex-col items-start gap-0.5 font-bosNormal text-sm leading-tight">
