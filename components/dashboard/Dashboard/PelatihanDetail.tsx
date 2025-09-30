@@ -4,18 +4,7 @@ import React from "react";
 import {
     Accordion,
 } from "@/components/ui/accordion";
-import { PelatihanMasyarakat, UserPelatihan } from "@/types/product";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { PelatihanMasyarakat } from "@/types/product";
 import { generateTanggalPelatihan, getStatusInfo } from "@/utils/text";
 import Image from "next/image";
 import { replaceUrl } from "@/lib/utils";
@@ -53,7 +42,6 @@ import PublishButton from "@/commons/actions/PublishButton";
 import { Button } from "@/components/ui/button";
 import Toast from "@/commons/Toast";
 import ZipPhotoParticipantAction from "@/commons/actions/lemdiklat/ZipPhotoParticipantAction";
-import TTDeDetail from "./TTDeDetail";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -107,12 +95,6 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 pelatihan={data}
                                                 handleFetchingData={fetchData}
                                             />
-
-                                            {/* 
-                                             data?.ModuleMateri != ""
-                                             data?.UserPelatihan.length != 0
-                                             data?.SuratPemberitahuan != ""
-                                             */}
 
                                             {data.SuratPemberitahuan !== "" && (data.StatusPenerbitan === "0" || data.StatusPenerbitan === "1.2") ? (
                                                 data?.UserPelatihan?.length !== 0 && data?.SuratPemberitahuan !== "" ? (

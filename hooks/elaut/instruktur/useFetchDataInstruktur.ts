@@ -14,6 +14,39 @@ export type CountStats = {
   tot: number
 }
 
+export function useFetchDataInstrukturChoose() {
+  const [instrukturs, setInstrukturs] = useState<Instruktur[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<unknown>(null)
+
+  const token = Cookies.get('XSRF091')
+  const fetchInstrukturData = useCallback(async () => {
+    if (!token) {
+      setError('Token is missing')
+      return
+    }
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await axios.get<Instruktur[]>(
+        `${elautBaseUrl}/getInstrukturs`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      )
+      setInstrukturs(response.data)
+    } catch (err) {
+      setError(err)
+    } finally {
+      setLoading(false)
+    }
+  }, [token])
+
+  return { instrukturs, loading, error, fetchInstrukturData }
+}
+
 export function useFetchDataInstruktur() {
   const [instrukturs, setInstrukturs] = useState<Instruktur[]>([])
   const [loading, setLoading] = useState(false)

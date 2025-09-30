@@ -23,7 +23,7 @@ import { PelatihanMasyarakat } from "@/types/product";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { useFetchDataInstruktur } from "@/hooks/elaut/instruktur/useFetchDataInstruktur";
+import { useFetchDataInstruktur, useFetchDataInstrukturChoose } from "@/hooks/elaut/instruktur/useFetchDataInstruktur";
 import { Instruktur } from "@/types/instruktur";
 import { arrayToString, stringToArray } from "@/utils/input";
 
@@ -41,7 +41,7 @@ const ChooseInstrukturAction: React.FC<ChooseInstrukturActionProps> = ({
     /**
         * Instruktur Pelatihan 
         */
-    const { instrukturs, loading: loadingInstruktur, error: errorInstruktur, fetchInstrukturData, stats } = useFetchDataInstruktur()
+    const { instrukturs, loading: loadingInstruktur, error: errorInstruktur, fetchInstrukturData } = useFetchDataInstrukturChoose()
 
     const [selectedIdInstruktur, setSelectedIdInstruktur] = useState<number[]>(stringToArray(currentData?.Instruktur || "") || [])
     const [selectedInstruktur, setSelectedInstruktur] = useState<Instruktur[]>([])
