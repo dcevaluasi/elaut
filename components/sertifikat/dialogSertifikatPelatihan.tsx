@@ -173,7 +173,7 @@ const FormatSTTPL = React.forwardRef(
 
 
                     <div className="w-full flex flex-col space-y-0 px-10 mt-10 ">
-                        {isPrint && pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan') ? <div className="mx-auto w-30 h-40"></div> : <Image
+                        {isPrint && pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan') ? <div className="mx-auto w-30 h-64"></div> : <Image
                             alt="Logo KKP"
                             className="mx-auto w-30"
                             width={0}
