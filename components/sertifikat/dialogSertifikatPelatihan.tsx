@@ -54,14 +54,14 @@ function QRCodeImage({ value }: { value: string }) {
         <div className="w-30">
             {/* Wrap QRCode with a ref-able div */}
             <div ref={wrapperRef} style={{ display: "none" }}>
-                <QRCode value={value} size={300} />
+                <QRCode value={`https://elaut-bppsdm.kkp.go.id/layanan/cek-sertifikat/${value}`} size={300} />
             </div>
 
             {imgUrl && (
                 <img
                     src={imgUrl}
                     alt="QR Code"
-                    style={{ height: "300px", width: "300px", marginLeft: "8rem" }}
+                    style={{ width: "300px", marginLeft: "8rem" }}
                 />
             )}
         </div>
