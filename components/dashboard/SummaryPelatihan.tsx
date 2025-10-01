@@ -55,11 +55,6 @@ const SummaryPelatihan: React.FC = () => {
     }
   };
 
-  const {
-    data: dataDukung,
-    isFetching: isFetchingDataDukung,
-    refetch: refetchDataDukung,
-  } = useFetchDataDukung();
 
   React.useEffect(() => {
     const fetchAllData = () => {

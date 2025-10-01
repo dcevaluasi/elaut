@@ -5,6 +5,9 @@ import { formatDateTime } from "@/utils";
 import {
   Bar,
   BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
@@ -27,12 +30,7 @@ import { UserPelatihan } from "@/types/user";
 import Cookies from "js-cookie";
 import { getFilteredDataByBalai, getFilteredDataPelatihanByBalai } from "@/lib/training";
 import { isSigned, isUnsigned } from "@/lib/sign";
-import TableDataPelatihanMasyrakatByGender from "@/components/dashboard/Tables/TableDataPelatihanMasyrakatByGender";
-import TableDataPelatihanMasyarakatByWilker from "@/components/dashboard/Tables/TableDataPelatihanMasyarakatByWilker";
-import TableDataPelatihanMasyarakatByProgramPrioritas from "@/components/dashboard/Tables/TableDataPelatihanMasyrakatByProgramPrioritas";
-import TableDataPelatihanMasyarakatByProvinsi from "@/components/dashboard/Tables/TableDataPelatihanMasyarakatByProvinsi";
-import TableDataPelatihanMasyarakat from "@/components/dashboard/Tables/TableDataPelatihanMasyarakat";
-import TableDataPelatihanMasyarakatByPendidikan from "@/components/dashboard/Tables/TableDataPelatihanMasyrakatByPendidikan";
+import { DynamicTablePelatihanMasyarakat } from "@/components/dashboard/Tables/DynamicTablePelatihanMasyarakat";
 
 const chartConfigJenisPelatihan = {
   visitors: {
@@ -137,53 +135,20 @@ const chartConfigProgramPrioritas = {
   },
 } satisfies ChartConfig;
 
-const chartConfigBidangPelatihan = {
-  visitors: {
-    label: "Penangkapan",
-    color: "#1487af", // Dark Blue (RGB: 20, 135, 175)
-  },
-  other4: {
-    label: "Kepelautan",
-    color: "#073f51", // Deep Navy (RGB: 7, 63, 81)
-  },
-  chrome: {
-    label: "Pengolahan dan Pemasaran",
-    color: "#47bdda", // Light Blue (RGB: 71, 189, 218)
-  },
-  safari: {
-    label: "Mesin Perikanan",
-    color: "#97d7e2", // Soft Blue (RGB: 151, 215, 226)
-  },
-  firefox: {
-    label: "Konservasi",
-    color: "#f7fdfb", // Off-White (RGB: 247, 253, 251)
-  },
-  edge: {
-    label: "Wisata Bahari",
-    color: "#1487af", // Dark Blue (RGB: 20, 135, 175)
-  },
-  other: {
-    label: "Manajemen Perikanan",
-    color: "#47bdda", // Light Blue (RGB: 71, 189, 218)
-  },
-  other2: {
-    label: "Budidaya",
-    color: "#073f51",
-  },
-} satisfies ChartConfig;
 
 interface ChartThreeState {
   series: number[];
 }
 
+
 const ChartDetailMasyarakatDilatih: React.FC<{
   data: PelatihanMasyarakat[];
   dataUser: UserPelatihan[];
 }> = ({ data, dataUser }) => {
-
   const isAdminBalaiPelatihan = Cookies.get('XSRF093') == 'balai'
   const nameBalaiPelatihan = Cookies.get('Satker')
 
+  console.log({ dataUser })
 
   const [selectedLemdiklat, setSelectedLemdiklat] =
     React.useState<string>("All");
@@ -227,7 +192,7 @@ const ChartDetailMasyarakatDilatih: React.FC<{
     });
 
   React.useEffect(() => {
-    const filteredDataByBalai = getFilteredDataByBalai(dataUser, isAdminBalaiPelatihan, nameBalaiPelatihan!);
+    const filteredDataByBalai = getFilteredDataByBalai(dataUser, nameBalaiPelatihan!);
     const filteredDataPelatihanByBalai = getFilteredDataPelatihanByBalai(data, isAdminBalaiPelatihan, nameBalaiPelatihan!);
 
     // Data Masyarakat Dilatih by Gender
@@ -247,26 +212,28 @@ const ChartDetailMasyarakatDilatih: React.FC<{
       series: dataMasyarakatByGender,
     });
 
-    // Data Masyarakat Dilatih by Program Pelatihan
-    const bidangPelatihanList = [
-      "Budidaya",
-      "Penangkapan",
-      "Kepelautan",
-      "Pengolahan dan Pemasaran",
-      "Mesin Perikanan",
-      "Konservasi",
-      "Wisata Bahari",
-      "Manajemen Perikanan",
-    ];
-    const dataMasyarakatDilatihByBidangPelatihan = bidangPelatihanList.map(
+    // Ambil list bidang pelatihan unik langsung dari data
+    const klasterPelatihanList = Array.from(
+      new Set(
+        filteredDataByBalai
+          .filter((item) => item.FileSertifikat !== "")
+          .map((item) => item.BidangPelatihan)
+      )
+    );
+
+    // Hitung jumlah per bidang
+    const dataMasyarakatDilatihByBidangPelatihan = klasterPelatihanList.map(
       (bidang) =>
         filteredDataByBalai.filter(
           (item) => item.BidangPelatihan === bidang && item.FileSertifikat !== ""
         ).length
     );
+
+    // Update state
     setStateMasyarakatDilatihByBidangPelatihan({
       series: dataMasyarakatDilatihByBidangPelatihan,
     });
+
 
     // Data Masyarakat Dilatih by Program Pelatihan
     const jenisProgramList = [
@@ -328,57 +295,6 @@ const ChartDetailMasyarakatDilatih: React.FC<{
     });
 
   }, [selectedLemdiklat, data, dataUser]);
-
-  const chartDataMasyarakatDilatihByBidangPelatihan = [
-    {
-      browser: "chrome",
-      name: "Pengolahan dan Pemasaran",
-      visitors: stateMasyarakatDilatihByBidangPelatihan.series[1],
-      fill: "#1487af",
-    },
-    {
-      browser: "safari",
-      name: "Mesin Perikanan",
-      visitors: stateMasyarakatDilatihByBidangPelatihan.series[2],
-      fill: "#073f51",
-    },
-    {
-      browser: "firefox",
-      name: "Konservasi",
-      visitors: stateMasyarakatDilatihByBidangPelatihan.series[3],
-      fill: "#47bdda",
-    },
-    {
-      browser: "edge",
-      name: "Wisata Bahari",
-      visitors: stateMasyarakatDilatihByBidangPelatihan.series[4],
-      fill: "#97d7e2",
-    },
-    {
-      browser: "other",
-      name: "Manajemen Perikanan",
-      visitors: stateMasyarakatDilatihByBidangPelatihan.series[5],
-      fill: "#f7fdfb",
-    },
-    {
-      browser: "other2",
-      name: "Budidaya",
-      visitors: stateMasyarakatDilatihByBidangPelatihan.series[6],
-      fill: "#1487af",
-    },
-    {
-      browser: "other3",
-      name: "Penangkapan",
-      visitors: stateMasyarakatDilatihByBidangPelatihan.series[7],
-      fill: "#47bdda",
-    },
-    {
-      browser: "other4",
-      name: "Kepelautan",
-      visitors: stateMasyarakatDilatihByBidangPelatihan.series[0],
-      fill: "#073f51",
-    },
-  ];
 
   const chartDataMasyarakatByGender = [
     {
@@ -509,6 +425,13 @@ const ChartDetailMasyarakatDilatih: React.FC<{
     },
   ];
 
+  const chartConfigKlasterPelatihan = {
+    visitors: {
+      label: "Jumlah Peserta",
+    },
+  };
+
+
   const TrainingChartCard = ({
     title,
     chartConfig,
@@ -576,16 +499,17 @@ const ChartDetailMasyarakatDilatih: React.FC<{
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 w-full">
+        <div className="grid grid-cols-2 gap-2 mb-5 w-full">
           <TrainingChartCard
             title="Program Pelatihan"
             chartConfig={chartConfigProgramPelatihan}
             chartData={chartDataMasyarakatDilatihByProgramPelatihan}
           />
+          {/* Klaster Pelatihan */}
           <TrainingChartCard
-            title="Bidang Pelatihan"
-            chartConfig={chartConfigBidangPelatihan}
-            chartData={chartDataMasyarakatDilatihByBidangPelatihan}
+            title="Klaster Pelatihan"
+            chartConfig={chartConfigKlasterPelatihan}
+            chartData={stateMasyarakatDilatihByBidangPelatihan.series}
           />
           <TrainingChartCard
             title="Jenis Pelatihan"
@@ -609,12 +533,41 @@ const ChartDetailMasyarakatDilatih: React.FC<{
           />
         </div>
 
-        <TableDataPelatihanMasyarakat dataUserPelatihan={isAdminBalaiPelatihan ? dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan! == nameBalaiPelatihan)) : dataUser} />
-        <TableDataPelatihanMasyarakatByProvinsi dataUserPelatihan={isAdminBalaiPelatihan ? dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan! == nameBalaiPelatihan)) : dataUser} />
-        <TableDataPelatihanMasyarakatByProgramPrioritas dataPelatihan={isAdminBalaiPelatihan ? data.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan! == nameBalaiPelatihan)) : data} />
-        <TableDataPelatihanMasyarakatByWilker dataUserPelatihan={isAdminBalaiPelatihan ? dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan! == nameBalaiPelatihan)) : dataUser} />
-        <TableDataPelatihanMasyrakatByGender dataUserPelatihan={isAdminBalaiPelatihan ? dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan! == nameBalaiPelatihan)) : dataUser} />
-        <TableDataPelatihanMasyarakatByPendidikan dataUserPelatihan={isAdminBalaiPelatihan ? dataUser.filter((item) => (isAdminBalaiPelatihan && item.PenyelenggaraPelatihan! == nameBalaiPelatihan)) : dataUser} />
+        <DynamicTablePelatihanMasyarakat
+          dataUser={dataUser}
+          rowKey="PenyelenggaraPelatihan"
+          colKey="Triwulan"
+          title="Masyarakat Dilatih berdasarkan Penyelenggara & Triwulan"
+        />
+
+        <DynamicTablePelatihanMasyarakat
+          dataUser={dataUser}
+          rowKey="PenyelenggaraPelatihan"
+          colKey="JenisKelamin"
+          title="Masyarakat Dilatih berdasarkan Penyelenggara & Jenis Kelamin"
+        />
+
+        <DynamicTablePelatihanMasyarakat
+          dataUser={dataUser}
+          rowKey="PenyelenggaraPelatihan"
+          colKey="PendidikanTerakhir"
+          title="Masyarakat Dilatih berdasarkan Penyelenggara & Pendidikan Terakhir"
+        />
+
+        <DynamicTablePelatihanMasyarakat
+          dataUser={dataUser}
+          rowKey="Provinsi"
+          colKey="BidangPelatihan"
+          title="Masyarakat Dilatih berdasarkan Provinsi & Bidang/Klaster Pelatihan"
+        />
+
+        <DynamicTablePelatihanMasyarakat
+          dataUser={dataUser}
+          rowKey="Provinsi"
+          colKey="PenyelenggaraPelatihan"
+          title="Masyarakat Dilatih berdasarkan Provinsi & Penyelenggara Pelatihan"
+        />
+
       </div>
     );
   };

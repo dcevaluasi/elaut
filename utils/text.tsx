@@ -290,3 +290,11 @@ export const parseDateFirebase = (dateStr: string): Date => {
   // JS Date uses month index starting at 0
   return new Date(year, month - 1, day, hour, minute, second);
 };
+
+export function toTitleCase(str: string) {
+  return str
+    .toLowerCase()
+    .split(" ")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ")
+}

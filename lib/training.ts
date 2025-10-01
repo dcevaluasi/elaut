@@ -1,17 +1,20 @@
 import { PelatihanMasyarakat } from '@/types/product'
 import { UserPelatihan } from '@/types/user'
+import Cookies from 'js-cookie'
 
 export const getFilteredDataByBalai = (
   dataUser: UserPelatihan[],
-  isAdminBalaiPelatihan: boolean,
   nameBalaiPelatihan: string,
 ): UserPelatihan[] => {
-  if (isAdminBalaiPelatihan) {
+  if (Cookies.get('Role') === 'Pengelola UPT') {
     return dataUser.filter(
       (item) => item.PenyelenggaraPelatihan === nameBalaiPelatihan,
     )
+  } else if (Cookies.get('Role') === 'Pengelola Pusat') {
+    return dataUser
+  } else {
+    return dataUser
   }
-  return dataUser
 }
 
 export const getFilteredDataPelatihanByBalai = (
@@ -25,4 +28,19 @@ export const getFilteredDataPelatihanByBalai = (
     )
   }
   return dataPelatihan
+}
+
+export const getDataByBidangPelatihan = (dataUser: UserPelatihan[]) => {
+  const result: Record<string, number> = {}
+
+  dataUser.forEach((item) => {
+    if (item.BidangPelatihan && item.FileSertifikat !== '') {
+      result[item.BidangPelatihan] = (result[item.BidangPelatihan] || 0) + 1
+    }
+  })
+
+  return Object.entries(result).map(([name, count]) => ({
+    name,
+    count,
+  }))
 }

@@ -221,6 +221,7 @@ export type UserUjikom = {
 }
 
 export type UserPelatihan = {
+  [key: string]: string | number | null | undefined
   CreatedAt: string
   CreteAt: string
   IdUserPelatihan: number

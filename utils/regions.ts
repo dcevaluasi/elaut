@@ -37,4 +37,5 @@ export const PROVINCES = [
   'Papua Tengah',
   'Papua Pegunungan',
   'Papua Barat Daya',
+  'Tidak Diketahui',
 ]
