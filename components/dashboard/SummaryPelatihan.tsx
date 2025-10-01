@@ -6,10 +6,9 @@ import { PelatihanMasyarakat } from "@/types/product";
 import { HashLoader } from "react-spinners";
 import Image from "next/image";
 import { UserPelatihan } from "@/types/user";
-import useFetchDataDukung from "@/hooks/elaut/useFetchDataDukung";
-import { exportDataDukungToExcel } from "@/lib/exportToExcel";
 import ChartMasyarakatDilatihMonthly from "@/commons/charts/ChartMasyarakatDilatihMonthly";
 import ChartDetailMasyarakatDilatih from "@/commons/charts/ChartDetailMasyarakatDilatih";
+import { StatusMetrics } from "./Summary/StatusMetrics";
 
 const SummaryPelatihan: React.FC = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;

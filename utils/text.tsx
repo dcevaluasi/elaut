@@ -244,7 +244,6 @@ export function getStatusInfo(
         color: "bg-green-500 text-white",
         icon: <RiCheckboxCircleFill className="w-4 h-4" />,
       };
-
     default:
       return {
         label: "Tidak Diketahui",

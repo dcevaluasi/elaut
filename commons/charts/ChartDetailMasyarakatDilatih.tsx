@@ -30,7 +30,7 @@ import { UserPelatihan } from "@/types/user";
 import Cookies from "js-cookie";
 import { getFilteredDataByBalai, getFilteredDataPelatihanByBalai } from "@/lib/training";
 import { isSigned, isUnsigned } from "@/lib/sign";
-import { DynamicTablePelatihanMasyarakat } from "@/components/dashboard/Tables/DynamicTablePelatihanMasyarakat";
+import { DynamicTablePelatihanMasyarakat } from "@/components/dashboard/Summary/DynamicTablePelatihanMasyarakat";
 
 const chartConfigJenisPelatihan = {
   visitors: {
@@ -570,9 +570,30 @@ const ChartDetailMasyarakatDilatih: React.FC<{
 
         <DynamicTablePelatihanMasyarakat
           dataUser={dataUser}
-          rowKey="Provinsi"
-          colKey="DukunganProgramPrioritas"
-          title="Masyarakat Dilatih berdasarkan Penyelenggara & Triwulan"
+          rowKey="JenisProgram"
+          colKey="PenyelenggaraPelatihan"
+          title="Masyarakat Dilatih berdasarkan Sektor Pelatihan & Penyelenggara Pelatihan"
+        />
+
+        <DynamicTablePelatihanMasyarakat
+          dataUser={dataUser}
+          rowKey="BidangPelatihan"
+          colKey="PenyelenggaraPelatihan"
+          title="Masyarakat Dilatih berdasarkan Klaster Pelatihan & Penyelenggara Pelatihan"
+        />
+
+        <DynamicTablePelatihanMasyarakat
+          dataUser={dataUser}
+          rowKey="Program"
+          colKey="PenyelenggaraPelatihan"
+          title="Masyarakat Dilatih berdasarkan Program Pelatihan & Penyelenggara Pelatihan"
+        />
+
+        <DynamicTablePelatihanMasyarakat
+          dataUser={dataUser}
+          rowKey="DukunganProgramPrioritas"
+          colKey="PenyelenggaraPelatihan"
+          title="Masyarakat Dilatih berdasarkan Dukungan Program Prioritas & Penyelenggara Pelatihan"
         />
       </div>
     );

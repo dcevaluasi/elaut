@@ -69,12 +69,6 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
     };
     const [isSubmitting, setIsSubmitting] = useState(false)
 
-    const oldFileLapwasUrl = pelatihan!.MemoPusat
-    const handleFileChangeLapwas = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files.length > 0) {
-            setLapPengawasan(e.target.files[0]);
-        }
-    };
 
     const { adminPusatData, loading: loadingPusat, error, fetchAdminPusatData } =
         useFetchDataPusat();
