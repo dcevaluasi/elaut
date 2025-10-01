@@ -568,6 +568,12 @@ const ChartDetailMasyarakatDilatih: React.FC<{
           title="Masyarakat Dilatih berdasarkan Provinsi & Penyelenggara Pelatihan"
         />
 
+        <DynamicTablePelatihanMasyarakat
+          dataUser={dataUser}
+          rowKey="Provinsi"
+          colKey="DukunganProgramPrioritas"
+          title="Masyarakat Dilatih berdasarkan Penyelenggara & Triwulan"
+        />
       </div>
     );
   };

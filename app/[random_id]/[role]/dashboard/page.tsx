@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <LayoutAdminElaut>
-      <section className="p-10 w-full mt-1">
+      <section className="py-10 w-full mt-1">
         <SummaryPelatihan />
       </section>
     </LayoutAdminElaut>
