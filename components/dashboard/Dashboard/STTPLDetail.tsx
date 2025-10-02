@@ -176,9 +176,9 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         <>
                                             <SendNoteAction
                                                 idPelatihan={data.IdPelatihan.toString()}
-                                                title="Reject Penerbitan"
+                                                title="Perbaikan"
                                                 description="Segera melakukan verifikasi pengajuan penerbitan STTPL, kelengkapan administrasi pelatihan sesuai dan lengkap"
-                                                buttonLabel="Reject Penerbitan"
+                                                buttonLabel="Perbaikan Penerbitan"
                                                 icon={TbPencilX}
                                                 buttonColor="rose"
                                                 onSuccess={fetchData}
@@ -205,9 +205,9 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         <>
                                             <SendNoteAction
                                                 idPelatihan={data.IdPelatihan.toString()}
-                                                title="Reject Penerbitan"
+                                                title="Perbaikan Penerbitan"
                                                 description="Segera melakukan approval pengajuan penerbitan STTPL"
-                                                buttonLabel="Reject Penerbitan"
+                                                buttonLabel="Perbaikan"
                                                 icon={TbPencilX}
                                                 buttonColor="rose"
                                                 onSuccess={fetchData}
@@ -236,9 +236,9 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         <>
                                             <SendNoteAction
                                                 idPelatihan={data.IdPelatihan.toString()}
-                                                title="Reject Penerbitan"
+                                                title="Perbaikan Penerbitan"
                                                 description="Segera melakukan approval pengajuan penerbitan STTPL"
-                                                buttonLabel="Reject Penerbitan"
+                                                buttonLabel="Perbaikan"
                                                 icon={TbPencilX}
                                                 buttonColor="rose"
                                                 onSuccess={fetchData}
@@ -268,9 +268,9 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     (Cookies.get('Access')?.includes('approveKabadan') && data.StatusPenerbitan == "12") && <>
                                         <SendNoteAction
                                             idPelatihan={data.IdPelatihan.toString()}
-                                            title="Reject Penerbitan"
+                                            title="Perbaikan Penerbitan"
                                             description="Segera melakukan approval pengajuan penerbitan STTPL"
-                                            buttonLabel="Reject Penerbitan"
+                                            buttonLabel="Perbaikan"
                                             icon={TbPencilX}
                                             buttonColor="rose"
                                             onSuccess={fetchData}

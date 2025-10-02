@@ -56,6 +56,7 @@ import { countUserWithNoSertifikat } from "@/utils/counter";
 import { IoCalendarClear, IoReload } from "react-icons/io5";
 import { getDateInIndonesianFormat } from "@/utils/time";
 import EditPesertaAction from "@/commons/actions/EditPesertaAction";
+import { FiTrash2 } from "react-icons/fi";
 
 interface UserPelatihanTableProps {
     pelatihan: PelatihanMasyarakat
@@ -554,6 +555,40 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                         {
                             Cookies.get('Access')?.includes('createPelatihan') && <EditPesertaAction idPelatihan={row.original.IdPelatihan.toString()} onSuccess={onSuccess} idPeserta={row.original.IdUsers.toString()} />
                         }
+                        {
+                            Cookies.get('Access')?.includes('createPelatihan') && (pelatihan?.StatusPenerbitan == "0" || pelatihan?.StatusPenerbitan == "1.2" || pelatihan?.StatusPenerbitan == "3" || pelatihan?.StatusPenerbitan == "7" || pelatihan?.StatusPenerbitan == "9") && <Button
+                                variant="outline"
+                                onClick={async () => {
+                                    const confirmDelete = window.confirm(`⚠️ Apakah Anda yakin ingin menghapus ${row.original.Nama} ini?`);
+                                    if (!confirmDelete) return;
+
+                                    try {
+                                        const res = await fetch(
+                                            `${elautBaseUrl}/deleteUserPelatihanById?id=${row.original.IdUserPelatihan}`,
+                                            {
+                                                method: "DELETE",
+                                                headers: {
+                                                    "Authorization": `Bearer ${Cookies.get('XSRF091')}`,
+                                                    "Content-Type": "application/json",
+                                                },
+                                            }
+                                        );
+                                        if (!res.ok) throw new Error("Gagal menghapus data peserta");
+                                        alert("✅ Data peserta berhasil dihapus");
+                                        onSuccess();
+
+                                    } catch (error) {
+                                        console.error(error);
+                                        alert("❌ Gagal menghapus data peserta");
+                                    }
+                                }}
+                                className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-rose-500 text-rose-500 hover:text-white hover:bg-rose-500 border group"
+                            >
+                                <FiTrash2 className="h-5 w-5 text-rose-500 group-hover:text-white" />
+                                Hapus
+                            </Button>
+                        }
+
                     </div>
 
                 ),

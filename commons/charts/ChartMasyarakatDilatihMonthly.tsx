@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import ReactApexChart from "react-apexcharts";
-import { ApexOptions } from "apexcharts";
+import type { ApexOptions } from "apexcharts";
 
 import { elautBaseUrl } from "@/constants/urls";
 import { PelatihanMasyarakat } from "@/types/product";
 import { UserPelatihan } from "@/types/user";
 import { formatDateTime, getMonthFromDateString } from "@/utils";
 
+// ================== Chart Config ==================
 const chartOptions: ApexOptions = {
   chart: {
     type: "area",
@@ -27,7 +28,10 @@ const chartOptions: ApexOptions = {
   },
   colors: ["#3C50E0", "#80CAEE"],
   stroke: { width: 2, curve: "straight" },
-  grid: { xaxis: { lines: { show: true } }, yaxis: { lines: { show: true } } },
+  grid: {
+    xaxis: { lines: { show: true } },
+    yaxis: { lines: { show: true } },
+  },
   markers: {
     size: 4,
     colors: "#fff",
@@ -43,44 +47,47 @@ const chartOptions: ApexOptions = {
   ],
   xaxis: {
     type: "category",
-    categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    categories: [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    ],
     axisBorder: { show: false },
     axisTicks: { show: false },
   },
   yaxis: { title: { style: { fontSize: "0px" } } },
 };
 
+// ================== Component ==================
 type Props = {
   data: PelatihanMasyarakat[];
   dataUser: UserPelatihan[];
 };
 
 export default function ChartMasyarakatDilatihMonthly({ data, dataUser }: Props) {
-  const [dataPelatihan, setDataPelatihan] = useState<PelatihanMasyarakat[]>([]);
-  const [dataUserPelatihan, setDataUserPelatihan] = useState<UserPelatihan[]>([]);
+  const [pelatihan, setPelatihan] = useState<PelatihanMasyarakat[]>([]);
+  const [userPelatihan, setUserPelatihan] = useState<UserPelatihan[]>([]);
   const [totalMasyarakat, setTotalMasyarakat] = useState(0);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+
   const isAdmin = Cookies.get("XSRF093") === "balai";
   const namaBalai = Cookies.get("Satker");
 
+  // ================== Fetching ==================
   useEffect(() => {
     const fetchData = async () => {
       try {
         const { data: res } = await axios.get(`${elautBaseUrl}/lemdik/getPelatihan`);
-        const pelatihan = res.data;
-        let userFiltered = dataUser.filter((u) => u.FileSertifikat !== "");
-        let pelatihanFiltered = pelatihan;
-        let userPelatihanFiltered = userFiltered;
+        let pelatihanData: PelatihanMasyarakat[] = res.data;
+        let userData: UserPelatihan[] = dataUser.filter((u) => u.FileSertifikat !== "");
 
+        // Filter if Admin Balai
         if (isAdmin && namaBalai) {
-          userFiltered = userFiltered.filter((u) => u.PenyelenggaraPelatihan === namaBalai);
-          pelatihanFiltered = pelatihan.filter((p: PelatihanMasyarakat) => p.PenyelenggaraPelatihan === namaBalai);
-          userPelatihanFiltered = userFiltered;
+          pelatihanData = pelatihanData.filter((p) => p.PenyelenggaraPelatihan === namaBalai);
+          userData = userData.filter((u) => u.PenyelenggaraPelatihan === namaBalai);
         }
 
-        setDataPelatihan(pelatihanFiltered);
-        setDataUserPelatihan(userPelatihanFiltered);
-        setTotalMasyarakat(userFiltered.length);
+        setPelatihan(pelatihanData);
+        setUserPelatihan(userData);
+        setTotalMasyarakat(userData.length);
       } catch (err) {
         console.error("Fetch error:", err);
       }
@@ -89,30 +96,40 @@ export default function ChartMasyarakatDilatihMonthly({ data, dataUser }: Props)
     fetchData();
   }, [dataUser, isAdmin, namaBalai]);
 
+  // ================== Data Processing ==================
   const monthlyPelatihan = Array.from({ length: 12 }, (_, i) => {
     const month = (i + 1).toString().padStart(2, "0");
-    return dataPelatihan.filter((p) => getMonthFromDateString(p.TanggalMulaiPelatihan!) === month).length;
+    return pelatihan.filter((p) => getMonthFromDateString(p.TanggalMulaiPelatihan!) === month).length;
   });
 
   const monthlyUser = Array.from({ length: 12 }, (_, i) => {
     const month = (i + 1).toString().padStart(2, "0");
-    return dataUserPelatihan.filter((u) => getMonthFromDateString(u.CreteAt!) === month).length;
+
+    return userPelatihan.filter((u) => {
+      if (!u.TanggalBerakhir) return false;
+
+      const dateObj = new Date(u.TanggalBerakhir);
+      if (isNaN(dateObj.getTime())) return false;
+
+      const endMonth = (dateObj.getMonth() + 1).toString().padStart(2, "0");
+      return endMonth === month;
+    }).length;
   });
 
-  const years = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i);
-
+  // ================== Render ==================
   return (
-    <div className="col-span-12 xl:col-span-8 rounded-xl border border-stroke bg-white shadow-default mb-4 px-5 pt-7.5 pb-5 sm:px-7.5">
+    <div className="col-span-12 xl:col-span-8 mb-4 rounded-xl border border-stroke bg-white shadow-default px-5 pt-7.5 pb-5 sm:px-7.5">
+      {/* Header */}
       <div className="flex flex-wrap justify-between gap-3 sm:flex-nowrap">
-        {/* Title */}
         <div className="flex flex-col w-full gap-4">
           <div>
             <h5 className="text-xl font-semibold text-black">Total Masyarakat Dilatih</h5>
-            <p className="italic text-sm">{formatDateTime()}</p>
+            <p className="text-sm italic">{formatDateTime()}</p>
           </div>
+
           {/* Stats */}
           <div className="flex gap-5">
-            <StatItem color="primary" label="Total Pelatihan" value={`${dataPelatihan.length} Pelatihan`} />
+            <StatItem color="primary" label="Total Pelatihan" value={`${pelatihan.length} Pelatihan`} />
             <StatItem color="secondary" label="Total Masyarakat Dilatih" value={`${totalMasyarakat} Orang`} />
           </div>
         </div>
@@ -135,14 +152,22 @@ export default function ChartMasyarakatDilatihMonthly({ data, dataUser }: Props)
   );
 }
 
+// ================== Sub Components ==================
 function StatItem({ color, label, value }: { color: "primary" | "secondary"; label: string; value: string }) {
+  const colorMap = {
+    primary: "text-primary border-primary bg-primary",
+    secondary: "text-secondary border-secondary bg-secondary",
+  };
+
   return (
     <div className="flex items-center gap-2">
-      <span className={`flex h-4 w-4 items-center justify-center rounded-full border border-${color}`}>
-        <span className={`block h-2.5 w-2.5 rounded-full bg-${color}`} />
+      {/* Icon Bullet */}
+      <span className={`flex h-4 w-4 items-center justify-center rounded-full border ${colorMap[color].split(" ")[1]}`}>
+        <span className={`block h-2.5 w-2.5 rounded-full ${colorMap[color].split(" ")[2]}`} />
       </span>
+      {/* Label + Value */}
       <div>
-        <p className={`font-semibold text-${color}`}>{label}</p>
+        <p className={`font-semibold ${colorMap[color].split(" ")[0]}`}>{label}</p>
         <p className="text-sm font-medium">{value}</p>
       </div>
     </div>

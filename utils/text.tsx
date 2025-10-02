@@ -130,7 +130,7 @@ export function getStatusInfo(
       };
     case "1.2":
       return {
-        label: "Reject SPV",
+        label: "Perbaikan SPV",
         color: "bg-rose-600 text-white",
         icon: <RiCloseCircleFill className="w-4 h-4" />,
       };
@@ -148,7 +148,7 @@ export function getStatusInfo(
       };
     case "7C":
       return {
-        label: "Reject Kabalai",
+        label: "Perbaikan Kabalai",
         color: "bg-rose-600 text-white",
         icon: <RiCloseCircleFill className="w-4 h-4" />,
       };
@@ -167,7 +167,7 @@ export function getStatusInfo(
       };
     case "3":
       return {
-        label: "Reject Verifikator",
+        label: "Perbaikan Verifikator",
         color: "bg-rose-600 text-white",
         icon: <RiCloseCircleFill className="w-4 h-4" />,
       };
@@ -192,7 +192,7 @@ export function getStatusInfo(
       };
     case "7":
       return {
-        label: "Reject STTPL Verifikator",
+        label: "Perbaikan STTPL Verifikator",
         color: "bg-rose-600 text-white",
         icon: <RiCloseCircleFill className="w-4 h-4" />,
       };
@@ -204,7 +204,7 @@ export function getStatusInfo(
       };
     case "9":
       return {
-        label: "Reject Kapus",
+        label: "Perbaikan Kapus",
         color: "bg-rose-600 text-white",
         icon: <RiCloseCircleFill className="w-4 h-4" />,
       };
@@ -228,7 +228,7 @@ export function getStatusInfo(
       };
     case "13":
       return {
-        label: "Reject Kabadan",
+        label: "Perbaikan Kabadan",
         color: "bg-rose-600 text-white",
         icon: <RiCloseCircleFill className="w-4 h-4" />,
       };

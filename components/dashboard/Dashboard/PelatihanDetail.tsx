@@ -192,9 +192,9 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         (Cookies.get('Access')?.includes('supervisePelaksanaan') && data.StatusPenerbitan == "1") && <>
                                             <SendNoteAction
                                                 idPelatihan={data.IdPelatihan.toString()}
-                                                title="Reject Pelaksanaan"
+                                                title="Perbaikan Pelaksanaan"
                                                 description="Segera menunjuk verifikator dalam melalukan verifikasi pelaksanaan pelatiha"
-                                                buttonLabel="Reject Pelaksanaan"
+                                                buttonLabel="Perbaikan"
                                                 icon={TbPencilX}
                                                 buttonColor="rose"
                                                 onSuccess={fetchData}
@@ -220,9 +220,9 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         <>
                                             <SendNoteAction
                                                 idPelatihan={data.IdPelatihan.toString()}
-                                                title="Reject Pelaksanaan"
+                                                title="Perbaikan Pelaksanaan"
                                                 description="Segera melakukan verifikasi pelaksanaan diklat, pastikan perangkat dan kelengkapan administrasi pelatihan sesuai dan lengkap"
-                                                buttonLabel="Reject Pelaksanaan"
+                                                buttonLabel="Perbaikan"
                                                 icon={TbPencilX}
                                                 buttonColor="rose"
                                                 onSuccess={fetchData}

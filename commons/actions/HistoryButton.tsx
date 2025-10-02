@@ -11,6 +11,7 @@ import getDocument from "@/firebase/firestore/getData"
 import { DIALOG_TEXTS } from "@/constants/texts"
 import { HistoryItem, HistoryTraining, PelatihanMasyarakat } from "@/types/product"
 import { parseDateFirebase } from "@/utils/text"
+import { parseCustomDate } from "@/firebase/firestore/services"
 
 interface HistoryButtonProps {
   statusPelatihan: string
@@ -55,15 +56,18 @@ const HistoryButton: React.FC<HistoryButtonProps> = ({ pelatihan }) => {
                   .slice()
                   .sort(
                     (a: HistoryItem, b: HistoryItem) =>
-                      parseDateFirebase(b.created_at).getTime() - parseDateFirebase(a.created_at).getTime()
+                      parseCustomDate(b.created_at).getTime() -
+                      parseCustomDate(a.created_at).getTime()
                   )
                   .map((item: HistoryItem, index: number, arr) => {
                     const isLatest = index === 0;
+                    const createdDate = parseCustomDate(item.created_at);
+
                     return (
                       <div
                         key={index}
                         className={`rounded-xl p-4 shadow-sm transition ${isLatest
-                          ? "bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-300"
+                          ? "bg-gradient-to-r from-blue-300 to-blue-400 border border-blue-500"
                           : "bg-white border border-gray-200"
                           }`}
                       >
