@@ -42,6 +42,7 @@ import PublishButton from "@/commons/actions/PublishButton";
 import { Button } from "@/components/ui/button";
 import Toast from "@/commons/Toast";
 import ZipPhotoParticipantAction from "@/commons/actions/lemdiklat/ZipPhotoParticipantAction";
+import TTDeDetail from "./TTDeDetail";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -735,6 +736,8 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                         </div>}
                 </div>
             </Accordion >
+
+            <TTDeDetail data={data} fetchData={fetchData} />
         </div >
     );
 };

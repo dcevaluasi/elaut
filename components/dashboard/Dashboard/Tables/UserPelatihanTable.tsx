@@ -553,7 +553,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                             />
                         </AlertDialog>
                         {
-                            Cookies.get('Access')?.includes('createPelatihan') && <EditPesertaAction idPelatihan={row.original.IdPelatihan.toString()} onSuccess={onSuccess} idPeserta={row.original.IdUsers.toString()} />
+                            Cookies.get('Access')?.includes('createPelatihan') && (pelatihan?.StatusPenerbitan == "0" || pelatihan?.StatusPenerbitan == "1.2" || pelatihan?.StatusPenerbitan == "3" || pelatihan?.StatusPenerbitan == "7" || pelatihan?.StatusPenerbitan == "9") && <EditPesertaAction idPelatihan={row.original.IdPelatihan.toString()} onSuccess={onSuccess} idPeserta={row.original.IdUsers.toString()} />
                         }
                         {
                             Cookies.get('Access')?.includes('createPelatihan') && (pelatihan?.StatusPenerbitan == "0" || pelatihan?.StatusPenerbitan == "1.2" || pelatihan?.StatusPenerbitan == "3" || pelatihan?.StatusPenerbitan == "7" || pelatihan?.StatusPenerbitan == "9") && <Button

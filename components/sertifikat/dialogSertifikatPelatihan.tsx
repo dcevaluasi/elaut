@@ -218,11 +218,9 @@ const FormatSTTPL = React.forwardRef(
                 <div ref={refPage} className={`pdf-page w-full flex flex-col  gap-4 relative  items-center justify-center h-[49.63rem]`}>
                     <div className="flex flex-row  absolute top-0 right-0">
                         <p className="text-lg font-bosNormal">
-                            No. Sertifikat : {userPelatihan?.NoRegistrasi}
+                            NO. SERTIFIKAT : {userPelatihan?.NoRegistrasi}
                         </p>
                     </div>
-
-
 
                     <div className="w-full flex flex-col space-y-0 px-10 mt-10 ">
                         {isPrint && pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan') ? <div className="mx-auto w-30 h-64"></div> : <Image
@@ -257,11 +255,13 @@ const FormatSTTPL = React.forwardRef(
 
                             <div className="flex flex-col h-fit items-center justify-center space-y-1">
                                 <h1 className="text-2xl font-bosBold leading-none">
-                                    SERTIFIKAT PELATIHAN
+                                    SERTIFIKAT TANDA TAMAT PELATIHAN
                                 </h1>
-                                <p className="text-xl font-bosItalic">TRAINING CERTIFICATE</p>
+                                <p className="text-xl font-bosItalic">Certificate of Training Completion</p>
 
                             </div>
+
+
 
                         </div>
 
@@ -306,12 +306,12 @@ const FormatSTTPL = React.forwardRef(
                         </div>
 
                         <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-1 mb-4">
-                            <h1 className="font-bosBold text-xl leading-none">
+                            <h1 className="font-bosBold text-2xl leading-none">
                                 {
                                     userPelatihan?.IsActice == "" ? "-" : generatedStatusCertificate(userPelatihan?.IsActice).status_indo
                                 }
                             </h1>
-                            <h3 className="font-bosNormal text-lg italic">
+                            <h3 className="font-bosNormal text-xl italic">
                                 {
                                     userPelatihan?.IsActice == "" ? "-" : generatedStatusCertificate(userPelatihan?.IsActice).status_eng
                                 }
@@ -783,6 +783,7 @@ const DialogSertifikatPelatihan = forwardRef<DialogSertifikatHandle, Props>(
 
         return (
             <div className="max-h-[700px] scale-95 bg-white flex flex-col gap-2 overflow-y-auto scroll-smooth">
+                <button onClick={() => downloadPdf()}>Download</button>
                 <FormatSTTPL
                     ref={componentRef}
                     refPage={componentRefPage}

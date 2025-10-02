@@ -36,9 +36,6 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
 
   const token = Cookies.get("XSRF091");
 
-  /*
-    state variables for posting & updating public training data
-  */
   const penyelenggara = Cookies.get('Satker')
   const idUnitKerja = Cookies.get('IDUnitKerja')!
   const [kodePelatihan, setKodePelatihan] = React.useState(
@@ -66,6 +63,20 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
   const [ttdSertifikat, setTtdSertifikat] = React.useState("");
   const [program, setProgram] = React.useState<string>("");
   const [jenisProgram, setJenisProgram] = React.useState<string>("");
+
+  const isFormValid =
+    kodePelatihan &&
+    namaPelatihan &&
+    penyelenggaraPelatihan &&
+    jenisPelatihan &&
+    bidangPelatihan &&
+    dukunganProgramTerobosan &&
+    tanggalMulaiPelatihan &&
+    tanggalBerakhirPelatihan &&
+    program &&
+    jenisProgram &&
+    lokasiPelatihan &&
+    pelaksanaanPelatihan
 
   const resetAllStateToEmptyString = () => {
     setKodePelatihan("");
@@ -113,6 +124,14 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
     e.preventDefault();
     setIsUploading(true);
 
+    if (!isFormValid) {
+      Toast.fire({
+        icon: "error",
+        title: "Oopsss!",
+        text: "Gagal menambahkan pelatihan baru! Pastikan semua data sudah diisi."
+      });
+      return;
+    }
     const data = new FormData();
     data.append("KodePelatihan", kodePelatihan);
     data.append("NamaPelatihan", namaPelatihan);

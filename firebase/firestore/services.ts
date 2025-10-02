@@ -60,9 +60,30 @@ export const handleAddHistoryTrainingInExisting = async (
 }
 
 export const parseCustomDate = (dateStr: string): Date => {
-  const [datePart, timePart] = dateStr.split(', ')
-  const [day, month, year] = datePart.split('/').map(Number)
-  const [hours, minutes, seconds] = timePart.split('.').map(Number)
+  try {
+    if (!dateStr) throw new Error('Empty date string')
 
-  return new Date(year, month - 1, day, hours, minutes, seconds)
+    const parts = dateStr.split(', ')
+    const datePart = parts[0]
+    const timePart = parts[1] || '00.00.00'
+
+    const [day, month, year] = datePart.split('/').map(Number)
+    const [hours, minutes, seconds] = timePart.split('.').map(Number)
+
+    if (isNaN(day) || isNaN(month) || isNaN(year)) {
+      throw new Error(`Invalid date part: ${dateStr}`)
+    }
+
+    return new Date(
+      year,
+      month - 1,
+      day,
+      hours || 0,
+      minutes || 0,
+      seconds || 0,
+    )
+  } catch (err) {
+    console.error('parseCustomDate error:', err, 'input:', dateStr)
+    return new Date(0)
+  }
 }
