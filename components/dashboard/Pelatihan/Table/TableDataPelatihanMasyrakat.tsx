@@ -96,7 +96,7 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                     </td>
                                     <td className="px-4 py-3 border border-gray-200">
                                         <div className="flex flex-col w-full h-full ">
-                                            <p className="text-base font-semibold leading-tight">{pelatihan.NamaPelatihan}</p>
+                                            <p className="text-base font-semibold leading-tight uppercase">{pelatihan.NamaPelatihan}</p>
                                             <div className="flex flex-col !font-normal">
                                                 {
                                                     pelatihan.TanggalMulaiPendaftaran != "" && <span className="text-sm text-gray-400 leading-tight">Pendaftaran : {waktuPendaftaran}</span>
