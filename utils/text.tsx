@@ -154,7 +154,7 @@ export function getStatusInfo(
       };
     case "7D":
       return {
-        label: "Signed Kabalai",
+        label: "Signed",
         color: "bg-green-500 text-white",
         icon: <RiCheckboxCircleFill className="w-4 h-4" />,
       };
@@ -216,7 +216,7 @@ export function getStatusInfo(
       };
     case "11":
       return {
-        label: "Signed Kapus",
+        label: "Signed",
         color: "bg-green-500 text-white",
         icon: <RiCheckboxCircleFill className="w-4 h-4" />,
       };
@@ -240,7 +240,7 @@ export function getStatusInfo(
       };
     case "15":
       return {
-        label: "Signed Kabadan",
+        label: "Signed",
         color: "bg-green-500 text-white",
         icon: <RiCheckboxCircleFill className="w-4 h-4" />,
       };
