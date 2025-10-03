@@ -65,7 +65,7 @@ export function ValidateParticipantAction({
             Toast.fire({
                 icon: "error",
                 title: "Oopsss!",
-                text: `Gagal meluluskan ${data.length} peserta pelatihan!`,
+                text: `Gagal memvalidasi ${data.length} peserta pelatihan!`,
             });
 
             setIsIteratingProcess(false);
