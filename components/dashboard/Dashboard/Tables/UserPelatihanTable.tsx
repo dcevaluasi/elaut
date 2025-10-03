@@ -322,12 +322,12 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                         <div className="capitalize w-full flex items-center justify-center">
                             <label className="flex items-center gap-2 text-base font-semibold tracking-tight leading-none">
                                 <label
-                                    htmlFor="isActice"
+                                    htmlFor="isLulus"
                                     className="flex items-center gap-2 cursor-pointer font-semibold  disabled:cursor-not-allowed justify-center"
                                 >
                                     <Checkbox
                                         disabled={row.original.StatusPenandatangan === "Done" || !Cookies.get('Access')?.includes('createPelatihan')}
-                                        id="isActice"
+                                        id="isLulus"
                                         onCheckedChange={() => handleLulusDataPeserta(row.original)}
                                         checked={
                                             row.original.IsActice === "{PESERTA}{TELAH LULUS}{Has Passed}"
@@ -346,12 +346,12 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                                 </label>
 
                                 <label
-                                    htmlFor="isActice"
+                                    htmlFor="isMengikuti"
                                     className="flex items-center gap-2 cursor-pointer font-semibold  disabled:cursor-not-allowed justify-center"
                                 >
                                     <Checkbox
                                         disabled={row.original.StatusPenandatangan === "Done" || !Cookies.get('Access')?.includes('createPelatihan')}
-                                        id="isActice"
+                                        id="isMengikuti"
                                         onCheckedChange={() => handleLulusDataPeserta(row.original)}
                                         checked={
                                             row.original.IsActice === "{PESERTA}{TELAH MENGIKUTI}{Has Attended}"
