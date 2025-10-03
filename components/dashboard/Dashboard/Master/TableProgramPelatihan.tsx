@@ -117,7 +117,7 @@ export default function TableProgramPelatihan() {
                             <div className="flex items-center gap-3">
                                 {rumpunIcons[rumpunName] || rumpunIcons.default}
                                 <span className="font-semibold text-gray-800">{rumpunName}</span>
-                                <span className="text-sm text-gray-500">({programs.length} program) {(rumpunName.includes('Sistem Jaminan Mutu') || rumpunName.includes('Awak Kapal Perikanan')) && "(Dikelola oleh Pusat)"}</span>
+                                <span className="text-sm text-gray-500">({programs.length} program) </span>
                             </div>
                             {openRumpun === rumpunName ? (
                                 <FiChevronDown className="text-gray-500" />
