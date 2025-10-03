@@ -238,24 +238,17 @@ export default function TableProgramPelatihan() {
 
                                                         <td className="text-center px-3 py-2">{row.abbrv_name}</td>
                                                         <td className="text-center px-3 py-2">
-                                                            {canManageProgram(rumpunName) &&
-                                                                <Link
-                                                                    href={`/admin/lemdiklat/master/program-pelatihan/materi/${row.name_indo}`}
-                                                                    target="_blank"
-                                                                    className="flex items-center gap-2 w-fit mx-auto rounded-lg px-3 py-1 shadow-sm transition bg-transparent border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
-                                                                >
-                                                                    <FiBookOpen />
-                                                                    Materi
-                                                                </Link>}
 
-                                                            {canManageProgramUPT(rumpunName) && <Link
+                                                            <Link
                                                                 href={`/admin/lemdiklat/master/program-pelatihan/materi/${row.name_indo}`}
                                                                 target="_blank"
                                                                 className="flex items-center gap-2 w-fit mx-auto rounded-lg px-3 py-1 shadow-sm transition bg-transparent border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
                                                             >
                                                                 <FiBookOpen />
                                                                 Materi
-                                                            </Link>}
+                                                            </Link>
+
+
 
                                                         </td>
                                                     </tr>
