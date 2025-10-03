@@ -313,7 +313,7 @@ const FormatSTTPL = React.forwardRef(
                         <>
                             <div className="flex w-full flex-col space-y-1 max-w-7xl mx-auto items-start text-sm -mt-2 text-center font-bos h-fit">
                                 <span className="text-lg leading-[115%] font-bosNormal max-w-7xl">
-                                    Pelatihan <span className={`${pelatihan?.Program.includes('HACCP') ? 'font-bosItalic' : 'font-bosNormal'}`}>{dataProgramPelatihan[0]?.name_indo}</span> pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))} {generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_indo == "" ? `yang diselenggarakan oleh ${pelatihan?.PenyelenggaraPelatihan} di ${pelatihan?.LokasiPelatihan}. Yang merupakan bagian dari upaya peningkatan kapasitas dan kompetensi sumber daya manusia di sektor kelautan dan perikanan, sesuai dengan standar mutu atau ketentuan yang berlaku, sehingga peserta memperoleh pengetahuan, keterampilan, dan pemahaman yang relevan sesuai program pelatihan.` : generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_indo}
+                                    Pelatihan <span className={`${pelatihan?.Program.includes('HACCP') ? 'font-bosItalic' : 'font-bosNormal'}`}>{dataProgramPelatihan[0]?.name_indo}</span> pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))} {generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_indo == "" ? `yang diselenggarakan oleh ${pelatihan?.PenyelenggaraPelatihan} dengan jam pelajaran ${totalHoursCertificateLvl.totalTheory + totalHoursCertificateLvl.totalPractice}. Yang merupakan bagian dari upaya peningkatan kapasitas dan kompetensi sumber daya manusia di sektor kelautan dan perikanan, sesuai dengan standar mutu atau ketentuan yang berlaku, sehingga peserta memperoleh pengetahuan, keterampilan, dan pemahaman yang relevan sesuai program pelatihan.` : generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_indo}
                                 </span>
                                 {
                                     generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng != "" && <span className="max-w-6xl mt-1 leading-none font-bosItalic text-[0.9rem] mx-auto">
@@ -356,7 +356,7 @@ const FormatSTTPL = React.forwardRef(
 
 
                                     {/* Kolom 3 - Tanda Tangan & Pejabat */}
-                                    <div className={`flex flex-col items-center justify-center text-center ${peserta?.Foto == "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/" ? "w-[120%]" : "w-[120%]"} mt-2 space-y-1 -ml-20`}>
+                                    <div className={`flex flex-col items-center justify-center text-center ${peserta?.Foto == "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/" ? "w-[120%]" : "w-[120%]"} mt-2 space-y-1 -ml-16`}>
                                         <div className="flex flex-col items-center gap-0.5 font-bosNormal text-sm leading-tight">
                                             <span className='text-base'>Jakarta, {generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan)}</span>
                                             <span className="w-full font-bosBold text-base">
