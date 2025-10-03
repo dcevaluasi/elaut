@@ -231,9 +231,7 @@ const FormatSTTPL = React.forwardRef(
                             src="/logo-kkp-2.png"
                         />}
 
-
                         <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-3">
-
                             <div className="flex flex-col h-fit items-center justify-center space-y-1">
                                 <h1 className="text-lg font-bosBold">
                                     KEMENTERIAN KELAUTAN DAN PERIKANAN
@@ -255,14 +253,10 @@ const FormatSTTPL = React.forwardRef(
 
                             <div className="flex flex-col h-fit items-center justify-center space-y-1">
                                 <h1 className="text-2xl font-bosBold leading-none">
-                                    SERTIFIKAT TANDA TAMAT PELATIHAN
+                                    SERTIFIKAT PELATIHAN
                                 </h1>
-                                <p className="text-xl font-bosItalic">Certificate of Training Completion</p>
-
+                                <p className="text-xl font-bosItalic">Certificate of Training</p>
                             </div>
-
-
-
                         </div>
 
                         <div className="flex w-full flex-col space-y-1 max-w-7xl mx-auto items-start text-base  text-center font-bos h-fit mt-2">
@@ -276,7 +270,6 @@ const FormatSTTPL = React.forwardRef(
                                 {
                                     dataProgramPelatihan[0]?.description == "" ? "  Based on Government Regulation Number 62 of 2014 concerning the Implementation of Fisheries Education, Training and Extension as well as its implementing provisions States that :" : generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).desc_eng + " States that :"
                                 }
-
                             </span>
                         </div>
 
@@ -300,7 +293,6 @@ const FormatSTTPL = React.forwardRef(
                                     <td className=" w-2/3 text-xl font-bosBold uppercase">
                                         : {peserta?.TempatLahir}, {peserta?.TanggalLahir}
                                     </td>
-
                                 </tr>
                             </table>
                         </div>
