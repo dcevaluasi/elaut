@@ -253,9 +253,9 @@ const FormatSTTPL = React.forwardRef(
 
                             <div className="flex flex-col h-fit items-center justify-center space-y-1">
                                 <h1 className="text-2xl font-bosBold leading-none">
-                                    SERTIFIKAT PELATIHAN
+                                    SERTIFIKAT
                                 </h1>
-                                <p className="text-xl font-bosItalic">Certificate of Training</p>
+                                <p className="text-xl font-bosItalic">Certificate</p>
                             </div>
                         </div>
 
