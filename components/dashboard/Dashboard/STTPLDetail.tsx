@@ -515,7 +515,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     </Button>
                                     }
 
-                                    {((data?.StatusPenerbitan == "7D" || data?.StatusPenerbitan == "11" || data?.StatusPenerbitan == "15") && Cookies.get('Access')?.includes('createPelatihan')) && (
+                                    {/* {((data?.StatusPenerbitan == "7D" || data?.StatusPenerbitan == "11" || data?.StatusPenerbitan == "15") && Cookies.get('Access')?.includes('createPelatihan')) && (
                                         <ReviseCertificateAction
                                             idPelatihan={data?.IdPelatihan.toString()}
                                             handleFetchingData={fetchData}
@@ -533,7 +533,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             {isPrinting ? 'Tutup Mode Print...' : 'Mode Print'}
                                         </span>
                                     </Button>
-                                    }
+                                    } */}
 
                                 </div>
 
