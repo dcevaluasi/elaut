@@ -737,7 +737,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                 </div>
             </Accordion >
 
-            <TTDeDetail data={data} fetchData={fetchData} />
+            {/* <TTDeDetail data={data} fetchData={fetchData} /> */}
         </div >
     );
 };

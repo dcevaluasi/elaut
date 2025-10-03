@@ -590,13 +590,13 @@ const FormatSTTPL = React.forwardRef(
                             </div>
                         </div>
 
-                        {
+                        {/* {
                             (pelatihan?.BidangPelatihan?.includes('Sistem Jaminan Mutu') || pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? <div className="w-full flex justify-center items-center">
-                                {/* <p className="max-w-3xl text-center font-bosItalic leading-none">
+                                <p className="max-w-3xl text-center font-bosItalic leading-none">
                                     Lampiran materi/kurikulum pelatihan disahkan sesuai dengan standar mutu yang berlaku dan diselenggarakan oleh <span className="font-bosBold uppercase">
                                         {pelatihan?.PenyelenggaraPelatihan}
                                     </span>
-                                </p> */}
+                                </p>
                             </div> :
                                 unitKerja != null ? <div className={`flex flex-col items-start justify-start text-left w-full mt-2 space-y-1 max-w-7xl`}>
                                     <div className="flex flex-col items-start gap-0.5 font-bosNormal text-sm leading-tight">
@@ -620,7 +620,7 @@ const FormatSTTPL = React.forwardRef(
                                         {generatedSignedCertificate(unitKerja?.pimpinan).name}
                                     </span>
                                 </div> : <></>
-                        }
+                        } */}
 
                     </div>
                 </div>
