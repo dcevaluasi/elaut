@@ -1,15 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
-import { formatDateTime } from "@/utils";
+import React, { useMemo, useState } from "react";
+import Cookies from "js-cookie";
 import {
   Bar,
   BarChart,
-  CartesianGrid,
   ResponsiveContainer,
-  Tooltip,
   XAxis,
   YAxis,
+  Tooltip,
+  CartesianGrid,
+  Cell,
+  PieChart,
+  Pie,
 } from "recharts";
 import {
   Card,
@@ -18,588 +21,345 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
+import { formatDateTime } from "@/utils";
 import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+  getFilteredDataByBalai,
+  getFilteredDataPelatihanByBalai,
+} from "@/lib/training";
+import { isSigned, isUnsigned } from "@/lib/sign";
 import { PelatihanMasyarakat } from "@/types/product";
 import { UserPelatihan } from "@/types/user";
 
-import Cookies from "js-cookie";
-import { getFilteredDataByBalai, getFilteredDataPelatihanByBalai } from "@/lib/training";
-import { isSigned, isUnsigned } from "@/lib/sign";
-import { DynamicTablePelatihanMasyarakat } from "@/components/dashboard/Summary/DynamicTablePelatihanMasyarakat";
+// ========================================================
+// Color Palette
+// ========================================================
+const barColors = [
+  "#09105E",
+  "#5335E9",
+  "#41C8ED",
+  "#00BFA6",
+  "#2DC6FF",
+  "#24388A",
+  "#1B254B",
+  "#111C44",
+  "#0B1437",
+];
 
-const chartConfigJenisPelatihan = {
-  visitors: {
-    label: "Masyarakat Dilatih",
-  },
-  chrome: {
-    label: "Aspirasi",
-    color: "#5335E9",
-  },
-  safari: {
-    label: "PNBP/BLU",
-    color: "#41C8ED",
-  },
-  firefox: {
-    label: "Reguler",
-    color: "#09105E",
-  },
-} satisfies ChartConfig;
+// ========================================================
+// Chart Configurations
+// ========================================================
+const chartConfigs = {
+  jenisPelatihan: { visitors: { label: "Masyarakat Dilatih" } },
+  gender: { visitors: { label: "Masyarakat Dilatih" } },
+  sertifikat: { visitors: { label: "Masyarakat Dilatih" } },
+  programPelatihan: { visitors: { label: "Masyarakat Dilatih" } },
+  programPrioritas: { visitors: { label: "Masyarakat Dilatih" } },
+};
 
-const chartConfigGender = {
-  visitors: {
-    label: "Masyarakat Dilatih",
-  },
-  chrome: {
-    label: "Laki - Laki",
-    color: "#5335E9",
-  },
-  firefox: {
-    label: "Perempuan",
-    color: "#09105E",
-  },
-} satisfies ChartConfig;
-
-const chartConfigSertifikat = {
-  visitors: {
-    label: "Masyarakat Dilatih",
-  },
-  chrome: {
-    label: "Tidak Bersertifikat",
-    color: "#5335E9",
-  },
-  firefox: {
-    label: "Bersertifikat",
-    color: "#41C8ED",
-  },
-} satisfies ChartConfig;
-
-const chartConfigProgramPelatihan = {
-  visitors: {
-    label: "Masyarakat Dilatih",
-  },
-  chrome: {
-    label: "Perikanan",
-    color: "#211951",
-  },
-  safari: {
-    label: "Kelautan",
-    color: "#836FFF",
-  },
-  firefox: {
-    label: "Awak Kapal Perikanan",
-    color: "#41C8ED",
-  },
-} satisfies ChartConfig;
-
-const chartConfigProgramPrioritas = {
-  visitors: {
-    label: "Masyarakat Dilatih",
-    color: "#1487af",
-  },
-  other4: {
-    label: "Non Terobosan",
-    color: "#073f51",
-  },
-  chrome: {
-    label: "Konservasi",
-    color: "#47bdda",
-  },
-  safari: {
-    label: "PIT",
-    color: "#97d7e2",
-  },
-  firefox: {
-    label: "Kalaju/Kalamo",
-    color: "#f7fdfb",
-  },
-  edge: {
-    label: "KPB",
-    color: "#1487af",
-  },
-  other: {
-    label: "Budidaya",
-    color: "#47bdda",
-  },
-  other2: {
-    label: "Pengawasan Pesisir",
-    color: "#073f51",
-  },
-  other3: {
-    label: "BCL",
-    color: "#97d7e2",
-  },
-} satisfies ChartConfig;
-
-
-interface ChartThreeState {
-  series: number[];
+// ========================================================
+// Reusable Chart Card
+// ========================================================
+interface ChartCardProps {
+  title: string;
+  chartConfig: any;
+  chartData: any[];
+  barHeight?: number
+  chartType?: "vertical" | "horizontal" | "pie"; // ✅ new prop
 }
 
+const TrainingChartCard: React.FC<ChartCardProps> = ({
+  title,
+  chartConfig,
+  chartData,
+  barHeight = 32,
+  chartType: initialChartType = "horizontal", // default
+}) => {
+  const [chartType, setChartType] = useState<"vertical" | "horizontal" | "pie">(initialChartType);
 
-const ChartDetailMasyarakatDilatih: React.FC<{
+  const chartHeight = Math.max(240, chartData.length * barHeight);
+
+  return (
+    <Card className="flex flex-col w-full">
+      <CardHeader className="flex justify-between items-center pb-0">
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+
+      <CardContent className="flex-1 pb-0">
+        <ChartContainer config={chartConfig} className="mx-auto w-full">
+          <ResponsiveContainer width="100%" height={chartHeight}>
+            {chartType === "pie" ? (
+              <PieChart>
+                <Tooltip content={<ChartTooltipContent hideLabel />} />
+                <Pie
+                  data={chartData}
+                  dataKey="visitors"
+                  nameKey="name"
+                  outerRadius={100}
+                  label
+                >
+                  {chartData.map((_, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={barColors[index % barColors.length]}
+                    />
+                  ))}
+                </Pie>
+              </PieChart>
+            ) : (
+              <BarChart
+                data={chartData}
+                layout={chartType === "horizontal" ? "vertical" : "horizontal"}
+                margin={{ top: 20, right: 0, left: chartType === "vertical" ? 0 : -18, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                <XAxis
+                  type={chartType === "horizontal" ? "number" : "category"}
+                  dataKey={chartType === "vertical" ? "name" : undefined}
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 12 }}
+                />
+                <YAxis
+                  type={chartType === "horizontal" ? "category" : "number"}
+                  dataKey={chartType === "horizontal" ? "name" : undefined}
+                  width={chartType === "horizontal" ? 150 : 0}
+                  tick={{ fontSize: 12 }}
+                  tickLine={false}
+                />
+                <Tooltip content={<ChartTooltipContent />} />
+                <Bar
+                  dataKey="visitors"
+                  radius={[6, 6, 0, 0]}
+                  label={{
+                    position: chartType === "horizontal" ? "right" : "top",
+                    fill: "#1B254B",
+                    fontSize: 12,
+                  }}
+                >
+                  {chartData.map((_, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={barColors[index % barColors.length]}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            )}
+          </ResponsiveContainer>
+        </ChartContainer>
+      </CardContent>
+
+      <CardFooter className="flex-col gap-1 text-sm items-center text-left">
+        <div className="mt-4 flex gap-2 flex-wrap">
+          {chartData.map((entry, index) => (
+            <div key={entry.name} className="flex gap-2 items-center">
+              <div
+                className="w-4 h-4 rounded"
+                style={{
+                  backgroundColor: barColors[index % barColors.length],
+                }}
+              ></div>
+              <span className="text-sm">{entry.name}</span>
+            </div>
+          ))}
+        </div>
+      </CardFooter>
+    </Card>
+  );
+};
+
+
+// ========================================================
+// Main Component
+// ========================================================
+interface ChartDetailMasyarakatDilatihProps {
   data: PelatihanMasyarakat[];
   dataUser: UserPelatihan[];
-}> = ({ data, dataUser }) => {
-  const isAdminBalaiPelatihan = Cookies.get('XSRF093') == 'balai'
-  const nameBalaiPelatihan = Cookies.get('Satker')
+}
 
-  console.log({ dataUser })
+const ChartDetailMasyarakatDilatih: React.FC<
+  ChartDetailMasyarakatDilatihProps
+> = ({ data, dataUser }) => {
+  const isAdminBalaiPelatihan = Cookies.get("Role") === "Pengelola UPT";
+  const nameBalaiPelatihan = Cookies.get("Satker");
 
-  const [selectedLemdiklat, setSelectedLemdiklat] =
-    React.useState<string>("All");
+  const filteredDataByBalai = useMemo(
+    () => getFilteredDataByBalai(dataUser, nameBalaiPelatihan!),
+    [dataUser, nameBalaiPelatihan]
+  );
 
-  const [
-    stateMasyarakatDilatihByBidangPelatihan,
-    setStateMasyarakatDilatihByBidangPelatihan,
-  ] = useState<ChartThreeState>({
-    series: [],
-  });
+  const filteredPelatihanByBalai = useMemo(
+    () =>
+      getFilteredDataPelatihanByBalai(
+        data,
+        isAdminBalaiPelatihan,
+        nameBalaiPelatihan!
+      ),
+    [data, isAdminBalaiPelatihan, nameBalaiPelatihan]
+  );
 
-  const [
-    stateMasyarakatDilatihByJenisPelatihan,
-    setStateMasyarakatDilatihByJenisPelatihan,
-  ] = useState<ChartThreeState>({
-    series: [],
-  });
+  const countWith = (cond: (item: any) => boolean) =>
+    filteredDataByBalai.filter(cond).length;
 
-  const [
-    stateMasyarakatDilatihByProgramPelatihan,
-    setStateMasyarakatDilatihByProgramPelatihan,
-  ] = useState<ChartThreeState>({
-    series: [],
-  });
-
-  const [
-    stateMasyarakatDilatihByProgramPrioritas,
-    setStateMasyarakatDilatihByProgramPrioritas,
-  ] = useState<ChartThreeState>({
-    series: [],
-  });
-
-  const [stateMasyarakatByGender, setStateMasyarakatByGender] =
-    useState<ChartThreeState>({
-      series: [],
-    });
-
-  const [stateMasyarakatBySertifikat, setStateMasyarakatBySertifikat] =
-    useState<ChartThreeState>({
-      series: [],
-    });
-
-  React.useEffect(() => {
-    const filteredDataByBalai = getFilteredDataByBalai(dataUser, nameBalaiPelatihan!);
-    const filteredDataPelatihanByBalai = getFilteredDataPelatihanByBalai(data, isAdminBalaiPelatihan, nameBalaiPelatihan!);
-
-    // Data Masyarakat Dilatih by Gender
-    const dataMasyarakatByGender = [
-      filteredDataByBalai.filter(
-        (item) =>
-          (item.JenisKelamin === "Laki - Laki" || item.JenisKelamin === "L") &&
-          item.FileSertifikat !== ""
-      ).length,
-      filteredDataByBalai.filter(
-        (item) =>
-          (item.JenisKelamin === "Perempuan" || item.JenisKelamin === "P") &&
-          item.FileSertifikat !== ""
-      ).length,
+  const chartData = useMemo(() => {
+    const uniqueJenisPelatihan = [
+      ...new Set(filteredPelatihanByBalai.map((i) => i.JenisPelatihan).filter(Boolean)),
     ];
-    setStateMasyarakatByGender({
-      series: dataMasyarakatByGender,
-    });
-
-    // Ambil list bidang pelatihan unik langsung dari data
-    const klasterPelatihanList = Array.from(
-      new Set(
-        filteredDataByBalai
-          .filter((item) => item.FileSertifikat !== "")
-          .map((item) => item.BidangPelatihan)
-      )
-    );
-
-    // Hitung jumlah per bidang
-    const dataMasyarakatDilatihByBidangPelatihan = klasterPelatihanList.map(
-      (bidang) =>
-        filteredDataByBalai.filter(
-          (item) => item.BidangPelatihan === bidang && item.FileSertifikat !== ""
-        ).length
-    );
-
-    // Update state
-    setStateMasyarakatDilatihByBidangPelatihan({
-      series: dataMasyarakatDilatihByBidangPelatihan,
-    });
-
-
-    // Data Masyarakat Dilatih by Program Pelatihan
-    const jenisProgramList = [
-      "Perikanan",
-      "Kelautan",
-      "Awak Kapal Perikanan",
-    ];
-    const dataMasyarakatDilatihByProgramPelatihan = jenisProgramList.map(
-      (program) =>
-        filteredDataByBalai.filter(
-          (item) =>
-            item.JenisProgram === program &&
-            item.FileSertifikat !== ""
-        ).length
-    );
-    setStateMasyarakatDilatihByProgramPelatihan({
-      series: dataMasyarakatDilatihByProgramPelatihan,
-    });
-
-    // Data Masyarakat Dilatih by Jenis Pelatihan
-    const jenisPelatihanList = ["Aspirasi", "PNBP/BLU", "Reguler", "Satuan Pendidikan"];
-    const dataMasyarakatDilatihByJenisPelatihan = jenisPelatihanList.map((jenis) =>
-      filteredDataPelatihanByBalai
+    const byJenisPelatihan = uniqueJenisPelatihan.map((jenis) => ({
+      name: jenis,
+      visitors: filteredPelatihanByBalai
         .filter((item) => item.JenisPelatihan === jenis)
-        .reduce((total, item) => total + (item.JumlahPeserta || 0), 0)
-    );
-    setStateMasyarakatDilatihByJenisPelatihan({
-      series: dataMasyarakatDilatihByJenisPelatihan,
-    });
+        .reduce((sum, item) => sum + (item.JumlahPeserta || 0), 0),
+    })).filter((item) => item.visitors > 0);
 
-    // Data Masyarakat Dilatih by Dukungan Program Prioritas
-    const kategoriPrioritas = [
-      "Non Terobosan",
-      "Konservasi",
-      "PIT",
-      "Kalaju/Kalamo",
-      "KPB",
-      "Budidaya",
-      "Pengawasan Pesisir",
-      "BCL",
+    const uniquePenyelenggaraPelatihan = [
+      ...new Set(filteredPelatihanByBalai.map((i) => i.PenyelenggaraPelatihan).filter(Boolean)),
     ];
-    const dataMasyarakatDilatihByProgramPrioritas = kategoriPrioritas.map((kategori) =>
-      filteredDataByBalai.filter(
-        (item) => item.FileSertifikat !== '' && item.DukunganProgramPrioritas === kategori
-      ).length
-    );
-    setStateMasyarakatDilatihByProgramPrioritas({
-      series: dataMasyarakatDilatihByProgramPrioritas,
-    });
+    const byPenyelenggaraPelatihan = uniquePenyelenggaraPelatihan.map((penyelenggara) => ({
+      name: penyelenggara,
+      visitors: filteredPelatihanByBalai
+        .filter((item) => item.PenyelenggaraPelatihan === penyelenggara)
+        .reduce((sum, item) => sum + (item.JumlahPeserta || 0), 0),
+    })).filter((item) => item.visitors > 0);
 
-    // Data Masyarakat Dilatih by Sertifikat
-    const dataMasyarakatBySertifikat = [
-      filteredDataByBalai.filter((item: UserPelatihan) => isUnsigned(item.FileSertifikat)).length,
-      filteredDataByBalai.filter((item: UserPelatihan) => isSigned(item.FileSertifikat)).length,
+    const uniqueSektor = [
+      ...new Set(filteredDataByBalai.map((i) => i.JenisProgram).filter(Boolean)),
+    ];
+    const bySektorPelatihan = uniqueSektor.map((program) => ({
+      name: program,
+      visitors: countWith((i) => i.JenisProgram === program && i.FileSertifikat.includes("signed")),
+    })).filter((item) => item.visitors > 0);
+
+    const uniqueProgram = [
+      ...new Set(filteredDataByBalai.map((i) => i.Program).filter(Boolean)),
+    ];
+    const byProgramPelatihan = uniqueProgram.map((program) => ({
+      name: program,
+      visitors: countWith((i) => i.Program === program && i.FileSertifikat.includes("signed")),
+    })).filter((item) => item.visitors > 0);
+
+
+    const uniqueKlaster = [
+      ...new Set(filteredDataByBalai.map((i) => i.BidangPelatihan).filter(Boolean)),
+    ];
+    const byKlasterPelatihan = uniqueKlaster.map((bidang) => ({
+      name: bidang,
+      visitors: countWith((i) => i.BidangPelatihan === bidang && i.FileSertifikat.includes("signed")),
+    })).filter((item) => item.visitors > 0);
+
+    const uniquePrioritas = [
+      ...new Set(filteredDataByBalai.map((i) => i.DukunganProgramPrioritas).filter(Boolean)),
+    ];
+    const byProgramPrioritas = uniquePrioritas.map((kategori) => ({
+      name: kategori,
+      visitors: countWith(
+        (i) => i.DukunganProgramPrioritas === kategori && i.FileSertifikat.includes("signed")
+      ),
+    })).filter((item) => item.visitors > 0);
+
+    const byGender = [
+      {
+        name: "Laki - Laki",
+        visitors: countWith(
+          (i) => ["L", "Laki - Laki"].includes(i.JenisKelamin) && i.FileSertifikat.includes("signed")
+        ),
+      },
+      {
+        name: "Perempuan",
+        visitors: countWith(
+          (i) => ["P", "Perempuan"].includes(i.JenisKelamin) && i.FileSertifikat.includes("signed")
+        ),
+      },
     ];
 
-    setStateMasyarakatBySertifikat({
-      series: dataMasyarakatBySertifikat,
-    });
+    const bySertifikat = [
+      {
+        name: "Tidak Bersertifikat",
+        visitors: countWith((i) => isUnsigned(i.FileSertifikat)),
+      },
+      {
+        name: "Bersertifikat",
+        visitors: countWith((i) => isSigned(i.FileSertifikat)),
+      },
+    ];
 
-  }, [selectedLemdiklat, data, dataUser]);
+    return {
+      byGender,
+      byJenisPelatihan,
+      bySektorPelatihan,
+      byKlasterPelatihan,
+      byProgramPrioritas,
+      byProgramPelatihan,
+      bySertifikat,
+      byPenyelenggaraPelatihan
+    };
+  }, [filteredDataByBalai, filteredPelatihanByBalai]);
 
-  const chartDataMasyarakatByGender = [
-    {
-      browser: "chrome",
-      name: "Laki - Laki",
-      visitors: stateMasyarakatByGender.series[0],
-      fill: "#5335E9",
-    },
-    {
-      browser: "firefox",
-      name: "Perempuan",
-      visitors: stateMasyarakatByGender.series[1],
-      fill: "#09105E",
-    },
-  ];
-
-  const chartDataMasyarakatBySertifikat = [
-    {
-      browser: "chrome",
-      name: "Tidak Bersertifikat",
-      visitors: stateMasyarakatBySertifikat.series[0],
-      fill: "#5335E9",
-    },
-    {
-      browser: "firefox",
-      name: "Bersertifikat",
-      visitors: stateMasyarakatBySertifikat.series[1],
-      fill: "#41C8ED",
-    },
-  ];
-
-  const chartDataMasyarakatDilatihByJenisPelatihan = [
-    {
-      browser: "chrome",
-      name: "Aspirasi",
-      visitors: stateMasyarakatDilatihByJenisPelatihan.series[0],
-      fill: "#5335E9",
-    },
-    {
-      browser: "safari",
-      name: "PNBP/BLU",
-      visitors: stateMasyarakatDilatihByJenisPelatihan.series[1],
-      fill: "#41C8ED",
-    },
-    {
-      browser: "firefox",
-      name: "Reguler",
-      visitors: stateMasyarakatDilatihByJenisPelatihan.series[2],
-      fill: "#09105E",
-    },
-    {
-      browser: "firefox",
-      name: "Satuan Pendidikan",
-      visitors: stateMasyarakatDilatihByJenisPelatihan.series[3],
-      fill: "#1487af",
-    },
-  ];
-
-  const chartDataMasyarakatDilatihByProgramPelatihan = [
-    {
-      browser: "chrome",
-      name: "Perikanan",
-      visitors: stateMasyarakatDilatihByProgramPelatihan.series[0],
-      fill: "#211951",
-    },
-    {
-      browser: "safari",
-      name: "Kelautan",
-      visitors: stateMasyarakatDilatihByProgramPelatihan.series[1],
-      fill: "#836FFF",
-    },
-    {
-      browser: "firefox",
-      name: "Awak Kapal Perikanan",
-      visitors: stateMasyarakatDilatihByProgramPelatihan.series[2],
-      fill: "#47bdda",
-    },
-  ];
-
-  const chartDataMasyarakatDilatihByProgramPrioritas = [
-    {
-      browser: "chrome",
-      name: "Konservasi",
-      visitors: stateMasyarakatDilatihByProgramPrioritas.series[1],
-      fill: "#b5b8c4",
-    },
-    {
-      browser: "safari",
-      name: "PIT",
-      visitors: stateMasyarakatDilatihByProgramPrioritas.series[2],
-      fill: "#47bdda",
-    },
-    {
-      browser: "firefox",
-      name: "Kalaju/Kalamo",
-      visitors: stateMasyarakatDilatihByProgramPrioritas.series[3],
-      fill: "#5335E9",
-    },
-    {
-      browser: "edge",
-      name: "KPB",
-      visitors: stateMasyarakatDilatihByProgramPrioritas.series[4],
-      fill: "#09105E",
-    },
-    {
-      browser: "other",
-      name: "Budidaya",
-      visitors: stateMasyarakatDilatihByProgramPrioritas.series[5],
-      fill: "#47bdda",
-    },
-    {
-      browser: "other2",
-      name: "Pengawasan Pesisir",
-      visitors: stateMasyarakatDilatihByProgramPrioritas.series[6],
-      fill: "#073f51",
-    },
-    {
-      browser: "other3",
-      name: "BCL",
-      visitors: stateMasyarakatDilatihByProgramPrioritas.series[7],
-      fill: "#0092ff",
-    },
-    {
-      browser: "other4",
-      name: "Non Terobosan",
-      visitors: stateMasyarakatDilatihByProgramPrioritas.series[0],
-      fill: "#41C8ED",
-    },
-  ];
-
-  const chartConfigKlasterPelatihan = {
-    visitors: {
-      label: "Jumlah Peserta",
-    },
-  };
-
-
-  const TrainingChartCard = ({
-    title,
-    chartConfig,
-    chartData,
-  }: {
-    title: string;
-    chartConfig: any;
-    chartData: any;
-  }) => {
-    const barHeight = 40;
-    const chartHeight = chartData.length * barHeight;
-
-    return (
-      <Card className="flex flex-col w-full">
-        <CardHeader className="items-center pb-0">
-          <CardTitle>{title}</CardTitle>
-        </CardHeader>
-        <CardContent className="flex-1 pb-0">
-          <ChartContainer
-            config={chartConfig}
-            className="mx-auto w-full max-w-md"
-
-          >
-            <BarChart data={chartData} layout="vertical">
-              <XAxis type="number" axisLine={false} hide tickLine={false} />
-              <YAxis dataKey="name" type="category" />
-              <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-              <Bar
-                style={{ height: chartHeight }}
-                dataKey="visitors"
-                fill="#EA8F02"
-                radius={[0, 4, 4, 0]}
-                label={{ position: 'right', fill: '#000', fontSize: 12 }}
-              />
-            </BarChart>
-          </ChartContainer>
-        </CardContent>
-        <CardFooter className="flex-col gap-1 text-sm items-start flex text-start">
-          <div className="mt-4 flex gap-2 flex-wrap items-start justify-start">
-            {chartData.map((entry: any) => (
-              <div key={entry.name} className="flex gap-2 items-center">
-                <div
-                  className="w-4 h-4"
-                  style={{ backgroundColor: entry.fill }}
-                ></div>
-                <span className="text-sm">{entry.name}</span>
-              </div>
-            ))}
-          </div>
-        </CardFooter>
-      </Card>
-    );
-  };
-
-
-  const TrainingDashboard = () => {
-    return (
-      <div className="col-span-12 rounded-xl border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default sm:px-7.5 xl:col-span-5 w-full">
-        <div className="mb-3 justify-between gap-4 sm:flex w-full">
-          <div>
-            <h5 className="text-xl font-semibold text-black">
-              Total Masyarakat Dilatih
-            </h5>
-            <p className="italic text-sm">{formatDateTime()}</p>
-          </div>
+  return (
+    <div className="col-span-12 rounded-xl border border-stroke bg-white px-5 pb-5 pt-6 shadow-md sm:px-7 w-full overflow-x-hidden">
+      <div className="mb-3 flex justify-between items-center">
+        <div>
+          <h5 className="text-xl font-semibold text-black">Total Masyarakat Dilatih</h5>
+          <p className="italic text-sm">{formatDateTime()}</p>
         </div>
+      </div>
 
-        <div className="grid grid-cols-2 gap-2 mb-5 w-full">
+      <div className="flex h-full gap-4 flex-col">
+        <div className="w-full grid grid-cols-2 gap-4 items-stretch">
           <TrainingChartCard
-            title="Program Pelatihan"
-            chartConfig={chartConfigProgramPelatihan}
-            chartData={chartDataMasyarakatDilatihByProgramPelatihan}
-          />
-          {/* Klaster Pelatihan */}
-          <TrainingChartCard
-            title="Klaster Pelatihan"
-            chartConfig={chartConfigKlasterPelatihan}
-            chartData={stateMasyarakatDilatihByBidangPelatihan.series}
+            title="Sektor Pelatihan"
+            chartConfig={chartConfigs.programPelatihan}
+            chartData={chartData.bySektorPelatihan}
+            chartType="horizontal"
           />
           <TrainingChartCard
-            title="Jenis Pelatihan"
-            chartConfig={chartConfigJenisPelatihan}
-            chartData={chartDataMasyarakatDilatihByJenisPelatihan}
-          />
-          <TrainingChartCard
-            title="Jenis Kelamin"
-            chartConfig={chartConfigGender}
-            chartData={chartDataMasyarakatByGender}
-          />
-          <TrainingChartCard
-            title="Program Prioritas"
-            chartConfig={chartConfigProgramPrioritas}
-            chartData={chartDataMasyarakatDilatihByProgramPrioritas}
-          />
-          <TrainingChartCard
-            title="Lulus Pelatihan"
-            chartConfig={chartConfigSertifikat}
-            chartData={chartDataMasyarakatBySertifikat}
+            title="Sumber Pembiayaan atau Pemenuhan IKU"
+            chartConfig={chartConfigs.jenisPelatihan}
+            chartData={chartData.byJenisPelatihan}
+            chartType="horizontal"
           />
         </div>
 
-        <DynamicTablePelatihanMasyarakat
-          dataUser={dataUser}
-          rowKey="PenyelenggaraPelatihan"
-          colKey="Triwulan"
-          title="Masyarakat Dilatih berdasarkan Penyelenggara & Triwulan"
+        <div className="w-full min-h-180 flex gap-4">
+          <TrainingChartCard
+            title="Penyelenggara Pelatihan"
+            chartConfig={chartConfigs.programPelatihan}
+            chartData={chartData.byPenyelenggaraPelatihan}
+            chartType="horizontal"
+          />
+
+          <TrainingChartCard
+            title="Klaster atau Bidang Pelatihan"
+            chartConfig={chartConfigs.programPelatihan}
+            chartData={chartData.byKlasterPelatihan}
+            chartType="horizontal"
+          />
+        </div>
+
+        <TrainingChartCard
+          title="Program Pelatihan"
+          chartConfig={chartConfigs.programPelatihan}
+          chartData={chartData.byProgramPelatihan}
+          chartType="vertical"
         />
 
-        <DynamicTablePelatihanMasyarakat
-          dataUser={dataUser}
-          rowKey="PenyelenggaraPelatihan"
-          colKey="JenisKelamin"
-          title="Masyarakat Dilatih berdasarkan Penyelenggara & Jenis Kelamin"
-        />
-
-        <DynamicTablePelatihanMasyarakat
-          dataUser={dataUser}
-          rowKey="PenyelenggaraPelatihan"
-          colKey="PendidikanTerakhir"
-          title="Masyarakat Dilatih berdasarkan Penyelenggara & Pendidikan Terakhir"
-        />
-
-        <DynamicTablePelatihanMasyarakat
-          dataUser={dataUser}
-          rowKey="Provinsi"
-          colKey="BidangPelatihan"
-          title="Masyarakat Dilatih berdasarkan Provinsi & Bidang/Klaster Pelatihan"
-        />
-
-        <DynamicTablePelatihanMasyarakat
-          dataUser={dataUser}
-          rowKey="Provinsi"
-          colKey="PenyelenggaraPelatihan"
-          title="Masyarakat Dilatih berdasarkan Provinsi & Penyelenggara Pelatihan"
-        />
-
-        <DynamicTablePelatihanMasyarakat
-          dataUser={dataUser}
-          rowKey="JenisProgram"
-          colKey="PenyelenggaraPelatihan"
-          title="Masyarakat Dilatih berdasarkan Sektor Pelatihan & Penyelenggara Pelatihan"
-        />
-
-        <DynamicTablePelatihanMasyarakat
-          dataUser={dataUser}
-          rowKey="BidangPelatihan"
-          colKey="PenyelenggaraPelatihan"
-          title="Masyarakat Dilatih berdasarkan Klaster Pelatihan & Penyelenggara Pelatihan"
-        />
-
-        <DynamicTablePelatihanMasyarakat
-          dataUser={dataUser}
-          rowKey="Program"
-          colKey="PenyelenggaraPelatihan"
-          title="Masyarakat Dilatih berdasarkan Program Pelatihan & Penyelenggara Pelatihan"
-        />
-
-        <DynamicTablePelatihanMasyarakat
-          dataUser={dataUser}
-          rowKey="DukunganProgramPrioritas"
-          colKey="PenyelenggaraPelatihan"
-          title="Masyarakat Dilatih berdasarkan Dukungan Program Prioritas & Penyelenggara Pelatihan"
+        <TrainingChartCard
+          title="Dukungan Program Prioritas"
+          chartConfig={chartConfigs.programPrioritas}
+          chartData={chartData.byProgramPrioritas}
+          chartType="vertical"
         />
       </div>
-    );
-  };
-
-  return <TrainingDashboard />;
+      {/* <TrainingChartCard
+        title="Jenis Kelamin"
+        chartConfig={chartConfigs.gender}
+        chartData={chartData.byGender}
+        chartType="pie"
+      /> */}
+    </div>
+  );
 };
 
 export default ChartDetailMasyarakatDilatih;

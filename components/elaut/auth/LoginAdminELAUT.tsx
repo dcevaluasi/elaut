@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button";
 import { HiOutlineEyeOff } from "react-icons/hi";
 import { sanitizedDangerousChars } from "@/utils/input";
 import { HashLoader } from "react-spinners";
+import Link from "next/link";
+import { AnyARecord } from "node:dns";
 
 export const LoginAdminELAUT = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -130,6 +132,35 @@ export const LoginAdminELAUT = () => {
     }
   };
 
+  const [to, setTo] = React.useState("");
+  const [text, setText] = React.useState("");
+  const [response, setResponse] = React.useState<any>(null);
+  const [loading, setLoading] = React.useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true); // start loader
+    setResponse(null);
+
+    const formattedTo = to.includes("@s.whatsapp.net")
+      ? to
+      : `${to}@s.whatsapp.net`;
+
+    try {
+      const res = await axios.post("/api/sendWhatsapp", {
+        to: formattedTo,
+        text,
+      });
+      console.log({ res });
+      setResponse(res.data);
+    } catch (error: any) {
+      console.error(error);
+      setResponse(error.response?.data || { message: "Request failed" });
+    } finally {
+      setLoading(false); // stop loader
+    }
+  };
+
   return (
     <section className="w-full">
       <main className="h-screen w-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-sky-900 to-blue-900 text-white">
@@ -162,6 +193,31 @@ export const LoginAdminELAUT = () => {
                   E-LAUT
                 </span>
               </h1>
+              {/* <form className="text-neutral-900" onSubmit={handleSubmit}>
+                <input
+                  type="text"
+                  placeholder="Phone number"
+                  value={to}
+                  onChange={(e) => setTo(e.target.value)}
+                />
+                <br />
+                <textarea
+                  placeholder="Your message"
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                />
+                <br />
+
+                <button type="submit" disabled={loading}>
+                  {loading ? "Sending..." : "Send Message"}
+                </button>
+
+                {loading && <p className="text-blue-400">Please wait, sending...</p>}
+
+                {response && (
+                  <pre className="text-white">{JSON.stringify(response, null, 2)}</pre>
+                )}
+              </form>; */}
               <p className="font-jakarta max-w-[42rem] leading-[115%] text-gray-300  sm:text-base -mt-1">
                 Selamat datang kembali, silahkan melakukan login untuk mengelola penyelenggaran pelatihan, perangkat pelatihan, instruktur, hinga melakukan penerbitan STTPL!
               </p>

@@ -164,7 +164,7 @@ export default function LayoutAdminElaut({
 
           {/* Master Pelatihan */}
           {
-            Cookies.get('Role')?.includes('Pengelola') && <li>
+            (Cookies.get('Role')?.includes('Pengelola') || Cookies.get('Access')?.includes('superAdmin')) && <li>
               <button
                 onClick={() => { setSubmenuOpen(!submenuOpen) }}
                 className={`flex items-center justify-between w-full px-4 py-2 transition-colors rounded-md ${pathname.includes("master")
@@ -259,6 +259,20 @@ export default function LayoutAdminElaut({
             >
               <IoSchoolOutline className="flex-shrink-0 w-6 h-6" />
               {sidebarOpen && <span className="text-sm">Penyelenggaraan Pelatihan</span>}
+            </a>
+          </li>
+
+          {/* Kinerja */}
+          <li>
+            <a
+              href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/kinerja/`}
+              className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname.includes(`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/kinerja`)
+                ? "bg-blue-600 text-white"
+                : "hover:bg-blue-500 hover:text-white"
+                }`}
+            >
+              <IoPieChartOutline className="flex-shrink-0 w-6 h-6" />
+              {sidebarOpen && <span className="text-sm">Indikator Kinerja</span>}
             </a>
           </li>
         </ul>
