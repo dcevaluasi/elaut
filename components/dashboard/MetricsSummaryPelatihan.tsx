@@ -45,14 +45,14 @@ const MetricsSummaryPelatihan: React.FC<MetricsSummaryPelatihanProps> = ({ data,
         if (!item.TanggalMulaiPelatihan || !item.TanggalBerakhirPelatihan) return false;
         const start = new Date(item.TanggalMulaiPelatihan);
         const end = new Date(item.TanggalBerakhirPelatihan);
-        return start <= now && end >= now;
+        return start <= now && end >= now && item?.StatusPenerbitan == "4";
     });
 
     // Akan berlangsung (belum mulai)
     const upcomingData = filteredData.filter((item) => {
         if (!item.TanggalMulaiPelatihan) return false;
         const start = new Date(item.TanggalMulaiPelatihan);
-        return start > now;
+        return start > now && item?.StatusPenerbitan == "4";
     });
 
     // Telah selesai
