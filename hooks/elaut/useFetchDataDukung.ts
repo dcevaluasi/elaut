@@ -27,11 +27,12 @@ const useFetchDataDukung = () => {
         (item: UserPelatihan) => item.FileSertifikat?.includes('signed'),
       )
       if (isPengelolaUPT) {
-        filteredData.filter(
-          (item) => item.PenyelenggaraPelatihan == nameLemdiklat,
+        filteredData = filteredData.filter(
+          (item) => item.PenyelenggaraPelatihan === nameLemdiklat,
         )
       }
       setData(filteredData)
+
       setIsFetching(false)
     } catch (error) {
       setIsFetching(false)

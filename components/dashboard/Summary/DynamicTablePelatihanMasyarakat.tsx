@@ -21,7 +21,6 @@ import {
 import * as XLSX from "xlsx"
 import { parseIndonesianDate, getQuarterForFiltering } from "@/utils/time"
 import { UserPelatihan } from "@/types/product"
-import { toTitleCase } from "@/utils/text"
 import { PROVINCES } from "@/utils/regions"
 
 
@@ -38,44 +37,76 @@ export function DynamicTablePelatihanMasyarakat({
     colKey,
     title,
 }: Props) {
-    const [tahun, setTahun] = React.useState<string>("")
-    const [triwulan, setTriwulan] = React.useState<string>("")
+    // Default: current year + current triwulan
+    const now = new Date()
+    const currentYear = String(now.getFullYear())
+    const currentQuarter = getQuarterForFiltering(now.toISOString())
 
-    // Derive tahun options dynamically
+    const [tahun, setTahun] = React.useState<string>(currentYear)
+    const [triwulan, setTriwulan] = React.useState<string>(currentQuarter)
+
+
     const tahunOptions = React.useMemo(() => {
         const years = new Set<string>()
         dataUser.forEach((item) => {
-            const d = parseIndonesianDate(item.TanggalMulai!)
+            let d: Date | null = null
+
+            // Try ISO first
+            if (item.TanggalMulai) {
+                d = new Date(item.TanggalMulai)
+                if (isNaN(d.getTime())) {
+                    // fallback to Indonesian parser
+                    d = parseIndonesianDate(item.TanggalMulai)
+                }
+            }
+
             if (d) years.add(String(d.getFullYear()))
         })
         return Array.from(years).sort()
     }, [dataUser])
 
-    // Filtered data based on tahun & triwulan
+    // Filtered by tahun & triwulan
     const filteredData = React.useMemo(() => {
         return dataUser.filter((item: UserPelatihan) => {
-            if (!item.FileSertifikat || item.FileSertifikat === "" || item.StatusPenandatangan != "Done") return false
+            if (!item.TanggalMulai) return false
 
-            const d = parseIndonesianDate(item.TanggalMulai!)
-            if (!d) return false
+            let d = new Date(item.TanggalMulai)
+            if (isNaN(d.getTime())) {
+                d = parseIndonesianDate(item.TanggalMulai) as Date
+            }
+            if (!d || isNaN(d.getTime())) return false
 
             const itemTahun = String(d.getFullYear())
             const itemTriwulan = getQuarterForFiltering(item.TanggalMulai!)
 
+            // filter by tahun
             if (tahun && itemTahun !== tahun) return false
-            if (triwulan && itemTriwulan !== triwulan) return false
+            // filter by triwulan (only include data up to the selected TW)
+            if (triwulan) {
+                const order = ["TW I", "TW II", "TW III", "TW IV"]
+                const selectedIdx = order.indexOf(triwulan)
+                const itemIdx = order.indexOf(itemTriwulan)
+                if (itemIdx > selectedIdx) return false
+            }
+
             return true
         })
     }, [dataUser, tahun, triwulan])
 
+
+
     const columns = React.useMemo(() => {
         if (colKey === "Triwulan") {
-            return ["TW I", "TW II", "TW III", "TW IV"]
+            const all = ["TW I", "TW II", "TW III", "TW IV"]
+            if (!triwulan) return all
+            const idx = all.indexOf(triwulan)
+            return all.slice(0, idx + 1) // show cumulative up to selected triwulan
         }
         return Array.from(
             new Set(filteredData.map((item) => item[colKey] || "Tidak Diketahui"))
         )
-    }, [filteredData, colKey])
+    }, [filteredData, colKey, triwulan])
+
 
     const rows = React.useMemo(() => {
         if (rowKey === "Provinsi") {
@@ -108,9 +139,7 @@ export function DynamicTablePelatihanMasyarakat({
                     rowVal = "Tidak Diketahui"
                 } else {
                     const strVal = String(rowVal).toLowerCase()
-                    const normalized = PROVINCES.find(
-                        (p) => p.toLowerCase() === strVal
-                    )
+                    const normalized = PROVINCES.find((p) => p.toLowerCase() === strVal)
                     rowVal = normalized ?? "Tidak Diketahui"
                 }
             }
@@ -133,15 +162,29 @@ export function DynamicTablePelatihanMasyarakat({
             row.total++
         })
 
+        // ✅ Make triwulan cumulative
+        if (colKey === "Triwulan") {
+            const order = ["TW I", "TW II", "TW III", "TW IV"]
+            map.forEach((row) => {
+                let running = 0
+                order.forEach((tw) => {
+                    running += row[tw] || 0
+                    row[tw] = running
+                })
+            })
+        }
+
         return Array.from(map.values())
     }, [filteredData, rowKey, colKey, columns, rows])
 
 
-    // Totals row
     const totals = React.useMemo(() => {
         const base: any = { row: "TOTAL", total: 0 }
+
+        // initialize totals for each column
         columns.forEach((col) => (base[col] = 0))
 
+        // accumulate values
         groupedData.forEach((row) => {
             columns.forEach((col) => {
                 base[col] += row[col]
@@ -151,6 +194,7 @@ export function DynamicTablePelatihanMasyarakat({
 
         return base
     }, [groupedData, columns])
+
 
     // Export Excel
     const exportToExcel = () => {
@@ -170,6 +214,7 @@ export function DynamicTablePelatihanMasyarakat({
         setTahun("")
         setTriwulan("")
     }
+
 
     return (
         <Card className="w-full shadow-md mt-5">
