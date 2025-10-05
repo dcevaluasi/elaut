@@ -59,7 +59,7 @@ const MetricsSummaryPelatihan: React.FC<MetricsSummaryPelatihanProps> = ({ data,
     const completedData = filteredData.filter((item) => {
         if (!item.TanggalBerakhirPelatihan) return false;
         const end = new Date(item.TanggalBerakhirPelatihan);
-        const isClosed = ["7D", "11", "15"].includes(item?.StatusPenerbitan);
+        const isClosed = parseInt(item?.StatusPenerbitan) >= 5
 
         return end < now && isClosed;
     });
@@ -90,6 +90,7 @@ const MetricsSummaryPelatihan: React.FC<MetricsSummaryPelatihanProps> = ({ data,
             id: idx,
             title: item.NamaPelatihan,
             batch: item.LokasiPelatihan ?? "-",
+            penyelenggara: item.PenyelenggaraPelatihan ?? "-",
             participants: peserta,
             progress,
             status: "Berlangsung",
