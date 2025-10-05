@@ -45,7 +45,7 @@ export function DynamicTablePelatihanMasyarakat({
     const tahunOptions = React.useMemo(() => {
         const years = new Set<string>()
         dataUser.forEach((item) => {
-            const d = parseIndonesianDate(item.TanggalSertifikat!)
+            const d = parseIndonesianDate(item.TanggalMulai!)
             if (d) years.add(String(d.getFullYear()))
         })
         return Array.from(years).sort()
@@ -56,11 +56,11 @@ export function DynamicTablePelatihanMasyarakat({
         return dataUser.filter((item: UserPelatihan) => {
             if (!item.FileSertifikat || item.FileSertifikat === "" || item.StatusPenandatangan != "Done") return false
 
-            const d = parseIndonesianDate(item.TanggalSertifikat!)
+            const d = parseIndonesianDate(item.TanggalMulai!)
             if (!d) return false
 
             const itemTahun = String(d.getFullYear())
-            const itemTriwulan = getQuarterForFiltering(item.TanggalSertifikat!)
+            const itemTriwulan = getQuarterForFiltering(item.TanggalMulai!)
 
             if (tahun && itemTahun !== tahun) return false
             if (triwulan && itemTriwulan !== triwulan) return false
@@ -118,7 +118,7 @@ export function DynamicTablePelatihanMasyarakat({
             // derive column value
             let colVal: string
             if (colKey === "Triwulan") {
-                colVal = getQuarterForFiltering(item.TanggalSertifikat!) || "Tidak Diketahui"
+                colVal = getQuarterForFiltering(item.TanggalMulai!) || "Tidak Diketahui"
             } else {
                 colVal = String(item[colKey as keyof UserPelatihan] ?? "Tidak Diketahui")
             }
