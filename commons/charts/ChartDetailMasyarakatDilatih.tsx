@@ -390,12 +390,7 @@ const ChartDetailMasyarakatDilatih: React.FC<
           chartType="vertical"
         />
       </div>
-      {/* <TrainingChartCard
-        title="Jenis Kelamin"
-        chartConfig={chartConfigs.gender}
-        chartData={chartData.byGender}
-        chartType="pie"
-      /> */}
+
     </div>
   );
 };

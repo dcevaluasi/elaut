@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { FiFilter } from "react-icons/fi";
 import { tahunList } from "@/utils/time";
+import MetricsSummaryPelatihan from "./MetricsSummaryPelatihan";
 
 const SummaryPelatihan: React.FC = () => {
   const { data: dataDukung, isFetching: isFetchingDataDukung, refetch } = useFetchDataDukung()
@@ -70,7 +71,10 @@ const SummaryPelatihan: React.FC = () => {
               </Select>
             </div>
           </div>
-          <ChartMasyarakatDilatihMonthly data={data} dataUser={dataDukung} tahun={tahun.toString()} triwulan={triwulan} />
+          <div className="grid grid-cols-2 gap-4 w-full mb-4">
+            <ChartMasyarakatDilatihMonthly data={data} dataUser={dataDukung} tahun={tahun.toString()} triwulan={triwulan} />
+            <MetricsSummaryPelatihan data={data} tahun={tahun.toString()} />
+          </div>
           <ChartDetailMasyarakatDilatih data={data} dataUser={dataDukung} tahun={tahun.toString()} triwulan={triwulan} />
         </>
       ) : (

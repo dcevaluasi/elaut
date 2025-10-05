@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <LayoutAdminElaut>
-      <HeaderPageLayoutAdminElaut title="Dashboard" description="Monitoring Capaian atau Realisasi Penyelenggaraan Pelatihan dan Status Pelaksanaan!" icon={<LucideLayoutDashboard className="text-3xl" />} />
+      <HeaderPageLayoutAdminElaut title="Dashboard" description="Monitoring capaian/Realisasi penyelenggaraan pelatihan dan status pelaksanaan!" icon={<LucideLayoutDashboard className="text-3xl" />} />
       <SummaryPelatihan />
     </LayoutAdminElaut>
   );

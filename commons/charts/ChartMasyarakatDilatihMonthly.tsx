@@ -77,11 +77,8 @@ export default function ChartMasyarakatDilatihMonthly({ data, dataUser, tahun, t
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data: res } = await axios.get(`${elautBaseUrl}/lemdik/getPelatihanAdmin`, {
-          headers: { Authorization: `Bearer ${Cookies.get("XSRF091")}` },
-        });
 
-        let pelatihanData: PelatihanMasyarakat[] = res.data.filter((p: PelatihanMasyarakat) => {
+        let pelatihanData: PelatihanMasyarakat[] = data.filter((p: PelatihanMasyarakat) => {
           const statusValid = ["7D", "11", "15"].includes(p?.StatusPenerbitan);
 
           let tahunValid = true;
@@ -135,7 +132,7 @@ export default function ChartMasyarakatDilatihMonthly({ data, dataUser, tahun, t
 
   // ================== Render ==================
   return (
-    <div className="col-span-12 xl:col-span-8 mb-4 rounded-xl border border-stroke bg-white shadow-default px-5 pt-7.5 pb-5 sm:px-7.5">
+    <div className=" mb-4 rounded-xl border border-stroke bg-white shadow-default px-5 pt-7.5 pb-5 sm:px-7.5">
       {/* Header */}
       <div className="flex flex-wrap justify-between gap-3 sm:flex-nowrap">
         <div className="flex flex-col w-full gap-4">

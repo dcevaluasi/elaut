@@ -152,6 +152,8 @@ export function useFetchAllDataPelatihanMasyarakat() {
 
   const fetchDataPelatihanMasyarakat = useCallback(async () => {
     setIsFetching(true)
+    const isPengelolaUPT = Cookies.get('Role') == 'Pengelola UPT'
+    const nameLemdiklat = Cookies.get('Satker')
 
     try {
       const response: AxiosResponse<{
@@ -160,7 +162,13 @@ export function useFetchAllDataPelatihanMasyarakat() {
         headers: { Authorization: `Bearer ${Cookies.get('XSRF091')}` },
       })
 
-      setData(response.data.data)
+      let filteredData: PelatihanMasyarakat[] = response.data.data
+      if (isPengelolaUPT) {
+        filteredData = filteredData.filter(
+          (item) => item.PenyelenggaraPelatihan === nameLemdiklat,
+        )
+      }
+      setData(filteredData)
       setIsFetching(false)
     } catch (error) {
       setIsFetching(false)
