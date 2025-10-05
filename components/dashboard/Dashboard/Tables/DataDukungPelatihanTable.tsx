@@ -15,16 +15,9 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { generateTanggalPelatihan } from "@/utils/text";
+import { tahunList } from "@/utils/time";
 
-const DataDukungPelatihanTable = ({ data }: { data: UserPelatihan[] }) => {
-    const [tahun, setTahun] = useState(() => dayjs().year()); // default ke tahun ini
-    const [triwulan, setTriwulan] = useState(() => {
-        const month = dayjs().month() + 1;
-        if (month <= 3) return "TW I";
-        if (month <= 6) return "TW II";
-        if (month <= 9) return "TW III";
-        return "TW IV";
-    });
+const DataDukungPelatihanTable = ({ data, tahun, triwulan }: { data: UserPelatihan[], tahun: number, triwulan: string }) => {
 
     const pageSize = 5;
 
@@ -50,9 +43,6 @@ const DataDukungPelatihanTable = ({ data }: { data: UserPelatihan[] }) => {
 
     // metrics
     const totalData = filteredData.length;
-
-    // tahun list (2015 - 2030)
-    const tahunList = Array.from({ length: 16 }, (_, i) => 2015 + i);
 
     // export excel
     const handleExportExcel = () => {
@@ -118,34 +108,6 @@ const DataDukungPelatihanTable = ({ data }: { data: UserPelatihan[] }) => {
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-4">
-                    {/* Filters */}
-                    <div className="flex flex-wrap gap-4">
-                        <Select value={String(tahun)} onValueChange={(val) => setTahun(Number(val))}>
-                            <SelectTrigger className="w-[140px]">
-                                <SelectValue placeholder="Pilih Tahun" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {tahunList.map((y) => (
-                                    <SelectItem key={y} value={String(y)}>
-                                        {y}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-
-                        <Select value={triwulan} onValueChange={setTriwulan}>
-                            <SelectTrigger className="w-[140px]">
-                                <SelectValue placeholder="Pilih Triwulan" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="TW I">TW I</SelectItem>
-                                <SelectItem value="TW II">TW II</SelectItem>
-                                <SelectItem value="TW III">TW III</SelectItem>
-                                <SelectItem value="TW IV">TW IV</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
                     {/* Rekap + Action */}
                     <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-t pt-3">
                         <div>

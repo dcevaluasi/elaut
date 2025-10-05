@@ -338,3 +338,5 @@ export function addDays(dateStr: string, days: number): string {
 
   return `${year}-${month}-${day}`
 }
+
+export const tahunList = Array.from({ length: 16 }, (_, i) => 2015 + i)

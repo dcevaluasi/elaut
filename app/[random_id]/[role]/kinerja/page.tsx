@@ -12,9 +12,7 @@ export default function Page() {
   return (
     <LayoutAdminElaut>
       <HeaderPageLayoutAdminElaut title="Indikator Kinerja" description=" Monitoring realisasi/capaian indikator kinerja penyelenggaran pelatihan kelautan dan perikanan!" icon={<IoPieChartOutline className="text-3xl" />} />
-      <section className="py-10 w-full mt-1">
-        <SummaryKinerja />
-      </section>
+      <SummaryKinerja />
     </LayoutAdminElaut>
   );
 }

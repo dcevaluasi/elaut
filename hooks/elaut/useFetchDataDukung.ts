@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react'
 import axios, { AxiosResponse } from 'axios'
 import Cookies from 'js-cookie'
-import { PengirimanSertifikat } from '@/types/blanko'
 import { elautBaseUrl } from '@/constants/urls'
-import { DataDukungPesertaPelatihan } from '@/types/pelatihan'
-import { PelatihanMasyarakat, UserPelatihan } from '@/types/product'
+import { UserPelatihan } from '@/types/product'
 
 const useFetchDataDukung = () => {
   const [data, setData] = useState<UserPelatihan[]>([])

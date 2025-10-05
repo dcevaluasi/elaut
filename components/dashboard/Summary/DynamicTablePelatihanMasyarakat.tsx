@@ -22,6 +22,7 @@ import * as XLSX from "xlsx"
 import { parseIndonesianDate, getQuarterForFiltering } from "@/utils/time"
 import { UserPelatihan } from "@/types/product"
 import { PROVINCES } from "@/utils/regions"
+import { HiUserGroup } from "react-icons/hi2"
 
 
 type Props = {
@@ -29,6 +30,8 @@ type Props = {
     rowKey: string // e.g. "Wilker", "Provinsi"
     colKey: string // e.g. "JenisKelamin", "PendidikanTerakhir", "Triwulan"
     title: string
+    tahun: string
+    triwulan: string
 }
 
 export function DynamicTablePelatihanMasyarakat({
@@ -36,34 +39,9 @@ export function DynamicTablePelatihanMasyarakat({
     rowKey,
     colKey,
     title,
+    tahun,
+    triwulan
 }: Props) {
-    // Default: current year + current triwulan
-    const now = new Date()
-    const currentYear = String(now.getFullYear())
-    const currentQuarter = getQuarterForFiltering(now.toISOString())
-
-    const [tahun, setTahun] = React.useState<string>(currentYear)
-    const [triwulan, setTriwulan] = React.useState<string>(currentQuarter)
-
-
-    const tahunOptions = React.useMemo(() => {
-        const years = new Set<string>()
-        dataUser.forEach((item) => {
-            let d: Date | null = null
-
-            // Try ISO first
-            if (item.TanggalMulai) {
-                d = new Date(item.TanggalMulai)
-                if (isNaN(d.getTime())) {
-                    // fallback to Indonesian parser
-                    d = parseIndonesianDate(item.TanggalMulai)
-                }
-            }
-
-            if (d) years.add(String(d.getFullYear()))
-        })
-        return Array.from(years).sort()
-    }, [dataUser])
 
     // Filtered by tahun & triwulan
     const filteredData = React.useMemo(() => {
@@ -205,51 +183,18 @@ export function DynamicTablePelatihanMasyarakat({
         ]
         const ws = XLSX.utils.aoa_to_sheet(wsData)
         const wb = XLSX.utils.book_new()
-        XLSX.utils.book_append_sheet(wb, ws, "Sheet1")
-        XLSX.writeFile(wb, `${title}.xlsx`)
+        XLSX.utils.book_append_sheet(wb, ws, "Capaian")
+        XLSX.writeFile(wb, `${title} - ${triwulan} ${tahun}.xlsx`)
     }
-
-    // Clear filters
-    const clearFilters = () => {
-        setTahun("")
-        setTriwulan("")
-    }
-
 
     return (
         <Card className="w-full shadow-md mt-5">
             <CardHeader className="flex flex-row justify-between items-center">
-                <CardTitle>{title}</CardTitle>
+                <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                    <HiUserGroup className="text-blue-600" />
+                    {title}
+                </CardTitle>
                 <div className="flex gap-2">
-                    <Select value={tahun} onValueChange={setTahun}>
-                        <SelectTrigger className="w-[120px]">
-                            <SelectValue placeholder="Pilih Tahun" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {tahunOptions.map((t) => (
-                                <SelectItem key={t} value={t}>
-                                    {t}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-
-                    <Select value={triwulan} onValueChange={setTriwulan}>
-                        <SelectTrigger className="w-[120px]">
-                            <SelectValue placeholder="Pilih Triwulan" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="TW I">TW I</SelectItem>
-                            <SelectItem value="TW II">TW II</SelectItem>
-                            <SelectItem value="TW III">TW III</SelectItem>
-                            <SelectItem value="TW IV">TW IV</SelectItem>
-                        </SelectContent>
-                    </Select>
-
-                    <Button variant="outline" onClick={clearFilters}>
-                        Clear
-                    </Button>
-
                     <Button size="sm" onClick={exportToExcel}>
                         Export Excel
                     </Button>
