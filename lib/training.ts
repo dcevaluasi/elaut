@@ -1,5 +1,5 @@
-import { PelatihanMasyarakat } from '@/types/product'
-import { UserPelatihan } from '@/types/user'
+import { PelatihanMasyarakat, UserPelatihan } from '@/types/product'
+
 import Cookies from 'js-cookie'
 
 export const getFilteredDataByBalai = (
@@ -22,12 +22,17 @@ export const getFilteredDataPelatihanByBalai = (
   isAdminBalaiPelatihan: boolean,
   nameBalaiPelatihan: string,
 ): PelatihanMasyarakat[] => {
-  if (isAdminBalaiPelatihan) {
-    return dataPelatihan.filter(
+  let filtered = dataPelatihan
+
+  if (Cookies.get('Role') === 'Pengelola UPT') {
+    return filtered.filter(
       (item) => item.PenyelenggaraPelatihan === nameBalaiPelatihan,
     )
+  } else if (Cookies.get('Role') === 'Pengelola Pusat') {
+    return filtered
+  } else {
+    return filtered
   }
-  return dataPelatihan
 }
 
 export const getDataByBidangPelatihan = (dataUser: UserPelatihan[]) => {

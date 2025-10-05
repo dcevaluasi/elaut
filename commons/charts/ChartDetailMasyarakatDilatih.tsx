@@ -21,7 +21,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 import { formatDateTime } from "@/utils";
 import {
@@ -29,8 +28,7 @@ import {
   getFilteredDataPelatihanByBalai,
 } from "@/lib/training";
 import { isSigned, isUnsigned } from "@/lib/sign";
-import { PelatihanMasyarakat } from "@/types/product";
-import { UserPelatihan } from "@/types/user";
+import { PelatihanMasyarakat, UserPelatihan } from "@/types/product";
 
 // ========================================================
 // Color Palette
@@ -195,7 +193,7 @@ const ChartDetailMasyarakatDilatih: React.FC<
       getFilteredDataPelatihanByBalai(
         data,
         isAdminBalaiPelatihan,
-        nameBalaiPelatihan!
+        nameBalaiPelatihan!,
       ),
     [data, isAdminBalaiPelatihan, nameBalaiPelatihan]
   );
@@ -204,24 +202,33 @@ const ChartDetailMasyarakatDilatih: React.FC<
     filteredDataByBalai.filter(cond).length;
 
   const chartData = useMemo(() => {
+    const filteredByStatus = filteredPelatihanByBalai.filter(item =>
+      ['7D', '11', '15'].includes(String(item?.StatusPenerbitan).trim().toUpperCase())
+    );
+
     const uniqueJenisPelatihan = [
-      ...new Set(filteredPelatihanByBalai.map((i) => i.JenisPelatihan).filter(Boolean)),
+      ...new Set(
+        filteredByStatus
+          .map(i => i.JenisPelatihan?.trim())
+          .filter(Boolean)
+      )
     ];
-    const byJenisPelatihan = uniqueJenisPelatihan.map((jenis) => ({
-      name: jenis,
-      visitors: filteredPelatihanByBalai
-        .filter((item) => item.JenisPelatihan === jenis)
-        .reduce((sum, item) => sum + (item.JumlahPeserta || 0), 0),
-    })).filter((item) => item.visitors > 0);
+
+    const byJenisPelatihan = uniqueJenisPelatihan.map(jenis => {
+      const visitors = filteredByStatus
+        .filter(item => item.JenisPelatihan?.trim() === jenis)
+        .reduce((sum, item) => sum + (item.UserPelatihan?.length || 0), 0);
+
+      return { name: jenis, visitors };
+    }).filter(item => item.visitors > 0);
+
 
     const uniquePenyelenggaraPelatihan = [
-      ...new Set(filteredPelatihanByBalai.map((i) => i.PenyelenggaraPelatihan).filter(Boolean)),
+      ...new Set(filteredDataByBalai.map((i) => i.PenyelenggaraPelatihan).filter(Boolean)),
     ];
     const byPenyelenggaraPelatihan = uniquePenyelenggaraPelatihan.map((penyelenggara) => ({
       name: penyelenggara,
-      visitors: filteredPelatihanByBalai
-        .filter((item) => item.PenyelenggaraPelatihan === penyelenggara)
-        .reduce((sum, item) => sum + (item.JumlahPeserta || 0), 0),
+      visitors: countWith((i) => i.PenyelenggaraPelatihan === penyelenggara && i.FileSertifikat.includes("signed")),
     })).filter((item) => item.visitors > 0);
 
     const uniqueSektor = [
@@ -250,13 +257,13 @@ const ChartDetailMasyarakatDilatih: React.FC<
     })).filter((item) => item.visitors > 0);
 
     const uniquePrioritas = [
-      ...new Set(filteredDataByBalai.map((i) => i.DukunganProgramPrioritas).filter(Boolean)),
+      ...new Set(filteredByStatus.map((i) => i.DukunganProgramTerobosan).filter(Boolean)),
     ];
     const byProgramPrioritas = uniquePrioritas.map((kategori) => ({
       name: kategori,
-      visitors: countWith(
-        (i) => i.DukunganProgramPrioritas === kategori && i.FileSertifikat.includes("signed")
-      ),
+      visitors: filteredByStatus
+        .filter(item => item.DukunganProgramTerobosan?.trim() === kategori)
+        .reduce((sum, item) => sum + (item.UserPelatihan?.length || 0), 0)
     })).filter((item) => item.visitors > 0);
 
     const byGender = [
@@ -301,7 +308,7 @@ const ChartDetailMasyarakatDilatih: React.FC<
     <div className="col-span-12 rounded-xl border border-stroke bg-white px-5 pb-5 pt-6 shadow-md sm:px-7 w-full overflow-x-hidden">
       <div className="mb-3 flex justify-between items-center">
         <div>
-          <h5 className="text-xl font-semibold text-black">Total Masyarakat Dilatih</h5>
+          <h5 className="text-xl font-semibold text-black">Grafik Capaian Masyarakat Dilatih</h5>
           <p className="italic text-sm">{formatDateTime()}</p>
         </div>
       </div>
@@ -322,7 +329,7 @@ const ChartDetailMasyarakatDilatih: React.FC<
           />
         </div>
 
-        <div className="w-full min-h-180 flex gap-4">
+        <div className="w-full grid grid-cols-2 gap-4 items-stretch">
           <TrainingChartCard
             title="Penyelenggara Pelatihan"
             chartConfig={chartConfigs.programPelatihan}

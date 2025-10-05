@@ -70,5 +70,6 @@ export type UserPelatihan = {
   TempatTanggalLahir: string
   JenisProgram: string
   Program: string
+  JenisPelatihan: string
   DukunganProgramPrioritas: string
 }

@@ -250,6 +250,7 @@ export type UserPelatihan = {
   NamaPelatihan: string
   DetailPelatihan: string
   BidangPelatihan: string
+  JenisPelatihan: string
   Keterangan: string
   Nama: string
   TotalBayar: string

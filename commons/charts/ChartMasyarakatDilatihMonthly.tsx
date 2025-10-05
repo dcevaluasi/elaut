@@ -68,19 +68,21 @@ export default function ChartMasyarakatDilatihMonthly({ data, dataUser }: Props)
   const [userPelatihan, setUserPelatihan] = useState<UserPelatihan[]>([]);
   const [totalMasyarakat, setTotalMasyarakat] = useState(0);
 
-  const isAdmin = Cookies.get("XSRF093") === "balai";
+  const isAdmin = Cookies.get("Role") === "Pengelola UPT";
   const namaBalai = Cookies.get("Satker");
 
   // ================== Fetching ==================
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data: res } = await axios.get(`${elautBaseUrl}/lemdik/getPelatihan`);
-        let pelatihanData: PelatihanMasyarakat[] = res.data;
-        let userData: UserPelatihan[] = dataUser.filter((u) => u.FileSertifikat !== "");
+        const { data: res } = await axios.get(`${elautBaseUrl}/lemdik/getPelatihanAdmin`, {
+          headers: { Authorization: `Bearer ${Cookies.get("XSRF091")}` },
+        });
+        let pelatihanData: PelatihanMasyarakat[] = res.data.filter((p: PelatihanMasyarakat) => ["7D", "11", "15"]?.includes(p?.StatusPenerbitan));
+        let userData: UserPelatihan[] = dataUser.filter((u: UserPelatihan) => u.FileSertifikat?.includes('signed'));
 
         // Filter if Admin Balai
-        if (isAdmin && namaBalai) {
+        if (isAdmin) {
           pelatihanData = pelatihanData.filter((p) => p.PenyelenggaraPelatihan === namaBalai);
           userData = userData.filter((u) => u.PenyelenggaraPelatihan === namaBalai);
         }
@@ -123,13 +125,13 @@ export default function ChartMasyarakatDilatihMonthly({ data, dataUser }: Props)
       <div className="flex flex-wrap justify-between gap-3 sm:flex-nowrap">
         <div className="flex flex-col w-full gap-4">
           <div>
-            <h5 className="text-xl font-semibold text-black">Total Masyarakat Dilatih</h5>
+            <h5 className="text-xl font-semibold text-black">Tren Pelatihan dan Masyarakat Dilatih</h5>
             <p className="text-sm italic">{formatDateTime()}</p>
           </div>
 
           {/* Stats */}
           <div className="flex gap-5">
-            <StatItem color="primary" label="Total Pelatihan" value={`${pelatihan.length} Pelatihan`} />
+            <StatItem color="primary" label="Total Pelatihan Selesai" value={`${pelatihan.length} Pelatihan`} />
             <StatItem color="secondary" label="Total Masyarakat Dilatih" value={`${totalMasyarakat} Orang`} />
           </div>
         </div>

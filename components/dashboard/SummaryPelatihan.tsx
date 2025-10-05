@@ -9,9 +9,9 @@ import { UserPelatihan } from "@/types/user";
 import ChartMasyarakatDilatihMonthly from "@/commons/charts/ChartMasyarakatDilatihMonthly";
 import ChartDetailMasyarakatDilatih from "@/commons/charts/ChartDetailMasyarakatDilatih";
 import { StatusMetrics } from "./Summary/StatusMetrics";
+import { elautBaseUrl } from "@/constants/urls";
 
 const SummaryPelatihan: React.FC = () => {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const token = Cookies.get("XSRF091");
 
   const [data, setData] = useState<PelatihanMasyarakat[]>([]);
@@ -24,7 +24,7 @@ const SummaryPelatihan: React.FC = () => {
     setIsFetching(true);
     try {
       const response: AxiosResponse = await axios.get(
-        `${baseUrl}/getUsersPelatihan`,
+        `${elautBaseUrl}/getUsersPelatihan`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -43,10 +43,9 @@ const SummaryPelatihan: React.FC = () => {
   ) => {
     setIsFetching(true);
     try {
-      const response: AxiosResponse = await axios.get(
-        `${baseUrl}/lemdik/getPelatihan?penyelenggara_pelatihan=${selectedBalaiPelatihan === "All" ? "" : selectedBalaiPelatihan
-        }`
-      );
+      const response: AxiosResponse = await axios.get(`${elautBaseUrl}/lemdik/getPelatihanAdmin`, {
+        headers: { Authorization: `Bearer ${Cookies.get('XSRF091')}` },
+      })
       setData(response.data.data);
       setIsFetching(false);
     } catch (error) {

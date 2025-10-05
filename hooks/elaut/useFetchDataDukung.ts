@@ -4,23 +4,34 @@ import Cookies from 'js-cookie'
 import { PengirimanSertifikat } from '@/types/blanko'
 import { elautBaseUrl } from '@/constants/urls'
 import { DataDukungPesertaPelatihan } from '@/types/pelatihan'
+import { PelatihanMasyarakat, UserPelatihan } from '@/types/product'
 
 const useFetchDataDukung = () => {
-  const [data, setData] = useState<DataDukungPesertaPelatihan[]>([])
+  const [data, setData] = useState<UserPelatihan[]>([])
   const [isFetching, setIsFetching] = useState<boolean>(false)
+  const isPengelolaUPT = Cookies.get('Role') == 'Pengelola UPT'
+  const nameLemdiklat = Cookies.get('Satker')
 
   const handleFetchDataDukung = async () => {
     setIsFetching(true)
     try {
       const response: AxiosResponse = await axios.get(
-        `${elautBaseUrl}/getDataDukung`,
+        `${elautBaseUrl}/getUsersPelatihan`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get('XSRF091')}`,
           },
         },
       )
-      setData(response.data.data)
+      let filteredData: UserPelatihan[] = response.data.data.filter(
+        (item: UserPelatihan) => item.FileSertifikat?.includes('signed'),
+      )
+      if (isPengelolaUPT) {
+        filteredData.filter(
+          (item) => item.PenyelenggaraPelatihan == nameLemdiklat,
+        )
+      }
+      setData(filteredData)
       setIsFetching(false)
     } catch (error) {
       setIsFetching(false)

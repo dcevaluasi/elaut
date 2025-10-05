@@ -2,14 +2,12 @@
 import React, { useState } from "react";
 import Cookies from "js-cookie";
 import axios, { AxiosResponse } from "axios";
-import { PelatihanMasyarakat } from "@/types/product";
+import { PelatihanMasyarakat, UserPelatihan } from "@/types/product";
 import { HashLoader } from "react-spinners";
 import Image from "next/image";
-import { UserPelatihan } from "@/types/user";
-import ChartMasyarakatDilatihMonthly from "@/commons/charts/ChartMasyarakatDilatihMonthly";
-import ChartDetailMasyarakatDilatih from "@/commons/charts/ChartDetailMasyarakatDilatih";
-import { StatusMetrics } from "./Summary/StatusMetrics";
 import { DynamicTablePelatihanMasyarakat } from "./Summary/DynamicTablePelatihanMasyarakat";
+import useFetchDataDukung from "@/hooks/elaut/useFetchDataDukung";
+import DataDukungPelatihanTable from "./Dashboard/Tables/DataDukungPelatihanTable";
 
 const SummaryKinerja: React.FC = () => {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -32,7 +30,8 @@ const SummaryKinerja: React.FC = () => {
                     },
                 }
             );
-            setDataUser(response.data.data);
+            const filteredData = response.data.data.filter((item: UserPelatihan) => item.FileSertifikat?.includes('signed'))
+            setDataUser(filteredData);
             setIsFetching(false);
         } catch (error) {
             setIsFetching(false);
@@ -45,8 +44,10 @@ const SummaryKinerja: React.FC = () => {
         setIsFetching(true);
         try {
             const response: AxiosResponse = await axios.get(
-                `${baseUrl}/lemdik/getPelatihan?penyelenggara_pelatihan=${selectedBalaiPelatihan === "All" ? "" : selectedBalaiPelatihan
-                }`
+                `${baseUrl}/lemdik/getPelatihanAdmin?penyelenggara_pelatihan=${selectedBalaiPelatihan === "All" ? "" : selectedBalaiPelatihan
+                }`, {
+                headers: { Authorization: `Bearer ${Cookies.get("XSRF091")}` },
+            }
             );
             setData(response.data.data);
             setIsFetching(false);
@@ -54,6 +55,8 @@ const SummaryKinerja: React.FC = () => {
             setIsFetching(false);
         }
     };
+
+    const { data: dataDukung, isFetching: isFetchingDataDukung, refetch } = useFetchDataDukung()
 
 
     React.useEffect(() => {
@@ -65,6 +68,13 @@ const SummaryKinerja: React.FC = () => {
         fetchAllData();
     }, []);
 
+    if (isFetching || isFetchingDataDukung) {
+        return <div className="w-full h-[60vh] flex items-center justify-center">
+            <HashLoader color="#338CF5" size={60} />
+        </div>
+    }
+
+
     return (
         <div className="w-full">
             {isFetching ? (
@@ -73,6 +83,7 @@ const SummaryKinerja: React.FC = () => {
                 </div>
             ) : data != null ? (
                 <>
+                    <DataDukungPelatihanTable data={dataDukung} />
                     <DynamicTablePelatihanMasyarakat
                         dataUser={dataUser}
                         rowKey="PenyelenggaraPelatihan"
@@ -162,5 +173,7 @@ const SummaryKinerja: React.FC = () => {
         </div>
     );
 };
+
+
 
 export default SummaryKinerja;
