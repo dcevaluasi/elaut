@@ -29,6 +29,7 @@ import {
 } from "@/lib/training";
 import { isSigned, isUnsigned } from "@/lib/sign";
 import { PelatihanMasyarakat, UserPelatihan } from "@/types/product";
+import { getQuarterForFiltering, parseIndonesianDate } from "@/utils/time";
 
 // ========================================================
 // Color Palette
@@ -175,17 +176,47 @@ const TrainingChartCard: React.FC<ChartCardProps> = ({
 interface ChartDetailMasyarakatDilatihProps {
   data: PelatihanMasyarakat[];
   dataUser: UserPelatihan[];
+  tahun: string
+  triwulan: string
 }
 
 const ChartDetailMasyarakatDilatih: React.FC<
   ChartDetailMasyarakatDilatihProps
-> = ({ data, dataUser }) => {
+> = ({ data, dataUser, tahun, triwulan }) => {
   const isAdminBalaiPelatihan = Cookies.get("Role") === "Pengelola UPT";
   const nameBalaiPelatihan = Cookies.get("Satker");
 
+  const filteredData = React.useMemo(() => {
+    return dataUser.filter((item: UserPelatihan) => {
+      if (!item.TanggalMulai) return false
+
+      let d = new Date(item.TanggalMulai)
+      if (isNaN(d.getTime())) {
+        d = parseIndonesianDate(item.TanggalMulai) as Date
+      }
+      if (!d || isNaN(d.getTime())) return false
+
+      const itemTahun = String(d.getFullYear())
+      const itemTriwulan = getQuarterForFiltering(item.TanggalMulai!)
+
+      // filter by tahun
+      if (tahun && itemTahun !== tahun) return false
+      // filter by triwulan (only include data up to the selected TW)
+      if (triwulan) {
+        const order = ["TW I", "TW II", "TW III", "TW IV"]
+        const selectedIdx = order.indexOf(triwulan)
+        const itemIdx = order.indexOf(itemTriwulan)
+        if (itemIdx > selectedIdx) return false
+      }
+
+      return true
+    })
+  }, [dataUser, tahun, triwulan])
+
+
   const filteredDataByBalai = useMemo(
-    () => getFilteredDataByBalai(dataUser, nameBalaiPelatihan!),
-    [dataUser, nameBalaiPelatihan]
+    () => getFilteredDataByBalai(filteredData, nameBalaiPelatihan!),
+    [filteredData, nameBalaiPelatihan]
   );
 
   const filteredPelatihanByBalai = useMemo(

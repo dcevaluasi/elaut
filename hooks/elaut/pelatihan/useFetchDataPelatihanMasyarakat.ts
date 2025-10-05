@@ -145,3 +145,36 @@ export function useFetchDataPelatihanMasyarakat() {
     refetch: fetchDataPelatihanMasyarakat,
   }
 }
+
+export function useFetchAllDataPelatihanMasyarakat() {
+  const [data, setData] = useState<PelatihanMasyarakat[]>([])
+  const [isFetching, setIsFetching] = useState(false)
+
+  const fetchDataPelatihanMasyarakat = useCallback(async () => {
+    setIsFetching(true)
+
+    try {
+      const response: AxiosResponse<{
+        data: PelatihanMasyarakat[]
+      }> = await axios.get(`${elautBaseUrl}/lemdik/getPelatihanAdmin`, {
+        headers: { Authorization: `Bearer ${Cookies.get('XSRF091')}` },
+      })
+
+      setData(response.data.data)
+      setIsFetching(false)
+    } catch (error) {
+      setIsFetching(false)
+      console.error('Error fetching training data:', error)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchDataPelatihanMasyarakat()
+  }, [fetchDataPelatihanMasyarakat])
+
+  return {
+    data,
+    isFetching,
+    refetch: fetchDataPelatihanMasyarakat,
+  }
+}

@@ -61,9 +61,11 @@ const chartOptions: ApexOptions = {
 type Props = {
   data: PelatihanMasyarakat[];
   dataUser: UserPelatihan[];
+  tahun: string;
+  triwulan: string
 };
 
-export default function ChartMasyarakatDilatihMonthly({ data, dataUser }: Props) {
+export default function ChartMasyarakatDilatihMonthly({ data, dataUser, tahun, triwulan }: Props) {
   const [pelatihan, setPelatihan] = useState<PelatihanMasyarakat[]>([]);
   const [userPelatihan, setUserPelatihan] = useState<UserPelatihan[]>([]);
   const [totalMasyarakat, setTotalMasyarakat] = useState(0);
@@ -78,10 +80,22 @@ export default function ChartMasyarakatDilatihMonthly({ data, dataUser }: Props)
         const { data: res } = await axios.get(`${elautBaseUrl}/lemdik/getPelatihanAdmin`, {
           headers: { Authorization: `Bearer ${Cookies.get("XSRF091")}` },
         });
-        let pelatihanData: PelatihanMasyarakat[] = res.data.filter((p: PelatihanMasyarakat) => ["7D", "11", "15"]?.includes(p?.StatusPenerbitan));
-        let userData: UserPelatihan[] = dataUser.filter((u: UserPelatihan) => u.FileSertifikat?.includes('signed'));
 
-        // Filter if Admin Balai
+        let pelatihanData: PelatihanMasyarakat[] = res.data.filter((p: PelatihanMasyarakat) => {
+          const statusValid = ["7D", "11", "15"].includes(p?.StatusPenerbitan);
+
+          let tahunValid = true;
+          if (tahun && p?.TanggalMulaiPelatihan) {
+            const dateObj = new Date(p.TanggalMulaiPelatihan);
+            if (!isNaN(dateObj.getTime())) {
+              tahunValid = dateObj.getFullYear().toString() === tahun;
+            }
+          }
+          return statusValid && tahunValid;
+        });
+
+        let userData: UserPelatihan[] = dataUser.filter((u: UserPelatihan) => u.FileSertifikat?.includes('signed') && u?.TanggalMulai?.includes(tahun));
+
         if (isAdmin) {
           pelatihanData = pelatihanData.filter((p) => p.PenyelenggaraPelatihan === namaBalai);
           userData = userData.filter((u) => u.PenyelenggaraPelatihan === namaBalai);
@@ -96,7 +110,8 @@ export default function ChartMasyarakatDilatihMonthly({ data, dataUser }: Props)
     };
 
     fetchData();
-  }, [dataUser, isAdmin, namaBalai]);
+  }, [dataUser, isAdmin, namaBalai, tahun, triwulan]);
+
 
   // ================== Data Processing ==================
   const monthlyPelatihan = Array.from({ length: 12 }, (_, i) => {
