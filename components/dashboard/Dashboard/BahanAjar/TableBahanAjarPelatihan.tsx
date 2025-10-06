@@ -21,6 +21,8 @@ import Cookies from "js-cookie";
 import { findNameUnitKerjaById, findUnitKerjaById } from "@/utils/unitkerja";
 import AddModulAction from "@/commons/actions/modul/AddModulAction";
 import UpdateModulAction from "@/commons/actions/modul/UpdateModulAction";
+import { moduleBaseUrl } from "@/constants/urls";
+import { FiTrash2 } from "react-icons/fi";
 
 export default function TableBahanAjarPelatihan() {
     const idUnitKerja = Cookies.get('IDUnitKerja')
@@ -28,7 +30,6 @@ export default function TableBahanAjarPelatihan() {
     const { data, loading, error, fetchModulPelatihan, stats } = useFetchDataMateriPelatihanMasyarakat("Bahan Ajar", idUnitKerja!);
 
     const { unitKerjas, loading: loadingUnitKerja, error: errorUnitKerja, fetchUnitKerjaData } = useFetchDataUnitKerja()
-    console.log({ unitKerjas })
     useEffect(() => {
         fetchUnitKerjaData()
     }, [fetchUnitKerjaData])
@@ -148,6 +149,32 @@ export default function TableBahanAjarPelatihan() {
                                             (isMatch && row.DeskripsiMateriPelatihan == idUnitKerja) && <UpdateModulAction onSuccess={fetchModulPelatihan} materiPelatihan={row} />
                                         }
 
+                                        {row.ModulPelatihan.length == 0 && <button
+                                            onClick={async () => {
+                                                const confirmDelete = window.confirm("⚠️ Apakah Anda yakin ingin menghapus bahan ajar ini?");
+                                                if (!confirmDelete) return;
+
+                                                try {
+                                                    const res = await fetch(
+                                                        `${moduleBaseUrl}/materi-pelatihan/deleteMateriPelatihan?id=${row.IdMateriPelatihan}`,
+                                                        { method: "DELETE" }
+                                                    );
+                                                    if (!res.ok) throw new Error("Gagal menghapus bahan ajar");
+
+                                                    fetchModulPelatihan();
+                                                    alert("✅ Bahan ajar berhasil dihapus");
+                                                } catch (error) {
+                                                    console.error(error);
+                                                    alert("❌ Gagal menghapus bahan ajar");
+                                                }
+                                            }}
+                                            className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-rose-500 text-rose-500 hover:text-white hover:bg-rose-500 border group"
+                                        >
+                                            <FiTrash2 className="h-5 w-5 text-rose-500 group-hover:text-white" />
+                                            Hapus
+                                        </button>}
+
+
                                         <Button
                                             variant="outline"
                                             onClick={() =>
@@ -165,7 +192,7 @@ export default function TableBahanAjarPelatihan() {
                                     className="px-3 py-4 border max-w-full"
                                     title={row.NamaMateriPelatihan}
                                 >
-                                    <p className="font-semibold text-base leading-none mb-2">
+                                    <p className="font-semibold text-base leading-none mb-2 uppercase">
                                         {row.NamaMateriPelatihan}
                                     </p>
                                     <div className="flex flex-col !font-normal">

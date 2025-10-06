@@ -140,7 +140,6 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                             {
                                                 (Cookies.get('Access')?.includes('isSigning') || Cookies.get('Access')?.includes('verifyPelaksanaan') || Cookies.get('Access')?.includes('supervisePelaksanaan')) && <Link
                                                     title="Review Pelatihan"
-                                                    target={'_blank'}
                                                     href={`/admin/${usePathname().includes('pusat') ? 'pusat' : 'lemdiklat'}/pelatihan/detail/${pelatihan.KodePelatihan}/${encryptValue(
                                                         pelatihan.IdPelatihan.toString()
                                                     )}`}
@@ -154,7 +153,6 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                             {
                                                 Cookies.get('Access')?.includes('createPelatihan') && <Link
                                                     title="Kelola Pelatihan"
-                                                    target={'_blank'}
                                                     href={`/admin/${usePathname().includes('pusat') ? 'pusat' : 'lemdiklat'}/pelatihan/detail/${pelatihan.KodePelatihan}/${encryptValue(
                                                         pelatihan.IdPelatihan.toString()
                                                     )}`}

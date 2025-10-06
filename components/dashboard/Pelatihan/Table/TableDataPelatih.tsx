@@ -454,7 +454,7 @@ function StatsCards({
 }
 
 
-function FilterDropdown({
+export function FilterDropdown({
     filterKeahlian,
     setFilterKeahlian,
     bidangKeahlianOptions,
@@ -480,7 +480,7 @@ function FilterDropdown({
                     Filter
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-64 p-3 space-y-3">
+            <DropdownMenuContent className="w-64 p-3 space-y-3 z-[99999999]">
                 <DropdownMenuLabel className="text-sm font-semibold">Filter Data</DropdownMenuLabel>
                 <DropdownMenuSeparator />
 
@@ -491,7 +491,7 @@ function FilterDropdown({
                         <SelectTrigger className="w-full text-sm">
                             <SelectValue placeholder="Pilih bidang" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent position="popper" className="z-[9999999999]">
                             {bidangKeahlianOptions.map((opt: any) => (
                                 <SelectItem key={opt} value={opt}>
                                     {opt}
@@ -508,7 +508,7 @@ function FilterDropdown({
                         <SelectTrigger className="w-full text-sm">
                             <SelectValue placeholder="Pilih jabatan" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent position="popper" className="z-[9999999999]">
                             {jabatanOptions.map((opt: any) => (
                                 <SelectItem key={opt} value={opt}>
                                     {opt}
@@ -525,7 +525,7 @@ function FilterDropdown({
                         <SelectTrigger className="w-full text-sm">
                             <SelectValue placeholder="Pilih pendidikan" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent position="popper" className="z-[9999999999]">
                             {pendidikanOptions.map((opt: any) => (
                                 <SelectItem key={opt} value={opt}>
                                     {opt}
@@ -542,7 +542,7 @@ function FilterDropdown({
                         <SelectTrigger className="w-full text-sm">
                             <SelectValue placeholder="Pilih status" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent position="popper" className="z-[9999999999]">
                             {statusOptions.map((opt: any) => (
                                 <SelectItem key={opt} value={opt}>
                                     {opt}
@@ -559,7 +559,7 @@ function FilterDropdown({
                         <SelectTrigger className="w-full text-sm">
                             <SelectValue placeholder="Pilih unit kerja" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent position="popper" className="z-[9999999999]">
                             {unitKerjaOptions.map((opt: UnitKerja) => (
                                 <SelectItem key={opt.id_unit_kerja} value={opt.id_unit_kerja.toString()}>
                                     {opt.nama}

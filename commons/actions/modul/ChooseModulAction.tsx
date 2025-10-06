@@ -41,6 +41,8 @@ import { MateriPelatihan, ModulPelatihan } from "@/types/module";
 import { truncateText } from "@/utils";
 import Link from "next/link";
 import { SlidersHorizontal } from "lucide-react";
+import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
+import { findNameUnitKerjaById, findUnitKerjaById } from "@/utils/unitkerja";
 
 interface ChooseModulActionProps {
     idPelatihan: string;
@@ -57,6 +59,13 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
         * Modul Pelatihan 
         */
     const { data: modulPelatihan, loading: loadingModulPelatihan, error: errorModulPelatihan, fetchModulPelatihan, stats: statsModulPelatihan } = useFetchDataMateriPelatihanMasyarakat();
+
+    const idUnitKerja = Cookies.get('IDUnitKerja')
+
+    const { unitKerjas, loading: loadingUnitKerja, error: errorUnitKerja, fetchUnitKerjaData } = useFetchDataUnitKerja()
+    React.useEffect(() => {
+        fetchUnitKerjaData()
+    }, [fetchUnitKerjaData])
 
     const [filterBidang, setFilterBidang] = useState("");
     const [filterType, setFilterType] = useState("");
@@ -247,48 +256,52 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
                             {
                                 selectedModulPelatihan == null ? <>
                                     {filtered.length > 0 ? (
-                                        filtered.map((item) => (
-                                            <div
-                                                key={item.IdMateriPelatihan}
-                                                className="border rounded-xl p-3 shadow-sm hover:shadow transition bg-white"
-                                            >
-                                                <div className="flex justify-between items-center mb-1">
-                                                    <h3 className="font-medium text-sm text-gray-800 truncate">
-                                                        {item.NamaMateriPelatihan}
-                                                    </h3>
-                                                    <Badge variant="outline" className="text-xs">
-                                                        {item.BidangMateriPelatihan}
-                                                    </Badge>
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs text-gray-600 line-clamp-2">
-                                                        Tahun :  {item.Tahun}
-                                                    </p>
-                                                    <p className="text-xs text-gray-600 line-clamp-2">
-                                                        Produsen :  {item.DeskripsiMateriPelatihan}
-                                                    </p>
-                                                    <p className="text-xs text-gray-600 line-clamp-2">
-                                                        Jumlah Materi :  {item.ModulPelatihan.length} Materi
-                                                    </p>
-                                                </div>
+                                        filtered.map((item) => {
+                                            const { isMatch, name } = findUnitKerjaById(unitKerjas, idUnitKerja)
+                                            const { name: nameUK } = findNameUnitKerjaById(unitKerjas, item.DeskripsiMateriPelatihan)
+                                            return (
+                                                <div
+                                                    key={item.IdMateriPelatihan}
+                                                    className="border rounded-xl p-3 w-full shadow-sm hover:shadow transition bg-white"
+                                                >
+                                                    <div className="flex justify-between items-center mb-1">
+                                                        <h3 className="font-medium text-sm max-w-xl text-gray-800 truncate uppercase">
+                                                            {item.NamaMateriPelatihan}
+                                                        </h3>
+                                                        <Badge variant="outline" className="text-xs">
+                                                            {item.BidangMateriPelatihan}
+                                                        </Badge>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs text-gray-600 line-clamp-2">
+                                                            Tahun :  {item.Tahun}
+                                                        </p>
+                                                        <p className="text-xs text-gray-600 line-clamp-2">
+                                                            Produsen :  {isMatch && item.DeskripsiMateriPelatihan == idUnitKerja ? name : nameUK}
+                                                        </p>
+                                                        <p className="text-xs text-gray-600 line-clamp-2">
+                                                            Jumlah Materi :  {item.ModulPelatihan.length} Materi
+                                                        </p>
+                                                    </div>
 
-                                                <div className="flex w-full items-end justify-between">
-                                                    <Button
-                                                        variant="outline"
-                                                        onClick={() => { setSelectedModulPelatihan(item); setIdModulPelatihan(item.IdMateriPelatihan.toString()) }}
-                                                        className="flex items-center gap-2 w-fit rounded-lg px-3 shadow-md transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 mt-2 text-xs"
-                                                    >
-                                                        <span>Pilih Perangkat</span>
-                                                        <TbArrowRight className="h-2 w-2" />
-                                                    </Button>
+                                                    <div className="flex w-full items-end justify-between">
+                                                        <Button
+                                                            variant="outline"
+                                                            onClick={() => { setSelectedModulPelatihan(item); setIdModulPelatihan(item.IdMateriPelatihan.toString()) }}
+                                                            className="flex items-center gap-2 w-fit rounded-lg px-3 shadow-md transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 mt-2 text-xs"
+                                                        >
+                                                            <span>Pilih Perangkat</span>
+                                                            <TbArrowRight className="h-2 w-2" />
+                                                        </Button>
 
-                                                    {/* <p className="text-xs text-gray-600 line-clamp-2">
+                                                        {/* <p className="text-xs text-gray-600 line-clamp-2">
                                                 * Harap dicek terlebih dahulu modul yang dipilih, apakah terdapat bahan ajar/tidak, jika belum maka harap upload bahan ajar sendiri
                                             </p> */}
-                                                </div>
+                                                    </div>
 
-                                            </div>
-                                        ))
+                                                </div>
+                                            )
+                                        })
                                     ) : (
                                         <p className="text-center text-gray-500 text-sm py-6">
                                             Tidak ada perangkat ditemukan
