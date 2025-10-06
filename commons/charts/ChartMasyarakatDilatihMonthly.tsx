@@ -79,7 +79,7 @@ export default function ChartMasyarakatDilatihMonthly({ data, dataUser, tahun, t
       try {
 
         let pelatihanData: PelatihanMasyarakat[] = data.filter((p: PelatihanMasyarakat) => {
-          const statusValid = parseInt(p?.StatusPenerbitan) > 5;
+          const statusValid = parseInt(p?.StatusPenerbitan) >= 5;
 
           let tahunValid = true;
           if (tahun && p?.TanggalMulaiPelatihan) {

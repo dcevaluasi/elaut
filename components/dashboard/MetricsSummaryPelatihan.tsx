@@ -82,20 +82,37 @@ const MetricsSummaryPelatihan: React.FC<MetricsSummaryPelatihanProps> = ({ data,
 
     // ================== Ongoing List ==================
     const ongoingTrainings = ongoingData.map((item, idx) => {
-        const peserta = item.JumlahPeserta ?? 0;
-        const kuota = parseInt(item.KoutaPelatihan) || 0;
-        const progress = kuota > 0 ? Math.round((peserta / kuota) * 100) : 0;
+        const startDate = new Date(item.TanggalMulaiPelatihan);
+        const endDate = new Date(item.TanggalBerakhirPelatihan);
+        const today = new Date();
+
+        // Calculate total duration in days
+        const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+
+        // Calculate how many days have passed since the start
+        const daysPassed = Math.ceil((today - startDate) / (1000 * 60 * 60 * 24));
+
+        // Calculate progress percentage
+        let progress = 0;
+        if (today < startDate) {
+            progress = 0; // belum mulai
+        } else if (today > endDate) {
+            progress = 100; // sudah selesai
+        } else {
+            progress = Math.round((daysPassed / totalDays) * 100);
+        }
 
         return {
             id: idx,
             title: item.NamaPelatihan,
             batch: item.LokasiPelatihan ?? "-",
             penyelenggara: item.PenyelenggaraPelatihan ?? "-",
-            participants: peserta,
+            participants: item.UserPelatihan.length ?? 0,
             progress,
             status: "Berlangsung",
         };
     });
+
 
     return (
         <div className="gap-5 flex w-full">
@@ -141,6 +158,7 @@ const MetricsSummaryPelatihan: React.FC<MetricsSummaryPelatihanProps> = ({ data,
                                     <Badge variant="secondary">{training.status}</Badge>
                                 </div>
                                 <p className="text-sm text-muted-foreground">{training.batch}</p>
+                                <p className="text-sm text-muted-foreground">{training.penyelenggara}</p>
                                 <Progress value={training.progress} className="h-2" />
                                 <p className="text-xs text-muted-foreground">
                                     {training.participants} participants
