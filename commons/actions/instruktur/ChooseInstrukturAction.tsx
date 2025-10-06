@@ -29,6 +29,7 @@ import { arrayToString, stringToArray } from "@/utils/input";
 import { findNameUnitKerjaById } from "@/utils/unitkerja";
 import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
 import { FilterDropdown } from "@/components/dashboard/Pelatihan/Table/TableDataPelatih";
+import { countInstrukturFromPelatihans } from "@/utils/instruktur";
 
 interface ChooseInstrukturActionProps {
     idPelatihan: string;

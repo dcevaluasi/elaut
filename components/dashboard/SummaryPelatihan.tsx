@@ -17,6 +17,7 @@ import {
 import { FiFilter } from "react-icons/fi";
 import { tahunList } from "@/utils/time";
 import MetricsSummaryPelatihan from "./MetricsSummaryPelatihan";
+import { StatsMetricStatus } from "./Summary/StatsMetricStatus";
 
 const SummaryPelatihan: React.FC = () => {
   const { data: dataDukung, isFetching: isFetchingDataDukung, refetch } = useFetchDataDukung()
@@ -38,7 +39,7 @@ const SummaryPelatihan: React.FC = () => {
           <HashLoader color="#338CF5" size={60} />
         </div>
       ) : data != null ? (
-        <>
+        <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2 text-base font-semibold">
               <FiFilter className="text-blue-600" />
@@ -71,12 +72,13 @@ const SummaryPelatihan: React.FC = () => {
               </Select>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4 w-full mb-4">
+          <div className="grid grid-cols-2 gap-4 w-full">
             <ChartMasyarakatDilatihMonthly data={data} dataUser={dataDukung} tahun={tahun.toString()} triwulan={triwulan} />
             <MetricsSummaryPelatihan data={data} tahun={tahun.toString()} />
           </div>
+          <StatsMetricStatus data={data} tahun={tahun.toString()} />
           <ChartDetailMasyarakatDilatih data={data} dataUser={dataDukung} tahun={tahun.toString()} triwulan={triwulan} />
-        </>
+        </div>
       ) : (
         <div className="relative max-w-7xl w-full mx-auto mt-20">
           <div className="pt-7 md:pt-0 flex flex-col items-center">

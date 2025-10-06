@@ -30,7 +30,7 @@ export default function LayoutAdminElaut({
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [submenuOpen, setSubmenuOpen] = useState(true);
   const [sidebarSubOpen, setSidebarSubOpen] = useState(true);
-  const [submenuSubOpen, setSubmenuSubOpen] = useState(true);
+  const [submenuSubOpen, setSubmenuSubOpen] = useState(false);
   const [pusatData, setPusatData] = useState<PusatDetailInfo | null>(null);
   const [lemdikData, setLemdikData] = useState<LemdiklatDetailInfo | null>(null);
 

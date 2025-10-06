@@ -1,3 +1,5 @@
+'use client'
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
@@ -5,6 +7,9 @@ import { Users, CalendarDays, BookOpen, Clock } from "lucide-react"
 import { PelatihanMasyarakat } from "@/types/product"
 import React from "react"
 import { parseIndonesianDate } from "@/utils/time"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { encryptValue } from "@/lib/utils"
 
 interface MetricsSummaryPelatihanProps {
     data: PelatihanMasyarakat[];
@@ -81,18 +86,23 @@ const MetricsSummaryPelatihan: React.FC<MetricsSummaryPelatihanProps> = ({ data,
 
 
     const ongoingTrainings = ongoingData.map((item, idx) => {
-        // Handle possible combined date string like "2025-07-23 - 2025-07-30"
-        const [startStr, endStr] = (item.TanggalMulaiPelatihan || "").includes("-")
-            ? item.TanggalMulaiPelatihan.split(" - ").map((s: string) => s.trim())
-            : [item.TanggalMulaiPelatihan, item.TanggalBerakhirPelatihan];
+        // Handle combined date string like "2025-07-23 - 2025-07-30"
+        let startStr = item.TanggalMulaiPelatihan || "";
+        let endStr = item.TanggalBerakhirPelatihan || "";
+
+        // If TanggalMulaiPelatihan actually contains both dates (e.g. "2025-07-23 - 2025-07-30")
+        if (startStr.includes(" - ")) {
+            const parts = startStr.split(" - ").map((s: string) => s.trim());
+            startStr = parts[0];
+            endStr = parts[1];
+        }
 
         const startDate = new Date(startStr);
         const endDate = new Date(endStr);
         const today = new Date();
 
-        // Ensure valid dates
+        // Validate
         const isValidDate = (d: Date) => !isNaN(d.getTime());
-
         let progress = 0;
 
         if (isValidDate(startDate) && isValidDate(endDate)) {
@@ -100,6 +110,7 @@ const MetricsSummaryPelatihan: React.FC<MetricsSummaryPelatihanProps> = ({ data,
                 1,
                 Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
             );
+
             const daysPassed = Math.ceil(
                 (today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
             );
@@ -110,7 +121,8 @@ const MetricsSummaryPelatihan: React.FC<MetricsSummaryPelatihanProps> = ({ data,
         }
 
         return {
-            id: idx,
+            id: item.IdPelatihan,
+            code: item.KodePelatihan,
             title: item.NamaPelatihan,
             batch: item.LokasiPelatihan ?? "-",
             penyelenggara: item.PenyelenggaraPelatihan ?? "-",
@@ -119,6 +131,7 @@ const MetricsSummaryPelatihan: React.FC<MetricsSummaryPelatihanProps> = ({ data,
             status: "Berlangsung",
         };
     });
+
 
 
 
@@ -162,14 +175,16 @@ const MetricsSummaryPelatihan: React.FC<MetricsSummaryPelatihanProps> = ({ data,
                                 className="space-y-2 border-b last:border-0 pb-4 last:pb-0"
                             >
                                 <div className="flex items-center justify-between">
-                                    <h3 className="font-medium">{training.title}</h3>
+                                    <Link href={`/admin/${usePathname().includes('pusat') ? 'pusat' : 'lemdiklat'}/pelatihan/detail/${training.code}/${encryptValue(
+                                        training.id.toString()
+                                    )}`} className="font-medium text-base">{training.title}</Link>
                                     <Badge variant="secondary">{training.status}</Badge>
                                 </div>
                                 <p className="text-sm text-muted-foreground">{training.batch}</p>
                                 <p className="text-sm text-muted-foreground">{training.penyelenggara}</p>
                                 <Progress value={training.progress} className="h-2" />
                                 <p className="text-xs text-muted-foreground">
-                                    {training.participants} participants
+                                    {training.participants} participants • {training.progress}% pelaksanaan
                                 </p>
                             </div>
                         ))
