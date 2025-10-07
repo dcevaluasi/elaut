@@ -97,13 +97,19 @@ const MetricsSummaryPelatihan: React.FC<MetricsSummaryPelatihanProps> = ({ data,
             endStr = parts[1];
         }
 
-        const startDate = new Date(startStr);
-        const endDate = new Date(endStr);
-        const today = new Date();
-
         // Validate
         const isValidDate = (d: Date) => !isNaN(d.getTime());
         let progress = 0;
+
+        const normalizeDate = (d: Date) => {
+            const nd = new Date(d);
+            nd.setHours(0, 0, 0, 0);
+            return nd;
+        };
+
+        const startDate = normalizeDate(new Date(startStr));
+        const endDate = normalizeDate(new Date(endStr));
+        const today = normalizeDate(new Date());
 
         if (isValidDate(startDate) && isValidDate(endDate)) {
             const totalDays = Math.max(
@@ -111,7 +117,7 @@ const MetricsSummaryPelatihan: React.FC<MetricsSummaryPelatihanProps> = ({ data,
                 Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
             );
 
-            const daysPassed = Math.ceil(
+            const daysPassed = Math.floor(
                 (today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
             );
 
