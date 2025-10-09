@@ -7,7 +7,7 @@ import {
     AccordionTrigger,
     AccordionContent,
 } from "@/components/ui/accordion";
-import { MateriPelatihan, PelatihanMasyarakat } from "@/types/product";
+import { PelatihanMasyarakat } from "@/types/product";
 import { generateTanggalPelatihan, getStatusInfo } from "@/utils/text";
 import { MdLock } from "react-icons/md";
 import Cookies from "js-cookie";
@@ -15,10 +15,8 @@ import Link from "next/link";
 import { urlFileBeritaAcara, urlFileLapwas } from "@/constants/urls";
 import { TbPencilCheck, TbPencilX, TbSend } from "react-icons/tb";
 import { LuSignature } from "react-icons/lu";
-import { generatedCurriculumCertificate, generatedDescriptionCertificate } from "@/utils/certificates";
-import { DialogFormatSTTPL } from "@/components/sertifikat/dialogFormatSTTPL";
 import { Button } from "@/components/ui/button";
-import { FaPrint, FaSearch } from "react-icons/fa";
+import { FaPrint } from "react-icons/fa";
 import UserPelatihanTable from "./Tables/UserPelatihanTable";
 import { countUserWithCertificate, countUserWithDraftCertificate, countUserWithNoStatus, countUserWithPassed } from "@/utils/counter";
 import TTDeDetail from "./TTDeDetail";
@@ -27,11 +25,8 @@ import { useFetchDataPusatById } from "@/hooks/elaut/pusat/useFetchDataPusatById
 import { downloadAndZipPDFs } from "@/utils/file";
 import { FaRegFolderOpen } from "react-icons/fa6";
 import SendNoteAction from "@/commons/actions/lemdiklat/SendNoteAction";
-import FormatCertificateAction from "@/commons/actions/FormatCertificateAction";
 import { PassedParticipantAction } from "@/commons/actions/lemdiklat/PassedParticipantAction";
-import ReviseCertificateAction from "@/commons/actions/ReviseCertificateAction";
 import HistoryButton from "@/commons/actions/HistoryButton";
-import { DialogDevSTTPL } from "@/components/sertifikat/dialogDevSTTPL";
 import { truncateText } from "@/utils";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 import DialogSertifikatPelatihan, { DialogSertifikatHandle } from "@/components/sertifikat/dialogSertifikatPelatihan";
@@ -132,12 +127,8 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                         title: "Lengkapi Status Peserta Terlebih Dahulu",
                                                         html: `
                                                   <ul style="text-align:left; margin-top:8px;">
-                                                    ${data?.ModuleMateri === "" ? "<li>Module Materi belum diisi</li>" : ""}
-                                                    ${!data?.UserPelatihan || data?.UserPelatihan.length === 0
-                                                                ? "<li>Peserta pelatihan belum ditambahkan</li>"
-                                                                : ""
-                                                            }
-                                                    ${data?.SuratPemberitahuan === "" ? "<li>Surat Pemberitahuan belum tersedia</li>" : ""}
+                                                    ${data?.BeritaAcara === "" ? "<li>Laporan pelaksanaan belum diupload</li>" : ""}
+                                                     ${countUserWithPassed(data?.UserPelatihan) !== data?.UserPelatihan.length ? "<li>Laporan pelaksanaan belum diupload</li>" : ""}
                                                   </ul>
                                                 `,
                                                     });
@@ -457,25 +448,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                     </div>
                                                 }
 
-                                                <DialogFormatSTTPL pelatihan={data}>
-                                                    <Button
-                                                        variant="outline"
-                                                        title="Preview  Sertifikat"
-                                                        className="flex items-center w-full mt-4 rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
-                                                    >
-                                                        <FaSearch className="h-4 w-4 mr-1" /> Preview Sertifikat
-                                                    </Button>
-                                                </DialogFormatSTTPL>
-
-                                                <DialogDevSTTPL pelatihan={data}>
-                                                    <Button
-                                                        variant="outline"
-                                                        title="Preview  Sertifikat"
-                                                        className="flex items-center w-full mt-4 rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
-                                                    >
-                                                        <FaSearch className="h-4 w-4 mr-1" /> Preview Dev
-                                                    </Button>
-                                                </DialogDevSTTPL>
+                                            
                                             </>
                                         ) : (
                                             <div className="py-10 w-full max-w-2xl mx-auto h-full flex items-center flex-col justify-center gap-1">

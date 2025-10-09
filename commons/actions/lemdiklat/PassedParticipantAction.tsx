@@ -16,7 +16,6 @@ import { elautBaseUrl } from "@/constants/urls";
 import Toast from "@/commons/Toast";
 import { DIALOG_TEXTS } from "@/constants/texts";
 import { Button } from "@/components/ui/button";
-import { HiUserGroup } from "react-icons/hi2";
 import { UserPelatihan } from "@/types/product";
 import { FaUserCheck } from "react-icons/fa6";
 
@@ -102,23 +101,23 @@ export function PassedParticipantAction({
                     <form autoComplete="off">
                         <AlertDialogFooter className="mt-3">
                             {isIteratingProcess ? (
-                                <AlertDialogAction
+                                <Button
                                     className="bg-green-500 hover:bg-green-600"
                                     disabled
                                 >
                                     Sedang diproses...
-                                </AlertDialogAction>
+                                </Button>
                             ) : (
                                 <>
                                     <AlertDialogCancel onClick={() => setOpen(false)}>
                                         Cancel
                                     </AlertDialogCancel>
-                                    <AlertDialogAction
+                                    <Button
                                         className="bg-green-500 hover:bg-green-600"
                                         onClick={handleLulusAllDataPeserta}
                                     >
                                         Lulus
-                                    </AlertDialogAction>
+                                    </Button>
                                 </>
                             )}
                         </AlertDialogFooter>

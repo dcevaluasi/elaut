@@ -235,7 +235,7 @@ export function getStatusInfo(
     case "14":
       return {
         label: "Approved Kabadan",
-        color: "bg-green-500 text-white",
+        color: "bg-blue-500 text-white",
         icon: <RiCheckboxCircleFill className="w-4 h-4" />,
       };
     case "15":

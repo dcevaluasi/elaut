@@ -4,6 +4,7 @@ export type ESELON = {
   fullNameEng: string
   abbrvEselon: string
   fullNameEselon: string
+  currentPerson?: string
 }
 
 export const KA_BPPSDM = 'Dr. I Nyoman Radiarta, S.Pi, M.Sc'
@@ -50,6 +51,7 @@ export const ESELON_1: ESELON = {
   abbrvEselon: 'BPPSDM KP',
   fullNameEselon:
     'Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan',
+  currentPerson: 'Dr. I Nyoman Radiarta, S.Pi, M.Sc',
 }
 
 export const ESELON_2: ESELON = {

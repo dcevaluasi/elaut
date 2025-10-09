@@ -24,7 +24,7 @@ import {
 import axios from "axios";
 import Cookies from "js-cookie";
 import Toast from "@/commons/Toast";
-import { elautBaseUrl, urlFileBeritaAcara, urlFileLapwas } from "@/constants/urls";
+import { elautBaseUrl, urlFileBeritaAcara } from "@/constants/urls";
 import { IconType } from "react-icons";
 import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
 import { PelatihanMasyarakat } from "@/types/product";
