@@ -327,11 +327,14 @@ const FormatSTTPL = React.forwardRef(
                                     <>
                                         <div className="flex w-full flex-col space-y-1 max-w-7xl mx-auto items-start text-sm -mt-2 text-center font-bos h-fit">
                                             <span className="text-lg leading-[115%] font-bosNormal max-w-7xl">
-                                                {generatedDescriptionCertificate(pelatihan?.DeskripsiSertifikat).desc_indo}
+                                                {generatedDescriptionCertificate(pelatihan?.DeskripsiSertifikat).desc_indo} pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
                                             </span>
                                             {
                                                 generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng != "" && <span className="max-w-6xl mt-1 leading-none font-bosItalic text-[0.9rem] mx-auto">
-                                                    {generatedDescriptionCertificate(pelatihan?.DeskripsiSertifikat).desc_eng}
+                                                    {generatedDescriptionCertificate(pelatihan?.DeskripsiSertifikat).desc_eng} on {formatDateRangeEnglish(
+                                                        generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan),
+                                                        generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan)
+                                                    )}
                                                 </span>
                                             }
 
