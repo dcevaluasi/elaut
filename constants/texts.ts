@@ -303,7 +303,7 @@ export const CURRICULLUM_CERTIFICATE: Record<
       },
       {
         name_ind:
-          'Perizinan berusaha terintegrasi terkait penerbitan  sertifikat  CPPIB',
+          'Perizinan berusaha terintegrasi terkait penerbitan  sertifikat CPPIB',
         name_eng:
           'Integrated business licensing related to the issuance of GfMP certificates',
         theory: 1,

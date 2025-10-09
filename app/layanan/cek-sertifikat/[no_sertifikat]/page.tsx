@@ -6,11 +6,14 @@ import axios, { isAxiosError } from 'axios';
 import { UserPelatihan } from '@/types/user';
 import { addFiveYears } from '@/utils/pelatihan';
 import { generateTanggalPelatihan } from '@/utils/text';
-import { RiVerifiedBadgeFill } from 'react-icons/ri';
-import { FiUser, FiBookOpen, FiCalendar, FiFileText, FiEdit3 } from 'react-icons/fi';
+import { RiQuillPenAiLine, RiVerifiedBadgeFill } from 'react-icons/ri';
+import { FiUser, FiBookOpen, FiCalendar, FiFileText, FiEdit3, FiMapPin } from 'react-icons/fi';
 import { useParams } from 'next/navigation';
 import Footer from '@/components/ui/footer';
 import { HashLoader } from 'react-spinners';
+import { PelatihanMasyarakat } from '@/types/product';
+import { HiOutlineInbox } from 'react-icons/hi2';
+import { FaRegBuilding } from 'react-icons/fa';
 
 const CertificateResultPage = () => {
     const params = useParams();
@@ -18,6 +21,7 @@ const CertificateResultPage = () => {
 
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState<UserPelatihan | null>(null);
+    const [dataPelatihan, setDataPelatihan] = useState<PelatihanMasyarakat | null>(null)
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -30,6 +34,7 @@ const CertificateResultPage = () => {
                     no_registrasi: no_sertifikat,
                 });
                 setData(res.data.data);
+                setDataPelatihan(res.data.pelatihan)
                 setError(null);
             } catch (err) {
                 if (isAxiosError(err)) {
@@ -94,23 +99,40 @@ const CertificateResultPage = () => {
                             <div className="text-left space-y-3 text-sm">
                                 <p className="flex items-center gap-2">
                                     <FiUser className="w-5 h-5 text-blue-300 flex-shrink-0" />
-                                    <span><strong className="text-blue-300">Nama:</strong> {data.Nama}</span>
+                                    <span><strong className="text-blue-300">Nama Peserta:</strong> {data.Nama}</span>
                                 </p>
                                 <p className="flex items-center gap-2">
                                     <FiBookOpen className="w-5 h-5 text-blue-300 flex-shrink-0" />
                                     <span><strong className="text-blue-300">Nama Pelatihan:</strong> {data.NamaPelatihan}</span>
                                 </p>
                                 <p className="flex items-center gap-2">
+                                    <FaRegBuilding className="w-5 h-5 text-blue-300 flex-shrink-0" />
+                                    <span><strong className="text-blue-300">Penyelenggara:</strong> {dataPelatihan?.PenyelenggaraPelatihan}</span>
+                                </p>
+                                <p className="flex items-center gap-2">
+                                    <HiOutlineInbox className="w-5 h-5 text-blue-300 flex-shrink-0" />
+                                    <span><strong className="text-blue-300">Bidang atau Klaster Pelatihan:</strong> {dataPelatihan?.BidangPelatihan}</span>
+                                </p>
+                                <p className="flex items-center gap-2">
+                                    <RiQuillPenAiLine className="w-5 h-5 text-blue-300 flex-shrink-0" />
+                                    <span><strong className="text-blue-300">Program Pelatihan:</strong> {dataPelatihan?.Program}</span>
+                                </p>
+                                <p className="flex items-center gap-2">
                                     <FiCalendar className="w-5 h-5 text-blue-300 flex-shrink-0" />
                                     <span><strong className="text-blue-300">Tanggal Pelaksanaan:</strong> {generateTanggalPelatihan(data.TanggalMulai)} - {generateTanggalPelatihan(data.TanggalBerakhir)}</span>
+                                </p>
+                                <p className="flex items-center gap-2">
+                                    <FiMapPin className="w-5 h-5 text-blue-300 flex-shrink-0" />
+                                    <span><strong className="text-blue-300">Lokasi Pelaksanaan:</strong> {dataPelatihan?.LokasiPelatihan}</span>
                                 </p>
                                 <p className="flex items-center gap-2">
                                     <FiFileText className="w-5 h-5 text-blue-300 flex-shrink-0" />
                                     <span><strong className="text-blue-300">Diterbitkan Pada:</strong> {data.TanggalSertifikat}</span>
                                 </p>
+
                                 <p className="flex items-center gap-2">
                                     <FiEdit3 className="w-5 h-5 text-blue-300 flex-shrink-0" />
-                                    <span><strong className="text-blue-300">Ditandatangani Oleh:</strong> Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan</span>
+                                    <span><strong className="text-blue-300">Ditandatangani Oleh:</strong> {dataPelatihan?.TtdSertifikat}</span>
                                 </p>
                                 <p className="italic text-xs text-gray-400 mt-4">
                                     * Sertifikat berlaku hingga{" "}
