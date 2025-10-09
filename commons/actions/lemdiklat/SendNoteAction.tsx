@@ -248,13 +248,13 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                     {
                         title == "Ajukan Penerbitan STTPL" ? <Button
                             onClick={handleSubmit}
-                            className={`border-${buttonColor}-500 text-${buttonColor}-500 hover:bg-${buttonColor}-700 hover:text-white`}
+                            className={`border-${buttonColor}-500 bg-transparent text-${buttonColor}-500 hover:bg-${buttonColor}-700 hover:text-white`}
                             disabled={loading || !message || !beritaAcaraFile}
                         >
                             {loading ? "Memproses..." : "Kirim"}
                         </Button> : <Button
                             onClick={handleSubmit}
-                            className={`border-${buttonColor}-500 text-${buttonColor}-500 hover:bg-${buttonColor}-700 hover:text-white`}
+                            className={`border-${buttonColor}-500 bg-transparent text-${buttonColor}-500 hover:bg-${buttonColor}-700 hover:text-white`}
                             disabled={loading || !message}
                         >
                             {loading ? "Memproses..." : "Kirim"}
