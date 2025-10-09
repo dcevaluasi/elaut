@@ -80,7 +80,7 @@ const CertificateResultPage = () => {
                             </div>
 
                             {/* Title */}
-                            <h1 className="text-2xl font-bold text-blue-400 mb-3">
+                            <h1 className="text-2xl leading-none max-w-md font-bold text-blue-400 mb-3">
                                 {data.NoRegistrasi}
                             </h1>
                             <p className="text-gray-200 mb-6 leading-relaxed">
