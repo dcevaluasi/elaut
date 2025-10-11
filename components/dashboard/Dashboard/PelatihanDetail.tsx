@@ -18,7 +18,7 @@ import { urlFileSuratPemberitahuan } from "@/constants/urls";
 import { TbChevronDown, TbChevronUp, TbClock, TbPencilCheck, TbPencilCog, TbPencilX, TbSend } from "react-icons/tb";
 import { isMoreThanToday } from "@/utils/time";
 import { LuSignature } from "react-icons/lu";
-import { countValidKeterangan } from "@/utils/counter";
+import { countUserWithStatus, countValidKeterangan } from "@/utils/counter";
 import { useFetchDataPusatById } from "@/hooks/elaut/pusat/useFetchDataPusatById";
 import { useFetchDataInstrukturSelected } from "@/hooks/elaut/instruktur/useFetchDataInstruktur";
 import { useFetchDataMateriPelatihanMasyarakatById } from "@/hooks/elaut/modul/useFetchDataMateriPelatihanMasyarakat";
@@ -73,7 +73,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
             <Accordion
                 type="multiple"
                 className="w-full space-y-3"
-                defaultValue={["Informasi Umum Pelatihan", "Publish Informasi dan Promosi", "Peserta Pelatihan", "Perangkat Pelatihan", "Instruktur/Pelatih"]}
+                defaultValue={["📌 Informasi Umum Pelatihan", "🌐 Publish Informasi dan Promosi", "👥 Peserta Pelatihan", "📑 Perangkat Pelatihan", "🧩 Instruktur atau Pelatih"]}
             >
                 <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm bg-white">
                     <div className="px-4 py-3 text-sm font-semibold text-gray-800 hover:bg-gray-50 transition">
@@ -685,8 +685,8 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     </p>
                                     <div className="flex flex-col gap-2 w-full">
                                         <div className="grid grid-cols-2 gap-4 text-sm">
-                                            <InfoItem label="Kuota Peserta" value={data.KoutaPelatihan} />
                                             <InfoItem label="Jumlah Peserta" value={data.UserPelatihan.length.toString()} />
+                                            <InfoItem label="Jumlah Peserta Valid" value={countValidKeterangan(data?.UserPelatihan).toString()} />
                                         </div>
                                         <UserPelatihanTable pelatihan={data} data={data.UserPelatihan} onSuccess={fetchData} />
                                     </div>

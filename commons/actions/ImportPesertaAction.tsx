@@ -191,13 +191,13 @@ const ImportPesertaAction: React.FC<ImportPesertaActionProps> = ({
                         <AlertDialogCancel className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-gray-100">
                             Batal
                         </AlertDialogCancel>
-                        <AlertDialogAction
+                        <Button
                             disabled={!fileExcel || loading}
                             onClick={handleUpload}
                             className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700"
                         >
                             {loading ? "Mengunggah..." : "Upload"}
-                        </AlertDialogAction>
+                        </Button>
                     </AlertDialogFooter>
                 </form>
             </AlertDialogContent>

@@ -150,9 +150,9 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
 
           <AlertDialogFooter className="mt-4">
             {!isUploading && <AlertDialogCancel>Cancel</AlertDialogCancel>}
-            <AlertDialogAction onClick={handleUpload} disabled={isUploading}>
+            <Button onClick={handleUpload} disabled={isUploading}>
               {isUploading ? "Mengirim..." : "Upload"}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

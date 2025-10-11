@@ -96,23 +96,23 @@ export function ValidateParticipantAction({
                     <form autoComplete="off">
                         <AlertDialogFooter className="mt-3">
                             {isIteratingProcess ? (
-                                <AlertDialogAction
+                                <Button
                                     className="bg-green-600 hover:bg-green-700"
                                     disabled
                                 >
                                     Sedang diproses...
-                                </AlertDialogAction>
+                                </Button>
                             ) : (
                                 <>
                                     <AlertDialogCancel onClick={() => setOpen(false)}>
                                         Cancel
                                     </AlertDialogCancel>
-                                    <AlertDialogAction
+                                    <Button
                                         className="bg-green-600 hover:bg-green-700"
                                         onClick={handleValidasiPeserta}
                                     >
                                         Validasi
-                                    </AlertDialogAction>
+                                    </Button>
                                 </>
                             )}
                         </AlertDialogFooter>

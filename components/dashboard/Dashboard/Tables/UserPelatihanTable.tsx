@@ -272,7 +272,14 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                 title: 'Yeayyy!',
                 text: `Berhasil memvalidasi peserta pelatihan!`,
             });
-            onSuccess()
+
+            setUsers((prev) =>
+                prev.map((item) =>
+                    item.IdUserPelatihan === user.IdUserPelatihan
+                        ? { ...item, Keterangan: item.Keterangan === "Valid" ? "Tidak Valid" : "Valid" }
+                        : item
+                )
+            );
         } catch (error) {
             Toast.fire({
                 icon: "error",
@@ -574,8 +581,12 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                                             }
                                         );
                                         if (!res.ok) throw new Error("Gagal menghapus data peserta");
-                                        alert("✅ Data peserta berhasil dihapus");
-                                        onSuccess();
+
+                                        // alert("✅ Data peserta berhasil dihapus");
+
+                                        setUsers((prevData) =>
+                                            prevData.filter((item) => item.IdUserPelatihan !== row.original.IdUserPelatihan)
+                                        );
 
                                     } catch (error) {
                                         console.error(error);

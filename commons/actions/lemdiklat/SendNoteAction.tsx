@@ -30,6 +30,9 @@ import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/service
 import { PelatihanMasyarakat } from "@/types/product";
 import { useFetchDataPusat } from "@/hooks/elaut/pusat/useFetchDataPusat";
 import { breakdownStatus } from "@/lib/utils";
+import { generateTanggalPelatihan } from "@/utils/text";
+import { generatePelatihanMessage } from "@/utils/messages";
+import { PusatDetail } from "@/types/pusat";
 
 interface SendNoteActionProps {
     idPelatihan: string;
@@ -70,38 +73,68 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
     const [isSubmitting, setIsSubmitting] = useState(false)
 
 
-    const { adminPusatData, loading: loadingPusat, error, fetchAdminPusatData } =
-        useFetchDataPusat();
+    const { adminPusatData, loading: loadingPusat, error, fetchAdminPusatData } = useFetchDataPusat(status)
 
     useEffect(() => {
         fetchAdminPusatData()
     }, [fetchAdminPusatData])
 
+
+    console.log({ adminPusatData })
+
     const [response, setResponse] = React.useState<any>(null);
 
-    const handleSendMessage = async (status: string, pelatihan: PelatihanMasyarakat, text: string) => {
-        setLoading(true); // start loader
+    const [selectedVerifikator, setSelectedVerifikator] = useState<PusatDetail | null>(null)
+
+    const handleSendMessage = async (
+        pelatihan: PelatihanMasyarakat,
+        text: string,
+        statusPenerbitan?: string
+    ) => {
+        setLoading(true);
         setResponse(null);
 
-        const to = adminPusatData.toString()
-        const formattedTo = to.includes("@s.whatsapp.net")
-            ? to
-            : `${to}@s.whatsapp.net`;
-
         try {
-            const res = await axios.post("/api/sendWhatsapp", {
-                to: formattedTo,
-                text,
-            });
-            console.log({ res });
-            setResponse(res.data);
+            let recipients: string[] = [];
+
+            if (statusPenerbitan === "1") {
+                recipients = adminPusatData
+                    .map((item) => item.NoTelpon)
+                    .filter((phone) => !!phone && phone.trim() !== "");
+            } else if (statusPenerbitan === "2") {
+                recipients = [selectedVerifikator?.NoTelpon!];
+            } else {
+                recipients = [];
+            }
+
+            for (const [index, phone] of recipients.entries()) {
+                const formattedTo = phone.includes("@s.whatsapp.net")
+                    ? phone
+                    : `${phone}@s.whatsapp.net`;
+
+                const message = generatePelatihanMessage(pelatihan, statusPenerbitan!);
+
+                const res = await axios.post("/api/sendWhatsapp", {
+                    to: formattedTo,
+                    text: message,
+                });
+
+                console.log(`✅ (${index + 1}/${recipients.length}) Sent message to ${phone}`, res.data);
+
+                // ⏱ Wait 5 seconds before next iteration
+                await new Promise((resolve) => setTimeout(resolve, 5000));
+            }
+
+            setResponse({ success: true, total: recipients.length });
         } catch (error: any) {
             console.error(error);
             setResponse(error.response?.data || { message: "Request failed" });
         } finally {
-            setLoading(false); // stop loader
+            setLoading(false);
         }
     };
+
+
 
     const handleSubmit = async () => {
         setIsSubmitting(true)
@@ -111,7 +144,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
         const formData = new FormData();
         formData.append("StatusPenerbitan", status);
         formData.append("VerifikatorPelatihan", verifikatorPelaksanaan);
-        formData.append("VerifikatorSertifikat", verifikatorPelaksanaan);
+        formData.append("VerifikatorSertifikat", selectedVerifikator?.NoTelpon!);
         if (beritaAcaraFile) formData.append("BeritaAcara", beritaAcaraFile);
         if (lapPengawasan) formData.append("MemoPusat", lapPengawasan);
         if (status == "4") formData.append("PemberitahuanDiterima", "Active")
@@ -136,6 +169,8 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                 `${Cookies.get("Nama")} - ${Cookies.get("Satker")}`
             );
 
+            handleSendMessage(pelatihan, message, status)
+
             Toast.fire({
                 icon: "success",
                 title: "Berhasil!",
@@ -144,6 +179,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
 
             setMessage("");
             setVerifikatorPelaksanaan("");
+            setSelectedVerifikator(null)
 
             setBeritaAcaraFile(null);
 
@@ -167,7 +203,6 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
             <AlertDialogTrigger asChild>
                 <Button
-
                     className={`flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all border bg-transparent border-${buttonColor}-500 text-${buttonColor}-500 hover:text-white hover:bg-${buttonColor}-500`}
                 >
                     <Icon className="h-5 w-5" />
@@ -185,25 +220,40 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                 {
                     (Cookies.get('Access')?.includes('supervisePelaksanaan') && (pelatihan?.StatusPenerbitan == "1") && title == "Pilih Verifikator") && <div>
                         <Select
-                            value={verifikatorPelaksanaan}
-                            onValueChange={setVerifikatorPelaksanaan}
+                            value={verifikatorPelaksanaan?.toString() ?? ""}
+                            onValueChange={(value) => {
+                                setVerifikatorPelaksanaan(value);
+
+                                // Find the full object of selected verifikator
+                                const selected = adminPusatData.find(
+                                    (item) => item.IdAdminPusat.toString() === value
+                                );
+                                setSelectedVerifikator(selected ?? null);
+                            }}
                             disabled={loading || loadingPusat}
                         >
                             <SelectTrigger>
                                 <SelectValue placeholder="Pilih Verifikator" />
                             </SelectTrigger>
-                            <SelectContent position="popper" className="z-[9999999]">
-                                {loadingPusat ? <></> : <> {adminPusatData.filter((item) => breakdownStatus(item.Status)[0] == "Verifikator").map((admin) => (
-                                    <SelectItem
-                                        key={admin.IdAdminPusat}
-                                        value={admin.IdAdminPusat.toString()}
-                                    >
-                                        {admin.Nama}
-                                    </SelectItem>
-                                ))}</>}
 
+                            <SelectContent position="popper" className="z-[9999999]">
+                                {loadingPusat ? (
+                                    <div className="p-2 text-sm text-muted-foreground">Memuat data...</div>
+                                ) : (
+                                    adminPusatData
+                                        .filter((item) => breakdownStatus(item.Status)[0] === "Verifikator")
+                                        .map((admin) => (
+                                            <SelectItem
+                                                key={admin.IdAdminPusat}
+                                                value={admin.IdAdminPusat.toString()}
+                                            >
+                                                {admin.Nama}
+                                            </SelectItem>
+                                        ))
+                                )}
                             </SelectContent>
                         </Select>
+
                     </div>
                 }
 
@@ -241,7 +291,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                                         <span className="truncate max-w-[200px]">Dokumen Penerbitan STTPL</span>
                                     </div>
                                     <a
-                                        href={`${urlFileBeritaAcara}/${oldFileUrl}`}
+                                        href={`${urlFileBeritaAcara} / ${oldFileUrl}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-navy-600 hover:text-navy-800 font-medium transition"
@@ -271,15 +321,18 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
 
                 <AlertDialogFooter>
                     <AlertDialogCancel disabled={loading}>Batal</AlertDialogCancel>
-                    {
-                        title == "Ajukan Penerbitan STTPL" ? <Button
+
+                    {title === "Ajukan Penerbitan STTPL" ? (
+                        <Button
                             onClick={handleSubmit}
                             variant="outline"
                             className={`border-${buttonColor}-500 bg-transparent text-${buttonColor}-500 hover:bg-${buttonColor}-700 hover:text-white`}
                             disabled={loading || !message || !beritaAcaraFile}
                         >
                             {loading ? "Memproses..." : "Kirim"}
-                        </Button> : <Button
+                        </Button>
+                    ) : (
+                        <Button
                             onClick={handleSubmit}
                             variant="outline"
                             className={`border-${buttonColor}-500 bg-transparent text-${buttonColor}-500 hover:bg-${buttonColor}-700 hover:text-white`}
@@ -287,7 +340,8 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                         >
                             {loading ? "Memproses..." : "Kirim"}
                         </Button>
-                    }
+                    )}
+
 
 
                 </AlertDialogFooter>

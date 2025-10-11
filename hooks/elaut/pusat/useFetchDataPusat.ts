@@ -6,7 +6,7 @@ import Cookies from 'js-cookie'
 import { elautBaseUrl } from '@/constants/urls'
 import { PusatDetail } from '@/types/pusat'
 
-export function useFetchDataPusat() {
+export function useFetchDataPusat(statusPenerbitan?: number | string) {
   const [adminPusatData, setAdminPusatData] = useState<PusatDetail[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<unknown>(null)
@@ -26,19 +26,27 @@ export function useFetchDataPusat() {
         headers: { Authorization: `Bearer ${token}` },
       })
 
-      if (Array.isArray(response.data)) {
-        setAdminPusatData(response.data)
-      } else if (Array.isArray(response.data.data)) {
-        setAdminPusatData(response.data.data)
-      } else {
-        setAdminPusatData([])
+      let data: PusatDetail[] = []
+      if (Array.isArray(response.data)) data = response.data
+      else if (Array.isArray(response.data.data)) data = response.data.data
+
+      if (statusPenerbitan === 1 || statusPenerbitan === "1" ) {
+        data = data.filter((item) =>
+          item.Status?.toLowerCase().includes('supervisor'),
+        )
+      } else if (statusPenerbitan === 2|| statusPenerbitan === "2" ) {
+        data = data.filter((item) =>
+          item.Status?.toLowerCase().includes('verifikator'),
+        )
       }
+
+      setAdminPusatData(data)
     } catch (err) {
       setError(err)
     } finally {
       setLoading(false)
     }
-  }, [token])
+  }, [token, statusPenerbitan])
 
   return { adminPusatData, loading, error, fetchAdminPusatData }
 }

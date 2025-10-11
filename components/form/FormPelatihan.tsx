@@ -130,6 +130,7 @@ function FormPelatihan({ edit = false }: { edit: boolean }) {
         title: "Oopsss!",
         text: "Gagal menambahkan pelatihan baru! Pastikan semua data sudah diisi."
       });
+      setIsUploading(false);
       return;
     }
     const data = new FormData();
