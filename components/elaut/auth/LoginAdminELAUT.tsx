@@ -132,35 +132,6 @@ export const LoginAdminELAUT = () => {
     }
   };
 
-  const [to, setTo] = React.useState("");
-  const [text, setText] = React.useState("");
-  const [response, setResponse] = React.useState<any>(null);
-  const [loading, setLoading] = React.useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true); // start loader
-    setResponse(null);
-
-    const formattedTo = to.includes("@s.whatsapp.net")
-      ? to
-      : `${to}@s.whatsapp.net`;
-
-    try {
-      const res = await axios.post("/api/sendWhatsapp", {
-        to: formattedTo,
-        text,
-      });
-      console.log({ res });
-      setResponse(res.data);
-    } catch (error: any) {
-      console.error(error);
-      setResponse(error.response?.data || { message: "Request failed" });
-    } finally {
-      setLoading(false); // stop loader
-    }
-  };
-
   return (
     <section className="w-full">
       <main className="h-screen w-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-sky-900 to-blue-900 text-white">

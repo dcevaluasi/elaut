@@ -77,6 +77,32 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
         fetchAdminPusatData()
     }, [fetchAdminPusatData])
 
+    const [response, setResponse] = React.useState<any>(null);
+
+    const handleSendMessage = async (status: string, pelatihan: PelatihanMasyarakat, text: string) => {
+        setLoading(true); // start loader
+        setResponse(null);
+
+        const to = adminPusatData.toString()
+        const formattedTo = to.includes("@s.whatsapp.net")
+            ? to
+            : `${to}@s.whatsapp.net`;
+
+        try {
+            const res = await axios.post("/api/sendWhatsapp", {
+                to: formattedTo,
+                text,
+            });
+            console.log({ res });
+            setResponse(res.data);
+        } catch (error: any) {
+            console.error(error);
+            setResponse(error.response?.data || { message: "Request failed" });
+        } finally {
+            setLoading(false); // stop loader
+        }
+    };
+
     const handleSubmit = async () => {
         setIsSubmitting(true)
         setLoading(true);
