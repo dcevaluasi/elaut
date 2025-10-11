@@ -122,7 +122,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                     text: message,
                 });
 
-                console.log(`✅ (${index + 1}/${recipients.length}) Sent message to ${phone}`, res.data);
+
 
                 // ⏱ Wait 5 seconds before next iteration
                 await new Promise((resolve) => setTimeout(resolve, 5000));

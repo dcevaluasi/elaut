@@ -53,7 +53,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
     const { label, color, icon } = getStatusInfo(data.StatusPenerbitan)
     const { adminPusatData, loading, error, fetchAdminPusatData } = useFetchDataPusatById(data?.VerifikatorPelatihan)
     const { instrukturs, loading: loadingInstruktur, error: errorInstruktur, fetchInstrukturData } = useFetchDataInstrukturSelected(stringToArray(data?.Instruktur))
-
+    console.log({ data })
     /**
      * Modul Pelatihan 
      */

@@ -194,7 +194,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 {Cookies.get("Access")?.includes("approveKabalai") &&
                                     data.StatusPenerbitan == "7A" && (
                                         <>
-                                            <SendNoteAction
+                                            {/* <SendNoteAction
                                                 idPelatihan={data.IdPelatihan.toString()}
                                                 title="Perbaikan Penerbitan"
                                                 description="Segera melakukan approval pengajuan penerbitan STTPL"
@@ -204,7 +204,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 onSuccess={fetchData}
                                                 status="7C"
                                                 pelatihan={data}
-                                            />
+                                            /> */}
                                             <SendNoteAction
                                                 idPelatihan={data.IdPelatihan.toString()}
                                                 title="Approve Penerbitan"
@@ -225,7 +225,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 {Cookies.get("Access")?.includes("approveKapus") &&
                                     data.StatusPenerbitan == "8" && (
                                         <>
-                                            <SendNoteAction
+                                            {/* <SendNoteAction
                                                 idPelatihan={data.IdPelatihan.toString()}
                                                 title="Perbaikan Penerbitan"
                                                 description="Segera melakukan approval pengajuan penerbitan STTPL"
@@ -235,7 +235,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 onSuccess={fetchData}
                                                 status="9"
                                                 pelatihan={data}
-                                            />
+                                            /> */}
                                             <SendNoteAction
                                                 idPelatihan={data.IdPelatihan.toString()}
                                                 title="Approve Penerbitan"
@@ -257,7 +257,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 {/* (12) Kabadan : Pending Kabadan for Reject and Approve */}
                                 {
                                     (Cookies.get('Access')?.includes('approveKabadan') && data.StatusPenerbitan == "12") && <>
-                                        <SendNoteAction
+                                        {/* <SendNoteAction
                                             idPelatihan={data.IdPelatihan.toString()}
                                             title="Perbaikan Penerbitan"
                                             description="Segera melakukan approval pengajuan penerbitan STTPL"
@@ -267,7 +267,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             onSuccess={fetchData}
                                             status={"13"}
                                             pelatihan={data}
-                                        />
+                                        /> */}
                                         <SendNoteAction
                                             idPelatihan={data.IdPelatihan.toString()}
                                             title="Approve Penerbitan"
