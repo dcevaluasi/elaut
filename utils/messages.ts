@@ -21,6 +21,10 @@ export function generatePelatihanMessage(pelatihan: any, status: string) {
       instruction =
         'Permohonan pelaksanaan pelatihan telah *disetujui*. Silakan lanjut ke tahap berikut melalui kanal berikut:'
       break
+    case '6': // Pending STTPL Verifikator
+      instruction =
+        'Harap untuk segera melakukan verifikasi permohonan penerbitan *STTPL* atau *Sertifikat* pelatihan melalui kanal berikut:'
+      break
     case '7A': // Pending Kabalai
       instruction =
         'Harap untuk segera melakukan pengecekan dan persetujuan pelaksanaan pelatihan melalui kanal berikut:'

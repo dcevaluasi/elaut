@@ -61,6 +61,7 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
     const [verifikatorPelaksanaan, setVerifikatorPelaksanaan] = useState(pelatihan!.VerifikatorPelatihan)
+    const [verifikatorSertifikat, setVerifikatorSertifikat] = useState(pelatihan!.VerifikatorSertifikat)
     const [beritaAcaraFile, setBeritaAcaraFile] = useState<File | null>(null);
     const [lapPengawasan, setLapPengawasan] = useState<File | null>(null);
     const [isPengawas, setIsPengawas] = useState(false)
@@ -103,6 +104,8 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                     .filter((phone) => !!phone && phone.trim() !== "");
             } else if (statusPenerbitan === "2") {
                 recipients = [selectedVerifikator?.NoTelpon!];
+            } else if (statusPenerbitan === "6") {
+                recipients = [verifikatorSertifikat];
             } else {
                 recipients = [];
             }
