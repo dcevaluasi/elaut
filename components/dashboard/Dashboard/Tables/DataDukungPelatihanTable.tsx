@@ -75,6 +75,7 @@ const DataDukungPelatihanTable = ({ data, tahun, triwulan }: { data: UserPelatih
             "JENIS KELAMIN": item.JenisKelamin,
             ALAMAT: item.Alamat || "-",
             "PENDIDIKAN TERKAHIR": item.PendidikanTerakhir,
+            "NAMA PELATIHAN": item.NamaPelatihan.toUpperCase(),
             "SEKTOR PELATIHAN": item.JenisProgram.toUpperCase(),
             "BIDANG/KLASTER PELATIHAN": item.BidangPelatihan.toUpperCase(),
             "PROGRAM PELATIHAN": item.Program.toUpperCase(),

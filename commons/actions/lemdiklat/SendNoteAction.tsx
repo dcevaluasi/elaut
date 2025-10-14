@@ -122,10 +122,8 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
                     text: message,
                 });
 
-
-
                 // ⏱ Wait 5 seconds before next iteration
-                await new Promise((resolve) => setTimeout(resolve, 5000));
+                await new Promise((resolve) => setTimeout(resolve, 60000));
             }
 
             setResponse({ success: true, total: recipients.length });
@@ -136,8 +134,6 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
             setLoading(false);
         }
     };
-
-
 
     const handleSubmit = async () => {
         setIsSubmitting(true)
