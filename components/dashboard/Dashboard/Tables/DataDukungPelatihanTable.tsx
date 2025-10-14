@@ -6,16 +6,8 @@ import * as XLSX from "xlsx";
 import dayjs from "dayjs";
 import { FiBarChart2, FiDownload } from "react-icons/fi"
 import { Button } from "@/components/ui/button";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { generateTanggalPelatihan, splitCityAndDate } from "@/utils/text";
-import { tahunList } from "@/utils/time";
 
 const DataDukungPelatihanTable = ({ data, tahun, triwulan }: { data: UserPelatihan[], tahun: number, triwulan: string }) => {
 
@@ -98,7 +90,6 @@ const DataDukungPelatihanTable = ({ data, tahun, triwulan }: { data: UserPelatih
             `DATA DUKUNG MASYARAKAT DILATIH ${tahun} - ${triwulan}.xlsx`
         );
     };
-
 
     return (
         <div className="space-y-6">
