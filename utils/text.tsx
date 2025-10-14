@@ -298,4 +298,17 @@ export function toTitleCase(str: string) {
     .join(" ")
 }
 
+export function splitCityAndDate(input: string): { city: string; date: string } {
+  const regex = /^([A-Za-z\s]+?)(\d{1,2}\s+[A-Za-z]+\s+\d{4})$/;
+  const match = input.match(regex);
 
+  if (!match) {
+    throw new Error("Invalid format. Expected something like 'Sidoarjo13 October 2000'");
+  }
+
+  const [, city, date] = match;
+  return {
+    city: city.trim(),
+    date: date.trim()
+  };
+}

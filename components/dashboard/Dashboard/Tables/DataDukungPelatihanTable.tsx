@@ -14,7 +14,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { generateTanggalPelatihan } from "@/utils/text";
+import { generateTanggalPelatihan, splitCityAndDate } from "@/utils/text";
 import { tahunList } from "@/utils/time";
 
 const DataDukungPelatihanTable = ({ data, tahun, triwulan }: { data: UserPelatihan[], tahun: number, triwulan: string }) => {
@@ -69,9 +69,10 @@ const DataDukungPelatihanTable = ({ data, tahun, triwulan }: { data: UserPelatih
             "NAMA": item.Nama.toUpperCase(),
             NIK: item.Nik || "-",
             "NO TELPON": item.NoTelpon || "-",
-            "TEMPAT & TANGGAL LAHIR": item.TempatTanggalLahir,
-            "KOTA/KABUPATEN": item.Kota,
-            PROVINSI: item.Provinsi,
+            "TEMPAT LAHIR": splitCityAndDate(item.TempatTanggalLahir).city,
+            "TANGGAL LAHIR": splitCityAndDate(item.TempatTanggalLahir).date,
+            "KOTA/KABUPATEN": item.Kota?.toString()?.toUpperCase(),
+            PROVINSI: item.Provinsi?.toString()?.toUpperCase(),
             "JENIS KELAMIN": item.JenisKelamin,
             ALAMAT: item.Alamat || "-",
             "PENDIDIKAN TERKAHIR": item.PendidikanTerakhir,
