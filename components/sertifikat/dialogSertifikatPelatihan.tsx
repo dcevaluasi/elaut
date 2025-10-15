@@ -70,7 +70,6 @@ function QRCodeImage({ value }: { value: string }) {
 
 }
 
-
 const FormatSTTPL = React.forwardRef(
     (
         {
@@ -781,7 +780,7 @@ const FormatSTTPL = React.forwardRef(
 
 
                                                 {/* Kolom 3 - Tanda Tangan & Pejabat */}
-                                                <div className={`flex flex-col items-center justify-center text-center ${peserta?.Foto == "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/" ? "w-[120%]" : "w-[120%]"} mt-2 space-y-1 -ml-16`}>
+                                                <div className={`flex flex-col items-center justify-center text-center ${peserta?.Foto == "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/" ? "w-[120%] ml-0" : "w-[120%] -ml-16"} mt-2 space-y-1 `}>
                                                     <div className="flex flex-col items-center gap-0.5 font-bosNormal text-sm leading-tight">
                                                         <span className='text-base'>Jakarta, {generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan)}</span>
                                                         <span className="w-full font-bosBold text-base">
@@ -1014,42 +1013,8 @@ const FormatSTTPL = React.forwardRef(
                                             </div>
                                         </div>
                                     </div>
-
-                                    {/* {
-                            (pelatihan?.BidangPelatihan?.includes('Sistem Jaminan Mutu') || pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? <div className="w-full flex justify-center items-center">
-                                <p className="max-w-3xl text-center font-bosItalic leading-none">
-                                    Lampiran materi/kurikulum pelatihan disahkan sesuai dengan standar mutu yang berlaku dan diselenggarakan oleh <span className="font-bosBold uppercase">
-                                        {pelatihan?.PenyelenggaraPelatihan}
-                                    </span>
-                                </p>
-                            </div> :
-                                unitKerja != null ? <div className={`flex flex-col items-start justify-start text-left w-full mt-2 space-y-1 max-w-7xl`}>
-                                    <div className="flex flex-col items-start gap-0.5 font-bosNormal text-sm leading-tight">
-                                        <span className='text-base'> {generatedSignedCertificate(unitKerja?.pimpinan).location}, {generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan)}</span>
-                                        <span className='text-base'> Disahkan oleh,</span>
-
-                                        <span className="w-full font-bosBold uppercase text-base">
-                                            {generatedSignedCertificate(unitKerja?.pimpinan).status_indo}
-                                        </span>
-
-                                        <span className="leading-tight font-bosItalic text-sm">
-                                            {generatedSignedCertificate(unitKerja?.pimpinan).status_eng}
-                                        </span>
-                                    </div>
-
-                                    <span className="w-full font-bosNormal uppercase text-base py-3 my-3">
-                                        TTD
-                                    </span>
-
-                                    <span className="font-bosBold text-base -mt-2">
-                                        {generatedSignedCertificate(unitKerja?.pimpinan).name}
-                                    </span>
-                                </div> : <></>
-                        } */}
-
                                 </div>
                             </div>
-
                         </div>
                 }
             </>
