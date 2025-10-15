@@ -779,7 +779,7 @@ const FormatSTTPL = React.forwardRef(
                                                 }
 
                                                 {/* Kolom 3 - Tanda Tangan & Pejabat */}
-                                                <div className={`flex flex-col items-center justify-center text-center ${peserta?.Foto == "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/" ? "w-[120%] ml-0" : "w-[120%] -ml-16"} mt-2 space-y-1 `}>
+                                                <div className={`flex flex-col items-center justify-center text-center ${peserta?.Foto == "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/" ? "w-[120%] -ml-10" : "w-[120%] -ml-16"} mt-2 space-y-1 `}>
                                                     <div className="flex flex-col items-center gap-0.5 font-bosNormal text-sm leading-tight">
                                                         <span className='text-base'>Jakarta, {generateTanggalPelatihan(pelatihan?.TanggalBerakhirPelatihan)}</span>
                                                         <span className="w-full font-bosBold text-base">
