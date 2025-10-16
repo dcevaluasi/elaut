@@ -21,9 +21,10 @@ const useFetchDataDukung = () => {
           },
         },
       )
-      let filteredData: UserPelatihan[] = response.data.data.filter(
-        (item: UserPelatihan) => item.FileSertifikat?.includes('signed'),
-      )
+      // let filteredData: UserPelatihan[] = response.data.data.filter(
+      //   (item: UserPelatihan) => item.FsileSertifikat?.includes('signed'),
+      // )
+      let filteredData: UserPelatihan[] = response.data.data
       if (isPengelolaUPT) {
         filteredData = filteredData.filter(
           (item) => item.PenyelenggaraPelatihan === nameLemdiklat,

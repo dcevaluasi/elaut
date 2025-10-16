@@ -813,9 +813,7 @@ const FormatSTTPL = React.forwardRef(
                                                         Dr. Lilly Aprilya Pregiwati, S.Pi., M.Si
                                                     </span>
                                                 </div>
-
                                             </div>
-
                                         </div>
                                     </>
                                 </div>
