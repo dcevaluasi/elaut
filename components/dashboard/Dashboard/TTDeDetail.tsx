@@ -53,20 +53,49 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
         refs.current = data.UserPelatihan.map((_, i) => refs.current[i] ?? React.createRef<DialogSertifikatHandle>());
     }
 
+    // const handleUploadAll = async () => {
+    //     setIsUploading(true);
+    //     setProgress(0);
+
+
+    //     for (let i = 0; i < refs.current.length; i++) {
+    //         const userPel = data.UserPelatihan[i];
+
+    //         // ✅ Only upload if FileSertifikat is empty
+    //         if (!userPel.FileSertifikat || userPel.FileSertifikat === "") {
+    //             await refs.current[i].current?.uploadPdf?.();
+    //         }
+
+    //         setProgress(((i + 1) / refs.current.length) * 100);
+    //         setCounter(i + 1);
+    //     }
+
+    //     setOpen(true);
+    //     setIsUploading(false);
+    // };
+
     const handleUploadAll = async () => {
         setIsUploading(true);
         setProgress(0);
 
-        for (let i = 0; i < refs.current.length; i++) {
-            const userPel = data.UserPelatihan[i];
+        const CONCURRENCY = 5; // Jumlah upload simultan
+        const toUpload = refs.current
+            .map((ref, i) => ({ ref, index: i, userPel: data.UserPelatihan[i] }))
+            .filter(({ userPel }) => !userPel.FileSertifikat || userPel.FileSertifikat === "");
 
-            // ✅ Only upload if FileSertifikat is empty
-            if (!userPel.FileSertifikat || userPel.FileSertifikat === "") {
-                await refs.current[i].current?.uploadPdf?.();
-            }
+        let completed = 0;
 
-            setProgress(((i + 1) / refs.current.length) * 100);
-            setCounter(i + 1);
+        for (let i = 0; i < toUpload.length; i += CONCURRENCY) {
+            const batch = toUpload.slice(i, i + CONCURRENCY);
+
+            await Promise.all(
+                batch.map(async ({ ref }) => {
+                    await ref.current?.uploadPdf?.();
+                    completed++;
+                    setProgress((completed / toUpload.length) * 100);
+                    setCounter(completed);
+                })
+            );
         }
 
         setOpen(true);
