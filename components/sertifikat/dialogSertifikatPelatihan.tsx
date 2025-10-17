@@ -1039,60 +1039,53 @@ const DialogSertifikatPelatihan = forwardRef<DialogSertifikatHandle, Props>(
 
         const uploadPdf = async () => {
             if (!userPelatihan) return;
-            console.log("⬆️ Uploading PDF for:", userPelatihan.Nama);
 
             try {
+                // Lazy load html2pdf hanya sekali
                 if (!html2pdfInstance) {
                     html2pdfInstance = (await import("html2pdf.js")).default;
-                }
-
-                if (!componentRef.current || !componentRefPage.current) {
-                    console.error("❌ Component reference is null");
-                    return;
                 }
 
                 const element = componentRef.current;
                 const elementPage = componentRefPage.current;
 
-                const { offsetWidth, scrollHeight } = element;
-                const firstPageHeight = elementPage.offsetHeight + 180;
-                const remainingHeight = scrollHeight - firstPageHeight;
+                if (!element || !elementPage) {
+                    console.error("❌ Component reference is null");
+                    return;
+                }
 
+                // Optimisasi html2canvas settings
                 const opt = {
                     margin: [0, 10, 10, 10],
                     filename: `${userPelatihan.Nama}_${userPelatihan.NoRegistrasi}.pdf`,
                     pagebreak: { mode: ["avoid-all", "css"] },
                     html2canvas: {
-                        scale: 1.5,
+                        scale: 1.2, // Turunkan dari 1.5 ke 1.2
                         useCORS: true,
-                        allowTaint: true,
                         logging: false,
                         backgroundColor: "#fff",
+                        windowWidth: element.offsetWidth,
+                        windowHeight: element.scrollHeight,
                     },
                     jsPDF: {
                         unit: "px",
-                        format: [offsetWidth, firstPageHeight],
+                        format: [element.offsetWidth, elementPage.offsetHeight + 180],
                         orientation: "landscape",
+                        compress: true, // Kompresi PDF
                     },
                 };
 
-                const pdfBlob: Blob = await html2pdfInstance()
+                const pdfBlob = await html2pdfInstance()
                     .from(element)
                     .set(opt)
                     .toPdf()
                     .outputPdf("blob");
 
-                const MAX_SIZE_MB = 3;
-                if (pdfBlob.size > MAX_SIZE_MB * 1024 * 1024) {
-                    Toast.fire({
-                        icon: "error",
-                        title: `Ukuran file terlalu besar! Maksimum ${MAX_SIZE_MB} MB.`,
-                    });
-                    return;
-                }
 
+
+                // Upload
                 const formData = new FormData();
-                formData.append("IdUserPelatihan", String(userPelatihan.IdUserPelatihan ?? ""));
+                formData.append("IdUserPelatihan", String(userPelatihan.IdUserPelatihan));
                 formData.append(
                     "fileSertifikat",
                     pdfBlob,
