@@ -78,7 +78,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
         setIsUploading(true);
         setProgress(0);
 
-        const CONCURRENCY = 5;
+        const CONCURRENCY = 15;
         const toUpload = refs.current
             .map((ref, i) => ({ ref, index: i, userPel: data.UserPelatihan[i] }))
             .filter(({ userPel }) => !userPel.FileSertifikat || userPel.FileSertifikat === "");
