@@ -21,9 +21,7 @@ const useFetchDataDukung = (isIncludePusat: boolean = false) => {
           },
         },
       )
-      // let filteredData: UserPelatihan[] = response.data.data.filter(
-      //   (item: UserPelatihan) => item.FsileSertifikat?.includes('signed'),
-      // )
+
       let filteredData: UserPelatihan[] = response.data.data
 
       if (isPengelolaUPT) {
@@ -40,7 +38,6 @@ const useFetchDataDukung = (isIncludePusat: boolean = false) => {
       }
 
       setData(filteredData)
-
       setIsFetching(false)
     } catch (error) {
       setIsFetching(false)
@@ -50,7 +47,7 @@ const useFetchDataDukung = (isIncludePusat: boolean = false) => {
 
   useEffect(() => {
     handleFetchDataDukung()
-  }, [])
+  }, [isIncludePusat]) // Tambahkan isIncludePusat ke dependency
 
   return {
     data,
