@@ -4,7 +4,7 @@ import Cookies from 'js-cookie'
 import { elautBaseUrl } from '@/constants/urls'
 import { UserPelatihan } from '@/types/product'
 
-const useFetchDataDukung = () => {
+const useFetchDataDukung = (isIncludePusat: boolean = false) => {
   const [data, setData] = useState<UserPelatihan[]>([])
   const [isFetching, setIsFetching] = useState<boolean>(false)
   const isPengelolaUPT = Cookies.get('Role') == 'Pengelola UPT'
@@ -25,11 +25,20 @@ const useFetchDataDukung = () => {
       //   (item: UserPelatihan) => item.FsileSertifikat?.includes('signed'),
       // )
       let filteredData: UserPelatihan[] = response.data.data
+
       if (isPengelolaUPT) {
         filteredData = filteredData.filter(
           (item) => item.PenyelenggaraPelatihan === nameLemdiklat,
         )
       }
+
+      if (!isIncludePusat) {
+        filteredData = filteredData.filter(
+          (item) =>
+            !item.PenyelenggaraPelatihan?.toLowerCase().includes('pusat'),
+        )
+      }
+
       setData(filteredData)
 
       setIsFetching(false)

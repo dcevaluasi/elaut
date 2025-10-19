@@ -18,8 +18,8 @@ import { tahunList } from "@/utils/time";
 import { FiFilter } from "react-icons/fi";
 
 const SummaryKinerja: React.FC = () => {
-
-    const { data: dataDukung, isFetching: isFetchingDataDukung, refetch } = useFetchDataDukung()
+    const [includePusat, setIncludePusat] = React.useState(true);
+    const { data: dataDukung, isFetching: isFetchingDataDukung, refetch } = useFetchDataDukung(includePusat)
 
     const [tahun, setTahun] = React.useState(() => dayjs().year());
     const [triwulan, setTriwulan] = React.useState(() => {
@@ -66,6 +66,20 @@ const SummaryKinerja: React.FC = () => {
                                     <SelectItem value="TW II">TW II</SelectItem>
                                     <SelectItem value="TW III">TW III</SelectItem>
                                     <SelectItem value="TW IV">TW IV</SelectItem>
+                                </SelectContent>
+                            </Select>
+
+
+                            <Select
+                                value={includePusat ? "true" : "false"}
+                                onValueChange={(value) => setIncludePusat(value === "true")}
+                            >
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="Include Pusat" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="false">Tanpa Pusat</SelectItem>
+                                    <SelectItem value="true">Dengan Pusat</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
