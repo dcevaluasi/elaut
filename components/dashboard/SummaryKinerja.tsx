@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { tahunList } from "@/utils/time";
 import { FiFilter } from "react-icons/fi";
+import Cookies from "js-cookie";
 
 const SummaryKinerja: React.FC = () => {
     const [includePusat, setIncludePusat] = React.useState(true);
@@ -69,19 +70,21 @@ const SummaryKinerja: React.FC = () => {
                                 </SelectContent>
                             </Select>
 
-                            {/* this is test */}
-                            <Select
-                                value={includePusat ? "true" : "false"}
-                                onValueChange={(value) => setIncludePusat(value === "true")}
-                            >
-                                <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder="Include Pusat" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="false">Tanpa Pusat</SelectItem>
-                                    <SelectItem value="true">Dengan Pusat</SelectItem>
-                                </SelectContent>
-                            </Select>
+                            {
+                                Cookies.get('Access')?.includes('superAdmin') && <Select
+                                    value={includePusat ? "true" : "false"}
+                                    onValueChange={(value) => setIncludePusat(value === "true")}
+                                >
+                                    <SelectTrigger className="w-[180px]">
+                                        <SelectValue placeholder="Include Pusat" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="false">Tanpa Pusat</SelectItem>
+                                        <SelectItem value="true">Dengan Pusat</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            }
+
                         </div>
                     </div>
 
