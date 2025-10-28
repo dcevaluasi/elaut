@@ -341,7 +341,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                     </AccordionSection>
                     {/* Pubish dan Promosi Kelas Pelatihan */}
                     {
-                        (Cookies.get('Access')?.includes('createPelatihan') && parseInt(data?.StatusPenerbitan) < 4) &&
+                        (Cookies.get('Access')?.includes('createPelatihan')) &&
                         <AccordionSection title="🌐 Publish Informasi dan Promosi" description={<small className="my-2 pb-4 text-sm text-slate-600 antialiased">Dalam proses ini kamu dapat mempublish informasi kelas pelatihan ke website utama E-LAUT agar masyarakat/publik dapat mendaftar secara mandiri kelas pelatihan yang dibuka atau hanya sebagai informasi. Dalam memenuhi proses ini, diharapkan dapat menguplaod <b>flyer, deskripsi, serta tanggal pendaftaran</b>. Selanjutnya dapat mengklik tombol <b>Publish</b> dan dapat ditarik kembali informasi yang disebarkan dengan mengklik tombol <b>Take Down</b>.</small>}>
                             <div className="flex flex-col w-full gap-4">
                                 <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
