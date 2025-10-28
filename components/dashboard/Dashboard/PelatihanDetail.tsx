@@ -348,17 +348,13 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     <p className="font-medium text-gray-600">
                                         Action :
                                     </p>
-                                    {
-                                        data?.StatusPenerbitan == "0" && <>
-                                            <EditPublishAction
-                                                idPelatihan={data.IdPelatihan.toString()}
-                                                currentDetail={data.DetailPelatihan}
-                                                currentFoto={data.FotoPelatihan}
-                                                tanggalPendaftaran={[data.TanggalMulaiPendaftaran, data.TanggalAkhirPendaftaran!]}
-                                                currentData={data}
-                                                onSuccess={fetchData} />
-                                        </>
-                                    }
+                                    <EditPublishAction
+                                        idPelatihan={data.IdPelatihan.toString()}
+                                        currentDetail={data.DetailPelatihan}
+                                        currentFoto={data.FotoPelatihan}
+                                        tanggalPendaftaran={[data.TanggalMulaiPendaftaran, data.TanggalAkhirPendaftaran!]}
+                                        currentData={data}
+                                        onSuccess={fetchData} />
                                     {
                                         data?.FotoPelatihan != "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" && <>
                                             {
