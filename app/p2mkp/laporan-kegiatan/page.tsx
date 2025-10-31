@@ -194,27 +194,13 @@ export default function P2MKPReportApp() {
             <td class="info-label">Nama P2MKP</td>
             <td>${data.namaP2MKP || '-'}</td>
           </tr>
-          <tr>
-            <td class="info-label">Tanggal Berdiri</td>
-            <td>${data.tanggalBerdiri || '-'}</td>
-          </tr>
-          <tr>
-            <td class="info-label">Alamat</td>
-            <td>${data.alamatP2MKP || '-'}</td>
-          </tr>
-          <tr>
-            <td class="info-label">Ketua/Penanggung Jawab</td>
-            <td>${data.namaKetua || '-'}</td>
-          </tr>
         </table>
         
-        <h3>1.1 LATAR BELAKANG</h3>
-        <p>${data.latarBelakang || '-'}</p>
         
-        <h3>1.2 BIDANG USAHA DAN PELATIHAN</h3>
+        <h3>1.1 BIDANG USAHA DAN PELATIHAN</h3>
         <p>${data.bidangUsaha || '-'}</p>
         
-        <h3>1.3 DAFTAR PELATIH</h3>
+        <h3>1.2 DAFTAR PELATIH</h3>
         <table>
           <tr><th>No</th><th>Nama</th><th>Keahlian</th><th>Sertifikasi</th></tr>
           ${data.pelatih.map((p, i) => `
@@ -222,7 +208,7 @@ export default function P2MKPReportApp() {
           `).join('')}
         </table>
         
-        <h3>1.4 DAFTAR PENGHARGAAN</h3>
+        <h3>1.3 DAFTAR PENGHARGAAN</h3>
         <table>
           <tr><th>No</th><th>Nama Penghargaan</th><th>Instansi Pemberi</th><th>Tahun</th></tr>
           ${data.penghargaan.map((p, i) => `

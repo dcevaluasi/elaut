@@ -1,9 +1,12 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { FileText, Download, Eye, Search, Calendar, MapPin, User } from 'lucide-react';
+import { FileText, Download, Eye, Search, Calendar, User, RefreshCw } from 'lucide-react';
+import { collection, getDocs, query, orderBy, getFirestore } from 'firebase/firestore';
+import firebaseApp from '@/firebase/config';
 
-// Types
+const db = getFirestore(firebaseApp)
+
 interface Pelatih {
     nama: string;
     keahlian: string;
@@ -52,7 +55,8 @@ interface ReportData {
     mitra: Mitra[];
     harapanUsaha: string[];
     harapanPelatihan: string[];
-    createdAt?: Date;
+    createdAt?: any;
+    updatedAt?: any;
 }
 
 export default function P2MKPDashboard() {
@@ -61,7 +65,6 @@ export default function P2MKPDashboard() {
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
 
-    // Load reports from Firebase or demo data
     useEffect(() => {
         loadReports();
     }, []);
@@ -69,96 +72,22 @@ export default function P2MKPDashboard() {
     const loadReports = async () => {
         setLoading(true);
         try {
-            // Replace with actual Firebase query
-            // const querySnapshot = await getDocs(collection(db, 'reports'));
-            // const loadedReports = querySnapshot.docs.map(doc => ({
-            //     id: doc.id,
-            //     ...doc.data()
-            // }));
+            const q = query(collection(db, 'reports'), orderBy('createdAt', 'desc'));
+            const querySnapshot = await getDocs(q);
 
-            // Demo data
-            const demoReports: ReportData[] = [
-                {
-                    id: '1',
-                    namaP2MKP: 'P2MKP Mina Bahari',
-                    tanggalBerdiri: '2020-05-15',
-                    alamatP2MKP: 'Jl. Pantai Indah No. 123, Semarang',
-                    namaKetua: 'Budi Santoso',
-                    latarBelakang: 'P2MKP Mina Bahari didirikan untuk meningkatkan kualitas SDM nelayan.',
-                    bidangUsaha: 'Pelatihan budidaya ikan, pengolahan hasil laut',
-                    pelatih: [
-                        { nama: 'Ir. Andi Wijaya', keahlian: 'Budidaya Ikan', sertifikasi: 'Sertifikat Pelatih Nasional' }
-                    ],
-                    penghargaan: [
-                        { nama: 'P2MKP Terbaik', instansi: 'Kementerian KKP', tahun: '2023' }
-                    ],
-                    pelatihan: [
-                        {
-                            jenis: 'Budidaya Lele',
-                            waktu: '1-10 Januari 2024',
-                            lokasi: 'Balai Pelatihan Semarang',
-                            jumlahPeserta: 25,
-                            instansiPeserta: 'Kelompok Nelayan',
-                            materi: ['Teknik Budidaya', 'Manajemen Pakan'],
-                            sumberAnggaran: 'APBN'
-                        }
-                    ],
-                    tantangan: ['Keterbatasan modal usaha', 'Sulitnya pemasaran produk'],
-                    tantanganCustom: [],
-                    upaya: ['Menjalin kemitraan', 'Promosi produk di pameran/media'],
-                    upayaCustom: [],
-                    dampak: ['Meningkatnya keterampilan masyarakat', 'Terciptanya lapangan kerja baru'],
-                    dampakCustom: [],
-                    mitra: [
-                        { nama: 'PT Mina Jaya', alamat: 'Jakarta', jenisKemitraan: 'Pemasaran' }
-                    ],
-                    harapanUsaha: ['Meningkatkan omzet penjualan'],
-                    harapanPelatihan: ['Menambah variasi pelatihan'],
-                    createdAt: new Date('2024-01-15')
-                },
-                {
-                    id: '2',
-                    namaP2MKP: 'P2MKP Samudra Jaya',
-                    tanggalBerdiri: '2019-08-20',
-                    alamatP2MKP: 'Jl. Nelayan Sejahtera No. 45, Surabaya',
-                    namaKetua: 'Siti Nurhaliza',
-                    latarBelakang: 'Didirikan untuk memberdayakan masyarakat pesisir.',
-                    bidangUsaha: 'Pelatihan pengolahan ikan, pemasaran digital',
-                    pelatih: [
-                        { nama: 'Dr. Made Sutama', keahlian: 'Teknologi Pengolahan', sertifikasi: 'PhD Teknologi Pangan' }
-                    ],
-                    penghargaan: [
-                        { nama: 'Inovasi Terbaik', instansi: 'Pemda Jawa Timur', tahun: '2022' }
-                    ],
-                    pelatihan: [
-                        {
-                            jenis: 'Pengolahan Ikan Asap',
-                            waktu: '5-15 Februari 2024',
-                            lokasi: 'Workshop Surabaya',
-                            jumlahPeserta: 30,
-                            instansiPeserta: 'Masyarakat Umum',
-                            materi: ['Teknik Pengasapan', 'Pengemasan Produk'],
-                            sumberAnggaran: 'APBD'
-                        }
-                    ],
-                    tantangan: ['Akses bahan baku terbatas', 'Peralatan pelatihan tidak memadai'],
-                    tantanganCustom: ['Jaringan internet buruk'],
-                    upaya: ['Pelatihan inovasi produk', 'Penggunaan teknologi tepat guna'],
-                    upayaCustom: [],
-                    dampak: ['Peningkatan pendapatan keluarga', 'Diversifikasi produk bernilai tambah'],
-                    dampakCustom: ['Produk lokal lebih dikenal'],
-                    mitra: [
-                        { nama: 'Koperasi Nelayan', alamat: 'Surabaya', jenisKemitraan: 'Permodalan' }
-                    ],
-                    harapanUsaha: ['Ekspansi pasar ke luar pulau'],
-                    harapanPelatihan: ['Pelatihan digital marketing'],
-                    createdAt: new Date('2024-02-20')
-                }
-            ];
+            const loadedReports: ReportData[] = [];
+            querySnapshot.forEach((doc) => {
+                loadedReports.push({
+                    id: doc.id,
+                    ...doc.data()
+                } as ReportData);
+            });
 
-            setReports(demoReports);
+            setReports(loadedReports);
+            console.log('Loaded reports:', loadedReports.length);
         } catch (error) {
             console.error('Error loading reports:', error);
+            alert('Gagal memuat laporan. Silakan coba lagi.');
         } finally {
             setLoading(false);
         }
@@ -168,9 +97,9 @@ export default function P2MKPDashboard() {
         const printWindow = window.open('', '_blank');
         if (!printWindow) return;
 
-        const allTantangan = [...report.tantangan, ...report.tantanganCustom].filter(Boolean);
-        const allUpaya = [...report.upaya, ...report.upayaCustom].filter(Boolean);
-        const allDampak = [...report.dampak, ...report.dampakCustom].filter(Boolean);
+        const allTantangan = [...(report.tantangan || []), ...(report.tantanganCustom || [])].filter(Boolean);
+        const allUpaya = [...(report.upaya || []), ...(report.upayaCustom || [])].filter(Boolean);
+        const allDampak = [...(report.dampak || []), ...(report.dampakCustom || [])].filter(Boolean);
 
         const htmlContent = `
       <!DOCTYPE html>
@@ -204,6 +133,10 @@ export default function P2MKPDashboard() {
             <td>${report.namaP2MKP || '-'}</td>
           </tr>
           <tr>
+            <td class="info-label">Tanggal Berdiri</td>
+            <td>${report.tanggalBerdiri || '-'}</td>
+          </tr>
+          <tr>
             <td class="info-label">Alamat</td>
             <td>${report.alamatP2MKP || '-'}</td>
           </tr>
@@ -222,16 +155,16 @@ export default function P2MKPDashboard() {
         <h3>1.3 DAFTAR PELATIH</h3>
         <table>
           <tr><th>No</th><th>Nama</th><th>Keahlian</th><th>Sertifikasi</th></tr>
-          ${report.pelatih.map((p, i) => `
-            <tr><td>${i + 1}</td><td>${p.nama}</td><td>${p.keahlian}</td><td>${p.sertifikasi}</td></tr>
+          ${(report.pelatih || []).map((p, i) => `
+            <tr><td>${i + 1}</td><td>${p.nama || '-'}</td><td>${p.keahlian || '-'}</td><td>${p.sertifikasi || '-'}</td></tr>
           `).join('')}
         </table>
         
         <h3>1.4 DAFTAR PENGHARGAAN</h3>
         <table>
           <tr><th>No</th><th>Nama Penghargaan</th><th>Instansi Pemberi</th><th>Tahun</th></tr>
-          ${report.penghargaan.map((p, i) => `
-            <tr><td>${i + 1}</td><td>${p.nama}</td><td>${p.instansi}</td><td>${p.tahun}</td></tr>
+          ${(report.penghargaan || []).map((p, i) => `
+            <tr><td>${i + 1}</td><td>${p.nama || '-'}</td><td>${p.instansi || '-'}</td><td>${p.tahun || '-'}</td></tr>
           `).join('')}
         </table>
         
@@ -244,11 +177,11 @@ export default function P2MKPDashboard() {
             <th>Jumlah Peserta</th><th>Instansi Peserta</th>
             <th>Materi</th><th>Sumber Anggaran</th>
           </tr>
-          ${report.pelatihan.map((p, i) => `
+          ${(report.pelatihan || []).map((p, i) => `
             <tr>
-              <td>${i + 1}</td><td>${p.jenis}</td><td>${p.waktu}</td><td>${p.lokasi}</td>
-              <td>${p.jumlahPeserta}</td><td>${p.instansiPeserta}</td>
-              <td>${p.materi.join(', ')}</td><td>${p.sumberAnggaran}</td>
+              <td>${i + 1}</td><td>${p.jenis || '-'}</td><td>${p.waktu || '-'}</td><td>${p.lokasi || '-'}</td>
+              <td>${p.jumlahPeserta || 0}</td><td>${p.instansiPeserta || '-'}</td>
+              <td>${(p.materi || []).join(', ') || '-'}</td><td>${p.sumberAnggaran || '-'}</td>
             </tr>
           `).join('')}
         </table>
@@ -271,8 +204,8 @@ export default function P2MKPDashboard() {
         <h2>BAB IV - JEJARING USAHA</h2>
         <table>
           <tr><th>No</th><th>Nama Mitra</th><th>Alamat</th><th>Jenis Kemitraan</th></tr>
-          ${report.mitra.map((m, i) => `
-            <tr><td>${i + 1}</td><td>${m.nama}</td><td>${m.alamat}</td><td>${m.jenisKemitraan}</td></tr>
+          ${(report.mitra || []).map((m, i) => `
+            <tr><td>${i + 1}</td><td>${m.nama || '-'}</td><td>${m.alamat || '-'}</td><td>${m.jenisKemitraan || '-'}</td></tr>
           `).join('')}
         </table>
         
@@ -295,11 +228,28 @@ export default function P2MKPDashboard() {
         }, 500);
     };
 
-    const filteredReports = reports.filter(report =>
-        report.namaP2MKP.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        report.namaKetua.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        report.alamatP2MKP.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredReports = reports.filter(report => {
+        if (!report) return false;
+
+        const searchLower = searchQuery.toLowerCase();
+        const namaP2MKP = report.namaP2MKP?.toLowerCase() || '';
+        const namaKetua = report.namaKetua?.toLowerCase() || '';
+        const alamat = report.alamatP2MKP?.toLowerCase() || '';
+
+        return namaP2MKP.includes(searchLower) ||
+            namaKetua.includes(searchLower) ||
+            alamat.includes(searchLower);
+    });
+
+    const formatDate = (date: any) => {
+        if (!date) return '-';
+        // Firebase Timestamp
+        if (date.toDate) return date.toDate().toLocaleDateString('id-ID');
+        // JavaScript Date
+        if (date instanceof Date) return date.toLocaleDateString('id-ID');
+        // String date
+        return new Date(date).toLocaleDateString('id-ID');
+    };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-950 p-2 sm:p-4 md:p-6">
@@ -312,17 +262,26 @@ export default function P2MKPDashboard() {
                             <p className="text-white/70 text-sm sm:text-base mt-1">Daftar Laporan Pusat Pelatihan Mandiri</p>
                         </div>
 
-                        {/* Search */}
-                        <div className="relative w-full sm:w-auto sm:min-w-[300px]">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50" size={20} />
-                            <input
-                                type="text"
-                                placeholder="Cari nama P2MKP, ketua, atau alamat..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
-                            />
-                        </div>
+                        <button
+                            onClick={loadReports}
+                            disabled={loading}
+                            className="flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-lg hover:bg-white/30 transition-all disabled:opacity-50"
+                        >
+                            <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
+                            <span className="font-semibold">Refresh</span>
+                        </button>
+                    </div>
+
+                    {/* Search */}
+                    <div className="relative mt-4">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50" size={20} />
+                        <input
+                            type="text"
+                            placeholder="Cari nama P2MKP, ketua, atau alamat..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
+                        />
                     </div>
                 </div>
 
@@ -333,10 +292,33 @@ export default function P2MKPDashboard() {
                             <h2 className="text-lg font-bold text-white mb-4">Daftar Laporan ({filteredReports.length})</h2>
 
                             {loading ? (
-                                <div className="text-white/70 text-center py-8">Loading...</div>
-                            ) : filteredReports.length === 0 ? (
                                 <div className="text-white/70 text-center py-8">
-                                    {searchQuery ? 'Tidak ada hasil pencarian' : 'Belum ada laporan'}
+                                    <RefreshCw className="animate-spin mx-auto mb-2" size={32} />
+                                    Loading...
+                                </div>
+                            ) : reports.length === 0 ? (
+                                <div className="text-center py-12">
+                                    <FileText className="mx-auto mb-4 opacity-30" size={64} />
+                                    <p className="text-white font-semibold mb-2">Belum Ada Laporan</p>
+                                    <p className="text-white/60 text-sm mb-4">Mulai buat laporan pertama Anda</p>
+                                    <button
+                                        onClick={() => window.location.href = '/'}
+                                        className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all text-sm font-semibold"
+                                    >
+                                        Buat Laporan Baru
+                                    </button>
+                                </div>
+                            ) : filteredReports.length === 0 ? (
+                                <div className="text-center py-12">
+                                    <Search className="mx-auto mb-4 opacity-30" size={64} />
+                                    <p className="text-white font-semibold mb-2">Tidak Ada Hasil</p>
+                                    <p className="text-white/60 text-sm mb-4">Coba kata kunci lain</p>
+                                    <button
+                                        onClick={() => setSearchQuery('')}
+                                        className="bg-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/30 transition-all text-sm font-semibold"
+                                    >
+                                        Reset Pencarian
+                                    </button>
                                 </div>
                             ) : (
                                 <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2">
@@ -352,14 +334,14 @@ export default function P2MKPDashboard() {
                                             <div className="flex items-start gap-3">
                                                 <FileText className="text-blue-300 mt-1" size={20} />
                                                 <div className="flex-1 min-w-0">
-                                                    <h3 className="font-semibold text-white text-sm truncate">{report.namaP2MKP}</h3>
+                                                    <h3 className="font-semibold text-white text-sm truncate">{report.namaP2MKP || 'Tanpa Nama'}</h3>
                                                     <p className="text-white/60 text-xs mt-1 flex items-center gap-1">
                                                         <User size={12} />
-                                                        {report.namaKetua}
+                                                        {report.namaKetua || '-'}
                                                     </p>
                                                     <p className="text-white/60 text-xs mt-1 flex items-center gap-1">
                                                         <Calendar size={12} />
-                                                        {report.tanggalBerdiri}
+                                                        {report.tanggalBerdiri || '-'}
                                                     </p>
                                                 </div>
                                             </div>
@@ -373,7 +355,23 @@ export default function P2MKPDashboard() {
                     {/* Detail Report */}
                     <div className="lg:col-span-2">
                         <div className="bg-white/10 backdrop-blur-lg rounded-xl shadow-2xl border border-white/20 p-4 sm:p-6">
-                            {!selectedReport ? (
+                            {reports.length === 0 && !loading ? (
+                                <div className="text-center py-20">
+                                    <div className="bg-blue-500/10 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
+                                        <FileText className="text-blue-300" size={48} />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-white mb-2">Selamat Datang di Dashboard P2MKP</h3>
+                                    <p className="text-white/70 mb-6 max-w-md mx-auto">
+                                        Belum ada laporan yang tersimpan. Mulai dokumentasikan kegiatan P2MKP Anda sekarang!
+                                    </p>
+                                    <button
+                                        onClick={() => window.location.href = '/'}
+                                        className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-3 rounded-lg hover:from-emerald-600 hover:to-emerald-700 shadow-lg transition-all font-semibold"
+                                    >
+                                        Buat Laporan Pertama
+                                    </button>
+                                </div>
+                            ) : !selectedReport ? (
                                 <div className="text-center py-16">
                                     <FileText className="mx-auto text-white/30 mb-4" size={64} />
                                     <p className="text-white/70">Pilih laporan untuk melihat detail</p>
@@ -383,9 +381,9 @@ export default function P2MKPDashboard() {
                                     {/* Header with Actions */}
                                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-white/20">
                                         <div>
-                                            <h2 className="text-xl sm:text-2xl font-bold text-white">{selectedReport.namaP2MKP}</h2>
+                                            <h2 className="text-xl sm:text-2xl font-bold text-white">{selectedReport.namaP2MKP || 'Tanpa Nama'}</h2>
                                             <p className="text-white/60 text-sm mt-1">
-                                                {selectedReport.createdAt && new Date(selectedReport.createdAt).toLocaleDateString('id-ID')}
+                                                Dibuat: {formatDate(selectedReport.createdAt)}
                                             </p>
                                         </div>
                                         <button
@@ -405,36 +403,56 @@ export default function P2MKPDashboard() {
                                                 <Eye size={18} />
                                                 Informasi Umum
                                             </h3>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                                                <div>
+                                                    <p className="text-white/60">Ketua/Penanggung Jawab</p>
+                                                    <p className="text-white font-semibold">{selectedReport.namaKetua || '-'}</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-white/60">Tanggal Berdiri</p>
+                                                    <p className="text-white font-semibold">{selectedReport.tanggalBerdiri || '-'}</p>
+                                                </div>
+                                                <div className="sm:col-span-2">
+                                                    <p className="text-white/60">Alamat</p>
+                                                    <p className="text-white font-semibold">{selectedReport.alamatP2MKP || '-'}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Latar Belakang */}
+                                        <div className="bg-white/5 rounded-lg p-4">
+                                            <h3 className="font-bold text-white mb-2">Latar Belakang</h3>
+                                            <p className="text-white/80 text-sm text-justify">{selectedReport.latarBelakang || '-'}</p>
                                         </div>
 
                                         {/* Bidang Usaha */}
                                         <div className="bg-white/5 rounded-lg p-4">
                                             <h3 className="font-bold text-white mb-2">Bidang Usaha dan Pelatihan</h3>
-                                            <p className="text-white/80 text-sm text-justify">{selectedReport.bidangUsaha}</p>
+                                            <p className="text-white/80 text-sm text-justify">{selectedReport.bidangUsaha || '-'}</p>
                                         </div>
 
                                         {/* Pelatih */}
                                         <div className="bg-white/5 rounded-lg p-4">
-                                            <h3 className="font-bold text-white mb-3">Daftar Pelatih ({selectedReport.pelatih.length})</h3>
+                                            <h3 className="font-bold text-white mb-3">Daftar Pelatih ({(selectedReport.pelatih || []).length})</h3>
                                             <div className="space-y-2">
-                                                {selectedReport.pelatih.map((p, i) => (
+                                                {(selectedReport.pelatih || []).map((p, i) => (
                                                     <div key={i} className="bg-white/5 p-3 rounded">
-                                                        <p className="text-white font-semibold text-sm">{p.nama}</p>
-                                                        <p className="text-white/60 text-xs">{p.keahlian} • {p.sertifikasi}</p>
+                                                        <p className="text-white font-semibold text-sm">{p.nama || '-'}</p>
+                                                        <p className="text-white/60 text-xs">{p.keahlian || '-'} • {p.sertifikasi || '-'}</p>
                                                     </div>
                                                 ))}
                                             </div>
                                         </div>
 
                                         {/* Penghargaan */}
-                                        {selectedReport.penghargaan.length > 0 && (
+                                        {(selectedReport.penghargaan || []).length > 0 && (
                                             <div className="bg-white/5 rounded-lg p-4">
                                                 <h3 className="font-bold text-white mb-3">Penghargaan ({selectedReport.penghargaan.length})</h3>
                                                 <div className="space-y-2">
                                                     {selectedReport.penghargaan.map((p, i) => (
                                                         <div key={i} className="bg-white/5 p-3 rounded">
-                                                            <p className="text-white font-semibold text-sm">{p.nama}</p>
-                                                            <p className="text-white/60 text-xs">{p.instansi} • {p.tahun}</p>
+                                                            <p className="text-white font-semibold text-sm">{p.nama || '-'}</p>
+                                                            <p className="text-white/60 text-xs">{p.instansi || '-'} • {p.tahun || '-'}</p>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -443,27 +461,27 @@ export default function P2MKPDashboard() {
 
                                         {/* Pelatihan */}
                                         <div className="bg-white/5 rounded-lg p-4">
-                                            <h3 className="font-bold text-white mb-3">Pelaksanaan Pelatihan ({selectedReport.pelatihan.length})</h3>
+                                            <h3 className="font-bold text-white mb-3">Pelaksanaan Pelatihan ({(selectedReport.pelatihan || []).length})</h3>
                                             <div className="space-y-3">
-                                                {selectedReport.pelatihan.map((p, i) => (
+                                                {(selectedReport.pelatihan || []).map((p, i) => (
                                                     <div key={i} className="bg-white/5 p-3 rounded">
-                                                        <p className="text-white font-semibold text-sm mb-2">{p.jenis}</p>
+                                                        <p className="text-white font-semibold text-sm mb-2">{p.jenis || '-'}</p>
                                                         <div className="grid grid-cols-2 gap-2 text-xs">
                                                             <div>
                                                                 <p className="text-white/60">Waktu</p>
-                                                                <p className="text-white">{p.waktu}</p>
+                                                                <p className="text-white">{p.waktu || '-'}</p>
                                                             </div>
                                                             <div>
                                                                 <p className="text-white/60">Peserta</p>
-                                                                <p className="text-white">{p.jumlahPeserta} orang</p>
+                                                                <p className="text-white">{p.jumlahPeserta || 0} orang</p>
                                                             </div>
                                                             <div className="col-span-2">
                                                                 <p className="text-white/60">Lokasi</p>
-                                                                <p className="text-white">{p.lokasi}</p>
+                                                                <p className="text-white">{p.lokasi || '-'}</p>
                                                             </div>
                                                             <div className="col-span-2">
                                                                 <p className="text-white/60">Materi</p>
-                                                                <p className="text-white">{p.materi.join(', ')}</p>
+                                                                <p className="text-white">{(p.materi || []).join(', ') || '-'}</p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -479,7 +497,7 @@ export default function P2MKPDashboard() {
                                                 <div>
                                                     <p className="text-white/80 font-semibold text-sm mb-2">Tantangan:</p>
                                                     <ul className="list-disc list-inside text-white/70 text-sm space-y-1">
-                                                        {[...selectedReport.tantangan, ...selectedReport.tantanganCustom].filter(Boolean).map((t, i) => (
+                                                        {[...(selectedReport.tantangan || []), ...(selectedReport.tantanganCustom || [])].filter(Boolean).map((t, i) => (
                                                             <li key={i}>{t}</li>
                                                         ))}
                                                     </ul>
@@ -488,7 +506,7 @@ export default function P2MKPDashboard() {
                                                 <div>
                                                     <p className="text-white/80 font-semibold text-sm mb-2">Upaya:</p>
                                                     <ul className="list-disc list-inside text-white/70 text-sm space-y-1">
-                                                        {[...selectedReport.upaya, ...selectedReport.upayaCustom].filter(Boolean).map((u, i) => (
+                                                        {[...(selectedReport.upaya || []), ...(selectedReport.upayaCustom || [])].filter(Boolean).map((u, i) => (
                                                             <li key={i}>{u}</li>
                                                         ))}
                                                     </ul>
@@ -497,7 +515,7 @@ export default function P2MKPDashboard() {
                                                 <div>
                                                     <p className="text-white/80 font-semibold text-sm mb-2">Dampak:</p>
                                                     <ul className="list-disc list-inside text-white/70 text-sm space-y-1">
-                                                        {[...selectedReport.dampak, ...selectedReport.dampakCustom].filter(Boolean).map((d, i) => (
+                                                        {[...(selectedReport.dampak || []), ...(selectedReport.dampakCustom || [])].filter(Boolean).map((d, i) => (
                                                             <li key={i}>{d}</li>
                                                         ))}
                                                     </ul>
@@ -506,14 +524,14 @@ export default function P2MKPDashboard() {
                                         </div>
 
                                         {/* Mitra */}
-                                        {selectedReport.mitra.length > 0 && (
+                                        {(selectedReport.mitra || []).length > 0 && (
                                             <div className="bg-white/5 rounded-lg p-4">
                                                 <h3 className="font-bold text-white mb-3">Jejaring Usaha ({selectedReport.mitra.length})</h3>
                                                 <div className="space-y-2">
                                                     {selectedReport.mitra.map((m, i) => (
                                                         <div key={i} className="bg-white/5 p-3 rounded">
-                                                            <p className="text-white font-semibold text-sm">{m.nama}</p>
-                                                            <p className="text-white/60 text-xs">{m.alamat} • {m.jenisKemitraan}</p>
+                                                            <p className="text-white font-semibold text-sm">{m.nama || '-'}</p>
+                                                            <p className="text-white/60 text-xs">{m.alamat || '-'} • {m.jenisKemitraan || '-'}</p>
                                                         </div>
                                                     ))}
                                                 </div>
