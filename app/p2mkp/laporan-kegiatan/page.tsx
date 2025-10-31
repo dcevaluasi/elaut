@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Plus, Trash2, Download } from 'lucide-react';
+import { Plus, Trash2, Download, Save } from 'lucide-react';
 
 // Types
 interface Pelatih {
@@ -33,30 +33,80 @@ interface Mitra {
 }
 
 interface ReportData {
+    namaP2MKP: string;
+    tanggalBerdiri: string;
+    alamatP2MKP: string;
+    namaKetua: string;
     latarBelakang: string;
     bidangUsaha: string;
     pelatih: Pelatih[];
     penghargaan: Penghargaan[];
     pelatihan: Pelatihan[];
     tantangan: string[];
+    tantanganCustom: string[];
     upaya: string[];
+    upayaCustom: string[];
     dampak: string[];
+    dampakCustom: string[];
     mitra: Mitra[];
     harapanUsaha: string[];
     harapanPelatihan: string[];
 }
 
+const TANTANGAN_OPTIONS = [
+    'Keterbatasan modal usaha',
+    'Sulitnya pemasaran produk',
+    'Kurangnya minat masyarakat',
+    'Akses bahan baku terbatas',
+    'Peralatan pelatihan tidak memadai',
+    'Dukungan pemerintah minim',
+    'Tenaga pelatih terbatas',
+    'Cuaca ekstrem / bencana',
+    'Manajemen keuangan belum baik'
+];
+
+const UPAYA_OPTIONS = [
+    'Menjalin kemitraan',
+    'Pelatihan lanjutan bagi alumni',
+    'Promosi produk di pameran/media',
+    'Membentuk koperasi/kelompok usaha',
+    'Pelatihan inovasi produk',
+    'Peningkatan kapasitas instruktur',
+    'Penggunaan teknologi tepat guna',
+    'Pendampingan berkelanjutan'
+];
+
+const DAMPAK_OPTIONS = [
+    'Meningkatnya keterampilan masyarakat',
+    'Terciptanya lapangan kerja baru',
+    'Peningkatan pendapatan keluarga',
+    'Terbentuknya KUB produktif',
+    'Kesadaran pengelolaan sumber daya',
+    'Diversifikasi produk bernilai tambah',
+    'Pengurangan pengangguran',
+    'Peningkatan peran perempuan',
+    'Tumbuhnya jiwa kewirausahaan'
+];
+
 export default function P2MKPReportApp() {
     const [step, setStep] = useState(1);
+    const [saving, setSaving] = useState(false);
     const [data, setData] = useState<ReportData>({
+        namaP2MKP: '',
+        tanggalBerdiri: '',
+        alamatP2MKP: '',
+        namaKetua: '',
         latarBelakang: '',
         bidangUsaha: '',
         pelatih: [{ nama: '', keahlian: '', sertifikasi: '' }],
         penghargaan: [{ nama: '', instansi: '', tahun: '' }],
         pelatihan: [{ jenis: '', waktu: '', lokasi: '', jumlahPeserta: 0, instansiPeserta: '', materi: [''], sumberAnggaran: '' }],
-        tantangan: [''],
-        upaya: [''],
-        dampak: [''],
+        tantangan: [],
+        tantanganCustom: [],
+        upaya: [],
+        upayaCustom: [],
+        dampak: [],
+        dampakCustom: [],
         mitra: [{ nama: '', alamat: '', jenisKemitraan: '' }],
         harapanUsaha: [''],
         harapanPelatihan: ['']
@@ -78,9 +128,40 @@ export default function P2MKPReportApp() {
         setData({ ...data, [field]: items });
     };
 
+    const toggleCheckbox = (field: 'tantangan' | 'upaya' | 'dampak', value: string) => {
+        const current = data[field];
+        if (current.includes(value)) {
+            setData({ ...data, [field]: current.filter(item => item !== value) });
+        } else {
+            setData({ ...data, [field]: [...current, value] });
+        }
+    };
+
+    const saveReport = async () => {
+        setSaving(true);
+        try {
+            // Panggil fungsi saveReport dari props atau import
+            // const result = await saveReport(data);
+
+            // Simulasi save untuk demo
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            alert('Laporan berhasil disimpan!');
+        } catch (error) {
+            alert('Gagal menyimpan laporan!');
+            console.error(error);
+        } finally {
+            setSaving(false);
+        }
+    };
+
     const generatePDF = () => {
         const printWindow = window.open('', '_blank');
         if (!printWindow) return;
+
+        const allTantangan = [...data.tantangan, ...data.tantanganCustom].filter(Boolean);
+        const allUpaya = [...data.upaya, ...data.upayaCustom].filter(Boolean);
+        const allDampak = [...data.dampak, ...data.dampakCustom].filter(Boolean);
 
         const htmlContent = `
       <!DOCTYPE html>
@@ -98,12 +179,34 @@ export default function P2MKPReportApp() {
           .page-break { page-break-after: always; }
           p { text-align: justify; }
           ul { margin-left: 20px; }
+          .info-table { margin: 20px 0; }
+          .info-table td { border: 1px solid #000; padding: 8px; }
+          .info-label { font-weight: bold; width: 30%; background-color: #f0f0f0; }
         </style>
       </head>
       <body>
         <h1>LAPORAN KEGIATAN<br/>PUSAT PELATIHAN MANDIRI KELAUTAN DAN PERIKANAN (P2MKP)</h1>
         
         <h2>BAB I - PENDAHULUAN</h2>
+        
+        <table class="info-table">
+          <tr>
+            <td class="info-label">Nama P2MKP</td>
+            <td>${data.namaP2MKP || '-'}</td>
+          </tr>
+          <tr>
+            <td class="info-label">Tanggal Berdiri</td>
+            <td>${data.tanggalBerdiri || '-'}</td>
+          </tr>
+          <tr>
+            <td class="info-label">Alamat</td>
+            <td>${data.alamatP2MKP || '-'}</td>
+          </tr>
+          <tr>
+            <td class="info-label">Ketua/Penanggung Jawab</td>
+            <td>${data.namaKetua || '-'}</td>
+          </tr>
+        </table>
         
         <h3>1.1 LATAR BELAKANG</h3>
         <p>${data.latarBelakang || '-'}</p>
@@ -150,13 +253,13 @@ export default function P2MKPReportApp() {
         <h2>BAB III - TANTANGAN & DAMPAK TERHADAP MASYARAKAT</h2>
         
         <h3>Tantangan yang Dihadapi</h3>
-        <ul>${data.tantangan.map(t => `<li>${t}</li>`).join('')}</ul>
+        <ul>${allTantangan.map(t => `<li>${t}</li>`).join('')}</ul>
         
         <h3>Upaya yang Dilakukan</h3>
-        <ul>${data.upaya.map(u => `<li>${u}</li>`).join('')}</ul>
+        <ul>${allUpaya.map(u => `<li>${u}</li>`).join('')}</ul>
         
         <h3>Dampak terhadap Masyarakat</h3>
-        <ul>${data.dampak.map(d => `<li>${d}</li>`).join('')}</ul>
+        <ul>${allDampak.map(d => `<li>${d}</li>`).join('')}</ul>
         
         <div class="page-break"></div>
         
@@ -172,10 +275,10 @@ export default function P2MKPReportApp() {
         <p>Demikian laporan kegiatan Pusat Pelatihan Mandiri Kelautan dan Perikanan (P2MKP) ini kami susun sebagai bentuk pertanggungjawaban atas pelaksanaan kegiatan usaha dan pelatihan yang telah dilakukan.</p>
         
         <h3>Harapan Bidang Usaha</h3>
-        <ul>${data.harapanUsaha.map(h => `<li>${h}</li>`).join('')}</ul>
+        <ul>${data.harapanUsaha.filter(Boolean).map(h => `<li>${h}</li>`).join('')}</ul>
         
         <h3>Harapan Bidang Pelatihan</h3>
-        <ul>${data.harapanPelatihan.map(h => `<li>${h}</li>`).join('')}</ul>
+        <ul>${data.harapanPelatihan.filter(Boolean).map(h => `<li>${h}</li>`).join('')}</ul>
       </body>
       </html>
     `;
@@ -197,13 +300,23 @@ export default function P2MKPReportApp() {
                         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white drop-shadow-lg">
                             Sistem Laporan P2MKP
                         </h1>
-                        <button
-                            onClick={generatePDF}
-                            className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-4 py-2 rounded-lg hover:from-emerald-600 hover:to-emerald-700 shadow-lg transition-all w-full sm:w-auto justify-center"
-                        >
-                            <Download size={20} />
-                            <span className="font-semibold">Export PDF</span>
-                        </button>
+                        <div className="flex gap-2 w-full sm:w-auto">
+                            <button
+                                onClick={saveReport}
+                                disabled={saving}
+                                className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-blue-700 shadow-lg transition-all flex-1 sm:flex-none justify-center disabled:opacity-50"
+                            >
+                                <Save size={20} />
+                                <span className="font-semibold">{saving ? 'Menyimpan...' : 'Save'}</span>
+                            </button>
+                            <button
+                                onClick={generatePDF}
+                                className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-4 py-2 rounded-lg hover:from-emerald-600 hover:to-emerald-700 shadow-lg transition-all flex-1 sm:flex-none justify-center"
+                            >
+                                <Download size={20} />
+                                <span className="font-semibold">PDF</span>
+                            </button>
+                        </div>
                     </div>
 
                     {/* Progress Steps */}
@@ -230,19 +343,20 @@ export default function P2MKPReportApp() {
                             <div className="space-y-4 sm:space-y-6">
                                 <h2 className="text-lg sm:text-xl font-bold text-white drop-shadow-lg">BAB I - Pendahuluan</h2>
 
-                                <div>
-                                    <label className="block font-semibold mb-2 text-white text-sm sm:text-base">1.1 Latar Belakang</label>
-                                    <textarea
-                                        value={data.latarBelakang}
-                                        onChange={(e) => setData({ ...data, latarBelakang: e.target.value })}
-                                        className="w-full p-2 sm:p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
-                                        rows={4}
-                                        placeholder="Deskripsi latar belakang pendirian P2MKP..."
-                                    />
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                                    <div className="sm:col-span-2">
+                                        <label className="block font-semibold mb-2 text-white text-sm sm:text-base">Nama P2MKP</label>
+                                        <input
+                                            value={data.namaP2MKP}
+                                            onChange={(e) => setData({ ...data, namaP2MKP: e.target.value })}
+                                            className="w-full p-2 sm:p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
+                                            placeholder="Nama lengkap P2MKP..."
+                                        />
+                                    </div>
                                 </div>
 
                                 <div>
-                                    <label className="block font-semibold mb-2 text-white text-sm sm:text-base">1.2 Bidang Usaha dan Pelatihan</label>
+                                    <label className="block font-semibold mb-2 text-white text-sm sm:text-base">1.1 Bidang Usaha dan Pelatihan</label>
                                     <textarea
                                         value={data.bidangUsaha}
                                         onChange={(e) => setData({ ...data, bidangUsaha: e.target.value })}
@@ -253,7 +367,7 @@ export default function P2MKPReportApp() {
                                 </div>
 
                                 <div>
-                                    <label className="block font-semibold mb-2 text-white text-sm sm:text-base">1.3 Daftar Pelatih</label>
+                                    <label className="block font-semibold mb-2 text-white text-sm sm:text-base">1.2 Daftar Pelatih</label>
                                     {data.pelatih.map((p, i) => (
                                         <div key={i} className="flex flex-col sm:flex-row gap-2 mb-2 bg-white/5 p-2 sm:p-3 rounded-lg">
                                             <input
@@ -288,7 +402,7 @@ export default function P2MKPReportApp() {
                                 </div>
 
                                 <div>
-                                    <label className="block font-semibold mb-2 text-white text-sm sm:text-base">1.4 Daftar Penghargaan</label>
+                                    <label className="block font-semibold mb-2 text-white text-sm sm:text-base">1.3 Daftar Penghargaan</label>
                                     {data.penghargaan.map((p, i) => (
                                         <div key={i} className="flex flex-col sm:flex-row gap-2 mb-2 bg-white/5 p-2 sm:p-3 rounded-lg">
                                             <input
@@ -421,73 +535,124 @@ export default function P2MKPReportApp() {
                             <div className="space-y-4 sm:space-y-6">
                                 <h2 className="text-lg sm:text-xl font-bold text-white drop-shadow-lg">BAB III - Tantangan & Dampak</h2>
 
+                                {/* Tantangan */}
                                 <div>
-                                    <label className="block font-semibold mb-2 text-white text-sm sm:text-base">Tantangan yang Dihadapi</label>
-                                    {data.tantangan.map((t, i) => (
-                                        <div key={i} className="flex gap-2 mb-2">
-                                            <textarea
-                                                value={t}
-                                                onChange={(e) => updateItem('tantangan', i, e.target.value)}
-                                                className="flex-1 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
-                                                rows={2}
-                                            />
-                                            <button onClick={() => removeItem('tantangan', i)} className="text-red-400 hover:text-red-300">
-                                                <Trash2 size={20} />
-                                            </button>
-                                        </div>
-                                    ))}
-                                    <button
-                                        onClick={() => addItem('tantangan', '')}
-                                        className="flex items-center gap-2 text-blue-300 hover:text-blue-200 text-sm sm:text-base"
-                                    >
-                                        <Plus size={20} /> Tambah
-                                    </button>
+                                    <label className="block font-semibold mb-3 text-white text-sm sm:text-base">Tantangan yang Dihadapi</label>
+                                    <div className="space-y-2 mb-3">
+                                        {TANTANGAN_OPTIONS.map((option) => (
+                                            <label key={option} className="flex items-center gap-3 p-2 bg-white/5 rounded-lg hover:bg-white/10 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={data.tantangan.includes(option)}
+                                                    onChange={() => toggleCheckbox('tantangan', option)}
+                                                    className="w-4 h-4 rounded border-white/20 text-blue-500 focus:ring-2 focus:ring-blue-400"
+                                                />
+                                                <span className="text-white text-sm">{option}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                    <div className="mt-3">
+                                        <label className="block text-sm font-semibold mb-2 text-white">Tambah Pilihan Lain:</label>
+                                        {data.tantanganCustom.map((item, i) => (
+                                            <div key={i} className="flex gap-2 mb-2">
+                                                <input
+                                                    value={item}
+                                                    onChange={(e) => updateItem('tantanganCustom', i, e.target.value)}
+                                                    className="flex-1 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
+                                                    placeholder="Tantangan lainnya..."
+                                                />
+                                                <button onClick={() => removeItem('tantanganCustom', i)} className="text-red-400 hover:text-red-300">
+                                                    <Trash2 size={20} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                        <button
+                                            onClick={() => addItem('tantanganCustom', '')}
+                                            className="flex items-center gap-2 text-blue-300 hover:text-blue-200 text-sm"
+                                        >
+                                            <Plus size={18} /> Tambah
+                                        </button>
+                                    </div>
                                 </div>
 
+                                {/* Upaya */}
                                 <div>
-                                    <label className="block font-semibold mb-2 text-white text-sm sm:text-base">Upaya yang Dilakukan</label>
-                                    {data.upaya.map((u, i) => (
-                                        <div key={i} className="flex gap-2 mb-2">
-                                            <textarea
-                                                value={u}
-                                                onChange={(e) => updateItem('upaya', i, e.target.value)}
-                                                className="flex-1 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
-                                                rows={2}
-                                            />
-                                            <button onClick={() => removeItem('upaya', i)} className="text-red-400 hover:text-red-300">
-                                                <Trash2 size={20} />
-                                            </button>
-                                        </div>
-                                    ))}
-                                    <button
-                                        onClick={() => addItem('upaya', '')}
-                                        className="flex items-center gap-2 text-blue-300 hover:text-blue-200 text-sm sm:text-base"
-                                    >
-                                        <Plus size={20} /> Tambah
-                                    </button>
+                                    <label className="block font-semibold mb-3 text-white text-sm sm:text-base">Upaya yang Dilakukan</label>
+                                    <div className="space-y-2 mb-3">
+                                        {UPAYA_OPTIONS.map((option) => (
+                                            <label key={option} className="flex items-center gap-3 p-2 bg-white/5 rounded-lg hover:bg-white/10 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={data.upaya.includes(option)}
+                                                    onChange={() => toggleCheckbox('upaya', option)}
+                                                    className="w-4 h-4 rounded border-white/20 text-blue-500 focus:ring-2 focus:ring-blue-400"
+                                                />
+                                                <span className="text-white text-sm">{option}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                    <div className="mt-3">
+                                        <label className="block text-sm font-semibold mb-2 text-white">Tambah Pilihan Lain:</label>
+                                        {data.upayaCustom.map((item, i) => (
+                                            <div key={i} className="flex gap-2 mb-2">
+                                                <input
+                                                    value={item}
+                                                    onChange={(e) => updateItem('upayaCustom', i, e.target.value)}
+                                                    className="flex-1 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
+                                                    placeholder="Upaya lainnya..."
+                                                />
+                                                <button onClick={() => removeItem('upayaCustom', i)} className="text-red-400 hover:text-red-300">
+                                                    <Trash2 size={20} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                        <button
+                                            onClick={() => addItem('upayaCustom', '')}
+                                            className="flex items-center gap-2 text-blue-300 hover:text-blue-200 text-sm"
+                                        >
+                                            <Plus size={18} /> Tambah
+                                        </button>
+                                    </div>
                                 </div>
 
+                                {/* Dampak */}
                                 <div>
-                                    <label className="block font-semibold mb-2 text-white text-sm sm:text-base">Dampak terhadap Masyarakat</label>
-                                    {data.dampak.map((d, i) => (
-                                        <div key={i} className="flex gap-2 mb-2">
-                                            <textarea
-                                                value={d}
-                                                onChange={(e) => updateItem('dampak', i, e.target.value)}
-                                                className="flex-1 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
-                                                rows={2}
-                                            />
-                                            <button onClick={() => removeItem('dampak', i)} className="text-red-400 hover:text-red-300">
-                                                <Trash2 size={20} />
-                                            </button>
-                                        </div>
-                                    ))}
-                                    <button
-                                        onClick={() => addItem('dampak', '')}
-                                        className="flex items-center gap-2 text-blue-300 hover:text-blue-200 text-sm sm:text-base"
-                                    >
-                                        <Plus size={20} /> Tambah
-                                    </button>
+                                    <label className="block font-semibold mb-3 text-white text-sm sm:text-base">Dampak terhadap Masyarakat</label>
+                                    <div className="space-y-2 mb-3">
+                                        {DAMPAK_OPTIONS.map((option) => (
+                                            <label key={option} className="flex items-center gap-3 p-2 bg-white/5 rounded-lg hover:bg-white/10 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={data.dampak.includes(option)}
+                                                    onChange={() => toggleCheckbox('dampak', option)}
+                                                    className="w-4 h-4 rounded border-white/20 text-blue-500 focus:ring-2 focus:ring-blue-400"
+                                                />
+                                                <span className="text-white text-sm">{option}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                    <div className="mt-3">
+                                        <label className="block text-sm font-semibold mb-2 text-white">Tambah Pilihan Lain:</label>
+                                        {data.dampakCustom.map((item, i) => (
+                                            <div key={i} className="flex gap-2 mb-2">
+                                                <input
+                                                    value={item}
+                                                    onChange={(e) => updateItem('dampakCustom', i, e.target.value)}
+                                                    className="flex-1 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
+                                                    placeholder="Dampak lainnya..."
+                                                />
+                                                <button onClick={() => removeItem('dampakCustom', i)} className="text-red-400 hover:text-red-300">
+                                                    <Trash2 size={20} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                        <button
+                                            onClick={() => addItem('dampakCustom', '')}
+                                            className="flex items-center gap-2 text-blue-300 hover:text-blue-200 text-sm"
+                                        >
+                                            <Plus size={18} /> Tambah
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         )}
