@@ -284,7 +284,7 @@ export default function P2MKPReportApp() {
                     {/* Header */}
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-3">
                         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white drop-shadow-lg">
-                            Sistem Laporan P2MKP
+                            Laporan Kegiatan Pelatihan P2MKP
                         </h1>
                         <div className="flex gap-2 w-full sm:w-auto">
                             <button
