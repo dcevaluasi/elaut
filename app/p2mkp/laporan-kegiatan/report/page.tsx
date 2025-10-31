@@ -301,12 +301,7 @@ export default function P2MKPDashboard() {
                                     <FileText className="mx-auto mb-4 opacity-30" size={64} />
                                     <p className="text-white font-semibold mb-2">Belum Ada Laporan</p>
                                     <p className="text-white/60 text-sm mb-4">Mulai buat laporan pertama Anda</p>
-                                    <button
-                                        onClick={() => window.location.href = '/'}
-                                        className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all text-sm font-semibold"
-                                    >
-                                        Buat Laporan Baru
-                                    </button>
+
                                 </div>
                             ) : filteredReports.length === 0 ? (
                                 <div className="text-center py-12">
@@ -364,12 +359,7 @@ export default function P2MKPDashboard() {
                                     <p className="text-white/70 mb-6 max-w-md mx-auto">
                                         Belum ada laporan yang tersimpan. Mulai dokumentasikan kegiatan P2MKP Anda sekarang!
                                     </p>
-                                    <button
-                                        onClick={() => window.location.href = '/'}
-                                        className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-3 rounded-lg hover:from-emerald-600 hover:to-emerald-700 shadow-lg transition-all font-semibold"
-                                    >
-                                        Buat Laporan Pertama
-                                    </button>
+
                                 </div>
                             ) : !selectedReport ? (
                                 <div className="text-center py-16">
@@ -397,33 +387,7 @@ export default function P2MKPDashboard() {
 
                                     {/* Detail Content */}
                                     <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2">
-                                        {/* Informasi Umum */}
-                                        <div className="bg-white/5 rounded-lg p-4">
-                                            <h3 className="font-bold text-white mb-3 flex items-center gap-2">
-                                                <Eye size={18} />
-                                                Informasi Umum
-                                            </h3>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                                                <div>
-                                                    <p className="text-white/60">Ketua/Penanggung Jawab</p>
-                                                    <p className="text-white font-semibold">{selectedReport.namaKetua || '-'}</p>
-                                                </div>
-                                                <div>
-                                                    <p className="text-white/60">Tanggal Berdiri</p>
-                                                    <p className="text-white font-semibold">{selectedReport.tanggalBerdiri || '-'}</p>
-                                                </div>
-                                                <div className="sm:col-span-2">
-                                                    <p className="text-white/60">Alamat</p>
-                                                    <p className="text-white font-semibold">{selectedReport.alamatP2MKP || '-'}</p>
-                                                </div>
-                                            </div>
-                                        </div>
 
-                                        {/* Latar Belakang */}
-                                        <div className="bg-white/5 rounded-lg p-4">
-                                            <h3 className="font-bold text-white mb-2">Latar Belakang</h3>
-                                            <p className="text-white/80 text-sm text-justify">{selectedReport.latarBelakang || '-'}</p>
-                                        </div>
 
                                         {/* Bidang Usaha */}
                                         <div className="bg-white/5 rounded-lg p-4">
