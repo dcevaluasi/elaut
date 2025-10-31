@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react';
 import { Plus, Trash2, Download } from 'lucide-react';
 
@@ -211,8 +213,8 @@ export default function P2MKPReportApp() {
                                 key={i}
                                 onClick={() => setStep(i + 1)}
                                 className={`py-2 sm:py-3 px-1 rounded-lg text-xs sm:text-sm font-semibold transition-all ${step === i + 1
-                                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg scale-105'
-                                        : 'bg-white/20 text-white/70 hover:bg-white/30 backdrop-blur-sm'
+                                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg scale-105'
+                                    : 'bg-white/20 text-white/70 hover:bg-white/30 backdrop-blur-sm'
                                     }`}
                             >
                                 {label}
