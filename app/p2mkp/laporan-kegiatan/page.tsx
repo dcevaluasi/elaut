@@ -375,7 +375,7 @@ export default function P2MKPReportApp() {
                                                 onChange={(e) => updateItem('pelatih', i, { ...p, sertifikasi: e.target.value })}
                                                 className="flex-1 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
                                             />
-                                            <button onClick={() => removeItem('pelatih', i)} className="text-red-400 hover:text-red-300 p-2">
+                                            <button onClick={() => removeItem('pelatih', i)} className="text-rose-400 hover:text-rose-300 p-2">
                                                 <Trash2 size={20} />
                                             </button>
                                         </div>
@@ -410,7 +410,7 @@ export default function P2MKPReportApp() {
                                                 onChange={(e) => updateItem('penghargaan', i, { ...p, tahun: e.target.value })}
                                                 className="w-full sm:w-24 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
                                             />
-                                            <button onClick={() => removeItem('penghargaan', i)} className="text-red-400 hover:text-red-300 p-2">
+                                            <button onClick={() => removeItem('penghargaan', i)} className="text-rose-400 hover:text-rose-300 p-2">
                                                 <Trash2 size={20} />
                                             </button>
                                         </div>
@@ -488,7 +488,7 @@ export default function P2MKPReportApp() {
                                                         const newMateri = p.materi.filter((_, idx) => idx !== j);
                                                         updateItem('pelatihan', i, { ...p, materi: newMateri });
                                                     }}
-                                                    className="text-red-400 hover:text-red-300"
+                                                    className="text-rose-400 hover:text-rose-300"
                                                 >
                                                     <Trash2 size={18} />
                                                 </button>
@@ -502,7 +502,7 @@ export default function P2MKPReportApp() {
                                         </button>
                                         <button
                                             onClick={() => removeItem('pelatihan', i)}
-                                            className="text-red-400 hover:text-red-300 float-right"
+                                            className="text-rose-400 hover:text-rose-300 float-right"
                                         >
                                             <Trash2 size={20} />
                                         </button>
@@ -548,7 +548,7 @@ export default function P2MKPReportApp() {
                                                     className="flex-1 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
                                                     placeholder="Tantangan lainnya..."
                                                 />
-                                                <button onClick={() => removeItem('tantanganCustom', i)} className="text-red-400 hover:text-red-300">
+                                                <button onClick={() => removeItem('tantanganCustom', i)} className="text-rose-400 hover:text-rose-300">
                                                     <Trash2 size={20} />
                                                 </button>
                                             </div>
@@ -588,7 +588,7 @@ export default function P2MKPReportApp() {
                                                     className="flex-1 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
                                                     placeholder="Upaya lainnya..."
                                                 />
-                                                <button onClick={() => removeItem('upayaCustom', i)} className="text-red-400 hover:text-red-300">
+                                                <button onClick={() => removeItem('upayaCustom', i)} className="text-rose-400 hover:text-rose-300">
                                                     <Trash2 size={20} />
                                                 </button>
                                             </div>
@@ -628,7 +628,7 @@ export default function P2MKPReportApp() {
                                                     className="flex-1 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
                                                     placeholder="Dampak lainnya..."
                                                 />
-                                                <button onClick={() => removeItem('dampakCustom', i)} className="text-red-400 hover:text-red-300">
+                                                <button onClick={() => removeItem('dampakCustom', i)} className="text-rose-400 hover:text-rose-300">
                                                     <Trash2 size={20} />
                                                 </button>
                                             </div>
@@ -668,7 +668,7 @@ export default function P2MKPReportApp() {
                                             onChange={(e) => updateItem('mitra', i, { ...m, jenisKemitraan: e.target.value })}
                                             className="flex-1 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
                                         />
-                                        <button onClick={() => removeItem('mitra', i)} className="text-red-400 hover:text-red-300 p-2">
+                                        <button onClick={() => removeItem('mitra', i)} className="text-rose-400 hover:text-rose-300 p-2">
                                             <Trash2 size={20} />
                                         </button>
                                     </div>
@@ -697,7 +697,7 @@ export default function P2MKPReportApp() {
                                                 className="flex-1 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
                                                 rows={2}
                                             />
-                                            <button onClick={() => removeItem('harapanUsaha', i)} className="text-red-400 hover:text-red-300">
+                                            <button onClick={() => removeItem('harapanUsaha', i)} className="text-rose-400 hover:text-rose-300">
                                                 <Trash2 size={20} />
                                             </button>
                                         </div>
@@ -720,7 +720,7 @@ export default function P2MKPReportApp() {
                                                 className="flex-1 p-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
                                                 rows={2}
                                             />
-                                            <button onClick={() => removeItem('harapanPelatihan', i)} className="text-red-400 hover:text-red-300">
+                                            <button onClick={() => removeItem('harapanPelatihan', i)} className="text-rose-400 hover:text-rose-300">
                                                 <Trash2 size={20} />
                                             </button>
                                         </div>
