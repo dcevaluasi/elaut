@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Plus, Trash2, Download, Save } from 'lucide-react';
+import { saveReport } from '@/utils/p2mkp';
 
 // Types
 interface Pelatih {
@@ -137,11 +138,11 @@ export default function P2MKPReportApp() {
         }
     };
 
-    const saveReport = async () => {
+    const saveReportUI = async () => {
         setSaving(true);
         try {
             // Panggil fungsi saveReport dari props atau import
-            // const result = await saveReport(data);
+            const result = await saveReport(data);
 
             // Simulasi save untuk demo
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -288,7 +289,7 @@ export default function P2MKPReportApp() {
                         </h1>
                         <div className="flex gap-2 w-full sm:w-auto">
                             <button
-                                onClick={saveReport}
+                                onClick={saveReportUI}
                                 disabled={saving}
                                 className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-blue-700 shadow-lg transition-all flex-1 sm:flex-none justify-center disabled:opacity-50"
                             >
