@@ -47,7 +47,7 @@ export default function ZipPhotoParticipantAction({ users, onSuccess }: Props) {
             return ext && ["jpg", "jpeg", "png"].includes(ext);
         });
 
-        setTotalFiles(imageFiles.length);
+        setTotalFiles(imageFiles.length / 2);
         setUploadedCount(0);
 
         for (const fileName of imageFiles) {
