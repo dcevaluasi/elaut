@@ -948,12 +948,15 @@ const DetailPesertaDialog = ({ pesertaId, userPelatihanId }: { pesertaId: number
                         <p><strong>Nama:</strong> {peserta.Nama}</p>
                         <p><strong>NIK:</strong> {peserta.Nik}</p>
                         <p><strong>No Telepon:</strong> {peserta.NoTelpon}</p>
-                        <p><strong>Email:</strong> {peserta.Email}</p>
                         <p><strong>Alamat:</strong> {peserta.Alamat}</p>
+                        <p><strong>Kabupaten/Kota:</strong> {peserta.Kota}</p>
+                        <p><strong>Provinsi:</strong> {peserta.Provinsi}</p>
                         <p><strong>Tempat dan Tanggal Lahir:</strong> <span className="uppercase">
                             {peserta!.TempatLahir || "-"}.{" "}
                             {peserta!.TanggalLahir}</span></p>
                         <p><strong>Jenis Kelamin:</strong> {peserta.JenisKelamin}</p>
+                        <p><strong>Pendidikan Terakhir:</strong> {peserta.PendidikanTerakhir}</p>
+                        <p><strong>Instansi:</strong>  {peserta!.Status || "-"}</p>
                     </div>
 
                     {pesertaPelatihan && (
