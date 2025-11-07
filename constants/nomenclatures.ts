@@ -77,6 +77,7 @@ export const UPT: string[] = [
   'Balai Pelatihan dan Penyuluhan Perikanan (BPPP) Banyuwangi',
   'Balai Pelatihan dan Penyuluhan Perikanan (BPPP) Bitung',
   'Balai Pelatihan dan Penyuluhan Perikanan (BPPP) Ambon',
+  'Pusat Pelatihan Mandiri Kelautan dan Perikanan (P2MKP)',
   'Politeknik KP Dumai',
   'Politeknik AUP Jakarta',
   'Politeknik KP Karawang',
