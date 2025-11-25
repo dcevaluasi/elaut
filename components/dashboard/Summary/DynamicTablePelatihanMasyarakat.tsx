@@ -11,13 +11,6 @@ import {
 } from "@/components/ui/table"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import {
-    Select,
-    SelectTrigger,
-    SelectValue,
-    SelectContent,
-    SelectItem,
-} from "@/components/ui/select"
 import * as XLSX from "xlsx"
 import { parseIndonesianDate, getQuarterForFiltering } from "@/utils/time"
 import { UserPelatihan } from "@/types/product"

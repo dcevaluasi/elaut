@@ -72,7 +72,7 @@ const TrainingChartCard: React.FC<ChartCardProps> = ({
   title,
   chartConfig,
   chartData,
-  barHeight = 32,
+  barHeight = 40,
   chartType: initialChartType = "horizontal", // default
 }) => {
   const [chartType, setChartType] = useState<"vertical" | "horizontal" | "pie">(initialChartType);

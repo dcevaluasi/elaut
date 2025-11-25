@@ -83,6 +83,7 @@ export const UPT: string[] = [
   'Pusat Pelatihan Mandiri Kelautan dan Perikanan (P2MKP) Bening Jatih Anugrah',
   'Pusat Pelatihan Mandiri Kelautan dan Perikanan (P2MKP) Citra Handycraft',
   'Pusat Pelatihan Mandiri Kelautan dan Perikanan (P2MKP) Mina Remboko',
+  'Pusat Pelatihan Mandiri Kelautan dan Perikanan (P2MKP) Dejeefish',
   'Politeknik KP Dumai',
   'Politeknik AUP Jakarta',
   'Politeknik KP Karawang',
