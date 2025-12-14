@@ -163,7 +163,7 @@ export default function Header() {
                                   icon={<HiOutlineDocumentText />}
                                 />
                                 <DropdownItem
-                                  href="/layanan/span-lapor"
+                                  href="https://span.lapor.go.id"
                                   label="SPAN Lapor"
                                   icon={<HiOutlineChatBubbleLeftRight />}
                                 />

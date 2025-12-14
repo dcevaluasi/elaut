@@ -48,7 +48,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <a
-                    href="/layanan/span-lapor"
+                    href="https://span.lapor.go.id"
                     className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                   >
                     SPAN Lapor
