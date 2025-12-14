@@ -24,35 +24,63 @@ export default function Footer() {
               </p>
             </div>
 
+            {/* Layanan & Pengaduan */}
             <div className="sm:col-span-6 md:col-span-3 lg:col-span-2">
-              <h6 className="text-gray-300 font-bold mb-2">Layanan</h6>
-              <ul className="text-sm">
-                <li className="mb-2">
+              <h6 className="text-gray-300 font-bold mb-2">
+                Layanan & Pengaduan
+              </h6>
+              <ul className="text-sm space-y-2">
+                <li>
                   <a
-                    href="#0"
+                    href="/layanan/maklumat-pelayanan"
                     className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                   >
-                    Pelatihan Masyarakat
+                    Maklumat Pelayanan
                   </a>
                 </li>
-                <li className="mb-2">
+                <li>
                   <a
-                    href="#0"
+                    href="/layanan/standar-pelayanan"
                     className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                   >
-                    Pelatihan Aparatur
+                    Standar Pelayanan
                   </a>
                 </li>
-                <li className="mb-2">
+                <li>
                   <a
-                    href="/layanan/cek-sertifikat"
+                    href="/layanan/span-lapor"
                     className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
                   >
-                    Cek Sertifikat
+                    SPAN Lapor
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/layanan/survey-kepuasan"
+                    className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
+                  >
+                    Survey Kepuasan Masyarakat
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/layanan/hasil-survey"
+                    className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
+                  >
+                    Hasil Survei Kepuasan
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/layanan/masukan-saran"
+                    className="text-gray-200 hover:text-gray-400 transition duration-150 ease-in-out"
+                  >
+                    Masukan & Saran
                   </a>
                 </li>
               </ul>
             </div>
+
 
             {/* 3rd block */}
             <div className="sm:col-span-6 md:col-span-3 lg:col-span-2">
