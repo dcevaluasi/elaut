@@ -88,8 +88,8 @@ export default function Header() {
   return (
     <header
       className={`fixed left-0 right-0 z-[150] transition duration-300 ease-in-out md:block ${top
-          ? "bg-transparent"
-          : "bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg"
+        ? "bg-transparent"
+        : "bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg"
         }`}
     >
       <div className="max-w-6xl mx-auto mt-6 px-5 rounded-3xl transition-all">
@@ -140,7 +140,7 @@ export default function Header() {
                   <div className={DROPDOWN_CONTAINER_CLASS}>
                     <ul className="flex flex-col p-2 text-sm text-white/90">
                       <DropdownItem
-                        href="/layanan/maklumat-pelayanan"
+                        href="/layanan/publik/maklumat-pelayanan"
                         label="Maklumat Pelayanan"
                         icon={<HiOutlineClipboardDocumentCheck />}
                       />

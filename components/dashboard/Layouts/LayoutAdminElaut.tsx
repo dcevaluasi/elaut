@@ -279,35 +279,20 @@ export default function LayoutAdminElaut({
 
           {/* Layanan Publik */}
           {
-            (Cookies.get('Access')?.includes('superAdmin')) && <li>
-              <button
-                onClick={() => { setSubmenuOpen(!submenuOpen) }}
-                className={`flex items-center justify-between w-full px-4 py-2 transition-colors rounded-md ${pathname.includes("master")
+            Cookies.get('Access')?.includes('superAdmin') && <li>
+              <a
+                href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/layanan/`}
+                className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname.includes(`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/kinerja`)
                   ? "bg-blue-600 text-white"
                   : "hover:bg-blue-500 hover:text-white"
                   }`}
               >
-                <div className="flex items-center gap-3">
-                  <IoMdGlobe className="w-6 h-6" />
-
-                  {sidebarOpen && (
-                    <span className="text-sm text-left">Layanan Publik</span>
-                  )}
-                </div>
-                {sidebarOpen && (submenuOpen ? <FiChevronDown /> : <FiChevronRight />)}
-              </button>
-              {submenuOpen && sidebarOpen && (
-                <ul className="ml-7 mt-1 space-y-1">
-                  <NavItem
-                    href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/layanan/masukan-saran`}
-                    icon={<IoAlbumsOutline className="flex-shrink-0 w-6 h-6" />}
-                    label="Masukan dan Saran"
-                  />
-
-                </ul>
-              )}
+                <IoAlbumsOutline className="flex-shrink-0 w-6 h-6" />
+                {sidebarOpen && <span className="text-sm">Layanan dan Pengaduan</span>}
+              </a>
             </li>
           }
+
         </ul>
 
         {/* Logout */}
