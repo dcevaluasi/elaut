@@ -11,7 +11,7 @@ import { usePathname, useRouter } from "next/navigation";
 import React, { ReactNode, useEffect, useState } from "react";
 import DropdownUser from "../Header/DropdownUser";
 import { LucideLayoutDashboard } from "lucide-react";
-import { IoBookOutline, IoDocumentOutline, IoFolderOpenOutline, IoPieChartOutline, IoSchoolOutline } from "react-icons/io5";
+import { IoAlbumsOutline, IoBookOutline, IoDocumentOutline, IoFolderOpenOutline, IoPieChartOutline, IoSchoolOutline } from "react-icons/io5";
 import { FiMenu, FiLogOut, FiChevronDown, FiChevronRight } from "react-icons/fi";
 import { HiOutlineInbox, HiOutlineUserGroup } from "react-icons/hi2";
 import { TbBuildingSkyscraper, TbDatabaseEdit } from "react-icons/tb";
@@ -19,6 +19,7 @@ import Link from "next/link";
 import { breakdownStatus } from "@/lib/utils";
 import { generatedSignedCertificate } from "@/utils/certificates";
 import { RiQuillPenAiLine } from "react-icons/ri";
+import { IoMdGlobe, IoMdListBox } from "react-icons/io";
 
 export default function LayoutAdminElaut({
   children,
@@ -275,6 +276,38 @@ export default function LayoutAdminElaut({
               {sidebarOpen && <span className="text-sm">Indikator Kinerja</span>}
             </a>
           </li>
+
+          {/* Layanan Publik */}
+          {
+            (Cookies.get('Access')?.includes('superAdmin')) && <li>
+              <button
+                onClick={() => { setSubmenuOpen(!submenuOpen) }}
+                className={`flex items-center justify-between w-full px-4 py-2 transition-colors rounded-md ${pathname.includes("master")
+                  ? "bg-blue-600 text-white"
+                  : "hover:bg-blue-500 hover:text-white"
+                  }`}
+              >
+                <div className="flex items-center gap-3">
+                  <IoMdGlobe className="w-6 h-6" />
+
+                  {sidebarOpen && (
+                    <span className="text-sm text-left">Layanan Publik</span>
+                  )}
+                </div>
+                {sidebarOpen && (submenuOpen ? <FiChevronDown /> : <FiChevronRight />)}
+              </button>
+              {submenuOpen && sidebarOpen && (
+                <ul className="ml-7 mt-1 space-y-1">
+                  <NavItem
+                    href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/layanan/masukan-saran`}
+                    icon={<IoAlbumsOutline className="flex-shrink-0 w-6 h-6" />}
+                    label="Masukan dan Saran"
+                  />
+
+                </ul>
+              )}
+            </li>
+          }
         </ul>
 
         {/* Logout */}

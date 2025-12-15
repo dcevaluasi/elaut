@@ -68,7 +68,7 @@ export default function Footer() {
               <FooterLink href="https://span.lapor.go.id">SPAN Lapor</FooterLink>
               <FooterLink href="/layanan/survey-kepuasan">Survey Kepuasan Masyarakat</FooterLink>
               <FooterLink href="/layanan/hasil-survey">Hasil Survei Kepuasan</FooterLink>
-              <FooterLink href="/layanan/masukan-saran">Masukan & Saran</FooterLink>
+              <FooterLink href="/layanan/publik/masukan-saran">Masukan & Saran</FooterLink>
             </ul>
           </div>
 

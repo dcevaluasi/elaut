@@ -87,11 +87,10 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed left-0 right-0 z-[150] transition duration-300 ease-in-out md:block ${
-        top
+      className={`fixed left-0 right-0 z-[150] transition duration-300 ease-in-out md:block ${top
           ? "bg-transparent"
           : "bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg"
-      }`}
+        }`}
     >
       <div className="max-w-6xl mx-auto mt-6 px-5 rounded-3xl transition-all">
         <div className="flex items-center justify-between h-20 md:h-24">
@@ -126,16 +125,14 @@ export default function Header() {
               <li className="relative">
                 <button
                   onClick={() => setOpenLayanan(!openLayanan)}
-                  className={`${NAV_LINK_CLASS} ${
-                    pathname.startsWith("/layanan") ? "text-blue-400" : "text-white"
-                  }`}
+                  className={`${NAV_LINK_CLASS} ${pathname.startsWith("/layanan") ? "text-blue-400" : "text-white"
+                    }`}
                 >
                   <HiNewspaper />
                   Layanan & Pengaduan
                   <HiMiniChevronDown
-                    className={`transition-transform duration-200 ${
-                      openLayanan ? "rotate-180" : ""
-                    }`}
+                    className={`transition-transform duration-200 ${openLayanan ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
@@ -168,7 +165,7 @@ export default function Header() {
                         icon={<HiOutlineChartBar />}
                       />
                       <DropdownItem
-                        href="/layanan/masukan-saran"
+                        href="/layanan/publik/masukan-saran"
                         label="Masukan & Saran"
                         icon={<HiOutlineChatBubbleBottomCenterText />}
                       />
