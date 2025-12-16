@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 import LayoutAdminElaut, { HeaderPageLayoutAdminElaut } from "@/components/dashboard/Layouts/LayoutAdminElaut";
 import { MdFeedback, MdSearch, MdClear, MdCalendarToday, MdPerson, MdBusiness, MdStar, MdImage, MdEdit, MdDelete, MdAdd } from "react-icons/md";
 import { IoMdGlobe } from "react-icons/io";
-import { getAllFeedbacks, getAllMaklumatPelayanan, saveMaklumatPelayanan, updateMaklumatPelayanan, deleteMaklumatPelayanan, uploadMaklumatImage } from "@/utils/feedback";
+import { getAllFeedbacks, getAllMaklumatPelayanan, saveMaklumatPelayanan, updateMaklumatPelayanan, deleteMaklumatPelayanan } from "@/utils/feedback";
+import { getDirectImageUrl } from "@/utils/imageHelper";
 import { HashLoader } from "react-spinners";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -53,7 +54,6 @@ interface MaklumatPelayanan {
     title: string;
     description: string;
     imageUrl: string;
-    imagePath: string;
     createdAt: {
         seconds: number;
         nanoseconds: number;
@@ -70,14 +70,11 @@ export default function LayananPage() {
     const [loadingMaklumat, setLoadingMaklumat] = useState(true);
     const [showMaklumatForm, setShowMaklumatForm] = useState(false);
     const [editingMaklumat, setEditingMaklumat] = useState<MaklumatPelayanan | null>(null);
-    const [uploadingImage, setUploadingImage] = useState(false);
-    const [uploadStatus, setUploadStatus] = useState("");
+    const [savingMaklumat, setSavingMaklumat] = useState(false);
     const [maklumatForm, setMaklumatForm] = useState({
         title: "",
         description: "",
-        imageFile: null as File | null,
-        imageUrl: "",
-        imagePath: ""
+        imageUrl: ""
     });
 
     useEffect(() => {
@@ -163,63 +160,37 @@ export default function LayananPage() {
         { key: 'kepuasanKeseluruhan', label: 'Kepuasan Keseluruhan' }
     ];
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            const fileSizeMB = file.size / (1024 * 1024);
-
-            if (fileSizeMB > 10) {
-                alert("Ukuran gambar terlalu besar! Maksimal 10MB. Gambar akan dikompres secara otomatis.");
-            }
-
-            setMaklumatForm({ ...maklumatForm, imageFile: file });
-        }
-    };
-
     const handleSaveMaklumat = async () => {
         if (!maklumatForm.title || !maklumatForm.description) {
             alert("Judul dan deskripsi harus diisi!");
             return;
         }
 
-        if (!editingMaklumat && !maklumatForm.imageFile) {
-            alert("Gambar harus diupload!");
+        if (!maklumatForm.imageUrl) {
+            alert("Link gambar harus diisi!");
             return;
         }
 
         try {
-            setUploadingImage(true);
-            let imageUrl = maklumatForm.imageUrl;
-            let imagePath = maklumatForm.imagePath;
+            setSavingMaklumat(true);
 
-            if (maklumatForm.imageFile) {
-                setUploadStatus("Mengompres gambar...");
-                const uploadResult = await uploadMaklumatImage(maklumatForm.imageFile);
-                setUploadStatus("Mengunggah ke server...");
-                imageUrl = uploadResult.url;
-                imagePath = uploadResult.path;
-            }
-
-            setUploadStatus("Menyimpan data...");
             if (editingMaklumat) {
                 await updateMaklumatPelayanan(editingMaklumat.id, {
                     title: maklumatForm.title,
                     description: maklumatForm.description,
-                    imageUrl,
-                    imagePath
+                    imageUrl: maklumatForm.imageUrl
                 });
                 alert("Maklumat Pelayanan berhasil diupdate!");
             } else {
                 await saveMaklumatPelayanan({
                     title: maklumatForm.title,
                     description: maklumatForm.description,
-                    imageUrl,
-                    imagePath
+                    imageUrl: maklumatForm.imageUrl
                 });
                 alert("Maklumat Pelayanan berhasil disimpan!");
             }
 
-            setMaklumatForm({ title: "", description: "", imageFile: null, imageUrl: "", imagePath: "" });
+            setMaklumatForm({ title: "", description: "", imageUrl: "" });
             setShowMaklumatForm(false);
             setEditingMaklumat(null);
             fetchMaklumat();
@@ -227,8 +198,7 @@ export default function LayananPage() {
             console.error("Error saving maklumat:", error);
             alert("Gagal menyimpan maklumat pelayanan!");
         } finally {
-            setUploadingImage(false);
-            setUploadStatus("");
+            setSavingMaklumat(false);
         }
     };
 
@@ -237,9 +207,7 @@ export default function LayananPage() {
         setMaklumatForm({
             title: maklumat.title,
             description: maklumat.description,
-            imageFile: null,
-            imageUrl: maklumat.imageUrl,
-            imagePath: maklumat.imagePath
+            imageUrl: maklumat.imageUrl
         });
         setShowMaklumatForm(true);
     };
@@ -248,7 +216,7 @@ export default function LayananPage() {
         if (!confirm("Apakah Anda yakin ingin menghapus maklumat pelayanan ini?")) return;
 
         try {
-            await deleteMaklumatPelayanan(maklumat.id, maklumat.imagePath);
+            await deleteMaklumatPelayanan(maklumat.id);
             alert("Maklumat Pelayanan berhasil dihapus!");
             fetchMaklumat();
         } catch (error) {
@@ -260,7 +228,7 @@ export default function LayananPage() {
     const cancelMaklumatForm = () => {
         setShowMaklumatForm(false);
         setEditingMaklumat(null);
-        setMaklumatForm({ title: "", description: "", imageFile: null, imageUrl: "", imagePath: "" });
+        setMaklumatForm({ title: "", description: "", imageUrl: "" });
     };
 
     return (
@@ -444,15 +412,7 @@ export default function LayananPage() {
                                 </div>
                             ) : (
                                 <div className="space-y-4">
-                                    <div className="flex justify-end">
-                                        <Button
-                                            onClick={() => setShowMaklumatForm(true)}
-                                            className="bg-blue-500 hover:bg-blue-600 text-white"
-                                        >
-                                            <MdAdd className="mr-2" />
-                                            Tambah Maklumat Pelayanan
-                                        </Button>
-                                    </div>
+
 
                                     {showMaklumatForm && (
                                         <Card className="border border-neutral-200">
@@ -482,44 +442,35 @@ export default function LayananPage() {
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium mb-1.5">Gambar</label>
-                                                    <input
-                                                        type="file"
-                                                        accept="image/*"
-                                                        onChange={handleImageChange}
-                                                        className="w-full text-sm"
+                                                    <label className="block text-sm font-medium mb-1.5">Link Gambar</label>
+                                                    <Input
+                                                        value={maklumatForm.imageUrl}
+                                                        onChange={(e) => setMaklumatForm({ ...maklumatForm, imageUrl: e.target.value })}
+                                                        placeholder="https://example.com/image.jpg"
+                                                        className="h-9"
                                                     />
-                                                    {maklumatForm.imageFile ? (
-                                                        <p className="text-xs text-blue-600 mt-1">
-                                                            ✓ {maklumatForm.imageFile.name} ({(maklumatForm.imageFile.size / 1024).toFixed(0)} KB) - akan dikompres otomatis
-                                                        </p>
-                                                    ) : maklumatForm.imageUrl ? (
-                                                        <p className="text-xs text-green-600 mt-1">✓ Gambar tersedia</p>
-                                                    ) : null}
+                                                    {maklumatForm.imageUrl && (
+                                                        <p className="text-xs text-green-600 mt-1">✓ Link tersedia</p>
+                                                    )}
                                                 </div>
                                                 <div className="flex gap-2 justify-end pt-2">
-                                                    <Button onClick={cancelMaklumatForm} variant="outline" size="sm" disabled={uploadingImage}>
+                                                    <Button onClick={cancelMaklumatForm} variant="outline" size="sm" disabled={savingMaklumat}>
                                                         Batal
                                                     </Button>
                                                     <Button
                                                         onClick={handleSaveMaklumat}
-                                                        disabled={uploadingImage}
+                                                        disabled={savingMaklumat}
                                                         size="sm"
-                                                        className="bg-blue-500 hover:bg-blue-600 min-w-[120px]"
+                                                        className="bg-blue-500 hover:bg-blue-600"
                                                     >
-                                                        {uploadingImage ? (
-                                                            <span className="flex items-center gap-2">
-                                                                <HashLoader color="#ffffff" size={16} />
-                                                                {uploadStatus || "Menyimpan..."}
-                                                            </span>
-                                                        ) : "Simpan"}
+                                                        {savingMaklumat ? "Menyimpan..." : "Simpan"}
                                                     </Button>
                                                 </div>
                                             </div>
                                         </Card>
                                     )}
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <div className="grid grid-cols-1  gap-4">
                                         {maklumatList.length === 0 ? (
                                             <div className="col-span-full text-center py-12 text-neutral-500">
                                                 Belum ada maklumat pelayanan
@@ -527,12 +478,15 @@ export default function LayananPage() {
                                         ) : (
                                             maklumatList.map((maklumat) => (
                                                 <Card key={maklumat.id} className="overflow-hidden">
-                                                    <div className="relative h-48 w-full">
-                                                        <Image
-                                                            src={maklumat.imageUrl}
+                                                    <div className="relative h-48 w-full bg-neutral-100">
+                                                        <img
+                                                            src={getDirectImageUrl(maklumat.imageUrl)}
                                                             alt={maklumat.title}
-                                                            fill
-                                                            className="object-cover"
+                                                            className="w-full h-full object-cover"
+                                                            onError={(e) => {
+                                                                console.error('Admin image failed to load:', maklumat.imageUrl);
+                                                                console.log('Converted URL:', getDirectImageUrl(maklumat.imageUrl));
+                                                            }}
                                                         />
                                                     </div>
                                                     <div className="p-4">
@@ -543,25 +497,17 @@ export default function LayananPage() {
                                                         <div className="text-xs text-neutral-400 mb-3">
                                                             {formatDate(maklumat.createdAt)}
                                                         </div>
-                                                        <div className="flex gap-2">
+                                                        <div className="flex gap-2 w-full">
                                                             <Button
                                                                 onClick={() => handleEditMaklumat(maklumat)}
                                                                 size="sm"
                                                                 variant="outline"
-                                                                className="flex-1"
+                                                                className="w-full"
                                                             >
                                                                 <MdEdit className="mr-1" />
                                                                 Edit
                                                             </Button>
-                                                            <Button
-                                                                onClick={() => handleDeleteMaklumat(maklumat)}
-                                                                size="sm"
-                                                                variant="destructive"
-                                                                className="flex-1"
-                                                            >
-                                                                <MdDelete className="mr-1" />
-                                                                Hapus
-                                                            </Button>
+
                                                         </div>
                                                     </div>
                                                 </Card>

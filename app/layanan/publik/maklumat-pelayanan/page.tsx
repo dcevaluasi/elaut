@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { getAllMaklumatPelayanan } from '@/utils/feedback';
+import { getDirectImageUrl } from '@/utils/imageHelper';
 import Footer from '@/components/ui/footer';
 import Image from 'next/image';
 import { FileText, Calendar, Loader2 } from 'lucide-react';
@@ -11,7 +12,6 @@ interface MaklumatPelayanan {
     title: string;
     description: string;
     imageUrl: string;
-    imagePath: string;
     createdAt: {
         seconds: number;
         nanoseconds: number;
@@ -77,7 +77,7 @@ export default function MaklumatPelayananPage() {
                                 {/* Image Section */}
                                 <div className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[500px]">
                                     <Image
-                                        src={maklumat.imageUrl}
+                                        src={getDirectImageUrl(maklumat.imageUrl)}
                                         alt={maklumat.title}
                                         fill
                                         className="object-contain p-4"
@@ -89,28 +89,7 @@ export default function MaklumatPelayananPage() {
 
                                 {/* Content Section */}
                                 <div className="p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6">
-                                    {/* Title */}
-                                    <div className="flex items-start gap-3">
-                                        <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-blue-300 flex-shrink-0 mt-1" />
-                                        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white leading-tight">
-                                            {maklumat.title}
-                                        </h2>
-                                    </div>
 
-                                    {/* Date */}
-                                    <div className="flex items-center gap-2 text-white/70">
-                                        <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
-                                        <span className="text-xs sm:text-sm">
-                                            Dipublikasikan: {formatDate(maklumat.createdAt)}
-                                        </span>
-                                    </div>
-
-                                    {/* Description */}
-                                    <div className="bg-white/5 rounded-lg p-4 sm:p-6 border border-white/10">
-                                        <p className="text-white/90 text-sm sm:text-base md:text-lg leading-relaxed whitespace-pre-wrap">
-                                            {maklumat.description}
-                                        </p>
-                                    </div>
 
                                     {/* Decorative Element */}
                                     <div className="flex items-center justify-center pt-4">

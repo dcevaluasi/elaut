@@ -151,17 +151,8 @@ export const updateMaklumatPelayanan = async (id: string, data: any) => {
   })
 }
 
-export const deleteMaklumatPelayanan = async (
-  id: string,
-  imagePath: string,
-) => {
+export const deleteMaklumatPelayanan = async (id: string) => {
   // Delete from Firestore
   const docRef = doc(db, 'maklumat-pelayanan', id)
   await deleteDoc(docRef)
-
-  // Delete image from Storage
-  if (imagePath) {
-    const imageRef = ref(storage, imagePath)
-    await deleteObject(imageRef)
-  }
 }
