@@ -413,22 +413,22 @@ function FormRegistrasi() {
 
   return (
     <section className="flex flex-col">
-      <div className=" h-full pb-10 min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-sky-900 to-blue-900 text-white">
+      <div className=" h-full pb-10 w-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-sky-900 to-blue-900 text-white">
         {/* gradient blobs */}
         <div className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-blue-500/40 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-cyan-400/20 blur-3xl" />
         <div className="pointer-events-none absolute top-1/3 -right-16 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
 
         <AlertDialog open={openInfoKusuka}>
-          <AlertDialogContent className="rounded-2xl">
+          <AlertDialogContent className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl text-white">
             <AlertDialogHeader>
               <div className="flex flex-col gap-0">
-                <AlertDialogTitle className="text-xl ">
+                <AlertDialogTitle className="text-xl font-bold text-white drop-shadow-md">
                   {isKusukaUser
                     ? "No KUSUKA Tersedia!"
                     : "No KUSUKA Tidak Tersedia!"}
                 </AlertDialogTitle>
-                <AlertDialogDescription>
+                <AlertDialogDescription className="text-gray-200">
                   {isKusukaUser
                     ? "Selamat karena anda merupakan pelaku utama dan memiliki nomor KUSUKA, klik lanjutkan untuk mengisi data secara otomatis"
                     : "Maaf nomor KUSUKA tidak tersedia, kamu dapat registrasi manual kedalam ELAUT!"}
@@ -436,14 +436,14 @@ function FormRegistrasi() {
               </div>
 
               <AlertDialogTitle>
-                <div className="flex w-full items-center justify-center gap-1 text-xl md:text-3xl border border-gray-300 rounded-xl py-3">
+                <div className="flex w-full items-center justify-center gap-1 text-xl md:text-3xl border border-white/20 bg-white/5 rounded-xl py-3">
                   {isKusukaUser ? (
-                    <RiVerifiedBadgeFill className="text-green-500 text-3xl" />
+                    <RiVerifiedBadgeFill className="text-green-400 text-3xl" />
                   ) : (
-                    <IoMdCloseCircle className="text-rose-600 text-3xl" />
+                    <IoMdCloseCircle className="text-rose-500 text-3xl" />
                   )}
 
-                  <span className="font-semibold">{noKusuka}</span>
+                  <span className="font-semibold text-white">{noKusuka}</span>
                 </div>
               </AlertDialogTitle>
             </AlertDialogHeader>
@@ -453,7 +453,7 @@ function FormRegistrasi() {
                   setOpenInfoKusuka(false);
                   clearForm();
                 }}
-                className={`${!isKusukaUser && "-mt-2"}`}
+                className={`bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl border border-white/20 shadow-lg transition-all ${!isKusukaUser && "-mt-2"}`}
               >
                 {isKusukaUser ? "Batal" : "Oke"}
               </AlertDialogCancel>
@@ -464,7 +464,7 @@ function FormRegistrasi() {
                     setIsKUSUKA("yes");
                     Cookies.set("IsUsedKusuka", "yes");
                   }}
-                  className="bg-blue-500 h-10"
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg transition-all h-10"
                 >
                   Lanjutkan
                 </AlertDialogAction>
@@ -493,15 +493,15 @@ function FormRegistrasi() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6  relative">
           <div className="pt-48 ">
             <div className="w-full mx-auto text-center pb-0 md:pb-0">
-              <h1 className="font-bold text-[2.8rem] leading-[110%] text-gray-200 font-calsans">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl leading-[110%] text-white drop-shadow-lg font-calsans mb-4">
                 <span className="">
                   Registrasi Akun
                 </span>{" "}
-                <span className="z-0 bg-clip-text  w-[600px] leading-[110%]  text-transparent bg-gradient-to-r  from-blue-500  to-teal-400">
+                <span className="z-0 bg-clip-text  w-[600px] leading-[110%]  text-transparent bg-gradient-to-r  from-blue-400  to-teal-400">
                   E-LAUT
                 </span>{" "}
               </h1>
-              <p className="text-base text-center mx-auto text-gray-200 mt-2  max-w-3xl">
+              <p className="text-sm sm:text-base text-center mx-auto text-white/80 mt-2 max-w-3xl">
                 Registrasi tersedia dalam tiga opsi: Perseorangan untuk individu,
                 Corporate untuk grup, dan Portofolio untuk yang punya rekam
                 jejak atau sertifikasi. Fleksibel sesuai kebutuhan!
@@ -510,11 +510,12 @@ function FormRegistrasi() {
 
             <div
               className={`${role == "Perseorangan" || role == "" || role == "Portfolio"
-                ? "max-w-sm"
+                ? "max-w-2xl"
                 : "max-w-4xl"
                 }  mx-5 md:mx-auto mt-5`}
             >
-              {/* <div className="flex flex-col gap-1">
+              <div className="bg-white/10 backdrop-blur-lg rounded-xl sm:rounded-2xl shadow-2xl border border-white/20 p-4 sm:p-6 md:p-8">
+                {/* <div className="flex flex-col gap-1">
                 <label
                   className="block text-gray-200 text-sm font-medium mb-1"
                   htmlFor="name"
@@ -544,367 +545,134 @@ function FormRegistrasi() {
                   </SelectContent>
                 </Select>
               </div> */}
-              {useKUSUKA && (
-                <form
-                  onSubmit={(e) => handleCheckingNoKusuka(e)}
-                  className="w-full flex gap-1 mt-2"
-                >
-                  <div className="w-full">
-                    <label
-                      className="block text-gray-200 text-sm font-medium mb-1"
-                      htmlFor="name"
-                    >
-                      No KUSUKA <span className="text-red-600"></span>
-                    </label>
-                    <input
-                      id="name"
-                      type="text"
-                      className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                      placeholder="Masukkan nomor KUSUKA"
-                      value={noKusuka}
-                      onChange={(e) => setNoKusuka(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="flex flex-wrap -mx-3 mt-6">
-                    <div className="w-full px-3">
-                      <button
-                        type="submit"
-                        disabled={isHandlingCekKUSUKA ? true : false}
-                        className="btn text-white py-3 bg-blue-500 hover:bg-blue-600 w-full"
-                      >
-                        {isHandlingCekKUSUKA ? 'Loading...' : 'Cek'}
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              )}
-
-              {role == "Perseorangan" && (
-                <>
-                  <div className="flex items-center my-6">
-                    <div
-                      className="border-t border-gray-300 grow mr-3"
-                      aria-hidden="true"
-                    ></div>
-                    <div
-                      className="border-t border-gray-300 grow ml-3"
-                      aria-hidden="true"
-                    ></div>
-                  </div>
+                {useKUSUKA && (
                   <form
-                    onSubmit={(e) => handleRegistrasiAkun(e)}
-                    autoComplete="off"
+                    onSubmit={(e) => handleCheckingNoKusuka(e)}
+                    className="w-full flex gap-1 mt-2"
                   >
-                    <div className="flex flex-wrap -mx-3 mb-1">
-                      <div className="w-full px-3">
-                        <label
-                          className="block text-gray-200 text-sm font-medium mb-1"
-                          htmlFor="name"
-                        >
-                          Nama Lengkap <span className="text-red-600">*</span>
-                        </label>
-                        <input
-                          id="name"
-                          type="text"
-                          className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                          placeholder="Masukkan nama lengkap tanpa gelar"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          required
-                        />
-                        {isInputError ? (
-                          <span className="text-rose-500 font-medium">
-                            *Masukkan nama lengkap!
-                          </span>
-                        ) : <p className="text-gray-400 leading-[100%] text-xs font-medium mt-2">
-                          * Tanpa gelar apapun, hanya nama lengkap
-                        </p>}
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap -mx-3 mb-1">
-                      <div className="w-full px-3">
-                        <label
-                          className="block text-gray-200 text-sm font-medium mb-1"
-                          htmlFor="nik"
-                        >
-                          NIK/NIP/NIM/PASPOR <span className="text-red-600">*</span>
-                        </label>
-                        <input
-                          id="nik"
-                          type="text"
-                          className={`form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200 active:border-gray-200 text-gray-200 ${isInputError ? "border-red-600" : ""
-                            }`}
-                          placeholder="Masukkan NIK/NIP/NIM/PASPOR"
-                          value={nik}
-                          maxLength={20}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            setNik(value);
-                            setIsInputErrorNIK(value.length > 20);
-                          }}
-                          required
-                        />
-                        {isInputErrorNIK ? (
-                          <span className="text-rose-500 font-medium text-xs">
-                            *NIK/NIP/NIM/PASPOR maksimal 20 karakter!
-                          </span>
-                        ) : <p className="text-gray-400 leading-[100%] text-xs font-medium mt-2">
-                          * NIK/NIP/NIM/PASPOR harus valid karena untuk kebutuhan sertifikat
-                        </p>}
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap -mx-3 mb-1">
-                      <div className="w-full px-3">
-                        <label
-                          className="block text-gray-200 text-sm font-medium mb-1"
-                          htmlFor="email"
-                        >
-                          No Telpon <span className="text-red-600">*</span>
-                        </label>
-                        <input
-                          id="phone number"
-                          type="text"
-                          className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                          placeholder="Masukkan no telpon/WA"
-                          value={phoneNumber}
-                          minLength={12}
-                          maxLength={14}
-                          onChange={handleChangePhoneNumber}
-                          required
-                        />
-                        {isInputErrorNoTelpon && phoneNumber != '' && (
-                          <span className="text-rose-500 font-medium text-xs">
-                            *No Telpon minimal 12 digit!
-                          </span>
-                        )}
-                        {isInputError && (
-                          <span className="text-rose-500 font-medium">
-                            *Masukkan no telpon!
-                          </span>
-                        )}
-                        {(!isInputError && !isInputErrorNoTelpon) && <p className="text-gray-400 leading-[100%] text-xs font-medium mt-2">
-                          * Masukkan nomor yang dapat dihubungi penyelenggara
-                        </p>}
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap -mx-3 mb-1">
-                      <div className="w-full px-3">
-                        <label
-                          className="block text-gray-200 text-sm font-medium mb-1"
-                          htmlFor="password"
-                        >
-                          Password <span className="text-red-600">*</span>
-                        </label>
-                        <span className="relative w-full h-fit">
-                          <input
-                            id="password"
-                            type={isShowPassword ? 'text' : 'password'}
-                            className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                            placeholder="Buat password"
-                            required
-                            value={password}
-                            onChange={(e) => handlePasswordChange(e)}
-                          />
-                          <span onClick={(e) => setIsShowPassword(!isShowPassword)}>
-                            {isShowPassword ? (
-                              <HiOutlineEyeOff className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
-                            ) : (
-                              <HiOutlineEye className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
-                            )}
-                          </span>
-                        </span>
-
-                        {isInputError ? (
-                          <span className="text-rose-500 font-medium">
-                            *Masukkan password!
-                          </span>
-                        ) : (
-                          <p className="text-gray-400 leading-[100%] text-xs font-medium mt-2">
-                            *Password minimal 8 karakter, harus terdiri dari
-                            satu angka, huruf kapital dan kecil, serta karakter
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap -mx-3 mb-1">
-                      <div className="w-full px-3">
-                        <label
-                          className="block text-gray-200 text-sm font-medium mb-1"
-                          htmlFor="password"
-                        >
-                          Konfirmasi Password <span className="text-red-600">*</span>
-                        </label>
-                        <span className="relative w-full h-fit">
-                          <input
-                            id="confirmPassword"
-                            type={isShowConfirmPassword ? 'text' : 'password'}
-                            className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                            placeholder="Konfirmasi password"
-                            required
-                            value={confirmPassword}
-                            onChange={(e) => handleConfirmPasswordChange(e)}
-                          />
-                          <span onClick={(e) => setIsShowConfirmPassword(!isShowConfirmPassword)}>
-                            {isShowConfirmPassword ? (
-                              <HiOutlineEyeOff className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
-                            ) : (
-                              <HiOutlineEye className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
-                            )}
-                          </span>
-                        </span>
-
-                        {(!isMatch && confirmPassword != '') && (
-                          <span className="text-rose-500 text-xs font-medium">
-                            *Password dan konfirmasi password tidak sesuai!
-                          </span>
-                        )}
-                        {isInputError && (
-                          <span className="text-rose-500 font-medium">
-                            *Masukkan konfirmasi password!
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    {(confirmPassword != "" && nik != "" && password != "" && phoneNumber != '' && name != '') && isMatch && (
-                      <div
-                        className="flex flex-wrap w-full mb-1"
-                        style={{ width: "100% !important" }}
+                    <div className="w-full">
+                      <label
+                        className="block text-gray-200 text-sm font-medium mb-1"
+                        htmlFor="name"
                       >
-                        <div
-                          className="w-full"
-                          style={{ width: "100% !important" }}
-                        >
-                          <label
-                            className="block text-gray-200 text-sm font-medium mb-1"
-                            htmlFor="password"
-                          >
-                            Verify if you are not a robot{" "}
-                            <span className="text-red-600">*</span>
-                          </label>
-                          <ReCAPTCHA
-                            style={{ width: "100% !important" }}
-                            sitekey={
-                              process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!
-                            }
-                            className=" w-[600px] font-inter text-sm"
-                            onChange={setCaptcha}
-                          />
-                        </div>
-                      </div>
-                    )}
-                    <div className="flex flex-wrap -mx-3 mt-3">
-                      <div className="w-full px-3 flex flex-col gap-2">
-                        <Button
-                          type="submit"
-                          disabled={captcha == null}
-                          className="btn text-white bg-blue-500 py-5 hover:bg-blue-600 bg-opacity-100 w-full text-lg"
-                        >
-                          Registrasi
-                        </Button>
-
-                        {!useKUSUKA && role == "Perseorangan" && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              setUseKUSUKA(!useKUSUKA);
-                              window.scrollTo(0, 0);
-                            }}
-                            className="btn text-white bg-transparent border border-blue-500 hover:bg-blue-500 flex w-full gap-2"
-                          >
-                            <Image
-                              src={"/logo-kkp-full-white.png"}
-                              className="w-6"
-                              alt=""
-                              width={0}
-                              height={0}
-                            />
-                            <span>Daftar Dengan KUSUKA</span>
-                          </button>
-                        )}
-                      </div>
+                        No KUSUKA <span className="text-red-600"></span>
+                      </label>
+                      <input
+                        id="name"
+                        type="text"
+                        className="form-input w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        placeholder="Masukkan nomor KUSUKA"
+                        value={noKusuka}
+                        onChange={(e) => setNoKusuka(e.target.value)}
+                        required
+                      />
                     </div>
-                    <div className="text-sm text-gray-200 text-center mt-3">
-                      Dengan membuat akun, anda menyetujui{" "}
-                      <a className="underline" href="#0">
-                        Ketentuan & Kondisi
-                      </a>
-                      , serta{" "}
-                      <a className="underline" href="#0">
-                        Keamanan Privasi
-                      </a>{" "}
-                      kami .
+                    <div className="flex flex-wrap -mx-3 mt-6">
+                      <div className="w-full px-3">
+                        <button
+                          type="submit"
+                          disabled={isHandlingCekKUSUKA ? true : false}
+                          className="w-full flex justify-center items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 shadow-lg transition-all font-semibold text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isHandlingCekKUSUKA ? 'Loading...' : 'Cek'}
+                        </button>
+                      </div>
                     </div>
                   </form>
-                </>
-              )}
+                )}
 
-              {role == "Corporate/Manning Agent" && (
-                <div className="">
-                  <div className="flex items-center my-6">
-                    <div
-                      className="border-t border-gray-300 grow mr-3"
-                      aria-hidden="true"
-                    ></div>
-                    <div
-                      className="border-t border-gray-300 grow ml-3"
-                      aria-hidden="true"
-                    ></div>
-                  </div>
-                  <form
-                    onSubmit={(e) => handleRegistrasiAkunManningAgent(e)}
-                    autoComplete="off"
-                  >
-                    <div className="grid grid-cols-2 gap-2">
+                {role == "Perseorangan" && (
+                  <>
+                    <div className="flex items-center my-6">
+                      <div
+                        className="border-t border-white/20 grow mr-3"
+                        aria-hidden="true"
+                      ></div>
+                      <div
+                        className="border-t border-white/20 grow ml-3"
+                        aria-hidden="true"
+                      ></div>
+                    </div>
+                    <form
+                      onSubmit={(e) => handleRegistrasiAkun(e)}
+                      autoComplete="off"
+                    >
                       <div className="flex flex-wrap -mx-3 mb-1">
                         <div className="w-full px-3">
                           <label
                             className="block text-gray-200 text-sm font-medium mb-1"
-                            htmlFor="namaManningAgent"
+                            htmlFor="name"
                           >
-                            Nama Manning Agent{" "}
-                            <span className="text-red-600">*</span>
+                            Nama Lengkap <span className="text-red-600">*</span>
                           </label>
                           <input
-                            id="namaManningAgent"
+                            id="name"
                             type="text"
-                            className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                            placeholder="Masukkan nama lengkap"
-                            value={namaManningAgent}
-                            onChange={(e) =>
-                              setNamaManningAgent(e.target.value)
-                            }
+                            className="form-input w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            placeholder="Masukkan nama lengkap tanpa gelar"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
                             required
                           />
-                          {isInputError && (
+                          {isInputError ? (
                             <span className="text-rose-500 font-medium">
                               *Masukkan nama lengkap!
                             </span>
-                          )}
+                          ) : <p className="text-white/60 leading-[100%] text-xs font-medium mt-2">
+                            * Tanpa gelar apapun, hanya nama lengkap
+                          </p>}
                         </div>
                       </div>
                       <div className="flex flex-wrap -mx-3 mb-1">
                         <div className="w-full px-3">
                           <label
                             className="block text-gray-200 text-sm font-medium mb-1"
-                            htmlFor="noTelponManingAgent"
+                            htmlFor="nik"
+                          >
+                            NIK/NIP/NIM/PASPOR <span className="text-red-600">*</span>
+                          </label>
+                          <input
+                            id="nik"
+                            type="text"
+                            className={`form-input w-full p-3 bg-white/10 backdrop-blur-sm border rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 ${isInputError ? "border-red-500" : "border-white/20"
+                              }`}
+                            placeholder="Masukkan NIK/NIP/NIM/PASPOR"
+                            value={nik}
+                            maxLength={20}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              setNik(value);
+                              setIsInputErrorNIK(value.length > 20);
+                            }}
+                            required
+                          />
+                          {isInputErrorNIK ? (
+                            <span className="text-rose-500 font-medium text-xs">
+                              *NIK/NIP/NIM/PASPOR maksimal 20 karakter!
+                            </span>
+                          ) : <p className="text-white/60 leading-[100%] text-xs font-medium mt-2">
+                            * NIK/NIP/NIM/PASPOR harus valid karena untuk kebutuhan sertifikat
+                          </p>}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap -mx-3 mb-1">
+                        <div className="w-full px-3">
+                          <label
+                            className="block text-gray-200 text-sm font-medium mb-1"
+                            htmlFor="email"
                           >
                             No Telpon <span className="text-red-600">*</span>
                           </label>
                           <input
-                            id="noTelponManingAgent"
+                            id="phone number"
                             type="text"
-                            className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                            placeholder="Masukkan No Telpon"
-                            value={noTelponManingAgent}
+                            className="form-input w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            placeholder="Masukkan no telpon/WA"
+                            value={phoneNumber}
                             minLength={12}
-                            maxLength={13}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              setNoTelponManningAgent(value);
-                              setIsInputErrorNoTelpon(value.length > 0 && value.length < 12);
-                            }}
+                            maxLength={14}
+                            onChange={handleChangePhoneNumber}
                             required
                           />
                           {isInputErrorNoTelpon && phoneNumber != '' && (
@@ -914,86 +682,12 @@ function FormRegistrasi() {
                           )}
                           {isInputError && (
                             <span className="text-rose-500 font-medium">
-                              *Masukkan No Telpon!
+                              *Masukkan no telpon!
                             </span>
                           )}
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap -mx-3 mb-1">
-                        <div className="w-full px-3">
-                          <label
-                            className="block text-gray-200 text-sm font-medium mb-1"
-                            htmlFor="emailManningAgent"
-                          >
-                            Email <span className="text-red-600">*</span>
-                          </label>
-                          <input
-                            id="emailManningAgent"
-                            type="email"
-                            className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                            placeholder="Masukkan email"
-                            value={emailManningAgent}
-                            onChange={(e) =>
-                              setEmailManningAgent(e.target.value)
-                            }
-                            required
-                          />
-                          {isInputError && (
-                            <span className="text-rose-500 font-medium">
-                              *Masukkan email!
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap -mx-3 mb-1">
-                        <div className="w-full px-3">
-                          <label
-                            className="block text-gray-200 text-sm font-medium mb-1"
-                            htmlFor="namaPenanggungJawabManningAgent"
-                          >
-                            Nama Penanggung Jawab{" "}
-                            <span className="text-red-600">*</span>
-                          </label>
-                          <input
-                            id="namaPenanggungJawabManningAgent"
-                            type="text"
-                            className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                            placeholder="Masukkan nama penanggung jawab"
-                            value={namaPenanggungJawabManningAgent}
-                            onChange={(e) =>
-                              setNamaPenanggungJawabManningAgent(e.target.value)
-                            }
-                            required
-                          />
-                          {isInputError && (
-                            <span className="text-rose-500 font-medium">
-                              *Masukkan nama penanggung jawab!
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap -mx-3 mb-1">
-                        <div className="w-full px-3">
-                          <label
-                            className="block text-gray-200 text-sm font-medium mb-1"
-                            htmlFor="alamat"
-                          >
-                            Alamat <span className="text-red-600">*</span>
-                          </label>
-                          <input
-                            id="alamat"
-                            type="text"
-                            className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                            placeholder="Masukkan alamat"
-                            value={alamat}
-                            onChange={(e) => setAlamat(e.target.value)}
-                            required
-                          />
-                          {isInputError && (
-                            <span className="text-rose-500 font-medium">
-                              *Masukkan alamat!
-                            </span>
-                          )}
+                          {(!isInputError && !isInputErrorNoTelpon) && <p className="text-gray-400 leading-[100%] text-xs font-medium mt-2">
+                            * Masukkan nomor yang dapat dihubungi penyelenggara
+                          </p>}
                         </div>
                       </div>
                       <div className="flex flex-wrap -mx-3 mb-1">
@@ -1008,17 +702,17 @@ function FormRegistrasi() {
                             <input
                               id="password"
                               type={isShowPassword ? 'text' : 'password'}
-                              className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                              placeholder="Masukkan password"
+                              className="form-input w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                              placeholder="Buat password"
                               required
-                              value={passwordManningAgent}
-                              onChange={(e) => handlePasswordManningChange(e)}
+                              value={password}
+                              onChange={(e) => handlePasswordChange(e)}
                             />
                             <span onClick={(e) => setIsShowPassword(!isShowPassword)}>
                               {isShowPassword ? (
-                                <HiOutlineEyeOff className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
+                                <HiOutlineEyeOff className="text-white/70 hover:text-white my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer transition-colors" />
                               ) : (
-                                <HiOutlineEye className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
+                                <HiOutlineEye className="text-white/70 hover:text-white my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer transition-colors" />
                               )}
                             </span>
                           </span>
@@ -1028,127 +722,435 @@ function FormRegistrasi() {
                               *Masukkan password!
                             </span>
                           ) : (
-                            <p className="text-gray-300 leading-[100%] text-xs font-medium mt-2">
+                            <p className="text-gray-400 leading-[100%] text-xs font-medium mt-2">
                               *Password minimal 8 karakter, harus terdiri dari
-                              satu angka, huruf kapital dan kecil, serta
-                              karakter
+                              satu angka, huruf kapital dan kecil, serta karakter
                             </p>
                           )}
                         </div>
                       </div>
-                    </div>
-
-                    <div className="flex flex-wrap -mx-3 mb-1">
-                      <div className="w-full px-3">
-                        <label
-                          className="block text-gray-200 text-sm font-medium mb-1"
-                          htmlFor="password"
-                        >
-                          Konfirmasi Password <span className="text-red-600">*</span>
-                        </label>
-                        <span className="relative w-full h-fit">
-                          <input
-                            id="confirmPassword"
-                            type={isShowConfirmPassword ? 'text' : 'password'}
-                            className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                            placeholder="Konfirmasi password"
-                            required
-                            value={confirmPassword}
-                            onChange={(e) => handleConfirmPasswordManningChange(e)}
-                          />
-                          <span onClick={(e) => setIsShowConfirmPassword(!isShowConfirmPassword)}>
-                            {isShowConfirmPassword ? (
-                              <HiOutlineEyeOff className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
-                            ) : (
-                              <HiOutlineEye className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
-                            )}
-                          </span>
-                        </span>
-
-                        {(!isMatchManning && confirmPassword != '') && (
-                          <span className="text-rose-500 text-xs font-medium">
-                            *Password dan konfirmasi password tidak sesuai!
-                          </span>
-                        )}
-                        {isInputError && (
-                          <span className="text-rose-500 font-medium">
-                            *Masukkan konfirmasi password!
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {(passwordManningAgent != "" && confirmPassword != '' && namaPenanggungJawabManningAgent != '' && noTelponManingAgent != '' && emailManningAgent != '' && namaManningAgent != '' && alamat != '') && isMatchManning && (
-                      <div
-                        className="flex flex-wrap w-full mb-1"
-                        style={{ width: "100% !important" }}
-                      >
-                        <div
-                          className="w-full"
-                          style={{ width: "100% !important" }}
-                        >
+                      <div className="flex flex-wrap -mx-3 mb-1">
+                        <div className="w-full px-3">
                           <label
                             className="block text-gray-200 text-sm font-medium mb-1"
                             htmlFor="password"
                           >
-                            Verify if you are not a robot{" "}
-                            <span className="text-red-600">*</span>
+                            Konfirmasi Password <span className="text-red-600">*</span>
                           </label>
-                          <ReCAPTCHA
-                            style={{ width: "100% !important" }}
-                            sitekey={
-                              process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!
-                            }
-                            className=" w-[600px] font-inter text-sm"
-                            onChange={setCaptcha}
-                          />
+                          <span className="relative w-full h-fit">
+                            <input
+                              id="confirmPassword"
+                              type={isShowConfirmPassword ? 'text' : 'password'}
+                              className="form-input w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                              placeholder="Konfirmasi password"
+                              required
+                              value={confirmPassword}
+                              onChange={(e) => handleConfirmPasswordChange(e)}
+                            />
+                            <span onClick={(e) => setIsShowConfirmPassword(!isShowConfirmPassword)}>
+                              {isShowConfirmPassword ? (
+                                <HiOutlineEyeOff className="text-white/70 hover:text-white my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer transition-colors" />
+                              ) : (
+                                <HiOutlineEye className="text-white/70 hover:text-white my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer transition-colors" />
+                              )}
+                            </span>
+                          </span>
+
+                          {(!isMatch && confirmPassword != '') && (
+                            <span className="text-rose-500 text-xs font-medium">
+                              *Password dan konfirmasi password tidak sesuai!
+                            </span>
+                          )}
+                          {isInputError && (
+                            <span className="text-rose-500 font-medium">
+                              *Masukkan konfirmasi password!
+                            </span>
+                          )}
                         </div>
                       </div>
-                    )}
-                    <div className="flex flex-wrap -mx-3 mt-3">
-                      <div className="w-full px-3 flex flex-col gap-2">
-                        <Button
-                          type="submit"
-                          disabled={captcha == null}
-                          className="btn text-white bg-blue-500 py-5 hover:bg-blue-600 bg-opacity-100 w-full"
+                      {(confirmPassword != "" && nik != "" && password != "" && phoneNumber != '' && name != '') && isMatch && (
+                        <div
+                          className="flex flex-wrap w-full mb-1"
+                          style={{ width: "100% !important" }}
                         >
-                          Registrasi
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="text-sm text-gray-200 text-center mt-3">
-                      Dengan membuat akun, anda menyetujui{" "}
-                      <a className="underline" href="#0">
-                        Ketentuan & Kondisi
-                      </a>
-                      , serta{" "}
-                      <a className="underline" href="#0">
-                        Keamanan Privasi
-                      </a>{" "}
-                      kami .
-                    </div>
-                  </form>
-                </div>
-              )}
+                          <div
+                            className="w-full"
+                            style={{ width: "100% !important" }}
+                          >
+                            <label
+                              className="block text-gray-200 text-sm font-medium mb-1"
+                              htmlFor="password"
+                            >
+                              Verify if you are not a robot{" "}
+                              <span className="text-red-600">*</span>
+                            </label>
+                            <ReCAPTCHA
+                              style={{ width: "100% !important" }}
+                              sitekey={
+                                process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!
+                              }
+                              className=" w-[600px] font-inter text-sm"
+                              onChange={setCaptcha}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      <div className="flex flex-wrap -mx-3 mt-3">
+                        <div className="w-full px-3 flex flex-col gap-2">
+                          <Button
+                            type="submit"
+                            disabled={captcha == null}
+                            className="w-full flex justify-center items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-3 sm:px-10 sm:py-4 rounded-lg hover:from-blue-600 hover:to-blue-700 shadow-lg transition-all font-semibold text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Registrasi
+                          </Button>
 
-              <div className="flex items-center my-6">
-                <div
-                  className="border-t border-gray-300 grow mr-3"
-                  aria-hidden="true"
-                ></div>
-                <div
-                  className="border-t border-gray-300 grow ml-3"
-                  aria-hidden="true"
-                ></div>
-              </div>
-              <div className="text-gray-200 text-center mt-6">
-                Sudah punya akun sebelumnya?{" "}
-                <Link
-                  href={"/login"}
-                  className="text-blue-500 hover:underline transition duration-150 ease-in-out"
-                >
-                  Log In
-                </Link>
+                          {!useKUSUKA && role == "Perseorangan" && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                setUseKUSUKA(!useKUSUKA);
+                                window.scrollTo(0, 0);
+                              }}
+                              className="w-full flex justify-center items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-8 py-3 rounded-lg border border-white/20 shadow-lg transition-all font-semibold text-sm sm:text-base"
+                            >
+                              <Image
+                                src={"/logo-kkp-full-white.png"}
+                                className="w-6"
+                                alt=""
+                                width={0}
+                                height={0}
+                              />
+                              <span>Daftar Dengan KUSUKA</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-sm text-gray-200 text-center mt-3">
+                        Dengan membuat akun, anda menyetujui{" "}
+                        <a className="underline" href="#0">
+                          Ketentuan & Kondisi
+                        </a>
+                        , serta{" "}
+                        <a className="underline" href="#0">
+                          Keamanan Privasi
+                        </a>{" "}
+                        kami .
+                      </div>
+                    </form>
+                  </>
+                )}
+
+                {role == "Corporate/Manning Agent" && (
+                  <div className="">
+                    <div className="flex items-center my-6">
+                      <div
+                        className="border-t border-white/20 grow mr-3"
+                        aria-hidden="true"
+                      ></div>
+                      <div
+                        className="border-t border-white/20 grow ml-3"
+                        aria-hidden="true"
+                      ></div>
+                    </div>
+                    <form
+                      onSubmit={(e) => handleRegistrasiAkunManningAgent(e)}
+                      autoComplete="off"
+                    >
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="flex flex-wrap -mx-3 mb-1">
+                          <div className="w-full px-3">
+                            <label
+                              className="block text-gray-200 text-sm font-medium mb-1"
+                              htmlFor="namaManningAgent"
+                            >
+                              Nama Manning Agent{" "}
+                              <span className="text-red-600">*</span>
+                            </label>
+                            <input
+                              id="namaManningAgent"
+                              type="text"
+                              className="form-input w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                              placeholder="Masukkan nama lengkap"
+                              value={namaManningAgent}
+                              onChange={(e) =>
+                                setNamaManningAgent(e.target.value)
+                              }
+                              required
+                            />
+                            {isInputError && (
+                              <span className="text-rose-500 font-medium">
+                                *Masukkan nama lengkap!
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap -mx-3 mb-1">
+                          <div className="w-full px-3">
+                            <label
+                              className="block text-gray-200 text-sm font-medium mb-1"
+                              htmlFor="noTelponManingAgent"
+                            >
+                              No Telpon <span className="text-red-600">*</span>
+                            </label>
+                            <input
+                              id="noTelponManingAgent"
+                              type="text"
+                              className="form-input w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                              placeholder="Masukkan No Telpon"
+                              value={noTelponManingAgent}
+                              minLength={12}
+                              maxLength={13}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                setNoTelponManningAgent(value);
+                                setIsInputErrorNoTelpon(value.length > 0 && value.length < 12);
+                              }}
+                              required
+                            />
+                            {isInputErrorNoTelpon && phoneNumber != '' && (
+                              <span className="text-rose-500 font-medium text-xs">
+                                *No Telpon minimal 12 digit!
+                              </span>
+                            )}
+                            {isInputError && (
+                              <span className="text-rose-500 font-medium">
+                                *Masukkan No Telpon!
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap -mx-3 mb-1">
+                          <div className="w-full px-3">
+                            <label
+                              className="block text-gray-200 text-sm font-medium mb-1"
+                              htmlFor="emailManningAgent"
+                            >
+                              Email <span className="text-red-600">*</span>
+                            </label>
+                            <input
+                              id="emailManningAgent"
+                              type="email"
+                              className="form-input w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                              placeholder="Masukkan email"
+                              value={emailManningAgent}
+                              onChange={(e) =>
+                                setEmailManningAgent(e.target.value)
+                              }
+                              required
+                            />
+                            {isInputError && (
+                              <span className="text-rose-500 font-medium">
+                                *Masukkan email!
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap -mx-3 mb-1">
+                          <div className="w-full px-3">
+                            <label
+                              className="block text-gray-200 text-sm font-medium mb-1"
+                              htmlFor="namaPenanggungJawabManningAgent"
+                            >
+                              Nama Penanggung Jawab{" "}
+                              <span className="text-red-600">*</span>
+                            </label>
+                            <input
+                              id="namaPenanggungJawabManningAgent"
+                              type="text"
+                              className="form-input w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                              placeholder="Masukkan nama penanggung jawab"
+                              value={namaPenanggungJawabManningAgent}
+                              onChange={(e) =>
+                                setNamaPenanggungJawabManningAgent(e.target.value)
+                              }
+                              required
+                            />
+                            {isInputError && (
+                              <span className="text-rose-500 font-medium">
+                                *Masukkan nama penanggung jawab!
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap -mx-3 mb-1">
+                          <div className="w-full px-3">
+                            <label
+                              className="block text-gray-200 text-sm font-medium mb-1"
+                              htmlFor="alamat"
+                            >
+                              Alamat <span className="text-red-600">*</span>
+                            </label>
+                            <input
+                              id="alamat"
+                              type="text"
+                              className="form-input w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                              placeholder="Masukkan alamat"
+                              value={alamat}
+                              onChange={(e) => setAlamat(e.target.value)}
+                              required
+                            />
+                            {isInputError && (
+                              <span className="text-rose-500 font-medium">
+                                *Masukkan alamat!
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap -mx-3 mb-1">
+                          <div className="w-full px-3">
+                            <label
+                              className="block text-gray-200 text-sm font-medium mb-1"
+                              htmlFor="password"
+                            >
+                              Password <span className="text-red-600">*</span>
+                            </label>
+                            <span className="relative w-full h-fit">
+                              <input
+                                id="password"
+                                type={isShowPassword ? 'text' : 'password'}
+                                className="form-input w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                placeholder="Masukkan password"
+                                required
+                                value={passwordManningAgent}
+                                onChange={(e) => handlePasswordManningChange(e)}
+                              />
+                              <span onClick={(e) => setIsShowPassword(!isShowPassword)}>
+                                {isShowPassword ? (
+                                  <HiOutlineEyeOff className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
+                                ) : (
+                                  <HiOutlineEye className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
+                                )}
+                              </span>
+                            </span>
+
+                            {isInputError ? (
+                              <span className="text-rose-500 font-medium">
+                                *Masukkan password!
+                              </span>
+                            ) : (
+                              <p className="text-white/60 leading-[100%] text-xs font-medium mt-2">
+                                *Password minimal 8 karakter, harus terdiri dari
+                                satu angka, huruf kapital dan kecil, serta
+                                karakter
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap -mx-3 mb-1">
+                        <div className="w-full px-3">
+                          <label
+                            className="block text-gray-200 text-sm font-medium mb-1"
+                            htmlFor="password"
+                          >
+                            Konfirmasi Password <span className="text-red-600">*</span>
+                          </label>
+                          <span className="relative w-full h-fit">
+                            <input
+                              id="confirmPassword"
+                              type={isShowConfirmPassword ? 'text' : 'password'}
+                              className="form-input w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                              placeholder="Konfirmasi password"
+                              required
+                              value={confirmPassword}
+                              onChange={(e) => handleConfirmPasswordManningChange(e)}
+                            />
+                            <span onClick={(e) => setIsShowConfirmPassword(!isShowConfirmPassword)}>
+                              {isShowConfirmPassword ? (
+                                <HiOutlineEyeOff className="text-white/70 hover:text-white my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer transition-colors" />
+                              ) : (
+                                <HiOutlineEye className="text-white/70 hover:text-white my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer transition-colors" />
+                              )}
+                            </span>
+                          </span>
+
+                          {(!isMatchManning && confirmPassword != '') && (
+                            <span className="text-rose-500 text-xs font-medium">
+                              *Password dan konfirmasi password tidak sesuai!
+                            </span>
+                          )}
+                          {isInputError && (
+                            <span className="text-rose-500 font-medium">
+                              *Masukkan konfirmasi password!
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {(passwordManningAgent != "" && confirmPassword != '' && namaPenanggungJawabManningAgent != '' && noTelponManingAgent != '' && emailManningAgent != '' && namaManningAgent != '' && alamat != '') && isMatchManning && (
+                        <div
+                          className="flex flex-wrap w-full mb-1"
+                          style={{ width: "100% !important" }}
+                        >
+                          <div
+                            className="w-full"
+                            style={{ width: "100% !important" }}
+                          >
+                            <label
+                              className="block text-gray-200 text-sm font-medium mb-1"
+                              htmlFor="password"
+                            >
+                              Verify if you are not a robot{" "}
+                              <span className="text-red-600">*</span>
+                            </label>
+                            <ReCAPTCHA
+                              style={{ width: "100% !important" }}
+                              sitekey={
+                                process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!
+                              }
+                              className=" w-[600px] font-inter text-sm"
+                              onChange={setCaptcha}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      <div className="flex flex-wrap -mx-3 mt-3">
+                        <div className="w-full px-3 flex flex-col gap-2">
+                          <Button
+                            type="submit"
+                            disabled={captcha == null}
+                            className="w-full flex justify-center items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-3 sm:px-10 sm:py-4 rounded-lg hover:from-blue-600 hover:to-blue-700 shadow-lg transition-all font-semibold text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Registrasi
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="text-sm text-gray-200 text-center mt-3">
+                        Dengan membuat akun, anda menyetujui{" "}
+                        <a className="underline" href="#0">
+                          Ketentuan & Kondisi
+                        </a>
+                        , serta{" "}
+                        <a className="underline" href="#0">
+                          Keamanan Privasi
+                        </a>{" "}
+                        kami .
+                      </div>
+                    </form>
+                  </div>
+                )}
+
+                <div className="flex items-center my-6">
+                  <div
+                    className="border-t border-gray-300 grow mr-3"
+                    aria-hidden="true"
+                  ></div>
+                  <div
+                    className="border-t border-gray-300 grow ml-3"
+                    aria-hidden="true"
+                  ></div>
+                </div>
+                <div className="text-gray-200 text-center mt-6">
+                  Sudah punya akun sebelumnya?{" "}
+                  <Link
+                    href={"/login"}
+                    className="text-blue-400 hover:text-blue-300 hover:underline transition duration-150 ease-in-out font-semibold"
+                  >
+                    Log In
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

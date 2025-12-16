@@ -1,6 +1,5 @@
 "use client";
 
-// NEXT JS COMPONENTS
 import Image from "next/image";
 import Link from "next/link";
 
@@ -525,7 +524,7 @@ function FormLogin() {
                   type="button"
                   onClick={(e) => handleGetTokenResetPassword(e)}
                   disabled={isInputErrorNIK}
-                  className="bg-blue-500/90 hover:bg-blue-600/90 text-white font-semibold rounded-xl"
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl shadow-lg transition-all"
                 >
                   Cek Akunmu
                 </Button>
@@ -533,7 +532,7 @@ function FormLogin() {
                 <Button
                   type="button"
                   onClick={(e) => handleResetPassword(e)}
-                  className="bg-blue-500/90 hover:bg-blue-600/90 text-white font-semibold rounded-xl"
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg transition-all"
                 >
                   Reset Password
                 </Button>
@@ -547,7 +546,7 @@ function FormLogin() {
                   setTokenResetPassword("");
                   setIsInputErrorNIK(true);
                 }}
-                className="bg-gray-500/80 hover:bg-gray-600/90 text-white font-semibold rounded-xl"
+                className="bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl border border-white/20 shadow-lg transition-all"
               >
                 Close
               </Button>
@@ -569,13 +568,13 @@ function FormLogin() {
       <div className="max-w-6xl h-full mx-auto px-4 sm:px-6 md:-mt-8 relative">
         <div className="pt-44 md:pb-20">
           <div className="w-full mx-auto text-center pb-0 md:pb-0">
-            <h1 className="font-bold text-4xl leading-[110%] text-gray-200 font-calsans">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-[110%] text-white drop-shadow-lg font-calsans mb-4">
               <span className="">Login dan Ikuti</span> <br />
-              <span className="z-0 bg-clip-text  w-[600px] leading-[110%]  text-transparent bg-gradient-to-r  from-blue-500  to-teal-400">
+              <span className="z-0 bg-clip-text  w-[600px] leading-[110%]  text-transparent bg-gradient-to-r  from-blue-400  to-teal-400">
                 Pelatihan di E-LAUT
               </span>{" "}
             </h1>
-            <p className="text-base text-center mx-auto text-gray-200 mt-2  max-w-3xl">
+            <p className="text-sm sm:text-base text-center mx-auto text-white/80 mt-2 max-w-3xl">
               login tersedia dalam dua opsi: Perseorangan untuk individu,
               Corporate untuk grup untuk yang punya rekam jejak atau
               sertifikasi. Fleksibel sesuai kebutuhan!
@@ -584,8 +583,9 @@ function FormLogin() {
 
           {/* Form */}
 
-          <div className="max-w-sm  mx-5 md:mx-auto mt-5">
-            {/* <div className="flex flex-col gap-1 mb-2">
+          <div className="max-w-2xl mx-5 md:mx-auto mt-5">
+            <div className="bg-white/10 backdrop-blur-lg rounded-xl sm:rounded-2xl shadow-2xl border border-white/20 p-4 sm:p-6 md:p-8">
+              {/* <div className="flex flex-col gap-1 mb-2">
               <label
                 className="block text-gray-200 text-sm font-medium mb-1"
                 htmlFor="name"
@@ -613,269 +613,270 @@ function FormLogin() {
                 </SelectContent>
               </Select>
             </div> */}
-            {role == "" ? (
-              <></>
-            ) : role == "Perseorangan" ? (
-              <form onSubmit={(e) => handleLoginAkun(e)} autoComplete="off">
-                <div className="flex flex-col gap-1 mb-2">
-                  <label
-                    className="block text-gray-200 text-sm font-medium mb-1"
-                    htmlFor="name"
-                  >
-                    Login Menggunakan <span className="text-red-600">*</span>
-                  </label>
-                  <Select
-                    value={role}
-                    onValueChange={(value: string) => setSelectedMethodLogin(value)}
-                  >
-                    <SelectTrigger className="form-input w-full py-6 bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200">
-                      <p className="mr-3 flex items-center gap-1 text-base text-gray-300">
-                        <HiMiniUserGroup />
-                        {selectedMethodLogin != "" ? selectedMethodLogin : "Pilih Login Menggunakan"}
-                      </p>
-                    </SelectTrigger>
-                    <SelectContent side="bottom" className=" flex flex-col gap-1 mt-2 
+              {role == "" ? (
+                <></>
+              ) : role == "Perseorangan" ? (
+                <form onSubmit={(e) => handleLoginAkun(e)} autoComplete="off">
+                  <div className="flex flex-col gap-1 mb-2">
+                    <label
+                      className="block text-gray-200 text-sm font-medium mb-1"
+                      htmlFor="name"
+                    >
+                      Login Menggunakan <span className="text-red-600">*</span>
+                    </label>
+                    <Select
+                      value={role}
+                      onValueChange={(value: string) => setSelectedMethodLogin(value)}
+                    >
+                      <SelectTrigger className="form-input w-full py-6 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent text-white">
+                        <p className="mr-3 flex items-center gap-1 text-base text-white">
+                          <HiMiniUserGroup />
+                          {selectedMethodLogin != "" ? selectedMethodLogin : "Pilih Login Menggunakan"}
+                        </p>
+                      </SelectTrigger>
+                      <SelectContent side="bottom" className=" flex flex-col gap-1 mt-2 
               bg-white/10 backdrop-blur-xl border border-white/20 
               rounded-2xl shadow-xl p-3 text-white">
-                      <SelectGroup>
-                        <SelectLabel>Login Menggunakan</SelectLabel>
-                        <SelectItem className="flex gap-2 items-center px-3 py-2 rounded-lg !hover:bg-white/5 text-white" value="Whatsapp/No Telpon">Whatsapp/No Telpon</SelectItem>
-                        <SelectItem className="flex gap-2 items-center px-3 py-2 rounded-lg !hover:bg-white/5 text-white" value="NIK">
-                          NIK
-                        </SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex flex-wrap -mx-3 mb-2">
-                  <div className="w-full px-3">
-                    <label
-                      className="block text-gray-200 text-sm font-medium mb-1"
-                      htmlFor="name"
-                    >
-                      {selectedMethodLogin == 'NIK' ? 'NIK' : 'No Telepon/WA'}
-                      <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                      id="name"
-                      type="text"
-                      className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                      placeholder={selectedMethodLogin == 'NIK' ? 'Masukkan NIK' : 'Masukkan No Telepon/WA'}
-                      value={formData.no_number}
-                      name="no_number"
-                      minLength={selectedMethodLogin == 'NIK' ? 16 : 12}
-                      maxLength={selectedMethodLogin == 'NIK' ? 24 : 13}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        handleInputChange(e);
-                        setIsInputErrorNoTelpon(
-                          value.length > 0 && value.length < 12
-                        );
-                      }}
-                      required
-                    />
-
-                    <span className="block text-gray-400 text-xs font-medium">
-                      Lupa no telpon/WA? klik{" "}
-                      <span
-                        onClick={(e) => {
-                          setIsForgetPhoneNumber(true);
-                          setIsForgetPassword(true);
+                        <SelectGroup>
+                          <SelectLabel>Login Menggunakan</SelectLabel>
+                          <SelectItem className="flex gap-2 items-center px-3 py-2 rounded-lg !hover:bg-white/5 text-white" value="Whatsapp/No Telpon">Whatsapp/No Telpon</SelectItem>
+                          <SelectItem className="flex gap-2 items-center px-3 py-2 rounded-lg !hover:bg-white/5 text-white" value="NIK">
+                            NIK
+                          </SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex flex-wrap -mx-3 mb-2">
+                    <div className="w-full px-3">
+                      <label
+                        className="block text-gray-200 text-sm font-medium mb-1"
+                        htmlFor="name"
+                      >
+                        {selectedMethodLogin == 'NIK' ? 'NIK' : 'No Telepon/WA'}
+                        <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        id="name"
+                        type="text"
+                        className="form-input w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        placeholder={selectedMethodLogin == 'NIK' ? 'Masukkan NIK' : 'Masukkan No Telepon/WA'}
+                        value={formData.no_number}
+                        name="no_number"
+                        minLength={selectedMethodLogin == 'NIK' ? 16 : 12}
+                        maxLength={selectedMethodLogin == 'NIK' ? 24 : 13}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          handleInputChange(e);
+                          setIsInputErrorNoTelpon(
+                            value.length > 0 && value.length < 12
+                          );
                         }}
-                        className="text-white font-semibold cursor-pointer"
-                      >
-                        disini
-                      </span>
-                    </span>
-                  </div>
-                </div>
-                <div className="flex flex-wrap -mx-3 mb-2">
-                  <div className="w-full px-3">
-                    <label
-                      className="block text-gray-200 text-sm font-medium mb-1"
-                      htmlFor="password"
-                    >
-                      Password <span className="text-red-600">*</span>
-                    </label>
-                    <span className="relative w-full h-fit">
-                      <input
-                        id="password"
-                        type={isShowPassword ? "text" : "password"}
-                        className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                        placeholder="Masukkan password"
                         required
-                        name="password"
-                        value={formData.password}
-                        onChange={(e) => handleInputChange(e)}
                       />
-                      <span onClick={(e) => setIsShowPassword(!isShowPassword)}>
-                        {isShowPassword ? (
-                          <HiOutlineEyeOff className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
-                        ) : (
-                          <HiOutlineEye className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
-                        )}
-                      </span>
-                    </span>
 
-                    <span className="block text-gray-400 text-xs font-medium">
-                      Lupa password? klik{" "}
-                      <span
-                        onClick={(e) => setIsForgetPassword(true)}
-                        className="text-white font-semibold cursor-pointer"
-                      >
-                        disini
+                      <span className="block text-white/60 text-xs font-medium mt-1">
+                        Lupa no telpon/WA? klik{" "}
+                        <span
+                          onClick={(e) => {
+                            setIsForgetPhoneNumber(true);
+                            setIsForgetPassword(true);
+                          }}
+                          className="text-blue-400 hover:text-blue-300 font-semibold cursor-pointer transition-colors"
+                        >
+                          disini
+                        </span>
                       </span>
-                    </span>
+                    </div>
                   </div>
-                </div>
-                <div className="flex flex-wrap -mx-3 mt-3">
-                  <div className="w-full px-3">
-                    <button
-                      type="submit"
-                      className={`btn text-white bg-blue-500 hover:bg-blue-600 w-full`}
-                    >
-                      Login
-                    </button>
-                  </div>
-                </div>
-                <div className="text-sm text-gray-200 text-center mt-3">
-                  By creating an account, you agree to the{" "}
-                  <a className="underline" href="#0">
-                    terms & conditions
-                  </a>
-                  , and our{" "}
-                  <a className="underline" href="#0">
-                    privacy policy
-                  </a>
-                  .
-                </div>
-              </form>
-            ) : (
-              <form
-                onSubmit={(e) => handleLoginAkunManningAgent(e)}
-                autoComplete="off"
-              >
-                <div className="flex flex-wrap -mx-3 mb-2">
-                  <div className="w-full px-3">
-                    <label
-                      className="block text-gray-200 text-sm font-medium mb-1"
-                      htmlFor="name"
-                    >
-                      Email <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                      id="name"
-                      type="email"
-                      className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                      placeholder="Masukkan Email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-wrap -mx-3 mb-2">
-                  <div className="w-full px-3">
-                    <label
-                      className="block text-gray-200 text-sm font-medium mb-1"
-                      htmlFor="password"
-                    >
-                      Password <span className="text-red-600">*</span>
-                    </label>
-                    <span className="relative w-full h-fit">
-                      <input
-                        id="password"
-                        type={isShowPassword ? "text" : "password"}
-                        className="form-input w-full bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200"
-                        placeholder="Masukkan password"
-                        required
-                        value={passwordManningAgent}
-                        onChange={(e) =>
-                          setPasswordManningAgent(e.target.value)
-                        }
-                      />
-                      <span onClick={(e) => setIsShowPassword(!isShowPassword)}>
-                        {isShowPassword ? (
-                          <HiOutlineEyeOff className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
-                        ) : (
-                          <HiOutlineEye className="text-gray-200 my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer" />
-                        )}
-                      </span>
-                    </span>
-                  </div>
-                </div>
-                {passwordManningAgent != "" && (
-                  <div
-                    className="flex flex-wrap w-full -mx-3 mb-2"
-                    style={{ width: "100% !important" }}
-                  >
-                    <div
-                      className="w-full px-3"
-                      style={{ width: "100% !important" }}
-                    >
+                  <div className="flex flex-wrap -mx-3 mb-2">
+                    <div className="w-full px-3">
                       <label
                         className="block text-gray-200 text-sm font-medium mb-1"
                         htmlFor="password"
                       >
-                        Verify if you are not a robot{" "}
-                        <span className="text-red-600">*</span>
+                        Password <span className="text-red-600">*</span>
                       </label>
-                      <ReCAPTCHA
-                        style={{ width: "100% !important" }}
-                        sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
-                        className="mx-auto w-full font-inter text-sm"
-                        onChange={setCaptcha}
+                      <span className="relative w-full h-fit">
+                        <input
+                          id="password"
+                          type={isShowPassword ? "text" : "password"}
+                          className="form-input w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                          placeholder="Masukkan password"
+                          required
+                          name="password"
+                          value={formData.password}
+                          onChange={(e) => handleInputChange(e)}
+                        />
+                        <span onClick={(e) => setIsShowPassword(!isShowPassword)}>
+                          {isShowPassword ? (
+                            <HiOutlineEyeOff className="text-white/70 hover:text-white my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer transition-colors" />
+                          ) : (
+                            <HiOutlineEye className="text-white/70 hover:text-white my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer transition-colors" />
+                          )}
+                        </span>
+                      </span>
+
+                      <span className="block text-white/60 text-xs font-medium mt-1">
+                        Lupa password? klik{" "}
+                        <span
+                          onClick={(e) => setIsForgetPassword(true)}
+                          className="text-blue-400 hover:text-blue-300 font-semibold cursor-pointer transition-colors"
+                        >
+                          disini
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap -mx-3 mt-3">
+                    <div className="w-full px-3">
+                      <button
+                        type="submit"
+                        className="w-full flex justify-center items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-3 sm:px-10 sm:py-4 rounded-lg hover:from-blue-600 hover:to-blue-700 shadow-lg transition-all font-semibold text-sm sm:text-base"
+                      >
+                        Login
+                      </button>
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-200 text-center mt-3">
+                    By creating an account, you agree to the{" "}
+                    <a className="underline" href="#0">
+                      terms & conditions
+                    </a>
+                    , and our{" "}
+                    <a className="underline" href="#0">
+                      privacy policy
+                    </a>
+                    .
+                  </div>
+                </form>
+              ) : (
+                <form
+                  onSubmit={(e) => handleLoginAkunManningAgent(e)}
+                  autoComplete="off"
+                >
+                  <div className="flex flex-wrap -mx-3 mb-2">
+                    <div className="w-full px-3">
+                      <label
+                        className="block text-gray-200 text-sm font-medium mb-1"
+                        htmlFor="name"
+                      >
+                        Email <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        id="name"
+                        type="email"
+                        className="form-input w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        placeholder="Masukkan Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
                       />
                     </div>
                   </div>
-                )}
-
-                <div className="flex flex-wrap -mx-3 mt-3">
-                  <div className="w-full px-3">
-                    <button
-                      type="submit"
-                      className={`btn text-white ${captcha
-                        ? "bg-blue-500 hover:bg-blue-600"
-                        : "bg-gray-500 hover:bg-gray-600"
-                        } w-full`}
-                      disabled={captcha ? false : true}
-                    >
-                      Login
-                    </button>
+                  <div className="flex flex-wrap -mx-3 mb-2">
+                    <div className="w-full px-3">
+                      <label
+                        className="block text-gray-200 text-sm font-medium mb-1"
+                        htmlFor="password"
+                      >
+                        Password <span className="text-red-600">*</span>
+                      </label>
+                      <span className="relative w-full h-fit">
+                        <input
+                          id="password"
+                          type={isShowPassword ? "text" : "password"}
+                          className="form-input w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                          placeholder="Masukkan password"
+                          required
+                          value={passwordManningAgent}
+                          onChange={(e) =>
+                            setPasswordManningAgent(e.target.value)
+                          }
+                        />
+                        <span onClick={(e) => setIsShowPassword(!isShowPassword)}>
+                          {isShowPassword ? (
+                            <HiOutlineEyeOff className="text-white/70 hover:text-white my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer transition-colors" />
+                          ) : (
+                            <HiOutlineEye className="text-white/70 hover:text-white my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer transition-colors" />
+                          )}
+                        </span>
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="text-sm text-gray-200 text-center mt-3">
-                  By creating an account, you agree to the{" "}
-                  <a className="underline" href="#0">
-                    terms & conditions
-                  </a>
-                  , and our{" "}
-                  <a className="underline" href="#0">
-                    privacy policy
-                  </a>
-                  .
-                </div>
-              </form>
-            )}
-            <div className="flex items-center my-6">
-              <div
-                className="border-t border-gray-300 grow mr-3"
-                aria-hidden="true"
-              ></div>
-              <div
-                className="border-t border-gray-300 grow ml-3"
-                aria-hidden="true"
-              ></div>
-            </div>
-            <div className="text-gray-200 text-center mt-6">
-              Belum punya akun sebelumnya?{" "}
-              <Link
-                href="/registrasi"
-                onClick={() => Cookies.set("XSRF087", "1")}
-                className="text-blue-500 hover:underline transition duration-150 ease-in-out"
-              >
-                Registrasi
-              </Link>
+                  {passwordManningAgent != "" && (
+                    <div
+                      className="flex flex-wrap w-full -mx-3 mb-2"
+                      style={{ width: "100% !important" }}
+                    >
+                      <div
+                        className="w-full px-3"
+                        style={{ width: "100% !important" }}
+                      >
+                        <label
+                          className="block text-gray-200 text-sm font-medium mb-1"
+                          htmlFor="password"
+                        >
+                          Verify if you are not a robot{" "}
+                          <span className="text-red-600">*</span>
+                        </label>
+                        <ReCAPTCHA
+                          style={{ width: "100% !important" }}
+                          sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                          className="mx-auto w-full font-inter text-sm"
+                          onChange={setCaptcha}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap -mx-3 mt-3">
+                    <div className="w-full px-3">
+                      <button
+                        type="submit"
+                        className={`w-full flex justify-center items-center gap-2 text-white px-8 py-3 sm:px-10 sm:py-4 rounded-lg shadow-lg transition-all font-semibold text-sm sm:text-base ${captcha
+                            ? "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                            : "bg-gray-500/50 cursor-not-allowed"
+                          }`}
+                        disabled={captcha ? false : true}
+                      >
+                        Login
+                      </button>
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-200 text-center mt-3">
+                    By creating an account, you agree to the{" "}
+                    <a className="underline" href="#0">
+                      terms & conditions
+                    </a>
+                    , and our{" "}
+                    <a className="underline" href="#0">
+                      privacy policy
+                    </a>
+                    .
+                  </div>
+                </form>
+              )}
+              <div className="flex items-center my-6">
+                <div
+                  className="border-t border-white/20 grow mr-3"
+                  aria-hidden="true"
+                ></div>
+                <div
+                  className="border-t border-white/20 grow ml-3"
+                  aria-hidden="true"
+                ></div>
+              </div>
+              <div className="text-gray-200 text-center mt-6">
+                Belum punya akun sebelumnya?{" "}
+                <Link
+                  href="/registrasi"
+                  onClick={() => Cookies.set("XSRF087", "1")}
+                  className="text-blue-400 hover:text-blue-300 hover:underline transition duration-150 ease-in-out font-semibold"
+                >
+                  Registrasi
+                </Link>
+              </div>
             </div>
           </div>
         </div>
