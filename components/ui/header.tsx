@@ -127,7 +127,7 @@ export default function Header() {
               <li className="relative">
                 <button
                   onClick={() => setOpenLayanan(!openLayanan)}
-                  className={`${NAV_LINK_CLASS} ${pathname.startsWith("/layanan") ? "text-blue-400" : "text-white"
+                  className={`${NAV_LINK_CLASS} ${pathname.startsWith("/layanan/publik") ? "text-blue-400" : "text-white"
                     }`}
                 >
                   <HiNewspaper />
