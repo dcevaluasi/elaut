@@ -93,17 +93,36 @@ export const uploadMaklumatImage = async (
   file: File,
   onProgress?: (progress: number) => void
 ) => {
-  // Compress image first
-  const compressedFile = await compressImage(file)
+  try {
+    console.log('Starting upload process...')
+    console.log('Original file:', file.name, file.size, 'bytes')
 
-  const timestamp = Date.now()
-  const fileName = `maklumat-pelayanan/${timestamp}_${file.name}`
-  const storageRef = ref(storage, fileName)
+    // Compress image first
+    console.log('Compressing image...')
+    const compressedFile = await compressImage(file)
+    console.log('Compressed file:', compressedFile.size, 'bytes')
 
-  await uploadBytes(storageRef, compressedFile)
-  const downloadURL = await getDownloadURL(storageRef)
+    const timestamp = Date.now()
+    const fileName = `maklumat-pelayanan/${timestamp}_${file.name}`
+    const storageRef = ref(storage, fileName)
 
-  return { url: downloadURL, path: fileName }
+    console.log('Uploading to Firebase Storage:', fileName)
+    await uploadBytes(storageRef, compressedFile)
+
+    console.log('Getting download URL...')
+    const downloadURL = await getDownloadURL(storageRef)
+    console.log('Upload successful! URL:', downloadURL)
+
+    return { url: downloadURL, path: fileName }
+  } catch (error: any) {
+    console.error('Upload error details:', {
+      message: error.message,
+      code: error.code,
+      serverResponse: error.serverResponse,
+      customData: error.customData,
+    })
+    throw error
+  }
 }
 
 export const saveMaklumatPelayanan = async (data: any) => {
