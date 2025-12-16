@@ -1,4 +1,6 @@
 import Hero from "@/components/hero";
+import BalaiPelatihanSection from "@/components/balai-pelatihan-section";
+import TourGuide from "@/components/tour-guide";
 import Footer from "@/components/ui/footer";
 
 export const metadata = {
@@ -77,6 +79,7 @@ export default function Home() {
     <>
       <Hero />
       <Footer />
+      <TourGuide />
     </>
   );
 }

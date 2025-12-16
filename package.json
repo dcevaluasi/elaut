@@ -45,6 +45,7 @@
     "crypto-js": "^4.2.0",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.18",
+    "driver.js": "^1.4.0",
     "file-saver": "^2.0.5",
     "firebase": "^11.7.3",
     "flatpickr": "^4.6.13",

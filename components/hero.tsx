@@ -72,7 +72,9 @@ export default function Hero() {
         <div className="relative z-10 max-w-7xl w-full mx-auto flex flex-col items-center md:items-start text-center md:text-left">
           {/* Title + Logo */}
           <div className="gap-4 flex flex-col items-center md:items-start">
-            <Logo />
+            <div className="hero-logo">
+              <Logo />
+            </div>
             <h1 className="text-[2rem] md:text-[3rem] leading-tight font-calsans text-white drop-shadow-lg">
               Elektronik Layanan Pelatihan Utama Terpadu<br />
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">
@@ -86,7 +88,7 @@ export default function Hero() {
 
           {/* Program Cards */}
           <div
-            className="w-full flex md:flex-row flex-col md:gap-10 gap-5 mt-10 
+            className="program-cards w-full flex md:flex-row flex-col md:gap-10 gap-5 mt-10
               overflow-x-auto md:overflow-visible pb-4 md:pb-0 justify-center items-center"
           >
             {programPelatihan.map((item, index) => (
@@ -95,10 +97,10 @@ export default function Hero() {
                   onClick={() =>
                     setSelectedProgram(selectedProgram === index ? null : index)
                   }
-                  className={`flex flex-col flex-shrink-0 w-64 md:w-72 
-                    items-center justify-center cursor-pointer 
-                    rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl 
-                    shadow-[0_8px_32px_rgba(0,0,0,0.35)] transition-all duration-500 
+                  className={`flex flex-col flex-shrink-0 w-64 md:w-72
+                    items-center justify-center cursor-pointer
+                    rounded-2xl border border-white/15 bg-white/10 backdrop-blur-xl
+                    shadow-[0_8px_32px_rgba(0,0,0,0.35)] transition-all duration-500
                     hover:scale-105 hover:border-blue-400/40 p-6 text-center ${selectedProgram === index ? "opacity-100" : "opacity-70"
                     }`}
                 >
