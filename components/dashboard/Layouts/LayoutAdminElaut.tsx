@@ -282,7 +282,7 @@ export default function LayoutAdminElaut({
             Cookies.get('Access')?.includes('superAdmin') && <li>
               <a
                 href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/layanan/`}
-                className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname.includes(`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/kinerja`)
+                className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname.includes(`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/layanan`)
                   ? "bg-blue-600 text-white"
                   : "hover:bg-blue-500 hover:text-white"
                   }`}

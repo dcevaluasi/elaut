@@ -136,7 +136,7 @@ const MetricsSummaryPelatihan: React.FC<MetricsSummaryPelatihanProps> = ({ data,
             progress,
             status: "Berlangsung",
         };
-    });
+    }).sort((a, b) => b.participants - a.participants);
 
 
 

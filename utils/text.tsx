@@ -299,16 +299,75 @@ export function toTitleCase(str: string) {
 }
 
 export function splitCityAndDate(input: string): { city: string; date: string } {
-  const regex = /^([A-Za-z\s]+?)(\d{1,2}\s+[A-Za-z]+\s+\d{4})$/;
-  const match = input.match(regex);
-
-  if (!match) {
-    throw new Error("Invalid format. Expected something like 'Sidoarjo13 October 2000'");
+  if (!input || input.trim() === "") {
+    return { city: "-", date: "-" };
   }
 
-  const [, city, date] = match;
-  return {
-    city: city.trim(),
-    date: date.trim()
-  };
+  // Normalize input: remove extra spaces and handle various formats
+  const normalized = input.trim().replace(/\s+/g, " ");
+
+  // Try multiple regex patterns to handle different formats
+  // Pattern 1: "City, DD Month YYYY" or "City DD Month YYYY"
+  const pattern1 = /^([A-Za-z\s]+?),?\s*(\d{1,2}\s+[A-Za-z]+\s+\d{4})$/;
+  const match1 = normalized.match(pattern1);
+
+  if (match1) {
+    const [, city, dateStr] = match1;
+    // Normalize date format to "DD MONTH YYYY"
+    const dateParts = dateStr.trim().split(/\s+/);
+    if (dateParts.length === 3) {
+      const day = dateParts[0].padStart(2, "0");
+      const month = dateParts[1].toUpperCase();
+      const year = dateParts[2];
+      return {
+        city: city.trim(),
+        date: `${day} ${month} ${year}`
+      };
+    }
+  }
+
+  // Pattern 2: "CityDDMonthYYYY" (no space before date)
+  const pattern2 = /^([A-Za-z\s]+?)(\d{1,2}[A-Za-z]+\d{4})$/;
+  const match2 = normalized.match(pattern2);
+
+  if (match2) {
+    const [, city, dateStr] = match2;
+    // Extract day, month, year from compact format
+    const dateMatch = dateStr.match(/^(\d{1,2})([A-Za-z]+)(\d{4})$/);
+    if (dateMatch) {
+      const day = dateMatch[1].padStart(2, "0");
+      const month = dateMatch[2].toUpperCase();
+      const year = dateMatch[3];
+      return {
+        city: city.trim(),
+        date: `${day} ${month} ${year}`
+      };
+    }
+  }
+
+  // Pattern 3: Try to split by comma first
+  if (normalized.includes(",")) {
+    const parts = normalized.split(",");
+    if (parts.length >= 2) {
+      const city = parts[0].trim();
+      const dateStr = parts.slice(1).join(",").trim();
+
+      // Try to extract date components
+      const dateMatch = dateStr.match(/(\d{1,2})\s*([A-Za-z]+)\s*(\d{4})/);
+      if (dateMatch) {
+        const day = dateMatch[1].padStart(2, "0");
+        const month = dateMatch[2].toUpperCase();
+        const year = dateMatch[3];
+        return {
+          city: city,
+          date: `${day} ${month} ${year}`
+        };
+      }
+
+      return { city: city, date: dateStr };
+    }
+  }
+
+  // If all patterns fail, return the original input as city
+  throw new Error(`Invalid format. Expected something like 'Sidoarjo, 13 October 2000' or 'Sidoarjo13October2000'. Got: '${input}'`);
 }

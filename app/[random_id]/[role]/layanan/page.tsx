@@ -478,7 +478,7 @@ export default function LayananPage() {
                                         ) : (
                                             maklumatList.map((maklumat) => (
                                                 <Card key={maklumat.id} className="overflow-hidden">
-                                                    <div className="relative h-48 w-full bg-neutral-100">
+                                                    <div className="relative h-90 w-full bg-neutral-100">
                                                         <img
                                                             src={getDirectImageUrl(maklumat.imageUrl)}
                                                             alt={maklumat.title}

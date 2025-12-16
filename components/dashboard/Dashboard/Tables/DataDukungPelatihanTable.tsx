@@ -8,10 +8,13 @@ import { FiBarChart2, FiDownload } from "react-icons/fi"
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { generateTanggalPelatihan, splitCityAndDate } from "@/utils/text";
+import { Loader2 } from "lucide-react";
+import Toast from "@/commons/Toast";
 
 const DataDukungPelatihanTable = ({ data, tahun, triwulan }: { data: UserPelatihan[], tahun: number, triwulan: string }) => {
 
     const pageSize = 5;
+    const [isDownloading, setIsDownloading] = useState(false);
 
     // fungsi helper
     const triwulanToMonth = (tw: string) => {
@@ -37,58 +40,116 @@ const DataDukungPelatihanTable = ({ data, tahun, triwulan }: { data: UserPelatih
     const totalData = filteredData.length;
 
     // export excel
-    const handleExportExcel = () => {
-        // sort by PenyelenggaraPelatihan (A → Z)
-        const sortedData = [...filteredData].sort((a, b) => {
-            const aPeny = a.PenyelenggaraPelatihan || "";
-            const bPeny = b.PenyelenggaraPelatihan || "";
+    const handleExportExcel = async () => {
+        if (filteredData.length === 0) {
+            Toast.fire({
+                icon: "warning",
+                title: "Data Kosong",
+                text: "Tidak ada data untuk didownload!",
+            });
+            return;
+        }
 
-            const aIsPusat = aPeny.toLowerCase().includes("pusat");
-            const bIsPusat = bPeny.toLowerCase().includes("pusat");
+        setIsDownloading(true);
 
-            // Prioritize ones with "Pusat"
-            if (aIsPusat && !bIsPusat) return -1;
-            if (!aIsPusat && bIsPusat) return 1;
+        try {
+            // sort by PenyelenggaraPelatihan (A → Z)
+            const sortedData = [...filteredData].sort((a, b) => {
+                const aPeny = a.PenyelenggaraPelatihan || "";
+                const bPeny = b.PenyelenggaraPelatihan || "";
 
-            // If both are "Pusat" or both not, sort alphabetically
-            return aPeny.localeCompare(bPeny);
-        });
+                const aIsPusat = aPeny.toLowerCase().includes("pusat");
+                const bIsPusat = bPeny.toLowerCase().includes("pusat");
+
+                // Prioritize ones with "Pusat"
+                if (aIsPusat && !bIsPusat) return -1;
+                if (!aIsPusat && bIsPusat) return 1;
+
+                // If both are "Pusat" or both not, sort alphabetically
+                return aPeny.localeCompare(bPeny);
+            });
 
 
-        const exportData = sortedData.map((item, index) => ({
-            "NO": index + 1,
-            "PENYELENGGARA PELATIHAN": item.PenyelenggaraPelatihan.toUpperCase(),
-            "NAMA": item.Nama.toUpperCase(),
-            NIK: item.Nik || "-",
-            "NO TELPON": item.NoTelpon || "-",
-            "TEMPAT LAHIR": splitCityAndDate(item.TempatTanggalLahir).city,
-            "TANGGAL LAHIR": splitCityAndDate(item.TempatTanggalLahir).date,
-            "KOTA/KABUPATEN": item.Kota?.toString()?.toUpperCase(),
-            PROVINSI: item.Provinsi?.toString()?.toUpperCase(),
-            "JENIS KELAMIN": item.JenisKelamin,
-            ALAMAT: item.Alamat || "-",
-            "PENDIDIKAN TERKAHIR": item.PendidikanTerakhir,
-            "NAMA PELATIHAN": item.NamaPelatihan.toUpperCase(),
-            "SEKTOR PELATIHAN": item.JenisProgram.toUpperCase(),
-            "BIDANG/KLASTER PELATIHAN": item.BidangPelatihan.toUpperCase(),
-            "PROGRAM PELATIHAN": item.Program.toUpperCase(),
-            "DUKUNGAN PROGRAM PRIORITAS": item.DukunganProgramPrioritas.toUpperCase(),
-            "TANGGAL PELATIHAN": `${generateTanggalPelatihan(item.TanggalMulai)} - ${generateTanggalPelatihan(item.TanggalBerakhir)}`.toUpperCase(),
-            "NO SERTIFIKAT": item.NoRegistrasi,
-            "FILE SERTIFIKAT": item.FileSertifikat
-                ? `https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${item.FileSertifikat}`
-                : "-",
-        }));
+            const exportData = sortedData.map((item, index) => {
+                // Safely parse tempat tanggal lahir
+                let tempatLahir = "-";
+                let tanggalLahir = "-";
 
-        const worksheet = XLSX.utils.json_to_sheet(exportData);
-        worksheet["!cols"] = Object.keys(exportData[0]).map(() => ({ wch: 25 }));
+                if (item.TempatTanggalLahir) {
+                    try {
+                        const result = splitCityAndDate(item.TempatTanggalLahir);
+                        tempatLahir = result.city || "-";
+                        tanggalLahir = result.date || "-";
+                    } catch (error) {
+                        // If splitCityAndDate fails, try to manually split by common patterns
+                        const input = item.TempatTanggalLahir;
 
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Data Pelatihan");
-        XLSX.writeFile(
-            workbook,
-            `DATA DUKUNG MASYARAKAT DILATIH ${tahun} - ${triwulan}.xlsx`
-        );
+                        // Try pattern: "City, DD Month YYYY" or "City DD Month YYYY"
+                        const commaMatch = input.match(/^([^,]+),?\s*(.*)$/);
+                        if (commaMatch && commaMatch[2]) {
+                            tempatLahir = commaMatch[1].trim();
+                            tanggalLahir = commaMatch[2].trim();
+                        } else {
+                            // If all parsing fails, just use the original value
+                            tempatLahir = input;
+                            tanggalLahir = "-";
+                        }
+
+                        console.warn("Could not parse TempatTanggalLahir with standard format:", input, "Using fallback parsing");
+                    }
+                }
+
+                return {
+                    "NO": index + 1,
+                    "PENYELENGGARA PELATIHAN": item.PenyelenggaraPelatihan?.toUpperCase() || "-",
+                    "NAMA": item.Nama?.toUpperCase() || "-",
+                    NIK: item.Nik || "-",
+                    "NO TELPON": item.NoTelpon || "-",
+                    "TEMPAT LAHIR": tempatLahir,
+                    "TANGGAL LAHIR": tanggalLahir,
+                    "KOTA/KABUPATEN": item.Kota?.toString()?.toUpperCase() || "-",
+                    PROVINSI: item.Provinsi?.toString()?.toUpperCase() || "-",
+                    "JENIS KELAMIN": item.JenisKelamin || "-",
+                    ALAMAT: item.Alamat || "-",
+                    "PENDIDIKAN TERKAHIR": item.PendidikanTerakhir || "-",
+                    "NAMA PELATIHAN": item.NamaPelatihan?.toUpperCase() || "-",
+                    "SEKTOR PELATIHAN": item.JenisProgram?.toUpperCase() || "-",
+                    "BIDANG/KLASTER PELATIHAN": item.BidangPelatihan?.toUpperCase() || "-",
+                    "PROGRAM PELATIHAN": item.Program?.toUpperCase() || "-",
+                    "DUKUNGAN PROGRAM PRIORITAS": item.DukunganProgramPrioritas?.toUpperCase() || "-",
+                    "TANGGAL PELATIHAN": `${generateTanggalPelatihan(item.TanggalMulai)} - ${generateTanggalPelatihan(item.TanggalBerakhir)}`.toUpperCase(),
+                    "NO SERTIFIKAT": item.NoRegistrasi || "-",
+                    "FILE SERTIFIKAT": item.FileSertifikat
+                        ? `https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${item.FileSertifikat}`
+                        : "-",
+                };
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            worksheet["!cols"] = Object.keys(exportData[0]).map(() => ({ wch: 25 }));
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Data Pelatihan");
+            XLSX.writeFile(
+                workbook,
+                `DATA DUKUNG MASYARAKAT DILATIH ${tahun} - ${triwulan}.xlsx`
+            );
+
+            Toast.fire({
+                icon: "success",
+                title: "Berhasil!",
+                text: `Data berhasil didownload (${exportData.length} data)`,
+            });
+        } catch (error) {
+            console.error("Error exporting data:", error);
+            Toast.fire({
+                icon: "error",
+                title: "Gagal Download",
+                text: "Terjadi kesalahan saat mengunduh data. Silakan coba lagi.",
+            });
+        } finally {
+            setIsDownloading(false);
+        }
     };
 
     return (
@@ -111,9 +172,22 @@ const DataDukungPelatihanTable = ({ data, tahun, triwulan }: { data: UserPelatih
                                 Total Data: <span className="font-bold text-blue-600">{totalData}</span>
                             </p>
                         </div>
-                        <Button onClick={handleExportExcel} className="flex items-center gap-2 text-xs">
-                            <FiDownload className="w-4 h-4" />
-                            Download Data Dukung
+                        <Button
+                            onClick={handleExportExcel}
+                            disabled={isDownloading}
+                            className="flex items-center gap-2 text-xs"
+                        >
+                            {isDownloading ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    Downloading...
+                                </>
+                            ) : (
+                                <>
+                                    <FiDownload className="w-4 h-4" />
+                                    Download Data Dukung
+                                </>
+                            )}
                         </Button>
                     </div>
                 </CardContent>
