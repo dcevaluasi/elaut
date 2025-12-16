@@ -5,6 +5,7 @@ import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import { HiSparkles, HiXMark } from "react-icons/hi2";
 import Cookies from "js-cookie";
+import CallCenter from "./call-center";
 
 const TOUR_COOKIE = "ELAUT_TOUR_COMPLETED";
 
@@ -144,6 +145,9 @@ export default function TourGuide() {
 
   return (
     <>
+      {/* Call Center Component */}
+
+
       {/* Welcome Popup */}
       {showStartButton && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 animate-in fade-in duration-300">
@@ -155,6 +159,8 @@ export default function TourGuide() {
 
           {/* Welcome Card */}
           <div className="relative bg-gradient-to-br from-blue-600 to-cyan-600 rounded-3xl shadow-2xl max-w-lg w-full p-8 md:p-10 animate-in zoom-in-95 duration-500">
+            {/* <CallCenter /> */}
+
             {/* Close Button */}
             <button
               onClick={dismissWelcome}

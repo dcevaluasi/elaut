@@ -152,7 +152,6 @@ export default function RootLayout({
 
           <Header />
           {children}
-          <CallCenter />
           <BottomNavigation />
         </div>
       </body>

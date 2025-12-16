@@ -87,7 +87,7 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed left-0 right-0 z-[150] transition duration-300 ease-in-out ${top
+      className={`fixed left-0 right-0 z-[999999] transition duration-300 ease-in-out ${top
         ? "bg-transparent"
         : "bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg"
         }`}
