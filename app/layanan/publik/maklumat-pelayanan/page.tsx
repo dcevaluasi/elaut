@@ -57,8 +57,8 @@ export default function MaklumatPelayananPage() {
                     {/* Glass Card */}
                     <div className="bg-white/10 backdrop-blur-lg rounded-xl sm:rounded-2xl shadow-2xl border border-white/20 p-4 sm:p-6 md:p-8">
                         {/* Header */}
-                        <div className="mb-6 sm:mb-8">
-                            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white drop-shadow-lg mb-2">
+                        <div className="mb-6 sm:mb-8 w-full flex-col text-center justify-center items-center">
+                            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white drop-shadow-lgß">
                                 Maklumat Pelayanan
                             </h1>
                             <p className="text-white/80 text-sm sm:text-base">
@@ -75,7 +75,7 @@ export default function MaklumatPelayananPage() {
                         ) : maklumat ? (
                             <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden">
                                 {/* Image Section */}
-                                <div className="relative w-full h-64 sm:h-80 md:h-96 lg:h-[500px]">
+                                <div className="relative w-full h-64 sm:h-80 md:h-125 lg:h-[600px]">
                                     <Image
                                         src={getDirectImageUrl(maklumat.imageUrl)}
                                         alt={maklumat.title}
@@ -114,22 +114,6 @@ export default function MaklumatPelayananPage() {
                                 </div>
                             </div>
                         )}
-
-                        {/* Info Box */}
-                        <div className="mt-6 bg-blue-500/20 backdrop-blur-sm rounded-lg p-4 sm:p-5 border border-blue-400/30">
-                            <div className="flex items-start gap-3">
-                                <div className="w-1.5 h-full bg-blue-400 rounded-full flex-shrink-0" />
-                                <div>
-                                    <h3 className="text-white font-semibold text-sm sm:text-base mb-1">
-                                        Informasi Penting
-                                    </h3>
-                                    <p className="text-white/80 text-xs sm:text-sm leading-relaxed">
-                                        Maklumat pelayanan ini berisi standar pelayanan, persyaratan, biaya, waktu pelayanan,
-                                        dan informasi penting lainnya terkait pelayanan pelatihan kelautan dan perikanan.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
