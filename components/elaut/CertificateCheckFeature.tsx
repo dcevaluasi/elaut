@@ -208,10 +208,7 @@ const CertificateCheckFeature = () => {
     };
 
     return (
-        <section className="flex flex-col min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-sky-900 to-blue-900 text-white items-center justify-center py-20 md:py-24">
-            <div className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-blue-500/40 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-cyan-400/20 blur-3xl" />
-            <div className="pointer-events-none absolute top-1/3 -right-16 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
+        <section className="flex flex-col min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-blue-900 via-blue-800 to-blue-950 text-white items-center justify-center py-20 md:py-24">
 
             <div className="flex items-center justify-center w-full">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
@@ -254,8 +251,8 @@ const CertificateCheckFeature = () => {
                                         <div
                                             key={index}
                                             className="flex flex-col gap-3 items-center justify-center w-full
-                                                bg-white/10 backdrop-blur-xl border border-white/20
-                                                rounded-3xl p-6 sm:p-8 relative shadow-lg transition-all duration-500
+                                                bg-white/10 backdrop-blur-lg border border-white/20
+                                                rounded-3xl p-6 sm:p-8 relative shadow-2xl transition-all duration-500
                                                 hover:scale-105 hover:shadow-2xl"
                                         >
                                             {/* Info Button */}
@@ -323,7 +320,7 @@ const CertificateCheckFeature = () => {
                                 open={openPopUpInfoCheckCertificateFeature}
                                 onOpenChange={setOpenPopUpInfoCheckCertificateFeature}
                             >
-                                <AlertDialogContent className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl text-white">
+                                <AlertDialogContent className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl text-white shadow-2xl">
                                     <AlertDialogHeader>
                                         <AlertDialogTitle className="text-blue-400">
                                             {certificates[selectedCertificatesFeature].title}
@@ -348,7 +345,7 @@ const CertificateCheckFeature = () => {
 
                             {validSertifikat != null && (
                                 <AlertDialog open={isShowValidForm}>
-                                    <AlertDialogContent className="flex flex-col items-center justify-center !w-[420px] bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl text-white">
+                                    <AlertDialogContent className="flex flex-col items-center justify-center !w-[420px] bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl shadow-2xl text-white">
                                         <AlertDialogHeader>
                                             <AlertDialogTitle className="w-full flex gap-2 items-center justify-center flex-col">
                                                 {/* Verified Badge Glow */}
@@ -427,7 +424,7 @@ const CertificateCheckFeature = () => {
 
                                                 {/* Close Button */}
                                                 <AlertDialogAction
-                                                    className="py-3 rounded-2xl bg-blue-500/80 text-white hover:bg-blue-500 transition shadow-md"
+                                                    className="py-3 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 transition shadow-lg"
                                                     onClick={() => setIsShowValidForm(!isShowValidForm)}
                                                 >
                                                     Close
@@ -449,7 +446,7 @@ const CertificateCheckFeature = () => {
 
                             {/* Cek Sertifikat Pop-up */}
                             <AlertDialog open={openPopUpVerifyCertificateFeature} onOpenChange={setOpenPopUpVerifyCertificateFeature}>
-                                <AlertDialogContent className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl text-white">
+                                <AlertDialogContent className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl shadow-2xl text-white">
                                     <AlertDialogHeader>
                                         <AlertDialogTitle className="text-blue-500">
                                             {DIALOG_TEXTS["Cek Sertifikat"].title}
@@ -469,7 +466,7 @@ const CertificateCheckFeature = () => {
                                                 type="text"
                                                 value={noRegistrasi}
                                                 onChange={(e) => setNoRegistrasi(e.target.value)}
-                                                className="form-input w-full rounded-lg border border-white/30 bg-white/10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                                className="form-input w-full p-3 rounded-lg border border-white/20 bg-white/10 backdrop-blur-sm text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
                                                 placeholder="Masukkan nomor STTPL..."
                                             />
                                         </div>
@@ -483,7 +480,7 @@ const CertificateCheckFeature = () => {
                                             <AlertDialogAction
                                                 onClick={() => handleCekValiditasSertifikat()}
                                                 disabled={isLoadingSertifikat}
-                                                className="bg-blue-500/80 border border-blue-400 text-white rounded-xl hover:bg-blue-500 transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                                                className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 {isLoadingSertifikat ? (
                                                     <span className="flex items-center gap-2">
@@ -502,7 +499,7 @@ const CertificateCheckFeature = () => {
 
                             {/* Cek Pelatihan by NIK Pop-up */}
                             <AlertDialog open={openPopUpVerifyByNik} onOpenChange={setOpenPopUpVerifyByNik}>
-                                <AlertDialogContent className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl text-white">
+                                <AlertDialogContent className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl shadow-2xl text-white">
                                     <AlertDialogHeader>
                                         <AlertDialogTitle className="text-blue-500">
                                             Cek Pelatihan Berdasarkan NIK
@@ -522,7 +519,7 @@ const CertificateCheckFeature = () => {
                                                 type="text"
                                                 value={nik}
                                                 onChange={(e) => setNik(e.target.value)}
-                                                className="form-input w-full rounded-lg border border-white/30 bg-white/10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                                className="form-input w-full p-3 rounded-lg border border-white/20 bg-white/10 backdrop-blur-sm text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
                                                 placeholder="Masukkan NIK (16 digit)..."
                                                 maxLength={16}
                                             />
@@ -537,7 +534,7 @@ const CertificateCheckFeature = () => {
                                             <AlertDialogAction
                                                 onClick={() => handleCekPelatihanByNik()}
                                                 disabled={isLoadingPelatihanByNik}
-                                                className="bg-blue-500/80 border border-blue-400 text-white rounded-xl hover:bg-blue-500 transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                                                className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 {isLoadingPelatihanByNik ? (
                                                     <span className="flex items-center gap-2">
@@ -557,7 +554,7 @@ const CertificateCheckFeature = () => {
                             {/* Pelatihan by NIK Result */}
                             {pelatihanByNik != null && (
                                 <AlertDialog open={isShowPelatihanByNikForm}>
-                                    <AlertDialogContent className="flex flex-col items-start justify-start max-w-4xl max-h-[90vh] overflow-y-auto bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl text-white">
+                                    <AlertDialogContent className="flex flex-col items-start justify-start max-w-4xl max-h-[90vh] overflow-y-auto bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl shadow-2xl text-white">
                                         <AlertDialogHeader className="w-full">
                                             <AlertDialogTitle className="w-full flex gap-3 items-center justify-start flex-row">
                                                 <div className="w-16 h-16 rounded-full bg-gradient-to-b from-blue-400/50 via-blue-300/20 to-transparent flex items-center justify-center shadow-lg">
@@ -643,7 +640,7 @@ const CertificateCheckFeature = () => {
 
                                                 {/* Close Button */}
                                                 <AlertDialogAction
-                                                    className="py-3 rounded-2xl bg-blue-500/80 text-white hover:bg-blue-500 transition shadow-md"
+                                                    className="py-3 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 transition shadow-lg"
                                                     onClick={() => setIsShowPelatihanByNikForm(!isShowPelatihanByNikForm)}
                                                 >
                                                     Close
