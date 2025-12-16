@@ -87,17 +87,18 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed left-0 right-0 z-[150] transition duration-300 ease-in-out md:block ${top
+      className={`fixed left-0 right-0 z-[150] transition duration-300 ease-in-out ${top
         ? "bg-transparent"
         : "bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg"
         }`}
     >
-      <div className="max-w-6xl mx-auto mt-6 px-5 rounded-3xl transition-all">
-        <div className="flex items-center justify-between h-20 md:h-24">
+      <div className="max-w-6xl mx-auto mt-3 md:mt-6 px-3 md:px-5 rounded-3xl transition-all">
+        <div className="flex items-center justify-between h-16 md:h-20 lg:h-24">
+          {/* Logo - Always visible on mobile */}
           {pathname !== "/" && (
-            <Link href="/" className="flex items-center gap-3 shrink-0">
+            <Link href="/" className="flex items-center gap-2 md:gap-3 shrink-0 z-50">
               <Image
-                className={LOGO_SIZE}
+                className="w-12 sm:w-14 md:w-16 lg:w-20"
                 width={0}
                 height={0}
                 src={LOGO_PATH}
@@ -106,7 +107,8 @@ export default function Header() {
             </Link>
           )}
 
-          <nav className="flex md:grow">
+          {/* Desktop Navigation - Hidden on mobile/tablet */}
+          <nav className="hidden lg:flex lg:grow">
             <ul className="flex grow justify-end items-center gap-1">
               <NavLinkDefault
                 href="/"
@@ -187,7 +189,10 @@ export default function Header() {
             </ul>
           </nav>
 
-          <MobileMenu isTop={top} />
+          {/* Mobile Menu Button - Visible on mobile/tablet only */}
+          <div className="lg:hidden">
+            <MobileMenu isTop={top} />
+          </div>
         </div>
       </div>
     </header>

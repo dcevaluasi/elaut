@@ -4,11 +4,25 @@ import { useState, useRef, useEffect } from "react";
 import { Transition } from "@headlessui/react";
 import Link from "next/link";
 import Cookies from "js-cookie";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  HiMiniChevronDown,
+  HiHome,
+  HiIdentification,
+  HiNewspaper,
+  HiOutlineClipboardDocumentCheck,
+  HiOutlineDocumentText,
+  HiOutlineChatBubbleLeftRight,
+  HiOutlineChartBar,
+  HiOutlineChatBubbleBottomCenterText,
+} from "react-icons/hi2";
 
 export default function MobileMenu({ isTop }: { isTop: boolean }) {
   const [mobileNavOpen, setMobileNavOpen] = useState<boolean>(false);
+  const [openLayanan, setOpenLayanan] = useState<boolean>(false);
   const isLoggedIn = Cookies.get("XSRF081");
+  const router = useRouter();
+  const pathname = usePathname();
 
   const trigger = useRef<HTMLButtonElement>(null);
   const mobileNav = useRef<HTMLDivElement>(null);
@@ -51,8 +65,7 @@ export default function MobileMenu({ isTop }: { isTop: boolean }) {
       >
         <span className="sr-only">Menu</span>
         <svg
-          className={`w-6 h-6 fill-current ${isTop ? "text-[#979797]" : "text-gray-900"
-            }`}
+          className="w-6 h-6 fill-current text-white"
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
         >
@@ -68,7 +81,7 @@ export default function MobileMenu({ isTop }: { isTop: boolean }) {
           show={mobileNavOpen}
           as="nav"
           id="mobile-nav"
-          className="absolute top-full h-screen pb-16 z-20 left-0 w-full overflow-scroll bg-white"
+          className="absolute top-full h-screen pb-16 z-20 left-0 w-full overflow-scroll bg-gradient-to-br from-blue-900 via-blue-800 to-blue-950"
           enter="transition ease-out duration-200 transform"
           enterFrom="opacity-0 -translate-y-2"
           enterTo="opacity-100 translate-y-0"
@@ -76,81 +89,143 @@ export default function MobileMenu({ isTop }: { isTop: boolean }) {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <ul className="px-5 py-2">
+          <ul className="px-5 py-4 space-y-2">
+            {/* Beranda */}
             <li>
               <Link
                 href="/"
-                className="flex font-medium w-full text-gray-600 hover:text-gray-900 py-2 justify-center"
+                className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl font-semibold transition duration-200 ${
+                  pathname === "/" ? "bg-white/20 text-blue-400" : "text-white hover:bg-white/10"
+                }`}
                 onClick={() => setMobileNavOpen(false)}
               >
+                <HiHome className="text-xl" />
                 Beranda
               </Link>
             </li>
 
+            {/* Cek Sertifikat */}
             <li>
               <Link
-                href="/#cek-sertifikat"
-                className="flex font-medium w-full text-gray-600 hover:text-gray-900 py-2 justify-center"
+                href="/layanan/cek-sertifikat"
+                className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl font-semibold transition duration-200 ${
+                  pathname === "/layanan/cek-sertifikat" ? "bg-white/20 text-blue-400" : "text-white hover:bg-white/10"
+                }`}
                 onClick={() => setMobileNavOpen(false)}
               >
+                <HiIdentification className="text-xl" />
                 Cek Sertifikat
               </Link>
             </li>
 
-            {isLoggedIn ? (
-              <li>
+            {/* Layanan & Pengaduan Dropdown */}
+            <li>
+              <button
+                onClick={() => setOpenLayanan(!openLayanan)}
+                className={`flex items-center justify-between gap-3 w-full px-4 py-3 rounded-xl font-semibold transition duration-200 ${
+                  pathname.startsWith("/layanan") ? "bg-white/20 text-blue-400" : "text-white hover:bg-white/10"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <HiNewspaper className="text-xl" />
+                  Layanan & Pengaduan
+                </div>
+                <HiMiniChevronDown
+                  className={`text-lg transition-transform duration-200 ${
+                    openLayanan ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              {/* Dropdown Items */}
+              {openLayanan && (
+                <ul className="mt-2 ml-4 space-y-1 bg-white/5 rounded-xl p-2">
+                  <li>
+                    <Link
+                      href="/layanan/publik/maklumat-pelayanan"
+                      className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-white/90 text-sm hover:bg-white/10 hover:text-white transition"
+                      onClick={() => setMobileNavOpen(false)}
+                    >
+                      <HiOutlineClipboardDocumentCheck className="text-lg" />
+                      Maklumat Pelayanan
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/layanan/standar-pelayanan"
+                      className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-white/90 text-sm hover:bg-white/10 hover:text-white transition"
+                      onClick={() => setMobileNavOpen(false)}
+                    >
+                      <HiOutlineDocumentText className="text-lg" />
+                      Standar Pelayanan
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="https://span.lapor.go.id"
+                      className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-white/90 text-sm hover:bg-white/10 hover:text-white transition"
+                      onClick={() => setMobileNavOpen(false)}
+                    >
+                      <HiOutlineChatBubbleLeftRight className="text-lg" />
+                      SPAN Lapor
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/layanan/survey-kepuasan"
+                      className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-white/90 text-sm hover:bg-white/10 hover:text-white transition"
+                      onClick={() => setMobileNavOpen(false)}
+                    >
+                      <HiOutlineChartBar className="text-lg" />
+                      Survey Kepuasan Masyarakat (Susan KKP)
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/layanan/hasil-survey"
+                      className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-white/90 text-sm hover:bg-white/10 hover:text-white transition"
+                      onClick={() => setMobileNavOpen(false)}
+                    >
+                      <HiOutlineChartBar className="text-lg" />
+                      Hasil Survei Kepuasan Masyarakat
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/layanan/publik/masukan-saran"
+                      className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-white/90 text-sm hover:bg-white/10 hover:text-white transition"
+                      onClick={() => setMobileNavOpen(false)}
+                    >
+                      <HiOutlineChatBubbleBottomCenterText className="text-lg" />
+                      Masukan & Saran
+                    </Link>
+                  </li>
+                </ul>
+              )}
+            </li>
+
+            {/* Login/Dashboard Button */}
+            <li className="pt-4">
+              {isLoggedIn ? (
                 <Link
                   href="/dashboard"
-                  className="btn-sm text-gray-200 bg-gray-900 hover:bg-gray-800 w-full my-2"
+                  className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-xl border border-blue-400 bg-blue-500/20 text-white hover:bg-blue-500 hover:text-white font-semibold transition"
                   onClick={() => setMobileNavOpen(false)}
                 >
-                  <span>Dashboard</span>
-                  <svg
-                    className="w-3 h-3 fill-current text-gray-400 shrink-0 ml-2 -mr-1"
-                    viewBox="0 0 12 12"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M11.707 5.293L7 .586 5.586 2l3 3H0v2h8.586l-3 3L7 11.414l4.707-4.707a1 1 0 000-1.414z"
-                      fill="#999"
-                      fillRule="nonzero"
-                    />
-                  </svg>
+                  Dashboard
                 </Link>
-              </li>
-            ) : (
-              <>
-                <li>
-                  <Link
-                    href="/#cek-sertifikat"
-                    className="flex font-medium w-full text-gray-600 hover:text-gray-900 py-2 justify-center"
-                    onClick={() => setMobileNavOpen(false)}
-                  >
-                    Cek Sertifikat
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/registrasi"
-                    className="btn-sm text-gray-200 bg-gray-900 hover:bg-gray-800 w-full my-2"
-                    onClick={() => setMobileNavOpen(false)}
-                  >
-                    <span>Buat Akun</span>
-                    <svg
-                      className="w-3 h-3 fill-current text-gray-400 shrink-0 ml-2 -mr-1"
-                      viewBox="0 0 12 12"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M11.707 5.293L7 .586 5.586 2l3 3H0v2h8.586l-3 3L7 11.414l4.707-4.707a1 1 0 000-1.414z"
-                        fill="#999"
-                        fillRule="nonzero"
-                      />
-                    </svg>
-                  </Link>
-                </li>
-              </>
-            )}
+              ) : (
+                <button
+                  onClick={() => {
+                    setMobileNavOpen(false);
+                    router.push("/login");
+                  }}
+                  className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-xl border border-blue-400 bg-blue-500/20 text-white hover:bg-blue-500 hover:text-white font-semibold transition"
+                >
+                  Login
+                </button>
+              )}
+            </li>
           </ul>
         </Transition>
       </div>
