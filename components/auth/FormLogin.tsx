@@ -568,7 +568,7 @@ function FormLogin() {
       <div className="max-w-6xl h-full mx-auto px-4 sm:px-6 md:-mt-8 relative">
         <div className="pt-44 md:pb-20">
           <div className="w-full mx-auto text-center pb-0 md:pb-0">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-[110%] text-white drop-shadow-lg font-calsans mb-4">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl leading-[110%] text-white drop-shadow-lg font-calsans mb-4">
               <span className="">Login dan Ikuti</span> <br />
               <span className="z-0 bg-clip-text  w-[600px] leading-[110%]  text-transparent bg-gradient-to-r  from-blue-400  to-teal-400">
                 Pelatihan di E-LAUT
@@ -585,34 +585,7 @@ function FormLogin() {
 
           <div className="max-w-2xl mx-5 md:mx-auto mt-5">
             <div className="bg-white/10 backdrop-blur-lg rounded-xl sm:rounded-2xl shadow-2xl border border-white/20 p-4 sm:p-6 md:p-8">
-              {/* <div className="flex flex-col gap-1 mb-2">
-              <label
-                className="block text-gray-200 text-sm font-medium mb-1"
-                htmlFor="name"
-              >
-                Masuk Sebagai <span className="text-red-600">*</span>
-              </label>
-              <Select
-                value={role}
-                onValueChange={(value: string) => setRole(value)}
-              >
-                <SelectTrigger className="form-input w-full py-6 bg-transparent placeholder:text-gray-200 border-gray-400 focus:border-gray-200  active:border-gray-200 text-gray-200">
-                  <p className="mr-3 flex items-center gap-1 text-base text-gray-300">
-                    <HiMiniUserGroup />
-                    {role != "" ? role : "Pilih Masuk Sebagai"}
-                  </p>
-                </SelectTrigger>
-                <SelectContent side="bottom">
-                  <SelectGroup>
-                    <SelectLabel>Masuk Sebagai</SelectLabel>
-                    <SelectItem value="Perseorangan">Perseorangan</SelectItem>
-                    <SelectItem value="Corporate/Manning Agent">
-                      Corporate/Manning Agent
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div> */}
+
               {role == "" ? (
                 <></>
               ) : role == "Perseorangan" ? (
@@ -635,12 +608,12 @@ function FormLogin() {
                         </p>
                       </SelectTrigger>
                       <SelectContent side="bottom" className=" flex flex-col gap-1 mt-2 
-              bg-white/10 backdrop-blur-xl border border-white/20 
-              rounded-2xl shadow-xl p-3 text-white">
-                        <SelectGroup>
+              bg-white/70  backdrop-blur-xl border border-white/20 
+              rounded-2xl shadow-xl p-3 text-blue-500">
+                        <SelectGroup className="">
                           <SelectLabel>Login Menggunakan</SelectLabel>
-                          <SelectItem className="flex gap-2 items-center px-3 py-2 rounded-lg !hover:bg-white/5 text-white" value="Whatsapp/No Telpon">Whatsapp/No Telpon</SelectItem>
-                          <SelectItem className="flex gap-2 items-center px-3 py-2 rounded-lg !hover:bg-white/5 text-white" value="NIK">
+                          <SelectItem className="flex gap-2 items-center px-3 py-2 rounded-lg !hover:bg-white/5 hover:text-blue-500 text-gray-600" value="Whatsapp/No Telpon">Whatsapp/No Telpon</SelectItem>
+                          <SelectItem className="flex gap-2 items-center px-3 py-2 rounded-lg !hover:bg-white/5 hover:text-blue-500 text-gray-600" value="NIK">
                             NIK
                           </SelectItem>
                         </SelectGroup>
@@ -835,8 +808,8 @@ function FormLogin() {
                       <button
                         type="submit"
                         className={`w-full flex justify-center items-center gap-2 text-white px-8 py-3 sm:px-10 sm:py-4 rounded-lg shadow-lg transition-all font-semibold text-sm sm:text-base ${captcha
-                            ? "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
-                            : "bg-gray-500/50 cursor-not-allowed"
+                          ? "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                          : "bg-gray-500/50 cursor-not-allowed"
                           }`}
                         disabled={captcha ? false : true}
                       >
