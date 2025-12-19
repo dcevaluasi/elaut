@@ -325,6 +325,7 @@ const FormatSTTPL = React.forwardRef(
 
                                     <>
                                         <div className="flex w-full flex-col space-y-1 max-w-7xl mx-auto items-start text-sm -mt-2 text-center font-bos h-fit">
+
                                             <span className="text-lg leading-[115%] font-bosNormal max-w-7xl">
                                                 {generatedDescriptionCertificate(pelatihan?.DeskripsiSertifikat).desc_indo} pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
                                             </span>
@@ -735,17 +736,30 @@ const FormatSTTPL = React.forwardRef(
                                     </div>
 
                                     <>
-                                        <div className="flex w-full flex-col space-y-1 max-w-7xl mx-auto items-start text-sm -mt-2 text-center font-bos h-fit">
-                                            <span className="text-lg leading-[115%] font-bosNormal max-w-7xl">
-                                                Pelatihan <span className={`${pelatihan?.Program.includes('HACCP') ? 'font-bosItalic' : 'font-bosNormal'}`}>{dataProgramPelatihan[0]?.name_indo}</span> pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))} {generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_indo == "" ? `yang diselenggarakan oleh ${pelatihan?.PenyelenggaraPelatihan} dengan jam pelajaran ${totalHoursCertificateLvl.totalTheory + totalHoursCertificateLvl.totalPractice} JP secara ${pelatihan?.PelaksanaanPelatihan}. Pelatihan ini merupakan bagian dari upaya peningkatan kapasitas dan kompetensi sumber daya manusia di sektor kelautan dan perikanan, sesuai dengan standar mutu atau ketentuan yang berlaku, sehingga peserta memperoleh pengetahuan, keterampilan, dan pemahaman yang relevan sesuai program pelatihan.` : generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_indo}
-                                            </span>
-                                            {
-                                                generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng != "" && <span className="max-w-6xl mt-1 leading-none font-bosItalic text-[0.9rem] mx-auto">
-                                                    {dataProgramPelatihan[0]?.name_english} training on {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))} {dataProgramPelatihan[0]?.description == "" ? "in support of the Quality Assurance System based on Regulation of the Minister of Marine Affairs and Fisheries of the Republic of Indonesia Number 8 of 2024 concerning Control of the Implementation of the Quality Assurance and Safety System for Marine and Fishery Product" : generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng}
+                                        {
+                                            pelatihan?.JenisPelatihan != "Kerja Sama" ? <div className="flex w-full flex-col space-y-1 max-w-7xl mx-auto items-start text-sm -mt-2 text-center font-bos h-fit">
+                                                <span className="text-lg leading-[115%] font-bosNormal max-w-7xl">
+                                                    Pelatihan <span className={`${pelatihan?.Program.includes('HACCP') ? 'font-bosItalic' : 'font-bosNormal'}`}>{dataProgramPelatihan[0]?.name_indo}</span> pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))} {generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_indo == "" ? `yang diselenggarakan oleh ${pelatihan?.PenyelenggaraPelatihan} dengan jam pelajaran ${totalHoursCertificateLvl.totalTheory + totalHoursCertificateLvl.totalPractice} JP secara ${pelatihan?.PelaksanaanPelatihan}. Pelatihan ini merupakan bagian dari upaya peningkatan kapasitas dan kompetensi sumber daya manusia di sektor kelautan dan perikanan, sesuai dengan standar mutu atau ketentuan yang berlaku, sehingga peserta memperoleh pengetahuan, keterampilan, dan pemahaman yang relevan sesuai program pelatihan.` : generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_indo}
                                                 </span>
-                                            }
+                                                {
+                                                    generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng != "" && <span className="max-w-6xl mt-1 leading-none font-bosItalic text-[0.9rem] mx-auto">
+                                                        {dataProgramPelatihan[0]?.name_english} training on {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))} {dataProgramPelatihan[0]?.description == "" ? "in support of the Quality Assurance System based on Regulation of the Minister of Marine Affairs and Fisheries of the Republic of Indonesia Number 8 of 2024 concerning Control of the Implementation of the Quality Assurance and Safety System for Marine and Fishery Product" : generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng}
+                                                    </span>
+                                                }
 
-                                        </div>
+                                            </div> : <div className="flex w-full flex-col space-y-1 max-w-7xl mx-auto items-start text-sm -mt-2 text-center font-bos h-fit">
+                                                <span className="text-lg leading-[115%] font-bosNormal max-w-7xl">
+                                                    {generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_indo}
+                                                </span>
+                                                {
+                                                    generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng != "" && <span className="max-w-6xl mt-1 leading-none font-bosItalic text-[0.9rem] mx-auto">
+                                                        {generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng}
+                                                    </span>
+                                                }
+
+                                            </div>
+                                        }
+
 
                                         <div className="flex gap-2 items-center justify-center pt-4">
                                             <div className="grid grid-cols-3 items-center">
