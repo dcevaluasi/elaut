@@ -840,7 +840,7 @@ const FormatSTTPL = React.forwardRef(
                                     {/* Title */}
                                     <div className={`flex flex-row justify-center items-center ${materiIntiCount >= 10 ? "-mb-20" : "mb-5"}`}>
                                         <div className="flex flex-col text-center space-y-0 h-fit items-center justify-center w-full gap-0">
-                                            <p className={`font-bosBold ${materiIntiCount >= 10 ? "text-xl" : "text-2xl max-w-6xl"} w-full uppercase leading-none mb-0`}>
+                                            <p className={`font-bosBold ${materiIntiCount >= 10 ? "text-xl" : "text-xl max-w-6xl"} w-full uppercase leading-none mb-0`}>
                                                 Materi Pelatihan {dataProgramPelatihan[0]?.name_indo}, Diselenggarakan oleh {pelatihan?.PenyelenggaraPelatihan} pada tanggal{" "}
                                                 {formatDateRange(
                                                     generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan),
