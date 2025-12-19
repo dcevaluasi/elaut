@@ -435,7 +435,7 @@ const FormatSTTPL = React.forwardRef(
                                     </div>
 
                                     {/* Table */}
-                                    <div className={`${scaleClass} ${(pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? '-mb-28' : 'mb-0'} pb-0 w-full border border-gray-400 rounded-md overflow-hidden `}>
+                                    <div className={`${scaleClass} ${(pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? '-mb-24' : 'mb-0'} pb-0 w-full border border-gray-400 rounded-md overflow-hidden `}>
                                         {/* Header Baris 1 */}
                                         <div className="flex text-center font-bosNormal bg-gray-100 ">
                                             <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 leading-none relative">
