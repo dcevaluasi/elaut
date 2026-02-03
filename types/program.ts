@@ -1,6 +1,7 @@
 export interface RumpunPelatihan {
   id_rumpun_pelatihan: number
   name: string
+  nama_rumpun_pelatihan?: string
   created: string
   updated: string
   programs: ProgramPelatihan[]

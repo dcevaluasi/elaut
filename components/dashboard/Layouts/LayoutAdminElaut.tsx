@@ -14,12 +14,12 @@ import { LucideLayoutDashboard } from "lucide-react";
 import { IoAlbumsOutline, IoBookOutline, IoDocumentOutline, IoFolderOpenOutline, IoPieChartOutline, IoSchoolOutline } from "react-icons/io5";
 import { FiMenu, FiLogOut, FiChevronDown, FiChevronRight } from "react-icons/fi";
 import { HiOutlineInbox, HiOutlineUserGroup } from "react-icons/hi2";
-import { TbBuildingSkyscraper, TbDatabaseEdit } from "react-icons/tb";
+import { TbBuildingEstate, TbBuildingSkyscraper, TbChartPie, TbDatabaseEdit, TbGavel, TbSchool } from "react-icons/tb";
 import Link from "next/link";
 import { breakdownStatus } from "@/lib/utils";
 import { generatedSignedCertificate } from "@/utils/certificates";
 import { RiQuillPenAiLine } from "react-icons/ri";
-import { IoMdGlobe, IoMdListBox } from "react-icons/io";
+import { BiBadgeCheck } from "react-icons/bi";
 
 export default function LayoutAdminElaut({
   children,
@@ -32,6 +32,9 @@ export default function LayoutAdminElaut({
   const [submenuOpen, setSubmenuOpen] = useState(true);
   const [sidebarSubOpen, setSidebarSubOpen] = useState(true);
   const [submenuSubOpen, setSubmenuSubOpen] = useState(false);
+  const [menuP2MKPOpen, setMenuP2MKPOpen] = useState(false);
+  const [subMenuP2MKPOpen, setSubMenuP2MKPOpen] = useState(false);
+
   const [pusatData, setPusatData] = useState<PusatDetailInfo | null>(null);
   const [lemdikData, setLemdikData] = useState<LemdiklatDetailInfo | null>(null);
 
@@ -122,44 +125,60 @@ export default function LayoutAdminElaut({
 
 
   return (
-    <div className="h-screen w-full flex text-gray-800 bg-white">
+    <div className="h-screen w-full flex bg-slate-50 font-sans">
       {/* Sidebar */}
       <aside
-        className={`flex-none flex flex-col bg-neutral-900 text-gray-300 transition-all duration-300 ${sidebarOpen ? "w-64" : "w-16"
+        className={`flex-none flex flex-col bg-[#0f172a] text-slate-300 transition-all duration-300 ease-in-out z-50 shadow-2xl ${sidebarOpen ? "w-72" : "w-20"
           }`}
       >
         {/* Logo + Toggle */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-700">
+        <div className="flex items-center justify-between h-20 px-6 border-b border-slate-800/50 bg-[#0f172a]">
           {sidebarOpen ? (
-            <div className="flex gap-2 items-center">
-              <Image src="/logo-kkp-white.png" alt="Logo" width={40} height={40} />
-              <span className="leading-none text-sm">Elektronik Layanan Terpadu Utama Pelatihan</span>
+            <div className="flex gap-3 items-center overflow-hidden">
+              <div className="relative w-8 h-8 flex-shrink-0">
+                <Image src="/logo-kkp-white.png" alt="Logo" fill className="object-contain" />
+              </div>
+              <span className="leading-tight text-xs font-semibold text-white tracking-wide">
+                ELAUT <br /> <span className="text-slate-400 font-normal">Kementerian Kelautan</span>
+              </span>
             </div>
           ) : (
-            <Image src="/logo-kkp-white.png" alt="Logo" width={40} height={40} />
+            <div className="w-full flex justify-center">
+              <div className="relative w-8 h-8">
+                <Image src="/logo-kkp-white.png" alt="Logo" fill className="object-contain" />
+              </div>
+            </div>
           )}
 
+          {sidebarOpen && <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="text-slate-400 hover:text-white transition-colors"
+          >
+            <FiMenu size={20} />
+          </button>}
+        </div>
+        {!sidebarOpen && <div className="flex justify-center py-4 border-b border-slate-800/50">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="text-gray-300 hover:text-white"
+            className="text-slate-400 hover:text-white transition-colors"
           >
             <FiMenu size={20} />
           </button>
-        </div>
+        </div>}
 
 
-        <ul className="flex-1 mt-4 space-y-1">
+        <div className="flex-1 overflow-y-auto py-6 px-3 space-y-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
           {/* Dashboard */}
           <li>
             <a
               href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/dashboard/`}
-              className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname.includes(`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/dashboard`)
-                ? "bg-blue-600 text-white"
-                : "hover:bg-blue-500 hover:text-white"
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${pathname.includes(`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/dashboard`)
+                ? "bg-blue-600 text-white shadow-lg shadow-blue-900/40"
+                : "hover:bg-slate-800 hover:text-white"
                 }`}
             >
-              <LucideLayoutDashboard />
-              {sidebarOpen && <span className="text-sm">Dashboard</span>}
+              <LucideLayoutDashboard className={pathname.includes("dashboard") ? "text-white" : "text-slate-400 group-hover:text-white"} />
+              {sidebarOpen && <span className="text-sm font-medium">Dashboard</span>}
             </a>
           </li>
 
@@ -168,64 +187,66 @@ export default function LayoutAdminElaut({
             (Cookies.get('Role')?.includes('Pengelola') || Cookies.get('Access')?.includes('superAdmin')) && <li>
               <button
                 onClick={() => { setSubmenuOpen(!submenuOpen) }}
-                className={`flex items-center justify-between w-full px-4 py-2 transition-colors rounded-md ${pathname.includes("master")
-                  ? "bg-blue-600 text-white"
-                  : "hover:bg-blue-500 hover:text-white"
+                className={`flex items-center justify-between w-full px-3 py-2.5 rounded-lg transition-all duration-200 group ${pathname.includes("master")
+                  ? "bg-blue-600 text-white shadow-lg shadow-blue-900/40"
+                  : "hover:bg-slate-800 hover:text-white"
                   }`}
               >
                 <div className="flex items-center gap-3">
-                  <TbDatabaseEdit className="w-6 h-6" />
+                  <TbDatabaseEdit className={`w-6 h-6 ${pathname.includes("master") ? "text-white" : "text-slate-400 group-hover:text-white"}`} />
 
                   {sidebarOpen && (
-                    <span className="text-sm text-left">Master Pelatihan</span>
+                    <span className="text-sm font-medium text-left">Master Pelatihan</span>
                   )}
                 </div>
-                {sidebarOpen && (submenuOpen ? <FiChevronDown /> : <FiChevronRight />)}
+                {sidebarOpen && (submenuOpen ? <FiChevronDown className="opacity-70" /> : <FiChevronRight className="opacity-70" />)}
               </button>
               {submenuOpen && sidebarOpen && (
-                <ul className="ml-7 mt-1 space-y-1">
+                <ul className="ml-4 mt-1 pl-3 border-l border-slate-700 space-y-1">
                   <NavItem
                     href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/instruktur`}
-                    icon={<HiOutlineUserGroup className="flex-shrink-0 w-6 h-6" />}
+                    icon={<HiOutlineUserGroup className="flex-shrink-0 w-5 h-5" />}
                     label="Instruktur/Pelatih"
                   />
                   <button
                     onClick={() => { setSubmenuSubOpen(!submenuSubOpen) }}
-                    className={`flex items-center justify-between w-full px-3 py-2 transition-colors rounded-md ${submenuSubOpen
-                      ? "bg-blue-600 text-white"
-                      : "hover:bg-blue-500 hover:text-white"
+                    className={`flex items-center justify-between w-full px-3 py-2 rounded-lg transition-colors text-sm ${submenuSubOpen
+                      ? "text-blue-400 font-medium"
+                      : "text-slate-400 hover:text-white hover:bg-slate-800"
                       }`}
                   >
                     <div className="flex items-center gap-3">
-                      <IoBookOutline className="w-6 h-6" />
+                      <IoBookOutline className="w-5 h-5" />
                       {sidebarSubOpen && (
-                        <span className="text-sm text-left">Peragkat Pelatihan</span>
+                        <span className="text-left">Perangkat Pelatihan</span>
                       )}
                     </div>
-                    {sidebarSubOpen && (submenuSubOpen ? <FiChevronDown /> : <FiChevronRight />)}
+                    {sidebarSubOpen && (submenuSubOpen ? <FiChevronDown size={14} /> : <FiChevronRight size={14} />)}
                   </button>
                   {submenuSubOpen && sidebarSubOpen && (
-                    <ul className="ml-7 mt-1 space-y-1">
+                    <ul className="ml-3 mt-1 pl-3 border-l border-slate-700 space-y-1">
                       {
                         Cookies.get('Access')?.includes('viewModul') &&
                         <NavItem
                           href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/modul`}
-                          icon={<IoDocumentOutline className="flex-shrink-0 w-6 h-6" />}
+                          icon={<IoDocumentOutline className="flex-shrink-0 w-5 h-5" />}
                           label="Modul Pelatihan"
+                          compact
                         />
                       }
                       {
                         Cookies.get('Access')?.includes('viewModul') &&
                         <NavItem
                           href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/bahan-ajar`}
-                          icon={<IoFolderOpenOutline className="flex-shrink-0 w-6 h-6" />}
+                          icon={<IoFolderOpenOutline className="flex-shrink-0 w-5 h-5" />}
                           label="Bahan Ajar"
+                          compact
                         />
                       }
                     </ul>)}
                   <NavItem
                     href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/unit-kerja`}
-                    icon={<TbBuildingSkyscraper className="flex-shrink-0 w-6 h-6" />}
+                    icon={<TbBuildingSkyscraper className="flex-shrink-0 w-5 h-5" />}
                     label="Unit Kerja"
                   />
                   {
@@ -233,17 +254,53 @@ export default function LayoutAdminElaut({
                     <>
                       <NavItem
                         href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/klaster-pelatihan`}
-                        icon={<HiOutlineInbox className="flex-shrink-0 w-6 h-6" />}
+                        icon={<HiOutlineInbox className="flex-shrink-0 w-5 h-5" />}
                         label="Klaster Pelatihan"
                       />
                     </>
                   }
                   <NavItem
                     href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/program-pelatihan`}
-                    icon={<RiQuillPenAiLine className="flex-shrink-0 w-6 h-6" />}
+                    icon={<RiQuillPenAiLine className="flex-shrink-0 w-5 h-5" />}
                     label="Program Pelatihan"
                   />
 
+                </ul>
+              )}
+            </li>
+          }
+
+          {/* Pusat Pelatihan Mandiri KP */}
+          {
+            (Cookies.get('Role')?.includes('Pengelola') || Cookies.get('Access')?.includes('superAdmin')) && <li>
+              <button
+                onClick={() => { setSubMenuP2MKPOpen(!subMenuP2MKPOpen) }}
+                className={`flex items-center justify-between w-full px-3 py-2.5 rounded-lg transition-all duration-200 group ${pathname.includes("p2mkp")
+                  ? "bg-blue-600 text-white shadow-lg shadow-blue-900/40"
+                  : "hover:bg-slate-800 hover:text-white"
+                  }`}
+              >
+                <div className="flex items-center gap-3">
+                  <TbBuildingEstate className={`w-6 h-6 ${pathname.includes("p2mkp") ? "text-white" : "text-slate-400 group-hover:text-white"}`} />
+                  {sidebarOpen && (
+                    <span className="text-sm font-medium text-left">P2MKP</span>
+                  )}
+
+                </div>
+                {sidebarOpen && (subMenuP2MKPOpen ? <FiChevronDown className="opacity-70" /> : <FiChevronRight className="opacity-70" />)}
+              </button>
+              {subMenuP2MKPOpen && (
+                <ul className="ml-4 mt-1 pl-3 border-l border-slate-700 space-y-1">
+                  <NavItem
+                    href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/p2mkp/manage`}
+                    icon={<BiBadgeCheck className="flex-shrink-0 w-5 -ml-0.5 h-6" />}
+                    label="Data P2MKP"
+                  />
+                  <NavItem
+                    href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/p2mkp/penetapan`}
+                    icon={<TbGavel className="flex-shrink-0 w-5 h-6" />}
+                    label="Penetapan dan Klasifikasi"
+                  />
                 </ul>
               )}
             </li>
@@ -253,13 +310,13 @@ export default function LayoutAdminElaut({
           <li>
             <a
               href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/pelatihan`}
-              className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname.includes(`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/pelatihan`)
-                ? "bg-blue-600 text-white"
-                : "hover:bg-blue-500 hover:text-white"
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${pathname.includes(`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/pelatihan`)
+                ? "bg-blue-600 text-white shadow-lg shadow-blue-900/40"
+                : "hover:bg-slate-800 hover:text-white"
                 }`}
             >
-              <IoSchoolOutline className="flex-shrink-0 w-6 h-6" />
-              {sidebarOpen && <span className="text-sm">Penyelenggaraan Pelatihan</span>}
+              <TbSchool className={`flex-shrink-0 w-6 h-6 ${pathname.includes("pelatihan") ? "text-white" : "text-slate-400 group-hover:text-white"}`} />
+              {sidebarOpen && <span className="text-sm font-medium">Penyelenggaraan Pelatihan</span>}
             </a>
           </li>
 
@@ -267,13 +324,13 @@ export default function LayoutAdminElaut({
           <li>
             <a
               href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/kinerja/`}
-              className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname.includes(`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/kinerja`)
-                ? "bg-blue-600 text-white"
-                : "hover:bg-blue-500 hover:text-white"
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${pathname.includes(`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/kinerja`)
+                ? "bg-blue-600 text-white shadow-lg shadow-blue-900/40"
+                : "hover:bg-slate-800 hover:text-white"
                 }`}
             >
-              <IoPieChartOutline className="flex-shrink-0 w-6 h-6" />
-              {sidebarOpen && <span className="text-sm">Indikator Kinerja</span>}
+              <TbChartPie className={`flex-shrink-0 w-6 h-6 ${pathname.includes("kinerja") ? "text-white" : "text-slate-400 group-hover:text-white"}`} />
+              {sidebarOpen && <span className="text-sm font-medium">Indikator Kinerja</span>}
             </a>
           </li>
 
@@ -282,36 +339,36 @@ export default function LayoutAdminElaut({
             Cookies.get('Access')?.includes('superAdmin') && <li>
               <a
                 href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/layanan/`}
-                className={`flex items-center gap-3 px-4 py-2 transition-colors rounded-md ${pathname.includes(`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/layanan`)
-                  ? "bg-blue-600 text-white"
-                  : "hover:bg-blue-500 hover:text-white"
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${pathname.includes(`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/layanan`)
+                  ? "bg-blue-600 text-white shadow-lg shadow-blue-900/40"
+                  : "hover:bg-slate-800 hover:text-white"
                   }`}
               >
-                <IoAlbumsOutline className="flex-shrink-0 w-6 h-6" />
-                {sidebarOpen && <span className="text-sm">Layanan dan Pengaduan</span>}
+                <IoAlbumsOutline className={`flex-shrink-0 w-6 h-6 ${pathname.includes("layanan") ? "text-white" : "text-slate-400 group-hover:text-white"}`} />
+                {sidebarOpen && <span className="text-sm font-medium">Layanan dan Pengaduan</span>}
               </a>
             </li>
           }
 
-        </ul>
+        </div>
 
         {/* Logout */}
-        <div className="p-4 border-t border-gray-700">
+        <div className="p-4 border-t border-slate-800/50 bg-[#0f172a]">
           <button
             onClick={handleLogOut}
-            className="flex items-center gap-3 w-full px-4 py-2 text-gray-300 hover:bg-red-500 hover:text-white rounded-md"
+            className="flex items-center gap-3 w-full px-3 py-2.5 text-slate-400 hover:bg-rose-500/10 hover:text-rose-500 rounded-lg transition-all duration-200 group"
           >
-            <FiLogOut />
-            {sidebarOpen && <span>Logout</span>}
+            <FiLogOut className="w-5 h-5 group-hover:text-rose-500" />
+            {sidebarOpen && <span className="font-medium">Logout</span>}
           </button>
         </div>
       </aside>
 
       <div className="flex-grow flex flex-col overflow-y-auto">
-        <header className="flex justify-end items-center bg-white h-20 px-6 py-2 border-b">
+        <header className="flex justify-end items-center bg-white/80 backdrop-blur-md sticky top-0 z-40 h-20 px-8 border-b border-slate-200/60 shadow-sm">
           <DropdownUser lemdiklatLoggedInInfo={lemdikData} pusatLoggedInInfo={pusatData} />
         </header>
-        <main className="flex-grow p-4">{children}</main>
+        <main className="flex-grow p-6 bg-slate-50">{children}</main>
       </div>
     </div>
   );
@@ -325,17 +382,19 @@ interface HeaderPageLayoutAdminElautProps {
 
 export function HeaderPageLayoutAdminElaut({ icon, title, description }: HeaderPageLayoutAdminElautProps) {
   return (
-    <article className="flex flex-row gap-2 items-center">
+    <article className="flex flex-row gap-2 items-center mb-6">
       <header
         aria-label="page caption"
-        className="flex-row w-full flex h-20 items-center gap-2 bg-gray-100 border-t px-4"
+        className="flex-row w-full flex h-auto items-center gap-4 bg-white border border-slate-200/60 shadow-sm rounded-2xl p-6"
       >
-        <div className="text-3xl">{icon}</div>
-        <div className="flex flex-col">
-          <h1 id="page-caption" className="font-semibold text-lg">
+        <div className="w-14 h-14 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-3xl shrink-0">
+          {icon}
+        </div>
+        <div className="flex flex-col gap-1">
+          <h1 id="page-caption" className="font-bold text-xl text-slate-900">
             {title}
           </h1>
-          <p className="font-medium text-gray-400 text-base">
+          <p className="font-medium text-slate-500 text-sm">
             {description}
           </p>
         </div>
@@ -348,9 +407,10 @@ type NavItemProps = {
   href: string;
   icon: React.ReactNode;
   label: string;
+  compact?: boolean;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ href, icon, label }) => {
+const NavItem: React.FC<NavItemProps> = ({ href, icon, label, compact }) => {
   const pathname = usePathname();
 
   const isActive = pathname.includes(href);
@@ -359,12 +419,12 @@ const NavItem: React.FC<NavItemProps> = ({ href, icon, label }) => {
     <li>
       <Link
         href={href}
-        className={`flex gap-3 px-3 py-2 rounded-md text-sm transition-colors ${isActive
-          ? "bg-blue-500 text-white"
-          : "hover:bg-blue-400 hover:text-white"
-          }`}
+        className={`flex gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 items-center ${isActive
+          ? "text-blue-400 font-medium bg-blue-400/10 border-r-2 border-blue-400"
+          : "text-slate-400 hover:text-white hover:bg-slate-800"
+          } ${compact ? "py-1.5" : ""}`}
       >
-        <span className="text-xl">{icon}</span>
+        <span className={`flex-shrink-0 ${compact ? "opacity-70" : ""}`}>{icon}</span>
         {label}
       </Link>
     </li>

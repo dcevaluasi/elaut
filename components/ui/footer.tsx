@@ -82,7 +82,7 @@ export default function Footer() {
           </div>
 
           <div className="sm:col-span-6 md:col-span-3 lg:col-span-2">
-            <h6 className="text-gray-300 font-bold mb-2">Balai Pelatihan dan Sertifikasi</h6>
+            <h6 className="text-gray-300 font-bold mb-2">Lembaga Pelatihan KP</h6>
             <ul className="text-sm">
               <FooterLink href="https://ppid.sipelatihaksi.com/">BPPP Medan</FooterLink>
               <FooterLink href="https://sites.google.com/view/ppidbppakkp">BDA Sukamandi</FooterLink>
@@ -90,6 +90,7 @@ export default function Footer() {
               <FooterLink href="https://www.bpppbanyuwangi.com/">BPPP Banyuwangi</FooterLink>
               <FooterLink href="https://bp3ambon.kkp.go.id/">BPPP Ambon</FooterLink>
               <FooterLink href="https://bpppbitung.id/#">BPPP Bitung</FooterLink>
+              <FooterLink href="/p2mkp">P2MKP - Pusat Pelatihan Mandiri Kelautan dan Perikanan</FooterLink>
             </ul>
           </div>
 
