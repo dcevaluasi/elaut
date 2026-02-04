@@ -118,7 +118,7 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
                 </AlertDialogHeader>
 
                 <div className="space-y-1">
-                    <div className=" gap-2 w-full grid grid-cols-3">
+                    <div className=" gap-2 w-full grid grid-cols-1 md:grid-cols-3">
                         <div className="space-y-2 w-full">
                             <label className="text-sm font-medium text-gray-700">
                                 Tanggal Mulai Pendaftaran

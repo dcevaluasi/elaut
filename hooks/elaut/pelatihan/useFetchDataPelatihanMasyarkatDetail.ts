@@ -38,7 +38,7 @@ export function useFetchDataPelatihanMasyarakatDetail(
     } finally {
       setLoading(false)
     }
-  }, [idPelatihan, Cookies.get('XSRF091')])
+  }, [idPelatihan])
 
   React.useEffect(() => {
     fetchData()

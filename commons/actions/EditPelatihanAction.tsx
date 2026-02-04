@@ -166,7 +166,7 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 
-                <div className="py-2 max-h-[70vh] gap-3 overflow-y-auto pr-2 grid grid-cols-2">
+                <div className="py-2 max-h-[70vh] gap-3 overflow-y-auto pr-2 grid grid-cols-1 md:grid-cols-2">
                     {/* Nama Kegiatan */}
                     <div className="space-y-1">
                         <label

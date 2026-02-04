@@ -65,7 +65,7 @@ const DeleteInstrukturAction: React.FC<{
             <AlertDialogTrigger asChild>
                 <Button
                     variant="outline"
-                    className="flex items-center gap-2 w-fit rounded-lg px-3 py-1.5 shadow-sm text-sm text-rose-500 hover:text-white border-rose-500 hover:bg-rose-500"
+                    className="flex items-center gap-2 w-full rounded-lg px-3 py-1.5 shadow-sm text-sm text-rose-500 hover:text-white border-rose-500 hover:bg-rose-500"
                 >
                     <TbTrash className="h-4 w-4" />
                     Hapus

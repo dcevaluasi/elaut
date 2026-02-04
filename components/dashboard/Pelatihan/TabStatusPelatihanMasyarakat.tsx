@@ -112,15 +112,11 @@ export default function TabStatusPelatihanMasyarakat({
 }: TabStatusPelatihanMasyarakatProps) {
 
     const handleClickWithDelay = (status: string) => {
-        setIsFetching(true);
-        setTimeout(() => {
-            setSelectedStatusFilter(status);
-            setIsFetching(false);
-        }, 800);
+        setSelectedStatusFilter(status);
     };
 
     return (
-        <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-4 py-3 mb-10">
+        <nav className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-4 py-3 mb-3">
             {/* Original Buttons */}
             <section aria-labelledby="ticket-statistics-tabs-label" className="overflow-x-auto">
                 <ul className="flex gap-2 min-w-max">
