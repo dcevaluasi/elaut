@@ -57,7 +57,7 @@ const ManagePelatihan = () => {
                                     2. Penerbitan STTPL
                                 </TabsTrigger>
                             </TabsList>
-
+                            {/* testing */}
                             <TabsContent value="1">
                                 <PelatihanDetail data={dataPelatihan!} fetchData={refetchDetailPelatihan} />
                             </TabsContent>
