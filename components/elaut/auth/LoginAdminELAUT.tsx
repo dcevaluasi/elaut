@@ -6,16 +6,14 @@ import Cookies from "js-cookie";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-import { HiOutlineEye } from "react-icons/hi2";
+import { HiOutlineEye, HiOutlineEnvelope, HiOutlineLockClosed, HiOutlineUserGroup } from "react-icons/hi2";
 import ReCAPTCHA from "react-google-recaptcha";
 import { generateRandomId } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { HiOutlineEyeOff } from "react-icons/hi";
-import { sanitizedDangerousChars } from "@/utils/input";
 import { HashLoader } from "react-spinners";
-import Link from "next/link";
-import { AnyARecord } from "node:dns";
 
 export const LoginAdminELAUT = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -27,7 +25,7 @@ export const LoginAdminELAUT = () => {
   // CAPTCHA VALIDATION
   const [captcha, setCaptcha] = React.useState<string | null>();
 
-  const [isRedirecting, setIsRedirecting] = React.useState<boolean>(false)
+  const [isRedirecting, setIsRedirecting] = React.useState<boolean>(false);
 
   /*
       state variables for login
@@ -55,7 +53,6 @@ export const LoginAdminELAUT = () => {
 
     setIsLoadingLogin(true);
 
-
     if (!email || !password) {
       Toast.fire({
         icon: "error",
@@ -79,8 +76,7 @@ export const LoginAdminELAUT = () => {
 
     try {
       const response: AxiosResponse = await axios.post(
-        `${baseUrl}/${role == "upt" ? "lemdik" : "adminPusat"
-        }/login`,
+        `${baseUrl}/${role == "upt" ? "lemdik" : "adminPusat"}/login`,
         JSON.stringify({ email, password }),
         { headers: { "Content-Type": "application/json" } }
       );
@@ -93,13 +89,7 @@ export const LoginAdminELAUT = () => {
 
       Cookies.set("XSRF091", response.data.t, { expires: 1 });
       Cookies.set("XSRF092", "true", { expires: 1 });
-      Cookies.set(
-        "XSRF093",
-        role == "upt"
-          ? "balai"
-          : "adminPusat",
-        { expires: 1 }
-      );
+      Cookies.set("XSRF093", role == "upt" ? "balai" : "adminPusat", { expires: 1 });
 
       resetAllStateToEmptyString();
       setIsLoadingLogin(false);
@@ -108,10 +98,10 @@ export const LoginAdminELAUT = () => {
         role == "upt"
           ? `/${generateRandomId()}/lemdiklat/dashboard`
           : "/admin/pusat/dashboard";
-      setIsRedirecting(true)
+      setIsRedirecting(true);
       router.push(dashboardPath);
     } catch (error) {
-      console.error({ error })
+      console.error({ error });
       if (error instanceof AxiosError) {
         const errorMessage =
           error.response?.status === 401
@@ -127,184 +117,216 @@ export const LoginAdminELAUT = () => {
         });
 
         setIsLoadingLogin(false);
-        setIsRedirecting(false)
+        setIsRedirecting(false);
       }
     }
   };
 
   return (
-    <section className="w-full">
-      <main className="h-screen w-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-sky-900 to-blue-900 text-white">
-        <Image
-          src={"/images/hero-img6.jpg"}
-          className="absolute w-full h-screen  opacity-20 object-cover duration-1000"
-          alt=""
-          fill={true}
-          priority
+    <div className="fixed inset-0 z-[999999] font-jakarta overflow-hidden scrollbar-hide">
+      <main className="h-full w-full relative bg-slate-950 text-white flex items-center justify-center p-4 scrollbar-hide">
+        {/* Animated Background Image */}
+        <motion.div
+          initial={{ scale: 1.1, opacity: 0 }}
+          animate={{ scale: 1, opacity: 0.25 }}
+          transition={{ duration: 2, ease: "easeOut" }}
+          className="absolute inset-0 z-0"
+        >
+          <Image
+            src={"/images/hero-img6.jpg"}
+            className="w-full h-full object-cover"
+            alt="Background"
+            fill={true}
+            priority
+          />
+        </motion.div>
+
+        {/* Gradient Blobs with Animation */}
+        <motion.div
+          animate={{
+            x: [0, 30, 0],
+            y: [0, -30, 0],
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+          className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-blue-600/30 blur-[100px] z-1"
+        />
+        <motion.div
+          animate={{
+            x: [0, -40, 0],
+            y: [0, 40, 0],
+          }}
+          transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+          className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-cyan-500/20 blur-[120px] z-1"
+        />
+        <motion.div
+          animate={{
+            opacity: [0.1, 0.2, 0.1],
+          }}
+          transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+          className="pointer-events-none absolute top-1/3 left-1/2 -translate-x-1/2 h-72 w-72 rounded-full bg-indigo-500/10 blur-[80px]"
         />
 
-        {/* gradient blobs */}
-        <div className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-blue-500/40 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-cyan-400/20 blur-3xl" />
-        <div className="pointer-events-none absolute top-1/3 -right-16 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
-
-
-        <section className=" z-50 relative h-fit space-y-6 pb-8 pt-36 md:h-screen md:pb-12 md:pt-20 lg:py-44 w-full flex items-center justify-center flex-col">
-          {
-            isRedirecting ? <div className="mt-32">
-              <HashLoader color="#338CF5" size={50} />
-            </div> : <> <div className="container relative flex max-w-[64rem] flex-col items-center gap-2 text-center">
-              <div className="rounded-2xl bg-blue-500 px-4 py-1.5 text-sm text-gray-200 font-medium">
-                E-LAUT
-              </div>
-
-              <h1 className="font-calsans text-gray-200 text-4xl -mt-2">
-                Login Admin{" "}
-                <span className="bg-clip-text text-transparent bg-gradient-to-r leading-none pt-0 from-blue-500 to-teal-400">
-                  E-LAUT
-                </span>
-              </h1>
-              {/* <form className="text-neutral-900" onSubmit={handleSubmit}>
-                <input
-                  type="text"
-                  placeholder="Phone number"
-                  value={to}
-                  onChange={(e) => setTo(e.target.value)}
-                />
-                <br />
-                <textarea
-                  placeholder="Your message"
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                />
-                <br />
-
-                <button type="submit" disabled={loading}>
-                  {loading ? "Sending..." : "Send Message"}
-                </button>
-
-                {loading && <p className="text-blue-400">Please wait, sending...</p>}
-
-                {response && (
-                  <pre className="text-white">{JSON.stringify(response, null, 2)}</pre>
-                )}
-              </form>; */}
-              <p className="font-jakarta max-w-[42rem] leading-[115%] text-gray-300  sm:text-base -mt-1">
-                Selamat datang kembali, silahkan melakukan login untuk mengelola penyelenggaran pelatihan, perangkat pelatihan, instruktur, hinga melakukan penerbitan STTPL!
-              </p>
-            </div>
-              <div className="flex flex-col gap-2 w-full max-w-md mx-auto z-50">
-                <div className="flex flex-col gap-1">
-                  <p className="font-jakarta  leading-[100%] text-gray-300  sm:text-sm sm:leading-8 -mt-4">
-                    Email Address
-                  </p>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="border rounded-xl text-white border-blue-500 bg-transparent w-full placeholder:text-gray-300"
-                    placeholder="Enter your email address"
-                    autoComplete="off"
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <p className="font-jakarta  leading-[100%] text-gray-300  sm:text-sm sm:leading-8 ">
-                    Password
-                  </p>
-                  <span className="w-full relative h-fit">
-                    <input
-                      type={isShowPassword ? "text" : "password"}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="border rounded-xl text-white border-blue-500 bg-transparent w-full placeholder:text-gray-300"
-                      placeholder="Enter your password"
-                      autoComplete="off"
-                    />
-                    <span onClick={(e) => setIsShowPassword(!isShowPassword)}>
-                      {isShowPassword ? (
-                        <HiOutlineEyeOff className="text-gray-200 my-auto top-3 mr-5 absolute right-0 text-xl cursor-pointer" />
-                      ) : (
-                        <HiOutlineEye className="text-gray-200 my-auto top-3 mr-5 absolute right-0 text-xl cursor-pointer" />
-                      )}
-                    </span>
-                  </span>
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <p className="font-jakarta leading-[100%] text-gray-300 sm:text-sm sm:leading-8">
-                    Akses Sebagai
-                  </p>
-                  <select
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                    className="border rounded-xl text-white border-blue-500 bg-transparent w-full placeholder:text-gray-300 px-3 py-2"
+        <section className="relative z-10 w-full max-w-lg flex flex-col items-center max-h-full overflow-y-auto scrollbar-hide py-6">
+          <AnimatePresence mode="wait">
+            {isRedirecting ? (
+              <motion.div
+                key="redirecting"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="flex flex-col items-center gap-4"
+              >
+                <HashLoader color="#3b82f6" size={60} />
+                <p className="text-blue-400 font-medium animate-pulse text-lg text-center">Redirecting to Dashboard...</p>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="login-form"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="w-full flex flex-col items-center"
+              >
+                {/* Header Section */}
+                <div className="text-center mb-5">
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] md:text-xs font-semibold uppercase tracking-wider mb-3"
                   >
-                    <option value="" disabled>
-                      Pilih akses
-                    </option>
-                    <option value="upt" className="text-black">
-                      Pengelola UPT
-                    </option>
-                    <option value="pusat" className="text-black">
-                      Pengelola Pusat
-                    </option>
-                    <option value="pimpinan" className="text-black">
-                      Pimpinan
-                    </option>
-                  </select>
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                    Portal Admin
+                  </motion.div>
+                  <h1 className="text-2xl md:text-3xl lg:text-4xl leading-none font-bold tracking-tight text-white font-calsans">
+                    Login Admin <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">E-LAUT</span>
+                  </h1>
+                  <p className="text-gray-400 mx-auto text-xs md:text-sm leading-relaxed">
+                    Selamat datang kembali. Silakan masuk untuk mengelola portal E-LAUT.
+                  </p>
                 </div>
 
-                {(email != "" && password != "" && role != "") && (
-                  <div
-                    className="flex flex-wrap w-full -mx-3 mb-2"
-                    style={{ width: "100% !important" }}
-                  >
-                    <div
-                      className="w-full px-3"
-                      style={{ width: "100% !important" }}
-                    >
-                      <label
-                        className="block text-gray-200 text-sm font-medium mb-1"
-                        htmlFor="password"
+                {/* Glassmorphism Form Card */}
+                <div className="w-full relative group px-2 md:px-0">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-3xl blur opacity-15 group-hover:opacity-25 transition duration-1000"></div>
+
+                  <div className="relative bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl">
+                    <form className="space-y-4 md:space-y-5" onSubmit={handleLogin}>
+                      {/* Email Input */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs md:text-sm font-medium text-gray-300 flex items-center gap-2">
+                          <HiOutlineEnvelope className="text-blue-400" /> Email Address
+                        </label>
+                        <input
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm md:text-base placeholder:text-gray-500 outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all font-inter"
+                          placeholder="admin@elaut.id"
+                          autoComplete="off"
+                        />
+                      </div>
+
+                      {/* Password Input */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs md:text-sm font-medium text-gray-300 flex items-center gap-2">
+                          <HiOutlineLockClosed className="text-blue-400" /> Password
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={isShowPassword ? "text" : "password"}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm md:text-base placeholder:text-gray-500 outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all font-inter"
+                            placeholder="••••••••"
+                            autoComplete="off"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setIsShowPassword(!isShowPassword)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                          >
+                            {isShowPassword ? <HiOutlineEyeOff size={18} /> : <HiOutlineEye size={18} />}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Role Selection */}
+                      <div className="space-y-1.5">
+                        <label className="text-xs md:text-sm font-medium text-gray-300 flex items-center gap-2">
+                          <HiOutlineUserGroup className="text-blue-400" /> Akses Sebagai
+                        </label>
+                        <select
+                          value={role}
+                          onChange={(e) => setRole(e.target.value)}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm md:text-base outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer placeholder:text-gray-500 font-inter"
+                        >
+                          <option value="" disabled className="bg-slate-900">Pilih akses</option>
+                          <option value="upt" className="bg-slate-900">Pengelola UPT</option>
+                          <option value="pusat" className="bg-slate-900">Pengelola Pusat</option>
+                          <option value="pimpinan" className="bg-slate-900 text-white">Pimpinan</option>
+                        </select>
+                      </div>
+
+                      {/* reCAPTCHA Animation */}
+                      <AnimatePresence>
+                        {email && password && role && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="pt-2">
+                              <label className="text-[10px] md:text-xs font-medium text-gray-400 mb-2 block">
+                                Verification <span className="text-red-500">*</span>
+                              </label>
+                              <div className="bg-white/5 rounded-xl p-1.5 flex justify-center border border-white/5 scale-[0.85] md:scale-100 origin-top">
+                                <ReCAPTCHA
+                                  theme="dark"
+                                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                                  onChange={setCaptcha}
+                                />
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      {/* Login Button */}
+                      <motion.div
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
                       >
-                        Verify if you are not a robot{" "}
-                        <span className="text-red-600">*</span>
-                      </label>
-                      <ReCAPTCHA
-                        style={{ width: "100% !important" }}
-                        sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
-                        className="mx-auto w-full font-inter text-sm"
-                        onChange={setCaptcha}
-                      />
+                        <Button
+                          disabled={isLoadingLogin || !captcha}
+                          type="submit"
+                          className="w-full h-11 md:h-12 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-semibold text-base md:text-lg shadow-lg shadow-blue-500/25 transition-all border-none"
+                        >
+                          {isLoadingLogin ? (
+                            <div className="flex items-center justify-center gap-2">
+                              <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                              Logging in...
+                            </div>
+                          ) : (
+                            "Sign In"
+                          )}
+                        </Button>
+                      </motion.div>
+                    </form>
+
+                    <div className="mt-6 pt-5 border-t border-white/10">
+                      <p className="text-[10px] md:text-xs text-center text-gray-500 leading-relaxed">
+                        Dengan login, Anda menyetujui <span className="text-blue-400 underline cursor-pointer hover:neon-glow">Ketentuan Layanan</span> dan <span className="text-blue-400 underline cursor-pointer">Kebijakan Keamanan</span>.
+                      </p>
                     </div>
                   </div>
-                )}
-
-                {isLoadingLogin ? (
-                  <Button
-                    type="button"
-                    className="text-white w-full text-base bg-blue-500 bg-opacity-50 rounded-xl hover:bg-blue-600  py-3"
-                  >
-                    Loading...
-                  </Button>
-                ) : (
-                  <Button
-                    disabled={captcha ? false : true}
-                    onClick={(e) => handleLogin(e)}
-                    className="text-white w-full text-base bg-blue-500 rounded-xl hover:bg-blue-600  py-3"
-                  >
-                    Login
-                  </Button>
-                )}
-                <div className="text-sm text-gray-200 text-center mt-2">
-                  Dengan login ke e-laut, anda menyetujui{" "}
-                  <span className="underline">ketentuan serta peraturan yang berlaku</span>, dan {" "}
-                  <span className="underline">kebijakan keamanan</span>.
                 </div>
-              </div></>
-          }
+              </motion.div>
+            )}
+          </AnimatePresence>
         </section>
       </main>
-    </section>
+    </div>
   );
 };

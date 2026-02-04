@@ -77,26 +77,46 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
     const handleUploadAll = async () => {
         setIsUploading(true);
         setProgress(0);
+        setCounter(0);
 
-        const CONCURRENCY = 15;
         const toUpload = refs.current
             .map((ref, i) => ({ ref, index: i, userPel: data.UserPelatihan[i] }))
             .filter(({ userPel }) => !userPel.FileSertifikat || userPel.FileSertifikat === "");
 
-        let completed = 0;
-
-        for (let i = 0; i < toUpload.length; i += CONCURRENCY) {
-            const batch = toUpload.slice(i, i + CONCURRENCY);
-
-            await Promise.all(
-                batch.map(async ({ ref }) => {
-                    await ref.current?.uploadPdf?.();
-                    completed++;
-                    setProgress((completed / toUpload.length) * 100);
-                    setCounter(completed);
-                })
-            );
+        if (toUpload.length === 0) {
+            setOpen(true);
+            setIsUploading(false);
+            return;
         }
+
+        let completed = 0;
+        const total = toUpload.length;
+        const MAX_CONCURRENCY = 8; // Optimal for browser CPU/GPU limits with html2pdf
+        const pool = [...toUpload];
+
+        const executeWorker = async () => {
+            while (pool.length > 0) {
+                const item = pool.shift();
+                if (!item) break;
+
+                try {
+                    await item.ref.current?.uploadPdf?.();
+                } catch (err) {
+                    console.error("Upload failed for index", item.index, err);
+                } finally {
+                    completed++;
+                    setProgress((completed / total) * 100);
+                    setCounter(completed);
+                }
+            }
+        };
+
+        // Start initial workers
+        const workers = Array(Math.min(MAX_CONCURRENCY, total))
+            .fill(null)
+            .map(() => executeWorker());
+
+        await Promise.all(workers);
 
         setOpen(true);
         setIsUploading(false);
@@ -108,17 +128,23 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
         setLoadingTanggal(true);
 
         try {
-            for (const user of dataUserPelatihan) {
-                const formData = new FormData();
-                formData.append(
-                    "TanggalSertifikat",
-                    getDateInIndonesianFormat(tanggalSertifikat)
-                );
+            const BATCH_SIZE = 25; // API calls are faster than PDF generation
+            for (let i = 0; i < dataUserPelatihan.length; i += BATCH_SIZE) {
+                const batch = dataUserPelatihan.slice(i, i + BATCH_SIZE);
+                await Promise.all(
+                    batch.map(async (user) => {
+                        const formData = new FormData();
+                        formData.append(
+                            "TanggalSertifikat",
+                            getDateInIndonesianFormat(tanggalSertifikat)
+                        );
 
-                await axios.put(
-                    `${elautBaseUrl}/lemdik/updatePelatihanUsers?id=${user.IdUserPelatihan}`,
-                    formData,
-                    { headers: { Authorization: `Bearer ${Cookies.get("XSRF091")}` } }
+                        await axios.put(
+                            `${elautBaseUrl}/lemdik/updatePelatihanUsers?id=${user.IdUserPelatihan}`,
+                            formData,
+                            { headers: { Authorization: `Bearer ${Cookies.get("XSRF091")}` } }
+                        );
+                    })
                 );
             }
 

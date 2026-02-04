@@ -368,15 +368,41 @@ const ChartDetailMasyarakatDilatih: React.FC<
     [filteredData, nameBalaiPelatihan]
   );
 
-  const filteredPelatihanByBalai = useMemo(
-    () =>
-      getFilteredDataPelatihanByBalai(
-        data,
-        isAdminBalaiPelatihan,
-        nameBalaiPelatihan!,
-      ),
-    [data, isAdminBalaiPelatihan, nameBalaiPelatihan]
-  );
+  const filteredPelatihanByBalai = useMemo(() => {
+    let filtered = getFilteredDataPelatihanByBalai(
+      data,
+      isAdminBalaiPelatihan,
+      nameBalaiPelatihan!,
+    );
+
+    const currentYear = new Date().getFullYear().toString();
+    const targetYear = tahun || currentYear;
+
+    return filtered.filter((item) => {
+      if (!item.TanggalMulaiPelatihan) return false;
+      let d = new Date(item.TanggalMulaiPelatihan);
+      if (isNaN(d.getTime())) {
+        d = parseIndonesianDate(item.TanggalMulaiPelatihan) as Date;
+      }
+      if (!d || isNaN(d.getTime())) return false;
+
+      const itemTahun = String(d.getFullYear());
+
+      // Filter by target year (selected or current)
+      if (itemTahun !== targetYear) return false;
+
+      // Optional: Filter by Triwulan to match UserPelatihan logic
+      if (triwulan) {
+        const itemTriwulan = getQuarterForFiltering(item.TanggalMulaiPelatihan!);
+        const order = ["TW I", "TW II", "TW III", "TW IV"];
+        const selectedIdx = order.indexOf(triwulan);
+        const itemIdx = order.indexOf(itemTriwulan);
+        if (itemIdx > selectedIdx) return false;
+      }
+
+      return true;
+    });
+  }, [data, isAdminBalaiPelatihan, nameBalaiPelatihan, tahun, triwulan]);
 
   const countWith = (cond: (item: any) => boolean) =>
     filteredDataByBalai.filter(cond).length;
@@ -386,22 +412,16 @@ const ChartDetailMasyarakatDilatih: React.FC<
       ['7D', '11', '15'].includes(String(item?.StatusPenerbitan).trim().toUpperCase())
     );
 
+    // Source categories from PelatihanMasyarakat (data) and sum signed users
     const uniqueJenisPelatihan = [
-      ...new Set(
-        filteredByStatus
-          .map(i => i.JenisPelatihan?.trim())
-          .filter(Boolean)
-      )
+      ...new Set(filteredByStatus.map((i) => i.JenisPelatihan?.trim()).filter(Boolean)),
     ];
-
-    const byJenisPelatihan = uniqueJenisPelatihan.map(jenis => {
-      const visitors = filteredByStatus
+    const byJenisPelatihan = uniqueJenisPelatihan.map((jenis) => ({
+      name: jenis!,
+      visitors: filteredByStatus
         .filter(item => item.JenisPelatihan?.trim() === jenis)
-        .reduce((sum, item) => sum + (item.UserPelatihan?.length || 0), 0);
-
-      return { name: jenis, visitors };
-    }).filter(item => item.visitors > 0).sort((a, b) => b.visitors - a.visitors);
-
+        .reduce((sum, item) => sum + (item.UserPelatihan?.filter(u => u.FileSertifikat?.includes("signed")).length || 0), 0)
+    })).filter((item) => item.visitors > 0).sort((a, b) => b.visitors - a.visitors);
 
     const uniquePenyelenggaraPelatihan = [
       ...new Set(filteredDataByBalai.map((i) => i.PenyelenggaraPelatihan).filter(Boolean)),
@@ -437,13 +457,13 @@ const ChartDetailMasyarakatDilatih: React.FC<
     })).filter((item) => item.visitors > 0).sort((a, b) => b.visitors - a.visitors);
 
     const uniquePrioritas = [
-      ...new Set(filteredByStatus.map((i) => i.DukunganProgramTerobosan).filter(Boolean)),
+      ...new Set(filteredByStatus.map((i) => i.DukunganProgramTerobosan?.trim()).filter(Boolean)),
     ];
     const byProgramPrioritas = uniquePrioritas.map((kategori) => ({
-      name: kategori,
+      name: kategori!,
       visitors: filteredByStatus
         .filter(item => item.DukunganProgramTerobosan?.trim() === kategori)
-        .reduce((sum, item) => sum + (item.UserPelatihan?.length || 0), 0)
+        .reduce((sum, item) => sum + (item.UserPelatihan?.filter(u => u.FileSertifikat?.includes("signed")).length || 0), 0)
     })).filter((item) => item.visitors > 0).sort((a, b) => b.visitors - a.visitors);
 
     const byGender = [

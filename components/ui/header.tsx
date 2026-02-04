@@ -31,7 +31,8 @@ const HIDDEN_PATHS = [
   "/e-katalog",
   "instruktur",
   "p2mkp/laporan-kegiatan",
-  "p2mkp/dashboard"
+  "p2mkp/dashboard",
+  "/login"
 ];
 
 const NAV_LINK_CLASS = "px-4 py-2 flex items-center gap-2 rounded-xl font-semibold transition duration-200 ease-in-out hover:text-blue-400 hover:scale-105";

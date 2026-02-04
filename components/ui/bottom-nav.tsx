@@ -84,7 +84,7 @@ const BottomNavigation = () => {
       bottom-4 left-1/2 rounded-full 
       bg-white/10 backdrop-blur-xl border border-white/20 
       shadow-[0_8px_32px_rgba(0,0,0,0.25)] 
-      transition md:hidden `}
+      transition md:hidden ${pathname === "/login" ? "hidden" : "block"} `}
         >
             <div className="grid h-full max-w-lg grid-cols-5 mx-auto">
                 {navItems.map(({ href, icon: Icon, label, center }, idx) => (
