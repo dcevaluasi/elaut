@@ -42,6 +42,8 @@ import {
 } from "@/utils/input";
 import { handlePasswordCriteria } from "@/utils/security";
 import Toast from "@/commons/Toast";
+import { motion, AnimatePresence } from "framer-motion";
+import { HiOutlineDeviceMobile, HiOutlineIdentification, HiOutlineLockClosed, HiOutlineMail } from "react-icons/hi";
 
 function FormLogin() {
   const [formData, setFormData] = React.useState<{ [key: string]: string }>({
@@ -298,7 +300,8 @@ function FormLogin() {
   const [role, setRole] = React.useState<string>("Perseorangan");
 
   const [imageIndex, setImageIndex] = React.useState(0);
-  const images = ["/images/hero-img3.jpg"];
+  const images = ["/images/hero-img3.jpg", "/images/hero-img6.jpg"];
+  const imagesMob = ["/diklat/bstf-1.jpg"];
 
   // Showing password state management
   const [isShowPassword, setIsShowPassword] = React.useState<boolean>(false);
@@ -441,11 +444,42 @@ function FormLogin() {
   const [selectedMethodLogin, setSelectedMethodLogin] = React.useState<string>('Whatsapp/No Telpon')
 
   return (
-    <section className=" h-full pb-10 min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-sky-900 to-blue-900 text-white">
-      {/* gradient blobs */}
-      <div className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-blue-500/40 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-cyan-400/20 blur-3xl" />
-      <div className="pointer-events-none absolute top-1/3 -right-16 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
+    <div className="relative min-h-screen w-full overflow-hidden bg-[#020617] font-jakarta">
+      <div className="absolute inset-0 z-0">
+        <Image
+          src={images[imageIndex]}
+          className="absolute w-full h-full hidden md:block object-cover duration-1000 opacity-[0.15] z-0"
+          alt=""
+          layout="fill"
+          priority
+        />
+        <Image
+          src={imagesMob[0]}
+          className="absolute w-full h-full block md:hidden object-cover duration-1000 opacity-[0.15] z-0"
+          alt=""
+          layout="fill"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#020617]/40 to-[#020617]" />
+      </div>
+
+      {/* Modern Animated Gradient Blobs */}
+      <motion.div
+        animate={{
+          x: [0, 50, 0],
+          y: [0, -30, 0],
+        }}
+        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+        className="pointer-events-none absolute -top-24 -left-24 h-[40rem] w-[40rem] rounded-full bg-blue-600/20 blur-[120px] z-1"
+      />
+      <motion.div
+        animate={{
+          x: [0, -60, 0],
+          y: [0, 40, 0],
+        }}
+        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+        className="pointer-events-none absolute -bottom-48 -right-48 h-[45rem] w-[45rem] rounded-full bg-cyan-500/15 blur-[150px] z-1"
+      />
 
       <Dialog open={isForgetPassword} onOpenChange={setIsForgetPassword}>
         <DialogContent
@@ -556,84 +590,108 @@ function FormLogin() {
       </Dialog>
 
 
-      <Image
-        src={images[imageIndex]}
-        className="absolute w-full h-full object-cover duration-1000 opacity-20"
-        alt=""
-        width={0}
-        height={0}
-        priority
-      />
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
+        <div className="pt-32 pb-20">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="w-full mx-auto text-center mb-8"
+          >
+            <div className="px-5 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs md:text-sm font-semibold tracking-widest uppercase mb-6 inline-flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+              Selamat Datang Kembali
+            </div>
+          </motion.div>
 
-      <div className="max-w-6xl h-full mx-auto px-4 sm:px-6 md:-mt-8 relative">
-        <div className="pt-44 md:pb-20">
-          <div className="w-full mx-auto text-center pb-0 md:pb-0">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl leading-[110%] text-white drop-shadow-lg font-calsans mb-4">
-              <span className="">Login dan Ikuti</span> <br />
-              <span className="z-0 bg-clip-text  w-[600px] leading-[110%]  text-transparent bg-gradient-to-r  from-blue-400  to-teal-400">
-                Pelatihan di E-LAUT
-              </span>{" "}
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1, delay: 0.2 }}
+            className="text-center mb-12"
+          >
+            <h1 className="text-4xl md:text-6xl font-bold font-calsans text-white tracking-tight leading-none drop-shadow-2xl mb-6">
+              Masuk ke Akun <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-300 to-teal-300">
+                E-LAUT Anda
+              </span>
             </h1>
-            <p className="text-sm sm:text-base text-center mx-auto text-white/80 mt-2 max-w-3xl">
-              login tersedia dalam dua opsi: Perseorangan untuk individu,
-              Corporate untuk grup untuk yang punya rekam jejak atau
-              sertifikasi. Fleksibel sesuai kebutuhan!
+            <p className="mt-6 text-gray-400 text-sm md:text-lg max-w-2xl mx-auto leading-relaxed font-light">
+              Akses akun anda untuk menjelajahi pelatihan maritim terbaik. Tersedia opsi login untuk <span className="text-blue-400 font-medium">Perseorangan</span> dan <span className="text-teal-400 font-medium">Corporate</span>.
             </p>
-          </div>
+          </motion.div>
 
           {/* Form */}
 
-          <div className="max-w-2xl mx-5 md:mx-auto mt-5">
-            <div className="bg-white/10 backdrop-blur-lg rounded-xl sm:rounded-2xl shadow-2xl border border-white/20 p-4 sm:p-6 md:p-8">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="max-w-xl mx-auto relative group"
+          >
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-[2rem] blur opacity-10 group-hover:opacity-20 transition duration-500" />
+            <div className="relative bg-[#1e293b]/20 backdrop-blur-2xl rounded-[2rem] shadow-2xl border border-white/10 p-8 sm:p-12 overflow-hidden transition-all duration-500 hover:bg-[#1e293b]/30">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-cyan-400 to-teal-400" />
 
               {role == "" ? (
                 <></>
               ) : role == "Perseorangan" ? (
                 <form onSubmit={(e) => handleLoginAkun(e)} autoComplete="off">
-                  <div className="flex flex-col gap-1 mb-2">
+                  <div className="flex flex-col gap-2 mb-6">
                     <label
-                      className="block text-gray-200 text-sm font-medium mb-1"
-                      htmlFor="name"
+                      className="block text-blue-200/80 text-xs font-semibold uppercase tracking-wider ml-1"
+                      htmlFor="role"
                     >
-                      Login Menggunakan <span className="text-red-600">*</span>
+                      Login Menggunakan <span className="text-rose-500">*</span>
                     </label>
                     <Select
-                      value={role}
+                      value={selectedMethodLogin}
                       onValueChange={(value: string) => setSelectedMethodLogin(value)}
                     >
-                      <SelectTrigger className="form-input w-full py-6 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent text-white">
-                        <p className="mr-3 flex items-center gap-1 text-base text-white">
-                          <HiMiniUserGroup />
-                          {selectedMethodLogin != "" ? selectedMethodLogin : "Pilih Login Menggunakan"}
-                        </p>
+                      <SelectTrigger className="w-full h-12 bg-white/5 border-white/10 rounded-2xl focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 text-white transition-all hover:bg-white/10">
+                        <div className="flex items-center gap-3">
+                          <HiMiniUserGroup className="text-blue-400 text-xl" />
+                          <span className="text-sm font-medium">
+                            {selectedMethodLogin || "Pilih Metode Login"}
+                          </span>
+                        </div>
                       </SelectTrigger>
-                      <SelectContent side="bottom" className=" flex flex-col gap-1 mt-2 
-              bg-white/70  backdrop-blur-xl border border-white/20 
-              rounded-2xl shadow-xl p-3 text-blue-500">
-                        <SelectGroup className="">
-                          <SelectLabel>Login Menggunakan</SelectLabel>
-                          <SelectItem className="flex gap-2 items-center px-3 py-2 rounded-lg !hover:bg-white/5 hover:text-blue-500 text-gray-600" value="Whatsapp/No Telpon">Whatsapp/No Telpon</SelectItem>
-                          <SelectItem className="flex gap-2 items-center px-3 py-2 rounded-lg !hover:bg-white/5 hover:text-blue-500 text-gray-600" value="NIK">
-                            NIK
+                      <SelectContent className="bg-slate-900/95 backdrop-blur-xl border-white/10 rounded-2xl p-2">
+                        <SelectGroup>
+                          <SelectLabel className="text-blue-300/60 text-[10px] uppercase font-bold px-3 py-2">Metode Login</SelectLabel>
+                          <SelectItem className="rounded-xl focus:bg-blue-500/20 focus:text-blue-100 cursor-pointer py-3 transition-colors text-slate-300" value="Whatsapp/No Telpon">
+                            <div className="flex items-center gap-2">
+                              <HiOutlineDeviceMobile className="text-lg" />
+                              <span>Whatsapp / No Telpon</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem className="rounded-xl focus:bg-blue-500/20 focus:text-blue-100 cursor-pointer py-3 transition-colors text-slate-300" value="NIK">
+                            <div className="flex items-center gap-2">
+                              <HiOutlineIdentification className="text-lg" />
+                              <span>NIK</span>
+                            </div>
                           </SelectItem>
                         </SelectGroup>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex flex-wrap -mx-3 mb-2">
-                    <div className="w-full px-3">
-                      <label
-                        className="block text-gray-200 text-sm font-medium mb-1"
-                        htmlFor="name"
-                      >
-                        {selectedMethodLogin == 'NIK' ? 'NIK' : 'No Telepon/WA'}
-                        <span className="text-red-600">*</span>
-                      </label>
+                  <div className="mb-6">
+                    <label
+                      className="block text-blue-200/80 text-xs font-semibold uppercase tracking-wider ml-1 mb-2"
+                      htmlFor="no_number"
+                    >
+                      {selectedMethodLogin == 'NIK' ? 'Nomor Induk Kependudukan (NIK)' : 'No Telepon / WhatsApp'}
+                      <span className="text-rose-500 ml-1">*</span>
+                    </label>
+                    <div className="relative group">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-blue-400 group-focus-within:text-blue-300 transition-colors">
+                        {selectedMethodLogin === 'NIK' ? <HiOutlineIdentification className="text-xl" /> : <HiOutlineDeviceMobile className="text-xl" />}
+                      </div>
                       <input
-                        id="name"
+                        id="no_number"
                         type="text"
-                        className="form-input w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        placeholder={selectedMethodLogin == 'NIK' ? 'Masukkan NIK' : 'Masukkan No Telepon/WA'}
+                        className="w-full pl-12 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 transition-all hover:bg-white/10"
+                        placeholder={selectedMethodLogin == 'NIK' ? '32xxxxxxxxxxxxxx' : '62xxxxxxxxxxx'}
                         value={formData.no_number}
                         name="no_number"
                         minLength={selectedMethodLogin == 'NIK' ? 16 : 12}
@@ -647,80 +705,107 @@ function FormLogin() {
                         }}
                         required
                       />
+                    </div>
 
-                      <span className="block text-white/60 text-xs font-medium mt-1">
-                        Lupa no telpon/WA? klik{" "}
-                        <span
-                          onClick={(e) => {
-                            setIsForgetPhoneNumber(true);
-                            setIsForgetPassword(true);
-                          }}
-                          className="text-blue-400 hover:text-blue-300 font-semibold cursor-pointer transition-colors"
-                        >
-                          disini
+                    <div className="flex justify-between items-center mt-2 px-1">
+                      <div className="flex flex-col">
+                        {isInputErrorNoTelpon && formData.no_number != "" && (
+                          <span className="text-rose-400 font-medium text-[10px]">
+                            * Minimal {selectedMethodLogin === 'NIK' ? '16' : '12'} digit!
+                          </span>
+                        )}
+                        <span className="text-white/40 text-[10px] font-medium">
+                          Lupa data anda? klik{" "}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsForgetPhoneNumber(true);
+                              setIsForgetPassword(true);
+                            }}
+                            className="text-blue-400 hover:text-blue-300 font-bold transition-colors underline decoration-blue-500/30 underline-offset-2"
+                          >
+                            disini
+                          </button>
                         </span>
-                      </span>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex flex-wrap -mx-3 mb-2">
-                    <div className="w-full px-3">
-                      <label
-                        className="block text-gray-200 text-sm font-medium mb-1"
-                        htmlFor="password"
-                      >
-                        Password <span className="text-red-600">*</span>
-                      </label>
-                      <span className="relative w-full h-fit">
-                        <input
-                          id="password"
-                          type={isShowPassword ? "text" : "password"}
-                          className="form-input w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                          placeholder="Masukkan password"
-                          required
-                          name="password"
-                          value={formData.password}
-                          onChange={(e) => handleInputChange(e)}
-                        />
-                        <span onClick={(e) => setIsShowPassword(!isShowPassword)}>
-                          {isShowPassword ? (
-                            <HiOutlineEyeOff className="text-white/70 hover:text-white my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer transition-colors" />
-                          ) : (
-                            <HiOutlineEye className="text-white/70 hover:text-white my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer transition-colors" />
-                          )}
-                        </span>
-                      </span>
-
-                      <span className="block text-white/60 text-xs font-medium mt-1">
-                        Lupa password? klik{" "}
-                        <span
-                          onClick={(e) => setIsForgetPassword(true)}
-                          className="text-blue-400 hover:text-blue-300 font-semibold cursor-pointer transition-colors"
-                        >
-                          disini
-                        </span>
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap -mx-3 mt-3">
-                    <div className="w-full px-3">
+                  <div className="mb-8">
+                    <label
+                      className="block text-blue-200/80 text-xs font-semibold uppercase tracking-wider ml-1 mb-2"
+                      htmlFor="password"
+                    >
+                      Password <span className="text-rose-500 ml-1">*</span>
+                    </label>
+                    <div className="relative group">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-blue-400 group-focus-within:text-blue-300 transition-colors">
+                        <HiOutlineLockClosed className="text-xl" />
+                      </div>
+                      <input
+                        id="password"
+                        type={isShowPassword ? "text" : "password"}
+                        className="w-full pl-12 pr-12 py-3.5 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 transition-all hover:bg-white/10"
+                        placeholder="••••••••••••"
+                        required
+                        name="password"
+                        value={formData.password}
+                        onChange={(e) => handleInputChange(e)}
+                      />
                       <button
-                        type="submit"
-                        className="w-full flex justify-center items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-3 sm:px-10 sm:py-4 rounded-lg hover:from-blue-600 hover:to-blue-700 shadow-lg transition-all font-semibold text-sm sm:text-base"
+                        type="button"
+                        onClick={() => setIsShowPassword(!isShowPassword)}
+                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-white/40 hover:text-white transition-colors"
                       >
-                        Login
+                        {isShowPassword ? (
+                          <HiOutlineEyeOff className="text-xl" />
+                        ) : (
+                          <HiOutlineEye className="text-xl" />
+                        )}
+                      </button>
+                    </div>
+
+                    <div className="flex justify-between items-center mt-2 px-1">
+                      <span className="text-white/40 text-[10px] font-medium uppercase tracking-tight">
+                        Harap jaga kerahasiaan password anda
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setIsForgetPassword(true)}
+                        className="text-blue-400 hover:text-blue-300 text-[10px] font-bold transition-colors underline decoration-blue-500/30 underline-offset-2"
+                      >
+                        Lupa password?
                       </button>
                     </div>
                   </div>
-                  <div className="text-sm text-gray-200 text-center mt-3">
-                    By creating an account, you agree to the{" "}
-                    <a className="underline" href="#0">
-                      terms & conditions
-                    </a>
-                    , and our{" "}
-                    <a className="underline" href="#0">
-                      privacy policy
-                    </a>
-                    .
+                  <div className="mt-8">
+                    <motion.button
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.98 }}
+                      type="submit"
+                      className="w-full bg-gradient-to-r from-blue-600 to-sky-500 text-white py-4 rounded-2xl font-bold shadow-[0_10px_20px_-10px_rgba(59,130,246,0.5)] hover:shadow-[0_15px_30px_-10px_rgba(59,130,246,0.6)] transition-all flex justify-center items-center gap-2 group"
+                    >
+                      <span>Masuk ke Akun</span>
+                      <motion.div
+                        animate={{ x: [0, 5, 0] }}
+                        transition={{ repeat: Infinity, duration: 1.5 }}
+                      >
+                        <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                      </motion.div>
+                    </motion.button>
+                  </div>
+
+                  <div className="text-[11px] text-white/40 text-center mt-8 font-medium leading-relaxed max-w-[280px] mx-auto">
+                    Dengan masuk, anda menyetujui {" "}
+                    <a className="text-white/60 hover:text-white underline decoration-white/20 transition-colors" href="#0">
+                      syarat & ketentuan
+                    </a>{" "}
+                    serta {" "}
+                    <a className="text-white/60 hover:text-white underline decoration-white/20 transition-colors" href="#0">
+                      kebijakan privasi
+                    </a>{" "}
+                    kami.
                   </div>
                 </form>
               ) : (
@@ -728,133 +813,134 @@ function FormLogin() {
                   onSubmit={(e) => handleLoginAkunManningAgent(e)}
                   autoComplete="off"
                 >
-                  <div className="flex flex-wrap -mx-3 mb-2">
-                    <div className="w-full px-3">
-                      <label
-                        className="block text-gray-200 text-sm font-medium mb-1"
-                        htmlFor="name"
-                      >
-                        Email <span className="text-red-600">*</span>
-                      </label>
+                  <div className="mb-6">
+                    <label
+                      className="block text-blue-200/80 text-xs font-semibold uppercase tracking-wider ml-1 mb-2"
+                      htmlFor="email_agent"
+                    >
+                      Email Address <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative group">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-blue-400 group-focus-within:text-blue-300 transition-colors">
+                        <HiOutlineMail className="text-xl" />
+                      </div>
                       <input
-                        id="name"
+                        id="email_agent"
                         type="email"
-                        className="form-input w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        placeholder="Masukkan Email"
+                        className="w-full pl-12 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 transition-all hover:bg-white/10"
+                        placeholder="corporate@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
                       />
                     </div>
                   </div>
-                  <div className="flex flex-wrap -mx-3 mb-2">
-                    <div className="w-full px-3">
-                      <label
-                        className="block text-gray-200 text-sm font-medium mb-1"
-                        htmlFor="password"
-                      >
-                        Password <span className="text-red-600">*</span>
-                      </label>
-                      <span className="relative w-full h-fit">
-                        <input
-                          id="password"
-                          type={isShowPassword ? "text" : "password"}
-                          className="form-input w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                          placeholder="Masukkan password"
-                          required
-                          value={passwordManningAgent}
-                          onChange={(e) =>
-                            setPasswordManningAgent(e.target.value)
-                          }
-                        />
-                        <span onClick={(e) => setIsShowPassword(!isShowPassword)}>
-                          {isShowPassword ? (
-                            <HiOutlineEyeOff className="text-white/70 hover:text-white my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer transition-colors" />
-                          ) : (
-                            <HiOutlineEye className="text-white/70 hover:text-white my-auto top-0 mr-5 absolute right-0 text-xl cursor-pointer transition-colors" />
-                          )}
-                        </span>
-                      </span>
-                    </div>
-                  </div>
-                  {passwordManningAgent != "" && (
-                    <div
-                      className="flex flex-wrap w-full -mx-3 mb-2"
-                      style={{ width: "100% !important" }}
-                    >
-                      <div
-                        className="w-full px-3"
-                        style={{ width: "100% !important" }}
-                      >
-                        <label
-                          className="block text-gray-200 text-sm font-medium mb-1"
-                          htmlFor="password"
-                        >
-                          Verify if you are not a robot{" "}
-                          <span className="text-red-600">*</span>
-                        </label>
-                        <ReCAPTCHA
-                          style={{ width: "100% !important" }}
-                          sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
-                          className="mx-auto w-full font-inter text-sm"
-                          onChange={setCaptcha}
-                        />
-                      </div>
-                    </div>
-                  )}
 
-                  <div className="flex flex-wrap -mx-3 mt-3">
-                    <div className="w-full px-3">
+                  <div className="mb-8">
+                    <label
+                      className="block text-blue-200/80 text-xs font-semibold uppercase tracking-wider ml-1 mb-2"
+                      htmlFor="password_corporate"
+                    >
+                      Password <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative group">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-blue-400 group-focus-within:text-blue-300 transition-colors">
+                        <HiOutlineLockClosed className="text-xl" />
+                      </div>
+                      <input
+                        id="password_corporate"
+                        type={isShowPassword ? "text" : "password"}
+                        className="w-full pl-12 pr-12 py-3.5 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400/50 transition-all hover:bg-white/10"
+                        placeholder="••••••••••••"
+                        required
+                        value={passwordManningAgent}
+                        onChange={(e) => setPasswordManningAgent(e.target.value)}
+                      />
                       <button
-                        type="submit"
-                        className={`w-full flex justify-center items-center gap-2 text-white px-8 py-3 sm:px-10 sm:py-4 rounded-lg shadow-lg transition-all font-semibold text-sm sm:text-base ${captcha
-                          ? "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
-                          : "bg-gray-500/50 cursor-not-allowed"
-                          }`}
-                        disabled={captcha ? false : true}
+                        type="button"
+                        onClick={() => setIsShowPassword(!isShowPassword)}
+                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-white/40 hover:text-white transition-colors"
                       >
-                        Login
+                        {isShowPassword ? (
+                          <HiOutlineEyeOff className="text-xl" />
+                        ) : (
+                          <HiOutlineEye className="text-xl" />
+                        )}
                       </button>
                     </div>
                   </div>
-                  <div className="text-sm text-gray-200 text-center mt-3">
-                    By creating an account, you agree to the{" "}
-                    <a className="underline" href="#0">
-                      terms & conditions
-                    </a>
-                    , and our{" "}
-                    <a className="underline" href="#0">
-                      privacy policy
-                    </a>
-                    .
+
+                  {passwordManningAgent != "" && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mb-8 p-4 bg-white/5 rounded-2xl border border-white/10"
+                    >
+                      <label className="block text-white/40 text-[10px] uppercase font-bold mb-4 tracking-[0.2em] text-center">
+                        Verifikasi Keamanan
+                      </label>
+                      <div className="flex justify-center scale-90 sm:scale-100 items-center overflow-hidden">
+                        <ReCAPTCHA
+                          sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                          theme="dark"
+                          onChange={setCaptcha}
+                        />
+                      </div>
+                    </motion.div>
+                  )}
+
+                  <div className="mt-8">
+                    <motion.button
+                      whileHover={captcha ? { scale: 1.01 } : {}}
+                      whileTap={captcha ? { scale: 0.98 } : {}}
+                      type="submit"
+                      disabled={!captcha}
+                      className={`w-full py-4 rounded-2xl font-bold transition-all flex justify-center items-center gap-2 group ${captcha
+                        ? "bg-gradient-to-r from-blue-600 to-sky-500 text-white shadow-[0_10px_20px_-10px_rgba(59,130,246,0.5)] hover:shadow-[0_15px_30px_-10px_rgba(59,130,246,0.6)]"
+                        : "bg-white/10 text-white/30 cursor-not-allowed border border-white/5"
+                        }`}
+                    >
+                      <span>Masuk Corporate</span>
+                    </motion.button>
+                  </div>
+
+                  <div className="text-[11px] text-white/40 text-center mt-8 font-medium leading-relaxed max-w-[280px] mx-auto">
+                    Dengan masuk, anda menyetujui {" "}
+                    <a className="text-white/60 hover:text-white underline decoration-white/20 transition-colors" href="#0">
+                      syarat & ketentuan
+                    </a>{" "}
+                    serta {" "}
+                    <a className="text-white/60 hover:text-white underline decoration-white/20 transition-colors" href="#0">
+                      kebijakan privasi
+                    </a>{" "}
+                    kami.
                   </div>
                 </form>
               )}
-              <div className="flex items-center my-6">
-                <div
-                  className="border-t border-white/20 grow mr-3"
-                  aria-hidden="true"
-                ></div>
-                <div
-                  className="border-t border-white/20 grow ml-3"
-                  aria-hidden="true"
-                ></div>
+
+              <div className="flex items-center my-10">
+                <div className="border-t border-white/10 grow" aria-hidden="true" />
+                <div className="mx-4 text-white/20 text-[10px] font-bold uppercase tracking-[0.2em]">Atau</div>
+                <div className="border-t border-white/10 grow" aria-hidden="true" />
               </div>
-              <div className="text-gray-200 text-center mt-6">
-                Belum punya akun sebelumnya?{" "}
-                <Link
-                  href="/registrasi"
-                  onClick={() => Cookies.set("XSRF087", "1")}
-                  className="text-blue-400 hover:text-blue-300 hover:underline transition duration-150 ease-in-out font-semibold"
-                >
-                  Registrasi
-                </Link>
+
+              <div className="text-center pb-4">
+                <p className="text-white/50 text-sm">
+                  Belum punya akun sebelumnya?{" "}
+                  <Link
+                    href="/registrasi"
+                    onClick={() => Cookies.set("XSRF087", "1")}
+                    className="text-white font-bold hover:text-blue-400 transition-colors underline decoration-blue-500/30 underline-offset-4 ml-1"
+                  >
+                    Mulai Registrasi
+                  </Link>
+                </p>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
-    </section >
+    </div>
   );
 }
 

@@ -17,9 +17,11 @@ function ProgramPelatihan() {
   }, []);
 
   return (
-    <section className="h-full flex flex-col gap-0 bg-white">
+    <section className="min-h-screen flex flex-col gap-0 bg-[#020617] font-jakarta">
       <HeroProgramPelatihan program={programPelatihanPath!} />
-      <PencarianPelatihan />
+      <div className="relative z-10">
+        <PencarianPelatihan />
+      </div>
       <Footer />
     </section>
   );

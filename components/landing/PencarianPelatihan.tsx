@@ -34,6 +34,7 @@ import {
 import { FiCalendar, FiSearch } from "react-icons/fi";
 import { formatDateRange } from "@/utils/time";
 import { HiClock } from "react-icons/hi2";
+import { motion } from "framer-motion";
 
 function PencarianPelatihan() {
   const [data, setData] = React.useState<PelatihanMasyarakat[] | null>(null);
@@ -122,6 +123,7 @@ function PencarianPelatihan() {
     setSelectedBalaiPelatihan("");
     setSelectedBiayaPelatihan("");
     setSelectedBulanPelatihan("");
+    setJenisPelaksanaan("");
 
     handleFetchingPublicTrainingData();
   };
@@ -142,263 +144,226 @@ function PencarianPelatihan() {
   }, []);
 
   return (
-    <section className="-mt-20 w-full">
-      {loading ? (
-        <></>
-      ) : (
-        <div className=" mx-auto max-w-7xl py-5 flex flex-col gap-4 -mt-20 md:mt-0  px-3 md:px-0">
-          <div className="col-span-2 sm:col-span-1 md:col-span-2 bg-white h-auto w-fit mx-auto items-center justify-center flex flex-col relative shadow-custom rounded-3xl overflow-hidden">
-            <div className="group relative flex flex-col overflow-hidden justify-center rounded-3xl px-6  flex-grow group">
-              <div className="flex flex-col gap-1  ">
-                <h3 className="text-lg font-calsans mt-5 -mb-3 ">
-                  Filter dan Cari Pelatihan
-                </h3>
-                <div className="grid grid-cols-2 md:flex w-fit gap-2 py-5 items-center justify-center">
-                  {/* Jenis Pembayaran */}
-                  <Select
-                    value={jenisPembayaran}
-                    onValueChange={(value) => setJenisPembayaran(value)}
-                  >
-                    <SelectTrigger className="w-[180px] border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
-                      <div className="inline-flex gap-2 px-3 w-full text-sm items-center rounded-md bg-white p-1.5  cursor-pointer border border-gray-300">
-                        <HiViewGrid />
-                        {jenisPembayaran == ""
-                          ? "Jenis Pelatihan"
-                          : jenisPembayaran}
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent className="z-[10000]">
-                      <SelectGroup>
-                        <SelectLabel>Pilih Jenis Pelatihan</SelectLabel>
-                        <SelectItem value="Gratis">Gratis</SelectItem>
-                        <SelectItem value="Berbayar">Berbayar</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
+    <section className="relative w-full py-20 bg-[#020617] font-jakarta">
+      <div className="mx-auto max-w-7xl px-4 md:px-6">
+        {/* Search & Filter Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative z-20 bg-[#1e293b]/40 backdrop-blur-2xl border border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden p-8 mb-16"
+        >
+          <div className="flex flex-col gap-6">
+            <h3 className="text-2xl font-bold font-calsans text-white tracking-tight">
+              Filter dan Cari Pelatihan
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+              {/* Jenis Pembayaran */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1">Jenis Layanan</label>
+                <Select
+                  value={jenisPembayaran}
+                  onValueChange={(value) => setJenisPembayaran(value)}
+                >
+                  <SelectTrigger className="w-full h-12 bg-white/5 border-white/10 text-gray-300 rounded-xl focus:ring-blue-500/50 hover:bg-white/10 transition-all">
+                    <div className="flex gap-2 items-center">
+                      <HiViewGrid className="text-blue-400" />
+                      <span className="text-sm">
+                        {jenisPembayaran == "" ? "Pilih Jenis" : jenisPembayaran}
+                      </span>
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#0f172a] border-white/10 text-white z-[9999]">
+                    <SelectGroup>
+                      <SelectItem value="Gratis">Gratis</SelectItem>
+                      <SelectItem value="Berbayar">Berbayar</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
 
-                  {/* Lembaga Pelatihan */}
-                  <Select
-                    value={selectedBalaiPelatihan}
-                    onValueChange={(value) => setSelectedBalaiPelatihan(value)}
-                  >
-                    <SelectTrigger className="w-[180px] border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
-                      <div className="inline-flex gap-2 w-full px-3 text-sm items-center rounded-md bg-white p-1.5  cursor-pointer border border-gray-300">
-                        <RiSchoolLine />
-                        {selectedBalaiPelatihan == ""
-                          ? "Lemdiklat KP"
-                          : selectedBalaiPelatihan}
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent className="z-[10000]">
-                      <SelectGroup>
-                        <SelectLabel>Balai Pelatihan KP</SelectLabel>
-                        {BALAI_PELATIHAN.map((balaiPelatihan, index) => (
-                          <SelectItem key={index} value={balaiPelatihan.Name}>
-                            {balaiPelatihan.Name}
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
+              {/* Lembaga Pelatihan */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1">Lemdiklat KP</label>
+                <Select
+                  value={selectedBalaiPelatihan}
+                  onValueChange={(value) => setSelectedBalaiPelatihan(value)}
+                >
+                  <SelectTrigger className="w-full h-12 bg-white/5 border-white/10 text-gray-300 rounded-xl focus:ring-blue-500/50 hover:bg-white/10 transition-all">
+                    <div className="flex gap-2 items-center">
+                      <RiSchoolLine className="text-blue-400" />
+                      <span className="text-sm truncate">
+                        {selectedBalaiPelatihan == "" ? "Pilih Balai" : selectedBalaiPelatihan}
+                      </span>
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#0f172a] border-white/10 text-white z-[9999]">
+                    <SelectGroup>
+                      {BALAI_PELATIHAN.map((balai, idx) => (
+                        <SelectItem key={idx} value={balai.Name}>{balai.Name}</SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
 
-                  {/* Jenis Pelaksanaan */}
-                  <Select
-                    value={jenisPembayaran}
-                    onValueChange={(value) => setJenisPembayaran(value)}
-                  >
-                    <SelectTrigger className="w-[180px] border-none shadow-none bg-none p-0 active:ring-0 focus:ring-0">
-                      <div className="inline-flex gap-2 px-3 w-full text-sm items-center rounded-md bg-white p-1.5  cursor-pointer border border-gray-300">
-                        <HiClock />
-                        {jenisPembayaran == ""
-                          ? "Jenis Pelaksanaan"
-                          : jenisPembayaran}
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent className="z-[10000]">
-                      <SelectGroup>
-                        <SelectLabel>Pilih Jenis Pelaksanaan</SelectLabel>
-                        {
-                          JENIS_PELAKSANAAN.map((item) => (
-                            <SelectItem value={item}>{item}</SelectItem>
-                          ))
-                        }
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
+              {/* Jenis Pelaksanaan */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 ml-1">Pelaksanaan</label>
+                <Select
+                  value={jenisPelaksanaan}
+                  onValueChange={(value) => setJenisPelaksanaan(value)}
+                >
+                  <SelectTrigger className="w-full h-12 bg-white/5 border-white/10 text-gray-300 rounded-xl focus:ring-blue-500/50 hover:bg-white/10 transition-all">
+                    <div className="flex gap-2 items-center">
+                      <HiClock className="text-blue-400" />
+                      <span className="text-sm">
+                        {jenisPelaksanaan == "" ? "Pilih Metode" : jenisPelaksanaan}
+                      </span>
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#0f172a] border-white/10 text-white z-[9999]">
+                    <SelectGroup>
+                      {JENIS_PELAKSANAAN.map((item, idx) => (
+                        <SelectItem key={idx} value={item}>{item}</SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
 
-                  {(jenisPembayaran !== "" ||
-                    selectedBalaiPelatihan !== "" ||
-                    selectedBiayaPelatihan !== "" ||
-                    selectedBidangPelatihan !== "" ||
-                    selectedProgramPelatihan !== ""
-                  ) && (
-                      <div
-                        onClick={() => handleClearFilter()}
-                        className="inline-flex gap-2 w-full px-3 text-sm items-center rounded-md bg-white p-1.5 cursor-pointer border border-gray-300"
-                      >
-                        <MdClear />
-                        Bersihkan Filter
-                      </div>
-                    )}
-
-                  <div className="hidden md:flex w-full">
-                    <Button
-                      onClick={(e) => handleFetchingPublicTrainingData()}
-                      className="btn-sm text-sm w-full text-white bg-blue-500 cursor-pointer"
-                    >
-                      <span className="mr-2">Cari</span>
-                      <FiSearch />
-                    </Button>
-                  </div>
-                </div>
-                <div className="flex md:hidden w-full md:w-fit mb-5 -mt-2">
+              <div className="flex gap-2">
+                {(jenisPembayaran !== "" || selectedBalaiPelatihan !== "" || jenisPelaksanaan !== "") && (
                   <Button
-                    onClick={(e) => handleFetchingPublicTrainingData()}
-                    className="btn-sm text-sm w-full md:w-fit px-3 text-white bg-blue-500 hover:bg-blue-600 cursor-pointer"
+                    onClick={handleClearFilter}
+                    variant="outline"
+                    className="h-12 w-12 rounded-xl border-white/10 bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-all flex items-center justify-center p-0"
                   >
-                    <span className="mr-2">Cari</span>
-                    <FiSearch />
+                    <MdClear size={20} />
                   </Button>
-                </div>
+                )}
+                <Button
+                  onClick={handleFetchingPublicTrainingData}
+                  className="h-12 flex-1 rounded-xl bg-gradient-to-r from-blue-600 to-sky-500 text-white font-bold hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] transition-all flex items-center justify-center gap-2 group"
+                >
+                  <span>Cari Pelatihan</span>
+                  <FiSearch />
+                </Button>
               </div>
             </div>
           </div>
+        </motion.div>
 
-          {loading ? (
-            <div className="w-full flex h-[50vh] items-center justify-center">
-              <HashLoader color="#338CF5" size={50} />
-            </div>
-          ) : (
-            showResult && (
-              <div className="w-full max-w-7xl mx-auto pb-4">
-                {/* Header */}
-                {selectedBulanPelatihan != "" && (
-                  <div className="bg-white shadow-custom rounded-xl p-3 text-xl  text-center font-calsans">
-                    <span className="font-bold">
-                      {getMonthName(selectedBulanPelatihan)}{" "}
-                      {new Date().getFullYear()}
-                    </span>
-                  </div>
-                )}
-
-                {/* Table */}
-                <div className="bg-white shadow-custom text-black text-center hidden md:grid grid-cols-5 gap-2 p-4 rounded-xl font-calsans text-lg mt-4">
-                  <div>Pelatihan</div>
-                  <div>Penyelenggara</div>
-                  <div></div>
-                  <div>Waktu Pelaksanaan</div>
-                  <div>Biaya</div>
-                </div>
-
-                <div className=" gap-4 flex w-full mt-4">
-                  {data == null || data.length === 0 ? (
-                    <div className="flex flex-col w-full items-center justify-center h-fit">
-                      <Image
-                        src={"/illustrations/not-found.png"}
-                        alt="Not Found"
-                        width={0}
-                        height={0}
-                        className="w-[400px]"
-                      />
-                      <div className="max-w-3xl mx-auto text-center pb-5 md:pb-8 -mt-2">
-                        <h1 className="text-3xl font-calsans leading-[110%] text-black">
-                          Belum Ada Pelatihan
-                        </h1>
-                        <div className="text-gray-600 text-center  max-w-md">
-                          Belum ada pelatihan yang tersedia saat ini, harap
-                          terus cek berkala ya websitenya Sobat E-LAUT!
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="w-full grid grid-cols-1 gap-3  justify-center  ">
-                      {data.map((pelatihan, index) => (
-                        <CardPelatihan key={index} pelatihan={pelatihan} />
-                      ))}
-                    </div>
-                  )}
-                </div>
+        {loading ? (
+          <div className="w-full flex h-[40vh] items-center justify-center">
+            <HashLoader color="#3b82f6" size={50} />
+          </div>
+        ) : (
+          showResult && (
+            <div className="space-y-6">
+              {/* Results Table Header */}
+              <div className="hidden md:grid grid-cols-5 gap-4 px-8 py-4 bg-white/5 border border-white/10 rounded-2xl text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500">
+                <div className="col-span-1">Informasi Pelatihan</div>
+                <div className="text-center">Penyelenggara</div>
+                <div className="text-center">Pelaksanaan</div>
+                <div className="text-center">Waktu</div>
+                <div className="text-center">Biaya & Action</div>
               </div>
-            )
-          )}
-        </div>
-      )}
+
+              {data == null || data.length === 0 ? (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex flex-col items-center justify-center py-20"
+                >
+                  <Image src="/illustrations/not-found.png" alt="Not Found" width={300} height={300} className="opacity-20 grayscale" />
+                  <h3 className="text-2xl font-bold text-white mt-6 font-calsans">Belum Ada Pelatihan</h3>
+                  <p className="text-gray-500 mt-2 text-center max-w-sm font-light">
+                    Belum ada pelatihan yang tersedia untuk kriteria ini. Harap cek secara berkala!
+                  </p>
+                </motion.div>
+              ) : (
+                <div className="grid grid-cols-1 gap-4">
+                  {data.map((pelatihan, index) => (
+                    <CardPelatihan key={index} pelatihan={pelatihan} index={index} />
+                  ))}
+                </div>
+              )}
+            </div>
+          )
+        )}
+      </div>
     </section>
   );
 }
 
-const CardPelatihan = ({ pelatihan }: { pelatihan: PelatihanMasyarakat }) => {
+const CardPelatihan = ({ pelatihan, index }: { pelatihan: PelatihanMasyarakat; index: number }) => {
   return (
-    <div className="bg-white shadow-custom text-black p-4 rounded-xl grid grid-cols-1 md:grid-cols-5 mb-4 items-center">
-      <div className="max-w-xs leading-[115%]">
-        <h3 className="text-xl font-bold">{pelatihan.NamaPelatihan}</h3>
-        <p className="text-sm">{pelatihan.BidangPelatihan}</p>
-        <p className="text-sm">
-          {pelatihan!.TanggalMulaiPendaftaran != "" && (
-            <span className="text-sm leading-[100%] block">
-              Waktu Pendaftaran :<br />
-              {formatDateRange(pelatihan!.TanggalMulaiPendaftaran, pelatihan!.TanggalBerakhirPendaftaran)}
-            </span>
-          )}
-        </p>
-      </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.05 }}
+      whileHover={{ y: -4 }}
+      className="group relative bg-[#1e293b]/20 backdrop-blur-xl border border-white/5 hover:border-blue-500/30 p-6 rounded-[2.5rem] transition-all duration-300"
+    >
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 items-center">
+        {/* Info Pelatihan */}
+        <div className="flex flex-col gap-1">
+          <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">{pelatihan.BidangPelatihan}</span>
+          <h3 className="text-lg font-bold text-white group-hover:text-blue-300 transition-colors leading-tight">{pelatihan.NamaPelatihan}</h3>
+          <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
+            <FiCalendar className="text-blue-500" />
+            <span className="truncate">Pendaftaran: {formatDateRange(pelatihan.TanggalMulaiPendaftaran, pelatihan.TanggalBerakhirPendaftaran)}</span>
+          </div>
+        </div>
 
-      <div className="text-left md:text-center">
-        <p className="font-bold leading-none">{pelatihan.PenyelenggaraPelatihan}</p>
-        <p className="text-sm leading-[100%]">{pelatihan.LokasiPelatihan}</p>
-      </div>
+        {/* Penyelenggara */}
+        <div className="flex flex-col md:text-center gap-1">
+          <span className="text-sm font-bold text-gray-200">{pelatihan.PenyelenggaraPelatihan}</span>
+          <span className="text-xs text-gray-500 font-medium truncate">{pelatihan.LokasiPelatihan}</span>
+        </div>
 
-      <div className="hidden md:flex flex-col items-start md:items-center">
-        <div className="bg-blue-500 p-2 rounded-full">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            stroke="#000"
-            className="w-6 h-6 text-white stroke-white"
+        {/* Metode */}
+        <div className="flex flex-col items-start md:items-center gap-2">
+          <div className="px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-wider">
+            {pelatihan.PelaksanaanPelatihan}
+          </div>
+        </div>
+
+        {/* Waktu Pelaksanaan */}
+        <div className="flex flex-col md:text-center gap-1">
+          <div className="flex flex-col items-start md:items-center gap-1">
+            <span className="text-xs text-gray-400 font-medium">Mulai Pelatihan:</span>
+            <span className="text-sm font-bold text-white">{pelatihan.TanggalMulaiPelatihan ? getMonthName(pelatihan.TanggalMulaiPelatihan) : "-"}</span>
+            <span className="text-[10px] text-gray-500 tracking-tighter">{formatDateRange(pelatihan.TanggalMulaiPelatihan, pelatihan.TanggalBerakhirPelatihan)}</span>
+          </div>
+        </div>
+
+        {/* Harga & Action */}
+        <div className="flex flex-col md:items-center gap-4">
+          <div className="text-left md:text-center">
+            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Investasi</span>
+            <p className="text-xl font-bold text-white">
+              {pelatihan.HargaPelatihan === 0 ? (
+                <span className="text-teal-400">GRATIS</span>
+              ) : (
+                formatToRupiah(pelatihan.HargaPelatihan)
+              )}
+            </p>
+          </div>
+
+          <Link
+            onClick={() => Cookies.set("JenisProgram", pelatihan?.JenisProgram)}
+            href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${pelatihan?.KodePelatihan}/${encryptValue(pelatihan?.IdPelatihan)}`}
+            className={`w-full py-3 rounded-2xl text-xs font-bold transition-all flex justify-center items-center gap-2 ${pelatihan?.StatusApproval == "Selesai"
+                ? "bg-white/5 text-gray-400 cursor-not-allowed"
+                : "bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-500/20"
+              }`}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M13 5l7 7-7 7M5 12h14"
-              className="text-white"
-            />
-          </svg>
+            {pelatihan.StatusApproval == "Selesai" ? "Sudah Selesai" : "Lihat Detail"}
+          </Link>
         </div>
       </div>
-
-      <div className="text-left md:text-center">
-        <p className="font-bold">{pelatihan.PelaksanaanPelatihan}</p>
-        {pelatihan!.TanggalMulaiPelatihan != "" && (
-          <span className="text-sm leading-[100%] block">
-            {formatDateRange(pelatihan.TanggalMulaiPelatihan, pelatihan.TanggalBerakhirPelatihan)}
-          </span>
-        )}
-      </div>
-
-      <div className="text-center flex md:items-center md:justify-center flex-col">
-        {pelatihan?.StatusApproval != "Selesai" && (
-          <p className="text-blue-500 text-left text-xl leading-none font-bold">
-            {formatToRupiah(pelatihan.HargaPelatihan)}
-          </p>
-        )}
-
-        <Link
-          onClick={(e) => Cookies.set("JenisProgram", pelatihan?.JenisProgram)}
-          href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${pelatihan?.KodePelatihan
-            }/${encryptValue(pelatihan?.IdPelatihan)}`}
-          className={`${pelatihan?.StatusApproval == "Selesai"
-            ? "bg-gray-500"
-            : "bg-blue-500"
-            } text-white px-4 py-2 text-sm rounded-full mb-1 mt-2 w-full md:w-fit block`}
-        >
-          {pelatihan.StatusApproval == "Selesai"
-            ? "Sudah Selesai"
-            : "Lihat Detail"}
-        </Link>
-      </div>
-    </div>
+    </motion.div>
   );
 };
 

@@ -17,8 +17,8 @@ export function generateInstrukturName(names: string) {
   return instruktur
 }
 
-export function getMonthName(monthValue: string) {
-  const months: any = {
+export function getMonthName(dateString: string) {
+  const months: Record<string, string> = {
     "01": "Januari",
     "02": "Februari",
     "03": "Maret",
@@ -30,11 +30,13 @@ export function getMonthName(monthValue: string) {
     "09": "September",
     "10": "Oktober",
     "11": "November",
-    "12": "Desember"
+    "12": "Desember",
   };
 
-  return months[monthValue] || "Invalid month";
+  const month = dateString.split("-")[1];
+  return months[month] || "-";
 }
+
 
 export const generateRandomId = (): string => {
   return `${Math.random().toString(36).substr(2, 9)}-${Date.now()}`;
