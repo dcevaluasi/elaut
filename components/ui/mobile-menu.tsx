@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Transition } from "@headlessui/react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Cookies from "js-cookie";
 import { usePathname, useRouter } from "next/navigation";
@@ -27,7 +27,6 @@ export default function MobileMenu({ isTop }: { isTop: boolean }) {
   const trigger = useRef<HTMLButtonElement>(null);
   const mobileNav = useRef<HTMLDivElement>(null);
 
-  // close the mobile menu on click outside
   useEffect(() => {
     const clickHandler = ({ target }: { target: EventTarget | null }): void => {
       if (!mobileNav.current || !trigger.current) return;
@@ -41,9 +40,8 @@ export default function MobileMenu({ isTop }: { isTop: boolean }) {
     };
     document.addEventListener("click", clickHandler);
     return () => document.removeEventListener("click", clickHandler);
-  });
+  }, [mobileNavOpen]);
 
-  // close the mobile menu if the esc key is pressed
   useEffect(() => {
     const keyHandler = ({ keyCode }: { keyCode: number }): void => {
       if (!mobileNavOpen || keyCode !== 27) return;
@@ -51,184 +49,217 @@ export default function MobileMenu({ isTop }: { isTop: boolean }) {
     };
     document.addEventListener("keydown", keyHandler);
     return () => document.removeEventListener("keydown", keyHandler);
-  });
+  }, [mobileNavOpen]);
 
   return (
-    <div className={`${usePathname().includes('instruktur/form') ? 'hidden' : 'flex md:hidden'} px-6 md:px-0 mt-0`}>
+    <div className={`${pathname.includes('instruktur/form') ? 'hidden' : 'flex lg:hidden'} items-center`}>
       {/* Hamburger button */}
       <button
         ref={trigger}
-        className={`hamburger ${mobileNavOpen && "active"}`}
-        aria-controls="mobile-nav"
-        aria-expanded={mobileNavOpen}
+        className="relative z-[9999999] p-2 text-white transition-colors"
         onClick={() => setMobileNavOpen(!mobileNavOpen)}
       >
-        <span className="sr-only">Menu</span>
-        <svg
-          className="w-6 h-6 fill-current text-white"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <rect y="4" width="24" height="2" />
-          <rect y="11" width="24" height="2" />
-          <rect y="18" width="24" height="2" />
-        </svg>
+        <div className="flex flex-col gap-1.5 w-6">
+          <motion.span
+            animate={mobileNavOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
+            className="h-0.5 w-full bg-white rounded-full transition-transform origin-center"
+          />
+          <motion.span
+            animate={mobileNavOpen ? { opacity: 0 } : { opacity: 1 }}
+            className="h-0.5 w-full bg-white rounded-full transition-opacity"
+          />
+          <motion.span
+            animate={mobileNavOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
+            className="h-0.5 w-full bg-white rounded-full transition-transform origin-center"
+          />
+        </div>
       </button>
 
-      {/*Mobile navigation */}
-      <div ref={mobileNav}>
-        <Transition
-          show={mobileNavOpen}
-          as="nav"
-          id="mobile-nav"
-          className="absolute top-full h-screen pb-16 z-20 left-0 w-full overflow-scroll bg-gradient-to-br from-blue-900 via-blue-800 to-blue-950"
-          enter="transition ease-out duration-200 transform"
-          enterFrom="opacity-0 -translate-y-2"
-          enterTo="opacity-100 translate-y-0"
-          leave="transition ease-out duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <ul className="px-5 py-4 space-y-2">
-            {/* Beranda */}
-            <li>
-              <Link
-                href="/"
-                className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl font-semibold transition duration-200 ${
-                  pathname === "/" ? "bg-white/20 text-blue-400" : "text-white hover:bg-white/10"
-                }`}
-                onClick={() => setMobileNavOpen(false)}
-              >
-                <HiHome className="text-xl" />
-                Beranda
-              </Link>
-            </li>
+      {/* Mobile navigation */}
+      <AnimatePresence>
+        {mobileNavOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999998] bg-[#020617]/95 backdrop-blur-2xl"
+          >
+            <motion.nav
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              ref={mobileNav}
+              className="absolute right-0 top-0 h-full w-[80%] max-w-sm bg-[#0f172a] shadow-2xl border-l border-white/10 overflow-y-auto"
+            >
+              <div className="flex flex-col h-full p-8 pt-24">
+                <ul className="space-y-4 flex-grow">
+                  <MobileNavItem
+                    href="/"
+                    label="Beranda"
+                    icon={<HiHome />}
+                    active={pathname === "/"}
+                    onClick={() => setMobileNavOpen(false)}
+                  />
+                  <MobileNavItem
+                    href="/layanan/cek-sertifikat"
+                    label="Cek Sertifikat"
+                    icon={<HiIdentification />}
+                    active={pathname === "/layanan/cek-sertifikat"}
+                    onClick={() => setMobileNavOpen(false)}
+                  />
 
-            {/* Cek Sertifikat */}
-            <li>
-              <Link
-                href="/layanan/cek-sertifikat"
-                className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl font-semibold transition duration-200 ${
-                  pathname === "/layanan/cek-sertifikat" ? "bg-white/20 text-blue-400" : "text-white hover:bg-white/10"
-                }`}
-                onClick={() => setMobileNavOpen(false)}
-              >
-                <HiIdentification className="text-xl" />
-                Cek Sertifikat
-              </Link>
-            </li>
+                  <li>
+                    <button
+                      onClick={() => setOpenLayanan(!openLayanan)}
+                      className={`flex items-center justify-between w-full p-4 rounded-2xl transition-all duration-300 ${pathname.startsWith("/layanan") ? "bg-blue-500/10 text-blue-400" : "text-gray-300 hover:text-white hover:bg-white/5"
+                        }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`p-2 rounded-xl ${pathname.startsWith("/layanan") ? "bg-blue-500/20" : "bg-white/5"}`}>
+                          <HiNewspaper className="text-xl" />
+                        </div>
+                        <span className="font-semibold tracking-wide">Layanan</span>
+                      </div>
+                      <HiMiniChevronDown
+                        className={`text-xl transition-transform duration-300 ${openLayanan ? "rotate-180" : ""}`}
+                      />
+                    </button>
 
-            {/* Layanan & Pengaduan Dropdown */}
-            <li>
-              <button
-                onClick={() => setOpenLayanan(!openLayanan)}
-                className={`flex items-center justify-between gap-3 w-full px-4 py-3 rounded-xl font-semibold transition duration-200 ${
-                  pathname.startsWith("/layanan") ? "bg-white/20 text-blue-400" : "text-white hover:bg-white/10"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <HiNewspaper className="text-xl" />
-                  Layanan & Pengaduan
-                </div>
-                <HiMiniChevronDown
-                  className={`text-lg transition-transform duration-200 ${
-                    openLayanan ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-
-              {/* Dropdown Items */}
-              {openLayanan && (
-                <ul className="mt-2 ml-4 space-y-1 bg-white/5 rounded-xl p-2">
-                  <li>
-                    <Link
-                      href="/layanan/publik/maklumat-pelayanan"
-                      className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-white/90 text-sm hover:bg-white/10 hover:text-white transition"
-                      onClick={() => setMobileNavOpen(false)}
-                    >
-                      <HiOutlineClipboardDocumentCheck className="text-lg" />
-                      Maklumat Pelayanan
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/layanan/standar-pelayanan"
-                      className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-white/90 text-sm hover:bg-white/10 hover:text-white transition"
-                      onClick={() => setMobileNavOpen(false)}
-                    >
-                      <HiOutlineDocumentText className="text-lg" />
-                      Standar Pelayanan
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="https://span.lapor.go.id"
-                      className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-white/90 text-sm hover:bg-white/10 hover:text-white transition"
-                      onClick={() => setMobileNavOpen(false)}
-                    >
-                      <HiOutlineChatBubbleLeftRight className="text-lg" />
-                      SPAN Lapor
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/layanan/survey-kepuasan"
-                      className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-white/90 text-sm hover:bg-white/10 hover:text-white transition"
-                      onClick={() => setMobileNavOpen(false)}
-                    >
-                      <HiOutlineChartBar className="text-lg" />
-                      Survey Kepuasan Masyarakat (Susan KKP)
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/layanan/hasil-survey"
-                      className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-white/90 text-sm hover:bg-white/10 hover:text-white transition"
-                      onClick={() => setMobileNavOpen(false)}
-                    >
-                      <HiOutlineChartBar className="text-lg" />
-                      Hasil Survei Kepuasan Masyarakat
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/layanan/publik/masukan-saran"
-                      className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-white/90 text-sm hover:bg-white/10 hover:text-white transition"
-                      onClick={() => setMobileNavOpen(false)}
-                    >
-                      <HiOutlineChatBubbleBottomCenterText className="text-lg" />
-                      Masukan & Saran
-                    </Link>
+                    <AnimatePresence>
+                      {openLayanan && (
+                        <motion.ul
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="mt-2 ml-4 border-l border-white/10 space-y-1 overflow-hidden"
+                        >
+                          <MobileDropdownSubItem
+                            href="/layanan/publik/maklumat-pelayanan"
+                            label="Maklumat Pelayanan"
+                            icon={<HiOutlineClipboardDocumentCheck />}
+                            onClick={() => setMobileNavOpen(false)}
+                          />
+                          <MobileDropdownSubItem
+                            href="/layanan/standar-pelayanan"
+                            label="Standar Pelayanan"
+                            icon={<HiOutlineDocumentText />}
+                            onClick={() => setMobileNavOpen(false)}
+                          />
+                          <MobileDropdownSubItem
+                            href="https://span.lapor.go.id"
+                            label="SPAN Lapor"
+                            icon={<HiOutlineChatBubbleLeftRight />}
+                            onClick={() => setMobileNavOpen(false)}
+                          />
+                          <MobileDropdownSubItem
+                            href="/layanan/survey-kepuasan"
+                            label="Susan KKP"
+                            icon={<HiOutlineChartBar />}
+                            onClick={() => setMobileNavOpen(false)}
+                          />
+                          <MobileDropdownSubItem
+                            href="/layanan/hasil-survey"
+                            label="Hasil Survei"
+                            icon={<HiOutlineChartBar />}
+                            onClick={() => setMobileNavOpen(false)}
+                          />
+                          <MobileDropdownSubItem
+                            href="/layanan/publik/masukan-saran"
+                            label="Masukan & Saran"
+                            icon={<HiOutlineChatBubbleBottomCenterText />}
+                            onClick={() => setMobileNavOpen(false)}
+                          />
+                        </motion.ul>
+                      )}
+                    </AnimatePresence>
                   </li>
                 </ul>
-              )}
-            </li>
 
-            {/* Login/Dashboard Button */}
-            <li className="pt-4">
-              {isLoggedIn ? (
-                <Link
-                  href="/dashboard"
-                  className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-xl border border-blue-400 bg-blue-500/20 text-white hover:bg-blue-500 hover:text-white font-semibold transition"
-                  onClick={() => setMobileNavOpen(false)}
-                >
-                  Dashboard
-                </Link>
-              ) : (
-                <button
-                  onClick={() => {
-                    setMobileNavOpen(false);
-                    router.push("/login");
-                  }}
-                  className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-xl border border-blue-400 bg-blue-500/20 text-white hover:bg-blue-500 hover:text-white font-semibold transition"
-                >
-                  Login
-                </button>
-              )}
-            </li>
-          </ul>
-        </Transition>
-      </div>
+                <div className="pt-8 mt-8 border-t border-white/10">
+                  {isLoggedIn ? (
+                    <button
+                      onClick={() => {
+                        setMobileNavOpen(false);
+                        router.push("/dashboard");
+                      }}
+                      className="w-full p-4 rounded-2xl bg-blue-600 text-white font-bold tracking-wide shadow-lg shadow-blue-500/20 active:scale-95 transition-all"
+                    >
+                      DASHBOARD
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setMobileNavOpen(false);
+                        router.push("/login");
+                      }}
+                      className="w-full p-4 rounded-2xl bg-blue-600 text-white font-bold tracking-wide shadow-lg shadow-blue-500/20 active:scale-95 transition-all"
+                    >
+                      LOGIN
+                    </button>
+                  )}
+                </div>
+              </div>
+            </motion.nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
+
+function MobileNavItem({
+  href,
+  label,
+  icon,
+  active,
+  onClick,
+}: {
+  href: string;
+  label: string;
+  icon: React.ReactNode;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <li>
+      <Link
+        href={href}
+        onClick={onClick}
+        className={`flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 ${active ? "bg-blue-500/10 text-blue-400" : "text-gray-300 hover:text-white hover:bg-white/5"
+          }`}
+      >
+        <div className={`p-2 rounded-xl ${active ? "bg-blue-500/20" : "bg-white/5"}`}>
+          <span className="text-xl">{icon}</span>
+        </div>
+        <span className="font-semibold tracking-wide">{label}</span>
+      </Link>
+    </li>
+  );
+}
+
+function MobileDropdownSubItem({
+  href,
+  label,
+  icon,
+  onClick,
+}: {
+  href: string;
+  label: string;
+  icon: React.ReactNode;
+  onClick: () => void;
+}) {
+  return (
+    <li>
+      <Link
+        href={href}
+        onClick={onClick}
+        className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 text-sm hover:text-white hover:bg-white/5 transition-all duration-300"
+      >
+        <span className="text-lg opacity-60">{icon}</span>
+        <span className="font-medium tracking-wide">{label}</span>
+      </Link>
+    </li>
+  );
+}
+
