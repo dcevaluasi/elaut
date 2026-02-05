@@ -272,7 +272,7 @@ export default function LayoutAdminElaut({
 
           {/* Pusat Pelatihan Mandiri KP */}
           {
-            (Cookies.get('Role')?.includes('Pengelola') || Cookies.get('Access')?.includes('superAdmin')) && <li>
+            (Cookies.get('Access')?.includes('superAdmin')) && <li>
               <button
                 onClick={() => { setSubMenuP2MKPOpen(!subMenuP2MKPOpen) }}
                 className={`flex items-center justify-between w-full px-3 py-2.5 rounded-lg transition-all duration-200 group ${pathname.includes("p2mkp")
