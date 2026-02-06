@@ -14,10 +14,12 @@ export function useFetchDataPelatihanMasyarakat() {
 
   const [countDiklatSPV, setCountDiklatSPV] = useState(0)
 
+
   const [countPendingSigning, setCountPendingSigning] = useState(0)
   const [countSigned, setCountSigned] = useState(0)
 
   const idLemdik = Cookies.get('IDLemdik')
+  const idUnitKerja = Cookies.get('IDUnitKerja')
   const token = Cookies.get('XSRF091')
 
   const isLemdiklat =
@@ -47,7 +49,7 @@ export function useFetchDataPelatihanMasyarakat() {
 
     if (isLemdiklat) {
       const satker = Cookies.get('Satker')
-      filtered = filtered.filter((p) => p.PenyelenggaraPelatihan === satker)
+      filtered = filtered.filter((p) => p.PenyelenggaraPelatihan === satker || p.IdUnitKerja == idUnitKerja)
     }
 
     if (isPusat) {

@@ -31,28 +31,12 @@ import TabStatusPelatihanMasyarakat from "./TabStatusPelatihanMasyarakat";
 import TableDataPelatihanMasyarakat from "./Table/TableDataPelatihanMasyrakat";
 import { isPendingSigning, isSigned, isVerifyDiklat } from "@/utils/status";
 import FormPelatihan from "@/components/form/FormPelatihan";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-} from "recharts";
 import { Calendar, Users, Briefcase, GraduationCap, TrendingUp, SlidersHorizontal } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-const COLORS_PROGRAM = ["#3B82F6", "#0EA5E9", "#06B6D4"]; // Blue shades
-const COLORS_MONTHS = ["#F59E0B", "#F97316", "#EF4444", "#EC4899", "#8B5CF6", "#6366f1"];
 
 const TableDataPelatihan: React.FC = () => {
   const {
@@ -114,6 +98,8 @@ const TableDataPelatihan: React.FC = () => {
       );
     });
   }, [data, filterCategory, filterCategoryPenyelenggara, filterCategorySasaran, searchQuery, selectedStatusFilter, filterYear]);
+
+
 
   // Year Options
   const yearOptions = useMemo(() => {

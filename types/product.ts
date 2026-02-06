@@ -31,6 +31,7 @@ export type JawabanSoalPelatihan = {
 export type PelatihanMasyarakat = {
   TanggalAkhirPendaftaran?: string
   IdPelatihan: number
+  IdUnitKerja?: string
   IdLemdik: string
   KodePelatihan: string
   NamaPelatihan: string
