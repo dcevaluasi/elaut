@@ -26,7 +26,6 @@ import Toast from "../toast";
 import axios, { isAxiosError } from "axios";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { addFiveYears } from "@/utils/pelatihan";
-import { DIALOG_TEXTS } from "@/constants/texts";
 import { generateTanggalPelatihan } from "@/utils/text";
 
 interface PelatihanByNik {
