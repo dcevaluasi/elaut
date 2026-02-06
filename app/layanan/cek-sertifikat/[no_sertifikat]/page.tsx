@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useEffect, useState } from 'react';
-import Head from 'next/head';
 import axios, { isAxiosError } from 'axios';
 import { UserPelatihan } from '@/types/user';
 import { addFiveYears } from '@/utils/pelatihan';
@@ -10,10 +9,11 @@ import { RiQuillPenAiLine, RiVerifiedBadgeFill } from 'react-icons/ri';
 import { FiUser, FiBookOpen, FiCalendar, FiFileText, FiEdit3, FiMapPin } from 'react-icons/fi';
 import { useParams } from 'next/navigation';
 import Footer from '@/components/ui/footer';
-import { HashLoader } from 'react-spinners';
 import { PelatihanMasyarakat } from '@/types/product';
 import { HiOutlineInbox } from 'react-icons/hi2';
 import { FaRegBuilding } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 
 const CertificateResultPage = () => {
     const params = useParams();
@@ -38,9 +38,9 @@ const CertificateResultPage = () => {
                 setError(null);
             } catch (err) {
                 if (isAxiosError(err)) {
-                    setError(err.response?.data?.Pesan || 'Terjadi kesalahan');
+                    setError(err.response?.data?.Pesan || 'Sertifikat tidak ditemukan dalam pangkalan data kami.');
                 } else {
-                    setError('Terjadi kesalahan tidak diketahui');
+                    setError('Terjadi masalah saat menghubungi server. Silakan coba lagi nanti.');
                 }
                 setData(null);
             } finally {
@@ -52,102 +52,137 @@ const CertificateResultPage = () => {
     }, [no_sertifikat]);
 
     return (
-        <>
-            <Head>
-                <title>Cek Sertifikat: {no_sertifikat}</title>
-            </Head>
+        <div className="relative min-h-screen w-full overflow-hidden bg-[#020617] font-jakarta flex flex-col">
+            {/* Background Animations */}
+            <div className="absolute inset-0 z-0">
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#020617]/60 to-[#020617]" />
+            </div>
 
-            <main className="min-h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-sky-900 to-blue-900 p-6 flex items-center justify-center relative">
-                <div className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-blue-500/40 blur-3xl" />
-                <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-cyan-400/20 blur-3xl" />
-                <div className="pointer-events-none absolute top-1/3 -right-16 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 max-w-xl w-full text-white mt-10">
+            <motion.div
+                animate={{
+                    x: [0, 40, 0],
+                    y: [0, -20, 0],
+                }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="pointer-events-none absolute -top-24 -left-24 h-[35rem] w-[35rem] rounded-full bg-blue-600/10 blur-[100px] z-1"
+            />
+            <motion.div
+                animate={{
+                    x: [0, -50, 0],
+                    y: [0, 30, 0],
+                }}
+                transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                className="pointer-events-none absolute -bottom-48 -right-48 h-[40rem] w-[40rem] rounded-full bg-cyan-500/10 blur-[120px] z-1"
+            />
+
+            <main className="relative z-10 flex-grow flex items-center justify-center p-6 py-20">
+                <AnimatePresence mode="wait">
                     {loading ? (
-                        <div className="py-32 w-full items-center flex justify-center">
-                            <HashLoader color="#e5e5e5" size={50} />
-                        </div>
+                        <motion.div
+                            key="loading"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="flex flex-col items-center gap-6"
+                        >
+                            <div className="relative w-20 h-20">
+                                <div className="absolute inset-0 border-4 border-blue-500/20 rounded-full" />
+                                <div className="absolute inset-0 border-4 border-t-blue-500 rounded-full animate-spin" />
+                            </div>
+                            <p className="text-blue-400 font-medium animate-pulse">Menghubungkan ke Pusat Data...</p>
+                        </motion.div>
                     ) : error ? (
-                        <div className="text-center text-red-400">
-                            <p className="font-semibold">⚠ Oops! {error}</p>
-                        </div>
+                        <motion.div
+                            key="error"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="max-w-md w-full p-10 rounded-[2.5rem] bg-[#1e293b]/20 backdrop-blur-2xl border border-red-500/20 text-center"
+                        >
+                            <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <span className="text-4xl">⚠</span>
+                            </div>
+                            <h2 className="text-2xl font-bold text-white mb-4 font-calsans">Validasi Gagal</h2>
+                            <p className="text-gray-400 text-sm leading-relaxed mb-8">{error}</p>
+                            <Link href="/layanan/cek-sertifikat" className="inline-flex h-12 px-8 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all font-semibold">
+                                Kembali ke Pencarian
+                            </Link>
+                        </motion.div>
                     ) : data ? (
-                        <div className="text-center">
-                            {/* Verified Badge */}
-                            <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-b from-blue-400/60 via-blue-300/20 to-transparent flex items-center justify-center animate-pulse mb-6 shadow-lg">
-                                <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-inner">
-                                    <RiVerifiedBadgeFill className="h-12 w-12 text-neutral-200 drop-shadow-[0_0_15px_#3b82f6]" />
+                        <motion.div
+                            key="data"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="max-w-2xl w-full"
+                        >
+                            {/* Certificate Card */}
+                            <div className="relative group">
+                                <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-[2.5rem] blur opacity-10" />
+                                <div className="relative p-8 md:p-12 rounded-[2.5rem] bg-[#1e293b]/20 backdrop-blur-3xl border border-white/10 shadow-3xl text-white">
+
+                                    {/* Header Section */}
+                                    <div className="flex flex-col items-center text-center mb-10">
+                                        <div className="w-24 h-24 mb-6 relative">
+                                            <div className="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full" />
+                                            <RiVerifiedBadgeFill className="relative z-10 w-full h-full text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
+                                        </div>
+                                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold tracking-widest uppercase mb-4">
+                                            Verified Authentic Document
+                                        </div>
+                                        <h1 className="text-3xl md:text-4xl font-bold font-calsans mb-2 text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">
+                                            {data.NoRegistrasi}
+                                        </h1>
+                                        <p className="text-sm text-gray-400 font-light max-w-md">
+                                            Sertifikat ini telah melalui proses verifikasi digital dan dinyatakan resmi dalam pangkalan data E-LAUT.
+                                        </p>
+                                    </div>
+
+                                    {/* Info Grid */}
+                                    <div className="grid grid-cols-1 gap-6">
+                                        {[
+                                            { icon: <FiUser />, label: "Nama Lengkap", value: data.Nama },
+                                            { icon: <FiBookOpen />, label: "Pelatihan", value: data.NamaPelatihan },
+                                            { icon: <FaRegBuilding />, label: "Penyelenggara", value: dataPelatihan?.PenyelenggaraPelatihan },
+                                            { icon: <HiOutlineInbox />, label: "Bidang/Klaster", value: dataPelatihan?.BidangPelatihan },
+                                            { icon: <RiQuillPenAiLine />, label: "Program", value: dataPelatihan?.Program },
+                                            { icon: <FiCalendar />, label: "Periode Pelaksanaan", value: `${generateTanggalPelatihan(data.TanggalMulai)} - ${generateTanggalPelatihan(data.TanggalBerakhir)}` },
+                                            { icon: <FiMapPin />, label: "Lokasi", value: dataPelatihan?.LokasiPelatihan },
+                                            { icon: <FiFileText />, label: "Tanggal Terbit", value: data.TanggalSertifikat },
+                                            { icon: <FiEdit3 />, label: "Penandatangan", value: dataPelatihan?.TtdSertifikat },
+                                        ].map((item, idx) => (
+                                            <div key={idx} className="flex gap-4 p-5 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group/item">
+                                                <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 group-hover/item:scale-110 transition-transform">
+                                                    {item.icon}
+                                                </div>
+                                                <div className="flex flex-col min-w-0">
+                                                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-0.5">{item.label}</span>
+                                                    <span className="text-sm md:text-base text-gray-200 font-medium truncate">{item.value || "-"}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Footer Disclaimer */}
+                                    <div className="mt-12 pt-8 border-t border-white/5">
+                                        <p className="text-[11px] text-gray-500 leading-relaxed italic text-center">
+                                            * Sertifikat berlaku hingga <span className="text-white font-semibold">{addFiveYears(data.TanggalSertifikat)}</span>. Dokumen dikelola dan dijamin keasliannya oleh Balai Sertifikasi Elektronik (BSrE), Badan Siber dan Sandi Negara Republik Indonesia.
+                                        </p>
+                                        <div className="mt-8 flex justify-center">
+                                            <Link
+                                                href="/layanan/cek-sertifikat"
+                                                className="px-8 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-500 transition-all shadow-lg shadow-blue-600/20"
+                                            >
+                                                Pemeriksaan Selesai
+                                            </Link>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-
-                            {/* Title */}
-                            <h1 className="text-2xl leading-none max-w-md font-bold text-blue-400 mb-3">
-                                {data.NoRegistrasi}
-                            </h1>
-                            <p className="text-gray-200 mb-6 leading-relaxed">
-                                Sertifikat valid dan dinyatakan telah mengikuti pelatihan{" "}
-                                <span className="font-semibold text-white">
-                                    {data?.NamaPelatihan}
-                                </span>{" "}
-                                bidang{" "}
-                                <span className="font-semibold text-white">
-                                    {data?.BidangPelatihan}
-                                </span>{" "}
-                                dan memiliki sertifikat kelulusan dengan detail sebagai berikut :
-                            </p>
-
-                            {/* Certificate Details with Icons */}
-                            <div className="text-left space-y-3 text-sm">
-                                <p className="flex items-center gap-2">
-                                    <FiUser className="w-5 h-5 text-blue-300 flex-shrink-0" />
-                                    <span><strong className="text-blue-300">Nama Peserta:</strong> {data.Nama}</span>
-                                </p>
-                                <p className="flex items-center gap-2">
-                                    <FiBookOpen className="w-5 h-5 text-blue-300 flex-shrink-0" />
-                                    <span><strong className="text-blue-300">Nama Pelatihan:</strong> {data.NamaPelatihan}</span>
-                                </p>
-                                <p className="flex items-center gap-2">
-                                    <FaRegBuilding className="w-5 h-5 text-blue-300 flex-shrink-0" />
-                                    <span><strong className="text-blue-300">Penyelenggara:</strong> {dataPelatihan?.PenyelenggaraPelatihan}</span>
-                                </p>
-                                <p className="flex items-center gap-2">
-                                    <HiOutlineInbox className="w-5 h-5 text-blue-300 flex-shrink-0" />
-                                    <span><strong className="text-blue-300">Bidang atau Klaster Pelatihan:</strong> {dataPelatihan?.BidangPelatihan}</span>
-                                </p>
-                                <p className="flex items-center gap-2">
-                                    <RiQuillPenAiLine className="w-5 h-5 text-blue-300 flex-shrink-0" />
-                                    <span><strong className="text-blue-300">Program Pelatihan:</strong> {dataPelatihan?.Program}</span>
-                                </p>
-                                <p className="flex items-center gap-2">
-                                    <FiCalendar className="w-5 h-5 text-blue-300 flex-shrink-0" />
-                                    <span><strong className="text-blue-300">Tanggal Pelaksanaan:</strong> {generateTanggalPelatihan(data.TanggalMulai)} - {generateTanggalPelatihan(data.TanggalBerakhir)}</span>
-                                </p>
-                                <p className="flex items-center gap-2">
-                                    <FiMapPin className="w-5 h-5 text-blue-300 flex-shrink-0" />
-                                    <span><strong className="text-blue-300">Lokasi Pelaksanaan:</strong> {dataPelatihan?.LokasiPelatihan}</span>
-                                </p>
-                                <p className="flex items-center gap-2">
-                                    <FiFileText className="w-5 h-5 text-blue-300 flex-shrink-0" />
-                                    <span><strong className="text-blue-300">Diterbitkan Pada:</strong> {data.TanggalSertifikat}</span>
-                                </p>
-
-                                <p className="flex items-center gap-2">
-                                    <FiEdit3 className="w-5 h-5 text-blue-300 flex-shrink-0" />
-                                    <span><strong className="text-blue-300">Ditandatangani Oleh:</strong> {dataPelatihan?.TtdSertifikat}</span>
-                                </p>
-                                <p className="italic text-xs text-gray-400 mt-4">
-                                    * Sertifikat berlaku hingga{" "}
-                                    <span className="font-semibold text-gray-200">{addFiveYears(data.TanggalSertifikat)}</span> dan telah ditandatangani secara elektronik menggunakan
-                                    sertifikat elektronik yang telah diterbitkan oleh Balai
-                                    Sertifikasi Elektronik (BSrE), Badan Siber dan Sandi Negara
-                                </p>
-                            </div>
-
-                        </div>
+                        </motion.div>
                     ) : null}
-                </div>
+                </AnimatePresence>
             </main>
             <Footer />
-        </>
+        </div>
     );
 };
 
