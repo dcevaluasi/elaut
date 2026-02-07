@@ -649,7 +649,7 @@ function FormLogin() {
                             </span>
                           </div>
                         </SelectTrigger>
-                        <SelectContent className="bg-slate-900/95 backdrop-blur-xl border-white/10 rounded-2xl p-2">
+                        <SelectContent className="bg-slate-900/95 backdrop-blur-xl border-white/10 rounded-2xl p-2" >
                           <SelectGroup>
                             <SelectLabel className="text-blue-300/60 text-[10px] uppercase font-bold px-3 py-2">Metode Login</SelectLabel>
                             <SelectItem className="rounded-xl focus:bg-blue-500/20 focus:text-blue-100 cursor-pointer py-3 transition-colors text-slate-300" value="Whatsapp/No Telpon">

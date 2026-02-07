@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { FormEvent, MouseEventHandler } from "react";
 import axios, { AxiosError, AxiosResponse } from "axios";
-import { error } from "console";
 import Cookies from "js-cookie";
 
 import {
