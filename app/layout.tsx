@@ -176,9 +176,9 @@ export default function RootLayout({
       "availableLanguage": "Indonesian"
     },
     "sameAs": [
-      "https://www.facebook.com/kkpgoid",
-      "https://twitter.com/kkpgoid",
-      "https://www.instagram.com/kkpgoid"
+      "https://www.facebook.com/bppsdm_puslatkp",
+      "https://twitter.com/bppsdm_puslatkp",
+      "https://www.instagram.com/bppsdm_puslatkp"
     ]
   };
 
