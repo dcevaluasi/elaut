@@ -67,7 +67,7 @@ import { Metadata, Viewport } from "next";
 export const metadata: Metadata = {
   title: {
     default: "E-LAUT | Elektronik Layanan Pelatihan Kelautan & Perikanan Terpadu",
-    template: "%s | E-LAUT KKP"
+    template: "%s"
   },
   description:
     "Portal resmi E-LAUT Kementerian Kelautan dan Perikanan (KKP). Platform terpadu untuk pendaftaran pelatihan, sertifikasi kompetensi, dan pengembangan SDM Kelautan dan Perikanan di Indonesia.",
