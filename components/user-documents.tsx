@@ -193,7 +193,7 @@ export default function UserDocuments({ user }: { user: User | null }) {
             </motion.div>
           </div>
 
-          {/* RIGHT: Detailed Info & Documents */}
+          {/* RIGHT: Detailed Info & Documentsss */}
           <div className="flex-1 space-y-12">
 
             {/* Detailed Info Grid */}
