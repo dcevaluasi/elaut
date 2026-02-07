@@ -1,56 +1,77 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useRouter, usePathname } from "next/navigation";
+import axios, { AxiosResponse } from "axios";
+import Cookies from "js-cookie";
+import { HashLoader } from "react-spinners";
 import Toast from "@/commons/Toast";
+import {
+  FiUser,
+  FiMapPin,
+  FiFileText,
+  FiBriefcase,
+  FiArrowRight,
+  FiArrowLeft,
+  FiCheckCircle,
+  FiUploadCloud,
+  FiShield,
+  FiCamera,
+  FiPhone,
+  FiMail
+} from "react-icons/fi";
+import { TbUserEdit, TbMapPinSearch, TbFileStack } from "react-icons/tb";
+import { MdWorkOutline, MdCheckCircle } from "react-icons/md";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
-import { usePathname, useRouter } from "next/navigation";
-import React from "react";
-
-import { TbFileStack, TbMapPinSearch, TbUserEdit } from "react-icons/tb";
-
 import { Progress } from "@/components/ui/progress";
-import { MdCheckCircle, MdWorkOutline } from "react-icons/md";
-import axios, { AxiosResponse } from "axios";
-import Cookies from "js-cookie";
 import { User } from "@/types/user";
-import { HashLoader } from "react-spinners";
 import { ALLOWED_EXTENSIONS, MAX_FILE_SIZE, MIN_FILE_SIZE } from "@/utils/file";
 import { SATUAN_PENDIDIKAN_KEAHLIAN } from "@/constants/pelatihan";
 import { KABUPATENS, PROVINCES } from "@/constants/regions";
-import { FaFileUpload } from "react-icons/fa";
 import { truncateText } from "@/utils";
+import { capitalize } from "@/utils/text";
 
-function FormCompleteProfile() {
+export default function FormCompleteProfile() {
   const router = useRouter();
-
   const pathname = usePathname();
-
-  /* token user */
   const token = Cookies.get("XSRF081");
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
-  /* state variable to store basic user information to register */
-  const [name, setName] = React.useState<string>("");
-  const [nik, setNik] = React.useState<string>("");
-  const [phoneNumber, setPhoneNumber] = React.useState<string>("");
-  const [email, setEmail] = React.useState<string>("");
-  const [tanggalLahir, setTanggalLahir] = React.useState<string>("");
-  const [tempatLahir, setTempatLahir] = React.useState("");
-  const [jenisKelamin, setJenisKelamin] = React.useState("");
-  const [agama, setAgama] = React.useState("");
-  const [pekerjaan, setPekerjaan] = React.useState("");
-  const [golonganDarah, setGolonganDarah] = React.useState("");
-  const [statusMenikah, setStatusMenikah] = React.useState("");
-  const [pendidikanTerakhir, setPendidikanTerakhir] = React.useState("");
-  const [kewarganegaraan, setKewarganegaraan] = React.useState("");
-  const [ibuKandung, setIbuKandung] = React.useState("");
-  const [negaraTujuanBekerja, setNegaraTujuanBekerja] = React.useState("");
-  const [alamat, setAlamat] = React.useState<string>("");
-  const [oldFiles, setOldFiles] = React.useState({
+  const [indexFormTab, setIndexFormTab] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userDetail, setUserDetail] = useState<User | null>(null);
+
+  // Form States
+  const [name, setName] = useState("");
+  const [nik, setNik] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState("");
+  const [tanggalLahir, setTanggalLahir] = useState("");
+  const [tempatLahir, setTempatLahir] = useState("");
+  const [jenisKelamin, setJenisKelamin] = useState("");
+  const [agama, setAgama] = useState("");
+  const [pekerjaan, setPekerjaan] = useState("");
+  const [golonganDarah, setGolonganDarah] = useState("");
+  const [statusMenikah, setStatusMenikah] = useState("");
+  const [pendidikanTerakhir, setPendidikanTerakhir] = useState("");
+  const [kewarganegaraan, setKewarganegaraan] = useState("");
+  const [ibuKandung, setIbuKandung] = useState("");
+  const [negaraTujuanBekerja, setNegaraTujuanBekerja] = useState("");
+  const [alamat, setAlamat] = useState("");
+  const [provinsi, setProvinsi] = useState("");
+  const [kabupaten, setKabupaten] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [isEditingPekerjaan, setIsEditingPekerjaan] = useState(false);
+
+  const [oldFiles, setOldFiles] = useState({
     pasFoto: "",
     ktp: "",
     kk: "",
@@ -58,100 +79,7 @@ function FormCompleteProfile() {
     suratKesehatan: "",
   });
 
-  const [kabupaten, setKabupaten] = React.useState<string>("");
-  const [provinsi, setProvinsi] = React.useState<string>("");
-
-  const validateFile = (file: File) => {
-    const extension = file.name.split('.').pop()?.toLowerCase();
-    if (!extension || !ALLOWED_EXTENSIONS.includes(extension)) {
-      Toast.fire({
-        icon: 'error',
-        title: 'File tidak valid',
-        text: 'Hanya file dengan ekstensi PDF, PNG, JPEG, JPG, dan CSV yang diperbolehkan.',
-      });
-      return false;
-    }
-
-    if (file.size > MAX_FILE_SIZE) {
-      Toast.fire({
-        icon: 'error',
-        title: 'File terlalu besar',
-        text: 'Ukuran file tidak boleh melebihi 100MB.',
-      });
-      return false;
-    }
-
-    if (file.size < MIN_FILE_SIZE) {
-      Toast.fire({
-        icon: 'error',
-        title: 'File terlalu kecil',
-        text: 'Ukuran file tidak boleh kurang dari 1 byte.',
-      });
-      return false;
-    }
-
-    return true;
-  };
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth", // This smooth scrolling is optional, you can remove it if you want instant scrolling
-    });
-  };
-
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-
-  const [isLoadingCompleteProfile, setIsLoadingCompleteProfile] =
-    React.useState<boolean>(false);
-
-  const [userDetail, setUserDetail] = React.useState<User | null>(null);
-
-
-  const handleFetchingUserDetail = async () => {
-    try {
-      const response: AxiosResponse = await axios.get(
-        `${baseUrl}/users/getUsersById`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setUserDetail(response.data);
-      setName(response.data?.Nama);
-      setEmail(response.data?.Email);
-      setTanggalLahir(response.data?.TanggalLahir);
-      setAlamat(response.data?.Alamat)
-      setJenisKelamin(response.data?.JenisKelamin)
-      setGolonganDarah(response.data?.GolonganDarah)
-      setIbuKandung(response.data?.IbuKandung);
-      setAgama(response.data?.Agama);
-      setPekerjaan(response.data?.Pekerjaan);
-      setStatusMenikah(response.data?.StatusMenikah);
-      setKewarganegaraan(response.data?.Kewarganegaraan);
-      setPendidikanTerakhir(response.data?.PendidikanTerakhir);
-      setNegaraTujuanBekerja(response.data?.NegaraTujuanBekerja);
-      setTempatLahir(response.data?.TempatLahir);
-      setNik(response.data?.Nik);
-      setProvinsi(response.data?.Provinsi);
-      setKabupaten(response.data?.Kota);
-      setPhoneNumber(response.data?.NoTelpon);
-      setOldFiles({
-        pasFoto: response.data?.Foto || "",
-        ktp: response.data?.Ktp || "",
-        kk: response.data?.KK || "",
-        ijazah: response.data?.Ijazah || "",
-        suratKesehatan: response.data?.SuratKesehatan || "",
-      });
-    } catch (error) {
-      console.error("Error posting training data:", error);
-      throw error;
-    }
-  };
-
-
-  const [files, setFiles] = React.useState({
+  const [files, setFiles] = useState({
     suratKesehatan: null as File | null,
     pasFoto: null as File | null,
     ktp: null as File | null,
@@ -159,115 +87,68 @@ function FormCompleteProfile() {
     ijazah: null as File | null,
   });
 
-  const hasExtension = (url: string) => {
-    return /\.[0-9a-z]+$/i.test(url);
-  };
-
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response: AxiosResponse = await axios.get(`${baseUrl}/users/getUsersById`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = response.data;
+        setUserDetail(data);
+        setName(data.Nama || "");
+        setNik(data.Nik || "");
+        setPhoneNumber(data.NoTelpon || "");
+        setEmail(data.Email || "");
+        setTanggalLahir(data.TanggalLahir || "");
+        setTempatLahir(data.TempatLahir || "");
+        setJenisKelamin(data.JenisKelamin || "");
+        setAgama(data.Agama || "");
+        setPekerjaan(data.Pekerjaan || "");
+        setGolonganDarah(data.GolonganDarah || "");
+        setStatusMenikah(data.StatusMenikah || "");
+        setPendidikanTerakhir(data.PendidikanTerakhir || "");
+        setKewarganegaraan(data.Kewarganegaraan || "");
+        setIbuKandung(data.IbuKandung || "");
+        setAlamat(data.Alamat || "");
+        setProvinsi(data.Provinsi || "");
+        setKabupaten(data.Kota || "");
+        setNegaraTujuanBekerja(data.NegaraTujuanBekerja || "");
+        setOldFiles({
+          pasFoto: data.Foto || "",
+          ktp: data.Ktp || "",
+          kk: data.KK || "",
+          ijazah: data.Ijazah || "",
+          suratKesehatan: data.SuratKesehatan || "",
+        });
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching user detail:", error);
+        setIsLoading(false);
+      }
+    };
+    fetchUser();
+  }, [token, baseUrl]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: keyof typeof files) => {
     if (e.target.files && e.target.files[0]) {
-      setFiles((prev) => ({ ...prev, [field]: e.target.files![0] }));
+      const file = e.target.files[0];
+      const extension = file.name.split('.').pop()?.toLowerCase();
+
+      if (!extension || !ALLOWED_EXTENSIONS.includes(extension)) {
+        Toast.fire({ icon: 'error', title: 'Format file tidak didukung' });
+        return;
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        Toast.fire({ icon: 'error', title: 'Ukuran file terlalu besar (Max 100MB)' });
+        return;
+      }
+
+      setFiles((prev) => ({ ...prev, [field]: file }));
     }
   };
 
-  const renderInput = (
-    label: string,
-    field: keyof typeof files,
-    required = false
-  ) => {
-    const oldFileUrl = oldFiles[field];
-    const hasOld = hasExtension(oldFileUrl);
-
-    return (
-      <div className="w-full px-3 mb-3">
-        <label className="text-sm font-medium text-gray-200">{label}</label>
-
-        {hasOld ? (
-          <div className="mt-2 flex flex-col gap-2 bg-white/10 backdrop-blur-md border border-white/20 shadow-md rounded-xl p-3">
-            {oldFileUrl.match(/\.(jpg|jpeg|png|gif)$/i) ? (
-              <img
-                src={oldFileUrl}
-                alt={field}
-                className="w-40 h-40 object-cover rounded-lg border border-white/30"
-              />
-            ) : (
-              <a
-                href={oldFileUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-300 underline text-sm"
-              >
-                Lihat File Lama
-              </a>
-            )}
-            <label
-              className="flex items-center justify-between gap-3 w-full px-4 py-3 rounded-xl 
-            bg-white/10 backdrop-blur-md border border-white/20 shadow-md cursor-pointer 
-            hover:bg-white/20 transition"
-            >
-              <div className="flex items-center gap-3 text-gray-100">
-                <FaFileUpload className="text-lg text-blue-300" />
-                <span className="text-sm">
-                  {files[field] ? truncateText(files[field]!.name, 30, "...") : "Ganti file..."}
-                </span>
-              </div>
-              {files[field] && <MdCheckCircle className="text-green-400 text-xl" />}
-              <input
-                type="file"
-                className="hidden"
-                required={required}
-                onChange={(e) => handleFileChange(e, field)}
-              />
-            </label>
-          </div>
-        ) : (
-          <div className="mt-2 relative flex items-center">
-            <label
-              className="flex items-center justify-between gap-3 w-full px-4 py-3 rounded-xl 
-            bg-white/10 backdrop-blur-md border border-white/20 shadow-md cursor-pointer 
-            hover:bg-white/20 transition"
-            >
-              <div className="flex items-center gap-3 text-gray-100">
-                <FaFileUpload className="text-lg text-blue-300" />
-                <span className="text-sm">
-                  {files[field] ? truncateText(files[field]!.name, 30, "...") : "Pilih file..."}
-                </span>
-              </div>
-              {files[field] && <MdCheckCircle className="text-green-400 text-xl" />}
-              <input
-                type="file"
-                className="hidden"
-                required={required}
-                onChange={(e) => handleFileChange(e, field)}
-              />
-            </label>
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  const isFirstTimerUser = Cookies.get('XSRF087')
-
-  const handleCompleteProfileUser = async () => {
-    setIsLoadingCompleteProfile(true);
-    console.log(
-      name,
-      nik,
-      phoneNumber,
-      email,
-      tanggalLahir,
-      tempatLahir,
-      jenisKelamin,
-      pekerjaan,
-      golonganDarah,
-      statusMenikah,
-      pendidikanTerakhir,
-      kewarganegaraan,
-      ibuKandung,
-      negaraTujuanBekerja
-    );
-
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
     const formData = new FormData();
     formData.append("Nama", name);
     formData.append("Nik", nik);
@@ -287,763 +168,377 @@ function FormCompleteProfile() {
     formData.append("IbuKandung", ibuKandung);
     formData.append("Alamat", alamat);
     formData.append("NegaraTujuanBekerja", negaraTujuanBekerja);
-    if (files.pasFoto) {
-      formData.append("Fotos", files.pasFoto);
-    }
 
-    if (files.ktp) {
-      formData.append("Ktps", files.ktp);
-    }
+    if (files.pasFoto) formData.append("Fotos", files.pasFoto);
+    if (files.ktp) formData.append("Ktps", files.ktp);
+    if (files.kk) formData.append("KKs", files.kk);
+    if (files.ijazah) formData.append("Ijazahs", files.ijazah);
+    if (files.suratKesehatan) formData.append("SuratKesehatans", files.suratKesehatan);
 
-    if (files.kk) {
-      formData.append("KKs", files.kk);
-    }
-
-    if (files.ijazah) {
-      formData.append("Ijazahs", files.ijazah);
-    }
-
-    if (files.suratKesehatan) {
-      formData.append("SuratKesehatans", files.suratKesehatan);
-    }
     try {
-      const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/users/updateUsers`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      console.log({ response });
-      Toast.fire({
-        icon: "success",
-        title: 'Yeayyy!',
-        text: `Berhasil mengupdate data profile-mu!`,
+      await axios.put(`${baseUrl}/users/updateUsers`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
       });
-      setIsLoadingCompleteProfile(false);
+      Toast.fire({ icon: "success", title: 'Profil berhasil diperbarui!' });
 
-      if (Cookies.get('XSRF087')) {
-        if (Cookies.get('XSRF088')) {
-          Cookies.remove('XSRF087')
-          router.push(Cookies.get('XSRF088')!);
-        } else {
-          Cookies.remove('XSRF087')
-          router.push('/');
-        }
+      const isFirstTimer = Cookies.get('XSRF087');
+      const redirectUrl = Cookies.get('XSRF088');
+
+      if (isFirstTimer) {
+        Cookies.remove('XSRF087');
+        router.push(redirectUrl || '/');
       } else {
-        router.push('/dashboard')
+        router.push('/dashboard');
       }
     } catch (error) {
-      console.error({ error });
-      Toast.fire({
-        icon: "error",
-        title: `Gagal mengupdate data profile-mu!`,
-      });
-      setIsLoadingCompleteProfile(false);
+      console.error(error);
+      Toast.fire({ icon: "error", title: 'Gagal memperbarui profil' });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const [indexFormTab, setIndexFormTab] = React.useState(0);
+  const steps = [
+    { id: 0, name: "Info Pribadi", icon: FiUser },
+    { id: 1, name: "Domisili", icon: FiMapPin },
+    { id: 2, name: "Pekerjaan", icon: FiBriefcase },
+    { id: 3, name: "Dokumen", icon: FiFileText },
+  ];
 
-  const [selectedStatus, setSelectedStatus] = React.useState<string>('')
-  const [isEditingPekerjaan, setIsEditingPekerjaan] = React.useState(false)
-
-  React.useEffect(() => {
-    setTimeout(() => {
-      handleFetchingUserDetail();
-    }, 1000);
-  }, []);
-
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#020617]">
+        <HashLoader color="#3b82f6" size={50} />
+      </div>
+    );
+  }
 
   return (
-    <section className="w-full relative overflow-hidden bg-gradient-to-br from-slate-900 via-sky-900 to-blue-900 text-white shadow-custom mx-auto" id="explore">
-      {/* gradient blobs */}
-      <div className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-blue-500/40 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-cyan-400/20 blur-3xl" />
-      <div className="pointer-events-none absolute top-1/3 -right-16 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
+    <section className="min-h-screen relative overflow-hidden bg-[#020617] text-white py-12 px-4 md:py-24">
+      {/* Background Effects */}
+      <div className="absolute top-0 -left-20 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 -right-20 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
 
-      <section className="relative h-fit pb-20  mt-5 md:mt-36 max-w-6xl w-full rounded-xl shadow-custom mx-auto" id="explore">
-        <div className="relative max-w-6xl w-full mx-auto px-8 flex pb-20 flex-col space-y-2 border border-white/15 bg-white/10 backdrop-blur-xl 
-                    shadow-[0_8px_40px_rgba(0,0,0,0.35)] transition-all duration-500 
-                     hover:border-blue-400/40 rounded-3xl">
-          <div className="pt-12 md:pt-20 pb-6 md:pb-10 text-center flex flex-col space-y-2 border-b border-b-grayUsual mb-5 ">
-            <h1 className="text-2xl md:text-3xl font-calsans text-blue-400 leading-none">
-              Update dan Lengkapi <br /> Data Pengguna E-LAUT
-            </h1>
-            <p className="text-base text-gray-200 max-w-xl text-center mx-auto leading-none">
-              Update dan lengkap data agar validitas data dirimu dapat mempercepat proses keikutsertaan pelatihan di E-LAUT, lengkapi juga dokumen serta file yang diperlukan!
-            </p>
+      <div className="max-w-4xl mx-auto relative z-10">
+        {/* Header */}
+        <div className="text-center space-y-4 mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-widest"
+          >
+            <FiShield size={14} /> Security Compliance
+          </motion.div>
+          <motion.h1
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-4xl md:text-5xl font-calsans tracking-tight leading-none"
+          >
+            Update <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">Data Profil</span>
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-sm text-gray-400 max-w-xl mx-auto font-light leading-relaxed"
+          >
+            Pastikan informasi Anda valid untuk mempercepat proses verifikasi kepesertaan pelatihan di platform E-LAUT.
+          </motion.p>
+        </div>
+
+        {/* Form Container */}
+        <div className="bg-[#0f172a]/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] shadow-2xl overflow-hidden">
+
+          {/* Step Progress Bar */}
+          <div className="bg-white/5 px-8 py-6 border-b border-white/5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-blue-500/20 rounded-xl text-blue-400">
+                  {React.createElement(steps[indexFormTab].icon, { size: 20 })}
+                </div>
+                <div>
+                  <h3 className="text-lg font-calsans text-white">{steps[indexFormTab].name}</h3>
+                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-none">Step {indexFormTab + 1} of 4</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="text-2xl font-calsans text-blue-400">{(indexFormTab + 1) * 25}%</span>
+              </div>
+            </div>
+            <Progress value={(indexFormTab + 1) * 25} className="h-1.5 bg-white/5" />
           </div>
 
-          {userDetail != null && (
-            <form className="max-w-6xl w-full mx-auto">
-              <div className="flex items-center justify-between">
-                {indexFormTab == 0 ? (
-                  <h2 className=" text-2xl leading-[100%] my-6 md:text-2xl text-blue-400 font-calsans flex items-center gap-1">
-                    <TbUserEdit />
-                    <span className="mt-2">Data Pribadi</span>
-                  </h2>
-                ) : indexFormTab == 1 ? (
-                  <h2 className=" text-2xl leading-[100%] my-6 md:text-2xl text-blue-400 font-calsans flex items-center gap-1">
-                    <TbMapPinSearch />
-                    <span className="mt-2">Alamat Domisili</span>
-                  </h2>
-                ) : indexFormTab == 2 ? (
-                  <h2 className=" text-2xl leading-[100%] my-6 md:text-2xl text-blue-400 font-calsans flex items-center gap-1">
-                    <MdWorkOutline />
-                    <span className="mt-1">Riwayat Pendidikan/Pekerjaan</span>
-                  </h2>
-                ) : (
-                  <h2 className=" text-2xl leading-[100%] my-6 md:text-2xl text-blue-400 font-calsans flex items-center gap-1">
-                    <TbFileStack />
-                    <span className="mt-2">Berkas dan Dokumen</span>
-                  </h2>
+          <div className="p-8 md:p-12">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={indexFormTab}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-8"
+              >
+                {/* STEP 0: Info Pribadi */}
+                {indexFormTab === 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <InputField label="Nama Lengkap" value={name} readOnly icon={FiUser} required />
+                    <InputField label="NIK" value={nik} readOnly icon={FiShield} required />
+                    <InputField label="Nomor Telepon" value={phoneNumber} readOnly icon={FiPhone} required />
+                    <InputField label="Alamat Email" type="email" value={email} onChange={setEmail} icon={FiMail} placeholder="email@aktif.com" />
+                    <InputField label="Tanggal Lahir" type="date" value={tanggalLahir} onChange={setTanggalLahir} required />
+                    <InputField label="Tempat Lahir" value={tempatLahir} onChange={setTempatLahir} placeholder="Kota Kelahiran" required />
+
+                    <SelectField
+                      label="Jenis Kelamin"
+                      value={jenisKelamin}
+                      onChange={setJenisKelamin}
+                      options={[{ v: "L", l: "Laki-laki" }, { v: "P", l: "Perempuan" }]}
+                      required
+                    />
+
+                    <SelectField
+                      label="Agama"
+                      value={agama}
+                      onChange={setAgama}
+                      options={["Islam", "Kristen Protestan", "Kristen Katolik", "Hindu", "Buddha", "Konghucu"].map(a => ({ v: a, l: a }))}
+                      required
+                    />
+
+                    <SelectField
+                      label="Pendidikan Terakhir"
+                      value={pendidikanTerakhir}
+                      onChange={setPendidikanTerakhir}
+                      options={["SD", "SMP", "SMA/SMK", "DI/DII/DIII", "DIV/S1", "S2", "S3"].map(p => ({ v: p, l: p }))}
+                      required
+                    />
+
+                    <SelectField
+                      label="Status Menikah"
+                      value={statusMenikah}
+                      onChange={setStatusMenikah}
+                      options={["Belum Menikah", "Sudah Menikah"].map(s => ({ v: s, l: s }))}
+                      required
+                    />
+
+                    <InputField label="Nama Ibu Kandung" value={ibuKandung} onChange={setIbuKandung} placeholder="Nama Ibu" required />
+                    <InputField label="Negara Tujuan Kerja" value={negaraTujuanBekerja} onChange={setNegaraTujuanBekerja} placeholder="Opsional (Misal: Korea Selatan)" />
+                  </div>
                 )}
 
-                <p className="text-base text-gray-200">
-                  {indexFormTab == 0 ? (
-                    <span className="font-bold  leading-[100%] my-6 text-blue-400 ">
-                      1
-                    </span>
-                  ) : indexFormTab == 1 ? (
-                    <span className="font-bold  leading-[100%] my-6 text-blue-400 ">
-                      2
-                    </span>
-                  ) : indexFormTab == 2 ? (
-                    <span className="font-bold  leading-[100%] my-6 text-blue-400 ">
-                      3
-                    </span>
-                  ) : (
-                    <span className="font-bold  leading-[100%] my-6 text-blue-400 ">
-                      4
-                    </span>
-                  )}{" "}
-                  of 4
-                </p>
-              </div>
-              <div className="flex w-full -mt-2 mb-4">
-                <Progress
-                  value={(indexFormTab + 1) * 25}
-                  className="text-blue-500"
-                  max={4}
-                />
-              </div>
-              <div>
-                <div className={`${indexFormTab == 0 ? "block" : "hidden"}`}>
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label
-                        className=" text-sm font-medium text-gray-200"
-                        htmlFor="name"
-                      >
-                        Nama Lengkap <span className="text-rose-600">*</span>
-                      </label>
-                      <input
-                        id="name"
-                        type="text"
-                        className="w-full rounded-xl px-4 py-2 bg-white/10 border border-white/20 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        placeholder="Masukkan nama lengkap"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                        readOnly
-                      />
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label
-                        className=" text-sm font-medium text-gray-200"
-                        htmlFor="nik"
-                      >
-                        NIK <span className="text-rose-600">*</span>
-                      </label>
-                      <input
-                        id="nik"
-                        type="text"
-                        className="w-full rounded-xl px-4 py-2 bg-white/10 border border-white/20 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        placeholder="Masukkan NIK"
-                        value={nik}
-                        onChange={(e) => setNik(e.target.value)}
-                        required
-                        readOnly
-                      />
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label
-                        className=" text-sm font-medium text-gray-200"
-                        htmlFor="email"
-                      >
-                        No Telpon <span className="text-rose-600">*</span>
-                      </label>
-                      <input
-                        id="phone_number"
-                        type="text"
-                        className="w-full rounded-xl px-4 py-2 bg-white/10 border border-white/20 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        placeholder="Masukkan no telpon"
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value)}
-                        required
-                        readOnly
-                      />
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label
-                        className=" text-sm font-medium text-gray-200"
-                        htmlFor="email"
-                      >
-                        Email <span className="text-rose-600"></span>
-                      </label>
-                      <input
-                        id="email"
-                        type="email"
-                        className="w-full rounded-xl px-4 py-2 bg-white/10 border border-white/20 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        placeholder="Masukkan alamat email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                      />
-                      <p className="text-xs">*Email yang anda masukan BENAR dan masih AKTIF</p>
-
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label
-                        className=" text-sm font-medium text-gray-200"
-                        htmlFor="email"
-                      >
-                        Tanggal Lahir <span className="text-rose-600">*</span>
-                      </label>
-                      <input
-                        id="phone number"
-                        type="date"
-                        className="w-full rounded-xl px-4 py-2 bg-white/10 border border-white/20 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        placeholder="Masukkan tanggal lahir"
-                        required
-                        value={tanggalLahir}
-                        onChange={(e) => setTanggalLahir(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label
-                        className=" text-sm font-medium text-gray-200"
-                        htmlFor="email"
-                      >
-                        Tempat Lahir <span className="text-rose-600">*</span>
-                      </label>
-                      <input
-                        id="tempat_lahir"
-                        type="text"
-                        className="w-full rounded-xl px-4 py-2 bg-white/10 border border-white/20 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        placeholder="Masukkan tempat lahir"
-                        required
-                        value={tempatLahir}
-                        onChange={(e) => setTempatLahir(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label className=" text-sm font-medium text-gray-200" htmlFor="jenisKelamin">
-                        Jenis Kelamin <span className="text-rose-600">*</span>
-                      </label>
-                      <Select
-                        value={jenisKelamin || undefined} // Ensure it's undefined if empty
-                        onValueChange={(value) => setJenisKelamin(value)}
-                      >
-                        <SelectTrigger className="w-full text-base py-6">
-                          <SelectValue placeholder="Pilih jenis kelamin" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="L">Laki - Laki</SelectItem>
-                          <SelectItem value="P">Perempuan</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label className=" text-sm font-medium text-gray-200" htmlFor="agama">
-                        Agama <span className="text-rose-600">*</span>
-                      </label>
-                      <Select
-                        value={agama || undefined} // Ensure it's undefined if empty
-                        onValueChange={(value) => setAgama(value)}
-                      >
-                        <SelectTrigger className="w-full text-base py-6">
-                          <SelectValue placeholder="Pilih agama" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Islam">Islam</SelectItem>
-                          <SelectItem value="Kriten Protestan">Kristen Protestan</SelectItem>
-                          <SelectItem value="Kriten Katolik">Kristen Katolik</SelectItem>
-                          <SelectItem value="Hindu">Hindu</SelectItem>
-                          <SelectItem value="Buddha">Buddha</SelectItem>
-                          <SelectItem value="Konghucu">Konghucu</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label className=" text-sm font-medium text-gray-200" htmlFor="golonganDarah">
-                        Golongan Darah (Opsional)
-                      </label>
-                      <Select
-                        value={golonganDarah || undefined} // Ensure it's undefined if empty
-                        onValueChange={(value) => setGolonganDarah(value)}
-                      >
-                        <SelectTrigger className="w-full text-base py-6">
-                          <SelectValue placeholder="Pilih golongan darah" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="O">O</SelectItem>
-                          <SelectItem value="A">A</SelectItem>
-                          <SelectItem value="B">B</SelectItem>
-                          <SelectItem value="AB">AB</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label
-                        className=" text-sm font-medium text-gray-200"
-                        htmlFor="email"
-                      >
-                        Status Menikah <span className="text-rose-600">*</span>
-                      </label>
-                      <Select
-                        value={statusMenikah}
-                        onValueChange={(value) => setStatusMenikah(value)}
-                      >
-                        <SelectTrigger className="w-full text-base py-6">
-                          <SelectValue placeholder="Pilih status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Belum Menikah">
-                            Belum Menikah
-                          </SelectItem>
-                          <SelectItem value="Sudah Menikah">
-                            Sudah Menikah
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label
-                        className=" text-sm font-medium text-gray-200"
-                        htmlFor="email"
-                      >
-                        Pendidikan Terakhir{" "}
-                        <span className="text-rose-600">*</span>
-                      </label>
-                      <Select
-                        value={pendidikanTerakhir}
-                        onValueChange={(value) => setPendidikanTerakhir(value)}
-                      >
-                        <SelectTrigger className="w-full text-base py-6">
-                          <SelectValue placeholder="Pilih pendidikan terakhir" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Tidak/Belum Sekolah">
-                            Tidak/Belum Sekolah
-                          </SelectItem>
-                          <SelectItem value="SD">
-                            SD
-                          </SelectItem>
-                          <SelectItem value="SMP">
-                            SMP
-                          </SelectItem>
-                          <SelectItem value="SMA">
-                            SMA/SMK
-                          </SelectItem>
-                          <SelectItem value="DI/DII/DIII">
-                            DI/DII/DIII
-                          </SelectItem>
-                          <SelectItem value="DIV">
-                            DIV
-                          </SelectItem>
-                          <SelectItem value="S1">
-                            S1
-                          </SelectItem>
-                          <SelectItem value="S2">
-                            S2
-                          </SelectItem>
-                          <SelectItem value="S3">
-                            S3
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label
-                        className=" text-sm font-medium text-gray-200"
-                        htmlFor="email"
-                      >
-                        Kewarganegaraan <span className="text-rose-600">*</span>
-                      </label>
-                      <Select
-                        value={kewarganegaraan}
-                        onValueChange={(value) => setKewarganegaraan(value)}
-                      >
-                        <SelectTrigger className="w-full text-base py-6">
-                          <SelectValue placeholder="Pilih kewarganegaraan" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="WNI">
-                            WNI (Warga Negara Indonesia)
-                          </SelectItem>
-                          <SelectItem value="WNA">
-                            WNA (Warga Negara Asing)
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label
-                        className=" text-sm font-medium text-gray-200"
-                        htmlFor="email"
-                      >
-                        Ibu Kandung <span className="text-rose-600">*</span>
-                      </label>
-                      <input
-                        id="ibu_kandung"
-                        type="text"
-                        className="w-full rounded-xl px-4 py-2 bg-white/10 border border-white/20 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        placeholder="Masukkan ibu kandung"
-                        required
-                        value={ibuKandung}
-                        onChange={(e) => setIbuKandung(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label
-                        className=" text-sm font-medium text-gray-200"
-                        htmlFor="email"
-                      >
-                        Negara Tujuan Bekerja{" "}
-                      </label>
-                      <input
-                        id="negara_tujuan"
-                        type="text"
-                        className="w-full rounded-xl px-4 py-2 bg-white/10 border border-white/20 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                        placeholder="Masukkan negara tujuan"
-                        value={negaraTujuanBekerja}
-                        onChange={(e) => setNegaraTujuanBekerja(e.target.value)}
-                      />
-                      <p className="text-xs">*Diisi apabila tidak/setelah mengikuti pelatihan akan berencana bekerja di luar negeri</p>
-                    </div>
-                  </div>
-                </div>
-                <div className={`${indexFormTab == 1 ? "block" : "hidden"}`}>
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label
-                        className=" text-sm font-medium text-gray-200"
-                        htmlFor="email"
-                      >
-                        Provinsi <span className="text-rose-600">*</span>
-                      </label>
-                      {
-                        PROVINCES.length != 0 && <Select value={provinsi} onValueChange={(value) => setProvinsi(value)}>
-                          <SelectTrigger className="w-full text-base py-6">
-                            <SelectValue placeholder="Pilih provinsi" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {
-                              PROVINCES.map((province, i) => (
-                                <SelectItem key={i} value={province.provinsi} >{province.provinsi}</SelectItem>
-                              ))
-                            }
-                          </SelectContent>
-                        </Select>
-                      }
-
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label
-                        className=" text-sm font-medium text-gray-200"
-                        htmlFor="email"
-                      >
-                        Kabupaten/Kota <span className="text-rose-600">*</span>
-                      </label>
-                      {
-                        KABUPATENS.length != 0 && <Select value={kabupaten} onValueChange={(value) => setKabupaten(value)}>
-                          <SelectTrigger className="w-full text-base py-6">
-                            <SelectValue placeholder="Pilih kabupaten/kota" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {
-                              KABUPATENS.map((regency, i) => (
-                                <SelectItem key={i} value={regency.kabupaten} >{regency.kabupaten}</SelectItem>
-                              ))
-                            }
-                          </SelectContent>
-                        </Select>
-                      }
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label
-                        className=" text-sm font-medium text-gray-200"
-                        htmlFor="email"
-                      >
-                        Alamat Domisili <span className="text-rose-600">*</span>
-                      </label>
+                {/* STEP 1: Domisili */}
+                {indexFormTab === 1 && (
+                  <div className="space-y-6">
+                    <SelectField
+                      label="Provinsi"
+                      value={provinsi}
+                      onChange={setProvinsi}
+                      options={PROVINCES.map(p => ({ v: p.provinsi, l: p.provinsi }))}
+                      required
+                    />
+                    <SelectField
+                      label="Kabupaten/Kota"
+                      value={kabupaten}
+                      onChange={setKabupaten}
+                      options={KABUPATENS.map(k => ({ v: k.kabupaten, l: k.kabupaten }))}
+                      required
+                    />
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Alamat Lengkap</label>
                       <textarea
-                        id="phone number"
                         rows={4}
-                        placeholder={alamat}
                         value={alamat}
                         onChange={(e) => setAlamat(e.target.value)}
-                        className="w-full rounded-xl px-4 py-2 bg-white/10 border border-white/20 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all placeholder:text-gray-600"
+                        placeholder="Masukkan alamat domisili saat ini..."
                         required
                       />
                     </div>
                   </div>
-                </div>
-                <div className={`${indexFormTab == 2 ? "block" : "hidden"}`}>
-                  <div className="flex flex-wrap -mx-3 mb-1">
-                    <div className="w-full px-3">
-                      <label
-                        className=" text-sm font-medium text-gray-200"
-                        htmlFor="email"
-                      >
-                        Status <span className="text-rose-600">*</span>
-                      </label>
-                      <Select onValueChange={(value) => setSelectedStatus(value)}>
-                        <SelectTrigger className="w-full text-base py-6">
-                          <SelectValue placeholder="Pilih Status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Masyarakat/Pelaku Utama/Pelaku Usaha">Masyarakat/Pelaku Utama/Pelaku Usaha</SelectItem>
-                          <SelectItem value="Taruna Satuan Pendidikan KP">
-                            Taruna Satuan Pendidikan KP
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
+                )}
+
+                {/* STEP 2: Pekerjaan */}
+                {indexFormTab === 2 && (
+                  <div className="space-y-8">
+                    <SelectField
+                      label="Status Kepesertaan"
+                      value={selectedStatus}
+                      onChange={setSelectedStatus}
+                      options={[
+                        { v: "Masyarakat/Pelaku Utama/Pelaku Usaha", l: "Umum / Pelaku Utama Perikanan" },
+                        { v: "Taruna Satuan Pendidikan KP", l: "Taruna / Siswa KKP" }
+                      ]}
+                      required
+                    />
+
+                    {selectedStatus === "Masyarakat/Pelaku Utama/Pelaku Usaha" && (
+                      <div className="space-y-4">
+                        <label className="text-sm font-medium text-gray-300">Pilih Pekerjaan</label>
+                        {pekerjaan && !isEditingPekerjaan ? (
+                          <div className="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-5">
+                            <div className="flex items-center gap-3">
+                              <FiCheckCircle className="text-emerald-500" />
+                              <span className="text-sm font-medium">{pekerjaan}</span>
+                            </div>
+                            <button onClick={() => setIsEditingPekerjaan(true)} className="text-xs font-bold text-blue-400 hover:underline">Ubah</button>
+                          </div>
+                        ) : (
+                          <select
+                            value={pekerjaan}
+                            onChange={(e) => setPekerjaan(e.target.value)}
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm outline-none cursor-pointer"
+                          >
+                            <option value="" disabled className="bg-[#020617]">-- Pilih Pekerjaan --</option>
+                            {["Nelayan", "Pembudidaya Ikan", "Pengolah Ikan", "Pemasar Ikan", "PNS", "Wiraswasta", "Pencari Kerja", "Other"].map(p => (
+                              <option key={p} value={p} className="bg-[#020617]">{p}</option>
+                            ))}
+                          </select>
+                        )}
+                        {pekerjaan === "Other" && (
+                          <input
+                            type="text"
+                            placeholder="Sebutkan pekerjaan Anda..."
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-sm outline-none"
+                            onChange={(e) => setPekerjaan(e.target.value)}
+                          />
+                        )}
+                      </div>
+                    )}
+
+                    {selectedStatus === "Taruna Satuan Pendidikan KP" && (
+                      <SelectField
+                        label="Asal Satuan Pendidikan"
+                        value={pekerjaan}
+                        onChange={setPekerjaan}
+                        options={SATUAN_PENDIDIKAN_KEAHLIAN.map(s => ({ v: s.FullName, l: s.FullName }))}
+                        required
+                      />
+                    )}
+                  </div>
+                )}
+
+                {/* STEP 3: Dokumen */}
+                {indexFormTab === 3 && (
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FileDropzone label="Pas Foto (Wajib)" field="pasFoto" current={oldFiles.pasFoto} file={files.pasFoto} onChange={handleFileChange} required />
+                      <FileDropzone label="E-KTP (Wajib)" field="ktp" current={oldFiles.ktp} file={files.ktp} onChange={handleFileChange} required />
+                      <FileDropzone label="Kartu Keluarga" field="kk" current={oldFiles.kk} file={files.kk} onChange={handleFileChange} />
+                      <FileDropzone label="Ijazah Terakhir" field="ijazah" current={oldFiles.ijazah} file={files.ijazah} onChange={handleFileChange} />
+                      <FileDropzone label="Suket Sehat" field="suratKesehatan" current={oldFiles.suratKesehatan} file={files.suratKesehatan} onChange={handleFileChange} />
+                    </div>
+                    <div className="p-4 bg-blue-500/5 border border-blue-500/10 rounded-2xl">
+                      <p className="text-[11px] text-blue-300 leading-relaxed italic">
+                        *Demi alasan keamanan, Anda wajib mengunggah Pas Foto dan Scan KTP yang valid untuk memvalidasi kepemilikan akun.
+                      </p>
                     </div>
                   </div>
-                  {
-                    selectedStatus == 'Masyarakat/Pelaku Utama/Pelaku Usaha' ? <>
-                      <div className="flex flex-wrap -mx-3 mb-1">
-                        <div className="w-full px-3">
-                          <label
-                            className="text-sm font-medium text-gray-200"
-                            htmlFor="pekerjaan"
-                          >
-                            Pekerjaan
-                            <span className="text-rose-600">*</span> <br />
-                            <span className="text-gray-200">
-                              Jika tidak ada pilih <strong>Other</strong> lalu isi dengan tanda (-)
-                            </span>
-                          </label>
+                )}
+              </motion.div>
+            </AnimatePresence>
 
-                          {/* Kondisi: kalau sudah ada pekerjaan dan belum klik edit → tampilkan readonly */}
-                          {pekerjaan && !isEditingPekerjaan ? (
-                            <div className="mt-2 flex items-center justify-between bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-4 py-2 text-gray-200">
-                              <span>{pekerjaan}</span>
-                              <button
-                                type="button"
-                                onClick={() => setIsEditingPekerjaan(true)}
-                                className="text-blue-400 hover:underline text-sm"
-                              >
-                                Edit
-                              </button>
-                            </div>
-                          ) : (
-                            <>
-                              {/* Kalau pekerjaan kosong atau user klik edit → tampilkan select */}
-                              <select
-                                id="pekerjaan"
-                                value={pekerjaan}
-                                onChange={(e) => setPekerjaan(e.target.value)}
-                                className="w-full mt-2 rounded-xl px-4 py-2 bg-white/10 
-                     backdrop-blur-md border border-white/20 
-                     text-gray-200 focus:outline-none focus:ring-2 
-                     focus:ring-blue-400 cursor-pointer"
-                                required
-                              >
-                                <option value="">-- Pilih Pekerjaan --</option>
-                                <option value="Pengolah Ikan">Pengolah Ikan</option>
-                                <option value="Pemasar Ikan">Pemasar Ikan</option>
-                                <option value="Nelayan">Nelayan</option>
-                                <option value="Pembudidaya Ikan">Pembudidaya Ikan</option>
-                                <option value="Petambak Garam">Petambak Garam</option>
-                                <option value="Kelompok Masyarakat Pengawas (POKMASWAS)">
-                                  Kelompok Masyarakat Pengawas (POKMASWAS)
-                                </option>
-                                <option value="Ibu Rumah Tangga">Ibu Rumah Tangga</option>
-                                <option value="Wiraswasta/Wirausaha">Wiraswasta/Wirausaha</option>
-                                <option value="Pencari Kerja / Belum Bekerja">
-                                  Pencari Kerja / Belum Bekerja
-                                </option>
-                                <option value="Penyuluh Perikanan PNS">Penyuluh Perikanan PNS</option>
-                                <option value="Penyuluh Perikanan Bantu">Penyuluh Perikanan Bantu</option>
-                                <option value="ASN">ASN</option>
-                                <option value="TNI/Polri">TNI/Polri</option>
-                                <option value="Mahasiswa/Pelajar">Mahasiswa/Pelajar</option>
-                                <option value="Karyawan Swasta">Karyawan Swasta</option>
-                                <option value="Pegawai Honorer/Karyawan Kontrak">
-                                  Pegawai Honorer/Karyawan Kontrak
-                                </option>
-                                <option value="Tenaga Pendidik (Guru/Dosen)">
-                                  Tenaga Pendidik (Guru/Dosen)
-                                </option>
-                                <option value="Tenaga Medis (Dokter/Perawat/Bidan)">
-                                  Tenaga Medis (Dokter/Perawat/Bidan)
-                                </option>
-                                <option value="Buruh (Buruh lepas)">Buruh (Buruh lepas)</option>
-                                <option value="P3K">P3K</option>
-                                <option value="Other">Other</option>
-                              </select>
+            {/* Navigation Buttons */}
+            <div className="flex items-center gap-4 mt-12 pt-8 border-t border-white/5">
+              {indexFormTab > 0 && (
+                <button
+                  onClick={() => setIndexFormTab(prev => prev - 1)}
+                  className="flex-1 h-14 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl font-bold text-sm tracking-wide transition-all flex items-center justify-center gap-2 group"
+                >
+                  <FiArrowLeft className="group-hover:-translate-x-1 transition-transform" /> Kembali
+                </button>
+              )}
 
-                              {/* Kalau pilih "Other" → input manual */}
-                              {pekerjaan === "Other" && (
-                                <input
-                                  type="text"
-                                  value={pekerjaan}
-                                  placeholder="Masukkan pekerjaan lain..."
-                                  className="mt-2 w-full rounded-xl px-4 py-2 bg-white/10 border border-white/20 text-gray-200 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                  onChange={(e) => setPekerjaan(e.target.value)}
-                                />
-                              )}
-                            </>
-                          )}
-                        </div>
-                      </div>
-
-
-                    </> : selectedStatus == 'Taruna Satuan Pendidikan KP' ? <>
-                      <div className="flex flex-wrap -mx-3 mb-1">
-                        <div className="w-full px-3">
-                          <label
-                            className=" text-sm font-medium text-gray-200"
-                            htmlFor="email"
-                          >
-                            Asal Satuan Pendidikan
-                            <span className="text-rose-600">*</span> <br />
-                            <span className="text-gray-500">
-                              Jika tidak ada isi (-)
-                            </span>
-                          </label>
-                          <Select
-                            value={pekerjaan || undefined} // Ensure it's undefined if empty
-                            onValueChange={(value) => setPekerjaan(value)}
-                          >
-                            <SelectTrigger className="w-full text-base py-6">
-                              <SelectValue placeholder="Pilih satuan pendidikan" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {
-                                SATUAN_PENDIDIKAN_KEAHLIAN.map((satdik, index) => (
-                                  <SelectItem value={satdik.FullName} key={index}>{satdik.FullName}</SelectItem>
-                                ))
-                              }
-
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-
-
-                    </> : <></>
-                  }
-
-                </div>
-                <div className={`${indexFormTab == 3 ? "block" : "hidden"}`}>
-                  <div className="flex flex-wrap -mx-3">
-                    {renderInput("File Surat Kesehatan (Opsional)", "suratKesehatan")}
-                    {renderInput("Pas Foto (Wajib)", "pasFoto", true)}
-                    {renderInput("File KTP (Wajib)", "ktp", true)}
-                    {renderInput("File Kartu Keluarga (Opsional)", "kk")}
-                    {renderInput("Ijazah (Opsional)", "ijazah")}
-                  </div>
-
-                  <div className="text-sm text-gray-200 text-left mt-3">
-                    Demi alasan keamanan maka Anda wajib mengisi foto/file
-                    <span className="underline text-blue-500 font-medium"> dan KTP</span> untuk memvalidasi kepemilikan data peserta.
-                  </div>
-
-
-                </div>
-                <div className="flex -mx-3 mt-5 gap-2 px-3">
-                  <div className={`w-full ${indexFormTab == 0 && "hidden"}`}>
-                    <button
-                      type="submit"
-                      className="btn text-white bg-blue-500 hover:bg-blue-600 w-full"
-                      onClick={(e) => {
-                        setIndexFormTab(indexFormTab - 1);
-                        scrollToTop();
-                      }}
-                    >
-                      Sebelumnya
-                    </button>
-                  </div>
-                  <div
-                    className={`w-full ${indexFormTab == 3 ? "hidden" : "block"
-                      }`}
-                  >
-                    <button
-                      type="submit"
-                      onClick={(e) => { setIndexFormTab(indexFormTab + 1); scrollToTop() }}
-                      className="btn text-white bg-blue-500 hover:bg-blue-600 w-full"
-                    >
-                      Selanjutnya
-                    </button>
-                  </div>
-                  <div
-                    className={`w-full ${indexFormTab == 3 ? "block" : "hidden"
-                      }`}
-                  >
-                    <button
-                      onClick={(e) => {
-                        handleCompleteProfileUser();
-                      }}
-                      type="submit"
-                      className="btn text-white flex items-center justify-center bg-blue-500 hover:bg-blue-600 w-full"
-                    >
-                      {isLoadingCompleteProfile ? (
-                        <HashLoader color="#FFFFFF" size={20} />
-                      ) : (
-                        <span>Upload</span>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </form>
-          )}
+              {indexFormTab < 3 ? (
+                <button
+                  onClick={() => { setIndexFormTab(prev => prev + 1); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+                  className="flex-[2] h-14 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold text-sm tracking-wide shadow-lg shadow-blue-500/20 transition-all active:scale-95 flex items-center justify-center gap-2 group"
+                >
+                  Selanjutnya <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
+                </button>
+              ) : (
+                <button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  className="flex-[2] h-14 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-bold text-sm tracking-wide shadow-lg shadow-emerald-500/20 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {isSubmitting ? <HashLoader size={20} color="#fff" /> : <><FiCheckCircle /> Simpan & Perbarui</>}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
-      </section >
+      </div>
     </section>
-
   );
 }
 
-export default FormCompleteProfile;
+const InputField = ({ label, icon: Icon, readOnly, ...props }: any) => (
+  <div className="space-y-2">
+    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">{label} {props.required && <span className="text-rose-500">*</span>}</label>
+    <div className="relative group">
+      {Icon && <Icon className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-400 transition-colors" size={16} />}
+      <input
+        {...props}
+        className={`w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 ${Icon ? 'pl-14' : ''} text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all ${readOnly ? 'opacity-60 cursor-not-allowed border-transparent' : 'hover:border-white/20'}`}
+        readOnly={readOnly}
+      />
+    </div>
+  </div>
+);
+
+const SelectField = ({ label, value, onChange, options, required }: any) => (
+  <div className="space-y-2">
+    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">{label} {required && <span className="text-rose-500">*</span>}</label>
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger className="w-full bg-white/5 border-white/10 rounded-2xl px-5 h-[54px] text-sm focus:ring-2 focus:ring-blue-500/50">
+        <SelectValue placeholder={`Pilih ${label}`} />
+      </SelectTrigger>
+      <SelectContent className="bg-[#020617] border-white/10 text-white rounded-xl">
+        {options.map((opt: any, i: number) => (
+          <SelectItem key={i} value={opt.v} className="focus:bg-blue-500/20 focus:text-blue-400">{opt.l}</SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  </div>
+);
+
+const FileDropzone = ({ label, field, current, file, onChange, required }: any) => {
+  const isImage = current?.match(/\.(jpg|jpeg|png)$/i);
+
+  return (
+    <div className="space-y-3">
+      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">{label}</label>
+      <div className="relative group">
+        <label className="flex flex-col items-center justify-center w-full min-h-[120px] bg-white/5 border border-dashed border-white/10 hover:border-blue-500/50 rounded-3xl p-6 cursor-pointer transition-all duration-300">
+          {file ? (
+            <div className="flex flex-col items-center gap-2 text-blue-400">
+              <FiCheckCircle size={28} />
+              <span className="text-xs font-bold text-center line-clamp-1">{truncateText(file.name, 20, '...')}</span>
+            </div>
+          ) : current && current !== "" && !current.endsWith('/') ? (
+            <div className="flex flex-col items-center gap-3">
+              {isImage ? (
+                <img src={current} className="w-16 h-16 rounded-xl object-cover border border-white/20" />
+              ) : (
+                <div className="p-3 bg-blue-500/10 rounded-xl text-blue-400"><FiFileText size={24} /></div>
+              )}
+              <span className="text-[10px] font-bold text-blue-400/70">Klik untuk ganti file</span>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-3 text-gray-500 group-hover:text-blue-400">
+              <FiUploadCloud size={32} className="transition-transform group-hover:-translate-y-1" />
+              <div className="text-center">
+                <p className="text-[10px] font-bold uppercase tracking-wider">Unggah Berkas</p>
+                <p className="text-[9px] font-light">Max 100MB (PDF/JPG/PNG)</p>
+              </div>
+            </div>
+          )}
+          <input type="file" className="hidden" onChange={(e) => onChange(e, field)} required={required && (!current || current === "" || current.endsWith('/'))} />
+        </label>
+      </div>
+    </div>
+  );
+};

@@ -1,9 +1,25 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Save } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+    FiMessageSquare,
+    FiUser,
+    FiBriefcase,
+    FiSend,
+    FiCheckCircle,
+    FiStar,
+    FiInfo,
+    FiLayout,
+    FiZap,
+    FiSmartphone,
+    FiCpu,
+    FiLayers
+} from 'react-icons/fi';
 import { saveFeedback } from '@/utils/feedback';
 import Footer from '@/components/ui/footer';
+import { HashLoader } from 'react-spinners';
+import Toast from '@/commons/Toast';
 
 interface FeedbackData {
     nama: string;
@@ -24,35 +40,43 @@ interface FeedbackData {
 const RATING_QUESTIONS = [
     {
         key: 'kemudahanAkses',
-        label: 'Kemudahan akses ke aplikasi E-LAUT'
+        label: 'Kemudahan akses ke aplikasi E-LAUT',
+        icon: <FiLayers />
     },
     {
         key: 'kemudahanPenggunaan',
-        label: 'Kemudahan penggunaan aplikasi E-LAUT'
+        label: 'Kemudahan penggunaan aplikasi E-LAUT',
+        icon: <FiZap />
     },
     {
         key: 'kecepatan',
-        label: 'Kecepatan dan performa aplikasi'
+        label: 'Kecepatan dan performa aplikasi',
+        icon: <FiCpu />
     },
     {
         key: 'desainTampilan',
-        label: 'Desain dan tampilan aplikasi'
+        label: 'Desain dan tampilan aplikasi',
+        icon: <FiLayout />
     },
     {
         key: 'kelengkapanFitur',
-        label: 'Kelengkapan fitur yang tersedia'
+        label: 'Kelengkapan fitur yang tersedia',
+        icon: <FiInfo />
     },
     {
         key: 'kejelasanInformasi',
-        label: 'Kejelasan informasi dan panduan'
+        label: 'Kejelasan informasi dan panduan',
+        icon: <FiInfo />
     },
     {
         key: 'responsifMobile',
-        label: 'Tampilan responsif di perangkat mobile'
+        label: 'Tampilan responsif di perangkat mobile',
+        icon: <FiSmartphone />
     },
     {
         key: 'kepuasanKeseluruhan',
-        label: 'Kepuasan keseluruhan terhadap aplikasi'
+        label: 'Kepuasan keseluruhan terhadap aplikasi',
+        icon: <FiStar />
     }
 ];
 
@@ -88,22 +112,21 @@ export default function MasukanSaranPage() {
     const handleSubmit = async () => {
         // Validation
         if (!data.nama.trim()) {
-            alert('Nama tidak boleh kosong!');
+            Toast.fire({ icon: 'error', title: 'Nama tidak boleh kosong!' });
             return;
         }
         if (!data.asalInstansi.trim()) {
-            alert('Asal Instansi tidak boleh kosong!');
+            Toast.fire({ icon: 'error', title: 'Asal Instansi tidak boleh kosong!' });
             return;
         }
         if (!data.masukanSaran.trim()) {
-            alert('Masukan dan Saran tidak boleh kosong!');
+            Toast.fire({ icon: 'error', title: 'Masukan dan Saran tidak boleh kosong!' });
             return;
         }
 
-        // Check if at least one rating is filled
         const hasRating = Object.values(data.ratings).some(rating => rating > 0);
         if (!hasRating) {
-            alert('Mohon berikan minimal satu penilaian!');
+            Toast.fire({ icon: 'error', title: 'Mohon berikan minimal satu penilaian!' });
             return;
         }
 
@@ -111,9 +134,8 @@ export default function MasukanSaranPage() {
         try {
             await saveFeedback(data);
             setSubmitted(true);
-            alert('Terima kasih! Masukan dan saran Anda berhasil disimpan.');
+            Toast.fire({ icon: 'success', title: 'Terima kasih! Masukan Anda sangat berarti.' });
 
-            // Reset form after 2 seconds
             setTimeout(() => {
                 setData({
                     nama: '',
@@ -131,9 +153,9 @@ export default function MasukanSaranPage() {
                     }
                 });
                 setSubmitted(false);
-            }, 2000);
+            }, 3000);
         } catch (error) {
-            alert('Gagal menyimpan masukan dan saran!');
+            Toast.fire({ icon: 'error', title: 'Gagal mengirim masukan' });
             console.error(error);
         } finally {
             setSaving(false);
@@ -148,125 +170,204 @@ export default function MasukanSaranPage() {
         return 'Sangat Baik';
     };
 
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1 }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+    };
+
     return (
-        <section>
-            <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-950 p-2 sm:p-4 md:p-6">
-                <div className="max-w-6xl mx-auto mt-28">
-                    {/* Glass Card */}
-                    <div className="bg-white/10 backdrop-blur-lg rounded-xl sm:rounded-2xl shadow-2xl border border-white/20 p-4 sm:p-6 md:p-8">
-                        {/* Header */}
-                        <div className="mb-6 sm:mb-8">
-                            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white drop-shadow-lg mb-2">
-                                Masukan dan Saran
-                            </h1>
-                            <p className="text-white/80 text-sm sm:text-base">
-                                Bantu kami meningkatkan aplikasi E-LAUT dengan memberikan masukan dan penilaian Anda
-                            </p>
-                        </div>
+        <section className="min-h-screen bg-[#020617] text-white selection:bg-blue-500/30">
+            {/* Background Decorations */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px] animate-pulse" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-600/10 rounded-full blur-[120px]" />
+                <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] bg-indigo-600/5 rounded-full blur-[100px]" />
+            </div>
 
-                        {/* Form Container */}
-                        <div className="space-y-6">
-                            {/* Informasi Pengguna */}
-                            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10">
-                                <h2 className="text-lg sm:text-xl font-bold text-white mb-4">Informasi Pengguna</h2>
+            <div className="relative pt-32 pb-20 px-4 md:px-8">
+                <div className="max-w-5xl mx-auto space-y-12">
 
-                                <div className="space-y-4">
+                    {/* Header Section */}
+                    <div className="text-center space-y-6">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-widest"
+                        >
+                            <FiMessageSquare size={14} /> Feedback Center
+                        </motion.div>
+                        <motion.h1
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-4xl md:text-6xl font-calsans tracking-tight leading-none"
+                        >
+                            Masukan & <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">Saran</span>
+                        </motion.h1>
+                        <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="text-gray-400 max-w-2xl mx-auto font-light leading-relaxed"
+                        >
+                            Suara Anda menentukan masa depan E-LAUT. Bantu kami menciptakan layanan terbaik bagi masyarakat kelautan dan perikanan dengan memberikan masukan konstruktif.
+                        </motion.p>
+                    </div>
+
+                    {/* Main Form Content */}
+                    <motion.div
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="show"
+                        className="space-y-10"
+                    >
+                        {/* Section: Identitas */}
+                        <motion.div variants={itemVariants} className="bg-[#0f172a]/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-12 bg-blue-500/5 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-blue-500/10 transition-colors" />
+
+                            <div className="relative z-10 space-y-8">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-blue-500/10 rounded-2xl text-blue-400">
+                                        <FiUser size={24} />
+                                    </div>
                                     <div>
-                                        <label className="block font-semibold mb-2 text-white text-sm sm:text-base">
-                                            Nama <span className="text-red-400">*</span>
-                                        </label>
-                                        <input
-                                            value={data.nama}
-                                            onChange={(e) => setData({ ...data, nama: e.target.value })}
-                                            className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
-                                            placeholder="Masukkan nama lengkap Anda..."
-                                        />
+                                        <h2 className="text-2xl font-calsans">Informasi Pengirim</h2>
+                                        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Personal Identification</p>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Nama Lengkap <span className="text-rose-500">*</span></label>
+                                        <div className="relative group">
+                                            <FiUser className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
+                                            <input
+                                                value={data.nama}
+                                                onChange={(e) => setData({ ...data, nama: e.target.value })}
+                                                className="w-full pl-12 pr-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all placeholder:text-gray-600"
+                                                placeholder="Masukan nama lengkap..."
+                                            />
+                                        </div>
                                     </div>
 
-                                    <div>
-                                        <label className="block font-semibold mb-2 text-white text-sm sm:text-base">
-                                            Asal Instansi <span className="text-red-400">*</span>
-                                        </label>
-                                        <input
-                                            value={data.asalInstansi}
-                                            onChange={(e) => setData({ ...data, asalInstansi: e.target.value })}
-                                            className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
-                                            placeholder="Masukkan asal instansi Anda..."
-                                        />
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Instansi / Lembaga <span className="text-rose-500">*</span></label>
+                                        <div className="relative group">
+                                            <FiBriefcase className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
+                                            <input
+                                                value={data.asalInstansi}
+                                                onChange={(e) => setData({ ...data, asalInstansi: e.target.value })}
+                                                className="w-full pl-12 pr-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all placeholder:text-gray-600"
+                                                placeholder="Instansi tempat Anda bekerja..."
+                                            />
+                                        </div>
                                     </div>
 
-                                    <div>
-                                        <label className="block font-semibold mb-2 text-white text-sm sm:text-base">
-                                            Masukan dan Saran <span className="text-red-400">*</span>
-                                        </label>
+                                    <div className="md:col-span-2 space-y-2">
+                                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Pesan & Aspirasi <span className="text-rose-500">*</span></label>
                                         <textarea
                                             value={data.masukanSaran}
                                             onChange={(e) => setData({ ...data, masukanSaran: e.target.value })}
-                                            className="w-full p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
                                             rows={6}
-                                            placeholder="Tuliskan masukan, saran, atau kritik Anda untuk meningkatkan aplikasi E-LAUT..."
+                                            className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-[2rem] text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all placeholder:text-gray-600"
+                                            placeholder="Tuliskan kritikan, masukan, atau saran perkembangan aplikasi di sini..."
                                         />
                                     </div>
                                 </div>
                             </div>
+                        </motion.div>
 
-                            {/* Penilaian Aplikasi */}
-                            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-4 sm:p-6 border border-white/10">
-                                <h2 className="text-lg sm:text-xl font-bold text-white mb-2">Penilaian Aplikasi E-LAUT</h2>
-                                <p className="text-white/70 text-xs sm:text-sm mb-4">
-                                    Berikan penilaian dari skala 1 (sangat kurang) hingga 5 (sangat baik)
-                                </p>
-
-                                <div className="gap-2 grid-cols-1  md:grid-cols-2 grid">
-                                    {RATING_QUESTIONS.map((question) => {
-                                        const currentRating = data.ratings[question.key as keyof FeedbackData['ratings']];
-                                        return (
-                                            <div key={question.key} className="bg-white/5 p-3 sm:p-4 rounded-lg">
-                                                <div className="flex flex-col sm:flex-row justify-center items-center mb-3 gap-2">
-                                                    <label className="font-medium text-white text-sm sm:text-base">
-                                                        {question.label}
-                                                    </label>
-                                                    {currentRating > 0 && (
-                                                        <span className="text-blue-300 text-xs sm:text-sm font-semibold">
-                                                            {getRatingLabel(currentRating)}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <div className="flex gap-2 sm:gap-3 justify-center ">
-                                                    {[1, 2, 3, 4, 5].map((rating) => (
-                                                        <button
-                                                            key={rating}
-                                                            onClick={() => updateRating(question.key as keyof FeedbackData['ratings'], rating)}
-                                                            className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg font-bold text-sm sm:text-base transition-all ${currentRating >= rating
-                                                                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg scale-105'
-                                                                : 'bg-white/10 text-white/50 hover:bg-white/20'
-                                                                }`}
-                                                        >
-                                                            {rating}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
+                        {/* Section: Ratings Grid */}
+                        <motion.div variants={itemVariants} className="space-y-6">
+                            <div className="flex items-center gap-4 px-2">
+                                <div className="p-3 bg-cyan-500/10 rounded-2xl text-cyan-400">
+                                    <FiStar size={24} />
+                                </div>
+                                <div className="flex-1">
+                                    <h2 className="text-2xl font-calsans">Penilaian Produk</h2>
+                                    <div className="flex items-center gap-2">
+                                        <div className="h-px bg-white/5 flex-1" />
+                                        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">User Satisfaction Metrics</p>
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Submit Button */}
-                            <div className="flex justify-center w-full">
-                                <button
-                                    onClick={handleSubmit}
-                                    disabled={saving || submitted}
-                                    className="w-full flex justify-center  items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-3 sm:px-10 sm:py-4 rounded-lg hover:from-blue-600 hover:to-blue-700 shadow-lg transition-all font-semibold text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed text-center"
-                                >
-                                    <Save size={20} />
-                                    <span>{saving ? 'Menyimpan...' : submitted ? 'Tersimpan!' : 'Kirim Masukan'}</span>
-                                </button>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {RATING_QUESTIONS.map((question) => {
+                                    const currentRating = data.ratings[question.key as keyof FeedbackData['ratings']];
+                                    return (
+                                        <div key={question.key} className="bg-white/5 hover:bg-white/[0.07] border border-white/5 rounded-3xl p-6 transition-all group">
+                                            <div className="flex items-center justify-between mb-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 bg-blue-500/10 rounded-xl text-blue-400 group-hover:scale-110 transition-transform">
+                                                        {question.icon}
+                                                    </div>
+                                                    <span className="text-xs font-medium text-gray-300 group-hover:text-white transition-colors">
+                                                        {question.label}
+                                                    </span>
+                                                </div>
+                                                <AnimatePresence>
+                                                    {currentRating > 0 && (
+                                                        <motion.span
+                                                            initial={{ opacity: 0, x: 10 }}
+                                                            animate={{ opacity: 1, x: 0 }}
+                                                            className="text-[9px] font-black uppercase tracking-widest px-2 py-1 bg-blue-500/20 text-blue-400 rounded-md"
+                                                        >
+                                                            {getRatingLabel(currentRating)}
+                                                        </motion.span>
+                                                    )}
+                                                </AnimatePresence>
+                                            </div>
+
+                                            <div className="flex justify-between gap-2">
+                                                {[1, 2, 3, 4, 5].map((rating) => (
+                                                    <motion.button
+                                                        key={rating}
+                                                        whileHover={{ y: -3 }}
+                                                        whileTap={{ scale: 0.9 }}
+                                                        onClick={() => updateRating(question.key as keyof FeedbackData['ratings'], rating)}
+                                                        className={`flex-1 h-12 rounded-xl font-bold text-sm transition-all border ${currentRating >= rating
+                                                                ? 'bg-blue-600 border-blue-400 text-white shadow-[0_0_20px_rgba(37,99,235,0.3)]'
+                                                                : 'bg-white/5 border-white/5 text-gray-500 hover:bg-white/10 hover:border-white/20'
+                                                            }`}
+                                                    >
+                                                        {rating}
+                                                    </motion.button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
-                        </div>
-                    </div>
+                        </motion.div>
+
+                        {/* Submit Button */}
+                        <motion.div variants={itemVariants} className="pt-6">
+                            <button
+                                onClick={handleSubmit}
+                                disabled={saving || submitted}
+                                className="w-full h-16 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white rounded-3xl font-bold tracking-widest shadow-2xl shadow-blue-500/20 transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50 group"
+                            >
+                                {saving ? (
+                                    <HashLoader size={24} color="#fff" />
+                                ) : submitted ? (
+                                    <><FiCheckCircle size={22} className="animate-bounce" /> PESAN TERKIRIM</>
+                                ) : (
+                                    <><FiSend className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /> KIRIM FEEDBACK KAMI</>
+                                )}
+                            </button>
+                        </motion.div>
+                    </motion.div>
                 </div>
             </div>
+
             <Footer />
         </section>
     );

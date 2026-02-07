@@ -1,25 +1,31 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   HiGlobeAmericas,
-  HiMiniUserGroup,
   HiOutlineCake,
-  HiUserGroup,
 } from "react-icons/hi2";
-
-
-import Link from "next/link";
-import { Slide } from "react-awesome-reveal";
-import { GrFormEdit, GrFormTrash, GrLocation } from "react-icons/gr";
-import { Button } from "./ui/button";
-import { usePathname, useRouter } from "next/navigation";
-import axios, { AxiosResponse } from "axios";
-import { IoIosInformationCircle, IoMdCloseCircle } from "react-icons/io";
-import { Edit3Icon, LucideDot, Trash } from "lucide-react";
+import {
+  FiEdit3,
+  FiMapPin,
+  FiMail,
+  FiPhone,
+  FiShield,
+  FiCalendar,
+  FiBriefcase,
+  FiBookOpen,
+  FiUser,
+  FiHash,
+  FiFileText,
+  FiFilePlus,
+  FiCheckCircle,
+  FiExternalLink
+} from "react-icons/fi";
 import { User } from "@/types/user";
-import { RiHeart3Line, RiVerifiedBadgeFill } from "react-icons/ri";
+import { RiHeart3Line } from "react-icons/ri";
 import {
   MdAlternateEmail,
   MdOutlineWoman,
@@ -28,340 +34,303 @@ import {
 import { PiHandsPrayingBold, PiTrainRegional } from "react-icons/pi";
 import { TbFlag, TbGenderBigender, TbNumber, TbPhone, TbSchool } from "react-icons/tb";
 import { BiDonateBlood } from "react-icons/bi";
-import { createSlug, truncateText } from "@/utils";
-
-import Cookies from "js-cookie";
-import Toast from "@/commons/Toast";
 import { capitalize } from "@/utils/text";
+import { truncateText } from "@/utils";
 
 export default function UserDocuments({ user }: { user: User | null }) {
-  const tabMenus = [
+  const documentTabs = [
     {
       id: 1,
       name: "Pas Foto",
-      description:
-        "Pelatihan yang diselenggaran BPPSDM KP untuk menjaring masyarakat kelautan perikanan yang ingin mengasah skill nya dibidang kelautan dan perikanan",
       image: "/illustrations/pas-foto.png",
-      icon: (
-        <HiUserGroup className="absolute right-5 bottom-5 text-5xl text-gray-200 duration-1000" />
-      ),
       link: user?.Foto,
-      available: user?.Foto.endsWith("/") ? false : true,
+      available: user?.Foto && !user.Foto.endsWith("/"),
     },
     {
       id: 2,
       name: "Kartu Keluarga",
-      description:
-        "Pelatihan yang diselenggaran BPPSDM KP untuk menjaring masyarakat kelautan perikanan yang ingin mengasah skill nya dibidang kelautan dan perikanan",
       image: "/illustrations/kartu-keluarga.png",
-      icon: (
-        <HiUserGroup className="absolute right-5 bottom-5 text-5xl text-gray-200 duration-1000" />
-      ),
       link: user?.KK,
-      available: user?.KK.endsWith("/") ? false : true,
+      available: user?.KK && !user.KK.endsWith("/"),
     },
-
     {
       id: 3,
       name: "KTP/Identitas",
-      description:
-        "Pelatihan yang diselenggaran BPPSDM KP untuk menjaring masyarakat kelautan perikanan yang ingin mengasah skill nya dibidang kelautan dan perikanan",
       image: "/illustrations/ktp.png",
-      icon: (
-        <HiUserGroup className="absolute right-5 bottom-5 text-5xl text-gray-200 duration-1000" />
-      ),
       link: user?.Ktp,
-      available: user?.Ktp.endsWith("/") ? false : true,
+      available: user?.Ktp && !user.Ktp.endsWith("/"),
     },
     {
       id: 4,
       name: "Ijazah",
-      description:
-        "Pelatihan yang diselenggaran BPPSDM KP untuk menjaring masyarakat kelautan perikanan yang ingin mengasah skill nya dibidang kelautan dan perikanan",
       image: "/illustrations/ijazah.png",
-      icon: (
-        <HiUserGroup className="absolute right-5 bottom-5 text-5xl text-gray-200 duration-1000" />
-      ),
       link: user?.Ijazah,
-      available: user?.Ijazah.endsWith("/") ? false : true,
+      available: user?.Ijazah && !user.Ijazah.endsWith("/"),
     },
     {
-      id: 4,
-      name: "Surat Keterangan Sehat",
-      description:
-        "Pelatihan yang diselenggaran BPPSDM KP untuk menjaring masyarakat kelautan perikanan yang ingin mengasah skill nya dibidang kelautan dan perikanan",
+      id: 5,
+      name: "Suket Sehat",
       image: "/illustrations/surat-keterangan-sehat.png",
-      icon: (
-        <HiUserGroup className="absolute right-5 bottom-5 text-5xl text-gray-200 duration-1000" />
-      ),
       link: user?.SuratKesehatan,
-      available: user?.SuratKesehatan.endsWith("/") ? false : true,
+      available: user?.SuratKesehatan && !user.SuratKesehatan.endsWith("/"),
     },
   ];
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [profilePicture, setProfilePicture] = useState<File | null>(null);
-  const [tab, setTab] = useState<number>(1);
-  const [menuSelected, setMenuSelected] = useState(false);
-  const [indexMenuSelected, setIndexMenuSelected] = useState(0);
-
-  const tabsRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (tabsRef.current?.parentElement) {
-      tabsRef.current.parentElement.style.height = `${tabsRef.current.clientHeight}px`;
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.05, delayChildren: 0.2 }
     }
-  }, [tabsRef]);
-
-  const handleSelectedMenu = (index: number) => {
-    setMenuSelected(!menuSelected);
-    setIndexMenuSelected(index);
   };
 
-  return (
-    <>
+  const itemVariants = {
+    hidden: { opacity: 0, scale: 0.95, y: 10 },
+    show: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.3 } }
+  };
 
-      <section
-        className="relative h-fit pb-20 rounded-2xl 
-  bg-white/10 backdrop-blur-md border border-white/20 shadow-lg"
-        id="explore"
-      >
-        <div className="relative max-w-6xl w-full mx-auto px-4 sm:px-6 flex flex-col space-y-2 text-gray-200">
-          {/* Header */}
-          <div className="pt-12 md:pt-20 pb-6 md:pb-10 text-center flex flex-col space-y-2 border-b border-white/20 mb-5">
-            <h1 className="text-2xl md:text-3xl font-calsans text-blue-400 leading-none drop-shadow-sm">
-              Biodata Pribadi <br /> Pengguna E-LAUT
+  if (!user) return null;
+
+  return (
+    <section className="relative w-full text-white pb-20">
+      {/* Background Decorative Blob */}
+      <div className="absolute top-0 -right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-40 -left-20 w-80 h-80 bg-cyan-500/10 rounded-full blur-[100px] pointer-events-none" />
+
+      <div className="relative max-w-7xl mx-auto px-4 md:px-0">
+
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-white/5 pb-10">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-1 bg-blue-500 rounded-full" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-blue-400">Personal Identity</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-calsans tracking-tight leading-none">
+              Profil & <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">Verifikasi Data</span>
             </h1>
-            <p className="text-base text-gray-300 max-w-xl text-center mx-auto leading-relaxed">
-              Lihat profile-mu dan edit data agar validitas data dirimu dapat mempercepat
-              proses keikutsertaan pelatihan di E-LAUT, lengkapi juga dokumen serta file
-              yang diperlukan!
+            <p className="text-sm text-gray-400 max-w-2xl font-light">
+              Kelola informasi pribadi dan kelengkapan dokumen pendukung Anda untuk validasi keikutsertaan pelatihan resmi.
             </p>
           </div>
 
-          <div className="flex flex-col md:flex-row space-y-5 md:space-y-0 md:space-x-4 md:items-start text-center">
-            {/* Profile Card */}
-            <div
-              className="flex flex-col items-center 
-        bg-white/10 backdrop-blur-md border border-white/20 
-        shadow-lg rounded-2xl py-6 px-12 max-w-4xl"
+          <Link href="/dashboard/edit-profile">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-2xl font-bold text-sm shadow-lg shadow-blue-500/20 transition-all border border-blue-400/20 group"
             >
-              <div className="relative">
-                <Image
-                  src={
-                    user?.Foto! !=
-                      "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/"
-                      ? user?.Foto!
-                      : "/dummies/profile.jpg"
-                  }
-                  alt={"profile picture"}
-                  width={0}
-                  height={0}
-                  className="w-32 h-32 rounded-full object-cover border border-white/30"
-                />
-                <Link
-                  href={"/dashboard/edit-profile"}
-                  className="w-fit bg-white/20 backdrop-blur-md border border-white/30 
-            rounded-full p-2 shadow-md absolute right-0 cursor-pointer bottom-4"
-                >
-                  <Edit3Icon className="text-blue-400" />
-                </Link>
-              </div>
+              <FiEdit3 className="group-hover:rotate-12 transition-transform" />
+              Edit Profil
+            </motion.div>
+          </Link>
+        </div>
 
-              <div className="flex flex-col space-y-1 items-center justify-center mt-3">
-                <h2 className="text-2xl font-calsans text-blue-400 leading-none">
-                  {capitalize(user?.Nama!.toLocaleLowerCase()!)}
-                </h2>
-                {user!.KusukaUsers == "yes" && (
-                  <p className="text-sm text-gray-200 bg-white/20 px-3 py-1 my-2 rounded-full w-full text-center leading-none">
-                    Anggota/Anak Pelaku Utama
+        <div className="flex flex-col lg:flex-row gap-10">
+
+          {/* LEFT: Profile Overview */}
+          <div className="lg:w-1/3 xl:w-1/4">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="sticky top-24 space-y-8"
+            >
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-tr from-blue-500 to-cyan-500 rounded-[2.5rem] blur opacity-25 group-hover:opacity-40 transition duration-500" />
+                <div className="relative bg-[#020617]/40 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 text-center shadow-2xl">
+                  <div className="relative w-32 h-32 mx-auto mb-6">
+                    <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-xl animate-pulse" />
+                    <Image
+                      src={user.Foto?.includes('http') ? user.Foto : "/dummies/profile.jpg"}
+                      alt={user.Nama}
+                      width={128}
+                      height={128}
+                      className="relative w-full h-full rounded-full object-cover border-2 border-white/20 shadow-xl"
+                    />
+                    <div className="absolute -bottom-2 -right-2 p-2 bg-blue-600 rounded-xl border border-white/20 shadow-lg text-white">
+                      <FiShield size={16} />
+                    </div>
+                  </div>
+
+                  <h3 className="text-xl font-calsans text-white mb-1 line-clamp-1">
+                    {capitalize(user.Nama.toLocaleLowerCase())}
+                  </h3>
+                  <p className="text-xs font-medium text-blue-400 tracking-wide mb-4">
+                    {user.KusukaUsers === "yes" ? "Anggota Pelaku Utama" : "Peserta Umum"}
                   </p>
-                )}
-              </div>
-            </div>
 
-            {/* Info Cards */}
-            <div className="flex flex-col space-y-5 w-full">
-              {/* UserInfoItem remains the same but updated with glass styles */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-5">
-                <UserInfoItem icon={TbNumber} title="NIK" value={user!.Nik.toString()} />
-                <UserInfoItem icon={TbFlag} title="Kewarganegaraan" value={user!.Kewarganegaraan} />
-                <UserInfoItem icon={MdAlternateEmail} title="Email" value={user!.Email} />
-                <UserInfoItem
-                  icon={RiHeart3Line}
-                  title="Status Menikah"
-                  value={user!.StatusMenikah}
-                />
-                <UserInfoItem
-                  icon={TbPhone}
-                  title="No Telpon/Whatsapp"
-                  value={user!.NoTelpon.toString()}
-                />
-                <UserInfoItem
-                  icon={GrLocation}
-                  title="Alamat"
-                  value={user!.Alamat}
-                />
-                <UserInfoItem
-                  icon={PiTrainRegional}
-                  title="Domisili"
-                  value={`${user!.Kota}, ${user!.Provinsi}`}
-                />
-                <UserInfoItem
-                  icon={TbGenderBigender}
-                  title="Jenis Kelamin"
-                  value={user!.JenisKelamin}
-                />
-                <UserInfoItem
-                  icon={HiOutlineCake}
-                  title="TTL"
-                  value={`${user!.TempatLahir}, ${user!.TanggalLahir}`}
-                />
-                <UserInfoItem
-                  icon={MdOutlineWorkOutline}
-                  title="Pekerjaan"
-                  value={user!.Pekerjaan}
-                />
-                <UserInfoItem
-                  icon={TbSchool}
-                  title="Pendidikan Terakhir"
-                  value={user!.PendidikanTerakhir}
-                />
-                <UserInfoItem
-                  icon={PiHandsPrayingBold}
-                  title="Agama"
-                  value={user!.Agama}
-                />
-                <UserInfoItem
-                  icon={BiDonateBlood}
-                  title="Golongan Darah"
-                  value={user!.GolonganDarah}
-                />
-                <UserInfoItem
-                  icon={MdOutlineWoman}
-                  title="Ibu Kandung"
-                  value={user!.IbuKandung}
-                />
-                <UserInfoItem
-                  icon={HiGlobeAmericas}
-                  title="Negara Tujuan Bekerja"
-                  value={user!.NegaraTujuanBekerja}
-                />
+                  <div className="h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent my-6" />
+
+                  <div className="space-y-4 text-left">
+                    <div className="flex items-center gap-3 text-gray-400">
+                      <FiHash className="text-blue-500 shrink-0" />
+                      <span className="text-[11px] font-bold tracking-wider">{user.Nik}</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-gray-400">
+                      <FiMail className="text-blue-500 shrink-0" />
+                      <span className="text-[11px] truncate">{user.Email}</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-gray-400">
+                      <FiPhone className="text-blue-500 shrink-0" />
+                      <span className="text-[11px] tracking-widest">{user.NoTelpon}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {/* Tab Menus */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {tabMenus.map((tabMenu, index) => (
-                  <TabMenuItem
-                    key={tabMenu.id}
-                    tabMenu={tabMenu}
-                    handleSelectedMenu={handleSelectedMenu}
-                    index={index}
-                  />
+              {/* Document Summary Card */}
+              <div className="bg-white/5 border border-white/5 rounded-3xl p-6 hidden lg:block">
+                <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">Document Status</h4>
+                <div className="space-y-3">
+                  {documentTabs.map(doc => (
+                    <div key={doc.id} className="flex items-center justify-between text-xs">
+                      <span className="text-gray-400">{doc.name}</span>
+                      {doc.available ? <FiCheckCircle className="text-emerald-500" /> : <FiCalendar className="text-gray-600" />}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* RIGHT: Detailed Info & Documents */}
+          <div className="flex-1 space-y-12">
+
+            {/* Detailed Info Grid */}
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="show"
+              className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
+            >
+              <InfoCard icon={TbNumber} title="Nomor Identitas (NIK)" value={user.Nik} status="Verified" />
+              <InfoCard icon={TbFlag} title="Kewarganegaraan" value={user.Kewarganegaraan} />
+              <InfoCard icon={RiHeart3Line} title="Status Perkawinan" value={user.StatusMenikah} />
+              <InfoCard icon={TbGenderBigender} title="Jenis Kelamin" value={user.JenisKelamin} />
+              <InfoCard icon={HiOutlineCake} title="Tempat & Tanggal Lahir" value={`${user.TempatLahir}, ${user.TanggalLahir}`} />
+              <InfoCard icon={FiMapPin} title="Alamat Domisili" value={user.Alamat} />
+              <InfoCard icon={PiTrainRegional} title="Kota / Provinsi" value={`${user.Kota}, ${user.Provinsi}`} />
+              <InfoCard icon={MdOutlineWorkOutline} title="Pekerjaan Saat Ini" value={user.Pekerjaan} />
+              <InfoCard icon={TbSchool} title="Pendidikan Terakhir" value={user.PendidikanTerakhir} />
+              <InfoCard icon={PiHandsPrayingBold} title="Agama" value={user.Agama} />
+              <InfoCard icon={BiDonateBlood} title="Golongan Darah" value={user.GolonganDarah} />
+              <InfoCard icon={MdOutlineWoman} title="Nama Ibu Kandung" value={user.IbuKandung} />
+              <InfoCard icon={HiGlobeAmericas} title="Negara Tujuan Kerja" value={user.NegaraTujuanBekerja || "-"} />
+            </motion.div>
+
+            {/* Documents Section */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-calsans">Berkas & Unggahan</h2>
+                <div className="h-px flex-1 bg-white/5" />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                {documentTabs.map((tab, idx) => (
+                  <DocumentCard key={idx} tab={tab} />
                 ))}
               </div>
             </div>
+
           </div>
         </div>
-      </section>
-
-    </>
+      </div>
+    </section>
   );
 }
 
-const UserInfoItem = ({
-  icon: Icon,
-  title,
-  value,
-}: {
-  icon: any;
-  title: string;
-  value: string;
-}) => (
-  <div className="gap-2 md:gap-4 w-full">
-    <Slide direction="up">
-      <div className="flex flex-col gap-1 w-full items-center text-center">
-        <div
-          className="flex items-center justify-start gap-2 
-        bg-white/10 backdrop-blur-md border border-white/20 shadow-md 
-        rounded-xl w-full h-fit md:h-24 px-3 py-3 md:py-1 text-gray-200"
-        >
-          <Icon className="text-lg text-blue-400" />
-          <div className="flex flex-col gap-0">
-            <p className="text-xs text-blue-400 text-left font-semibold">
-              {value.includes("Politeknik") ? "Satuan Pendidikan" : title}
-            </p>
-            <p className="text-sm cursor-pointer hover:underline text-gray-300 text-left font-normal leading-[105%]">
-              {value}
-            </p>
-          </div>
-        </div>
+const InfoCard = ({ icon: Icon, title, value, status }: { icon: any, title: string, value: string, status?: string }) => (
+  <motion.div
+    variants={{
+      hidden: { opacity: 0, y: 10 },
+      show: { opacity: 1, y: 0 }
+    }}
+    className="group relative bg-white/5 hover:bg-white/[0.08] backdrop-blur-3xl border border-white/5 hover:border-white/10 p-5 rounded-2xl transition-all duration-300"
+  >
+    <div className="flex items-start gap-4">
+      <div className="p-3 bg-blue-500/10 rounded-xl text-blue-400 group-hover:scale-110 transition-transform duration-500">
+        <Icon className="text-lg" />
       </div>
-    </Slide>
-  </div>
-
-);
-
-
-
-const TabMenuItem = ({
-  tabMenu,
-  handleSelectedMenu,
-  index,
-}: {
-  tabMenu: any;
-  handleSelectedMenu: (index: number) => void;
-  index: number;
-}) => {
-  const hasExtension = (url: string) => {
-    return /\.[0-9a-z]+$/i.test(url);
-  };
-  const hasFile = hasExtension(tabMenu.link);
-
-  return (
-    <div className="gap-4 w-full">
-      <div
-        onClick={() => handleSelectedMenu(index)}
-        className="flex items-center justify-start 
-        bg-white/10 backdrop-blur-md border border-white/20 
-        shadow-md rounded-xl w-full h-fit md:h-28 p-6 cursor-pointer 
-        hover:scale-[1.02] duration-300 text-gray-200"
-      >
-        <Image
-          className="w-12"
-          width={0}
-          height={0}
-          src={tabMenu.image}
-          alt="Document Icon"
-        />
-
-        <div className="ml-2 text-left flex space-y-1 flex-col">
-          <p className="text-blue-400 text-base leading-none font-semibold">
-            {tabMenu.name}
-          </p>
-
-          {hasFile ? <a
-            href={tabMenu.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-blue-300 underline truncate max-w-[200px]"
-          >
-            {truncateText(tabMenu.link, 50, "...")}
-          </a> : (
-            <p className="text-xs text-gray-200 leading-[115%]">
-              Belum ada file yang diupload, ke menu pengaturan akun untuk
-              mengunggah
-            </p>
-          )}
-        </div>
+      <div className="space-y-1">
+        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-none">
+          {title}
+        </p>
+        <p className="text-sm font-medium text-gray-200 line-clamp-1">
+          {value || "-"}
+        </p>
+        {status && (
+          <div className="flex items-center gap-1 mt-1">
+            <div className="w-1 h-1 rounded-full bg-emerald-500" />
+            <span className="text-[8px] font-bold text-emerald-500/80 uppercase tracking-widest">{status}</span>
+          </div>
+        )}
       </div>
     </div>
+  </motion.div>
+);
+
+const DocumentCard = ({ tab }: { tab: any }) => {
+  const hasExtension = (url: string) => /\.[0-9a-z]+$/i.test(url);
+  const isValidFile = tab.link && hasExtension(tab.link);
+
+  return (
+    <motion.div
+      variants={{
+        hidden: { opacity: 0, y: 10 },
+        show: { opacity: 1, y: 0 }
+      }}
+      whileHover={{ y: -5 }}
+      className="group relative h-full bg-[#020617]/20 backdrop-blur-2xl border border-white/10 rounded-3xl p-6 overflow-hidden flex flex-col justify-between transition-all"
+    >
+      <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-blue-500/10 transition-colors" />
+
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <div className="p-3 bg-white/5 rounded-2xl border border-white/10 group-hover:border-blue-500/30 transition-colors">
+            <FiFileText size={20} className="text-gray-400 group-hover:text-blue-400 transition-colors" />
+          </div>
+          {isValidFile ? (
+            <span className="px-2 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-md text-[8px] font-bold uppercase tracking-widest">Uploaded</span>
+          ) : (
+            <span className="px-2 py-1 bg-white/5 text-gray-500 border border-white/10 rounded-md text-[8px] font-bold uppercase tracking-widest">Missing</span>
+          )}
+        </div>
+
+        <h4 className="text-lg font-calsans mb-2 text-white/90 group-hover:text-blue-400 transition-colors">{tab.name}</h4>
+
+        {isValidFile ? (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 p-3 bg-blue-500/5 border border-blue-500/10 rounded-xl">
+              <FiFilePlus className="text-blue-400" size={14} />
+              <span className="text-[10px] text-blue-300 truncate lowercase font-light italic">
+                {truncateText(tab.link.split('/').pop(), 30, "...")}
+              </span>
+            </div>
+            <a
+              href={tab.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-[10px] font-bold text-blue-400 hover:text-blue-300 transition-colors uppercase tracking-widest"
+            >
+              Pratinjau Berkas <FiExternalLink size={12} />
+            </a>
+          </div>
+        ) : (
+          <p className="text-[11px] text-gray-500 leading-relaxed font-light mt-4">
+            Berkas belum tersedia dalam sistem. Selesaikan pengunggahan melalui menu Pengaturan Akun.
+          </p>
+        )}
+      </div>
+
+      {!isValidFile && (
+        <div className="mt-8">
+          <Link href="/dashboard/edit-profile">
+            <div className="text-[10px] font-bold text-blue-500 hover:underline uppercase tracking-tighter">
+              Lengkapi Sekarang →
+            </div>
+          </Link>
+        </div>
+      )}
+    </motion.div>
   );
 };
