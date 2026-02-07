@@ -15,11 +15,15 @@ import {
   HiOutlineChatBubbleLeftRight,
   HiOutlineChartBar,
   HiOutlineChatBubbleBottomCenterText,
+  HiOutlineUsers,
+  HiOutlineBuildingOffice2,
+  HiOutlineShieldCheck,
 } from "react-icons/hi2";
 
 export default function MobileMenu({ isTop }: { isTop: boolean }) {
   const [mobileNavOpen, setMobileNavOpen] = useState<boolean>(false);
   const [openLayanan, setOpenLayanan] = useState<boolean>(false);
+  const [openLogin, setOpenLogin] = useState<boolean>(false);
   const isLoggedIn = Cookies.get("XSRF081");
   const router = useRouter();
   const pathname = usePathname();
@@ -183,20 +187,50 @@ export default function MobileMenu({ isTop }: { isTop: boolean }) {
                         setMobileNavOpen(false);
                         router.push("/dashboard");
                       }}
-                      className="w-full p-4 rounded-2xl bg-blue-600 text-white font-bold tracking-wide shadow-lg shadow-blue-500/20 active:scale-95 transition-all"
+                      className="w-full p-4 rounded-2xl bg-blue-600 text-white font-bold tracking-wide shadow-lg shadow-blue-500/20 active:scale-95 transition-all text-center"
                     >
                       DASHBOARD
                     </button>
                   ) : (
-                    <button
-                      onClick={() => {
-                        setMobileNavOpen(false);
-                        router.push("/login");
-                      }}
-                      className="w-full p-4 rounded-2xl bg-blue-600 text-white font-bold tracking-wide shadow-lg shadow-blue-500/20 active:scale-95 transition-all"
-                    >
-                      LOGIN
-                    </button>
+                    <div className="space-y-4">
+                      <button
+                        onClick={() => setOpenLogin(!openLogin)}
+                        className="w-full p-4 rounded-2xl bg-blue-600 text-white font-bold tracking-wide shadow-lg shadow-blue-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+                      >
+                        LOGIN
+                        <HiMiniChevronDown className={`transition-transform duration-300 ${openLogin ? "rotate-180" : ""}`} />
+                      </button>
+
+                      <AnimatePresence>
+                        {openLogin && (
+                          <motion.ul
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="space-y-2 overflow-hidden"
+                          >
+                            <MobileDropdownSubItem
+                              href="/login"
+                              label="Masyarakat"
+                              icon={<HiOutlineUsers />}
+                              onClick={() => setMobileNavOpen(false)}
+                            />
+                            <MobileDropdownSubItem
+                              href="/p2mkp/login"
+                              label="P2MKP"
+                              icon={<HiOutlineBuildingOffice2 />}
+                              onClick={() => setMobileNavOpen(false)}
+                            />
+                            <MobileDropdownSubItem
+                              href="/admin/auth/login"
+                              label="Pengelola/Admin"
+                              icon={<HiOutlineShieldCheck />}
+                              onClick={() => setMobileNavOpen(false)}
+                            />
+                          </motion.ul>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   )}
                 </div>
               </div>

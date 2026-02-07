@@ -15,6 +15,9 @@ import {
   HiOutlineChatBubbleLeftRight,
   HiOutlineChartBar,
   HiOutlineChatBubbleBottomCenterText,
+  HiOutlineUsers,
+  HiOutlineBuildingOffice2,
+  HiOutlineShieldCheck,
 } from "react-icons/hi2";
 import Cookies from "js-cookie";
 import MobileMenu from "./mobile-menu";
@@ -69,6 +72,7 @@ function NavLinkDefault({
 export default function Header() {
   const [top, setTop] = React.useState(true);
   const [openLayanan, setOpenLayanan] = React.useState(false);
+  const [openLogin, setOpenLogin] = React.useState(false);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -102,8 +106,8 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
           className={`relative flex items-center justify-between h-16 md:h-20 px-4 md:px-8 rounded-[2rem] transition-all duration-500 ${top
-              ? "bg-transparent"
-              : "bg-[#020617]/40 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
+            ? "bg-transparent"
+            : "bg-[#020617]/40 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
             }`}
         >
           {/* Logo */}
@@ -217,13 +221,54 @@ export default function Header() {
               {isAuthenticated ? (
                 <DropdownUserPelatihan top={top} />
               ) : (
-                <Button
-                  onClick={() => router.push("/login")}
-                  className="relative group overflow-hidden rounded-2xl bg-blue-600 px-8 py-2.5 transition-all duration-300 hover:bg-blue-500 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)]"
-                >
-                  <span className="relative z-10 text-white font-semibold">Login</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </Button>
+                <div className="relative">
+                  <Button
+                    onMouseEnter={() => setOpenLogin(true)}
+                    onMouseLeave={() => setOpenLogin(false)}
+                    className="relative group overflow-hidden rounded-2xl bg-blue-600 px-8 py-2.5 transition-all duration-300 hover:bg-blue-500 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)]"
+                  >
+                    <span className="relative z-10 text-white font-semibold flex items-center gap-2">
+                      Login
+                      <HiMiniChevronDown className={`transition-transform duration-300 ${openLogin ? "rotate-180" : ""}`} />
+                    </span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </Button>
+
+                  <AnimatePresence>
+                    {openLogin && (
+                      <motion.div
+                        onMouseEnter={() => setOpenLogin(true)}
+                        onMouseLeave={() => setOpenLogin(false)}
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="absolute right-0 top-full mt-2 w-64 rounded-3xl overflow-hidden bg-[#0f172a]/95 backdrop-blur-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] ring-1 ring-white/10"
+                      >
+                        <div className="p-2 space-y-1">
+                          <DropdownItem
+                            href="/login"
+                            label="Masyarakat"
+                            subLabel="Peserta Pelatihan"
+                            icon={<HiOutlineUsers />}
+                          />
+                          <DropdownItem
+                            href="/p2mkp/login"
+                            label="P2MKP"
+                            subLabel="Lembaga Mandiri"
+                            icon={<HiOutlineBuildingOffice2 />}
+                          />
+                          <DropdownItem
+                            href="/admin/auth/login"
+                            label="Pengelola/Admin"
+                            subLabel="Administrator System"
+                            icon={<HiOutlineShieldCheck />}
+                          />
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               )}
             </div>
           </nav>
