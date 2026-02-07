@@ -239,7 +239,7 @@ export default function UserDocuments({ user }: { user: User | null }) {
   );
 }
 
-const InfoCard = ({ icon: Icon, title, value, status }: { icon: any, title: string, value: string, status?: string }) => (
+const InfoCard: any = ({ icon: Icon, title, value, status }: { icon: any, title: string, value: string, status?: string }) => (
   <motion.div
     variants={{
       hidden: { opacity: 0, y: 10 },
