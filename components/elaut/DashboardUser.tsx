@@ -1,35 +1,13 @@
 "use client";
 
 import React from "react";
-import axios, { AxiosResponse, isAxiosError } from "axios";
+import axios, { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
 import { User, UserPelatihan } from "@/types/user";
 import UserService from "@/components/user-service";
-import Footer from "@/components/ui/footer";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ManningAgent } from "@/types/product";
 import ManningAgentService from "@/components/manning-agent-service";
-import Image from 'next/image';
-import Link from 'next/link';
-import { verifyPDFBSrEUrl } from '@/constants/urls';
-import { FaRegCircleQuestion } from 'react-icons/fa6';
-
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { sanitizedDangerousChars, validateIsDangerousChars } from '@/utils/input';
-import Toast from '../toast';
-import { RiVerifiedBadgeFill } from 'react-icons/ri';
-import { addFiveYears } from '@/utils/pelatihan';
-import { capitalizeWords, DIALOG_TEXTS } from '@/constants/texts';
+import { motion, AnimatePresence } from "framer-motion";
 import { HashLoader } from "react-spinners";
 
 export default function DashboardUser() {
@@ -41,10 +19,9 @@ export default function DashboardUser() {
     const [userDetail, setUserDetail] = React.useState<User | null>(null);
     const [manningAgentDetail, setManningAgentDetail] =
         React.useState<ManningAgent | null>(null);
-    const [isLoading, setIsLoading] = React.useState(false);
+    const [isLoading, setIsLoading] = React.useState(true);
 
     const handleFetchingUserDetail = async () => {
-        setIsLoading(true);
         try {
             const response: AxiosResponse = await axios.get(
                 `${baseUrl}/users/getUsersById`,
@@ -54,19 +31,15 @@ export default function DashboardUser() {
                     },
                 }
             );
-            console.log({ response });
             setUserDetail(response.data);
-            setIsLoading(false);
         } catch (error) {
+            console.error("Error fetching user detail:", error);
+        } finally {
             setIsLoading(false);
-            console.error("Error posting training data:", error);
-            throw error;
         }
     };
 
     const handleFetchingManningAgentDetail = async () => {
-        setIsLoading(true);
-
         try {
             const response: AxiosResponse = await axios.get(
                 `${baseUrl}/manningAgent/getManningAgent?id=${idManningAgent}`,
@@ -76,84 +49,123 @@ export default function DashboardUser() {
                     },
                 }
             );
-            console.log({ response });
             setManningAgentDetail(response.data.data[0]);
-            setIsLoading(false);
         } catch (error) {
+            console.error("Error fetching manning agent detail:", error);
+        } finally {
             setIsLoading(false);
-            console.error("Error posting training data:", error);
-            throw error;
         }
     };
 
-    const [loading, setLoading] = React.useState<boolean>(true);
-
     React.useEffect(() => {
-        setTimeout(() => {
-            setLoading(false);
-            if (isManningAgent == "true") {
+        const timer = setTimeout(() => {
+            if (isManningAgent === "true") {
                 handleFetchingManningAgentDetail();
             } else {
                 handleFetchingUserDetail();
             }
-        }, 1000);
+        }, 800);
+        return () => clearTimeout(timer);
     }, []);
 
     return (
-        <>
-            {
-                userDetail != null && !isLoading ? <section className="flex flex-col relative overflow-hidden bg-gradient-to-br from-slate-900 via-sky-900 to-blue-900 text-white">
-                    {/* gradient blobs */}
-                    <div className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-blue-500/40 blur-3xl" />
-                    <div className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-cyan-400/20 blur-3xl" />
-                    <div className="pointer-events-none absolute top-1/3 -right-16 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
+        <div className="relative min-h-screen w-full overflow-hidden bg-[#020617] font-jakarta">
+            {/* Ambient Background Effects */}
+            <div className="absolute inset-0 z-0">
+                <div className="absolute inset-0 bg-[url('/images/hero-img.jpg')] opacity-5 bg-cover bg-center" />
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#020617]/60 to-[#020617]" />
+            </div>
 
-                    <div className="relative w-full h-full pb-10">
-                        <div className="max-w-6xl mx-auto">
-                            <div className="pt-28 px-8 md:px-0  md:pt-32 ">
-                                <section
-                                    id="cek-sertifikat"
-                                    className="scroll-smooth w-full  -mt-16 md:mt-6"
+            {/* Modern Animated Gradient Blobs */}
+            <motion.div
+                animate={{
+                    x: [0, 40, 0],
+                    y: [0, -20, 0],
+                }}
+                transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                className="pointer-events-none absolute -top-24 -left-24 h-[35rem] w-[35rem] rounded-full bg-blue-600/15 blur-[120px] z-1"
+            />
+            <motion.div
+                animate={{
+                    x: [0, -50, 0],
+                    y: [0, 30, 0],
+                }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="pointer-events-none absolute -bottom-48 -right-48 h-[40rem] w-[40rem] rounded-full bg-cyan-500/10 blur-[150px] z-1"
+            />
+
+            <AnimatePresence mode="wait">
+                {isLoading ? (
+                    <motion.div
+                        key="loader"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="flex items-center justify-center w-full h-screen relative z-10"
+                    >
+                        <HashLoader color="#338CF5" size={60} />
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        key="content"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                        className="relative z-10 w-full h-full pt-28 md:pt-36 pb-20 px-4"
+                    >
+                        <div className="max-w-7xl mx-auto flex flex-col items-center">
+                            {/* Dashboard Header Card */}
+                            <div className="w-full mb-12">
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="relative group overflow-hidden rounded-[2.5rem] border border-white/10 bg-[#1e293b]/30 backdrop-blur-2xl p-8 md:p-16 text-center shadow-2xl"
                                 >
-                                    <div className="flex flex-col  space-y-5 w-full items-center justify-center  text-center">
-                                        <div className="flex flex-col space-y-2 text-center rounded-2xl 
-  bg-white/10 backdrop-blur-md border border-white/20 
-  shadow-lg w-full py-16 px-5 md:px-0 text-gray-200">
+                                    <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 blur opacity-0 group-hover:opacity-100 transition duration-1000" />
 
-                                            <h1 className="text-[3rem] md:text-[3.6rem] font-calsans leading-none capitalize drop-shadow-sm">
-                                                Dashboard <br />  <span className="bg-clip-text text-transparent bg-gradient-to-r from-gray-300 via-blue-400 to-blue-500">
-                                                    {userDetail!.Nama.toLowerCase()}
-                                                </span>
-                                            </h1>
-
-                                            <div className="space-y-1 flex flex-col leading-none">
-                                                <p className="drop-shadow-sm">
-                                                    Ayo jelajahi aplikasi E-LAUT dan temukan pelatihan unggul di sektor Kelautan dan Perikanan menarik!
-                                                </p>
-
-                                                <p className="text-xs opacity-80 drop-shadow-sm">
-                                                    *Ini merupakan laman dashboard pengguna E-LAUT, telusuri pelatihan yang kamu ikuti dan nikmati layanan tersedi lainnya!
-                                                </p>
-                                            </div>
+                                    <div className="relative z-10 space-y-6">
+                                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold tracking-widest uppercase">
+                                            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                                            User Portal Access
                                         </div>
 
+                                        <h1 className="text-4xl md:text-6xl lg:text-7xl font-calsans leading-[1.1] text-white">
+                                            Dashboard <br />
+                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-300 to-teal-300">
+                                                {isManningAgent === "true" ? manningAgentDetail?.NamaManingAgent : userDetail?.Nama.toLowerCase()}
+                                            </span>
+                                        </h1>
 
-                                        {isManningAgent == "true" ? (
-                                            <ManningAgentService manningAgent={manningAgentDetail} />
-                                        ) : (
-                                            <UserService user={userDetail} />
-                                        )}
+                                        <div className="max-w-2xl mx-auto space-y-4">
+                                            <p className="text-gray-400 text-lg font-light leading-relaxed">
+                                                Ayo jelajahi aplikasi <span className="text-blue-400 font-semibold">E-LAUT</span> dan temukan pelatihan unggul di sektor Kelautan dan Perikanan yang menarik untuk peningkatan kompetensi Anda.
+                                            </p>
+                                            <p className="text-gray-500 text-sm italic font-light">
+                                                *Laman dashboard terpadu untuk menelusuri pelatihan, status pendaftaran, dan akses layanan digital kelautan.
+                                            </p>
+                                        </div>
                                     </div>
-                                </section>
+                                </motion.div>
                             </div>
+
+                            {/* Service Components */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2 }}
+                                className="w-full"
+                            >
+                                {isManningAgent === "true" ? (
+                                    <ManningAgentService manningAgent={manningAgentDetail} />
+                                ) : (
+                                    <UserService user={userDetail} />
+                                )}
+                            </motion.div>
                         </div>
-
-
-                    </div>
-                </section> : <section className="flex items-center justify-center w-full h-screen">
-                    <HashLoader color="#338CF5" size={50} />
-                </section>
-            }
-        </>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
     );
 }
+

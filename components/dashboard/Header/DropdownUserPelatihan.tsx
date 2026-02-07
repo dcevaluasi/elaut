@@ -180,9 +180,9 @@ const DropdownUserPelatihan = ({ top }: { top: boolean }) => {
 
               <button
                 onClick={handleLogOut}
-                className="w-full flex items-center gap-4 px-4 py-3 text-red-400 hover:bg-red-500/10 transition-all duration-300 rounded-2xl group/logout"
+                className="w-full flex items-center gap-4 px-4 py-3 text-rose-400 hover:bg-rose-500/10 transition-all duration-300 rounded-2xl group/logout"
               >
-                <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-red-500/10 group-hover/logout:bg-red-500 group-hover/logout:text-white transition-all duration-300">
+                <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-rose-500/10 group-hover/logout:bg-rose-500 group-hover/logout:text-white transition-all duration-300">
                   <FiLogOut className="text-lg" />
                 </div>
                 <span className="text-sm font-semibold tracking-wide">Logout Session</span>

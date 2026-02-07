@@ -1,14 +1,8 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import Image from "next/image";
+import React, { useState } from "react";
 import { HiUserGroup } from "react-icons/hi2";
-import "swiper/css";
-import "swiper/css/pagination";
-import "./../app/css/additional-styles/features-slider.css";
-import { Slide } from "react-awesome-reveal";
-import { usePathname } from "next/navigation";
-import { extractPathAfterBppp, getPenyeleggara } from "@/utils/pelatihan";
+import { motion, AnimatePresence } from "framer-motion";
 import { User } from "@/types/user";
 import UserTrainingService from "./user-training-service";
 import UserCertificateService from "./user-certificate-service";
@@ -20,96 +14,121 @@ export default function UserService({ user }: { user: User | null }) {
   const tabMenus = [
     {
       id: 1,
-      name: "Pelatihan Yang Diikuti",
-      description: "Lihat daftar pelatihan yang kamu ikuti.",
-      image: "/illustrations/bppp-training.png",
-      icon: <FaFilePen className="text-5xl text-gray-200 duration-1000" />,
+      name: "Pelatihan Diikuti",
+      description: "Riwayat & status pelatihan yang kamu ambil.",
+      icon: <FaFilePen className="text-3xl" />,
+      color: "blue",
     },
     {
       id: 2,
-      name: "Sertifikat Pelatihan",
-      description: "Koleksi sertifikat pelatihan yang sudah kamu peroleh.",
-      image: "/illustrations/bppp-certificate.png",
-      icon: <RiVerifiedBadgeFill className="text-5xl text-gray-200 duration-1000" />,
+      name: "Sertifikat",
+      description: "Koleksi sertifikat resmi yang sudah diraih.",
+      icon: <RiVerifiedBadgeFill className="text-3xl" />,
+      color: "cyan",
     },
     {
       id: 3,
-      name: "Profile Pengguna",
-      description: "Informasi pribadi & dokumen pentingmu.",
-      image: "/illustrations/user-profile.png",
-      icon: <HiUserGroup className="text-5xl text-gray-200 duration-1000" />,
+      name: "Profil & Dokumen",
+      description: "Pengaturan profil data & unggah berkas.",
+      icon: <HiUserGroup className="text-3xl" />,
+      color: "teal",
     },
   ];
 
-  const pathname = usePathname();
-  const location = extractPathAfterBppp(pathname);
-  const penyelenggara = getPenyeleggara(location!);
-
-  const [loading, setLoading] = React.useState<boolean>(true);
   const [indexMenuSelected, setIndexMenuSelected] = useState(0);
 
-  React.useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-  }, []);
-
-  const handleSelectedMenu = (index: number) => {
-    setIndexMenuSelected(index);
-  };
-
   return (
-    <div className="w-full text-left flex flex-col space-y-5">
-      {/* Tabs */}
-      <div className="relative w-full" id="explore">
-        <div className={`grid grid-cols-${tabMenus.length} md:flex md:flex-row md:flex-nowrap md:items-center justify-center gap-5 w-full`}>
+    <div className="w-full flex flex-col space-y-12">
+      {/* Premium Tab Navigation */}
+      <div className="w-full" id="explore">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
           {tabMenus.map((tabMenu, index) => {
             const isActive = indexMenuSelected === index;
             return (
-              <div key={index} className="gap-2 w-full">
-                <Slide direction="up" duration={500 * index}>
-                  <div
-                    onClick={() => handleSelectedMenu(index)}
-                    className={`flex flex-col gap-2 cursor-pointer items-center text-center w-full transition-all duration-500 ${isActive ? "scale-105" : "hover:scale-105"
-                      }`}
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                whileHover={{ y: -5 }}
+                className="relative cursor-pointer group"
+                onClick={() => setIndexMenuSelected(index)}
+              >
+                {/* Active/Hover Glow Backdrop */}
+                <div className={`absolute -inset-0.5 rounded-3xl blur transition-all duration-500 opacity-0 
+                  ${isActive ? 'bg-blue-500/30 opacity-100' : 'group-hover:opacity-20 bg-blue-400/20'}`}
+                />
+
+                <div className={`relative h-full flex flex-col items-center md:items-start p-6 md:p-8 rounded-3xl border transition-all duration-500 backdrop-blur-3xl overflow-hidden
+                  ${isActive
+                    ? "bg-blue-500/10 border-blue-500/40 shadow-[0_0_30px_rgba(59,130,246,0.1)]"
+                    : "bg-[#1e293b]/20 border-white/5 hover:bg-[#1e293b]/40 hover:border-white/10"
+                  }`}
+                >
+                  {/* Decorative Gradient Background (visible only when active) */}
+                  <AnimatePresence>
+                    {isActive && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        className="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"
+                      />
+                    )}
+                  </AnimatePresence>
+
+                  <div className={`p-4 rounded-2xl mb-6 transition-all duration-500
+                    ${isActive
+                      ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20"
+                      : "bg-white/5 text-gray-400 group-hover:text-gray-200"
+                    }`}
                   >
-                    <div
-                      className={`flex items-center justify-center !py-8 px-6 rounded-2xl flex-col space-y-2 w-full border backdrop-blur-lg transition-all duration-500
-                        ${isActive
-                          ? "bg-blue-500/10 border-blue-500/90 "
-                          : "bg-white/10 border-white/20 shadow-lg hover:shadow-xl"
-                        }`}
-                    >
-                      {tabMenu.icon}
-                      <div className="space-y-1 hidden md:flex flex-col leading-none">
-                        <p
-                          className={`font-semibold ${isActive ? "text-blue-400" : "text-blue-500"
-                            }`}
-                        >
-                          {tabMenu.name}
-                        </p>
-                        <p
-                          className={`text-xs ${isActive ? "text-gray-100" : "text-gray-300"
-                            }`}
-                        >
-                          {tabMenu.description}
-                        </p>
-                      </div>
-                    </div>
+                    {tabMenu.icon}
                   </div>
-                </Slide>
-              </div>
+
+                  <div className="space-y-2 text-center md:text-left">
+                    <h3 className={`font-calsans text-xl transition-colors duration-300
+                      ${isActive ? "text-blue-400" : "text-gray-200"}
+                    `}>
+                      {tabMenu.name}
+                    </h3>
+                    <p className="text-gray-400 text-sm font-light leading-relaxed">
+                      {tabMenu.description}
+                    </p>
+                  </div>
+
+                  {/* Active Indicator Bar */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTab"
+                      className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-cyan-500"
+                    />
+                  )}
+                </div>
+              </motion.div>
             );
           })}
         </div>
       </div>
 
-      {/* Content */}
-      <div className="w-full transition-all duration-500">
-        {indexMenuSelected === 0 && <UserTrainingService user={user} />}
-        {indexMenuSelected === 1 && <UserCertificateService user={user} />}
-        {indexMenuSelected === 2 && <UserDocuments user={user} />}
+      {/* Content Section with Animation */}
+      <div className="relative w-full">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={indexMenuSelected}
+            initial={{ opacity: 0, scale: 0.98, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.98, y: -10 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="w-full"
+          >
+            {indexMenuSelected === 0 && <UserTrainingService user={user} />}
+            {indexMenuSelected === 1 && <UserCertificateService user={user} />}
+            {indexMenuSelected === 2 && <UserDocuments user={user} />}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
 }
+
