@@ -4,7 +4,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { FiMaximize, FiMinimize, FiSearch, FiCalendar, FiMapPin, FiAward, FiInfo } from "react-icons/fi";
+import { FiMaximize, FiMinimize, FiSearch, FiCalendar, FiMapPin, FiAward, FiInfo, FiBriefcase } from "react-icons/fi";
 import { Input } from "./ui/input";
 import { usePathname } from "next/navigation";
 import {
@@ -155,8 +155,8 @@ function ManningAgentTrainingService({
                         handleFetchingDetailPelatihan(pelatihan.IdMiningAgentPelatihan, parseInt(pelatihan.IdPelatihan));
                       }}
                       className={`group relative p-6 rounded-3xl border transition-all cursor-pointer overflow-hidden ${isActive
-                          ? 'bg-indigo-600/10 border-indigo-500/40 shadow-lg'
-                          : 'bg-white/5 border-white/5 hover:border-white/10'
+                        ? 'bg-indigo-600/10 border-indigo-500/40 shadow-lg'
+                        : 'bg-white/5 border-white/5 hover:border-white/10'
                         }`}
                     >
                       <div className="flex items-start gap-4 relative z-10">

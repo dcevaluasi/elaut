@@ -203,7 +203,7 @@ export default function UserDocuments({ user }: { user: User | null }) {
               animate="show"
               className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
             >
-              <InfoCard icon={TbNumber} title="Nomor Identitas (NIK)" value={user.Nik} status="Verified" />
+              <InfoCard icon={TbNumber} title="Nomor Identitas (NIK)" value={user.Nik.toLocaleString()} status="Verified" />
               <InfoCard icon={TbFlag} title="Kewarganegaraan" value={user.Kewarganegaraan} />
               <InfoCard icon={RiHeart3Line} title="Status Perkawinan" value={user.StatusMenikah} />
               <InfoCard icon={TbGenderBigender} title="Jenis Kelamin" value={user.JenisKelamin} />

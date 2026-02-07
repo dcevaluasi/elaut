@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { TbBook, TbBuilding, TbCalendar, TbCalendarEvent, TbClock, TbInfoCircle, TbLocation, TbMoneybag, TbPin, TbSchool } from "react-icons/tb";
 import { RiTimeZoneLine } from "react-icons/ri";
 import { Button } from "@/components/ui/button";
