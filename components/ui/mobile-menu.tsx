@@ -139,6 +139,12 @@ export default function MobileMenu({ isTop }: { isTop: boolean }) {
                           className="mt-2 ml-4 border-l border-white/10 space-y-1 overflow-hidden"
                         >
                           <MobileDropdownSubItem
+                            href="/layanan/regulasi"
+                            label="Regulasi Pelatihan"
+                            icon={<HiOutlineDocumentText />}
+                            onClick={() => setMobileNavOpen(false)}
+                          />
+                          <MobileDropdownSubItem
                             href="/layanan/publik/maklumat-pelayanan"
                             label="Maklumat Pelayanan"
                             icon={<HiOutlineClipboardDocumentCheck />}

@@ -178,6 +178,12 @@ export default function Header() {
                       >
                         <div className="p-2 space-y-1">
                           <DropdownItem
+                            href="/layanan/regulasi"
+                            label="Regulasi Pelatihan"
+                            subLabel="Repository Peraturan & UU"
+                            icon={<HiOutlineDocumentText />}
+                          />
+                          <DropdownItem
                             href="/layanan/publik/maklumat-pelayanan"
                             label="Maklumat Pelayanan"
                             icon={<HiOutlineClipboardDocumentCheck />}

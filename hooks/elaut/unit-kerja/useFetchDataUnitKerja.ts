@@ -4,7 +4,6 @@ import { useState, useCallback, useMemo } from 'react'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { elautBaseUrl } from '@/constants/urls'
-import { Instruktur } from '@/types/instruktur'
 import { UnitKerja } from '@/types/master'
 
 export type CountStats = {
