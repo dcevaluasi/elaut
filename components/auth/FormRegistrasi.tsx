@@ -414,99 +414,97 @@ function FormRegistrasi() {
 
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-[#020617] font-jakarta">
-      <div className="absolute inset-0 z-0">
-        <Image
-          src={images[imageIndex]}
-          className="absolute w-full h-full hidden md:block object-cover duration-1000 opacity-[0.15] z-0"
-          alt=""
-          layout="fill"
-          priority
+    <div className="fixed inset-0 z-[999999] font-jakarta overflow-hidden scrollbar-hide">
+      <main className="h-full w-full relative bg-slate-950 text-white flex items-center justify-center p-4 scrollbar-hide">
+        {/* Animated Background Image */}
+        <motion.div
+          initial={{ scale: 1.1, opacity: 0 }}
+          animate={{ scale: 1, opacity: 0.25 }}
+          transition={{ duration: 2, ease: "easeOut" }}
+          className="absolute inset-0 z-0"
+        >
+          <Image
+            src={"/images/hero-img6.jpg"}
+            className="w-full h-full object-cover"
+            alt="Background"
+            fill={true}
+            priority
+          />
+        </motion.div>
+
+        {/* Gradient Blobs with Animation */}
+        <motion.div
+          animate={{
+            x: [0, 30, 0],
+            y: [0, -30, 0],
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+          className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-blue-600/30 blur-[100px] z-1"
         />
-        <Image
-          src={imagesMob[imageMobIndex]}
-          className="absolute w-full h-full block md:hidden object-cover duration-1000 opacity-[0.15] z-0"
-          alt=""
-          layout="fill"
-          priority
+        <motion.div
+          animate={{
+            x: [0, -40, 0],
+            y: [0, 40, 0],
+          }}
+          transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+          className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-cyan-500/20 blur-[120px] z-1"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#020617]/40 to-[#020617]" />
-      </div>
 
-      {/* Modern Animated Gradient Blobs */}
-      <motion.div
-        animate={{
-          x: [0, 50, 0],
-          y: [0, -30, 0],
-        }}
-        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        className="pointer-events-none absolute -top-24 -left-24 h-[40rem] w-[40rem] rounded-full bg-blue-600/20 blur-[120px] z-1"
-      />
-      <motion.div
-        animate={{
-          x: [0, -60, 0],
-          y: [0, 40, 0],
-        }}
-        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-        className="pointer-events-none absolute -bottom-48 -right-48 h-[45rem] w-[45rem] rounded-full bg-cyan-500/15 blur-[150px] z-1"
-      />
-
-      <AlertDialog open={openInfoKusuka}>
-        <AlertDialogContent className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl text-white">
-          <AlertDialogHeader>
-            <div className="flex flex-col gap-0">
-              <AlertDialogTitle className="text-xl font-bold text-white drop-shadow-md">
-                {isKusukaUser
-                  ? "No KUSUKA Tersedia!"
-                  : "No KUSUKA Tidak Tersedia!"}
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-gray-200">
-                {isKusukaUser
-                  ? "Selamat karena anda merupakan pelaku utama dan memiliki nomor KUSUKA, klik lanjutkan untuk mengisi data secara otomatis"
-                  : "Maaf nomor KUSUKA tidak tersedia, kamu dapat registrasi manual kedalam ELAUT!"}
-              </AlertDialogDescription>
-            </div>
-
-            <AlertDialogTitle>
-              <div className="flex w-full items-center justify-center gap-1 text-xl md:text-3xl border border-white/20 bg-white/5 rounded-xl py-3">
-                {isKusukaUser ? (
-                  <RiVerifiedBadgeFill className="text-green-400 text-3xl" />
-                ) : (
-                  <IoMdCloseCircle className="text-rose-500 text-3xl" />
-                )}
-
-                <span className="font-semibold text-white">{noKusuka}</span>
+        <AlertDialog open={openInfoKusuka}>
+          <AlertDialogContent className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl text-white">
+            <AlertDialogHeader>
+              <div className="flex flex-col gap-0">
+                <AlertDialogTitle className="text-xl font-bold text-white drop-shadow-md">
+                  {isKusukaUser
+                    ? "No KUSUKA Tersedia!"
+                    : "No KUSUKA Tidak Tersedia!"}
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-gray-200">
+                  {isKusukaUser
+                    ? "Selamat karena anda merupakan pelaku utama dan memiliki nomor KUSUKA, klik lanjutkan untuk mengisi data secara otomatis"
+                    : "Maaf nomor KUSUKA tidak tersedia, kamu dapat registrasi manual kedalam ELAUT!"}
+                </AlertDialogDescription>
               </div>
-            </AlertDialogTitle>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={(e) => {
-                setOpenInfoKusuka(false);
-                clearForm();
-              }}
-              className={`bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl border border-white/20 shadow-lg transition-all ${!isKusukaUser && "-mt-2"}`}
-            >
-              {isKusukaUser ? "Batal" : "Oke"}
-            </AlertDialogCancel>
-            {isKusukaUser && (
-              <AlertDialogAction
+
+              <AlertDialogTitle>
+                <div className="flex w-full items-center justify-center gap-1 text-xl md:text-3xl border border-white/20 bg-white/5 rounded-xl py-3">
+                  {isKusukaUser ? (
+                    <RiVerifiedBadgeFill className="text-green-400 text-3xl" />
+                  ) : (
+                    <IoMdCloseCircle className="text-rose-500 text-3xl" />
+                  )}
+
+                  <span className="font-semibold text-white">{noKusuka}</span>
+                </div>
+              </AlertDialogTitle>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel
                 onClick={(e) => {
                   setOpenInfoKusuka(false);
-                  setIsKUSUKA("yes");
-                  Cookies.set("IsUsedKusuka", "yes");
+                  clearForm();
                 }}
-                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg transition-all h-10"
+                className={`bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl border border-white/20 shadow-lg transition-all ${!isKusukaUser && "-mt-2"}`}
               >
-                Lanjutkan
-              </AlertDialogAction>
-            )}
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+                {isKusukaUser ? "Batal" : "Oke"}
+              </AlertDialogCancel>
+              {isKusukaUser && (
+                <AlertDialogAction
+                  onClick={(e) => {
+                    setOpenInfoKusuka(false);
+                    setIsKUSUKA("yes");
+                    Cookies.set("IsUsedKusuka", "yes");
+                  }}
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg transition-all h-10"
+                >
+                  Lanjutkan
+                </AlertDialogAction>
+              )}
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
-        <div className="pt-32 pb-20">
+        <section className="relative z-10 w-full max-w-6xl flex flex-col items-center max-h-full overflow-y-auto scrollbar-hide py-12">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -515,7 +513,7 @@ function FormRegistrasi() {
           >
             <div className="px-5 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs md:text-sm font-semibold tracking-widest uppercase mb-6 inline-flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-              Registrasi Akun Baru
+              Portal Masyarakat
             </div>
           </motion.div>
           <motion.div
@@ -539,14 +537,11 @@ function FormRegistrasi() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className={`${role == "Perseorangan" || role == "" || role == "Portfolio"
-              ? "max-w-xl"
-              : "max-w-4xl"
-              } mx-auto relative group`}
+            className={`${role == "Perseorangan" || role == "" || role == "Portfolio" ? "max-w-xl" : "max-w-4xl"} w-full relative group px-2 md:px-0`}
           >
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-[2rem] blur opacity-10 group-hover:opacity-20 transition duration-500" />
-            <div className="relative bg-[#1e293b]/20 backdrop-blur-2xl rounded-[2rem] shadow-2xl border border-white/10 p-8 sm:p-12 overflow-hidden transition-all duration-500 hover:bg-[#1e293b]/30">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-cyan-400 to-teal-400" />
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-[2rem] blur opacity-15 group-hover:opacity-25 transition duration-1000" />
+            <div className="relative bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-[2rem] p-6 md:p-12 shadow-2xl">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 via-cyan-400 to-teal-400" />
               <div className="flex flex-col gap-4 mb-8">
                 <label
                   className="block text-blue-200/80 text-xs font-semibold uppercase tracking-wider ml-1"
@@ -1075,8 +1070,8 @@ function FormRegistrasi() {
               </div>
             </div>
           </motion.div>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 }

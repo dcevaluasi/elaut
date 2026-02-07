@@ -146,7 +146,7 @@ export default function P2MKPPage() {
                             <motion.h2
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
-                                className="text-4xl md:text-6xl font-calsans text-white"
+                                className="text-3xl md:text-5xl font-calsans text-white"
                             >
                                 Alur Penetapan <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">P2MKP</span>
                             </motion.h2>
@@ -271,10 +271,10 @@ export default function P2MKPPage() {
                             <div className="absolute top-0 right-0 p-12 bg-blue-500/5 rounded-full blur-3xl -mr-20 -mt-20 group-hover:bg-blue-500/10 transition-colors" />
 
                             <div className="max-w-3xl mx-auto space-y-8 relative z-10">
-                                <h3 className="text-3xl md:text-4xl lg:text-5xl font-calsans leading-tight">
+                                <h2 className="text-3xl md:text-4xl lg:text-5xl font-calsans leading-tight">
                                     Bergabunglah Menjadi Bagian dari
                                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 italic"> P2MKP</span>
-                                </h3>
+                                </h2>
 
                                 <p className="text-gray-400 text-base md:text-lg font-light leading-relaxed">
                                     Apakah unit usaha atau lembaga Anda siap untuk berkontribusi dalam pengembangan SDM Kelautan dan Perikanan?

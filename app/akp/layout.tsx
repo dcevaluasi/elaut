@@ -1,14 +1,10 @@
-"use client";
 import "flatpickr/dist/flatpickr.min.css";
 import "@/components/styles/style.css";
-import React, { useEffect, useState } from "react";
-import Loader from "@/components/dashboard/common/Loader";
-
-import { Delius_Unicase, Inter, Plus_Jakarta_Sans } from "next/font/google";
-
+import React from "react";
+import { Delius_Unicase, Plus_Jakarta_Sans } from "next/font/google";
 import localFont from "next/font/local";
-import axios from "axios";
-import Image from "next/image";
+import AkpClientLayout from "./AkpClientLayout";
+import { Metadata } from "next";
 
 const myFont = localFont({
   src: "../font/calsans.ttf",
@@ -27,51 +23,93 @@ const delius = Delius_Unicase({
   variable: "--font-delius",
 });
 
+export const metadata: Metadata = {
+  title: "Sertifikasi & Pelatihan Awak Kapal Perikanan (AKP) | E-LAUT",
+  description:
+    "Daftar sertifikasi Awak Kapal Perikanan (AKP) melalui platform E-LAUT. Tersedia pelatihan BSTF, Kepelautan, dan Sertifikasi Kompetensi Resmi BPPSDM KP Kementerian Kelautan dan Perikanan Indonesia.",
+  keywords: [
+    "Awak Kapal Perikanan",
+    "AKP",
+    "Sertifikasi AKP",
+    "Pelatihan Nelayan",
+    "BSTF",
+    "KKP",
+    "BPPSDM KP",
+    "E-LAUT",
+    "Fisheries Certification Indonesia",
+    "Sertifikat Kecakapan Nelayan",
+    "Diklat Awak Kapal Perikanan",
+    "Pusat Pelatihan KKP",
+  ],
+  authors: [{ name: "BPPSDM KP - Kementerian Kelautan dan Perikanan" }],
+  openGraph: {
+    title: "Sertifikasi & Pelatihan Awak Kapal Perikanan (AKP) | E-LAUT",
+    description:
+      "Platform Elektronik Layanan Pelatihan Kelautan dan Perikanan Terpadu untuk Awak Kapal Perikanan profesional.",
+    url: "https://elaut.kkp.go.id/akp",
+    siteName: "E-LAUT",
+    locale: "id_ID",
+    type: "website",
+    images: [
+      {
+        url: "/images/program-pelatihan/dummies/akp/akp-1.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Pelatihan Awak Kapal Perikanan E-LAUT",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Sertifikasi & Pelatihan Awak Kapal Perikanan (AKP) | E-LAUT",
+    description:
+      "Daftar pelatihan dan sertifikasi AKP resmi kementerian kelautan dan perikanan melalui E-LAUT.",
+    images: ["/images/program-pelatihan/dummies/akp/akp-1.jpg"],
+  },
+  alternates: {
+    canonical: "https://elaut.kkp.go.id/akp",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [loading, setLoading] = useState<boolean>(true);
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "EducationalOrganization",
+    "name": "Awak Kapal Perikanan (AKP) Training Center - E-LAUT",
+    "description": "Pusat pelatihan dan sertifikasi resmi untuk Awak Kapal Perikanan di bawah naungan Kementerian Kelautan dan Perikanan Republik Indonesia.",
+    "url": "https://elaut.kkp.go.id/akp",
+    "logo": "https://elaut.kkp.go.id/logo-kkp.png",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Jakarta",
+      "addressCountry": "ID"
+    }
+  };
 
-  useEffect(() => {
-    setTimeout(() => setLoading(false), 1000);
-  }, []);
-
-  const images = [
-    "/images/program-pelatihan/dummies/akp/akp-1.jpg",
-    "/images/program-pelatihan/dummies/akp/akp-2.jpg",
-    "/images/program-pelatihan/dummies/akp/akp-3.JPG",
-    "/images/program-pelatihan/dummies/akp/akp-4.jpg",
-    "/images/program-pelatihan/dummies/akp/akp-5.jpg",
-  ];
-  const [imageIndex, setImageIndex] = React.useState(0);
-
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 8000);
-
-    return () => clearInterval(interval);
-  }, []);
   return (
-    <html lang="en">
-      <body
-        suppressHydrationWarning={true}
-        className={`${inter.className} mt-0 pt-0 w-full h-full relative ${myFont.variable} ${delius.variable}`}
-      >
-        <div className=" relative">{loading ? <Loader /> : children}</div>
-        {/* <Image
-          src={images[imageIndex]}
-          className="absolute w-full h-full rounded-3xl top-0 object-cover duration-1000  "
-          alt=""
-          layout="fill"
-          priority
-        />
-
-        <div className="absolute w-full h-full rounded-3xl z-[50] top-0 bg-black bg-opacity-70  "></div> */}
-      </body>
-    </html>
+    <div className={`${inter.className} ${myFont.variable} ${delius.variable} antialiased min-h-screen`}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <AkpClientLayout>
+        {children}
+      </AkpClientLayout>
+    </div>
   );
 }
