@@ -4,20 +4,28 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-    Loader2,
-    Save,
-    LayoutDashboard,
-    Award,
-    X,
-    Menu,
-    LogOut,
-    User,
-    Building,
-    MapPin,
-    Briefcase
-} from 'lucide-react';
+    FiBox,
+    FiUser,
+    FiBriefcase,
+    FiAward,
+    FiLogOut,
+    FiMenu,
+    FiX,
+    FiMapPin,
+    FiInfo,
+    FiSave,
+    FiFileText,
+    FiGlobe,
+    FiMail,
+    FiPhone,
+    FiChevronRight,
+    FiActivity,
+    FiLayout,
+    FiCalendar,
+    FiDatabase
+} from 'react-icons/fi';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
@@ -34,7 +42,7 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -43,7 +51,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
     Select,
     SelectContent,
@@ -53,6 +60,8 @@ import {
 } from '@/components/ui/select';
 import { useFetchDataRumpunPelatihan } from '@/hooks/elaut/master/useFetchDataRumpunPelatihan';
 import { elautBaseUrl } from '@/constants/urls';
+import { HashLoader } from 'react-spinners';
+import Toast from '@/commons/Toast';
 
 const formSchema = z.object({
     nama_Ppmkp: z.string().optional(),
@@ -95,15 +104,18 @@ const formSchema = z.object({
 export default function CompleteProfilePage() {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = React.useState(false);
+    const [loading, setLoading] = useState(true);
 
-    // Sidebar State
+    useEffect(() => {
+        const timer = setTimeout(() => setLoading(false), 800);
+        return () => clearTimeout(timer);
+    }, []);
+
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [isMobile, setIsMobile] = useState(false);
 
-    // Fetch Rumpun Pelatihan
     const { data: rumpunPelatihan, loading: loadingRumpun } = useFetchDataRumpunPelatihan();
 
-    // Initial Resize Check
     useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth < 1024) {
@@ -114,7 +126,6 @@ export default function CompleteProfilePage() {
                 setIsSidebarOpen(true);
             }
         };
-
         handleResize();
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
@@ -172,11 +183,6 @@ export default function CompleteProfilePage() {
         try {
             const token = Cookies.get('XSRF091');
             if (!token) {
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Anda belum login atau sesi habis.',
-                    icon: 'error',
-                });
                 router.push('/p2mkp/login');
                 return;
             }
@@ -188,499 +194,317 @@ export default function CompleteProfilePage() {
             });
 
             if (response.status === 200) {
-                Swal.fire({
-                    title: 'Profil Tersimpan!',
-                    text: 'Data profil P2MKP Anda berhasil diperbarui.',
+                Toast.fire({
                     icon: 'success',
-                    confirmButtonText: 'Ke Dashboard',
-                    confirmButtonColor: '#3b82f6',
-                }).then(() => {
-                    router.push('/p2mkp/dashboard');
+                    title: 'Profil Terupdate',
+                    text: 'Seluruh perubahan data profil Anda telah disimpan.'
                 });
+                router.push('/p2mkp/dashboard');
             }
         } catch (error: any) {
             console.error('Submission error:', error);
             Swal.fire({
-                title: 'Gagal Menyimpan',
-                text: error.response?.data?.message || 'Terjadi kesalahan saat menyimpan profil.',
+                title: 'Operation Failed',
+                text: error.response?.data?.message || 'Gagal sinkronisasi data profil.',
                 icon: 'error',
-                confirmButtonText: 'Tutup',
-                confirmButtonColor: '#d33',
+                background: '#0f172a',
+                color: '#fff',
+                confirmButtonColor: '#3b82f6',
             });
         } finally {
             setIsSubmitting(false);
         }
     }
 
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center">
+                <HashLoader color="#3b82f6" size={50} />
+                <p className="mt-6 text-gray-500 text-[10px] font-black uppercase tracking-[0.4em]">Decrypting Profile Core...</p>
+            </div>
+        );
+    }
+
     return (
-        <div className="min-h-screen bg-neutral-50 flex font-sans">
-            {/* Sidebar */}
+        <div className="min-h-screen bg-[#020617] text-white flex font-jakarta overflow-hidden">
+            {/* Ambient Ambient */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px]" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px]" />
+            </div>
+
+            {/* Shared Sidebar */}
             <aside
-                className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}
+                className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-[#0f172a]/60 backdrop-blur-3xl border-r border-white/5 transition-transform duration-500 ease-out shadow-2xl ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}
             >
-                <div className="h-full flex flex-col">
-                    {/* Header Sidebar */}
-                    <div className="h-20 flex items-center px-6 border-b border-white/10">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
-                                <span className="font-bold text-xl">P</span>
+                <div className="h-full flex flex-col pt-8">
+                    <div className="px-8 pb-10 flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                                <FiBox className="text-2xl text-white" />
                             </div>
                             <div>
-                                <h1 className="font-bold text-lg leading-none">P2MKP</h1>
-                                <p className="text-xs text-slate-400">Dashboard Area</p>
+                                <h1 className="font-calsans text-2xl leading-none">P2MKP</h1>
+                                <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mt-1">Management</p>
                             </div>
                         </div>
                         {isMobile && (
-                            <button onClick={() => setIsSidebarOpen(false)} className="ml-auto lg:hidden text-white/70 hover:text-white">
-                                <X className="w-6 h-6" />
+                            <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-gray-500 hover:text-white">
+                                <FiX size={24} />
                             </button>
                         )}
                     </div>
 
-                    {/* Navigation */}
-                    <nav className="flex-1 py-6 px-3 space-y-1">
-                        <NavItem href="/p2mkp/dashboard" icon={<LayoutDashboard />} label="Dashboard" />
-                        <NavItem href="/p2mkp/dashboard/penetapan" icon={<Award />} label="Penetapan P2MKP" />
-                    </nav>
-                </div>
-            </aside>
+                    <div className="flex-1 px-4 space-y-8">
+                        <div className="space-y-1">
+                            <p className="px-4 text-[10px] font-black text-gray-600 uppercase tracking-widest mb-4">Core Menu</p>
+                            <SidebarItem href="/p2mkp/dashboard" icon={<FiActivity />} label="Overview" />
+                            <SidebarItem href="/p2mkp/dashboard/penetapan" icon={<FiAward />} label="Penetapan P2MKP" />
+                        </div>
 
-            {/* Main Content */}
-            <main className="flex-1 flex flex-col overflow-hidden h-screen">
-                {/* Header Top */}
-                <header className="h-20 bg-white border-b border-neutral-200 flex items-center justify-between px-6 lg:px-10 shrink-0">
-                    <div className="flex items-center gap-4">
-                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 hover:bg-neutral-100 rounded-lg lg:hidden">
-                            <Menu className="w-6 h-6 text-neutral-600" />
-                        </button>
-                        <div className="hidden md:flex items-center gap-2 text-neutral-400 text-sm">
-                            <Link href="/p2mkp/dashboard" className="hover:text-blue-600 transition-colors">Dashboard</Link>
-                            <span>/</span>
-                            <span className="text-neutral-900 font-medium">Lengkapi Profil</span>
+                        <div className="space-y-1">
+                            <p className="px-4 text-[10px] font-black text-gray-600 uppercase tracking-widest mb-4">Reports</p>
+                            <SidebarItem href="/p2mkp/laporan-kegiatan" icon={<FiFileText />} label="Create Report" />
+                            <SidebarItem href="/p2mkp/laporan-kegiatan/report" icon={<FiDatabase />} label="Report History" />
+                        </div>
+
+                        <div className="space-y-1">
+                            <p className="px-4 text-[10px] font-black text-gray-600 uppercase tracking-widest mb-4">Account</p>
+                            <SidebarItem href="/p2mkp/dashboard/complete-profile" icon={<FiUser />} label="Profile Lembaga" active />
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    <div className="p-6">
+                        <div className="bg-white/5 rounded-[2rem] border border-white/5 p-6 relative overflow-hidden group">
+                            <div className="relative z-10 space-y-3 font-bold text-center">
+                                <p className="text-[10px] text-gray-500 uppercase tracking-widest">Profile Completion</p>
+                                <div className="text-2xl font-calsans text-blue-400">85%</div>
+                                <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                                    <div className="w-[85%] h-full bg-blue-500" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
 
-                        <div className="h-8 w-px bg-neutral-200 mx-1"></div>
+            {/* Main Content Area */}
+            <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                {/* Header Top */}
+                <header className="h-24 bg-transparent flex items-center justify-between px-8 lg:px-12 shrink-0 z-20">
+                    <div className="flex items-center gap-6">
+                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl lg:hidden text-blue-400 border border-white/5">
+                            <FiMenu size={20} />
+                        </button>
+                        <div className="hidden md:flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest">
+                            <Link href="/p2mkp/dashboard" className="text-gray-500 hover:text-white transition-colors">Dashboard</Link>
+                            <span className="text-gray-700">/</span>
+                            <span className="text-blue-400">Complete Profile</span>
+                        </div>
+                    </div>
 
+                    <div className="flex items-center gap-8">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <button className="flex items-center gap-3 hover:bg-neutral-50 p-1.5 rounded-full pl-3 transition-colors border border-transparent hover:border-neutral-200">
-                                    <div className="text-right hidden md:block">
-                                        <p className="text-sm font-semibold text-neutral-900 leading-none">Admin P2MKP</p>
-                                        <p className="text-xs text-neutral-500 mt-1">Pengelola</p>
+                                <button className="flex items-center gap-4 hover:bg-white/5 p-1.5 rounded-2xl transition-all border border-transparent hover:border-white/10">
+                                    <div className="text-right hidden sm:block">
+                                        <p className="text-xs font-bold text-white leading-none">Admin P2MKP</p>
+                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter mt-1">Institutional Lead</p>
                                     </div>
-                                    <Avatar className="h-9 w-9 border-2 border-white shadow-sm">
-                                        <AvatarImage src="https://github.com/shadcn.png" />
+                                    <Avatar className="h-10 w-10 border-2 border-white/10 shadow-xl rounded-2xl overflow-hidden">
+                                        <AvatarImage src="https://github.com/shadcn.png" className="rounded-2xl" />
                                         <AvatarFallback>AD</AvatarFallback>
                                     </Avatar>
                                 </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-56">
-                                <DropdownMenuLabel>Akun Saya</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem className="cursor-pointer">Profil</DropdownMenuItem>
-                                <DropdownMenuItem className="cursor-pointer">Pengaturan</DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50">
-                                    <LogOut className="w-4 h-4 mr-2" />
-                                    Keluar
+                            <DropdownMenuContent align="end" className="w-64 bg-[#0f172a]/95 backdrop-blur-3xl border-white/10 text-white p-2 rounded-[2rem] mt-2 shadow-2xl">
+                                <DropdownMenuLabel className="px-4 py-4 font-calsans text-lg text-blue-400">Portal Akses</DropdownMenuLabel>
+                                <DropdownMenuSeparator className="bg-white/5" />
+                                <DropdownMenuItem onClick={handleLogout} className="p-3 rounded-xl hover:bg-rose-500/10 cursor-pointer text-rose-400 text-xs font-black tracking-widest">
+                                    <FiLogOut className="mr-3" size={16} /> LOGOUT SESSION
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
                 </header>
 
-                <div className="flex-1 overflow-y-auto p-6 lg:p-10">
+                <div className="flex-1 overflow-y-auto p-8 lg:p-12 pt-4">
                     <motion.div
-                        initial={{ opacity: 0, y: 10 }}
+                        initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4 }}
-                        className="max-w-6xl mx-auto"
+                        className="max-w-5xl mx-auto space-y-12 pb-24"
                     >
-                        <div className="mb-8">
-                            <h1 className="text-2xl font-bold text-neutral-900">Lengkapi Profil P2MKP</h1>
-                            <p className="text-neutral-500">Lengkapi data profil kelembagaan dan penanggung jawab.</p>
+                        <div className="space-y-4">
+                            <h1 className="text-4xl md:text-5xl font-calsans">Complete <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Registry</span></h1>
+                            <p className="text-gray-500 text-sm max-w-2xl font-light italic leading-relaxed">
+                                Mohon lengkapi seluruh data kredensial lembaga dan penanggung jawab untuk proses verifikasi standarisasi P2MKP.
+                            </p>
                         </div>
 
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
                                 {/* Section 1: Data Umum Kelembagaan */}
-                                <Card className="border-neutral-200 shadow-sm">
-                                    <CardHeader>
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
-                                                <Building className="w-5 h-5" />
-                                            </div>
-                                            <CardTitle className="text-lg">Informasi Kelembagaan</CardTitle>
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-0">
-                                        <FormField
-                                            control={form.control}
-                                            name="nama_Ppmkp"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Nama P2MKP</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="Nama lengkap P2MKP" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
+                                <FormCard
+                                    icon={<FiBriefcase />}
+                                    title="Informasi Kelembagaan"
+                                    subtitle="Identitas inti dan legalitas lembaga P2MKP"
+                                    color="blue"
+                                >
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <FormFieldItem label="Nama P2MKP" name="nama_Ppmkp" control={form.control} placeholder="Masukkan Nama Resmi..." icon={<FiBriefcase />} />
                                         <FormField
                                             control={form.control}
                                             name="status_kepemilikan"
                                             render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Status Kepemilikan</FormLabel>
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Status Kepemilikan</FormLabel>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                         <FormControl>
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder="Pilih Status" />
+                                                            <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
+                                                                <SelectValue placeholder="Pilih Status..." />
                                                             </SelectTrigger>
                                                         </FormControl>
-                                                        <SelectContent>
-                                                            <SelectItem value="Perserorangan">Perserorangan</SelectItem>
-                                                            <SelectItem value="Kelompok">Kelompok</SelectItem>
-                                                            <SelectItem value="Instansi Pemerintah">Instansi Pemerintah</SelectItem>
-                                                            <SelectItem value="Swasta">Swasta</SelectItem>
+                                                        <SelectContent className="bg-[#0f172a] border-white/10 text-white backdrop-blur-3xl rounded-2xl">
+                                                            {['Perserorangan', 'Kelompok', 'Instansi Pemerintah', 'Swasta'].map(val => (
+                                                                <SelectItem key={val} value={val} className="hover:bg-blue-600/20 rounded-lg py-3 cursor-pointer">{val}</SelectItem>
+                                                            ))}
                                                         </SelectContent>
                                                     </Select>
-                                                    <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
-                                        <FormField
-                                            control={form.control}
-                                            name="nib"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Nomor Induk Berusaha (NIB)</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="Nomor NIB" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="email"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Email P2MKP</FormLabel>
-                                                    <FormControl>
-                                                        <Input type="email" placeholder="alamat@email.com" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="password"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Password (Opsional)</FormLabel>
-                                                    <FormControl>
-                                                        <Input type="password" placeholder="Isi jika ingin mengubah password" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="no_telp"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Nomor Telepon P2MKP</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="08..." {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
+                                        <FormFieldItem label="NIB (Nomor Induk Berusaha)" name="nib" control={form.control} placeholder="Enter NIB Code..." icon={<FiFileText />} />
+                                        <FormFieldItem label="Email Official" name="email" control={form.control} placeholder="admin@p2mkp.go.id" icon={<FiMail />} type="email" />
+                                        <FormFieldItem label="Update Password" name="password" control={form.control} placeholder="Leave blank to keep current..." icon={<FiGlobe />} type="password" />
+                                        <FormFieldItem label="Kontak Telepon" name="no_telp" control={form.control} placeholder="08XXXXXXXXXX" icon={<FiPhone />} />
                                         <FormField
                                             control={form.control}
                                             name="is_lpk"
                                             render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Apakah LPK?</FormLabel>
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Apakah Lembaga LPK?</FormLabel>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                         <FormControl>
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder="Pilih..." />
+                                                            <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
+                                                                <SelectValue placeholder="Konfirmasi LPK..." />
                                                             </SelectTrigger>
                                                         </FormControl>
-                                                        <SelectContent>
-                                                            <SelectItem value="Ya">Ya</SelectItem>
-                                                            <SelectItem value="Tidak">Tidak</SelectItem>
+                                                        <SelectContent className="bg-[#0f172a] border-white/10 text-white backdrop-blur-3xl rounded-2xl">
+                                                            <SelectItem value="Ya" className="hover:bg-blue-600/20 rounded-lg py-3 cursor-pointer">Ya, Terdaftar LPK</SelectItem>
+                                                            <SelectItem value="Tidak" className="hover:bg-blue-600/20 rounded-lg py-3 cursor-pointer">Tidak</SelectItem>
                                                         </SelectContent>
                                                     </Select>
-                                                    <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
-                                    </CardContent>
-                                </Card>
+                                    </div>
+                                </FormCard>
 
                                 {/* Section 2: Alamat */}
-                                <Card className="border-neutral-200 shadow-sm">
-                                    <CardHeader>
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-amber-100 text-amber-600 rounded-lg">
-                                                <MapPin className="w-5 h-5" />
-                                            </div>
-                                            <CardTitle className="text-lg">Alamat Lengkap</CardTitle>
+                                <FormCard
+                                    icon={<FiMapPin />}
+                                    title="Lokasi Operasional"
+                                    subtitle="Koordinat dan alamat fisik kantor pusat"
+                                    color="indigo"
+                                >
+                                    <div className="space-y-8">
+                                        <FormFieldItem label="Alamat Spesifik" name="alamat" control={form.control} placeholder="Jalan, No, RT/RW..." icon={<FiMapPin />} />
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                            <FormFieldItem label="Provinsi" name="provinsi" control={form.control} placeholder="Nama Provinsi..." />
+                                            <FormFieldItem label="Kota/Kabupaten" name="kota" control={form.control} placeholder="Nama Kota..." />
+                                            <FormFieldItem label="Kecamatan" name="kecamatan" control={form.control} placeholder="Kecamatan..." />
+                                            <FormFieldItem label="Kelurahan" name="kelurahan" control={form.control} placeholder="Kelurahan..." />
+                                            <FormFieldItem label="Kode Pos" name="kode_pos" control={form.control} placeholder="5 Digit..." maxlength={5} />
                                         </div>
-                                    </CardHeader>
-                                    <CardContent className="space-y-6 pt-0">
-                                        <FormField
-                                            control={form.control}
-                                            name="alamat"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Alamat (Jalan, RT/RW)</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="Nama jalan, nomor, RT/RW" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                            <FormField
-                                                control={form.control}
-                                                name="provinsi"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Provinsi</FormLabel>
-                                                        <FormControl>
-                                                            <Input placeholder="Nama Provinsi" {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <FormField
-                                                control={form.control}
-                                                name="kota"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Kota/Kabupaten</FormLabel>
-                                                        <FormControl>
-                                                            <Input placeholder="Nama Kota/Kabupaten" {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <FormField
-                                                control={form.control}
-                                                name="kecamatan"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Kecamatan</FormLabel>
-                                                        <FormControl>
-                                                            <Input placeholder="Nama Kecamatan" {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <FormField
-                                                control={form.control}
-                                                name="kelurahan"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Kelurahan/Desa</FormLabel>
-                                                        <FormControl>
-                                                            <Input placeholder="Nama Kelurahan/Desa" {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <FormField
-                                                control={form.control}
-                                                name="kode_pos"
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>Kode Pos</FormLabel>
-                                                        <FormControl>
-                                                            <Input placeholder="5 Digit Kode Pos" {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
-                                    </CardContent>
-                                </Card>
+                                    </div>
+                                </FormCard>
 
-                                {/* Section 3: Bidang Pelatihan & Klasifikasi */}
-                                <Card className="border-neutral-200 shadow-sm">
-                                    <CardHeader>
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg">
-                                                <Briefcase className="w-5 h-5" />
-                                            </div>
-                                            <CardTitle className="text-lg">Pelatihan & Klasifikasi</CardTitle>
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-0">
+                                {/* Section 3: Bidang Pelatihan */}
+                                <FormCard
+                                    icon={<FiActivity />}
+                                    title="Spesialisasi Pelatihan"
+                                    subtitle="Cakupan rumpun dan jenis kompetensi"
+                                    color="cyan"
+                                >
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         <FormField
                                             control={form.control}
                                             name="jenis_bidang_pelatihan"
                                             render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Jenis Bidang Pelatihan</FormLabel>
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Rumpun Utama</FormLabel>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                         <FormControl>
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder={loadingRumpun ? "Memuat..." : "Pilih Rumpun Pelatihan"} />
+                                                            <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
+                                                                <SelectValue placeholder={loadingRumpun ? "Syncing..." : "Pilih Rumpun..."} />
                                                             </SelectTrigger>
                                                         </FormControl>
-                                                        <SelectContent>
+                                                        <SelectContent className="bg-[#0f172a] border-white/10 text-white backdrop-blur-3xl rounded-2xl">
                                                             {rumpunPelatihan?.map((item: any) => (
-                                                                <SelectItem key={item.id_rumpun_pelatihan} value={String(item.id_rumpun_pelatihan)}>
+                                                                <SelectItem key={item.id_rumpun_pelatihan} value={String(item.id_rumpun_pelatihan)} className="hover:bg-cyan-600/20 rounded-lg py-3 cursor-pointer">
                                                                     {item.name}
                                                                 </SelectItem>
                                                             ))}
                                                         </SelectContent>
                                                     </Select>
-                                                    <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
-                                        <FormField
-                                            control={form.control}
-                                            name="jenis_pelatihan"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Jenis Pelatihan</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="Contoh: Budidaya Lele" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </CardContent>
-                                </Card>
+                                        <FormFieldItem label="Spesifikasi Pelatihan" name="jenis_pelatihan" control={form.control} placeholder="Contoh: Budidaya Ikan Nila..." icon={<FiAward />} />
+                                    </div>
+                                </FormCard>
 
-                                {/* Section 4: Document Links (Text Inputs for now) */}
-                                <Card className="border-neutral-200 shadow-sm">
-                                    <CardHeader>
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-slate-100 text-slate-600 rounded-lg">
-                                                <Save className="w-5 h-5" />
-                                            </div>
-                                            <CardTitle className="text-lg">Dokumen Pendukung</CardTitle>
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-0">
+                                {/* Section 4: Document Links */}
+                                <FormCard
+                                    icon={<FiFileText />}
+                                    title="Kumpulan Dokumentasi"
+                                    subtitle="Link verifikasi berkas pendukung"
+                                    color="emerald"
+                                >
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         {[
-                                            { name: "dokumen_identifikasi_pemilik", label: "Dok. Identifikasi Pemilik" },
-                                            { name: "dokumen_asesment_mandiri", label: "Dok. Asesmen Mandiri" },
-                                            { name: "dokument_surat_pernyataan", label: "Dok. Surat Pernyataan" },
-                                            { name: "dokumen_keterangan_usaha", label: "Dok. Keterangan Usaha" },
-                                            { name: "dokumen_afiliasi_parpol", label: "Dok. Afiliasi Parpol" },
-                                            { name: "dokumen_rekomendasi_dinas", label: "Dok. Rekomendasi Dinas" },
-                                            { name: "dokumen_permohonan_pembentukan", label: "Dok. Permohonan Pembentukan" },
-                                            { name: "dokumen_permohonan_klasifikasi", label: "Dok. Permohonan Klasifikasi" },
+                                            { name: "dokumen_identifikasi_pemilik", label: "ID Pemilik" },
+                                            { name: "dokumen_asesment_mandiri", label: "Self Asesmen" },
+                                            { name: "dokument_surat_pernyataan", label: "Surat Pernyataan" },
+                                            { name: "dokumen_keterangan_usaha", label: "Izin Usaha" },
+                                            { name: "dokumen_afiliasi_parpol", label: "Non-Parpol Statement" },
+                                            { name: "dokumen_rekomendasi_dinas", label: "Rekomendasi Dinas" },
+                                            { name: "dokumen_permohonan_pembentukan", label: "Surat Permohonan" },
+                                            { name: "dokumen_permohonan_klasifikasi", label: "Kuesioner Klasifikasi" },
                                         ].map((doc) => (
-                                            <FormField
-                                                key={doc.name}
-                                                control={form.control}
-                                                name={doc.name as any}
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>{doc.label}</FormLabel>
-                                                        <FormControl>
-                                                            <Input placeholder="Link/Path Dokumen..." {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
+                                            <FormFieldItem key={doc.name} label={doc.label} name={doc.name} control={form.control} placeholder="Cloud Drive Link..." icon={<FiGlobe />} />
                                         ))}
-                                    </CardContent>
-                                </Card>
+                                    </div>
+                                </FormCard>
 
                                 {/* Section 5: Penanggung Jawab */}
-                                <Card className="border-neutral-200 shadow-sm">
-                                    <CardHeader>
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-purple-100 text-purple-600 rounded-lg">
-                                                <User className="w-5 h-5" />
-                                            </div>
-                                            <CardTitle className="text-lg">Data Penanggung Jawab</CardTitle>
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-0">
-                                        <FormField
-                                            control={form.control}
-                                            name="nama_penanggung_jawab"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Nama Lengkap</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="Nama Penanggung Jawab" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="no_telp_penanggung_jawab"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>No. Telepon/WA</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="08..." {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="tempat_tanggal_lahir"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Tempat, Tanggal Lahir</FormLabel>
-                                                    <FormControl>
-                                                        <Input placeholder="Kota, DD-MM-YYYY" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
+                                <FormCard
+                                    icon={<FiUser />}
+                                    title="Penanggung Jawab"
+                                    subtitle="Personal data penanggung jawab lembaga"
+                                    color="purple"
+                                >
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        <FormFieldItem label="Nama Lengkap & Gelar" name="nama_penanggung_jawab" control={form.control} placeholder="Full legal name..." icon={<FiUser />} />
+                                        <FormFieldItem label="Kontak PIC" name="no_telp_penanggung_jawab" control={form.control} placeholder="WhatsApp/Phone..." icon={<FiPhone />} />
+                                        <FormFieldItem label="Tempat, Tanggal Lahir" name="tempat_tanggal_lahir" control={form.control} placeholder="City, DD-MM-YYYY" icon={<FiCalendar />} />
                                         <FormField
                                             control={form.control}
                                             name="jenis_kelamin"
                                             render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Jenis Kelamin</FormLabel>
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Gender</FormLabel>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                         <FormControl>
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder="Pilih Jenis Kelamin" />
+                                                            <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
+                                                                <SelectValue placeholder="Pilih..." />
                                                             </SelectTrigger>
                                                         </FormControl>
-                                                        <SelectContent>
-                                                            <SelectItem value="Laki-laki">Laki-laki</SelectItem>
-                                                            <SelectItem value="Perempuan">Perempuan</SelectItem>
+                                                        <SelectContent className="bg-[#0f172a] border-white/10 text-white backdrop-blur-3xl rounded-2xl">
+                                                            <SelectItem value="Laki-laki" className="hover:bg-purple-600/20 rounded-lg py-3 cursor-pointer">Laki-laki</SelectItem>
+                                                            <SelectItem value="Perempuan" className="hover:bg-purple-600/20 rounded-lg py-3 cursor-pointer">Perempuan</SelectItem>
                                                         </SelectContent>
                                                     </Select>
-                                                    <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
@@ -688,64 +512,136 @@ export default function CompleteProfilePage() {
                                             control={form.control}
                                             name="pendidikan_terakhir"
                                             render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Pendidikan Terakhir</FormLabel>
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Pendidikan Terakhir</FormLabel>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                         <FormControl>
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder="Pilih Pendidikan" />
+                                                            <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
+                                                                <SelectValue placeholder="Kualifikasi..." />
                                                             </SelectTrigger>
                                                         </FormControl>
-                                                        <SelectContent>
-                                                            <SelectItem value="SD">SD/Sederajat</SelectItem>
-                                                            <SelectItem value="SMP">SMP/Sederajat</SelectItem>
-                                                            <SelectItem value="SMA">SMA/SMK/Sederajat</SelectItem>
-                                                            <SelectItem value="D3">D3</SelectItem>
-                                                            <SelectItem value="S1">S1/D4</SelectItem>
-                                                            <SelectItem value="S2">S2</SelectItem>
-                                                            <SelectItem value="S3">S3</SelectItem>
-                                                            <SelectItem value="Lainnya">Lainnya</SelectItem>
+                                                        <SelectContent className="bg-[#0f172a] border-white/10 text-white backdrop-blur-3xl rounded-2xl">
+                                                            {['SD', 'SMP', 'SMA', 'D3', 'S1', 'S2', 'S3', 'Lainnya'].map(val => (
+                                                                <SelectItem key={val} value={val} className="hover:bg-purple-600/20 rounded-lg py-3 cursor-pointer">{val}</SelectItem>
+                                                            ))}
                                                         </SelectContent>
                                                     </Select>
-                                                    <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
-                                    </CardContent>
-                                </Card>
+                                    </div>
+                                </FormCard>
 
-                                <div className="flex justify-end pt-4">
-                                    <Button type="submit" disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-700 min-w-[200px] h-12 text-lg">
+                                <div className="pt-10 flex justify-end">
+                                    <button
+                                        type="submit"
+                                        disabled={isSubmitting}
+                                        className="group/save relative w-full md:w-auto min-w-[300px] h-16 bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90 text-white rounded-[2rem] font-black tracking-[0.2em] shadow-2xl transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50 overflow-hidden"
+                                    >
                                         {isSubmitting ? (
-                                            <>
-                                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                                Menyimpan...
-                                            </>
+                                            <HashLoader color="#fff" size={24} />
                                         ) : (
                                             <>
-                                                <Save className="mr-2 h-5 w-5" />
-                                                Simpan Profil
+                                                <FiSave size={20} className="group-hover:translate-y-[-2px] transition-transform" />
+                                                SUBMIT UPDATED PROFILE
                                             </>
                                         )}
-                                    </Button>
+                                        <div className="absolute inset-0 w-12 bg-white/20 -skew-x-12 translate-x-[-200%] group-hover/save:translate-x-[600%] transition-transform duration-1000" />
+                                    </button>
                                 </div>
                             </form>
                         </Form>
                     </motion.div>
                 </div>
-            </main>
+            </div>
         </div>
     );
 }
 
-// Components
-function NavItem({ href, icon, label, active }: { href: string, icon: React.ReactNode, label: string, active?: boolean }) {
+// Visual Sidebar Item
+function SidebarItem({ href, icon, label, active }: any) {
     return (
-        <Link href={href}>
-            <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${active ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
-                {React.cloneElement(icon as React.ReactElement, { size: 20 })}
-                <span className="font-medium text-sm">{label}</span>
-            </div>
+        <Link href={href} className="block px-4">
+            <motion.div
+                whileHover={{ x: 5 }}
+                className={`flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all duration-300 relative group ${active ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20' : 'text-gray-500 hover:bg-white/5 hover:text-gray-200'}`}
+            >
+                <span className={`text-xl transition-transform group-hover:scale-110 ${active ? 'text-white' : 'text-gray-600 group-hover:text-blue-400'}`}>
+                    {icon}
+                </span>
+                <span className={`text-xs font-bold tracking-wide ${active ? 'font-black' : ''}`}>{label}</span>
+                {active && (
+                    <motion.div layoutId="navBar" className="absolute left-0 w-1 h-6 bg-white rounded-full ml-1" />
+                )}
+            </motion.div>
         </Link>
+    );
+}
+
+// Premium Form Card Container
+function FormCard({ icon, title, subtitle, children, color }: any) {
+    const colors: any = {
+        blue: "text-blue-400 bg-blue-500/10 border-blue-500/20",
+        indigo: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20",
+        cyan: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
+        emerald: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+        purple: "text-purple-400 bg-purple-500/10 border-purple-500/20"
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="group p-8 md:p-12 rounded-[3.5rem] bg-[#0f172a]/40 backdrop-blur-3xl border border-white/5 shadow-2xl space-y-12 relative overflow-hidden transition-all duration-700 hover:border-white/10"
+        >
+            <div className={`absolute top-0 right-0 p-16 opacity-5 group-hover:opacity-10 transition-opacity`}>
+                <div className="text-9xl">{icon}</div>
+            </div>
+
+            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 pb-8 border-b border-white/5">
+                <div className="flex items-center gap-6">
+                    <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-3xl border ${colors[color]}`}>
+                        {icon}
+                    </div>
+                    <div className="space-y-1">
+                        <h3 className="text-2xl font-calsans tracking-tight text-white">{title}</h3>
+                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.2em]">{subtitle}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="relative z-10">
+                {children}
+            </div>
+        </motion.div>
+    );
+}
+
+// Reusable Form Field Item
+function FormFieldItem({ label, name, control, placeholder, icon, type = "text", ...props }: any) {
+    return (
+        <FormField
+            control={control}
+            name={name}
+            render={({ field }) => (
+                <FormItem className="space-y-2">
+                    <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">{label}</FormLabel>
+                    <FormControl>
+                        <div className="relative group/input">
+                            {icon && <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/input:text-blue-400 transition-colors">{icon}</span>}
+                            <Input
+                                placeholder={placeholder}
+                                type={type}
+                                {...field}
+                                {...props}
+                                className={`w-full ${icon ? 'pl-12' : 'pl-5'} pr-5 py-6 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all placeholder:text-gray-600 h-14`}
+                            />
+                        </div>
+                    </FormControl>
+                    <FormMessage className="text-rose-400 text-[10px] font-bold mt-1" />
+                </FormItem>
+            )}
+        />
     );
 }
