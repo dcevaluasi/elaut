@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import Cookies from 'js-cookie';
+import { setSecureCookie } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -56,8 +57,8 @@ export default function P2MKPLoginPage() {
             if (response.status === 200) {
                 const token = response.data.token || response.data.access_token;
                 if (token) {
-                    Cookies.set('XSRF091', token);
-                    Cookies.set('Access', 'p2mkp');
+                    setSecureCookie('XSRF091', token);
+                    setSecureCookie('Access', 'p2mkp');
                 }
 
                 Toast.fire({
@@ -69,7 +70,7 @@ export default function P2MKPLoginPage() {
                 router.push('/p2mkp/dashboard');
             }
         } catch (error: any) {
-            console.error('Login error:', error);
+            // console.error('Login error:', error);
             Swal.fire({
                 title: 'Otentikasi Gagal',
                 text: error.response?.data?.message || 'Email atau password yang Anda masukkan salah.',

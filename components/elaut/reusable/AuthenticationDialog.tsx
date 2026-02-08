@@ -4,6 +4,7 @@ import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, A
 import { Button } from "@/components/ui/button";
 import Cookies from "js-cookie";
 import { LogIn, UserPlus, Info } from "lucide-react";
+import { setSecureCookie } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -16,7 +17,7 @@ interface Props {
 export default function AuthenticationDialog({ open, setOpen }: Props) {
     const pathUrl = usePathname()
     React.useEffect(() => {
-        Cookies.set('XSRF088', pathUrl)
+        setSecureCookie('XSRF088', pathUrl)
     }, [])
 
     return (
@@ -51,7 +52,7 @@ export default function AuthenticationDialog({ open, setOpen }: Props) {
                     {/* Register Option */}
                     <Link href="/registrasi">
                         <Button
-                            onClick={() => Cookies.set('XSRF087', '1')}
+                            onClick={() => setSecureCookie('XSRF087', '1')}
                             className="w-full flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg"
                         >
                             <UserPlus className="h-5 w-5" />

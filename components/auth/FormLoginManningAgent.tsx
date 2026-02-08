@@ -12,6 +12,8 @@ import Cookies from "js-cookie";
 // RECAPTCHA
 import ReCAPTCHA from "react-google-recaptcha";
 import Toast from "@/commons/Toast";
+import { setSecureCookie } from "@/lib/utils";
+import { sanitizedDangerousChars } from "@/utils/input";
 
 function FormLoginManningAgent() {
   /* state variable to store basic user information to register */
@@ -40,8 +42,8 @@ function FormLoginManningAgent() {
             const response: AxiosResponse = await axios.post(
               `${baseUrl}/manningAgent/loginManningAgent`,
               JSON.stringify({
-                email: email,
-                password: password,
+                email: sanitizedDangerousChars(email),
+                password: sanitizedDangerousChars(password),
               }),
               {
                 headers: {
@@ -49,9 +51,9 @@ function FormLoginManningAgent() {
                 },
               }
             );
-            console.log({ response });
+            // console.log({ response });
 
-            Cookies.set("XSRF081", response.data.t, { expires: 1 });
+            setSecureCookie("XSRF081", response.data.t);
 
             if (Cookies.get("XSRF085")) {
               Toast.fire({
@@ -82,7 +84,7 @@ function FormLoginManningAgent() {
               }
             }
           } catch (error: any) {
-            console.error({ error });
+            // console.error({ error });
             if (
               error.response &&
               error.response.data &&

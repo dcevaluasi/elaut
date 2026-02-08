@@ -1,7 +1,27 @@
 import CryptoJS from 'crypto-js';
+import Cookies from 'js-cookie';
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { MateriPelatihan } from '@/types/product';
+
+/**
+ * Sets a secure cookie with optimal production settings
+ */
+export const setSecureCookie = (name: string, value: string, expires: number = 1) => {
+  Cookies.set(name, value, {
+    expires,
+    secure: process.env.NEXT_PUBLIC_NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/',
+  });
+}
+
+/**
+ * Removes a secure cookie
+ */
+export const removeSecureCookie = (name: string) => {
+  Cookies.remove(name, { path: '/' });
+}
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

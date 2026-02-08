@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import React, { FormEvent, MouseEventHandler } from "react";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import Cookies from "js-cookie";
+import { setSecureCookie } from "@/lib/utils";
 
 import {
   Select,
@@ -83,7 +84,7 @@ function FormRegistrasi() {
 
         if (Array.isArray(response.data.data) && response.data.data.length > 0) {
           const data = response.data.data[0];
-          console.log({ response });
+          // console.log({ response });
           setIsKusukaUser(true);
           setName(data.NamaPelakuUtama?.toUpperCase());
           setEmail("");
@@ -92,7 +93,7 @@ function FormRegistrasi() {
           setOpenInfoKusuka(true);
           setIsHandlingCekKUSUKA(false)
         } else {
-          console.log({ response });
+          // console.log({ response });
           setOpenInfoKusuka(true);
           setIsKusukaUser(false);
           setIsHandlingCekKUSUKA(false)
@@ -107,15 +108,15 @@ function FormRegistrasi() {
           text: `Internal server error, hubungi helpdesk!`,
         });
         if (error.response) {
-          console.error("Response data:", error.response.data);
-          console.error("Response status:", error.response.status);
-          console.error("Response headers:", error.response.headers);
+          // console.error("Response data:", error.response.data);
+          // console.error("Response status:", error.response.status);
+          // console.error("Response headers:", error.response.headers);
         } else if (error.request) {
-          console.error("Request data:", error.request);
+          // console.error("Request data:", error.request);
         } else {
-          console.error("Error message:", error.message);
+          // console.error("Error message:", error.message);
         }
-        console.error("Error config:", error.config);
+        // console.error("Error config:", error.config);
 
       }
     }
@@ -202,7 +203,7 @@ function FormRegistrasi() {
                   }
                 );
 
-                Cookies.set("XSRF083", "true");
+                setSecureCookie("XSRF083", "true");
 
                 Toast.fire({
                   icon: "success",
@@ -211,7 +212,7 @@ function FormRegistrasi() {
                 });
                 router.push("/login");
               } catch (error: any) {
-                console.error({ error });
+                // console.error({ error });
                 if (
                   error.response &&
                   error.response.data &&
@@ -309,7 +310,7 @@ function FormRegistrasi() {
                     },
                   }
                 );
-                Cookies.set("XSRF083", "true");
+                setSecureCookie("XSRF083", "true");
 
                 Toast.fire({
                   icon: "success",
@@ -492,7 +493,7 @@ function FormRegistrasi() {
                   onClick={(e) => {
                     setOpenInfoKusuka(false);
                     setIsKUSUKA("yes");
-                    Cookies.set("IsUsedKusuka", "yes");
+                    setSecureCookie("IsUsedKusuka", "yes");
                   }}
                   className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg transition-all h-10"
                 >

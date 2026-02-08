@@ -6,6 +6,8 @@ import Cookies from "js-cookie";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { setSecureCookie } from "@/lib/utils";
+import { sanitizedDangerousChars } from "@/utils/input";
 
 function page() {
   const baseUrl = process.env.NEXT_PUBLIC_BLANKO_AKAPI_URL;
@@ -15,13 +17,6 @@ function page() {
     */
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
-  /*
-    method for resting all state data login (LOG)
-*/
-  const logAllStates = () => {
-    console.log("username:", username);
-    console.log("password:", password);
-  };
 
   const resetAllStateToEmptyString = () => {
     setUsername("");
@@ -38,14 +33,13 @@ function page() {
     data.append("username", username);
     data.append("password", password);
 
-    logAllStates();
 
     try {
       const response: AxiosResponse = await axios.post(
         `${baseUrl}/adminpusat/login`,
         JSON.stringify({
-          username: username,
-          password: password,
+          username: sanitizedDangerousChars(username),
+          password: sanitizedDangerousChars(password),
         }),
         {
           headers: {
@@ -53,20 +47,20 @@ function page() {
           },
         }
       );
-      console.log({ response });
-      console.log("Successfully logged in");
+      // console.log({ response });
+      // console.log("Successfully logged in");
       Toast.fire({
         icon: "success",
         title: `Berhasil login ke admin AKAPI Puslat!`,
       });
 
-      Cookies.set("XSRF091", response.data.t);
-      Cookies.set("XSRF092", "true");
+      setSecureCookie("XSRF091", response.data.t);
+      setSecureCookie("XSRF092", "true");
 
       resetAllStateToEmptyString();
       router.push(`/akp/puslat/dashboard`);
     } catch (error) {
-      console.error("Error saat melakukan login", error);
+      // console.error("Error saat melakukan login", error);
       Toast.fire({
         icon: "error",
         title: `Gagal melakukan login, harap coba lagi nanti!`,

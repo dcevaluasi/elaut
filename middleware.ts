@@ -1,111 +1,70 @@
 import { NextResponse } from 'next/server'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { decryptValue } from './lib/utils'
+import type { NextRequest } from 'next/server'
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  const randomId = Math.random().toString(36).substring(2, 10)
-  res.redirect(307, `/${randomId}/auth/login`)
-}
+// Centralized route protection configuration
+const AUTH_COOKIE = 'XSRF081'       // Basic auth
+const PROFILE_COOKIE = 'XSRF087'    // Profile status
+const ADMIN_COOKIE = 'XSRF091'      // Admin access
 
-export function middleware(request: any) {
-  // if (request.headers.get("x-forwarded-proto") === "http") {
-  //   return NextResponse.redirect(`https://${request.headers.get("host")}${request.nextUrl.pathname}`, 301);
-  // }
+const PROTECTED_USER_ROUTES = ['/dashboard/edit-profile', '/dashboard']
+const PUBLIC_ONLY_ROUTES = ['/registrasi', '/login']
+const INCOMPLETE_PROFILE_REDIRECTS = [
+  '/',
+  '/layanan/pelatihan/program/akp',
+  '/layanan/pelatihan/program/perikanan',
+  '/layanan/pelatihan/program/kelautan',
+  '/layanan/cek-sertifikat'
+]
 
-  const XSRF091 = request.cookies.get('XSRF091')
-  const XSRF081 = request.cookies.get('XSRF081')
-  const XSRF087 = request.cookies.get('XSRF087')
-
+export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
+  const { cookies } = request
 
-  // Role-based access control
-  if (!XSRF081) {
-    const protectedPaths = ['/dashboard/edit-profile', '/dashboard']
-    if (protectedPaths.includes(path)) {
-      return NextResponse.redirect(new URL('/', request.url))
+  // 1. Force HTTPS in production
+  if (process.env.NODE_ENV === 'production' && request.headers.get("x-forwarded-proto") === "http") {
+    return NextResponse.redirect(`https://${request.headers.get("host")}${path}`, 301)
+  }
+
+  const isAuthenticated = cookies.get(AUTH_COOKIE)
+  const isProfileComplete = cookies.get(PROFILE_COOKIE)
+  const isAdmin = cookies.get(ADMIN_COOKIE)
+
+  // 2. User Authentication logic
+  if (!isAuthenticated) {
+    if (PROTECTED_USER_ROUTES.some(p => path.startsWith(p))) {
+      const url = new URL('/login', request.url)
+      url.searchParams.set('callback', path)
+      return NextResponse.redirect(url)
     }
   } else {
-    const protectedPaths = ['/registrasi', '/login']
-    if (protectedPaths.includes(path)) {
+    // Logged in users shouldn't access login/register
+    if (PUBLIC_ONLY_ROUTES.some(p => path.startsWith(p))) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
-  }
 
-  if (XSRF081 && XSRF087) {
-    const protectedPaths = [
-      '/',
-      '/layanan/pelatihan/akp',
-      '/layanan/pelatihan/perikanan',
-      '/layanan/pelatihan/kelautan',
-      '/layanan/cek-sertifikat',
-    ]
-    if (protectedPaths.includes(path)) {
-      return NextResponse.redirect(
-        new URL('/dashboard/edit-profile', request.url),
-      )
+    // 3. Mandatory Profile Completion check
+    if (isAuthenticated && isProfileComplete) {
+      if (INCOMPLETE_PROFILE_REDIRECTS.includes(path)) {
+        return NextResponse.redirect(new URL('/dashboard/edit-profile', request.url))
+      }
     }
   }
 
-  // if (!XSRF091) {
-  //   const adminProtectedPaths = [
-  //     '/admin/lemdiklat/dashboard',
-  //     '/admin/pusat/dashboard',
-  //     '/admin/[random_id]/pelaksanaan',
-  //     '/admin/pusat/pelatihan/penerbitan-sertifikat',
-  //     '/admin/lemdiklat/pelatihan',
-  //     '/admin/lemdiklat/pelatihan/penerbitan-sttpl',
-  //     '/admin/lemdiklat/pelatihan/[kode-pelatihan]/peserta-pelatihan/[id]',
-  //     '/admin/lemdiklat/pelatihan/[kode-pelatihan]/bank-soal/[id]',
-  //     '/admin/lemdiklat/pelatihan/[kode-pelatihan]/peserta-pelatihan/[id]/[id_user_pelatihan]/[id_user]',
-  //     '/admin/lemdiklat/pelatihan/detail-pelatihan/[kode_pelatihan]/[id_pelatihan]',
-  //     '/admin/lemdiklat/pelatihan/detail/[kode_pelatihan]/[id_pelatihan]',
-  //     '/admin/lemdiklat/pelatihan/edit-pelatihan/[id]',
-  //     '/admin/lemdiklat/pelatihan/pemberitahuan-pelatihan',
-  //     '/admin/lemdiklat/pelatihan/penerbitan-sertifikat',
-  //     '/admin/lemdiklat/pelatihan/penerbitan-sertifikat/detail-pelatihan/[kode_pelatihan]/[id_pelatihan]',
-  //     '/admin/lemdiklat/pelatihan/pengajuan-sttpl',
-  //     '/admin/lemdiklat/uji-kompetensi',
-  //     '/admin/lemdiklat/uji-kompetensi/[kode_pelatihan]/bank-soal/[id]',
-  //     '/admin/lemdiklat/uji-kompetensi/[kode_pelatihan]/peserta-pelatihan/[id]',
-  //     '/admin/lemdiklat/uji-kompetensi/[kode_pelatihan]/peserta-pelatihan/[id]/[id_user]',
-  //     '/admin/lemdiklat/uji-kompetensi/edit-pelatihan/[id]',
-  //     '/admin/lemdiklat/uji-kompetensi/pemberitahuan-pelatihan',
-  //     '/admin/lemdiklat/uji-kompetensi/pengajuan-sttpl',
-  //     '/admin/lemdiklat/uji-kompetensi/tambah-ujikom',
-  //   ]
-
-  //   const isAdminProtectedPath = adminProtectedPaths.some((protectedPath) => {
-  //     const regex = new RegExp(
-  //       `^${protectedPath.replace(/\[.*?\]/g, '[^/]+')}$`,
-  //     )
-  //     return regex.test(path)
-  //   })
-
-  //   // Special case for /admin/[random_id]/pelaksanaan
-  //   const match = path.match(/^\/admin\/([^/]+)\/pelaksanaan$/)
-  //   if (match) {
-  //     const randomId = match[1]
-  //     const decryptedId = decryptValue(randomId) // Implement your decrypt function
-
-  //     if (decryptedId !== 'pusat') {
-  //       return NextResponse.redirect(new URL('/admin/auth/login', request.url))
-  //     }
-  //   }
-
-  //   if (isAdminProtectedPath) {
-  //     return NextResponse.redirect(new URL('/admin/auth/login', request.url))
-  //   }
-  // } else {
-  //   const protectedPaths = ['/admin/auth/login']
-
-  //   if (protectedPaths.includes(path)) {
-  //     return NextResponse.redirect(
-  //       new URL('/admin/lemdiklat/pelatihan', request.url),
-  //     )
-  //   }
-  // }
-
-  // Additional role-based checks can be added here
+  // 4. Admin Protection (Example logic, can be expanded)
+  if (path.startsWith('/admin') && !path.includes('/auth') && !isAdmin) {
+    return NextResponse.redirect(new URL('/admin/auth/login', request.url))
+  }
 
   return NextResponse.next()
+}
+
+// Optimization: Run middleware only for specific paths
+export const config = {
+  matcher: [
+    '/dashboard/:path*',
+    '/registrasi',
+    '/login',
+    '/admin/:path*',
+    '/layanan/:path*',
+  ],
 }

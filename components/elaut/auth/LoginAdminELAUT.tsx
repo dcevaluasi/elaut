@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { HiOutlineEye, HiOutlineEnvelope, HiOutlineLockClosed, HiOutlineUserGroup } from "react-icons/hi2";
 import ReCAPTCHA from "react-google-recaptcha";
-import { generateRandomId } from "@/lib/utils";
+import { generateRandomId, setSecureCookie } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { HiOutlineEyeOff } from "react-icons/hi";
 import { HashLoader } from "react-spinners";
@@ -87,9 +87,9 @@ export const LoginAdminELAUT = () => {
         text: "Berhasil login ke admin E-LAUT, silahkan manajemen pelatihan dan sertifikat-mu!",
       });
 
-      Cookies.set("XSRF091", response.data.t, { expires: 1 });
-      Cookies.set("XSRF092", "true", { expires: 1 });
-      Cookies.set("XSRF093", role == "upt" ? "balai" : "adminPusat", { expires: 1 });
+      setSecureCookie("XSRF091", response.data.t);
+      setSecureCookie("XSRF092", "true");
+      setSecureCookie("XSRF093", role == "upt" ? "balai" : "adminPusat");
 
       resetAllStateToEmptyString();
       setIsLoadingLogin(false);
@@ -101,7 +101,7 @@ export const LoginAdminELAUT = () => {
       setIsRedirecting(true);
       router.push(dashboardPath);
     } catch (error) {
-      console.error({ error });
+      // console.error({ error });
       if (error instanceof AxiosError) {
         const errorMessage =
           error.response?.status === 401

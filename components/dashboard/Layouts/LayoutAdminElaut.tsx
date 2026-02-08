@@ -16,7 +16,7 @@ import { FiMenu, FiLogOut, FiChevronDown, FiChevronRight } from "react-icons/fi"
 import { HiOutlineInbox, HiOutlineUserGroup } from "react-icons/hi2";
 import { TbBuildingEstate, TbBuildingSkyscraper, TbChartPie, TbDatabaseEdit, TbGavel, TbSchool } from "react-icons/tb";
 import Link from "next/link";
-import { breakdownStatus } from "@/lib/utils";
+import { breakdownStatus, setSecureCookie, removeSecureCookie } from "@/lib/utils";
 import { generatedSignedCertificate } from "@/utils/certificates";
 import { RiQuillPenAiLine } from "react-icons/ri";
 import { BiBadgeCheck } from "react-icons/bi";
@@ -46,17 +46,17 @@ export default function LayoutAdminElaut({
         headers: { Authorization: `Bearer ${Cookies.get("XSRF091")}` },
       });
       setPusatData(data);
-      Cookies.set("NIK", data.data.Nip);
-      Cookies.set("IDLemdik", data.data.IdAdminPusat);
-      Cookies.set("Status", data.data.Status);
-      Cookies.set("Nama", data.data.Nama);
-      Cookies.set("Satker", generatedSignedCertificate(data.data.NoTelpon).status_indo);
-      Cookies.set("PimpinanLemdiklat", data.data.NoTelpon);
-      Cookies.set("Role", breakdownStatus(data.data.Status)[0]);
-      Cookies.set("Access", breakdownStatus(data.data.Status)[1]);
+      setSecureCookie("NIK", data.data.Nip);
+      setSecureCookie("IDLemdik", data.data.IdAdminPusat);
+      setSecureCookie("Status", data.data.Status);
+      setSecureCookie("Nama", data.data.Nama);
+      setSecureCookie("Satker", generatedSignedCertificate(data.data.NoTelpon).status_indo);
+      setSecureCookie("PimpinanLemdiklat", data.data.NoTelpon);
+      setSecureCookie("Role", breakdownStatus(data.data.Status)[0]);
+      setSecureCookie("Access", breakdownStatus(data.data.Status)[1]);
 
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 
@@ -68,13 +68,13 @@ export default function LayoutAdminElaut({
 
       setLemdikData(data);
 
-      Cookies.set("IDLemdik", data.data.IdLemdik);
-      Cookies.set("IDUnitKerja", data.data.IdUnitKerja);
-      Cookies.set("Nama", data.data.NamaLemdik);
-      Cookies.set("Role", breakdownStatus(data.data.Deskripsi)[0]);
-      Cookies.set("Eselon", breakdownStatus(data.data.Deskripsi)[0]);
-      Cookies.set("Access", breakdownStatus(data.data.Deskripsi)[1]);
-      Cookies.set("PimpinanLemdiklat", data.data.NamaKaBalai);
+      setSecureCookie("IDLemdik", data.data.IdLemdik);
+      setSecureCookie("IDUnitKerja", data.data.IdUnitKerja);
+      setSecureCookie("Nama", data.data.NamaLemdik);
+      setSecureCookie("Role", breakdownStatus(data.data.Deskripsi)[0]);
+      setSecureCookie("Eselon", breakdownStatus(data.data.Deskripsi)[0]);
+      setSecureCookie("Access", breakdownStatus(data.data.Deskripsi)[1]);
+      setSecureCookie("PimpinanLemdiklat", data.data.NamaKaBalai);
 
       const token = Cookies.get("XSRF091");
       const unitResponse = await axios.get(
@@ -84,12 +84,12 @@ export default function LayoutAdminElaut({
 
       const unitData = unitResponse.data.data;
       if (unitData?.nama) {
-        Cookies.set("Satker", unitData.nama);
+        setSecureCookie("Satker", unitData.nama);
       }
 
-      console.log({ data, unitData });
+      // console.log({ data, unitData });
     } catch (error) {
-      console.error("LEMDIK INFO: ", error);
+      // console.error("LEMDIK INFO: ", error);
     }
   };
 
@@ -114,7 +114,7 @@ export default function LayoutAdminElaut({
       "Nama",
       "Role",
       "PimpinanLemdiklat"
-    ].forEach((key) => Cookies.remove(key));
+    ].forEach((key) => removeSecureCookie(key));
 
     Toast.fire({
       icon: "success",

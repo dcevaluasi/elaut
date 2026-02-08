@@ -13,6 +13,7 @@ import { ManningAgent } from "@/types/product";
 import { elautBaseUrl } from "@/constants/urls";
 import { FiGrid, FiLogOut, FiSettings } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
+import { setSecureCookie, removeSecureCookie } from "@/lib/utils";
 
 const DropdownUserPelatihan = ({ top }: { top: boolean }) => {
   const token = Cookies.get("XSRF081");
@@ -34,10 +35,10 @@ const DropdownUserPelatihan = ({ top }: { top: boolean }) => {
           },
         }
       );
-      Cookies.set('status', response.data!.Pekerjaan)
+      setSecureCookie('status', response.data!.Pekerjaan)
       setUserDetail(response.data);
     } catch (error) {
-      console.error("Error fetching user detail:", error);
+      // console.error("Error fetching user detail:", error);
     }
   };
 
@@ -51,10 +52,10 @@ const DropdownUserPelatihan = ({ top }: { top: boolean }) => {
           },
         }
       );
-      Cookies.set("IdManningAgent", response.data.data.IdManingAgent);
+      setSecureCookie("IdManningAgent", response.data.data.IdManingAgent);
       setManningAgentDetail(response.data.data);
     } catch (error) {
-      console.error("Error fetching manning agent detail:", error);
+      // console.error("Error fetching manning agent detail:", error);
     }
   };
 
@@ -73,10 +74,10 @@ const DropdownUserPelatihan = ({ top }: { top: boolean }) => {
   const dropdown = useRef<any>(null);
 
   const handleLogOut = async () => {
-    Cookies.remove("XSRF081");
-    Cookies.remove("XSRF083");
-    Cookies.remove("status");
-    Cookies.remove("isManningAgent");
+    removeSecureCookie("XSRF081");
+    removeSecureCookie("XSRF083");
+    removeSecureCookie("status");
+    removeSecureCookie("isManningAgent");
     Toast.fire({
       icon: "success",
       title: "Berhasil Logout",

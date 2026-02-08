@@ -40,6 +40,7 @@ import {
   sanitizedDangerousChars,
   validateIsDangerousChars,
 } from "@/utils/input";
+import { setSecureCookie } from "@/lib/utils";
 import { handlePasswordCriteria } from "@/utils/security";
 import Toast from "@/commons/Toast";
 import { motion, AnimatePresence } from "framer-motion";
@@ -123,10 +124,10 @@ function FormLogin() {
                 },
               }
             );
-            console.log({ response });
+            // console.log({ response });
 
             // setting user's token
-            Cookies.set("XSRF081", response.data.t, { expires: 1 });
+            setSecureCookie("XSRF081", response.data.t);
 
             // user is first timer and has registered
             if (Cookies.get('XSRF087')) {

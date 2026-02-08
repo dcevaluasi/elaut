@@ -25,7 +25,7 @@ import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { HiMiniUserGroup } from "react-icons/hi2";
 import { elautBaseUrl } from "@/constants/urls";
 import { PusatDetailInfo } from "@/types/pusat";
-import { breakdownStatus } from "@/lib/utils";
+import { breakdownStatus, setSecureCookie, removeSecureCookie } from "@/lib/utils";
 const DropdownUser = ({
   lemdiklatLoggedInInfo,
   pusatLoggedInInfo
@@ -66,11 +66,11 @@ const DropdownUser = ({
           },
         }
       );
-      Cookies.set("Eselon", response.data.data.Nip);
+      setSecureCookie("Eselon", response.data.data.Nip);
 
       setDataAdminPusat(response.data.data);
     } catch (error) {
-      console.error({ error });
+      // console.error({ error });
     }
   };
 
@@ -130,7 +130,7 @@ const DropdownUser = ({
         text: `Data profile mu telah berhasil diupdate!`,
       });
 
-      console.log("SUCCESSFULLY UPDATE PROFILE: ", response)
+      // console.log("SUCCESSFULLY UPDATE PROFILE: ", response)
 
       setOpenDialogEditProfile(!openFormEditProfile);
       setOpenFormEditProfile(!openFormEditProfile);
@@ -144,7 +144,7 @@ const DropdownUser = ({
         text: `Data profile mu gagal diupdate!`,
       });
 
-      console.error("ERROR UPDATE PROFILE: ", error);
+      // console.error("ERROR UPDATE PROFILE: ", error);
     }
   };
 
@@ -186,7 +186,7 @@ const DropdownUser = ({
         icon: "error",
         title: `Data profile lemdiklat mu gagal diupdate!`,
       });
-      console.error("ERROR UPDATE PROFILE: ", error);
+      // console.error("ERROR UPDATE PROFILE: ", error);
       setOpenFormEditProfile(!openFormEditProfile);
     }
   };
@@ -212,7 +212,7 @@ const DropdownUser = ({
       "Nama",
       "Role",
       "PimpinanLemdiklat"
-    ].forEach((key) => Cookies.remove(key));
+    ].forEach((key) => removeSecureCookie(key));
     Toast.fire({
       icon: "success",
       title: `Yeayyy!`,

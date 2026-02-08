@@ -8,6 +8,7 @@ import React, { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import axios, { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
+import { setSecureCookie } from "@/lib/utils";
 
 
 // RECAPTCHA
@@ -52,9 +53,9 @@ function FormForgetPassword() {
                 },
               }
             );
-            console.log({ response });
+            // console.log({ response });
 
-            Cookies.set("XSRF081", response.data.t, { expires: 1 });
+            setSecureCookie("XSRF081", response.data.t);
 
             if (Cookies.get("XSRF085")) {
               Toast.fire({
@@ -85,7 +86,7 @@ function FormForgetPassword() {
               }
             }
           } catch (error: any) {
-            console.error({ error });
+            // console.error({ error });
             if (
               error.response &&
               error.response.data &&
@@ -148,11 +149,11 @@ function FormForgetPassword() {
                 },
               }
             );
-            console.log({ response });
+            // console.log({ response });
 
-            Cookies.set("XSRF081", response.data.t, { expires: 1 });
+            setSecureCookie("XSRF081", response.data.t);
 
-            Cookies.set("isManningAgent", "true", { expires: 1 });
+            setSecureCookie("isManningAgent", "true");
 
             if (Cookies.get("XSRF085")) {
               Toast.fire({
