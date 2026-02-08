@@ -23,6 +23,8 @@ import Cookies from "js-cookie";
 import MobileMenu from "./mobile-menu";
 import DropdownUserPelatihan from "../dashboard/Header/DropdownUserPelatihan";
 import { Button } from "./button";
+import LanguageSwitcher from "./LanguageSwitcher";
+import { useLanguage } from "@/context/LanguageContext";
 
 const COOKIE_FIRST_TIMER = "XSRF087";
 const COOKIE_AUTH = "XSRF081";
@@ -76,6 +78,7 @@ export default function Header() {
 
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useLanguage();
 
   const scrollHandler = () => {
     window.pageYOffset > 10 ? setTop(false) : setTop(true);
@@ -142,14 +145,14 @@ export default function Header() {
             <ul className="flex items-center gap-1">
               <NavLinkDefault
                 href="/"
-                name="Beranda"
+                name={t("nav.home")}
                 icon={<HiHome />}
                 isActive={pathname === "/"}
               />
 
               <NavLinkDefault
                 href="/layanan/cek-sertifikat"
-                name="Cek Sertifikat"
+                name={t("nav.services")}
                 icon={<HiIdentification />}
                 isActive={pathname === "/layanan/cek-sertifikat"}
               />
@@ -276,6 +279,9 @@ export default function Header() {
                   </AnimatePresence>
                 </div>
               )}
+              <div className="ml-4 pl-4 border-l border-white/10">
+                <LanguageSwitcher />
+              </div>
             </div>
           </nav>
 

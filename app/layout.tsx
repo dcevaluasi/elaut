@@ -143,6 +143,8 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
+import { LanguageProvider } from "@/context/LanguageContext";
+
 export default function RootLayout({
   children,
 }: {
@@ -198,11 +200,13 @@ export default function RootLayout({
         suppressHydrationWarning={true}
         className={`${inter.className} ${myFont.variable} ${bosNormal.variable} ${plusSansJakarta.variable} ${tuwir.variable} ${delius.variable} ${bos.variable} ${bosBold.variable}  ${bosItalic.variable} ${cambria.variable} antialiased bg-white text-gray-900 tracking-tight `}
       >
-        <div className="flex flex-col overflow-hidden supports-[overflow:clip]:overflow-clip relative">
-          <Header />
-          {children}
-          <BottomNavigation />
-        </div>
+        <LanguageProvider>
+          <div className="flex flex-col overflow-hidden supports-[overflow:clip]:overflow-clip relative">
+            <Header />
+            {children}
+            <BottomNavigation />
+          </div>
+        </LanguageProvider>
       </body>
     </html>
   );

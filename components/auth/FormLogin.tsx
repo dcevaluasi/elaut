@@ -46,8 +46,10 @@ import Toast from "@/commons/Toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiOutlineDeviceMobile, HiOutlineIdentification, HiOutlineLockClosed, HiOutlineMail } from "react-icons/hi";
 import { FiShield } from "react-icons/fi";
+import { useLanguage } from "@/context/LanguageContext";
 
 function FormLogin() {
+  const { t } = useLanguage();
   const [formData, setFormData] = React.useState<{ [key: string]: string }>({
     no_number: "",
     password: "",
