@@ -61,12 +61,3 @@ export function middleware(request: NextRequest) {
   return NextResponse.next()
 }
 
-// Optimization: Added '/' to matcher if you want to protect the root
-export const config = {
-  matcher: [
-    '/dashboard/:path*',
-    '/admin/pusat/:path*',
-    '/admin/lemdiklat/:path*',
-    '/p2mkp/dashboard/:path*'
-  ],
-}
