@@ -152,7 +152,7 @@ export default function Header() {
 
               <NavLinkDefault
                 href="/layanan/cek-sertifikat"
-                name={t("nav.services")}
+                name={"Cek Sertifikat"}
                 icon={<HiIdentification />}
                 isActive={pathname === "/layanan/cek-sertifikat"}
               />
