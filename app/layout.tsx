@@ -82,7 +82,7 @@ export const metadata: Metadata = {
   authors: [{ name: "BPPSDM KP - Kementerian Kelautan dan Perikanan" }],
   generator: "Next.js",
   keywords: [
-    "E-LAUT", "ELAUT", "Elaut", "e-laut", "Kementerian Kelautan dan Perikanan", "KKP", "BPPSDM KP",
+    "E-LAUT", "E-MILEA", "e-milea", "emilea", "EMILEA", "elearning kkp", "ELAUT", "Elaut", "e-laut", "Kementerian Kelautan dan Perikanan", "KKP", "BPPSDM KP",
     "pelatihan kelautan", "pelatihan perikanan", "sertifikasi kompetensi", "diklat perikanan",
     "sertifikat kelautan", "BSTF", "Awak Kapal Perikanan", "AKP", "P2MKP", "BPPP",
     "pendaftaran pelatihan online", "layanan masyarakat KKP", "SDM Maritim", "indonesia maritime training"
