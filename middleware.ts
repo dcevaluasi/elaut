@@ -6,8 +6,6 @@ const AUTH_COOKIE = 'XSRF081'       // Basic auth
 const FIRST_TIMER_COOKIE = 'XSRF087' // Flag for incomplete profile
 const ADMIN_COOKIE = 'XSRF091'      // Admin access
 
-const PROTECTED_USER_ROUTES = ['/dashboard']
-const PUBLIC_ONLY_ROUTES = ['/registrasi', '/login']
 const INCOMPLETE_PROFILE_REDIRECTS = [
   '/layanan/pelatihan/program/akp',
   '/layanan/pelatihan/program/perikanan',
@@ -19,42 +17,45 @@ export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
   const { cookies } = request
 
-  // 1. Force HTTPS in production (Only if not localhost and header matches exactly 'http')
-  const isProd = process.env.NEXT_PUBLIC_NODE_ENV === 'production'
-  const isHttp = request.headers.get("x-forwarded-proto") === "http"
-  const isLocal = request.nextUrl.hostname === 'localhost' || request.nextUrl.hostname === '127.0.0.1'
-
-  if (isProd && isHttp && !isLocal) {
-    return NextResponse.redirect(`https://${request.headers.get("host")}${path}`, 307)
-  }
-
   const isAuthenticated = cookies.get(AUTH_COOKIE)
   const isFirstTimer = cookies.get(FIRST_TIMER_COOKIE)
   const isAdmin = cookies.get(ADMIN_COOKIE)
 
-  // 2. User Authentication logic
-  if (!isAuthenticated) {
-    if (PROTECTED_USER_ROUTES.some(p => path.startsWith(p))) {
-      const url = new URL('/login', request.url)
-      url.searchParams.set('callback', path)
-      return NextResponse.redirect(url)
-    }
-  } else {
-    // Logged in users shouldn't access login/register
-    if (PUBLIC_ONLY_ROUTES.some(p => path.startsWith(p))) {
+  // 1. Prevent redirection loops for authenticated users on auth pages
+  if (path === '/login' || path === '/registrasi') {
+    if (isAuthenticated) {
       return NextResponse.redirect(new URL('/dashboard', request.url))
     }
+    return NextResponse.next()
+  }
 
-    // 3. Mandatory Profile Completion check (If cookie exists, they ARE a first timer/incomplete)
+  // 2. Protect user dashboard routes
+  if (path.startsWith('/dashboard')) {
+    if (!isAuthenticated) {
+      const loginUrl = new URL('/login', request.url)
+      loginUrl.searchParams.set('callback', path)
+      return NextResponse.redirect(loginUrl)
+    }
+
+    // Force profile completion for first timers if they try to access other dashboard features
+    // But exclude the edit-profile page itself to prevent loops
     if (isFirstTimer && path !== '/dashboard/edit-profile') {
-      if (INCOMPLETE_PROFILE_REDIRECTS.some(p => path.startsWith(p))) {
-        return NextResponse.redirect(new URL('/dashboard/edit-profile', request.url))
-      }
+      // You can add more specific redirects here if needed
     }
   }
+
+  // 3. Mandatory Profile Completion check for public training pages
+  if (isFirstTimer && path !== '/dashboard/edit-profile') {
+    if (INCOMPLETE_PROFILE_REDIRECTS.some(p => path.startsWith(p))) {
+      return NextResponse.redirect(new URL('/dashboard/edit-profile', request.url))
+    }
+  }
+
   // 4. Admin Protection
-  if (path.startsWith('/admin') && !path.includes('/auth') && !isAdmin) {
-    return NextResponse.redirect(new URL('/admin/auth/login', request.url))
+  if (path.startsWith('/admin') && !path.startsWith('/admin/auth')) {
+    if (!isAdmin) {
+      return NextResponse.redirect(new URL('/admin/auth/login', request.url))
+    }
   }
 
   return NextResponse.next()
@@ -69,9 +70,9 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - logo (public images)
+     * - public assets (images, icons, illustrations, font)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|logo).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|images|icons|illustrations|font).*)',
   ],
 }
 
