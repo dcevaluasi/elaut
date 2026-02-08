@@ -53,11 +53,6 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // 4. Admin Protection
-  if (path.startsWith('/admin') && !isAdmin) {
-    return NextResponse.redirect(new URL('/admin/auth/login', request.url))
-  }
-
   return NextResponse.next()
 }
 
