@@ -85,7 +85,7 @@ export const metadata: Metadata = {
     "E-LAUT", "E-MILEA", "e-milea", "elatar", "pentaru", "e-latar", "pelaut", "elut", "Badan Penyuluah", "puslatkp", "puslat kp", "Puslat KP", "PUSLAT  KP", "emilea", "EMILEA", "elearning kkp", "ELAUT", "Elaut", "e-laut", "Kementerian Kelautan dan Perikanan", "KKP", "BPPSDM KP",
     "pelatihan kelautan", "pelatihan perikanan", "sertifikasi kompetensi", "diklat perikanan",
     "sertifikat kelautan", "BSTF", "Awak Kapal Perikanan", "AKP", "P2MKP", "BPPP",
-    "pendaftaran pelatihan online", "layanan masyarakat KKP", "SDM Maritim", "indonesia maritime training"
+    "pendaftaran pelatihan online", "CORPU KKP", "corpu", "Corpu", "Maritime Training Center", "training center", "layanan masyarakat KKP", "SDM Maritim", "indonesia maritime training"
   ],
   referrer: "origin-when-cross-origin",
   robots: {
