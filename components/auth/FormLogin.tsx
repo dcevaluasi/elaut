@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import React, { FormEvent } from "react";
+import { useLanguage } from "@/context/LanguageContext";
 import { useRouter } from "next/navigation";
 import axios, { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
@@ -46,10 +47,9 @@ import Toast from "@/commons/Toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiOutlineDeviceMobile, HiOutlineIdentification, HiOutlineLockClosed, HiOutlineMail } from "react-icons/hi";
 import { FiShield } from "react-icons/fi";
-import { useLanguage } from "@/context/LanguageContext";
 
 function FormLogin() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [formData, setFormData] = React.useState<{ [key: string]: string }>({
     no_number: "",
     password: "",
@@ -602,13 +602,13 @@ function FormLogin() {
                 className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] md:text-xs font-semibold uppercase tracking-wider mb-3"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                Portal Masyarakat
+                {t("common.welcome").includes("E-LAUT") ? "Portal Masyarakat" : "Society Portal"}
               </motion.div>
               <h1 className="text-3xl md:text-4xl leading-none font-bold tracking-tight text-white font-calsans mb-2">
-                Selamat Datang di <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">E-LAUT</span>
+                {language === "id" ? "Selamat Datang di " : "Welcome to "}<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">E-LAUT</span>
               </h1>
               <p className="text-gray-400 mx-auto text-xs md:text-sm leading-relaxed max-w-sm">
-                Akses portal pelatihan dan sertifikasi kelautan terpadu. Pilih peran anda untuk melanjutkan.
+                {language === "id" ? "Akses portal pelatihan dan sertifikasi kelautan terpadu. Pilih peran anda untuk melanjutkan." : "Access the integrated marine training and certification portal. Choose your role to continue."}
               </p>
             </div>
 
@@ -619,14 +619,14 @@ function FormLogin() {
                 className={`flex-1 py-2 px-4 rounded-xl text-xs font-bold tracking-wide transition-all duration-300 ${role === "Perseorangan" ? "bg-blue-600 text-white shadow-lg" : "text-gray-400 hover:text-white"
                   }`}
               >
-                PERSEORANGAN
+                {language === "id" ? "PERSEORANGAN" : "INDIVIDUAL"}
               </button>
               <button
                 onClick={() => setRole("Corporate")}
                 className={`flex-1 py-2 px-4 rounded-xl text-xs font-bold tracking-wide transition-all duration-300 ${role === "Corporate" ? "bg-blue-600 text-white shadow-lg" : "text-gray-400 hover:text-white"
                   }`}
               >
-                CORPORATE
+                {language === "id" ? "CORPORATE" : "CORPORATE"}
               </button>
             </div>
 
@@ -747,7 +747,7 @@ function FormLogin() {
                         type="submit"
                         className="w-full h-12 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 group"
                       >
-                        SIGN IN PERSEORANGAN
+                        {language === "id" ? `SIGN IN ${role.toUpperCase()}` : `SIGN IN ${role.toUpperCase()}`}
                         <HiOutlineMail className="group-hover:translate-x-1 transition-transform" />
                       </motion.button>
                     </div>

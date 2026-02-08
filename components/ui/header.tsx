@@ -279,9 +279,7 @@ export default function Header() {
                   </AnimatePresence>
                 </div>
               )}
-              <div className="ml-4 pl-4 border-l border-white/10">
-                <LanguageSwitcher />
-              </div>
+
             </div>
           </nav>
 
