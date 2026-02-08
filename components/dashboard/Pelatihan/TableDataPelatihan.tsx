@@ -72,6 +72,7 @@ const TableDataPelatihan: React.FC = () => {
     "Done": p => isSigned(p.StatusPenerbitan),
     "Signed": p => isSigned(p.StatusPenerbitan) && (Cookies.get('Role')?.includes(p.TtdSertifikat)! || Cookies.get('Role') == p.TtdSertifikat),
     "Published": p => p.Status === "Publish",
+    "Approved": p => p.StatusPenerbitan === "1.1",
   };
 
   const filteredData = useMemo(() => {
@@ -140,6 +141,45 @@ const TableDataPelatihan: React.FC = () => {
     return { total, totalPeserta, programDist, trendData };
   }, [filteredData]);
 
+  // Reactive Status Counts based on filtered total (except status itself)
+  const tabCounts = useMemo(() => {
+    const baseFiltered = data.filter(p => {
+      const program = p.Program.toLowerCase();
+      const namaPelatihan = p.NamaPelatihan.toLowerCase();
+      const penyelenggara = p.PenyelenggaraPelatihan.toLowerCase();
+      const sasaran = p.AsalPelatihan.toLowerCase();
+      const pYear = p.TanggalMulaiPelatihan ? new Date(p.TanggalMulaiPelatihan).getFullYear().toString() : "";
+      const matchesYear = filterYear === "All" || pYear === filterYear;
+
+      return (
+        (!filterCategory || program === filterCategory.toLowerCase()) &&
+        (!filterCategoryPenyelenggara || penyelenggara === filterCategoryPenyelenggara.toLowerCase()) &&
+        (!filterCategorySasaran || sasaran === filterCategorySasaran.toLowerCase()) &&
+        namaPelatihan.includes(searchQuery.toLowerCase()) &&
+        matchesYear
+      );
+    });
+
+    return {
+      all: baseFiltered.length,
+      published: baseFiltered.filter(p => p.Status === "Publish").length,
+      verifying: baseFiltered.filter(p => isVerifyDiklat(p.StatusPenerbitan)).length,
+      done: baseFiltered.filter(p => isSigned(p.StatusPenerbitan)).length,
+      diklatSPV: baseFiltered.filter(p => p.StatusPenerbitan === "1").length,
+      pendingSigning: baseFiltered.filter(p =>
+        isPendingSigning(p.StatusPenerbitan) &&
+        (Cookies.get('Role')?.includes(p.TtdSertifikat)! || Cookies.get('Role') == p.TtdSertifikat)
+      ).length,
+      signed: baseFiltered.filter(p =>
+        isSigned(p.StatusPenerbitan) &&
+        (Cookies.get('Role')?.includes(p.TtdSertifikat)! || Cookies.get('Role') == p.TtdSertifikat)
+      ).length,
+      approved: baseFiltered.filter(p => p.StatusPenerbitan === "1.1").length,
+    };
+  }, [data, filterCategory, filterCategoryPenyelenggara, filterCategorySasaran, searchQuery, filterYear]);
+
+  const [tabValue, setTabValue] = React.useState<string>("account");
+
   return (
     <div className="space-y-2 pb-10">
 
@@ -173,22 +213,23 @@ const TableDataPelatihan: React.FC = () => {
         </div>
 
         <TabStatusPelatihanMasyarakat
-          dataLength={data.length}
-          countPublished={countPublished}
-          countVerifying={countVerifying}
-          countDone={countDone}
-          countDiklatSPV={countDiklatSPV}
-          countPendingSigning={countPendingSigning}
-          countSigned={countSigned}
+          dataLength={tabCounts.all}
+          countPublished={tabCounts.published}
+          countVerifying={tabCounts.verifying}
+          countDone={tabCounts.done}
+          countDiklatSPV={tabCounts.diklatSPV}
+          countPendingSigning={tabCounts.pendingSigning}
+          countSigned={tabCounts.signed}
+          countApproved={tabCounts.approved}
           selectedStatusFilter={selectedStatusFilter}
           setSelectedStatusFilter={setSelectedStatusFilter}
-          isOperatorBalaiPelatihan={isOperatorBalaiPelatihan}
+          activeYear={filterYear}
         />
 
 
 
         <section className="w-full">
-          <Tabs defaultValue="account" className="w-full">
+          <Tabs value={tabValue} onValueChange={setTabValue} className="w-full">
             {
               Cookies.get('Access')?.includes('createPelatihan') &&
               <TabsList className={`grid w-full grid-cols-2 bg-slate-100 p-1 rounded-xl mb-3`}>
@@ -353,7 +394,13 @@ const TableDataPelatihan: React.FC = () => {
             <TabsContent value="password">
               <Card className="border-slate-200 shadow-sm rounded-xl">
                 <CardContent className="p-6">
-                  <FormPelatihan edit={false} />
+                  <FormPelatihan
+                    edit={false}
+                    onSuccess={() => {
+                      setTabValue("account");
+                      refetch();
+                    }}
+                  />
                 </CardContent>
               </Card>
             </TabsContent>

@@ -17,13 +17,13 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import Toast from "@/commons/Toast";
 import { elautBaseUrl } from "@/constants/urls";
-import { Instruktur } from "@/types/instruktur";
+import { ProgramPelatihan } from "@/types/program";
 import { TbTrash, TbAlertTriangle } from "react-icons/tb";
 
-const DeleteInstrukturAction: React.FC<{
-    instruktur: Instruktur;
+const DeleteProgramPelatihanAction: React.FC<{
+    program: ProgramPelatihan;
     onSuccess?: () => void;
-}> = ({ instruktur, onSuccess }) => {
+}> = ({ program, onSuccess }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -31,7 +31,7 @@ const DeleteInstrukturAction: React.FC<{
         try {
             setLoading(true);
             const response = await axios.delete(
-                `${elautBaseUrl}/deleteInstruktur/${instruktur.IdInstruktur}`,
+                `${elautBaseUrl}/program_pelatihan/delete_program_pelatihan?id=${program.id_program_pelatihan}`,
                 {
                     headers: {
                         Authorization: `Bearer ${Cookies.get("XSRF091")}`,
@@ -42,7 +42,7 @@ const DeleteInstrukturAction: React.FC<{
             Toast.fire({
                 icon: "success",
                 title: "Berhasil!",
-                text: "Data instruktur berhasil dihapus.",
+                text: "Program pelatihan berhasil dihapus.",
             });
             setIsOpen(false);
             setLoading(false);
@@ -53,7 +53,7 @@ const DeleteInstrukturAction: React.FC<{
             Toast.fire({
                 icon: "error",
                 title: "Gagal!",
-                text: "Terjadi kesalahan saat menghapus instruktur.",
+                text: "Terjadi kesalahan saat menghapus program.",
             });
         }
     };
@@ -62,10 +62,9 @@ const DeleteInstrukturAction: React.FC<{
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
             <AlertDialogTrigger asChild>
                 <div
-                    className="relative flex cursor-pointer select-none items-center rounded-xl px-3 py-2 text-sm outline-none hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors w-full gap-2 text-rose-600 dark:text-rose-400 font-medium"
+                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-rose-500/5 group/del border border-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white transition-all shadow-sm cursor-pointer"
                 >
-                    <TbTrash className="h-4 w-4" />
-                    Hapus Data
+                    <TbTrash size={18} />
                 </div>
             </AlertDialogTrigger>
 
@@ -79,10 +78,10 @@ const DeleteInstrukturAction: React.FC<{
 
                     <div className="space-y-2">
                         <AlertDialogTitle className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight">
-                            Hapus Data Instruktur?
+                            Hapus Program?
                         </AlertDialogTitle>
                         <AlertDialogDescription className="text-sm font-medium text-slate-500">
-                            Anda akan menghapus data <span className="font-bold text-slate-800 dark:text-slate-200">"{instruktur?.nama}"</span>. Tindakan ini tidak dapat dibatalkan.
+                            Anda akan menghapus program <span className="font-bold text-slate-800 dark:text-slate-200">"{program?.name_indo}"</span>. Tindakan ini tidak dapat dibatalkan.
                         </AlertDialogDescription>
                     </div>
                 </div>
@@ -117,4 +116,4 @@ const DeleteInstrukturAction: React.FC<{
     );
 };
 
-export default DeleteInstrukturAction;
+export default DeleteProgramPelatihanAction;

@@ -24,10 +24,24 @@ import {
     SelectContent,
     SelectItem,
 } from "@/components/ui/select";
-import { TbPencil } from "react-icons/tb";
+import {
+    TbPencil,
+    TbUser,
+    TbId,
+    TbMail,
+    TbPhone,
+    TbBuildingSkyscraper,
+    TbBriefcase,
+    TbActivity,
+    TbSchool,
+    TbCertificate,
+    TbLink,
+    TbUserCheck,
+    TbX,
+    TbChecks
+} from "react-icons/tb";
 import { Instruktur } from "@/types/instruktur";
 import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
-import { devNull } from "os";
 import { UK_ESELON_1, UK_ESELON_2 } from "@/constants/unitkerja";
 import { useFetchDataRumpunPelatihan } from "@/hooks/elaut/master/useFetchDataRumpunPelatihan";
 import { RumpunPelatihan } from "@/types/program";
@@ -36,9 +50,15 @@ const UpdateInstrukturAction: React.FC<{
     instruktur: Instruktur;
     onSuccess?: () => void;
 }> = ({ instruktur, onSuccess }) => {
-    const { data: dataRumpunPelatihan, loading: loadingRumpunPelatihan, error: errorRumpunPelatihan, fetchRumpunPelatihan } = useFetchDataRumpunPelatihan();
+    const { data: dataRumpunPelatihan, loading: loadingRumpunPelatihan } = useFetchDataRumpunPelatihan();
+    const { unitKerjas, fetchUnitKerjaData } = useFetchDataUnitKerja();
+
+    React.useEffect(() => {
+        fetchUnitKerjaData();
+    }, [fetchUnitKerjaData]);
 
     const [isOpen, setIsOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     // Controlled states (prefill data lama)
     const [nama, setNama] = useState(instruktur.nama || "");
@@ -56,11 +76,9 @@ const UpdateInstrukturAction: React.FC<{
     const [linkSertifikat, setLinkSertifikat] = useState(instruktur.link_data_dukung_sertifikat || "");
     const [status, setStatus] = useState(instruktur.status || "Active");
     const [pendidikanTerakhir, setPendidikanTerakhir] = useState(instruktur.pendidikkan_terakhir || "");
-    const [idLemdik, setIdLemdik] = useState(instruktur?.id_lemdik || null)
+    const [idLemdik, setIdLemdik] = useState<number | undefined>(instruktur?.id_lemdik ? Number(instruktur.id_lemdik) : undefined);
     const [eselon1, setEselon1] = useState(instruktur.eselon_1 || "");
     const [eselon2, setEselon2] = useState(instruktur.eselon_2 || "");
-
-    const [loading, setLoading] = useState(false);
 
     const handleUpdate = async () => {
         const form = {
@@ -84,8 +102,6 @@ const UpdateInstrukturAction: React.FC<{
             pendidikkan_terakhir: pendidikanTerakhir,
         };
 
-        console.log({ idLemdik })
-
         try {
             setLoading(true);
             const response = await axios.put(
@@ -106,7 +122,6 @@ const UpdateInstrukturAction: React.FC<{
             setIsOpen(false);
             setLoading(false);
             if (onSuccess) onSuccess();
-            console.log("UPDATE INSTRUKTUR: ", response);
         } catch (error) {
             console.error("ERROR UPDATE INSTRUKTUR: ", error);
             setLoading(false);
@@ -118,301 +133,276 @@ const UpdateInstrukturAction: React.FC<{
         }
     };
 
-    const { unitKerjas, loading: loadingUnitKerja, error: errorUnitKerja, fetchUnitKerjaData } = useFetchDataUnitKerja()
-
-    React.useEffect(() => {
-        fetchUnitKerjaData()
-    }, [fetchUnitKerjaData])
-
-
     return (
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
             <AlertDialogTrigger asChild>
-                <Button
-                    variant="outline"
-                    className="flex items-center gap-2 w-full rounded-lg px-3 py-1.5 shadow-sm text-sm text-gray-500 hover:text-white border-gray-500 hover:bg-gray-500"
+                <div
+                    className="relative flex cursor-pointer select-none items-center rounded-xl px-3 py-2 text-sm outline-none hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors w-full gap-2 text-slate-700 dark:text-slate-200 font-medium"
                 >
-                    <TbPencil className="h-4 w-4" />
-                    Edit
-                </Button>
+                    <TbPencil className="h-4 w-4 text-blue-500" />
+                    Edit Data
+                </div>
             </AlertDialogTrigger>
 
-            <AlertDialogContent className="max-w-5xl">
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Edit Data Instruktur</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Ubah data instruktur berikut sesuai kebutuhan.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-
-                {/* isi form → sama seperti AddInstrukturAction, tapi sudah prefill */}
-                <div className="py-2 max-h-[70vh] flex flex-col gap-1 overflow-y-auto pr-2">
-                    {/* Nama */}
-                    <div className="col-span-2 space-y-1">
-                        <label className="text-sm font-medium text-gray-700">Nama</label>
-                        <input
-                            type="text"
-                            className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                            value={nama}
-                            onChange={(e) => setNama(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium text-gray-700">Unit Kerja</label>
-                        <Select value={idLemdik?.toString()} onValueChange={(value) => setIdLemdik(parseInt(value))}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Pilih status" />
-                            </SelectTrigger>
-                            <SelectContent position="popper" className="z-[9999999]">
-                                {
-                                    unitKerjas?.map((item, index) => (
-                                        <SelectItem value={item.id_unit_kerja.toString()}>{item.nama}</SelectItem>
-                                    ))
-                                }
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-2">
-                        {/* NIP */}
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium text-gray-700">NIP</label>
-                            <input
-                                type="text"
-                                className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                                value={nip}
-                                onChange={(e) => setNip(e.target.value)}
-                            />
+            <AlertDialogContent className="w-[95vw] max-w-[95vw] h-[90vh] p-0 bg-white dark:bg-slate-900 border-none rounded-[32px] shadow-[0_32px_120px_rgba(0,0,0,0.2)] z-[999999] flex flex-col">
+                {/* Header */}
+                {/* Header */}
+                <div className="relative px-8 py-6 border-b border-gray-100 dark:border-white/5 bg-gradient-to-br from-blue-50/50 to-transparent dark:from-blue-500/5 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-white dark:bg-white/10 flex items-center justify-center text-blue-600 shadow-sm border border-blue-100 dark:border-white/5">
+                            <TbPencil size={24} />
                         </div>
-
-                        {/* Email */}
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium text-gray-700">Email</label>
-                            <input
-                                type="text"
-                                className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                        </div>
-
-                        {/* No Telpon */}
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium text-gray-700">No Telpon</label>
-                            <input
-                                type="url"
-                                className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                                value={noTelpon}
-                                onChange={(e) => setNoTelpon(e.target.value)}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="w-full flex gap-4">
-                        {/* Jenjang Jabatan */}
-                        <div className="space-y-1 w-full">
-                            <label className="text-sm font-medium text-gray-700">Jenjang Jabatan</label>
-                            <input
-                                type="text"
-                                className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                                value={jenjangJabatan}
-                                onChange={(e) => setJenjangJabatan(e.target.value)}
-                            />
-                        </div>
-
-                        <div className="space-y-1 w-full">
-                            <label className="text-sm font-medium text-gray-700">Pangkat/Golongan</label>
-                            <input
-                                type="text"
-                                className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                                value={pelatihanPelatih}
-                                onChange={(e) => setPelatihanPelatih(e.target.value)}
-                            />
-                        </div>
-                    </div>
-
-
-                    {/* Bidang Keahlian */}
-                    <div className="col-span-2 space-y-1">
-                        <label className="text-sm font-medium text-gray-700">Bidang Keahlian</label>
-                        <select
-                            className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                            value={bidangKeahlian}
-                            onChange={(e) => setBidangKeahlian(e.target.value)}
-                            disabled={loadingRumpunPelatihan}
-                        >
-                            <option value="">-- Pilih Bidang Pelatihan --</option>
-                            {dataRumpunPelatihan?.map((rumpun: RumpunPelatihan) => (
-                                <option
-                                    key={rumpun.id_rumpun_pelatihan}
-                                    value={rumpun.name}
-                                >
-                                    {rumpun.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    {/* Link */}
-                    <div className="grid grid-cols-3 gap-2">
-                        {/* Management of Training */}
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium text-gray-700">Management of Training</label>
-                            <input
-                                type="text"
-                                className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                                value={managementOfTraining}
-                                onChange={(e) => setManagementOfTraining(e.target.value)}
-                            />
-                        </div>
-
-                        {/* Training Officer Course */}
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium text-gray-700">Training Officer Course</label>
-                            <input
-                                type="text"
-                                className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                                value={trainingOfficerCourse}
-                                onChange={(e) => setTrainingOfficerCourse(e.target.value)}
-                            />
-                        </div>
-
-                        {/* Link Sertifikat */}
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium text-gray-700">Link Sertifikat</label>
-                            <input
-                                type="url"
-                                className="w-full rounded-md border border-gray-300 p-2 text-sm"
-                                value={linkSertifikat}
-                                onChange={(e) => setLinkSertifikat(e.target.value)}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="w-full flex gap-4">
-                        {/* Status */}
-                        <div className="w-full space-y-1">
-                            <label className="text-sm font-medium text-gray-700">Status</label>
-                            <Select value={status} onValueChange={setStatus}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Pilih status" />
-                                </SelectTrigger>
-                                <SelectContent position="popper" className="z-[9999999]">
-                                    <SelectItem value="Active">Aktif</SelectItem>
-                                    <SelectItem value="No Active">Nonaktif</SelectItem>
-                                    <SelectItem value="Tugas Belajar">Tugas Belajar</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        {/* Pendidikan Terakhir */}
-                        <div className="w-full space-y-1">
-                            <label className="text-sm font-medium text-gray-700">Pendidikan Terakhir</label>
-                            <Select
-                                value={pendidikanTerakhir}
-                                onValueChange={(value) => setPendidikanTerakhir(value)}
-                            >
-                                <SelectTrigger className="w-full text-base py-4">
-                                    <SelectValue placeholder="Pilih pendidikan terakhir" />
-                                </SelectTrigger>
-                                <SelectContent position="popper" className="z-[9999999999]">
-                                    <SelectItem value="Tidak/Belum Sekolah">
-                                        Tidak/Belum Sekolah
-                                    </SelectItem>
-                                    <SelectItem value="SD">
-                                        SD
-                                    </SelectItem>
-                                    <SelectItem value="SMP">
-                                        SMP
-                                    </SelectItem>
-                                    <SelectItem value="SMA">
-                                        SMA/SMK
-                                    </SelectItem>
-                                    <SelectItem value="D1">
-                                        D1
-                                    </SelectItem>
-                                    <SelectItem value="D2">
-                                        D2
-                                    </SelectItem>
-                                    <SelectItem value="D3">
-                                        D3
-                                    </SelectItem>
-                                    <SelectItem value="D4">
-                                        D4
-                                    </SelectItem>
-                                    <SelectItem value="S1">
-                                        S1
-                                    </SelectItem>
-                                    <SelectItem value="S2">
-                                        S2
-                                    </SelectItem>
-                                    <SelectItem value="S3">
-                                        S3
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-
-
-                    <div className="flex flex-col w-full gap-2">
-                        <div className="w-full">
-                            <label className="text-sm font-medium text-gray-700">Eselon I</label>
-                            <Select
-                                value={eselon1}
-                                onValueChange={(v) => setEselon1(v)}
-                            >
-                                <SelectTrigger >
-                                    <SelectValue placeholder="Pilih Eselon I" className="truncate" />
-                                </SelectTrigger>
-                                <SelectContent position="popper" className="z-[9999999] truncate">
-                                    {
-                                        UK_ESELON_1.map((eselon1, index) => (
-                                            <SelectItem className='truncate' value={eselon1.name} key={eselon1.id}>{eselon1.name}</SelectItem>
-                                        ))
-                                    }
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        {
-                            eselon1 != '' && <div className="w-full">
-                                <label className="text-sm font-medium text-gray-700">Eselon II</label>
-                                <Select
-                                    value={eselon2}
-                                    onValueChange={(v) => setEselon2(v)}
-                                >
-                                    <SelectTrigger >
-                                        <SelectValue placeholder="Pilih Eselon II" className="truncate" />
-                                    </SelectTrigger>
-                                    <SelectContent position="popper" className="z-[9999999] truncate">
-                                        {UK_ESELON_2[eselon1 as keyof typeof UK_ESELON_2]?.map(
-                                            (eselon2: string, index: number) => (
-                                                <SelectItem className="truncate" value={eselon2} key={index}>
-                                                    {eselon2}
-                                                </SelectItem>
-                                            )
-                                        )}
-
-                                    </SelectContent>
-                                </Select>
+                        <div>
+                            <div className="flex items-center gap-2 mb-1">
+                                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                                <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">
+                                    Modification Mode
+                                </span>
                             </div>
-                        }
+                            <h2 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight leading-none">
+                                Edit Data Instruktur
+                            </h2>
+                        </div>
                     </div>
-
+                    <button onClick={() => setIsOpen(false)} className="w-10 h-10 rounded-full hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 transition-colors">
+                        <TbX size={22} />
+                    </button>
                 </div>
 
-                <AlertDialogFooter>
-                    <AlertDialogCancel disabled={loading}>Batal</AlertDialogCancel>
-                    <AlertDialogAction
+                <div className="p-8 flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                        {/* --- Section 1: Profil Utama --- */}
+                        <div className="md:col-span-12">
+                            <div className="flex items-center gap-2 mb-4">
+                                <span className="h-8 w-1 rounded-full bg-blue-500" />
+                                <h4 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">Profil Utama</h4>
+                            </div>
+                        </div>
+
+                        <div className="md:col-span-8 space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Nama Lengkap</label>
+                            <div className="relative group">
+                                <TbUser className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={20} />
+                                <input
+                                    type="text"
+                                    className="w-full h-14 pl-12 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-300"
+                                    placeholder="Masukkan nama lengkap"
+                                    value={nama}
+                                    onChange={(e) => setNama(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="md:col-span-4 space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">NIP</label>
+                            <div className="relative group">
+                                <TbId className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={20} />
+                                <input
+                                    type="text"
+                                    className="w-full h-14 pl-12 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-300"
+                                    placeholder="Nomor Induk Pegawai"
+                                    value={nip}
+                                    onChange={(e) => setNip(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="md:col-span-6 space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Email</label>
+                            <div className="relative group">
+                                <TbMail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={20} />
+                                <input
+                                    type="email"
+                                    className="w-full h-14 pl-12 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-300"
+                                    placeholder="email@example.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="md:col-span-6 space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">No. Telepon / WhatsApp</label>
+                            <div className="relative group">
+                                <TbPhone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={20} />
+                                <input
+                                    type="text"
+                                    className="w-full h-14 pl-12 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-slate-300"
+                                    placeholder="08xxxxxxxxxx"
+                                    value={noTelpon}
+                                    onChange={(e) => setNoTelpon(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        {/* --- Section 2: Unit Kerja & Jabatan --- */}
+                        <div className="md:col-span-12 mt-4">
+                            <div className="flex items-center gap-2 mb-4">
+                                <span className="h-8 w-1 rounded-full bg-emerald-500" />
+                                <h4 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">Kepegawaian</h4>
+                            </div>
+                        </div>
+
+                        <div className="md:col-span-6 space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Unit Kerja (Lemdik)</label>
+                            <Select value={idLemdik?.toString()} onValueChange={(value) => setIdLemdik(parseInt(value))}>
+                                <SelectTrigger className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-emerald-500/10">
+                                    <div className="flex items-center gap-3">
+                                        <TbBuildingSkyscraper className="text-slate-400" size={20} />
+                                        <SelectValue placeholder="Pilih Unit Kerja" />
+                                    </div>
+                                </SelectTrigger>
+                                <SelectContent className="max-h-80 z-[9999999]">
+                                    {unitKerjas?.map((item, index) => (
+                                        <SelectItem key={index} value={item.id_unit_kerja.toString()} className="font-semibold text-xs py-3">{item.nama}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="md:col-span-6 space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Jenjang Jabatan</label>
+                            <div className="relative group">
+                                <TbBriefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors" size={20} />
+                                <input
+                                    type="text"
+                                    className="w-full h-14 pl-12 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-emerald-500/10 transition-all placeholder:text-slate-300"
+                                    placeholder="Contoh: Widyaiswara Ahli Madya"
+                                    value={jenjangJabatan}
+                                    onChange={(e) => setJenjangJabatan(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="md:col-span-6 space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Pangkat / Golongan</label>
+                            <div className="relative group">
+                                <TbActivity className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors" size={20} />
+                                <input
+                                    type="text"
+                                    className="w-full h-14 pl-12 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-emerald-500/10 transition-all placeholder:text-slate-300"
+                                    placeholder="Contoh: Pembina (IV/a)"
+                                    value={pelatihanPelatih}
+                                    onChange={(e) => setPelatihanPelatih(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="md:col-span-6 space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Pendidikan Terakhir</label>
+                            <Select value={pendidikanTerakhir} onValueChange={setPendidikanTerakhir}>
+                                <SelectTrigger className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-emerald-500/10">
+                                    <div className="flex items-center gap-3">
+                                        <TbSchool className="text-slate-400" size={20} />
+                                        <SelectValue placeholder="Pilih Pendidikan" />
+                                    </div>
+                                </SelectTrigger>
+                                <SelectContent className="z-[9999999]">
+                                    {["Tidak/Belum Sekolah", "SD", "SMP", "SMA/SMK", "D1", "D2", "D3", "D4", "S1", "S2", "S3"].map((level) => (
+                                        <SelectItem key={level} value={level} className="font-semibold text-xs py-3">{level}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {/* --- Section 3: Kompetensi & Sertifikasi --- */}
+                        <div className="md:col-span-12 mt-4">
+                            <div className="flex items-center gap-2 mb-4">
+                                <span className="h-8 w-1 rounded-full bg-violet-500" />
+                                <h4 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">Kompetensi & Sertifikasi</h4>
+                            </div>
+                        </div>
+
+                        <div className="md:col-span-12 space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Bidang Keahlian</label>
+                            <Select value={bidangKeahlian} onValueChange={setBidangKeahlian}>
+                                <SelectTrigger className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-violet-500/10">
+                                    <div className="flex items-center gap-3">
+                                        <TbCertificate className="text-slate-400" size={20} />
+                                        <SelectValue placeholder="Pilih Bidang Keahlian" />
+                                    </div>
+                                </SelectTrigger>
+                                <SelectContent className="max-h-80 z-[9999999]">
+                                    {dataRumpunPelatihan?.map((rumpun: RumpunPelatihan) => (
+                                        <SelectItem key={rumpun.id_rumpun_pelatihan} value={rumpun.name} className="font-semibold text-xs py-3">{rumpun.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="md:col-span-4 space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Link MoT</label>
+                            <div className="relative group">
+                                <TbLink className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-violet-500 transition-colors" size={20} />
+                                <input
+                                    type="text"
+                                    className="w-full h-14 pl-12 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-violet-500/10 transition-all placeholder:text-slate-300"
+                                    placeholder="URL Sertifikat MoT"
+                                    value={managementOfTraining}
+                                    onChange={(e) => setManagementOfTraining(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="md:col-span-4 space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Link ToT</label>
+                            <div className="relative group">
+                                <TbLink className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-violet-500 transition-colors" size={20} />
+                                <input
+                                    type="text"
+                                    className="w-full h-14 pl-12 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-violet-500/10 transition-all placeholder:text-slate-300"
+                                    placeholder="URL Sertifikat ToT"
+                                    value={trainingOfficerCourse}
+                                    onChange={(e) => setTrainingOfficerCourse(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="md:col-span-4 space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Link Sertifikat Lainnya</label>
+                            <div className="relative group">
+                                <TbLink className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-violet-500 transition-colors" size={20} />
+                                <input
+                                    type="text"
+                                    className="w-full h-14 pl-12 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-violet-500/10 transition-all placeholder:text-slate-300"
+                                    placeholder="URL Data Dukung"
+                                    value={linkSertifikat}
+                                    onChange={(e) => setLinkSertifikat(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="md:col-span-12 space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Status Keaktifan</label>
+                            <Select value={status} onValueChange={setStatus}>
+                                <SelectTrigger className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-emerald-500/10">
+                                    <div className="flex items-center gap-3">
+                                        <TbUserCheck className={status === "Active" ? "text-emerald-500" : "text-slate-400"} size={20} />
+                                        <SelectValue placeholder="Pilih Status" />
+                                    </div>
+                                </SelectTrigger>
+                                <SelectContent className="z-[9999999]">
+                                    <SelectItem value="Active" className="font-semibold text-xs py-3">Active</SelectItem>
+                                    <SelectItem value="No Active" className="font-semibold text-xs py-3">Non Active / Pensiun</SelectItem>
+                                    <SelectItem value="Tugas Belajar" className="font-semibold text-xs py-3">Tugas Belajar</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="p-6 bg-gray-50/50 dark:bg-white/5 border-t border-gray-100 dark:border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 rounded-b-[32px]">
+                    <button onClick={() => setIsOpen(false)} disabled={loading} className="px-8 py-4 text-xs font-black text-slate-400 uppercase tracking-widest hover:text-slate-900 transition-colors">
+                        Cancel
+                    </button>
+                    <button
                         onClick={handleUpdate}
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
                         disabled={loading}
+                        className="group relative h-12 px-8 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl flex items-center justify-center gap-3 font-black text-xs uppercase tracking-widest shadow-xl transition-all hover:-translate-y-1 active:scale-95 disabled:opacity-50"
                     >
-                        {loading ? "Menyimpan..." : "Update"}
-                    </AlertDialogAction>
-                </AlertDialogFooter>
+                        {loading ? "Processing..." : <><TbChecks size={18} /> Update Data</>}
+                    </button>
+                </div>
             </AlertDialogContent>
         </AlertDialog>
     );
