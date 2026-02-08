@@ -9,10 +9,6 @@ const nextConfig = {
         source: '/(.*)',
         headers: [
           {
-            key: 'X-Forwarded-Proto',
-            value: 'https',
-          },
-          {
             key: 'X-Frame-Options',
             value: 'DENY',
           },

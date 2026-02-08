@@ -22,7 +22,7 @@ export function middleware(request: NextRequest) {
   // 1. Force HTTPS in production (Only if not localhost and header matches exactly 'http')
   const isProd = process.env.NEXT_PUBLIC_NODE_ENV === 'production'
   const isHttp = request.headers.get("x-forwarded-proto") === "http"
-  const isLocal = request.nextUrl.hostname === 'localhost'
+  const isLocal = request.nextUrl.hostname === 'localhost' || request.nextUrl.hostname === '127.0.0.1'
 
   if (isProd && isHttp && !isLocal) {
     return NextResponse.redirect(`https://${request.headers.get("host")}${path}`, 307)
@@ -52,7 +52,26 @@ export function middleware(request: NextRequest) {
       }
     }
   }
+  // 4. Admin Protection
+  if (path.startsWith('/admin') && !path.includes('/auth') && !isAdmin) {
+    return NextResponse.redirect(new URL('/admin/auth/login', request.url))
+  }
 
   return NextResponse.next()
+}
+
+// Optimization: Ensure middleware only runs for relevant routes to avoid loops on system files
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - logo (public images)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|logo).*)',
+  ],
 }
 
