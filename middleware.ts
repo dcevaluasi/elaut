@@ -54,7 +54,7 @@ export function middleware(request: NextRequest) {
   }
 
   // 4. Admin Protection
-  if (path.startsWith('/admin') && !path.includes('/auth') && !isAdmin) {
+  if (path.startsWith('/admin') && !isAdmin) {
     return NextResponse.redirect(new URL('/admin/auth/login', request.url))
   }
 
@@ -64,11 +64,8 @@ export function middleware(request: NextRequest) {
 // Optimization: Added '/' to matcher if you want to protect the root
 export const config = {
   matcher: [
-    '/',
     '/dashboard/:path*',
-    '/registrasi',
-    '/login',
     '/admin/:path*',
-    '/layanan/:path*',
+    '/p2mkp/dashboard/:path*'
   ],
 }
