@@ -84,8 +84,8 @@ export const metadata: Metadata = {
   keywords: [
     "E-LAUT", "E-MILEA", "e-milea", "elatar", "pentaru", "e-latar", "pelaut", "elut", "Badan Penyuluah", "puslatkp", "puslat kp", "Puslat KP", "PUSLAT  KP", "emilea", "EMILEA", "elearning kkp", "ELAUT", "Elaut", "e-laut", "Kementerian Kelautan dan Perikanan", "KKP", "BPPSDM KP",
     "pelatihan kelautan", "pelatihan perikanan", "sertifikasi kompetensi", "diklat perikanan",
-    "sertifikat kelautan", "BSTF", "Awak Kapal Perikanan", "AKP", "P2MKP", "BPPP",
-    "pendaftaran pelatihan online", "CORPU KKP", "corpu", "Corpu", "Maritime Training Center", "training center", "layanan masyarakat KKP", "SDM Maritim", "indonesia maritime training"
+    "sertifikat kelautan", "BSTF", "pelatihan", "training", "waingapu", "ekonomi biru", "blu economy", "Awak Kapal Perikanan", "AKP", "P2MKP", "BPPP",
+    "pendaftaran pelatihan online", "CORPU KKP", "corpu", "Corpu", "Maritime Training Center", "training center", "layanan masyarakat KKP", "SDM Maritim", "indonesia maritime training", "budidaya", "Budi Daya", "HACCP", "SPI", "CPIB", "CBIB", "ANKAPIN", "ATKAPIN", "tegal", "Tegal", "Banyuwangi", "banyuwangi", "bitung", "Bitung", "Ambon", "BPPP Tegal", "BPPP Ambon", "BPPP Bitung", "BPPP Medan", "BPPP Banyuwangi", "BRBIH Depok", "BRBIH", "Rating", "diklat teknis kp"
   ],
   referrer: "origin-when-cross-origin",
   robots: {
