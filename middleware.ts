@@ -65,7 +65,8 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/dashboard/:path*',
-    '/admin/:path*',
+    '/admin/pusat/:path*',
+    '/admin/lemdiklat/:path*',
     '/p2mkp/dashboard/:path*'
   ],
 }
