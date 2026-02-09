@@ -179,7 +179,7 @@ export function DynamicTablePelatihanMasyarakat({
         XLSX.utils.book_append_sheet(wb, ws, "Capaian")
         XLSX.writeFile(wb, `${title} - ${triwulan} ${tahun}.xlsx`)
     }
-
+    // 
     return (
         <Card className="w-full shadow-[0_4px_20px_rgba(0,0,0,0.03)] border-none bg-white dark:bg-slate-900 rounded-[10px] overflow-hidden">
             <CardHeader className="flex flex-col md:flex-row justify-between items-center gap-4 bg-slate-50/50 dark:bg-white/5 border-b border-slate-100 dark:border-white/5 pb-4">
