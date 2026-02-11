@@ -138,7 +138,7 @@ const ManageProgramPelatihanAction: React.FC<{
                 )}
             </AlertDialogTrigger>
 
-            <AlertDialogContent className="w-[95vw] max-w-[95vw] h-[90vh] p-0 overflow-hidden bg-white dark:bg-slate-900 border-none rounded-[32px] shadow-[0_32px_120px_rgba(0,0,0,0.2)] z-[999999] flex flex-col">
+            <AlertDialogContent className="w-full max-w-5xl h-fit max-h-[90vh] p-0 overflow-hidden bg-white dark:bg-slate-900 border-none rounded-[32px] shadow-[0_32px_120px_rgba(0,0,0,0.2)] z-[999999] flex flex-col">
                 {/* Modal Header */}
                 <div className="relative p-8 md:p-10 bg-gradient-to-br from-blue-50/50 to-transparent dark:from-blue-500/5 border-b border-gray-100 dark:border-white/5">
                     <div className="flex items-start justify-between">

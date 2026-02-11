@@ -18,6 +18,7 @@ import {
   TbUsers,
   TbCurrencyDollar,
   TbMapPin,
+  TbPlus,
 } from "react-icons/tb";
 import { RiVerifiedBadgeLine } from "react-icons/ri";
 
@@ -44,7 +45,7 @@ import {
 } from "@/constants/pelatihan";
 import { useFetchDataRumpunPelatihan } from "@/hooks/elaut/master/useFetchDataRumpunPelatihan";
 import { ProgramPelatihan, RumpunPelatihan } from "@/types/program";
-import ManageProgramPelatihanAction from "@/commons/actions/master/program-pelatihan/ManageProgramPelatihanAction";
+
 import addData from "@/firebase/firestore/addData";
 
 const STEPS = [
@@ -336,7 +337,15 @@ function FormPelatihan({ edit = false, onSuccess }: { edit: boolean, onSuccess?:
                                 </SelectItem>
                               </SelectContent>
                             </Select>
-                            <ManageProgramPelatihanAction onSuccess={() => { fetchRumpunPelatihan(); Toast.fire({ icon: 'success', title: 'Ditambahkan!' }); }} />
+                            <button
+                              type="button"
+                              id="trigger-add-program"
+                              onClick={() => Toast.fire({ icon: "info", title: "Info", text: "Anda bisa menambahkan terlebih dahulu di menu program pelatihan" })}
+                              className="flex items-center gap-3 px-6 h-12 rounded-2xl bg-blue-600 dark:bg-blue-500 text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-1 transition-all active:scale-95"
+                            >
+                              <TbPlus size={20} strokeWidth={3} />
+                              New Program
+                            </button>
                           </div>
                         </FormField>
                       </div>
