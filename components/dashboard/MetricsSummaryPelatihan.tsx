@@ -141,59 +141,56 @@ const MetricsSummaryPelatihan: React.FC<MetricsSummaryPelatihanProps> = ({ data,
 
 
 
-    return (
-        <div className="gap-5 flex w-full">
-            {/* Metrics */}
-            <div className="flex flex-col gap-5">
-                {metrics.map((item) => (
-                    <Card key={item.title} className="shadow-sm border rounded-2xl">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">{item.title}</CardTitle>
-                            <item.icon className={`h-5 w-5 text-${item.color}-500`} />
-                        </CardHeader>
-                        <CardContent>
-                            <div className={`text-2xl font-bold text-${item.color}-500`}>{item.value}</div>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
 
-            {/* Ongoing Training List */}
-            <Card className="shadow-sm border rounded-2xl flex-1">
-                <CardHeader>
-                    <CardTitle className="text-lg font-semibold">Ongoing Trainings</CardTitle>
+    return (
+        <div className="flex flex-col gap-4 w-full h-full">
+            {metrics.map((item) => (
+                <Card key={item.title} className={`shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl overflow-hidden hover:border-${item.color}-200 transition-colors group`}>
+                    <CardContent className="p-5 flex items-center justify-between">
+                        <div className="space-y-1">
+                            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{item.title}</p>
+                            <div className="text-2xl font-black text-slate-800 dark:text-white flex items-baseline gap-1">
+                                {item.value}
+                                <span className="text-xs font-medium text-slate-400">Total</span>
+                            </div>
+                        </div>
+                        <div className={`p-3 rounded-xl bg-${item.color}-50 dark:bg-${item.color}-900/20 text-${item.color}-600 dark:text-${item.color}-400 group-hover:scale-110 transition-transform`}>
+                            <item.icon className="h-6 w-6" />
+                        </div>
+                    </CardContent>
+                </Card>
+            ))}
+
+            {/* Ongoing Training Snippet */}
+            <Card className="shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl flex-1 flex flex-col">
+                <CardHeader className="p-5 pb-2 border-b border-slate-50 dark:border-slate-800">
+                    <CardTitle className="text-sm font-bold text-slate-800 dark:text-white">Pelatihan Berlangsung</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="p-0 flex-1 overflow-auto max-h-[300px] custom-scrollbar">
                     {ongoingTrainings.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center p-6  rounded-xl border border-dashed border-gray-300 text-center">
-                            <CalendarDays className="h-10 w-10 text-blue-500 mb-3" />
-                            <p className="text-base font-medium text-gray-700 leading-none mb-1">
-                                Tidak ada pelatihan yang sedang berlangsung
-                            </p>
-                            <p className="text-sm text-gray-500">
-                                Nantikan jadwal pelatihan terbaru tahun ini 🚀
+                        <div className="flex flex-col items-center justify-center p-8 text-center h-full">
+                            <CalendarDays className="h-10 w-10 text-slate-300 mb-3" />
+                            <p className="text-sm font-medium text-slate-500">
+                                Tidak ada pelatihan aktif saat ini
                             </p>
                         </div>
                     ) : (
-                        ongoingTrainings.map((training) => (
-                            <div
-                                key={training.id}
-                                className="space-y-2 border-b last:border-0 pb-4 last:pb-0"
-                            >
-                                <div className="flex items-center justify-between">
-                                    <Link href={`/admin/${usePathname().includes('pusat') ? 'pusat' : 'lemdiklat'}/pelatihan/detail/${training.code}/${encryptValue(
-                                        training.id.toString()
-                                    )}`} className="font-medium text-base">{training.title}</Link>
-                                    <Badge variant="secondary">{training.status}</Badge>
+                        <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                            {ongoingTrainings.map((training) => (
+                                <div key={training.id} className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <Link href={`/admin/${usePathname().includes('pusat') ? 'pusat' : 'lemdiklat'}/pelatihan/detail/${training.code}/${encryptValue(training.id.toString())}`} className="font-bold text-sm text-slate-800 dark:text-white line-clamp-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                                            {training.title}
+                                        </Link>
+                                    </div>
+                                    <div className="flex justify-between items-center text-xs text-slate-500 mb-2">
+                                        <span>{training.batch}</span>
+                                        <span className="font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">{training.progress}%</span>
+                                    </div>
+                                    <Progress value={training.progress} className="h-1.5" />
                                 </div>
-                                <p className="text-sm text-muted-foreground">{training.batch}</p>
-                                <p className="text-sm text-muted-foreground">{training.penyelenggara}</p>
-                                <Progress value={training.progress} className="h-2" />
-                                <p className="text-xs text-muted-foreground">
-                                    {training.participants} participants • {training.progress}% pelaksanaan
-                                </p>
-                            </div>
-                        ))
+                            ))}
+                        </div>
                     )}
                 </CardContent>
             </Card>

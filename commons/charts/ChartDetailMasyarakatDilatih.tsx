@@ -107,8 +107,8 @@ const TrainingChartCard: React.FC<ChartCardProps> = ({
   };
 
   return (
-    <Card className="flex flex-col w-full shadow-xl hover:shadow-2xl transition-all duration-300 border border-slate-200/60 bg-white rounded-2xl overflow-hidden">
-      <CardHeader className="pb-4 pt-6 bg-gradient-to-r from-slate-50 to-gray-50 border-b border-slate-200">
+    <Card className="flex flex-col w-full shadow-sm hover:shadow-md transition-all duration-300 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl overflow-hidden group hover:ring-1 hover:ring-blue-100 dark:hover:ring-blue-900">
+      <CardHeader className="pb-4 pt-6 bg-gradient-to-r from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-800/50 border-b border-slate-100 dark:border-slate-800">
         <div className="flex justify-between items-start mb-4">
           <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
             <div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-indigo-500 rounded-full"></div>
@@ -123,22 +123,22 @@ const TrainingChartCard: React.FC<ChartCardProps> = ({
 
         {/* Quick Stats */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-white rounded-xl p-3 border border-slate-200 hover:border-blue-400 transition-all duration-200">
-            <p className="text-xs text-slate-500 font-medium mb-1">Total</p>
-            <p className="text-2xl font-bold text-slate-800">{totalVisitors.toLocaleString()}</p>
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-3 border border-slate-200 dark:border-slate-700 hover:border-blue-400 transition-all duration-200">
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">Total</p>
+            <p className="text-2xl font-bold text-slate-800 dark:text-white">{totalVisitors.toLocaleString()}</p>
           </div>
-          <div className="bg-white rounded-xl p-3 border border-slate-200 hover:border-emerald-400 transition-all duration-200">
-            <p className="text-xs text-slate-500 font-medium mb-1">Kategori</p>
-            <p className="text-2xl font-bold text-slate-800">{chartData.length}</p>
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-3 border border-slate-200 dark:border-slate-700 hover:border-emerald-400 transition-all duration-200">
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">Kategori</p>
+            <p className="text-2xl font-bold text-slate-800 dark:text-white">{chartData.length}</p>
           </div>
-          <div className="bg-white rounded-xl p-3 border border-slate-200 hover:border-amber-400 transition-all duration-200">
-            <p className="text-xs text-slate-500 font-medium mb-1">Tertinggi</p>
-            <p className="text-2xl font-bold text-slate-800">{highestValue.toLocaleString()}</p>
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-3 border border-slate-200 dark:border-slate-700 hover:border-amber-400 transition-all duration-200">
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">Tertinggi</p>
+            <p className="text-2xl font-bold text-slate-800 dark:text-white">{highestValue.toLocaleString()}</p>
           </div>
         </div>
 
         {topItem && (
-          <div className="mt-3 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl p-3 border border-indigo-200">
+          <div className="mt-3 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-xl p-3 border border-indigo-200 dark:border-indigo-800">
             <div className="flex items-center gap-2">
               <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
@@ -505,21 +505,7 @@ const ChartDetailMasyarakatDilatih: React.FC<
   }, [filteredDataByBalai, filteredPelatihanByBalai]);
 
   return (
-    <div className="mb-6 pt-10 rounded-2xl border border-slate-200/60 bg-white shadow-xl hover:shadow-2xl transition-all duration-300 px-6 pb-6 sm:px-8 overflow-hidden">
-      <div className="mb-8 flex justify-between items-center border-b-2 border-gradient-to-r from-indigo-500 to-blue-500 pb-6">
-        <div>
-          <h5 className="text-2xl font-bold text-slate-800 flex items-center gap-3">
-            <div className="w-1.5 h-8 bg-gradient-to-b from-indigo-500 to-blue-500 rounded-full"></div>
-            Grafik Capaian Masyarakat Dilatih
-          </h5>
-          <p className="text-sm text-slate-500 flex items-center gap-2 mt-2 font-medium">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            {formatDateTime()}
-          </p>
-        </div>
-      </div>
+    <div className="p-6">
 
       <div className="flex h-full gap-6 flex-col">
         {/* First Row - Mixed Layout */}

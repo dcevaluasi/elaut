@@ -1,15 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
 import Cookies from "js-cookie";
 import ReactApexChart from "react-apexcharts";
 import type { ApexOptions } from "apexcharts";
-
-import { elautBaseUrl } from "@/constants/urls";
 import { PelatihanMasyarakat } from "@/types/product";
 import { UserPelatihan } from "@/types/user";
-import { formatDateTime, getMonthFromDateString } from "@/utils";
+import { getMonthFromDateString } from "@/utils";
 
 // ================== Chart Config ==================
 const chartOptions: ApexOptions = {
@@ -132,25 +129,15 @@ export default function ChartMasyarakatDilatihMonthly({ data, dataUser, tahun, t
 
   // ================== Render ==================
   return (
-    <div className=" mb-4 rounded-xl border border-stroke bg-white shadow-default px-5 pt-7.5 pb-5 sm:px-7.5">
-      {/* Header */}
-      <div className="flex flex-wrap justify-between gap-3 sm:flex-nowrap">
-        <div className="flex flex-col w-full gap-4">
-          <div>
-            <h5 className="text-xl font-semibold text-black">Tren Pelatihan dan Masyarakat Dilatih</h5>
-            <p className="text-sm italic">{formatDateTime()}</p>
-          </div>
-
-          {/* Stats */}
-          <div className="flex gap-5">
-            <StatItem color="primary" label="Total Pelatihan Selesai" value={`${pelatihan.length} Pelatihan`} />
-            <StatItem color="secondary" label="Total Masyarakat Dilatih" value={`${totalMasyarakat} Orang`} />
-          </div>
-        </div>
+    <div className="w-full h-full flex flex-col gap-4">
+      {/* Stats */}
+      <div className="flex gap-5 px-5 pt-2">
+        <StatItem color="primary" label="Total Pelatihan Selesai" value={`${pelatihan.length} Pelatihan`} />
+        <StatItem color="secondary" label="Total Masyarakat Dilatih" value={`${totalMasyarakat} Orang`} />
       </div>
 
       {/* Chart */}
-      <div id="chartOne" className="-ml-5">
+      <div id="chartOne" className="-ml-5 flex-1 min-h-[300px]">
         <ReactApexChart
           options={chartOptions}
           series={[
@@ -158,7 +145,7 @@ export default function ChartMasyarakatDilatihMonthly({ data, dataUser, tahun, t
             { name: "Total Masyarakat Dilatih", data: monthlyUser },
           ]}
           type="area"
-          height={350}
+          height="100%"
           width="100%"
         />
       </div>
@@ -168,21 +155,20 @@ export default function ChartMasyarakatDilatihMonthly({ data, dataUser, tahun, t
 
 // ================== Sub Components ==================
 function StatItem({ color, label, value }: { color: "primary" | "secondary"; label: string; value: string }) {
-  const colorMap = {
-    primary: "text-primary border-primary bg-primary",
-    secondary: "text-secondary border-secondary bg-secondary",
-  };
+  const isPrimary = color === "primary";
+  const ringColor = isPrimary ? "ring-blue-500/20" : "ring-sky-500/20";
+  const bgColor = isPrimary ? "bg-blue-500" : "bg-sky-500";
+  const textColor = "text-slate-800 dark:text-white";
+  const subTextColor = "text-slate-500 dark:text-slate-400";
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-3">
       {/* Icon Bullet */}
-      <span className={`flex h-4 w-4 items-center justify-center rounded-full border ${colorMap[color].split(" ")[1]}`}>
-        <span className={`block h-2.5 w-2.5 rounded-full ${colorMap[color].split(" ")[2]}`} />
-      </span>
+      <span className={`flex h-3 w-3 items-center justify-center rounded-full ${bgColor} ring-4 ${ringColor}`} />
       {/* Label + Value */}
       <div>
-        <p className={`font-semibold ${colorMap[color].split(" ")[0]}`}>{label}</p>
-        <p className="text-sm font-medium">{value}</p>
+        <p className={`text-xs font-semibold uppercase tracking-wider ${subTextColor} mb-0.5`}>{label}</p>
+        <p className={`text-lg font-bold ${textColor} leading-none`}>{value}</p>
       </div>
     </div>
   );
