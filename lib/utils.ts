@@ -10,7 +10,7 @@ import { MateriPelatihan } from '@/types/product';
 export const setSecureCookie = (name: string, value: string, expires: number = 1) => {
   Cookies.set(name, value, {
     expires,
-    secure: process.env.NEXT_PUBLIC_NODE_ENV === 'production',
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
     path: '/',
   });
