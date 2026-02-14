@@ -79,7 +79,6 @@ export default function Home() {
   return (
     <>
       <Hero />
-      {/* <AboutElautSection /> */}
       <Footer />
     </>
   );
