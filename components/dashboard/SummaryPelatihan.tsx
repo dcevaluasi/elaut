@@ -182,7 +182,6 @@ const SummaryPelatihan: React.FC = () => {
             </div>
           </div>
 
-          {/* Detail Charts Section - Full Width */}
           <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
             <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-gradient-to-r from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-800/50">
               <div className="flex items-center gap-4">
