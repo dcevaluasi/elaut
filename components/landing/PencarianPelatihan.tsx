@@ -341,7 +341,6 @@ const CardPelatihan = ({ pelatihan, index }: { pelatihan: PelatihanMasyarakat; i
         {/* Harga & Action */}
         <div className="flex flex-col md:items-center gap-4">
           <div className="text-left md:text-center">
-            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Investasi</span>
             <p className="text-xl font-bold text-white">
               {pelatihan.HargaPelatihan === 0 ? (
                 <span className="text-teal-400">GRATIS</span>
@@ -355,8 +354,8 @@ const CardPelatihan = ({ pelatihan, index }: { pelatihan: PelatihanMasyarakat; i
             onClick={() => Cookies.set("JenisProgram", pelatihan?.JenisProgram)}
             href={`/layanan/pelatihan/${createSlug(pelatihan.NamaPelatihan)}/${pelatihan?.KodePelatihan}/${encryptValue(pelatihan?.IdPelatihan)}`}
             className={`w-full py-3 rounded-2xl text-xs font-bold transition-all flex justify-center items-center gap-2 ${pelatihan?.StatusApproval == "Selesai"
-                ? "bg-white/5 text-gray-400 cursor-not-allowed"
-                : "bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-500/20"
+              ? "bg-white/5 text-gray-400 cursor-not-allowed"
+              : "bg-blue-600 text-white hover:bg-blue-500 shadow-lg shadow-blue-500/20"
               }`}
           >
             {pelatihan.StatusApproval == "Selesai" ? "Sudah Selesai" : "Lihat Detail"}
