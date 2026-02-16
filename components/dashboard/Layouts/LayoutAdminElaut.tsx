@@ -382,21 +382,35 @@ interface HeaderPageLayoutAdminElautProps {
 
 export function HeaderPageLayoutAdminElaut({ icon, title, description }: HeaderPageLayoutAdminElautProps) {
   return (
-    <article className="flex flex-row gap-2 items-center mb-6">
+    <article className="flex flex-col gap-2 mb-6 group">
       <header
         aria-label="page caption"
-        className="flex-row w-full flex h-auto items-center gap-4 bg-white border border-slate-200/60 shadow-sm rounded-2xl p-6"
+        className="relative overflow-hidden flex flex-col md:flex-row w-full h-auto items-center gap-5 bg-white border border-slate-200 shadow-sm rounded-3xl p-6 transition-all duration-500"
       >
-        <div className="w-14 h-14 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-3xl shrink-0">
-          {icon}
+        {/* Background Decorative Element */}
+        <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 w-64 h-64 bg-blue-50/30 rounded-full blur-3xl group-hover:bg-blue-100/30 transition-colors duration-700" />
+
+        <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center text-3xl shrink-0 shadow-lg shadow-blue-500/20 transform group-hover:scale-105 transition-all duration-500">
+          <span className="relative z-10">{icon}</span>
         </div>
-        <div className="flex flex-col gap-1">
-          <h1 id="page-caption" className="font-bold text-xl text-slate-900">
-            {title}
-          </h1>
-          <p className="font-medium text-slate-500 text-sm">
+
+        <div className="relative flex flex-col gap-1 text-center md:text-left">
+          <div className="flex items-center gap-3 justify-center md:justify-start">
+            <h1 id="page-caption" className="font-bold text-xl text-slate-900 tracking-tight">
+              {title}
+            </h1>
+          </div>
+          <p className="font-medium text-slate-400 text-xs max-w-2xl leading-relaxed uppercase tracking-wider">
             {description}
           </p>
+        </div>
+
+        <div className="hidden lg:flex flex-col items-end ml-auto pr-4 border-l border-slate-100 pl-6 space-y-0.5">
+          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Konsol Manajemen</span>
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+            <span className="text-[10px] font-bold text-slate-700 uppercase">Sistem Aktif</span>
+          </div>
         </div>
       </header>
     </article>

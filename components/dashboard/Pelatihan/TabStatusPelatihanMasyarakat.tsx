@@ -30,39 +30,45 @@ const StatusButton = ({
 }: StatusButtonProps) => (
     <button
         onClick={onClick}
-        className={`relative flex flex-col items-start gap-1 px-5 py-3 rounded-2xl text-sm font-semibold transition-all duration-300 min-w-[200px] group
+        className={`relative flex flex-col items-start gap-1 px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all duration-500 min-w-[180px] group overflow-hidden
       ${isSelected
                 ? "text-blue-600 dark:text-blue-400"
-                : "text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+                : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
             }
     `}
     >
         {isSelected && (
-            <motion.div
-                layoutId="activeSegment"
-                className="absolute inset-0 bg-white dark:bg-slate-800 shadow-[0_4px_12px_rgba(0,0,0,0.08)] dark:shadow-none border border-gray-200/60 dark:border-white/10 rounded-2xl"
-                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-            />
+            <>
+                <motion.div
+                    layoutId="activeSegment"
+                    className="absolute inset-0 bg-white dark:bg-slate-800 shadow-sm border border-slate-200/60 dark:border-white/10"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+            </>
         )}
 
         <div className="relative z-10 w-full flex flex-col gap-1.5 text-left">
             <div className="flex items-center justify-between w-full">
-                <div className={`flex items-center gap-2 transition-all duration-300 ${isSelected ? "scale-105 font-bold" : "opacity-70 group-hover:opacity-100"}`}>
-                    <span className="shrink-0">{icon}</span>
-                    <span className="tracking-tight line-clamp-1">{label}</span>
+                <div className={`flex items-center gap-2.5 transition-all duration-500 ${isSelected ? "scale-[1.01]" : "opacity-60 group-hover:opacity-100"}`}>
+                    <div className={`p-1.5 rounded-lg transition-all duration-500 ${isSelected ? "bg-blue-600 text-white shadow-md shadow-blue-500/10" : "bg-slate-50 text-slate-400"}`}>
+                        {React.cloneElement(icon as React.ReactElement, { size: 14 })}
+                    </div>
+                    <span className="tracking-tight font-bold uppercase text-[10px] leading-none">{label}</span>
                 </div>
-                <span
-                    className={`flex items-center justify-center min-w-[24px] h-5 px-1.5 text-[10px] font-bold rounded-lg transition-all duration-300 ${isSelected
-                        ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
-                        : "bg-gray-200 text-gray-500 dark:bg-white/5 dark:text-gray-500 group-hover:bg-gray-300 dark:group-hover:bg-white/10"
-                        }`}
-                >
-                    {count}
-                </span>
+                <div className="relative">
+                    <span
+                        className={`flex items-center justify-center min-w-[28px] h-5 px-1.5 text-[10px] font-black rounded-lg transition-all duration-500 ${isSelected
+                            ? "bg-blue-600 text-white shadow-sm"
+                            : "bg-slate-100 text-slate-500"
+                            }`}
+                    >
+                        {count}
+                    </span>
+                </div>
             </div>
 
             {subLabel && (
-                <p className={`text-[10px] font-medium leading-tight transition-opacity duration-300 line-clamp-2 ${isSelected ? "opacity-90" : "opacity-40 group-hover:opacity-70"}`}>
+                <p className={`text-[9px] font-medium leading-none truncate w-full pl-0.5 ${isSelected ? "text-slate-400" : "text-slate-300 group-hover:text-slate-400"}`}>
                     {subLabel}
                 </p>
             )}
@@ -175,33 +181,45 @@ export default function TabStatusPelatihanMasyarakat({
     }
 
     return (
-        <div className="mt-10 space-y-4">
+        <div className="mt-8 space-y-4">
             {/* Informative Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-1">
-                <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-blue-100 dark:bg-blue-900/30 rounded-2xl shadow-sm border border-blue-200 dark:border-blue-800">
-                        <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 px-1">
+                <div className="flex items-center gap-4">
+                    <div className="relative group/info">
+                        <div className="relative p-3 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-white/5">
+                            <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        </div>
                     </div>
-                    <div>
-                        <h2 className="text-sm font-extrabold text-gray-900 dark:text-white tracking-tight leading-tight">
-                            Workflow Peran: <span className="text-blue-600 dark:text-blue-400 font-black">{getRoleContext()}</span>
+                    <div className="space-y-0.5">
+                        <div className="flex items-center gap-2">
+                            <span className="text-[9px] font-bold text-blue-500 uppercase tracking-widest">Informasi Peran</span>
+                            <div className="w-6 h-px bg-blue-500/20" />
+                        </div>
+                        <h2 className="text-lg font-bold text-slate-800 dark:text-white tracking-tight">
+                            Workflow Peran: <span className="text-blue-600">{getRoleContext()}</span>
                         </h2>
-                        <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium italic">
-                            Status operasional disesuaikan dengan otoritas akun Anda.
-                        </p>
+                        <div className="flex items-center gap-2 text-[10px] text-slate-400 font-medium">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+                            Status operasional aktif sesuai otoritas akun
+                        </div>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2.5 px-3.5 py-2 bg-gray-100/80 dark:bg-slate-800/50 rounded-2xl border border-gray-200 dark:border-white/5 shadow-inner">
-                    <Calendar className="w-4 h-4 text-blue-500" />
-                    <span className="text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-widest">
-                        Periode: {activeYear === "All" ? "Seluruh Waktu" : `TAHUN ${activeYear}`}
-                    </span>
+                <div className="flex items-center gap-3 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-xl shadow-sm">
+                    <div className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600">
+                        <Calendar size={14} />
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-[8px] font-bold text-slate-300 uppercase tracking-widest">Periode Aktif</span>
+                        <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-tighter">
+                            {activeYear === "All" ? "Seluruh Data" : `Tahun ${activeYear}`}
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            <div className="overflow-x-auto scrollbar-hide pb-3">
-                <nav className="inline-flex items-center gap-2 p-2 bg-gray-200/40 dark:bg-slate-950/40 backdrop-blur-xl border border-gray-200 dark:border-white/5 rounded-[26px]">
+            <div className="overflow-x-auto scrollbar-hide pb-2">
+                <nav className="inline-flex items-center gap-2 p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-3xl shadow-sm">
                     <StatusButton
                         {...getTabMetadata("All")}
                         count={dataLength}

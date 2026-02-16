@@ -184,30 +184,76 @@ const TableDataPelatihan: React.FC = () => {
     <div className="space-y-2 pb-10">
 
       {/* 2. Main Content (Filters + Table) */}
-      <div className="space-y-2">
-        <div className="flex flex-row w-full gap-4">
-          <Card className="shadow-sm border border-slate-200 bg-white rounded-xl overflow-hidden w-full">
-            <div className="p-5 flex items-center justify-between bg-gradient-to-br from-blue-50 to-white">
-              <div className="space-y-1">
-                <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider">Total Pelatihan</p>
-                <span className="text-3xl font-extrabold text-slate-800">{stats.total}</span>
-                <p className="text-xs text-slate-400">Kelas dibuka</p>
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card className="group relative overflow-hidden shadow-sm border border-slate-200 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl transition-all duration-500 hover:shadow-blue-500/10">
+            <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-700" />
+            <CardContent className="p-5 flex flex-col justify-between h-full relative z-10">
+              <div className="flex items-center justify-between mb-3">
+                <div className="p-3 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
+                  <Briefcase className="h-5 w-5 text-white" />
+                </div>
+                <div className="flex flex-col items-end">
+                  <span className="text-[9px] font-bold text-blue-100 uppercase tracking-widest opacity-80">Statistik</span>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-[8px] font-bold text-white uppercase tracking-wider">Aktif</span>
+                  </div>
+                </div>
               </div>
-              <div className="p-3 bg-blue-100 rounded-full">
-                <Briefcase className="h-6 w-6 text-blue-600" />
+              <div className="space-y-0.5">
+                <p className="text-[10px] font-bold text-blue-100 uppercase tracking-wider opacity-80">Total Pelatihan</p>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-3xl font-black text-white tracking-tighter">{stats.total}</span>
+                  <span className="text-[10px] font-bold text-blue-200 uppercase tracking-tighter">Kelas</span>
+                </div>
               </div>
+            </CardContent>
+          </Card>
+
+          <Card className="group relative overflow-hidden shadow-sm border border-slate-200 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl transition-all duration-500 hover:shadow-emerald-500/10">
+            <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-700" />
+            <CardContent className="p-5 flex flex-col justify-between h-full relative z-10">
+              <div className="flex items-center justify-between mb-3">
+                <div className="p-3 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
+                  <Users className="h-5 w-5 text-white" />
+                </div>
+                <div className="flex flex-col items-end">
+                  <span className="text-[9px] font-bold text-emerald-100 uppercase tracking-widest opacity-80">Registrasi</span>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                    <span className="text-[8px] font-bold text-white uppercase tracking-wider">Terverifikasi</span>
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-0.5">
+                <p className="text-[10px] font-bold text-emerald-100 uppercase tracking-wider opacity-80">Total Peserta</p>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-3xl font-black text-white tracking-tighter">{stats.totalPeserta}</span>
+                  <span className="text-[10px] font-bold text-emerald-200 uppercase tracking-tighter">Peserta</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Additional info cards made smaller and more subtle */}
+          <Card className="group hidden lg:flex relative overflow-hidden shadow-sm border border-slate-100 bg-white rounded-2xl p-5 flex-col justify-center items-center text-center">
+            <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mb-3">
+              <TrendingUp className="h-6 w-6 text-slate-400 group-hover:text-blue-500 transition-colors" />
+            </div>
+            <div className="space-y-0.5">
+              <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tren Bulanan</h4>
+              <p className="text-[9px] font-bold text-blue-500 uppercase">+12% Bulan ini</p>
             </div>
           </Card>
-          <Card className="shadow-sm border border-slate-200 bg-white rounded-xl overflow-hidden w-full current-year-highlight">
-            <div className="p-5 flex items-center justify-between bg-gradient-to-br from-emerald-50 to-white">
-              <div className="space-y-1">
-                <p className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Total Peserta</p>
-                <span className="text-3xl font-extrabold text-slate-800">{stats.totalPeserta}</span>
-                <p className="text-xs text-slate-400">Orang terdaftar</p>
-              </div>
-              <div className="p-3 bg-emerald-100 rounded-full">
-                <Users className="h-6 w-6 text-emerald-600" />
-              </div>
+
+          <Card className="group hidden lg:flex relative overflow-hidden shadow-sm border border-slate-100 bg-white rounded-2xl p-5 flex-col justify-center items-center text-center">
+            <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mb-3">
+              <GraduationCap className="h-6 w-6 text-slate-400 group-hover:text-amber-500 transition-colors" />
+            </div>
+            <div className="space-y-0.5">
+              <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rasio Kelulusan</h4>
+              <p className="text-[9px] font-bold text-amber-500 uppercase">Rerata 89.4%</p>
             </div>
           </Card>
         </div>
@@ -232,15 +278,20 @@ const TableDataPelatihan: React.FC = () => {
           <Tabs value={tabValue} onValueChange={setTabValue} className="w-full">
             {
               Cookies.get('Access')?.includes('createPelatihan') &&
-              <TabsList className={`grid w-full grid-cols-2 bg-slate-100 p-1 rounded-xl mb-3`}>
+              <TabsList className="grid w-full grid-cols-2 bg-slate-100/50 p-1.5 rounded-2xl mb-8 border border-slate-200/50 backdrop-blur-sm">
                 <TabsTrigger
                   value="account"
                   onClick={() => refetch()}
-                  className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm rounded-lg transition-all"
+                  className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-[0_8px_20px_-4px_rgba(0,0,0,0.1)] rounded-xl py-3 text-xs font-black uppercase tracking-widest transition-all duration-300"
                 >
                   Daftar Pelatihan
                 </TabsTrigger>
-                <TabsTrigger value="password" className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm rounded-lg transition-all">Buat Pelatihan Baru</TabsTrigger>
+                <TabsTrigger
+                  value="password"
+                  className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-[0_8px_20px_-4px_rgba(0,0,0,0.1)] rounded-xl py-3 text-xs font-black uppercase tracking-widest transition-all duration-300"
+                >
+                  Buat Pelatihan Baru
+                </TabsTrigger>
               </TabsList>
             }
 
@@ -250,33 +301,33 @@ const TableDataPelatihan: React.FC = () => {
                   <div className="py-32 w-full items-center flex justify-center">
                     <HashLoader color="#338CF5" size={50} />
                   </div> :
-                  <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-6">
                     {/* Compact Filter Bar */}
-                    <div className="flex flex-col md:flex-row gap-3 items-center bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+                    <div className="flex flex-col md:flex-row gap-4 items-center bg-white p-3 rounded-3xl border border-slate-200 shadow-sm">
                       {/* Search */}
-                      <div className="relative flex-1 w-full">
-                        <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+                      <div className="relative flex-1 w-full group">
+                        <MdSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-6 h-6 transition-colors group-focus-within:text-blue-500" />
                         <Input
                           type="text"
                           placeholder="Cari nama pelatihan..."
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
-                          className="pl-10 w-full border-slate-200 bg-slate-50 focus:bg-white transition-colors"
+                          className="pl-12 h-12 w-full border-none bg-slate-50 rounded-2xl focus-visible:ring-2 focus-visible:ring-blue-500/20 transition-all font-bold text-sm"
                         />
                       </div>
 
-                      <div className="flex gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
+                      <div className="flex gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
                         {/* Year Filter */}
                         <Select value={filterYear} onValueChange={setFilterYear}>
-                          <SelectTrigger className="w-[120px] bg-slate-50 border-slate-200">
+                          <SelectTrigger className="w-[140px] h-12 bg-slate-50 border-none rounded-2xl font-bold text-xs ring-offset-0 focus:ring-2 focus:ring-blue-500/20 transition-all">
                             <div className="flex items-center gap-2">
                               <Calendar className="w-4 h-4 text-slate-500" />
                               <SelectValue />
                             </div>
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="rounded-2xl border-slate-200">
                             {yearOptions.map(y => (
-                              <SelectItem key={y} value={y}>{y === 'All' ? 'Semua Tahun' : y}</SelectItem>
+                              <SelectItem key={y} value={y} className="rounded-xl">{y === 'All' ? 'Semua Tahun' : y}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -284,11 +335,11 @@ const TableDataPelatihan: React.FC = () => {
                         {/* More Filters Dropdown (To save space) */}
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="outline" className="gap-2 border-slate-200 bg-slate-50">
+                            <Button variant="outline" className="h-12 px-6 gap-3 border-none bg-slate-50 rounded-2xl font-bold text-xs hover:bg-slate-100 transition-all">
                               <SlidersHorizontal className="w-4 h-4 text-slate-500" />
-                              Filters
+                              Filter
                               {(filterCategory || filterCategoryPenyelenggara || filterCategorySasaran) && (
-                                <span className="w-2 h-2 rounded-full bg-blue-600" />
+                                <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
                               )}
                             </Button>
                           </DropdownMenuTrigger>

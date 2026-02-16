@@ -137,13 +137,14 @@ function InstrukturTable({ data, fetchData }: Props) {
     }, [data, search, filterKeahlian, filterStatus, filterPendidikan, filterJabatan, filterUnitKerja]);
 
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 8;
+    const itemsPerPage = 6;
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
-    const paginatedData = filteredData.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
+    const sortedAndPaginatedData = useMemo(() => {
+        return [...filteredData]
+            .sort((a, b) => a.nama.localeCompare(b.nama))
+            .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    }, [filteredData, currentPage]);
 
     const clearFilters = () => {
         setFilterKeahlian("");
@@ -157,80 +158,90 @@ function InstrukturTable({ data, fetchData }: Props) {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-1">
-                <div>
-                    <h3 className="text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight">Daftar Instruktur</h3>
-                    <p className="text-sm font-medium text-slate-500">Kelola data instruktur dan pelatih secara terpusat.</p>
-                </div>
+            {/* Premium Header & Search Bar */}
+            <div className="flex flex-col gap-6 bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm relative overflow-hidden group">
+                <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 w-64 h-64 bg-blue-50/50 rounded-full blur-3xl group-hover:bg-blue-100/50 transition-colors duration-700" />
 
-                <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="relative group">
-                        <TbSearch className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                        <input
-                            type="text"
-                            placeholder="Cari..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="pl-12 w-full sm:w-64 h-12 bg-white dark:bg-slate-900 border-none shadow-[0_4px_20px_rgba(0,0,0,0.03)] rounded-2xl text-sm font-bold focus:ring-4 focus:ring-blue-500/10 outline-none transition-all placeholder:text-slate-400 placeholder:font-medium"
-                        />
+                <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center text-2xl shadow-lg shadow-blue-500/20 transform group-hover:scale-105 transition-all duration-500">
+                            <TbUserCheck className="w-7 h-7" />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-black text-slate-800 tracking-tight">DATA INSTRUKTUR</h3>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Kelola & pantau data instruktur serta pelatih Anda</p>
+                        </div>
                     </div>
-                    <FilterDropdown
-                        filterKeahlian={filterKeahlian}
-                        setFilterKeahlian={setFilterKeahlian}
-                        bidangKeahlianOptions={bidangKeahlianOptions}
-                        filterJabatan={filterJabatan}
-                        setFilterJabatan={setFilterJabatan}
-                        jabatanOptions={jabatanOptions}
-                        filterPendidikan={filterPendidikan}
-                        setFilterPendidikan={setFilterPendidikan}
-                        pendidikanOptions={pendidikanOptions}
-                        filterStatus={filterStatus}
-                        setFilterStatus={setFilterStatus}
-                        statusOptions={statusOptions}
-                        filterUnitKerja={filterUnitKerja}
-                        setFilterUnitKerja={setFilterUnitKerja}
-                        unitKerjaOptions={unitKerjaOptions}
-                        clearFilters={clearFilters}
-                        hasActiveFilters={!!(filterKeahlian || filterJabatan || filterPendidikan || filterStatus || filterUnitKerja)}
-                    />
-                    <AddInstrukturAction onSuccess={fetchData} />
-                </div>
-            </div>
 
-            <div className="bg-white dark:bg-slate-900 rounded-[32px] shadow-[0_4px_20px_rgba(0,0,0,0.03)] overflow-hidden border border-slate-100 dark:border-white/5">
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        <div className="relative group">
+                            <TbSearch className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                            <input
+                                type="text"
+                                placeholder="Cari instruktur..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="pl-11 w-full sm:w-64 h-11 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:ring-4 focus:ring-blue-500/10 focus:bg-white outline-none transition-all placeholder:text-slate-400 placeholder:font-medium"
+                            />
+                        </div>
+                        <FilterDropdown
+                            filterKeahlian={filterKeahlian}
+                            setFilterKeahlian={setFilterKeahlian}
+                            bidangKeahlianOptions={bidangKeahlianOptions}
+                            filterJabatan={filterJabatan}
+                            setFilterJabatan={setFilterJabatan}
+                            jabatanOptions={jabatanOptions}
+                            filterPendidikan={filterPendidikan}
+                            setFilterPendidikan={setFilterPendidikan}
+                            pendidikanOptions={pendidikanOptions}
+                            filterStatus={filterStatus}
+                            setFilterStatus={setFilterStatus}
+                            statusOptions={statusOptions}
+                            filterUnitKerja={filterUnitKerja}
+                            setFilterUnitKerja={setFilterUnitKerja}
+                            unitKerjaOptions={unitKerjaOptions}
+                            clearFilters={clearFilters}
+                            hasActiveFilters={!!(filterKeahlian || filterJabatan || filterPendidikan || filterStatus || filterUnitKerja)}
+                        />
+                        <AddInstrukturAction onSuccess={fetchData} />
+                    </div>
+                </div>
+            </div >
+
+            <div className="bg-white rounded-[2.5rem] shadow-sm overflow-hidden border border-slate-200">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                        <thead className="text-xs text-slate-400 uppercase tracking-widest bg-slate-50/50 dark:bg-slate-900 border-b border-slate-100 dark:border-white/5">
-                            <tr>
-                                <th className="px-8 py-5 font-black text-center w-16 sticky left-0 bg-slate-50/80 dark:bg-slate-900 backdrop-blur-md z-10">No</th>
-                                <th className="px-6 py-5 font-black text-center sticky left-16 bg-slate-50/80 dark:bg-slate-900 backdrop-blur-md z-10">Aksi</th>
-                                <th className="px-6 py-5 font-black">Instruktur</th>
-                                <th className="px-6 py-5 font-black">Unit Kerja</th>
-                                <th className="px-6 py-5 font-black">Kompetensi</th>
-                                <th className="px-6 py-5 font-black">Pendidikan</th>
-                                <th className="px-6 py-5 font-black">Status</th>
-                                <th className="px-6 py-5 font-black">Berkas</th>
+                    <table className="w-full text-left">
+                        <thead>
+                            <tr className="bg-slate-50/80 border-b border-slate-100">
+                                <th className="w-16 px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">No</th>
+                                <th className="w-24 px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Aksi</th>
+                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Informasi Instruktur</th>
+                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Unit Kerja & Jabatan</th>
+                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Kompetensi</th>
+                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Pendidikan</th>
+                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
+                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Berkas</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50 dark:divide-white/5">
-                            {paginatedData.length > 0 ? (
-                                paginatedData.map((row, index) => {
+                        <tbody className="divide-y divide-slate-50">
+                            {sortedAndPaginatedData.length > 0 ? (
+                                sortedAndPaginatedData.map((row, index) => {
                                     const { name: nameUnitKerja } = findNameUnitKerjaById(unitKerjas, row.id_lemdik.toString());
                                     return (
-                                        <tr key={row.IdInstruktur} className="hover:bg-slate-50/80 dark:hover:bg-white/5 transition-colors group">
-                                            <td className="px-8 py-4 font-bold text-center text-slate-400 sticky left-0 bg-white group-hover:bg-slate-50/80 dark:bg-slate-900 dark:group-hover:bg-slate-800 transition-colors">
+                                        <tr key={row.IdInstruktur} className="hover:bg-slate-50/50 transition-colors group/row">
+                                            <td className="px-6 py-5 text-center text-xs font-bold text-slate-400">
                                                 {(currentPage - 1) * itemsPerPage + index + 1}
                                             </td>
-                                            <td className="px-6 py-4 sticky left-16 bg-white group-hover:bg-slate-50/80 dark:bg-slate-900 dark:group-hover:bg-slate-800 transition-colors z-10 text-center">
-                                                <div className="flex items-center justify-center">
+                                            <td className="px-6 py-5">
+                                                <div className="flex items-center justify-center gap-1.5">
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" className="h-10 w-10 p-0 rounded-xl hover:bg-slate-200/50">
-                                                                <TbDotsVertical className="h-5 w-5 text-slate-400" />
+                                                            <Button variant="ghost" className="h-8 w-8 p-0 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-all">
+                                                                <TbDotsVertical className="h-4 w-4" />
                                                             </Button>
                                                         </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end" className="rounded-2xl border-none shadow-xl p-2 z-[9999]">
-                                                            <DropdownMenuLabel className="text-xs font-bold text-slate-400 uppercase tracking-wider px-3 py-2">Actions</DropdownMenuLabel>
+                                                        <DropdownMenuContent align="end" className="rounded-2xl border-none shadow-xl p-2 z-[9999] bg-white/95 backdrop-blur-xl">
+                                                            <DropdownMenuLabel className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-3 py-2">Opsi Tindakan</DropdownMenuLabel>
                                                             <div className="space-y-1">
                                                                 <UpdateInstrukturAction onSuccess={fetchData} instruktur={row} />
                                                                 <DeleteInstrukturAction onSuccess={fetchData} instruktur={row} />
@@ -239,74 +250,77 @@ function InstrukturTable({ data, fetchData }: Props) {
                                                     </DropdownMenu>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex flex-col">
-                                                    <span className="font-bold text-slate-800 dark:text-white text-base">{row.nama}</span>
-                                                    <div className="flex flex-col gap-0.5 mt-1">
-                                                        <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                                                            <TbId size={14} className="text-slate-400" /> {row.nip || "No NIP"}
-                                                        </div>
-                                                        <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                                                            <TbPhone size={14} className="text-slate-400" /> {row.no_telpon}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 max-w-[200px]">
+                                            <td className="px-6 py-5">
                                                 <div className="flex flex-col gap-1">
-                                                    <span className="font-bold text-slate-700 dark:text-slate-300 line-clamp-2 text-sm" title={nameUnitKerja}>
-                                                        <TbBuildingSkyscraper className="inline mr-1 text-slate-400 mb-0.5" />
-                                                        {nameUnitKerja}
-                                                    </span>
-                                                    <span className="text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-white/5 w-fit px-2 py-0.5 rounded-full">
-                                                        {row.eselon_1 || "Eselon -"}
-                                                    </span>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="space-y-2">
-                                                    <Badge variant="secondary" className="font-bold bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg px-2.5 py-1">
-                                                        {row.bidang_keahlian || "-"}
-                                                    </Badge>
-                                                    {row.jenjang_jabatan && (
-                                                        <div className="text-xs font-semibold text-slate-500 px-1">
-                                                            {row.jenjang_jabatan}
+                                                    <span className="text-[13px] font-black text-slate-700 leading-tight group-hover/row:text-blue-600 transition-colors">{row.nama}</span>
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400">
+                                                            <TbId size={12} className="text-slate-300" /> {row.nip || "-"}
                                                         </div>
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="h-8 w-8 rounded-full bg-violet-50 text-violet-600 flex items-center justify-center font-black text-xs">
-                                                        <TbSchool />
+                                                        <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400">
+                                                            <TbPhone size={12} className="text-slate-300" /> {row.no_telpon}
+                                                        </div>
                                                     </div>
-                                                    <span className="text-sm font-bold text-slate-700">{row.pendidikkan_terakhir}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4">
+                                            <td className="px-6 py-5 max-w-[240px]">
+                                                <div className="flex flex-col gap-1.5">
+                                                    <div className="flex items-start gap-2">
+                                                        <TbBuildingSkyscraper className="w-3.5 h-3.5 text-blue-500 mt-0.5 flex-shrink-0" />
+                                                        <span className="text-[11px] font-bold text-slate-600 leading-snug line-clamp-2" title={nameUnitKerja}>
+                                                            {nameUnitKerja}
+                                                        </span>
+                                                    </div>
+                                                    <Badge variant="secondary" className="bg-slate-100 text-slate-500 border-none text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md w-fit">
+                                                        {row.jenjang_jabatan || "Umum"}
+                                                    </Badge>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-5 text-center">
+                                                <Badge variant="secondary" className="bg-blue-50 text-blue-600 border-blue-100 text-[10px] font-black px-2.5 py-1 rounded-lg">
+                                                    {row.bidang_keahlian || "-"}
+                                                </Badge>
+                                            </td>
+                                            <td className="px-6 py-5 text-center">
+                                                <div className="flex items-center justify-center gap-2">
+                                                    <div className="h-7 w-7 rounded-full bg-violet-50 text-violet-600 flex items-center justify-center">
+                                                        <TbSchool className="w-3.5 h-3.5" />
+                                                    </div>
+                                                    <span className="text-[11px] font-black text-slate-700">{row.pendidikkan_terakhir}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-5 text-center">
                                                 <span className={`
-                                                    inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider
-                                                    ${row.status === "Active" || row.status === "Aktif" || row.status === "PNS" ? "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-500/20" : ""}
-                                                    ${row.status === "Non Aktif" || row.status === "No Active" ? "bg-rose-50 text-rose-600 ring-1 ring-rose-500/20" : ""}
-                                                    ${row.status === "Tugas Belajar" ? "bg-amber-50 text-amber-600 ring-1 ring-amber-500/20" : ""}
+                                                    inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest
+                                                    ${row.status === "Active" || row.status === "Aktif" || row.status === "PNS" ? "bg-emerald-50 text-emerald-600 border border-emerald-100" : ""}
+                                                    ${row.status === "Non Aktif" || row.status === "No Active" ? "bg-rose-50 text-rose-600 border border-rose-100" : ""}
+                                                    ${row.status === "Tugas Belajar" ? "bg-amber-50 text-amber-600 border border-amber-100" : ""}
                                                 `}>
                                                     <span className={`w-1.5 h-1.5 rounded-full ${row.status === "Active" || row.status === "Aktif" || row.status === "PNS" ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`}></span>
                                                     {row.status}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4">
-                                                <div className="flex items-center gap-2">
+                                            <td className="px-6 py-5">
+                                                <div className="flex items-center justify-center gap-2">
                                                     {row.management_of_training ? (
-                                                        <a href={row.management_of_training} target="_blank" rel="noopener noreferrer" className="h-8 w-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white flex items-center justify-center transition-all" title="MOT">
-                                                            <TbCertificate size={18} />
+                                                        <a href={row.management_of_training} target="_blank" rel="noopener noreferrer" className="h-8 w-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white flex items-center justify-center transition-all shadow-sm" title="MOT">
+                                                            <TbCertificate className="w-4 h-4" />
                                                         </a>
-                                                    ) : <span className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-300"><TbCertificate size={18} /></span>}
+                                                    ) : (
+                                                        <div className="h-8 w-8 rounded-lg bg-slate-50 text-slate-300 flex items-center justify-center">
+                                                            <TbCertificate className="w-4 h-4" />
+                                                        </div>
+                                                    )}
 
                                                     {row.link_data_dukung_sertifikat ? (
-                                                        <a href={row.link_data_dukung_sertifikat} target="_blank" rel="noopener noreferrer" className="h-8 w-8 rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white flex items-center justify-center transition-all" title="Sertifikat">
-                                                            <TbBriefcase size={18} />
+                                                        <a href={row.link_data_dukung_sertifikat} target="_blank" rel="noopener noreferrer" className="h-8 w-8 rounded-lg bg-orange-50 text-orange-600 hover:bg-orange-600 hover:text-white flex items-center justify-center transition-all shadow-sm" title="Sertifikat">
+                                                            <TbBriefcase className="w-4 h-4" />
                                                         </a>
-                                                    ) : <span className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-300"><TbBriefcase size={18} /></span>}
+                                                    ) : (
+                                                        <div className="h-8 w-8 rounded-lg bg-slate-50 text-slate-300 flex items-center justify-center">
+                                                            <TbBriefcase className="w-4 h-4" />
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>
@@ -314,16 +328,10 @@ function InstrukturTable({ data, fetchData }: Props) {
                                 })
                             ) : (
                                 <tr>
-                                    <td colSpan={8} className="px-6 py-24 text-center">
-                                        <div className="flex flex-col items-center justify-center">
-                                            <div className="rounded-full bg-slate-50 p-6 mb-4">
-                                                <TbSearch className="h-10 w-10 text-slate-300" />
-                                            </div>
-                                            <p className="text-lg font-black text-slate-800 uppercase tracking-tight">Tidak ada instruktur ditemukan</p>
-                                            <p className="text-sm font-medium text-slate-400 mt-1 max-w-xs mx-auto mb-6">Coba sesuaikan kata kunci pencarian atau filter anda.</p>
-                                            <Button variant="outline" className="rounded-xl border-dashed" onClick={clearFilters}>
-                                                Reset Filter
-                                            </Button>
+                                    <td colSpan={8} className="px-6 py-20 text-center">
+                                        <div className="flex flex-col items-center justify-center opacity-50">
+                                            <TbUser size={48} className="text-slate-200 mb-3" />
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tidak ada data instruktur ditemukan</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -333,56 +341,29 @@ function InstrukturTable({ data, fetchData }: Props) {
                 </div>
 
                 {/* Pagination */}
-                <div className="bg-slate-50/50 dark:bg-slate-900 px-8 py-5 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-slate-100 dark:border-white/5">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                        Showing <span className="text-slate-800 dark:text-white">{(currentPage - 1) * itemsPerPage + 1}</span> - <span className="text-slate-800 dark:text-white">{Math.min(currentPage * itemsPerPage, filteredData.length)}</span> of <span className="text-slate-800 dark:text-white">{filteredData.length}</span>
-                    </span>
+                <div className="flex justify-between items-center mt-6 p-6 border-t border-slate-50">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                        Halaman <span className="text-blue-600">{currentPage}</span> Dari <span className="text-slate-600">{totalPages}</span>
+                    </p>
                     <div className="flex gap-2">
-                        <button
+                        <Button
+                            variant="outline"
+                            size="sm"
                             onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                             disabled={currentPage === 1}
-                            className="h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center font-bold transition-all text-sm"
+                            className="h-8 px-4 text-[10px] font-black uppercase tracking-wider rounded-lg border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-30"
                         >
-                            ←
-                        </button>
-                        <div className="flex items-center gap-1">
-                            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                                let pageNum;
-                                if (totalPages <= 5) {
-                                    pageNum = i + 1;
-                                } else if (currentPage <= 3) {
-                                    pageNum = i + 1;
-                                } else if (currentPage >= totalPages - 2) {
-                                    pageNum = totalPages - 4 + i;
-                                } else {
-                                    pageNum = currentPage - 2 + i;
-                                }
-
-                                if (pageNum > totalPages) return null;
-
-                                return (
-                                    <button
-                                        key={pageNum}
-                                        onClick={() => setCurrentPage(pageNum)}
-                                        className={`
-                                            h-10 w-10 rounded-xl font-black text-xs transition-all flex items-center justify-center
-                                            ${currentPage === pageNum
-                                                ? "bg-slate-900 text-white shadow-lg shadow-slate-900/20 scale-105"
-                                                : "bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-900"}
-                                        `}
-                                    >
-                                        {pageNum}
-                                    </button>
-                                )
-                            })}
-                        </div>
-                        <button
+                            Sebelumnya
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
                             onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
                             disabled={currentPage === totalPages}
-                            className="h-10 w-10 rounded-xl bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center font-bold transition-all text-sm"
+                            className="h-8 px-4 text-[10px] font-black uppercase tracking-wider rounded-lg border-slate-200 text-slate-500 hover:bg-slate-50 disabled:opacity-30"
                         >
-                            →
-                        </button>
+                            Berikutnya
+                        </Button>
                     </div>
                 </div>
             </div>
