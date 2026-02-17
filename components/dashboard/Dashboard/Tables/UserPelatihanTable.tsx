@@ -117,7 +117,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
             setUsers((prev: UserPelatihan[]) =>
                 prev.map((u: UserPelatihan) =>
                     u.IdUserPelatihan === id
-                        ? { ...u, PreTest: nilaiPretest, PostTest: nilaiPosttest }
+                        ? { ...u, PreTest: parseInt(nilaiPretest), PostTest: parseInt(nilaiPosttest) }
                         : u
                 )
             );
