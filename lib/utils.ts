@@ -76,6 +76,19 @@ export function formatToRupiah(amount: number): string {
   }).format(amount);
 }
 
+export function formatToShorthandRupiah(amount: number): string {
+  if (amount >= 1_000_000_000_000) {
+    return `Rp ${(amount / 1_000_000_000_000).toFixed(1).replace(/\.0$/, '')}T`;
+  }
+  if (amount >= 1_000_000_000) {
+    return `Rp ${(amount / 1_000_000_000).toFixed(1).replace(/\.0$/, '')}M`;
+  }
+  if (amount >= 1_000_000) {
+    return `Rp ${(amount / 1_000_000).toFixed(1).replace(/\.0$/, '')}jt`;
+  }
+  return formatToRupiah(amount);
+}
+
 export function formatIndonesianDateFromString(input: string): string {
   const months = [
     "Januari", "Februari", "Maret", "April", "Mei", "Juni",

@@ -335,32 +335,9 @@ const ChartDetailMasyarakatDilatih: React.FC<
   const nameBalaiPelatihan = Cookies.get("Satker");
 
   const filteredData = React.useMemo(() => {
-    return dataUser.filter((item: UserPelatihan) => {
-      if (!item.TanggalMulai) return false
-
-      let d = new Date(item.TanggalMulai)
-      if (isNaN(d.getTime())) {
-        d = parseIndonesianDate(item.TanggalMulai) as Date
-      }
-      if (!d || isNaN(d.getTime())) return false
-
-      const itemTahun = String(d.getFullYear())
-      const itemTriwulan = getQuarterForFiltering(item.TanggalMulai!)
-
-      // filter by tahun
-      if (tahun && itemTahun !== tahun) return false
-      // Accumulated data: include all data up to and including the selected TW
-      if (triwulan) {
-        const order = ["TW I", "TW II", "TW III", "TW IV"]
-        const selectedIdx = order.indexOf(triwulan)
-        const itemIdx = order.indexOf(itemTriwulan)
-        // Include all quarters up to the selected one (accumulated)
-        if (itemIdx > selectedIdx) return false
-      }
-
-      return true
-    })
-  }, [dataUser, tahun, triwulan])
+    // Rely on the dataUser (which is already filteredDataDukung from SummaryPelatihan)
+    return dataUser;
+  }, [dataUser]);
 
 
   const filteredDataByBalai = useMemo(
@@ -369,40 +346,14 @@ const ChartDetailMasyarakatDilatih: React.FC<
   );
 
   const filteredPelatihanByBalai = useMemo(() => {
-    let filtered = getFilteredDataPelatihanByBalai(
-      data,
-      isAdminBalaiPelatihan,
-      nameBalaiPelatihan!,
-    );
+    let filtered = [...data]; // Use already filteredDataPelatihan from SummaryPelatihan
 
-    const currentYear = new Date().getFullYear().toString();
-    const targetYear = tahun || currentYear;
+    if (isAdminBalaiPelatihan) {
+      filtered = filtered.filter((p) => p.PenyelenggaraPelatihan === nameBalaiPelatihan);
+    }
 
-    return filtered.filter((item) => {
-      if (!item.TanggalMulaiPelatihan) return false;
-      let d = new Date(item.TanggalMulaiPelatihan);
-      if (isNaN(d.getTime())) {
-        d = parseIndonesianDate(item.TanggalMulaiPelatihan) as Date;
-      }
-      if (!d || isNaN(d.getTime())) return false;
-
-      const itemTahun = String(d.getFullYear());
-
-      // Filter by target year (selected or current)
-      if (itemTahun !== targetYear) return false;
-
-      // Optional: Filter by Triwulan to match UserPelatihan logic
-      if (triwulan) {
-        const itemTriwulan = getQuarterForFiltering(item.TanggalMulaiPelatihan!);
-        const order = ["TW I", "TW II", "TW III", "TW IV"];
-        const selectedIdx = order.indexOf(triwulan);
-        const itemIdx = order.indexOf(itemTriwulan);
-        if (itemIdx > selectedIdx) return false;
-      }
-
-      return true;
-    });
-  }, [data, isAdminBalaiPelatihan, nameBalaiPelatihan, tahun, triwulan]);
+    return filtered;
+  }, [data, isAdminBalaiPelatihan, nameBalaiPelatihan]);
 
   const countWith = (cond: (item: any) => boolean) =>
     filteredDataByBalai.filter(cond).length;

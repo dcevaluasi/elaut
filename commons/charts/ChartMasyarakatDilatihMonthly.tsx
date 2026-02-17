@@ -72,59 +72,68 @@ export default function ChartMasyarakatDilatihMonthly({ data, dataUser, tahun, t
 
   // ================== Fetching ==================
   useEffect(() => {
-    const fetchData = async () => {
-      try {
+    // We already receive filteredDataPelatihan and filteredDataDukung from SummaryPelatihan
+    // which are correctly filtered by Year and Triwulan.
+    // We only need to check UPT specific filtering and set the state.
 
-        let pelatihanData: PelatihanMasyarakat[] = data.filter((p: PelatihanMasyarakat) => {
-          const statusValid = parseInt(p?.StatusPenerbitan) >= 5;
+    let filteredPelatihan = [...data];
+    let filteredUser = [...dataUser];
 
-          let tahunValid = true;
-          if (tahun && p?.TanggalMulaiPelatihan) {
-            const dateObj = new Date(p.TanggalMulaiPelatihan);
-            if (!isNaN(dateObj.getTime())) {
-              tahunValid = dateObj.getFullYear().toString() === tahun;
-            }
-          }
-          return statusValid && tahunValid;
-        });
+    if (isAdmin) {
+      filteredPelatihan = filteredPelatihan.filter((p) => p.PenyelenggaraPelatihan === namaBalai);
+      filteredUser = filteredUser.filter((u) => u.PenyelenggaraPelatihan === namaBalai);
+    }
 
-        let userData: UserPelatihan[] = dataUser.filter((u: UserPelatihan) => u.FileSertifikat?.includes('signed') && u?.TanggalMulai?.includes(tahun));
+    setPelatihan(filteredPelatihan);
+    setUserPelatihan(filteredUser);
+    setTotalMasyarakat(filteredUser.length);
+  }, [data, dataUser, isAdmin, namaBalai, tahun, triwulan]);
 
-        if (isAdmin) {
-          pelatihanData = pelatihanData.filter((p) => p.PenyelenggaraPelatihan === namaBalai);
-          userData = userData.filter((u) => u.PenyelenggaraPelatihan === namaBalai);
-        }
 
-        setPelatihan(pelatihanData);
-        setUserPelatihan(userData);
-        setTotalMasyarakat(userData.length);
-      } catch (err) {
-        console.error("Fetch error:", err);
-      }
+  // ================== Data Processing Helper ==================
+  const getMonthFromAnyDate = (dateStr: string | undefined): string | null => {
+    if (!dateStr) return null;
+    if (dateStr.includes("-")) {
+      const parts = dateStr.split("-");
+      // Handle both YYYY-MM-DD and DD-MM-YYYY
+      return (parts[0].length === 4 ? parts[1] : parts[1]).padStart(2, "0");
+    }
+    const d = parseIndonesianDate(dateStr);
+    return d ? (d.getMonth() + 1).toString().padStart(2, "0") : null;
+  };
+
+  const getYearFromAnyDate = (dateStr: string | undefined): number | null => {
+    if (!dateStr) return null;
+    if (dateStr.includes("-")) {
+      const parts = dateStr.split("-");
+      return parts[0].length === 4 ? parseInt(parts[0]) : parseInt(parts[2]);
+    }
+    return parseIndonesianDate(dateStr)?.getFullYear() || null;
+  };
+
+  const parseIndonesianDate = (dateStr: string): Date | null => {
+    const months: Record<string, number> = {
+      januari: 0, februari: 1, maret: 2, april: 3, mei: 4, juni: 5,
+      juli: 6, agustus: 7, september: 8, oktober: 9, november: 10, desember: 11,
     };
-
-    fetchData();
-  }, [dataUser, isAdmin, namaBalai, tahun, triwulan]);
+    const parts = dateStr.toLowerCase().split(' ');
+    if (parts.length !== 3) return null;
+    const [day, month, year] = parts;
+    const monthIndex = months[month];
+    if (monthIndex === undefined) return null;
+    return new Date(parseInt(year), monthIndex, parseInt(day));
+  };
 
 
   // ================== Data Processing ==================
   const monthlyPelatihan = Array.from({ length: 12 }, (_, i) => {
     const month = (i + 1).toString().padStart(2, "0");
-    return pelatihan.filter((p) => getMonthFromDateString(p.TanggalMulaiPelatihan!) === month).length;
+    return pelatihan.filter((p) => getMonthFromAnyDate(p.TanggalMulaiPelatihan!) === month).length;
   });
 
   const monthlyUser = Array.from({ length: 12 }, (_, i) => {
     const month = (i + 1).toString().padStart(2, "0");
-
-    return userPelatihan.filter((u) => {
-      if (!u.TanggalBerakhir) return false;
-
-      const dateObj = new Date(u.TanggalBerakhir);
-      if (isNaN(dateObj.getTime())) return false;
-
-      const endMonth = (dateObj.getMonth() + 1).toString().padStart(2, "0");
-      return endMonth === month;
-    }).length;
+    return userPelatihan.filter((u) => getMonthFromAnyDate(u.TanggalMulai) === month).length;
   });
 
   // ================== Render ==================

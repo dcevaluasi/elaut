@@ -22,12 +22,16 @@ import {
     AlertDialogTitle,
     AlertDialogDescription,
     AlertDialogCancel,
+    AlertDialogFooter,
 } from "@/components/ui/alert-dialog";
 import { Progress } from "@/components/ui/progress";
 import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
 import Link from "next/link";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
-import { MdLock } from "react-icons/md";
+import { MdLock, MdOutlineHistoryEdu } from "react-icons/md";
+import { motion, AnimatePresence } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
+import { Clock, Key, ShieldCheck, FileCheck, CheckCircle2, AlertCircle, ChevronRight, Hash, User as UserIcon } from "lucide-react";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -53,27 +57,6 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
         refs.current = data.UserPelatihan.map((_, i) => refs.current[i] ?? React.createRef<DialogSertifikatHandle>());
     }
 
-    // const handleUploadAll = async () => {
-    //     setIsUploading(true);
-    //     setProgress(0);
-
-
-    //     for (let i = 0; i < refs.current.length; i++) {
-    //         const userPel = data.UserPelatihan[i];
-
-    //         // ✅ Only upload if FileSertifikat is empty
-    //         if (!userPel.FileSertifikat || userPel.FileSertifikat === "") {
-    //             await refs.current[i].current?.uploadPdf?.();
-    //         }
-
-    //         setProgress(((i + 1) / refs.current.length) * 100);
-    //         setCounter(i + 1);
-    //     }
-
-    //     setOpen(true);
-    //     setIsUploading(false);
-    // };
-
     const handleUploadAll = async () => {
         setIsUploading(true);
         setProgress(0);
@@ -91,7 +74,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
 
         let completed = 0;
         const total = toUpload.length;
-        const MAX_CONCURRENCY = 8; // Optimal for browser CPU/GPU limits with html2pdf
+        const MAX_CONCURRENCY = 8;
         const pool = [...toUpload];
 
         const executeWorker = async () => {
@@ -111,7 +94,6 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
             }
         };
 
-        // Start initial workers
         const workers = Array(Math.min(MAX_CONCURRENCY, total))
             .fill(null)
             .map(() => executeWorker());
@@ -122,13 +104,12 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
         setIsUploading(false);
     };
 
-
     const handleTanggalSertifikat = async () => {
         const dataUserPelatihan = data?.UserPelatihan ?? [];
         setLoadingTanggal(true);
 
         try {
-            const BATCH_SIZE = 25; // API calls are faster than PDF generation
+            const BATCH_SIZE = 25;
             for (let i = 0; i < dataUserPelatihan.length; i += BATCH_SIZE) {
                 const batch = dataUserPelatihan.slice(i, i + BATCH_SIZE);
                 await Promise.all(
@@ -233,212 +214,273 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
         }
     };
 
-    return (
-        <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm bg-white">
-            <div className="px-4 py-3 text-sm font-semibold text-gray-800 hover:bg-gray-50 transition">
-                🖋 Penandatanganan
-            </div>
-            <div className="px-6 py-4 bg-gray-50">
-                <div className="flex flex-col w-full gap-4">
-                    <div className="w-full flex items-center gap-2 pb-4 border-b border-b-gray-200">
-                        <p className="font-medium text-gray-600 text-sm">
-                            Action :
-                        </p>
-
-                        <AlertDialog open={open} onOpenChange={setOpen}>
-                            <AlertDialogContent className="max-w-lg rounded-xl z-[999999999999]">
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>TTD Sertifikat</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        Lakukan penandatanganan secara elektronik (TTDe) STTPL
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-
-                                <div className="space-y-4">
-                                    {countUserWithTanggalSertifikat(data.UserPelatihan) === 0 ?
-                                        <div className="py-10 w-full mx-auto h-full flex items-center flex-col justify-center gap-1">
-                                            <MdLock className='w-14 h-14 text-gray-600' />
-                                            <p className="text-gray-500 font-normal text-center text-sm">
-                                                Harap untuk mengatur tanggal penerbitan terlebih dahulu, dan proses penandatanganan harus menyesuaikan tanggal yang telah ditentukan jika sesuai maka anda dapat mengklik tombol TTDe
-                                            </p>
-                                        </div>
-                                        : <>
-                                            {(isUploading || countUserWithDrafCertificate(data?.UserPelatihan) != data?.UserPelatihan.length) && (
-                                                <div className="w-full">
-                                                    Memuat File STTPL
-                                                    <Progress value={progress} className="w-full h-3 rounded-lg" />
-                                                    <p className="text-sm text-gray-600 mt-1">
-                                                        {Math.round(progress)}% ({counter}/{data.UserPelatihan.length}) STTPL selesai
-                                                    </p>
-                                                </div>
-                                            )}
-
-                                            {(!isUploading || countUserWithDrafCertificate(data?.UserPelatihan) == data?.UserPelatihan.length) &&
-                                                <fieldset>
-                                                    <form autoComplete="off">
-                                                        <div className="flex flex-col space-y-2">
-                                                            <label className="text-sm font-medium text-gray-700">
-                                                                Passphrase
-                                                            </label>
-                                                            <div className="relative">
-                                                                <input
-                                                                    disabled={isUploading}
-                                                                    type={isShowPassphrase ? "text" : "password"}
-                                                                    className="w-full h-10 px-3 border border-gray-300 rounded-md focus:ring-1 focus:ring-yellow-500 text-sm"
-                                                                    required
-                                                                    autoComplete="off"
-                                                                    value={passphrase}
-                                                                    onChange={(e) => setPassphrase(e.target.value)}
-                                                                />
-                                                                <span
-                                                                    onClick={() => setIsShowPassphrase(!isShowPassphrase)}
-                                                                    className="absolute right-3 top-2.5 cursor-pointer text-gray-500"
-                                                                >
-                                                                    {isShowPassphrase ? (
-                                                                        <HiOutlineEyeOff className="h-5 w-5" />
-                                                                    ) : (
-                                                                        <HiOutlineEye className="h-5 w-5" />
-                                                                    )}
-                                                                </span>
-                                                            </div>
-                                                            <button
-                                                                type="button"
-                                                                onClick={handleTTDe}
-                                                                disabled={isSigning || !passphrase}
-                                                                className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition disabled:opacity-50"
-                                                            >
-                                                                {isSigning ? "Menandatangan..." : "TTDe"}
-                                                            </button>
-                                                        </div>
-                                                    </form>
-                                                </fieldset>
-                                            }</>}
-
-                                </div>
-
-                                <AlertDialogCancel onClick={() => setOpen(!open)} className={`mt-4 ${(isSigning || isUploading) && 'hidden'}`}>Tutup</AlertDialogCancel>
-                            </AlertDialogContent>
-                        </AlertDialog>
-
-                        <AlertDialog >
-                            <AlertDialogTrigger asChild>
-                                {countUserWithTanggalSertifikat(data.UserPelatihan) === 0 && <Button
-                                    variant="outline"
-                                    className={`flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-neutral-600 text-neutral-600 hover:text-white hover:bg-neutral-600`}
-                                >
-                                    <TbCalendar className="h-5 w-5" />
-                                    <span>Tanggal TTDe</span>
-                                </Button>}
-
-
-                            </AlertDialogTrigger>
-                            {/* Content */}
-                            <AlertDialogContent className="max-w-lg rounded-xl z-[999999999999]">
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>Tanggal TTDe</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        Setting tanggal penandatanganan, dan harap pengaturan tanggal menyesuaikan hari anda melakukan TTDe
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-
-                                <div className="space-y-4">
-                                    <div className="flex flex-col w-full space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">
-                                            Tanggal Penandatangan
-                                        </label>
-                                        <input
-                                            type="date"
-                                            className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
-                                            value={tanggalSertifikat}
-                                            onChange={(e) => setTanggalSertifikat(e.target.value)}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => handleTanggalSertifikat()}
-                                            className="mt-2 px-4 py-2 h-fit bg-gray-600 text-white rounded-md hover:bg-gray-700 transition"
-                                            disabled={loadingTanggal}
-                                        >
-                                            {loadingTanggal ? "Menyimpan..." : "Simpan"}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <AlertDialogCancel className="mt-4">Tutup</AlertDialogCancel>
-                            </AlertDialogContent>
-                        </AlertDialog>
-
-                        {
-                            (Cookies.get('Role')?.includes(data?.TtdSertifikat) && (data?.StatusPenerbitan == "7B" || data?.StatusPenerbitan == "10" || data?.StatusPenerbitan == "14") || data?.IsRevisi == "Active") && <Button
-                                onClick={() => {
-                                    setOpen(!open);
-                                    if (countUserWithDrafCertificate(data?.UserPelatihan) != data?.UserPelatihan.length) {
-                                        handleUploadAll();
-                                    }
-                                }
-                                }
-                                variant="outline"
-                                className={`flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500`}
-                            >
-                                <TbPencilCheck className="h-5 w-5" />
-                                <span>TTDe STTPL</span>
-                            </Button>
-                        }
-
+    const MetricCard = ({ icon: Icon, label, value, current, total, color = "blue" }: any) => {
+        const colors: any = {
+            blue: "from-blue-600 to-indigo-700 shadow-blue-500/20 text-white",
+            emerald: "from-emerald-500 to-teal-600 shadow-emerald-500/20 text-white",
+            amber: "from-amber-500 to-orange-600 shadow-amber-500/20 text-white",
+        };
+        return (
+            <div className="relative group">
+                <div className={`p-6 rounded-[2rem] bg-gradient-to-br ${colors[color]} shadow-xl flex flex-col gap-4 overflow-hidden`}>
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:scale-150 transition-transform duration-700" />
+                    <div className="flex items-center justify-between">
+                        <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center">
+                            <Icon className="w-5 h-5 text-white" />
+                        </div>
+                        {total && (
+                            <Badge className="bg-white/20 border-none text-white font-black text-[10px] tracking-widest px-2 py-0.5 rounded-full">
+                                {Math.round((current / total) * 100)}%
+                            </Badge>
+                        )}
                     </div>
-
-                    <div className="w-full ">
-                        <p className="font-medium text-gray-600 mb-2 text-sm">
-                            Detail  :
-                        </p>
-                        <div className="grid-cols-3 grid w-full my-3 gap-4">
-                            <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
-                                <span className="text-xs font-medium text-gray-500">Jumlah Yang Perlu Di TTDe</span>
-                                <span className="text-sm font-semibold text-gray-800 mt-1">
-                                    {data?.UserPelatihan.length}
-                                </span>
-                            </div>
-                            <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
-                                <span className="text-xs font-medium text-gray-500">Jumlah Sertifikat Draft</span>
-                                <span className="text-sm font-semibold text-gray-800 mt-1">
-                                    {countUserWithDraftCertificate(data?.UserPelatihan)}/{data?.UserPelatihan.length}
-                                </span>
-                            </div>
-                            <div className="flex flex-col p-3 bg-white rounded-lg shadow-sm border border-gray-100">
-                                <span className="text-xs font-medium text-gray-500">Jumlah Sertifikat TTDe</span>
-                                <span className="text-sm font-semibold text-gray-800 mt-1">
-                                    {countUserWithCertificate(data?.UserPelatihan)}/{data?.UserPelatihan.length}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className={`flex flex-col gap-3`}>
-                            {data.UserPelatihan.map((item, i) => (
-                                <>
-                                    <div className="flex gap-2 items-center justify-between">
-                                        <p className="font-semibold text-sm text-gray-600 uppercase">{i + 1}. {item.Nama} - {item.NoRegistrasi}</p>  {
-                                            item.FileSertifikat?.includes('signed') && <Link
-                                                target="_blank"
-                                                href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${item.FileSertifikat}`}
-                                                className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 border "
-                                            >
-                                                <RiVerifiedBadgeFill className="h-4 w-4  " />
-                                                <span className="text-sm">Lihat e-STTPL</span>
-                                            </Link>}
-                                    </div>
-
-                                    <DialogSertifikatPelatihan
-                                        key={item.IdUserPelatihan ?? i}
-                                        ref={refs.current[i]}                 // ✅ pass the ref object directly
-                                        pelatihan={data}
-                                        userPelatihan={item}
-                                        handleFetchingData={fetchData}
-                                    />
-                                </>
-                            ))}
-                        </div>
+                    <div className="space-y-0.5">
+                        <p className="text-[10px] font-black text-white/70 uppercase tracking-widest leading-none">{label}</p>
+                        <p className="text-2xl font-black tracking-tight">{value}</p>
                     </div>
                 </div>
             </div>
+        );
+    };
+
+    return (
+        <div className="space-y-10">
+            {/* Action Toolbar */}
+            <div className="flex flex-wrap items-center justify-between gap-6 p-8 rounded-[2.5rem] bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-slate-100 dark:border-slate-800 shadow-xl">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-blue-100 dark:bg-blue-500/10 text-blue-600 flex items-center justify-center text-xl shadow-inner">
+                        <MdOutlineHistoryEdu />
+                    </div>
+                    <div>
+                        <h4 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-tight">KONTROL PENANDATANGAN</h4>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-1">Kelola Validasi & Tanda Tangan Digital</p>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            {countUserWithTanggalSertifikat(data.UserPelatihan) === 0 && (
+                                <Button
+                                    variant="outline"
+                                    className="h-12 flex items-center gap-2 rounded-2xl px-6 border-slate-200 text-slate-600 font-black uppercase tracking-widest text-[10px] hover:bg-slate-50 transition-all shadow-sm group"
+                                >
+                                    <TbCalendar className="h-5 w-5 group-hover:rotate-12 transition-transform" />
+                                    <span>TETAPKAN TANGGAL TTDe</span>
+                                </Button>
+                            )}
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border-white dark:border-slate-800 rounded-[3rem] p-10 max-w-md shadow-2xl">
+                            <AlertDialogHeader className="space-y-4">
+                                <div className="w-16 h-16 rounded-[1.5rem] bg-blue-50 dark:bg-blue-500/10 text-blue-600 flex items-center justify-center text-3xl shadow-xl shadow-blue-500/5">
+                                    <TbCalendar />
+                                </div>
+                                <AlertDialogTitle className="font-black text-2xl text-slate-900 dark:text-white tracking-tight leading-tight">Setting Jadwal Penandatanganan</AlertDialogTitle>
+                                <AlertDialogDescription className="text-xs text-slate-500 font-medium leading-relaxed uppercase tracking-widest">
+                                    Pastikan tanggal yang dipilih sesuai dengan hari pelaksanaan tanda tangan digital untuk menjaga integritas waktu dokumen.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+
+                            <div className="space-y-6 my-8">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pilih Tanggal Sertifikat</label>
+                                    <input
+                                        type="date"
+                                        className="w-full h-14 rounded-2xl border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 px-5 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                                        value={tanggalSertifikat}
+                                        onChange={(e) => setTanggalSertifikat(e.target.value)}
+                                    />
+                                </div>
+                                <Button
+                                    onClick={handleTanggalSertifikat}
+                                    disabled={loadingTanggal || !tanggalSertifikat}
+                                    className="w-full h-14 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-500/20 disabled:opacity-50"
+                                >
+                                    {loadingTanggal ? "Memproses Data..." : "Simpan & Terapkan Tanggal"}
+                                </Button>
+                            </div>
+                            <AlertDialogCancel className="w-full h-12 rounded-2xl border-none bg-slate-50 text-slate-400 font-black uppercase tracking-widest text-[10px]">Tutup Jendela</AlertDialogCancel>
+                        </AlertDialogContent>
+                    </AlertDialog>
+
+                    {(Cookies.get('Role')?.includes(data?.TtdSertifikat) && (data?.StatusPenerbitan == "7B" || data?.StatusPenerbitan == "10" || data?.StatusPenerbitan == "14") || data?.IsRevisi == "Active") && (
+                        <Button
+                            onClick={() => {
+                                setOpen(true);
+                                if (countUserWithDrafCertificate(data?.UserPelatihan) != data?.UserPelatihan.length) {
+                                    handleUploadAll();
+                                }
+                            }}
+                            className="h-12 flex items-center gap-2 rounded-2xl px-6 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-black uppercase tracking-widest text-[10px] shadow-lg shadow-blue-500/20 hover:scale-[1.02] transition-all group"
+                        >
+                            <TbPencilCheck className="h-5 w-5 group-hover:-rotate-12 transition-transform" />
+                            <span>MULAI TANDA TANGAN (TTDe)</span>
+                        </Button>
+                    )}
+                </div>
+            </div>
+
+            {/* Metrics Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <MetricCard icon={Hash} label="Target Penandatanganan" value={`${data?.UserPelatihan.length} Peserta`} />
+                <MetricCard
+                    icon={FileCheck}
+                    label="Draft Sertifikat Siap"
+                    value={`${countUserWithDraftCertificate(data?.UserPelatihan)}/${data?.UserPelatihan.length}`}
+                    current={countUserWithDraftCertificate(data?.UserPelatihan)}
+                    total={data?.UserPelatihan.length}
+                    color="amber"
+                />
+                <MetricCard
+                    icon={ShieldCheck}
+                    label="Tuntas Di-TTDe"
+                    value={`${countUserWithCertificate(data?.UserPelatihan)}/${data?.UserPelatihan.length}`}
+                    current={countUserWithCertificate(data?.UserPelatihan)}
+                    total={data?.UserPelatihan.length}
+                    color="emerald"
+                />
+            </div>
+
+            {/* Participant List */}
+            <div className="space-y-6">
+                <div className="flex items-center gap-3 pb-2 border-b border-slate-100 dark:border-slate-800 w-fit">
+                    <UserIcon className="w-4 h-4 text-blue-600" />
+                    <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-[0.3em]">DAFTAR VERIFIKASI SERTIFIKAT</h4>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {data.UserPelatihan.map((item, i) => (
+                        <div key={item.IdUserPelatihan ?? i} className="group p-5 rounded-[1.5rem] bg-white border border-slate-100 hover:border-blue-200 transition-all shadow-sm hover:shadow-md flex flex-col gap-4">
+                            <div className="flex items-center justify-between gap-3">
+                                <div className="flex items-center gap-3 overflow-hidden">
+                                    <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-xs font-black text-slate-400 shrink-0">
+                                        {i + 1}
+                                    </div>
+                                    <div className="overflow-hidden">
+                                        <p className="text-sm font-black text-slate-900 truncate uppercase leading-none mb-1">{item.Nama}</p>
+                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{item.NoRegistrasi}</p>
+                                    </div>
+                                </div>
+                                {item.FileSertifikat?.includes('signed') ? (
+                                    <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-sm">
+                                        <CheckCircle2 className="w-5 h-5" />
+                                    </div>
+                                ) : (
+                                    <div className="w-8 h-8 rounded-full bg-slate-50 text-slate-300 flex items-center justify-center">
+                                        <Clock className="w-4 h-4" />
+                                    </div>
+                                )}
+                            </div>
+
+                            {item.FileSertifikat?.includes('signed') && (
+                                <Link
+                                    target="_blank"
+                                    href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${item.FileSertifikat}`}
+                                    className="flex items-center justify-center gap-2 h-10 rounded-xl bg-blue-50/50 text-blue-600 text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all group/btn"
+                                >
+                                    <RiVerifiedBadgeFill className="h-4 w-4" />
+                                    <span>LIHAT e-STTPL</span>
+                                    <ChevronRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
+                                </Link>
+                            )}
+
+                            <div className="hidden">
+                                <DialogSertifikatPelatihan
+                                    ref={refs.current[i]}
+                                    pelatihan={data}
+                                    userPelatihan={item}
+                                    handleFetchingData={fetchData}
+                                />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* signing Modal */}
+            <AlertDialog open={open} onOpenChange={setOpen}>
+                <AlertDialogContent className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border-white dark:border-slate-800 rounded-[3rem] p-0 max-w-lg shadow-2xl overflow-hidden flex flex-col">
+                    <div className="p-10 pb-6 space-y-4">
+                        <div className="w-16 h-16 rounded-[1.5rem] bg-blue-50 dark:bg-blue-500/10 text-blue-600 flex items-center justify-center text-3xl shadow-xl shadow-blue-500/5 transition-transform hover:rotate-6">
+                            <TbPencilCheck />
+                        </div>
+                        <AlertDialogTitle className="font-black text-3xl text-slate-900 dark:text-white tracking-tight leading-tight">Otentikasi Tanda Tangan Digital</AlertDialogTitle>
+                        <AlertDialogDescription className="text-xs text-slate-500 font-medium leading-relaxed uppercase tracking-widest">
+                            {countUserWithTanggalSertifikat(data.UserPelatihan) === 0 ? "Prasyarat Belum Terpenuhi" : "Penyematan Segel Elektronik Bersertifikat"}
+                        </AlertDialogDescription>
+                    </div>
+
+                    <div className="p-10 pt-0 flex-1 overflow-y-auto min-h-[200px] flex flex-col justify-center">
+                        {countUserWithTanggalSertifikat(data.UserPelatihan) === 0 ? (
+                            <div className="flex flex-col items-center justify-center p-8 bg-amber-50 rounded-[2rem] border border-amber-100 text-center gap-4">
+                                <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center text-amber-500 text-2xl shadow-sm">
+                                    <AlertCircle />
+                                </div>
+                                <p className="text-xs font-bold text-amber-800 uppercase tracking-widest leading-relaxed">
+                                    Harap untuk mengatur tanggal penerbitan terlebih dahulu sebelum memulai proses TTDe.
+                                </p>
+                                <Button onClick={() => setOpen(false)} className="bg-amber-500 hover:bg-amber-600 text-white font-black text-[10px] tracking-widest h-10 px-6 rounded-xl uppercase">DIPAHAMI</Button>
+                            </div>
+                        ) : (
+                            <div className="space-y-8">
+                                {(isUploading || countUserWithDrafCertificate(data?.UserPelatihan) != data?.UserPelatihan.length) ? (
+                                    <div className="space-y-6">
+                                        <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
+                                            <span className="text-blue-600">Generating Blast...</span>
+                                            <span className="text-slate-400">{Math.round(progress)}% ({counter}/{data.UserPelatihan.length})</span>
+                                        </div>
+                                        <Progress value={progress} className="h-2 rounded-full bg-slate-100 fill-blue-600" />
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center italic">Mohon jangan menutup jendela ini...</p>
+                                    </div>
+                                ) : (
+                                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+                                        <div className="space-y-3">
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                                <Key className="w-3 h-3" /> Masukkan Passphrase Anda
+                                            </label>
+                                            <div className="relative">
+                                                <input
+                                                    disabled={isSigning}
+                                                    type={isShowPassphrase ? "text" : "password"}
+                                                    className="w-full h-14 rounded-2xl border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 px-5 text-sm font-black focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                                                    required
+                                                    autoComplete="new-password"
+                                                    value={passphrase}
+                                                    onChange={(e) => setPassphrase(e.target.value)}
+                                                    placeholder="••••••••••••"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setIsShowPassphrase(!isShowPassphrase)}
+                                                    className="absolute right-4 top-4 text-slate-400 hover:text-blue-600 transition-colors"
+                                                >
+                                                    {isShowPassphrase ? <HiOutlineEyeOff className="h-6 w-6" /> : <HiOutlineEye className="h-6 w-6" />}
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <Button
+                                            onClick={handleTTDe}
+                                            disabled={isSigning || !passphrase}
+                                            className="w-full h-14 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-500/20 disabled:opacity-50"
+                                        >
+                                            {isSigning ? "Memproses Tanda Tangan Digital..." : "OTENTIKASI & TANDA TANGAN (TTDe)"}
+                                        </Button>
+                                    </motion.div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="p-10 pt-0 shrink-0">
+                        <AlertDialogCancel
+                            disabled={isSigning || isUploading}
+                            className="w-full h-12 rounded-2xl border-none bg-slate-50 text-slate-400 font-black uppercase tracking-widest text-[10px] hover:bg-slate-100 transition-all"
+                        >
+                            BATALKAN PROSES
+                        </AlertDialogCancel>
+                    </div>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 };

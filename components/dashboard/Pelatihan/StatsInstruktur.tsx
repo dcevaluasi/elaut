@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { TrendingUp } from "lucide-react";
 import { Instruktur } from "@/types/instruktur";
 import { CountStats } from "@/hooks/elaut/instruktur/useFetchDataInstruktur";
 import {
@@ -24,6 +25,21 @@ import {
     Cell,
     Legend,
 } from "recharts";
+
+const barColors = [
+    "#6366f1", // Indigo
+    "#8b5cf6", // Violet
+    "#ec4899", // Pink
+    "#f59e0b", // Amber
+    "#10b981", // Emerald
+    "#3b82f6", // Blue
+    "#14b8a6", // Teal
+    "#f97316", // Orange
+    "#06b6d4", // Cyan
+    "#84cc16", // Lime
+    "#a855f7", // Purple
+    "#ef4444", // Red
+];
 
 const COLORS_ROLE = ["#F59E0B", "#EF4444", "#3B82F6"];
 const COLORS_STATUS = ["#10B981", "#6B7280", "#F59E0B", "#EF4444"];
@@ -102,230 +118,244 @@ export default function StatsInstruktur({ data, stats }: StatsInstrukturProps) {
         ].filter((d) => d.value > 0);
     }, [data]);
 
-    const formatTooltip = (value: any, name: any, props: any) => {
-        return [<span className="font-bold text-slate-800">{value}</span>, <span className="text-slate-500 capitalize text-xs">{name}</span>];
+    // ========================================================
+    // Reusable Chart Card
+    // ========================================================
+    interface ChartCardProps {
+        title: string;
+        chartConfig?: any;
+        chartData: any[];
+        barHeight?: number
+        chartType?: "vertical" | "horizontal" | "pie";
+        itemsPerPage?: number;
+        colorScheme?: "blue" | "emerald" | "violet" | "indigo" | "amber";
+        stackId?: string;
+        dataKeys?: string[];
+    }
+
+    const TrainingChartCard: React.FC<ChartCardProps> = ({
+        title,
+        chartData,
+        barHeight = 50,
+        chartType = "horizontal",
+        itemsPerPage = 6,
+        colorScheme = "blue",
+        stackId,
+        dataKeys = ["value"]
+    }) => {
+        const [currentPage, setCurrentPage] = React.useState(1);
+
+        const totalPages = Math.ceil(chartData.length / itemsPerPage);
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const paginatedData = chartData.slice(startIndex, endIndex);
+
+        const chartHeight = chartType === "horizontal"
+            ? Math.max(300, paginatedData.length * barHeight)
+            : 350;
+
+        const totalVisitors = chartData.reduce((sum, item) => {
+            if (dataKeys.length > 1) {
+                return sum + dataKeys.reduce((s, k) => s + (item[k] || 0), 0);
+            }
+            return sum + (item.value || 0);
+        }, 0);
+
+        const highestValue = chartData.length > 0
+            ? Math.max(...chartData.map(d => dataKeys.length > 1 ? dataKeys.reduce((s, k) => s + (d[k] || 0), 0) : d.value))
+            : 0;
+
+        const topItem = chartData.length > 0 ? chartData[0] : null;
+
+        const schemeColors = {
+            blue: "from-blue-500 to-indigo-500",
+            emerald: "from-emerald-500 to-teal-500",
+            violet: "from-violet-500 to-purple-500",
+            indigo: "from-indigo-500 to-blue-500",
+            amber: "from-amber-500 to-orange-500",
+        };
+
+        const accentGradient = schemeColors[colorScheme as keyof typeof schemeColors] || schemeColors.blue;
+
+        return (
+            <Card className="flex flex-col w-full shadow-sm hover:shadow-md transition-all duration-300 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-[2rem] overflow-hidden group hover:ring-1 hover:ring-slate-100 dark:hover:ring-slate-800">
+                <CardHeader className="pb-4 pt-6 bg-gradient-to-r from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+                    <div className="flex justify-between items-start mb-4">
+                        <CardTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                            <div className={`w-1 h-6 bg-gradient-to-b ${accentGradient} rounded-full`}></div>
+                            {title}
+                        </CardTitle>
+                        {totalPages > 1 && (
+                            <div className="text-[10px] text-slate-500 font-bold bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full uppercase tracking-wider">
+                                {startIndex + 1}-{Math.min(endIndex, chartData.length)} of {chartData.length}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-3">
+                        <div className="bg-white dark:bg-slate-950 rounded-2xl p-3 border border-slate-100 dark:border-slate-800">
+                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Total</p>
+                            <p className="text-xl font-black text-slate-800 dark:text-white">{totalVisitors.toLocaleString()}</p>
+                        </div>
+                        <div className="bg-white dark:bg-slate-950 rounded-2xl p-3 border border-slate-100 dark:border-slate-800">
+                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Kategori</p>
+                            <p className="text-xl font-black text-slate-800 dark:text-white">{chartData.length}</p>
+                        </div>
+                        <div className="bg-white dark:bg-slate-950 rounded-2xl p-3 border border-slate-100 dark:border-slate-800">
+                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Tertinggi</p>
+                            <p className="text-xl font-black text-slate-800 dark:text-white">{highestValue.toLocaleString()}</p>
+                        </div>
+                    </div>
+
+                    {topItem && chartType !== "pie" && (
+                        <div className="mt-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-100 dark:border-slate-800">
+                            <div className="flex items-center gap-2">
+                                <TrendingUp className="w-3.5 h-3.5 text-blue-500" />
+                                <p className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-tight">
+                                    Dominan: <span className="text-blue-600 dark:text-blue-400">{topItem.name}</span>
+                                </p>
+                            </div>
+                        </div>
+                    )}
+                </CardHeader>
+
+                <CardContent className="flex-1 pb-6 pt-6">
+                    <ResponsiveContainer width="100%" height={chartHeight}>
+                        {chartType === "pie" ? (
+                            <PieChart>
+                                <Pie
+                                    data={paginatedData}
+                                    dataKey="value"
+                                    nameKey="name"
+                                    cx="50%"
+                                    cy="50%"
+                                    outerRadius={100}
+                                    innerRadius={60}
+                                    paddingAngle={5}
+                                    label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
+                                >
+                                    {paginatedData.map((_, index) => (
+                                        <Cell key={`cell-${index}`} fill={barColors[index % barColors.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip
+                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}
+                                    itemStyle={{ fontWeight: 'bold' }}
+                                />
+                                <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: 'bold', paddingTop: '10px' }} />
+                            </PieChart>
+                        ) : (
+                            <BarChart
+                                data={paginatedData}
+                                layout={chartType === "horizontal" ? "vertical" : "horizontal"}
+                                margin={{ top: 5, right: 30, left: chartType === "horizontal" ? 40 : 10, bottom: 5 }}
+                            >
+                                <CartesianGrid strokeDasharray="3 3" vertical={chartType === "vertical"} horizontal={chartType === "horizontal"} opacity={0.1} />
+                                <XAxis
+                                    type={chartType === "horizontal" ? "number" : "category"}
+                                    dataKey={chartType === "vertical" ? "name" : undefined}
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fontSize: 10, fontWeight: 700, fill: '#64748b' }}
+                                />
+                                <YAxis
+                                    type={chartType === "horizontal" ? "category" : "number"}
+                                    dataKey={chartType === "horizontal" ? "name" : undefined}
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fontSize: 10, fontWeight: 700, fill: '#64748b' }}
+                                    width={chartType === "horizontal" ? 120 : 40}
+                                />
+                                <Tooltip
+                                    cursor={{ fill: 'rgba(0, 0, 0, 0.02)' }}
+                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 25px rgba(0,0,0,0.05)' }}
+                                />
+                                {dataKeys.map((key, index) => (
+                                    <Bar
+                                        key={key}
+                                        dataKey={key}
+                                        stackId={stackId}
+                                        fill={barColors[index % barColors.length]}
+                                        radius={chartType === "horizontal" ? [0, 4, 4, 0] : [4, 4, 0, 0]}
+                                        maxBarSize={40}
+                                    />
+                                ))}
+                            </BarChart>
+                        )}
+                    </ResponsiveContainer>
+                </CardContent>
+
+                {totalPages > 1 && (
+                    <CardFooter className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/20 border-t border-slate-100 dark:border-slate-800 py-4 px-6">
+                        <button
+                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                            disabled={currentPage === 1}
+                            className="p-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 disabled:opacity-50"
+                        >
+                            <div className="w-4 h-4 text-slate-600 flex items-center justify-center">←</div>
+                        </button>
+                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Page {currentPage} of {totalPages}</div>
+                        <button
+                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                            disabled={currentPage === totalPages}
+                            className="p-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 disabled:opacity-50"
+                        >
+                            <div className="w-4 h-4 text-slate-600 flex items-center justify-center">→</div>
+                        </button>
+                    </CardFooter>
+                )}
+            </Card>
+        );
     };
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-            {/* --- Summary Row --- */}
-            <div className="md:col-span-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card className="shadow-[0_4px_20px_rgba(0,0,0,0.05)] border-none bg-gradient-to-br from-white to-blue-50/50 dark:from-slate-900 dark:to-slate-800/50 rounded-3xl overflow-hidden relative group">
-                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <TbUserCheck className="w-24 h-24 text-blue-600" />
-                    </div>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2 z-10 relative">
-                        <div className="space-y-1">
-                            <CardTitle className="text-xs font-black text-blue-600 uppercase tracking-widest">Total Instruktur</CardTitle>
-                            <CardDescription className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Terdaftar Aktif</CardDescription>
-                        </div>
-                    </CardHeader>
-                    <CardContent className="z-10 relative">
-                        <div className="text-4xl font-black text-slate-800 dark:text-white">{data.length}</div>
-                    </CardContent>
-                </Card>
-
-                <Card className="shadow-[0_4px_20px_rgba(0,0,0,0.05)] border-none bg-gradient-to-br from-white to-emerald-50/50 dark:from-slate-900 dark:to-slate-800/50 rounded-3xl overflow-hidden relative group">
-                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <TbCertificate className="w-24 h-24 text-emerald-600" />
-                    </div>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2 z-10 relative">
-                        <div className="space-y-1">
-                            <CardTitle className="text-xs font-black text-emerald-600 uppercase tracking-widest">Bersertifikat ToT</CardTitle>
-                            <CardDescription className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Training of Trainer</CardDescription>
-                        </div>
-                    </CardHeader>
-                    <CardContent className="z-10 relative">
-                        <div className="flex items-baseline gap-2">
-                            <div className="text-4xl font-black text-slate-800 dark:text-white">{stats.tot}</div>
-                            <span className="text-sm font-bold text-emerald-600 bg-emerald-100 dark:bg-emerald-500/20 px-2 py-0.5 rounded-full">
-                                {((stats.tot / (data.length || 1)) * 100).toFixed(1)}%
-                            </span>
-                        </div>
-                    </CardContent>
-                </Card>
+        <div className="flex flex-col gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+                <TrainingChartCard
+                    title="Komposisi Jabatan"
+                    chartData={roleCompositionData}
+                    chartType="pie"
+                    colorScheme="amber"
+                />
+                <TrainingChartCard
+                    title="Status Kepegawaian"
+                    chartData={statusData}
+                    chartType="pie"
+                    colorScheme="emerald"
+                />
             </div>
 
-            {/* --- Charts Row 1 --- */}
-            <Card className="md:col-span-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border-none bg-white dark:bg-slate-900 rounded-3xl flex flex-col">
-                <CardHeader className="pb-0">
-                    <div className="flex items-center gap-2 mb-2">
-                        <span className="p-2 bg-blue-50 text-blue-600 rounded-lg"><TbChartPie size={18} /></span>
-                        <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Komposisi</span>
-                    </div>
-                    <CardTitle className="text-lg font-black text-slate-800 dark:text-white">Jabatan Fungsional</CardTitle>
-                </CardHeader>
-                <CardContent className="flex-1 min-h-[250px] relative">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                            <Pie
-                                data={roleCompositionData}
-                                cx="50%"
-                                cy="50%"
-                                innerRadius={60}
-                                outerRadius={80}
-                                paddingAngle={5}
-                                dataKey="value"
-                            >
-                                {roleCompositionData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS_ROLE[index % COLORS_ROLE.length]} strokeWidth={0} />
-                                ))}
-                            </Pie>
-                            <Tooltip
-                                contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '16px', border: 'none', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}
-                                itemStyle={{ color: '#1e293b', fontSize: '12px', fontWeight: 'bold' }}
-                                formatter={formatTooltip}
-                            />
-                            <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: '600', opacity: 0.7 }} />
-                        </PieChart>
-                    </ResponsiveContainer>
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none pb-8 mt-4">
-                        <div className="text-center">
-                            <span className="text-3xl font-black text-slate-700 dark:text-white">{data.length}</span>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total</p>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
+            <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 w-full">
+                <TrainingChartCard
+                    title="Distribusi Bidang Keahlian"
+                    chartData={keahlianData}
+                    chartType="horizontal"
+                    colorScheme="violet"
+                    itemsPerPage={6}
+                />
+            </div>
 
-            <Card className="md:col-span-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border-none bg-white dark:bg-slate-900 rounded-3xl flex flex-col">
-                <CardHeader className="pb-0">
-                    <div className="flex items-center gap-2 mb-2">
-                        <span className="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><TbUserCheck size={18} /></span>
-                        <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Status</span>
-                    </div>
-                    <CardTitle className="text-lg font-black text-slate-800 dark:text-white">Kepegawaian</CardTitle>
-                </CardHeader>
-                <CardContent className="flex-1 min-h-[250px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                            <Pie
-                                data={statusData}
-                                cx="50%"
-                                cy="50%"
-                                innerRadius={60}
-                                outerRadius={80}
-                                paddingAngle={2}
-                                dataKey="value"
-                            >
-                                {statusData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS_STATUS[index % COLORS_STATUS.length]} strokeWidth={0} />
-                                ))}
-                            </Pie>
-                            <Tooltip
-                                contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '16px', border: 'none', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}
-                                itemStyle={{ color: '#1e293b', fontSize: '12px', fontWeight: 'bold' }}
-                            />
-                            <Legend verticalAlign="bottom" height={36} iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: '600', opacity: 0.7 }} />
-                        </PieChart>
-                    </ResponsiveContainer>
-                </CardContent>
-            </Card>
-
-            <Card className="md:col-span-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border-none bg-white dark:bg-slate-900 rounded-3xl flex flex-col">
-                <CardHeader className="pb-0">
-                    <div className="flex items-center gap-2 mb-2">
-                        <span className="p-2 bg-violet-50 text-violet-600 rounded-lg"><TbBriefcase size={18} /></span>
-                        <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Top 5</span>
-                    </div>
-                    <CardTitle className="text-lg font-black text-slate-800 dark:text-white">Bidang Keahlian</CardTitle>
-                </CardHeader>
-                <CardContent className="flex-1 min-h-[250px]">
-                    <div className="space-y-5 pt-4">
-                        {keahlianData.map((item, index) => (
-                            <div key={item.name} className="flex items-center gap-3">
-                                <div className="w-8 text-center text-xs font-black text-slate-300">#{index + 1}</div>
-                                <div className="flex-1">
-                                    <div className="flex justify-between mb-1">
-                                        <span className="text-xs font-bold text-slate-700 dark:text-slate-300 line-clamp-1">{item.name}</span>
-                                        <span className="text-[10px] font-black text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 rounded-full">{item.value}</span>
-                                    </div>
-                                    <div className="w-full bg-slate-50 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                                        <div
-                                            className="bg-violet-500 h-full rounded-full transition-all duration-1000 ease-out"
-                                            style={{ width: `${(item.value / (keahlianData[0]?.value || 1)) * 100}%` }}
-                                        ></div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
-
-            {/* Education Level (Stacked) */}
-            <Card className="md:col-span-8 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border-none bg-white dark:bg-slate-900 rounded-3xl">
-                <CardHeader>
-                    <div className="flex items-center gap-2 mb-2">
-                        <span className="p-2 bg-indigo-50 text-indigo-600 rounded-lg"><TbSchool size={18} /></span>
-                        <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Analisis</span>
-                    </div>
-                    <CardTitle className="text-lg font-black text-slate-800 dark:text-white">Distribusi Pendidikan</CardTitle>
-                </CardHeader>
-                <CardContent className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={pendidikanData} margin={{ top: 20, right: 0, left: -20, bottom: 0 }} barSize={32}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" opacity={0.5} />
-                            <XAxis
-                                dataKey="name"
-                                axisLine={false}
-                                tickLine={false}
-                                tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }}
-                                dy={10}
-                            />
-                            <YAxis
-                                axisLine={false}
-                                tickLine={false}
-                                tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }}
-                            />
-                            <Tooltip
-                                cursor={{ fill: '#f1f5f9', opacity: 0.5 }}
-                                contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '16px', border: 'none', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}
-                            />
-                            <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: 600, opacity: 0.7, paddingBottom: '20px' }} />
-                            <Bar dataKey="Instruktur" stackId="a" fill={COLORS_ROLE[0]} radius={[0, 0, 0, 0]} />
-                            <Bar dataKey="Widyaiswara" stackId="a" fill={COLORS_ROLE[1]} radius={[0, 0, 0, 0]} />
-                            <Bar dataKey="Lainnya" stackId="a" fill={COLORS_ROLE[2]} radius={[6, 6, 0, 0]} />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </CardContent>
-            </Card>
-
-            {/* Job Levels */}
-            <Card className="md:col-span-4 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border-none bg-white dark:bg-slate-900 rounded-3xl">
-                <CardHeader>
-                    <div className="flex items-center gap-2 mb-2">
-                        <span className="p-2 bg-orange-50 text-orange-600 rounded-lg"><TbBriefcase size={18} /></span>
-                        <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Jabatan</span>
-                    </div>
-                    <CardTitle className="text-lg font-black text-slate-800 dark:text-white">Jenjang Jabatan</CardTitle>
-                </CardHeader>
-                <CardContent className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart layout="vertical" data={jabatanData} margin={{ top: 0, right: 20, left: 10, bottom: 0 }} barSize={16}>
-                            <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#E2E8F0" opacity={0.5} />
-                            <XAxis type="number" hide />
-                            <YAxis
-                                dataKey="name"
-                                type="category"
-                                width={130}
-                                tick={{ fill: '#64748b', fontSize: 10, fontWeight: 700 }}
-                                tickLine={false}
-                                axisLine={false}
-                            />
-                            <Tooltip
-                                cursor={{ fill: '#f1f5f9', opacity: 0.5 }}
-                                contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: '16px', border: 'none', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }}
-                            />
-                            <Bar dataKey="value" fill="#10B981" radius={[0, 4, 4, 0]}>
-                                {jabatanData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS_EDUCATION[index % COLORS_EDUCATION.length]} />
-                                ))}
-                            </Bar>
-                        </BarChart>
-                    </ResponsiveContainer>
-                </CardContent>
-            </Card>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
+                <div className="lg:col-span-2">
+                    <TrainingChartCard
+                        title="Distribusi Pendidikan (Stacked)"
+                        chartData={pendidikanData}
+                        chartType="vertical"
+                        colorScheme="indigo"
+                        stackId="a"
+                        dataKeys={["Instruktur", "Widyaiswara", "Lainnya"]}
+                    />
+                </div>
+                <div className="lg:col-span-1">
+                    <TrainingChartCard
+                        title="Jenjang Jabatan"
+                        chartData={jabatanData}
+                        chartType="horizontal"
+                        colorScheme="amber"
+                        barHeight={40}
+                    />
+                </div>
+            </div>
         </div>
     );
 }

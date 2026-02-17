@@ -320,20 +320,6 @@ export default function LayoutAdminElaut({
             </a>
           </li>
 
-          {/* Kinerja */}
-          <li>
-            <a
-              href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/kinerja/`}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${pathname.includes(`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/kinerja`)
-                ? "bg-blue-600 text-white shadow-lg shadow-blue-900/40"
-                : "hover:bg-slate-800 hover:text-white"
-                }`}
-            >
-              <TbChartPie className={`flex-shrink-0 w-6 h-6 ${pathname.includes("kinerja") ? "text-white" : "text-slate-400 group-hover:text-white"}`} />
-              {sidebarOpen && <span className="text-sm font-medium">Indikator Kinerja</span>}
-            </a>
-          </li>
-
           {/* Layanan Publik */}
           {
             Cookies.get('Access')?.includes('superAdmin') && <li>
@@ -382,7 +368,7 @@ interface HeaderPageLayoutAdminElautProps {
 
 export function HeaderPageLayoutAdminElaut({ icon, title, description }: HeaderPageLayoutAdminElautProps) {
   return (
-    <article className="flex flex-col gap-2 mb-6 group">
+    <article className="flex flex-col gap-2 mt-5 group">
       <header
         aria-label="page caption"
         className="relative overflow-hidden flex flex-col md:flex-row w-full h-auto items-center gap-5 bg-white border border-slate-200 shadow-sm rounded-3xl p-6 transition-all duration-500"

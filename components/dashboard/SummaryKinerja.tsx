@@ -34,99 +34,115 @@ const SummaryKinerja: React.FC = () => {
     });
 
     return (
-        <div className="w-full space-y-6 pb-32">
+        <div className="flex flex-col gap-8 w-full pb-32">
             {isFetchingDataDukung ? (
                 <div className="w-full h-[60vh] flex flex-col items-center justify-center gap-4">
-                    <HashLoader color="#3B82F6" size={50} />
-                    <p className="text-sm font-medium text-slate-500 animate-pulse">Memuat Data Kinerja...</p>
+                    <HashLoader color="#F59E0B" size={60} />
+                    <p className="text-sm font-medium text-slate-500 animate-pulse tracking-wide">Memuat Data Kinerja...</p>
                 </div>
             ) : dataDukung.length != 0 ? (
                 <>
+                    {/* Dashboard Header */}
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl p-8 rounded-[2rem] border border-slate-200/50 dark:border-slate-800 shadow-sm transition-all duration-500 hover:shadow-md">
+                        <div className="space-y-1">
+                            <h2 className="text-3xl font-black text-slate-800 dark:text-white tracking-tighter">Indikator Kinerja</h2>
+                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Analisis capaian dan output pelatihan secara komprehensif!</p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <div className="p-4 bg-amber-600/10 rounded-2xl border border-amber-600/20">
+                                <TbChartPie className="w-6 h-6 text-amber-600" />
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Filter Section */}
-                    {/* Sticky Filter Toolbar */}
-                    <div className="sticky top-4 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] rounded-2xl p-2 mb-6">
-                        <div className="flex flex-col xl:flex-row items-center justify-between gap-4 p-2">
-                            <div className="flex items-center gap-3 px-2 w-full xl:w-auto">
-                                <div className="h-10 w-10 rounded-xl bg-blue-600/10 flex items-center justify-center text-blue-600">
-                                    <TbFilter size={20} />
+                    <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 shadow-sm rounded-[2rem] p-6">
+                        <div className="flex flex-col xl:flex-row items-center justify-between gap-6">
+                            <div className="flex items-center gap-4">
+                                <div className="h-12 w-12 rounded-2xl bg-blue-600/10 flex items-center justify-center text-blue-600 border border-blue-600/20">
+                                    <TbFilter size={24} />
                                 </div>
-                                <div>
-                                    <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-tight">Filter Data</h3>
-                                    <p className="text-[10px] font-medium text-slate-500">Sesuaikan periode data yang ditampilkan</p>
+                                <div className="hidden sm:block">
+                                    <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-tight">Parameter Data</h3>
+                                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Periode Aktif: {triwulan} {tahun}</p>
                                 </div>
                             </div>
 
-                            <div className="flex flex-wrap items-center gap-2 w-full xl:w-auto overflow-x-auto pb-1 xl:pb-0 scrollbar-hide">
-                                <Select value={String(tahun)} onValueChange={(val) => setTahun(Number(val))}>
-                                    <SelectTrigger className="h-10 w-full md:w-[120px] rounded-xl bg-white border-slate-200 font-bold text-xs focus:ring-2 focus:ring-blue-500/10 dark:bg-slate-800 dark:border-white/10 shadow-sm">
-                                        <SelectValue placeholder="Tahun" />
-                                    </SelectTrigger>
-                                    <SelectContent className="rounded-xl border-none shadow-xl">
-                                        {tahunList.map((y) => (
-                                            <SelectItem key={y} value={String(y)} className="font-medium text-xs">
-                                                {y}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-
-                                <Select value={triwulan} onValueChange={setTriwulan}>
-                                    <SelectTrigger className="h-10 w-full md:w-[120px] rounded-xl bg-white border-slate-200 font-bold text-xs focus:ring-2 focus:ring-blue-500/10 dark:bg-slate-800 dark:border-white/10 shadow-sm">
-                                        <SelectValue placeholder="Triwulan" />
-                                    </SelectTrigger>
-                                    <SelectContent className="rounded-xl border-none shadow-xl">
-                                        <SelectItem value="TW I" className="font-medium text-xs">TW I</SelectItem>
-                                        <SelectItem value="TW II" className="font-medium text-xs">TW II</SelectItem>
-                                        <SelectItem value="TW III" className="font-medium text-xs">TW III</SelectItem>
-                                        <SelectItem value="TW IV" className="font-medium text-xs">TW IV</SelectItem>
-                                    </SelectContent>
-                                </Select>
-
-                                {Cookies.get('Access')?.includes('superAdmin') && (
-                                    <Select
-                                        value={includePusat ? "true" : "false"}
-                                        onValueChange={(value) => setIncludePusat(value === "true")}
-                                    >
-                                        <SelectTrigger className="h-10 w-full md:w-[160px] rounded-xl bg-white border-slate-200 font-bold text-xs focus:ring-2 focus:ring-blue-500/10 dark:bg-slate-800 dark:border-white/10 shadow-sm">
-                                            <SelectValue placeholder="Scope Data" />
+                            <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto overflow-x-auto pb-1 xl:pb-0 scrollbar-hide">
+                                <div className="flex-1 min-w-[120px]">
+                                    <Select value={String(tahun)} onValueChange={(val) => setTahun(Number(val))}>
+                                        <SelectTrigger className="h-12 w-full rounded-2xl bg-white border-slate-200 font-bold text-xs focus:ring-4 focus:ring-blue-500/10 dark:bg-slate-950 dark:border-white/10 shadow-sm transition-all">
+                                            <SelectValue placeholder="Tahun" />
                                         </SelectTrigger>
-                                        <SelectContent className="rounded-xl border-none shadow-xl">
-                                            <SelectItem value="false" className="font-medium text-xs">Tanpa Pusat</SelectItem>
-                                            <SelectItem value="true" className="font-medium text-xs">Dengan Pusat</SelectItem>
+                                        <SelectContent className="rounded-2xl border-none shadow-2xl">
+                                            {tahunList.sort((a, b) => b - a).map((y) => (
+                                                <SelectItem key={y} value={String(y)} className="font-bold text-xs py-3">
+                                                    TA {y}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
+                                </div>
+
+                                <div className="flex-1 min-w-[120px]">
+                                    <Select value={triwulan} onValueChange={setTriwulan}>
+                                        <SelectTrigger className="h-12 w-full rounded-2xl bg-white border-slate-200 font-bold text-xs focus:ring-4 focus:ring-blue-500/10 dark:bg-slate-950 dark:border-white/10 shadow-sm transition-all">
+                                            <SelectValue placeholder="Triwulan" />
+                                        </SelectTrigger>
+                                        <SelectContent className="rounded-2xl border-none shadow-2xl">
+                                            <SelectItem value="TW I" className="font-bold text-xs py-3">TW I</SelectItem>
+                                            <SelectItem value="TW II" className="font-bold text-xs py-3">TW II</SelectItem>
+                                            <SelectItem value="TW III" className="font-bold text-xs py-3">TW III</SelectItem>
+                                            <SelectItem value="TW IV" className="font-bold text-xs py-3">TW IV</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                {Cookies.get('Access')?.includes('superAdmin') && (
+                                    <div className="flex-1 min-w-[160px]">
+                                        <Select
+                                            value={includePusat ? "true" : "false"}
+                                            onValueChange={(value) => setIncludePusat(value === "true")}
+                                        >
+                                            <SelectTrigger className="h-12 w-full rounded-2xl bg-white border-slate-200 font-bold text-xs focus:ring-4 focus:ring-blue-500/10 dark:bg-slate-950 dark:border-white/10 shadow-sm transition-all">
+                                                <SelectValue placeholder="Scope Data" />
+                                            </SelectTrigger>
+                                            <SelectContent className="rounded-2xl border-none shadow-2xl">
+                                                <SelectItem value="false" className="font-bold text-xs py-3">Unit Pelaksana (Balai)</SelectItem>
+                                                <SelectItem value="true" className="font-bold text-xs py-3">Konsolidasi (Pusat & Balai)</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
                                 )}
                             </div>
                         </div>
                     </div>
 
                     {/* Summary & Download Card */}
-                    <div className="grid grid-cols-1">
-                        <DataDukungPelatihanTable data={dataDukung} tahun={tahun} triwulan={triwulan} />
-                    </div>
+                    <DataDukungPelatihanTable data={dataDukung} tahun={tahun} triwulan={triwulan} />
 
-                    {/* Tabs for Detailed Analysis */}
                     {/* Detailed Analysis Sections */}
-                    <div className="space-y-12">
+                    <div className="flex flex-col gap-12">
                         {/* Demografi Section */}
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-3 border-b border-slate-200 dark:border-white/10 pb-4">
-                                <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600">
-                                    <TbUsers className="text-xl" />
+                        <div className="space-y-8">
+                            <div className="flex items-center gap-4">
+                                <div className="h-12 w-12 rounded-2xl bg-blue-600/10 flex items-center justify-center text-blue-600 border border-blue-600/20">
+                                    <TbUsers className="text-2xl" />
                                 </div>
-                                <div>
-                                    <h3 className="text-lg font-black text-slate-800 dark:text-white uppercase tracking-tight">Demografi Peserta</h3>
-                                    <p className="text-xs font-medium text-slate-500">Analisis profil dan latar belakang peserta pelatihan</p>
+                                <div className="space-y-0.5">
+                                    <h3 className="text-xl font-black text-slate-800 dark:text-white tracking-tight uppercase">Demografi Peserta</h3>
+                                    <p className="text-sm font-medium text-slate-500">Analisis profil dan latar belakang pendidikan peserta!</p>
                                 </div>
+                                <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent dark:from-slate-800 ml-4 hidden sm:block"></div>
                             </div>
-                            <div className="grid grid-cols-1  gap-6">
+                            <div className="grid grid-cols-1 gap-8">
                                 <DynamicTablePelatihanMasyarakat
                                     tahun={tahun.toString()}
                                     triwulan={triwulan}
                                     dataUser={dataDukung}
                                     rowKey="PenyelenggaraPelatihan"
                                     colKey="JenisKelamin"
-                                    title="Analisis Gender Peserta"
+                                    title="Analisis Sebaran Gender"
                                 />
                                 <DynamicTablePelatihanMasyarakat
                                     tahun={tahun.toString()}
@@ -134,23 +150,24 @@ const SummaryKinerja: React.FC = () => {
                                     dataUser={dataDukung}
                                     rowKey="PenyelenggaraPelatihan"
                                     colKey="PendidikanTerakhir"
-                                    title="Latar Belakang Pendidikan"
+                                    title="Tingkat Pendidikan Terakhir"
                                 />
                             </div>
                         </div>
 
                         {/* Geografis Section */}
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-3 border-b border-slate-200 dark:border-white/10 pb-4">
-                                <div className="h-10 w-10 rounded-xl bg-teal-50 dark:bg-teal-500/10 flex items-center justify-center text-teal-600">
-                                    <TbMapPin className="text-xl" />
+                        <div className="space-y-8">
+                            <div className="flex items-center gap-4">
+                                <div className="h-12 w-12 rounded-2xl bg-emerald-600/10 flex items-center justify-center text-emerald-600 border border-emerald-600/20">
+                                    <TbMapPin className="text-2xl" />
                                 </div>
-                                <div>
-                                    <h3 className="text-lg font-black text-slate-800 dark:text-white uppercase tracking-tight">Sebaran Geografis</h3>
-                                    <p className="text-xs font-medium text-slate-500">Peta sebaran asal peserta dan minat wilayah</p>
+                                <div className="space-y-0.5">
+                                    <h3 className="text-xl font-black text-slate-800 dark:text-white tracking-tight uppercase">Sebaran Geografis</h3>
+                                    <p className="text-sm font-medium text-slate-500">Pemetaan asal wilayah peserta dan jangkauan pelatihan!</p>
                                 </div>
+                                <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent dark:from-slate-800 ml-4 hidden sm:block"></div>
                             </div>
-                            <div className="grid grid-cols-1  gap-6">
+                            <div className="grid grid-cols-1 gap-8">
                                 <DynamicTablePelatihanMasyarakat
                                     tahun={tahun.toString()}
                                     triwulan={triwulan}
@@ -165,42 +182,41 @@ const SummaryKinerja: React.FC = () => {
                                     dataUser={dataDukung}
                                     rowKey="Provinsi"
                                     colKey="BidangPelatihan"
-                                    title="Sebaran Minat Pelatihan per Provinsi"
+                                    title="Minat Pelatihan Berdasarkan Wilayah"
                                 />
                             </div>
                         </div>
 
-                        {/* Pelatihan Section */}
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-3 border-b border-slate-200 dark:border-white/10 pb-4">
-                                <div className="h-10 w-10 rounded-xl bg-purple-50 dark:bg-purple-500/10 flex items-center justify-center text-purple-600">
-                                    <TbCertificate className="text-xl" />
+                        {/* Analisis Output Section */}
+                        <div className="space-y-8">
+                            <div className="flex items-center gap-4">
+                                <div className="h-12 w-12 rounded-2xl bg-violet-600/10 flex items-center justify-center text-violet-600 border border-violet-600/20">
+                                    <TbCertificate className="text-2xl" />
                                 </div>
-                                <div>
-                                    <h3 className="text-lg font-black text-slate-800 dark:text-white uppercase tracking-tight">Analisis Pelatihan</h3>
-                                    <p className="text-xs font-medium text-slate-500">Detail pelaksanaan, sektor, dan program pelatihan</p>
+                                <div className="space-y-0.5">
+                                    <h3 className="text-xl font-black text-slate-800 dark:text-white tracking-tight uppercase">Analisis Pelatihan</h3>
+                                    <p className="text-sm font-medium text-slate-500">Output pelaksanaan berdasarkan program dan sektor kerja!</p>
                                 </div>
+                                <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent dark:from-slate-800 ml-4 hidden sm:block"></div>
                             </div>
 
-                            <div className="grid grid-cols-1 gap-6">
-                                <DynamicTablePelatihanMasyarakat
-                                    tahun={tahun.toString()}
-                                    triwulan={triwulan}
-                                    dataUser={dataDukung}
-                                    rowKey="PenyelenggaraPelatihan"
-                                    colKey="Triwulan"
-                                    title="Realisasi Pelatihan per Triwulan"
-                                />
-                            </div>
+                            <DynamicTablePelatihanMasyarakat
+                                tahun={tahun.toString()}
+                                triwulan={triwulan}
+                                dataUser={dataDukung}
+                                rowKey="PenyelenggaraPelatihan"
+                                colKey="Triwulan"
+                                title="Realisasi Output per Triwulan"
+                            />
 
-                            <div className="grid grid-cols-1  gap-6">
+                            <div className="grid grid-cols-1 gap-8">
                                 <DynamicTablePelatihanMasyarakat
                                     tahun={tahun.toString()}
                                     triwulan={triwulan}
                                     dataUser={dataDukung}
                                     rowKey="JenisProgram"
                                     colKey="PenyelenggaraPelatihan"
-                                    title="Sektor Pelatihan (Program)"
+                                    title="Sektor/Jenis Program Pelatihan"
                                 />
                                 <DynamicTablePelatihanMasyarakat
                                     tahun={tahun.toString()}
@@ -208,7 +224,7 @@ const SummaryKinerja: React.FC = () => {
                                     dataUser={dataDukung}
                                     rowKey="BidangPelatihan"
                                     colKey="PenyelenggaraPelatihan"
-                                    title="Klaster/Bidang Pelatihan"
+                                    title="Rumpun/Klaster Keilmuan"
                                 />
                                 <DynamicTablePelatihanMasyarakat
                                     tahun={tahun.toString()}
@@ -216,7 +232,7 @@ const SummaryKinerja: React.FC = () => {
                                     dataUser={dataDukung}
                                     rowKey="Program"
                                     colKey="PenyelenggaraPelatihan"
-                                    title="Judul Program Pelatihan"
+                                    title="Rincian Judul Program Pelatihan"
                                 />
                                 <DynamicTablePelatihanMasyarakat
                                     tahun={tahun.toString()}
@@ -224,7 +240,7 @@ const SummaryKinerja: React.FC = () => {
                                     dataUser={dataDukung}
                                     rowKey="DukunganProgramPrioritas"
                                     colKey="PenyelenggaraPelatihan"
-                                    title="Dukungan Program Prioritas"
+                                    title="Output Dukungan Program Prioritas"
                                 />
                             </div>
                         </div>
@@ -232,23 +248,19 @@ const SummaryKinerja: React.FC = () => {
                 </>
             ) : (
                 <div className="relative max-w-7xl w-full mx-auto mt-20">
-                    <div className="pt-7 md:pt-0 flex flex-col items-center">
+                    <div className="flex flex-col items-center bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl p-12 rounded-[3rem] border border-slate-200/50 dark:border-slate-800">
                         <Image
                             src={"/illustrations/not-found.png"}
                             alt="Not Found"
-                            width={0}
-                            height={0}
-                            className="w-[350px] md:w-[400px]"
+                            width={400}
+                            height={400}
+                            className="w-[300px] md:w-[350px]"
                         />
-                        <div className="max-w-3xl mx-auto text-center pb-5 md:pb-8 -mt-2">
-                            <h1 className="text-2xl md:text-3xl font-calsans leading-[110%] text-black">
-                                Belum Ada Pelatihan
-                            </h1>
-                            <div className="text-gray-600 text-center leading-[125%]  max-w-md">
-                                Capaian ataupun summary dari pelaksanaan pelatihan belum dapat
-                                dilihat, karena Balai Pelatihan belum memiliki peneyelenggaraan
-                                pelatihan!
-                            </div>
+                        <div className="max-w-md mx-auto text-center mt-4">
+                            <h1 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">Data Belum Tersedia</h1>
+                            <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium leading-relaxed">
+                                Capaian indikator kinerja belum dapat ditampilkan untuk periode ini. Pastikan data penyelenggaraan telah terinput dengan benar.
+                            </p>
                         </div>
                     </div>
                 </div>

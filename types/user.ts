@@ -28,6 +28,7 @@ export type User = {
   UpdateAt: string
   Ijazah: string
   KusukaUsers: string
+  Instansi?: string
   Pelatihan: UserPelatihan[]
 }
 
