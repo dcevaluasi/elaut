@@ -5,6 +5,7 @@ export type ESELON = {
   abbrvEselon: string
   fullNameEselon: string
   currentPerson?: string
+  nip?: string
 }
 
 export const KA_BPPSDM = 'Dr. I Nyoman Radiarta, S.Pi, M.Sc'
@@ -21,6 +22,7 @@ export const ESELONS = {
     fullNameEselon:
       'Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan',
     currentPerson: 'Dr. I Nyoman Radiarta, S.Pi, M.Sc',
+    nip: '19730501 200212 1 001',
   },
   'Kepala Pusat Pelatihan Kelautan dan Perikanan': {
     abbrv: 'Kepala Puslat KP',
@@ -29,6 +31,7 @@ export const ESELONS = {
     abbrvEselon: 'Puslat KP',
     fullNameEselon: 'Pusat Pelatihan Kelautan dan Perikanan',
     currentPerson: 'Dr. Lilly Aprilya Pregiwati, S.Pi., M.Si',
+    nip: '19730501 200212 1 001',
   },
   'Kepala Balai Pelatihan dan Penyuluhan Perikanan': {
     abbrv: 'Kepala BPPP',
@@ -52,6 +55,7 @@ export const ESELON_1: ESELON = {
   fullNameEselon:
     'Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan',
   currentPerson: 'Dr. I Nyoman Radiarta, S.Pi, M.Sc',
+  nip: '19730501 200212 1 001',
 }
 
 export const ESELON_2: ESELON = {

@@ -1,20 +1,17 @@
 "use client";
 
-import React, { forwardRef, useRef } from "react";
-import QRCode from "react-qr-code";
+import React, { forwardRef, useRef, useState, useEffect } from "react";
 import Image from "next/image";
+import QRCode from "react-qr-code";
 import './styles/certificate.css';
 import { P2MKP } from "@/types/p2mkp";
 import { ESELON_1 } from "@/constants/nomenclatures";
 
-/**
- * QRCodeImage component that converts SVG QR Code to a PNG image for better print support.
- */
 function QRCodeImage({ value }: { value: string }) {
-    const [imgUrl, setImgUrl] = React.useState("");
+    const [imgUrl, setImgUrl] = useState("");
     const wrapperRef = useRef<HTMLDivElement>(null);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (wrapperRef.current) {
             const svg = wrapperRef.current.querySelector("svg");
             if (svg) {
@@ -38,9 +35,9 @@ function QRCodeImage({ value }: { value: string }) {
     }, [value]);
 
     return (
-        <div className="w-24 h-24 bg-white p-1">
+        <div className="w-[8cqw] h-[8cqw] min-w-[60px] min-h-[60px]">
             <div ref={wrapperRef} style={{ display: "none" }}>
-                <QRCode value={value || "P2MKP-VALIDATION"} size={300} />
+                <QRCode value={value || "P2MKP-DEMO"} size={300} />
             </div>
             {imgUrl && (
                 <img
@@ -54,11 +51,11 @@ function QRCodeImage({ value }: { value: string }) {
 }
 
 /**
- * DialogSertifikatP2MKP component renders a professional certificate for P2MKP establishment.
- * It matches the design provided in the reference image and follows the styling conventions
- * of the training certificate (dialogSertifikatPelatihan.tsx).
+ * SertifikatP2MKP component renders a professional certificate for P2MKP establishment.
+ * Designed to be highly responsive while maintaining A4 Landscape ratio.
+ * It uses container queries (via cqw) or viewport units to ensure it "fits to window" nicely.
  */
-const DialogSertifikatP2MKP = forwardRef(
+const SertifikatP2MKP = forwardRef(
     (
         {
             p2mkp,
@@ -77,133 +74,129 @@ const DialogSertifikatP2MKP = forwardRef(
         return (
             <div
                 ref={ref}
-                className="w-full h-full flex items-center justify-center bg-gray-100 py-10 print:py-0 print:bg-white"
+                className="w-full min-h-screen flex flex-col items-center justify-start md:justify-center bg-gray-50 dark:bg-slate-950 p-4 md:p-8 lg:p-12 py-10 print:p-0 print:bg-white overflow-y-auto scrollbar-hide"
             >
+                {/* 
+                    The container below uses 'aspect-[297/210]' to maintain A4 Landscape.
+                    We set a max-width to not exceed real A4 resolution at 100% scale,
+                    but 'w-full' lets it shrink for smaller windows.
+                */}
                 <div
                     ref={refPage}
-                    className="pdf-page w-[1122.52px] h-[793.7px] bg-white relative overflow-hidden font-bos text-black p-0 m-0 box-border flex flex-col items-center justify-start scale-100 shadow-2xl print:shadow-none"
+                    className="relative bg-white shadow-2xl text-black flex flex-col items-center justify-start overflow-visible print:shadow-none w-full max-w-[1122px] mx-auto certificate-container print:w-[1122px] print:h-[793px]"
+                    style={{
+                        aspectRatio: "297 / 210",
+                        containerType: "size"
+                    }}
                 >
-                    {/* Background Decoration Elements (Waves as seen in the mockup) */}
-                    <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-                        {/* Top center faint glow for a premium feel */}
-                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] bg-gradient-to-b from-blue-50/50 to-transparent blur-3xl opacity-30"></div>
+                    {/* Background Decoration Elements */}
 
-                        {/* Bottom Right Dynamic Waves */}
-                        <div className="absolute bottom-0 right-0 w-[850px] h-[450px]">
-                            {/* Accent Gold Stripe Wave */}
-                            <svg className="absolute bottom-[-20px] right-[-20px] w-full h-[380px]" viewBox="0 0 800 380" preserveAspectRatio="none">
-                                <path d="M800 380L0 380C250 360 550 250 800 0V380Z" fill="#E9C46A" />
-                            </svg>
-                            {/* Main Dark Blue Wave */}
-                            <svg className="absolute bottom-[-20px] right-[-20px] w-full h-[350px]" viewBox="0 0 800 350" preserveAspectRatio="none">
-                                <path d="M800 350L50 350C280 330 580 200 800 0V350Z" fill="#003566" />
-                            </svg>
-                            {/* Primary Blue Wave */}
-                            <svg className="absolute bottom-[-20px] right-[-20px] w-full h-[320px]" viewBox="0 0 800 320" preserveAspectRatio="none">
-                                <path d="M800 320L100 320C320 300 620 180 800 0V320Z" fill="#004391" />
-                            </svg>
+
+                    {/* Certificate Content - All sizes are relative to the container width (cqw) */}
+                    <div className="relative z-10 w-full h-full flex flex-col items-center pt-[5cqh] box-border px-[8cqw]">
+
+                        {/* Top Right Certificate Number */}
+                        <div className="absolute top-[2cqh] right-[3cqw] flex flex-col items-end z-20">
+                            <p className="text-sm font-bosNormal text-gray-800">
+                                No. Penetapan : {String(p2mkp?.IdPpmkp || 0).padStart(3, '0')}.P2MKP.01.{["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"][new Date().getMonth()]}.{p2mkp?.tahun_penetapan || new Date().getFullYear()}
+                            </p>
                         </div>
 
-                        {/* Bottom Left Accent Shape */}
-                        <div className="absolute bottom-0 left-0 w-[550px] h-[350px]">
-                            <svg className="absolute bottom-[-20px] left-[-20px] w-full h-full" viewBox="0 0 500 300" preserveAspectRatio="none">
-                                <path d="M0 300H500C350 250 200 150 0 50V300Z" fill="#004391" />
-                                <path d="M0 250H400C250 200 150 100 0 30V250Z" fill="#003566" opacity="0.3" />
-                            </svg>
-                        </div>
-                    </div>
+                        {/* Header Group */}
+                        <div className="w-full flex flex-col items-center mb-2">
+                            {/* Logo */}
+                            <div className="mb-[1.5cqh] flex justify-center">
+                                <div className="w-[6.5cqw] h-[6.5cqw] min-w-[45px] min-h-[45px] rounded-full border-[0.1cqw] border-[#004391]/20 flex items-center justify-center bg-white shadow-sm overflow-hidden p-[0.8cqw] relative z-10">
+                                    <Image
+                                        alt="Logo KKP"
+                                        src="/logo-kkp-2.png"
+                                        width={100}
+                                        height={100}
+                                        className="object-contain w-full h-full"
+                                        priority
+                                    />
+                                </div>
+                            </div>
 
-                    {/* Certificate Header Content */}
-                    <div className="relative z-10 w-full h-full flex flex-col items-center pt-12 box-border px-10">
-                        {/* KKP Logo with Circular Frame */}
-                        <div className="absolute top-12 left-16">
-                            <div className="w-24 h-24 rounded-full border-[1.5px] border-[#004391] border-opacity-30 flex items-center justify-center bg-white shadow-sm overflow-hidden p-3 transition-transform hover:scale-105 duration-300">
-                                <Image
-                                    alt="Logo KKP"
-                                    src="/logo-kkp-2.png"
-                                    width={80}
-                                    height={80}
-                                    className="object-contain"
-                                />
+                            {/* Institutional Header Text */}
+                            <div className="text-center space-y-[0.2cqh]">
+                                <h2 className="text-md font-bosBold uppercase leading-none text-gray-900">KEMENTERIAN KELAUTAN DAN PERIKANAN</h2>
+                                <h2 className="text-md font-bosBold uppercase leading-none text-gray-900">BADAN PENYULUHAN DAN PENGEMBANGAN</h2>
+                                <h2 className="text-md font-bosBold uppercase leading-none text-gray-900">SUMBER DAYA MANUSIA KELAUTAN DAN PERIKANAN</h2>
                             </div>
                         </div>
 
-                        {/* Institutional Header Text */}
-                        <div className="text-center space-y-0.5 mt-2">
-                            <h2 className="text-lg font-bosBold tracking-wide uppercase leading-tight">KEMENTERIAN KELAUTAN DAN PERIKANAN</h2>
-                            <h2 className="text-lg font-bosBold tracking-wide uppercase leading-tight">BADAN PENYULUHAN DAN PENGEMBANGAN</h2>
-                            <h2 className="text-lg font-bosBold tracking-wide uppercase leading-tight">SUMBER DAYA MANUSIA KELAUTAN DAN PERIKANAN</h2>
-                        </div>
-
                         {/* Certificate Title */}
-                        <div className="mt-16 mb-10">
-                            <h1 className="text-[44px] font-bosBold text-[#004391] uppercase tracking-[0.1em] drop-shadow-sm leading-none">SERTIFIKAT PENETAPAN P2MKP</h1>
+                        <div className="relative w-full text-center mb-2">
+                            <h1 className="text-3xl font-bosBold text-[#004391] uppercase  drop-shadow-sm leading-none relative z-10 inline-block pb-[0.6cqh] border-b-[0.25cqh] border-[#E9C46A]">
+                                SERTIFIKAT PENETAPAN
+                            </h1>
                         </div>
 
                         {/* Regulatory Basis & Description */}
-                        <div className="px-36 text-center mb-10">
-                            <p className="text-[17px] font-bosNormal leading-[150%] text-gray-800 text-center max-w-5xl mx-auto">
-                                Berdasarkan Peraturan Peraturan Menteri Kelautan dan Perikanan Republik Indonesia Nomor 18 Tahun 2024 dan Keputusan Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan Nomor 393 Tahun 2025, Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan, menetapkan bahwa:
+                        <div className="text-center mb-[2cqh] w-[85%] mx-auto">
+                            <p className="text-[11px] font-bosNormal leading-[1.6] tracking-none text-gray-800 text-center">
+                                Berdasarkan Peraaturan Menteri Kelautan dan Perikanan Nomor 18 Tahun 2024 tentang Pusat Pelatihan Mandiri Kelautan dan Perikanan dan
+                                Keputusan Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan Nomor 393 Tahun 2025 tentang Penetapan Pusat Pelatihan Mandiri Kelautan dan Perikanan, dengan ini Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan menetapkan:
                             </p>
                         </div>
 
                         {/* P2MKP Detail Information Table */}
-                        <div className="w-full px-40 flex flex-col gap-4 mb-12">
-                            <div className="flex items-start">
-                                <span className="w-[300px] font-bosBold text-[19px]">Nama Lembaga</span>
-                                <span className="w-8 font-bosBold text-[19px]">:</span>
-                                <span className="flex-1 font-bosBold text-[19px] uppercase tracking-tight text-[#222]">
-                                    {p2mkp?.nama_Ppmkp || "KWT NGUDI MULYO"}
-                                </span>
-                            </div>
-                            <div className="flex items-start">
-                                <span className="w-[300px] font-bosBold text-[19px]">Pelatihan yang Diselenggarakan</span>
-                                <span className="w-8 font-bosBold text-[19px]">:</span>
-                                <span className="flex-1 font-bosNormal text-[19px] text-gray-800">
-                                    {p2mkp?.bidang_pelatihan || "Pengolahan dan Pemasaran Hasil Perikanan (Lele)"}
-                                </span>
-                            </div>
-                            <div className="flex items-start">
-                                <span className="w-[300px] font-bosBold text-[19px]">Alamat</span>
-                                <span className="w-8 font-bosBold text-[19px]">:</span>
-                                <span className="flex-1 font-bosNormal text-[19px] leading-snug text-gray-800 text-justify">
-                                    {alamatFull.includes('undefined') ? "Jalan Jongkangan, Dusun Jongkangan, RT/RW 01/01, Desa Tanjungsari, Kecamatan Banyudono, Kabupaten Boyolali, Provinsi Jawa Tengah 57373" : alamatFull}
-                                </span>
+                        <div className="w-full flex justify-center mb-[2cqh]">
+                            <div className="w-full flex flex-col gap-[0.8cqh] p-[2cqw] rounded-[1cqw] bg-white/60 border border-gray-100 shadow-sm backdrop-blur-sm">
+                                <div className="flex items-start">
+                                    <span className="w-[30%] font-bosBold text-[1.1cqw] text-[#003566]">NAMA LEMBAGA</span>
+                                    <span className="w-[4%] font-bosBold text-[1.1cqw] text-gray-500 text-center">:</span>
+                                    <span className="flex-1 font-bosBold text-[1.4cqw] uppercase tracking-wide text-black leading-none pt-[0.2cqh]">
+                                        {p2mkp?.nama_Ppmkp || "KWT NGUDI MULYO"}
+                                    </span>
+                                </div>
+                                <div className="flex items-start">
+                                    <span className="w-[30%] font-bosBold text-[1.1cqw] text-[#003566]">PELATIHAN YANG DISELENGGARAKAN</span>
+                                    <span className="w-[4%] font-bosBold text-[1.1cqw] text-gray-500 text-center">:</span>
+                                    <span className="flex-1 font-bosNormal text-[1.1cqw] text-gray-800 leading-tight pt-[0.2cqh]">
+                                        {p2mkp?.bidang_pelatihan || "Pengolahan dan Pemasaran Hasil Perikanan (Lele)"}
+                                    </span>
+                                </div>
+                                <div className="flex items-start">
+                                    <span className="w-[30%] font-bosBold text-[1.1cqw] text-[#003566]">ALAMAT</span>
+                                    <span className="w-[4%] font-bosBold text-[1.1cqw] text-gray-500 text-center">:</span>
+                                    <span className="flex-1 font-bosNormal text-[1.1cqw] leading-[1.4] text-gray-800 text-justify pt-[0.2cqh]">
+                                        {alamatFull.includes('undefined') ? "Jalan Jongkangan, Dusun Jongkangan, RT/RW 01/01, Desa Tanjungsari, Kecamatan Banyudono, Kabupaten Boyolali, Provinsi Jawa Tengah 57373" : alamatFull}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
                         {/* Designation Status Area */}
-                        <div className="text-center flex flex-col items-center mt-4">
-                            <p className="text-[18px] font-bosNormal italic mb-2 opacity-70">Sebagai</p>
-                            <h3 className="text-[25px] font-bosBold text-[#333] mb-3 tracking-tight">Pusat Pelatihan Mandiri Kelautan dan Perikanan (P2MKP)</h3>
-                            <div className="bg-[#004391] bg-opacity-5 px-6 py-1 rounded-full">
-                                <p className="text-[17px] font-bosNormal italic text-gray-700">
-                                    Penetapan ini berlaku 2 (dua) tahun sejak tanggal ditetapkan
-                                </p>
-                            </div>
+                        <div className="text-center flex flex-col items-center relative z-10 w-full">
+                            <p className="text-[1cqw] font-bosNormal italic text-gray-500">Sebagai</p>
+                            <h3 className="text-[1.8cqw] font-bosBold text-[#003566] mb-[0.5cqh] tracking-tight uppercase drop-shadow-sm">
+                                Pusat Pelatihan Mandiri Kelautan dan Perikanan (P2MKP)
+                            </h3>
+
+
+                            <p className="text-[0.95cqw] font-bosNormal italic text-gray-500 bg-white/80 px-[1cqw] py-[0.3cqh] rounded-full border border-gray-100 shadow-sm">
+                                Berlaku selama 2 (dua) tahun sejak tanggal ditetapkan
+                            </p>
                         </div>
 
-                        {/* Signature and Validation Footer Area */}
-                        <div className="absolute bottom-16 left-0 w-full px-28 flex justify-between items-end">
-                            {/* Validation QR Code */}
-                            <div className="flex flex-col items-start translate-x-4">
-                                <div className="bg-white p-2 shadow-lg border border-gray-100 rounded-sm">
-                                    <QRCodeImage value={p2mkp?.nib || "P2MKP-VALIDATION"} />
-                                </div>
-                                <p className="text-[10px] font-bosNormal mt-2 opacity-40 uppercase tracking-widest text-[#004391]">P2MKP Validation System</p>
-                            </div>
+                        {/* Bottom Decoration & QR Section */}
+                        <div className="absolute bottom-[18cqh] left-[8cqw] z-20">
+                            <QRCodeImage value={`https://elaut-bppsdm.kkp.go.id/layanan/cek-p2mkp/${p2mkp?.IdPpmkp}`} />
 
-                            {/* Official Signatory Name and Title */}
-                            <div className="text-center flex flex-col items-center mr-10">
-                                <p className="text-[18px] font-bosNormal mb-1.5">Jakarta, {p2mkp?.tahun_penetapan || "6 November 2025"}</p>
-                                <p className="text-[18px] font-bosBold mb-20 uppercase tracking-wide">Kepala Badan,</p>
+                        </div>
 
-                                <div className="flex flex-col items-center">
-                                    <div className="font-bosBold text-[20px] leading-tight mb-0.5 text-[#111]">
-                                        {ESELON_1.currentPerson}
-                                    </div>
-                                    <div className="w-[110%] h-[1.5px] bg-[#111] mt-1 shadow-sm"></div>
+                        {/* Signature Area */}
+                        <div className="absolute bottom-[8cqh] right-0 left-0 flex flex-col items-center z-20 min-w-[20cqw]">
+                            <p className="text-[1.1cqw] font-bosNormal">Jakarta, {p2mkp?.tahun_penetapan || "6 November 2025"}</p>
+                            <p className="text-[1.1cqw] font-bosBold mb-[7cqh] uppercase  text-center tracking-wide text-gray-900 leading-tight">Kepala Badan Penyuluhan dan Pengembangan<br /> Sumber Daya Manusia Kelautan dan Perikanan,</p>
+
+                            <div className="flex flex-col items-center relative w-full">
+                                <div className="font-bosBold text-[1.4cqw] leading-tight mb-[0.4cqh] text-black border-b-[0.15cqw] border-black pb-[0.4cqh] px-[2cqw] whitespace-nowrap">
+                                    {ESELON_1.currentPerson}
                                 </div>
+                                <p className="text-[1.1cqw] font-bosNormal mt-[0.8cqh] text-gray-800">NIP. {ESELON_1.nip}</p>
                             </div>
                         </div>
                     </div>
@@ -213,6 +206,6 @@ const DialogSertifikatP2MKP = forwardRef(
     }
 );
 
-DialogSertifikatP2MKP.displayName = "DialogSertifikatP2MKP";
+SertifikatP2MKP.displayName = "SertifikatP2MKP";
 
-export default DialogSertifikatP2MKP;
+export default SertifikatP2MKP;
