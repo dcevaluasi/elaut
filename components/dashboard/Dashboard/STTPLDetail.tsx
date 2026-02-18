@@ -35,7 +35,7 @@ import { LayoutGrid, ShieldCheck, FileText, Download, Printer, Settings, Chevron
 
 interface Props {
     data: PelatihanMasyarakat;
-    fetchData: any
+    fetchData: () => void
 }
 
 const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {

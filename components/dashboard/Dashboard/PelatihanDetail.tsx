@@ -50,7 +50,7 @@ import { LayoutGrid, Users, FileText, GraduationCap, Share2, ShieldCheck, Chevro
 
 interface Props {
     data: PelatihanMasyarakat;
-    fetchData: any
+    fetchData: () => void
 }
 
 const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {

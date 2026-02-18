@@ -35,7 +35,7 @@ import { Clock, Key, ShieldCheck, FileCheck, CheckCircle2, AlertCircle, ChevronR
 
 interface Props {
     data: PelatihanMasyarakat;
-    fetchData: any
+    fetchData: () => void
 }
 
 const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
@@ -214,7 +214,16 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
         }
     };
 
-    const MetricCard = ({ icon: Icon, label, value, current, total, color = "blue" }: any) => {
+    interface MetricCardProps {
+        icon: React.ElementType;
+        label: string;
+        value: string;
+        current?: number;
+        total?: number;
+        color?: "blue" | "emerald" | "amber";
+    }
+
+    const MetricCard = ({ icon: Icon, label, value, current, total, color = "blue" }: MetricCardProps) => {
         const colors: any = {
             blue: "from-blue-600 to-indigo-700 shadow-blue-500/20 text-white",
             emerald: "from-emerald-500 to-teal-600 shadow-emerald-500/20 text-white",
