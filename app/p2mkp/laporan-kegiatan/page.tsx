@@ -37,6 +37,8 @@ import {
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { HashLoader } from 'react-spinners';
+import axios from 'axios';
+import { elautBaseUrl } from '@/constants/urls';
 import Toast from '@/commons/Toast';
 import { saveReport } from '@/utils/p2mkp';
 
@@ -135,6 +137,53 @@ export default function P2MKPReportApp() {
         const timer = setTimeout(() => setLoading(false), 800);
         return () => clearTimeout(timer);
     }, []);
+
+    useEffect(() => {
+        const checkProfileCompletion = async () => {
+            try {
+                const token = Cookies.get('XSRF091');
+                if (!token) {
+                    router.push('/p2mkp/login');
+                    return;
+                }
+
+                const response = await axios.get(`${elautBaseUrl}/p2mkp/get_p2mkp_jwt`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 200) {
+                    const data = response.data.data || response.data;
+                    const essentialFields = [
+                        'nama_ppmkp', 'Nib', 'alamat', 'provinsi', 'kota',
+                        'kecamatan', 'kelurahan', 'no_telp',
+                        'nama_penanggung_jawab', 'no_telp_penanggung_jawab'
+                    ];
+
+                    const isComplete = essentialFields.every(field => {
+                        const value = data[field];
+                        return value !== null && value !== undefined && value !== "" && value !== "null";
+                    });
+
+                    if (!isComplete) {
+                        Toast.fire({
+                            icon: 'info',
+                            title: 'Lengkapi Profil',
+                            text: 'Silakan lengkapi data profil lembaga Anda terlebih dahulu.'
+                        });
+                        router.push('/p2mkp/dashboard/complete-profile');
+                    }
+                }
+            } catch (error) {
+                console.error('Profile check error:', error);
+            }
+        };
+
+        if (!loading) {
+            checkProfileCompletion();
+        }
+    }, [loading, router]);
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [isMobile, setIsMobile] = useState(false);
@@ -325,7 +374,7 @@ export default function P2MKPReportApp() {
                             </div>
                             <div>
                                 <h1 className="font-calsans text-2xl leading-none">P2MKP</h1>
-                                <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mt-1">Management</p>
+                                <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mt-1">Portal</p>
                             </div>
                         </div>
                         {isMobile && (

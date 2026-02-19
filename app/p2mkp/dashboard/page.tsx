@@ -25,6 +25,9 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
+import axios from 'axios';
+import { elautBaseUrl } from '@/constants/urls';
+import Toast from '@/commons/Toast';
 import {
     AreaChart,
     Area,
@@ -68,6 +71,66 @@ export default function P2MKPDashboardPage() {
         const timer = setTimeout(() => setLoading(false), 800);
         return () => clearTimeout(timer);
     }, []);
+
+    useEffect(() => {
+        const checkProfileCompletion = async () => {
+            try {
+                const token = Cookies.get('XSRF091');
+                if (!token) {
+                    router.push('/p2mkp/login');
+                    return;
+                }
+
+                const response = await axios.get(`${elautBaseUrl}/p2mkp/get_p2mkp_jwt`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 200) {
+                    const data = response.data.data || response.data;
+
+                    // Essential fields that must be filled
+                    const essentialFields = [
+                        'nama_ppmkp',
+                        'Nib',
+                        'alamat',
+                        'provinsi',
+                        'kota',
+                        'kecamatan',
+                        'kelurahan',
+                        'no_telp',
+                        'nama_penanggung_jawab',
+                        'no_telp_penanggung_jawab'
+                    ];
+
+                    const isComplete = essentialFields.every(field => {
+                        const value = data[field];
+                        return value !== null && value !== undefined && value !== "" && value !== "null";
+                    });
+
+                    if (!isComplete) {
+                        Toast.fire({
+                            icon: 'info',
+                            title: 'Lengkapi Profil',
+                            text: 'Silakan lengkapi data profil lembaga Anda terlebih dahulu.'
+                        });
+                        router.push('/p2mkp/dashboard/complete-profile');
+                    }
+                }
+            } catch (error) {
+                console.error('Profile check error:', error);
+                if (axios.isAxiosError(error) && error.response?.status === 401) {
+                    Cookies.remove('XSRF091');
+                    router.push('/p2mkp/login');
+                }
+            }
+        };
+
+        if (!loading) {
+            checkProfileCompletion();
+        }
+    }, [loading, router]);
 
     const handleLogout = () => {
         Cookies.remove('XSRF091');
@@ -120,7 +183,7 @@ export default function P2MKPDashboardPage() {
                             </div>
                             <div>
                                 <h1 className="font-calsans text-2xl leading-none">P2MKP</h1>
-                                <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mt-1">Management</p>
+                                <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mt-1">Portal</p>
                             </div>
                         </div>
                         {isMobile && (
@@ -180,9 +243,6 @@ export default function P2MKPDashboardPage() {
                     </div>
 
                     <div className="flex items-center gap-8">
-                        <div className="hidden sm:flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-white/5 border border-white/5 text-xs text-gray-400">
-                            <FiCalendar className="text-blue-400" /> Standar Pelayanan {new Date().getFullYear()}
-                        </div>
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -259,97 +319,7 @@ export default function P2MKPDashboardPage() {
                             </div>
                         </div>
 
-                        {/* Grid Metrics */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                            <StatCard title="Pelatihan Aktif" value="12" icon={<FiBookOpen />} trend="+2.5%" color="blue" />
-                            <StatCard title="Peserta Terdaftar" value="1,234" icon={<FiUsers />} trend="+12.0%" color="indigo" />
-                            <StatCard title="Sertifikat Resertifikasi" value="892" icon={<FiAward />} trend="+5.4%" color="cyan" />
-                            <StatCard title="Masa Berlaku SK" value="3 Thn" icon={<FiCalendar />} trend="Locked" color="emerald" />
-                        </div>
 
-                        {/* Analysis Grid */}
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                            {/* Analytics View */}
-                            <div className="lg:col-span-2 group">
-                                <div className="p-8 rounded-[2.5rem] bg-[#0f172a]/40 backdrop-blur-3xl border border-white/5 shadow-2xl relative overflow-hidden group-hover:border-blue-500/20 transition-all duration-700">
-                                    <div className="flex justify-between items-center mb-10">
-                                        <div className="space-y-1">
-                                            <h3 className="text-2xl font-calsans">Metrics Analytics</h3>
-                                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Growth Performance Insight</p>
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <div className="px-3 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold">Monthly</div>
-                                        </div>
-                                    </div>
-
-                                    <div className="h-[350px] w-full">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <AreaChart data={dataPelatihan}>
-                                                <defs>
-                                                    <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                                                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                                                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                                                    </linearGradient>
-                                                </defs>
-                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
-                                                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#4b5563', fontSize: 10, fontWeight: 700 }} dy={10} />
-                                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#4b5563', fontSize: 10, fontWeight: 700 }} dx={-10} />
-                                                <Tooltip
-                                                    contentStyle={{ backgroundColor: '#0f172a', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}
-                                                    itemStyle={{ color: '#fff', fontSize: '10px', fontWeight: 900 }}
-                                                    labelStyle={{ color: '#3b82f6', marginBottom: '4px', fontWeight: 900, fontSize: '12px' }}
-                                                />
-                                                <Area type="monotone" dataKey="peserta" stroke="#3b82f6" strokeWidth={4} fillOpacity={1} fill="url(#chartGradient)" />
-                                            </AreaChart>
-                                        </ResponsiveContainer>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Activity Section */}
-                            <div className="space-y-8">
-                                <div className="p-8 rounded-[2.5rem] bg-[#0f172a]/40 backdrop-blur-3xl border border-white/5 shadow-2xl relative group-hover:border-indigo-500/20 transition-all">
-                                    <div className="space-y-1 mb-8">
-                                        <h3 className="text-xl font-calsans">Aktivitas Laporan</h3>
-                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Real-time Operasional</p>
-                                    </div>
-
-                                    <div className="space-y-6">
-                                        {[
-                                            { title: 'Budidaya Lele', status: 'Approved', color: 'emerald', time: '2m ago' },
-                                            { title: 'Pengolahan Ikan', status: 'Pending', color: 'amber', time: '1h ago' },
-                                            { title: 'Pemasaran Mandiri', status: 'Updated', color: 'blue', time: '4h ago' },
-                                            { title: 'Sertifikasi Keahlian', status: 'Finalized', color: 'indigo', time: '1d ago' },
-                                        ].map((act, i) => (
-                                            <div key={i} className="flex gap-4 items-center group/act py-1">
-                                                <div className={`w-2.5 h-2.5 rounded-full bg-${act.color}-500 shadow-lg shadow-${act.color}-500/20`} />
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="text-[11px] font-bold text-white truncate">{act.title}</p>
-                                                    <p className="text-[9px] text-gray-500 mt-1 uppercase tracking-tighter font-black">ST: <span className={`text-${act.color}-400`}>{act.status}</span></p>
-                                                </div>
-                                                <span className="text-[9px] text-gray-700 font-bold whitespace-nowrap">{act.time}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    <Button variant="ghost" className="w-full mt-10 text-[10px] font-black text-gray-500 hover:text-white uppercase tracking-widest bg-white/5 hover:bg-white/10 rounded-2xl h-12">
-                                        LIHAT SEMUA LOG <FiChevronRight className="ml-2" />
-                                    </Button>
-                                </div>
-
-                                <div className="p-6 rounded-[2rem] bg-indigo-600/10 border border-indigo-500/20 backdrop-blur-xl relative group">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shrink-0 shadow-lg shadow-indigo-600/20">
-                                            <FiInfo size={24} />
-                                        </div>
-                                        <div>
-                                            <h4 className="text-xs font-black text-white uppercase tracking-widest">Pembaruan Sistem</h4>
-                                            <p className="text-[10px] text-indigo-200/60 mt-1 font-medium italic">Integrasi Sertifikat v4.2 Aktif.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </motion.div>
                 </main>
             </div>

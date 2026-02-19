@@ -112,12 +112,7 @@ export default function TabStatusPelatihanMasyarakat({
     const isSPV = access?.includes('approvePelaksanaanSPV');
     const isAdmin = access?.includes('createPelatihan');
 
-    const getRoleContext = () => {
-        if (isSignatory) return "Otoritas TTE";
-        if (isSPV) return "Supervisor Validasi";
-        if (isAdmin) return "Admin Pelatihan";
-        return "Pengamat Sistem";
-    }
+    const getRoleContext = Cookies.get('Role')
 
     // Role-specific sub-labels mapping based on system status info
     const getTabMetadata = (tab: string) => {
@@ -196,7 +191,7 @@ export default function TabStatusPelatihanMasyarakat({
                             <div className="w-6 h-px bg-blue-500/20" />
                         </div>
                         <h2 className="text-lg font-bold text-slate-800 dark:text-white tracking-tight">
-                            Workflow Peran: <span className="text-blue-600">{getRoleContext()}</span>
+                            Workflow Peran: <span className="text-blue-600">{getRoleContext}</span>
                         </h2>
                         <div className="flex items-center gap-2 text-[10px] text-slate-400 font-medium">
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />

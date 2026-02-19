@@ -199,443 +199,554 @@ export default function CreateP2MKPPage() {
 
     return (
         <LayoutAdminElaut>
-            <section className="flex-1 flex flex-col space-y-4">
-                <HeaderPageLayoutAdminElaut title="Tambah Data P2MKP" description="Tambahkan data P2MKP baru" icon={<HiUserGroup className="text-3xl" />} />
+            <section className="flex-1 flex flex-col space-y-6 relative overflow-hidden">
+                {/* Immersive Background Glows */}
+                <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
+                <div className="absolute top-1/2 -left-24 w-72 h-72 bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none" />
 
-                <div className="flex items-center gap-2 mb-4 px-1">
-                    <Button variant="outline" size="sm" onClick={() => router.back()} className="gap-2">
-                        <ArrowLeft className="w-4 h-4" /> Kembali
+                <HeaderPageLayoutAdminElaut
+                    title="Tambah Data P2MKP"
+                    description="Integrasi entitas P2MKP baru ke dalam ekosistem pelatihan terpadu."
+                    icon={<div className="p-3 bg-blue-600 rounded-2xl shadow-lg shadow-blue-500/40"><HiUserGroup className="text-2xl text-white" /></div>}
+                />
+
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="flex items-center gap-2 mb-2 px-1 relative z-10"
+                >
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => router.back()}
+                        className="gap-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50/50 rounded-xl transition-all"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        <span className="text-[10px] font-black uppercase tracking-widest">Kembali ke Daftar</span>
                     </Button>
-                </div>
+                </motion.div>
 
-                <article className="w-full h-full p-1 overflow-y-auto pb-20">
+                <article className="w-full h-full p-1 overflow-y-auto pb-20 custom-scrollbar">
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 max-w-6xl mx-auto">
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10 max-w-5xl mx-auto">
                             {/* Section 1: Data Umum Kelembagaan */}
-                            <Card className="border-neutral-200 shadow-sm">
-                                <CardHeader>
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-blue-100 text-blue-600 rounded-lg">
-                                            <Building className="w-5 h-5" />
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.1 }}
+                            >
+                                <Card className="border-slate-200/60 shadow-xl shadow-slate-200/40 rounded-[2.5rem] overflow-hidden bg-white/80 backdrop-blur-sm">
+                                    <CardHeader className="p-8 pb-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                                                <Building className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <CardTitle className="text-xl font-black italic uppercase tracking-tight text-slate-800">Profil Kelembagaan</CardTitle>
+                                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Identitas Utama Entitas P2MKP</p>
+                                            </div>
                                         </div>
-                                        <CardTitle className="text-lg">Informasi Kelembagaan</CardTitle>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-0">
-                                    <FormField
-                                        control={form.control}
-                                        name="nama_Ppmkp"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Nama P2MKP</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="Nama lengkap P2MKP" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="status_kepemilikan"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Status Kepemilikan</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
-                                                    <FormControl>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Pilih Status" />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        <SelectItem value="Perserorangan">Perserorangan</SelectItem>
-                                                        <SelectItem value="Kelompok">Kelompok</SelectItem>
-                                                        <SelectItem value="Instansi Pemerintah">Instansi Pemerintah</SelectItem>
-                                                        <SelectItem value="Swasta">Swasta</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="nib"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>NIB</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="Nomor Induk Berusaha" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="email"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Email</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="Email P2MKP" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="password"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Password Akun</FormLabel>
-                                                <FormControl>
-                                                    <Input type="password" placeholder="Password login..." {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="no_telp"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>No. Telepon</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="Nomor Telepon" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="is_lpk"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Apakah LPK?</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
-                                                    <FormControl>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Pilih..." />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        <SelectItem value="Ya">Ya</SelectItem>
-                                                        <SelectItem value="Tidak">Tidak</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                </CardContent>
-                            </Card>
-
-                            {/* Section 1: Data Umum Kelembagaan */}
-                            <Card className="border-neutral-200 shadow-sm">
-                                <CardHeader>
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-blue-100 text-teal-600 rounded-lg">
-                                            <Badge className="w-5 h-5" />
-                                        </div>
-                                        <CardTitle className="text-lg">Penetapan dan Klasifikasi</CardTitle>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-0">
-
-                                    <FormField
-                                        control={form.control}
-                                        name="status"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Status P2MKP</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
-                                                    <FormControl>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Pilih Status" />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        <SelectItem value="Aktif">Aktif</SelectItem>
-                                                        <SelectItem value="Tidak Aktif">Tidak Aktif</SelectItem>
-                                                        <SelectItem value="Calon">Calon</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <FormField
-                                        control={form.control}
-                                        name="klasiikasi"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Klasifikasi</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
-                                                    <FormControl>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Pilih Klasifikasi" />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        <SelectItem value="Pemula">Pemula</SelectItem>
-                                                        <SelectItem value="Madya">Madya</SelectItem>
-                                                        <SelectItem value="Utama">Utama</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="tahun_penetapan"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Tahun Penetapan</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="Tahun Penetapan" type="number" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="status_usaha"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Status Usaha</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="Status Usaha" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </CardContent>
-                            </Card>
-
-                            {/* Section 2: Alamat */}
-                            <Card className="border-neutral-200 shadow-sm">
-                                <CardHeader>
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-amber-100 text-amber-600 rounded-lg">
-                                            <MapPin className="w-5 h-5" />
-                                        </div>
-                                        <CardTitle className="text-lg">Alamat Lengkap</CardTitle>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="space-y-6 pt-0">
-                                    <FormField
-                                        control={form.control}
-                                        name="alamat"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Alamat (Jalan, RT/RW)</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="Nama jalan, nomor, RT/RW" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        {['provinsi', 'kota', 'kecamatan', 'kelurahan', 'kode_pos'].map((item) => (
-                                            <FormField
-                                                key={item}
-                                                control={form.control}
-                                                name={item as any}
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel className="capitalize">{item.replace('_', ' ')}</FormLabel>
-                                                        <FormControl>
-                                                            <Input placeholder={`Masukkan ${item}`} {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        ))}
-                                    </div>
-                                </CardContent>
-                            </Card>
-
-                            {/* Section 3: Bidang Pelatihan & Klasifikasi */}
-                            <Card className="border-neutral-200 shadow-sm">
-                                <CardHeader>
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg">
-                                            <Briefcase className="w-5 h-5" />
-                                        </div>
-                                        <CardTitle className="text-lg">Pelatihan</CardTitle>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-0">
-                                    <FormField
-                                        control={form.control}
-                                        name="jenis_bidang_pelatihan"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Jenis Bidang Pelatihan</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
-                                                    <FormControl>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder={loadingRumpun ? "Memuat..." : "Pilih Rumpun Pelatihan"} />
-                                                        </SelectTrigger>
-                                                    </FormControl>
-                                                    <SelectContent>
-                                                        {rumpunPelatihan?.map((item: any) => (
-                                                            <SelectItem key={item.id_rumpun_pelatihan} value={String(item.id_rumpun_pelatihan)}>
-                                                                {item.name}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="jenis_pelatihan"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Jenis Pelatihan</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="Contoh: Budidaya Lele" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <FormField
-                                        control={form.control}
-                                        name="status_peltihan"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Status Pelatihan</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="Status Pelatihan" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                </CardContent>
-                            </Card>
-
-                            {/* Section 5: Penanggung Jawab */}
-                            <Card className="border-neutral-200 shadow-sm">
-                                <CardHeader>
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-purple-100 text-purple-600 rounded-lg">
-                                            <User className="w-5 h-5" />
-                                        </div>
-                                        <CardTitle className="text-lg">Data Penanggung Jawab</CardTitle>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-0">
-                                    <FormField
-                                        control={form.control}
-                                        name="nama_penanggung_jawab"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Nama Lengkap</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="Nama Penanggung Jawab" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="no_telp_penanggung_jawab"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>No. HP Penanggung Jawab</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="08..." {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </CardContent>
-                            </Card>
-
-                            {/* Section 4: Document Links */}
-                            <Card className="border-neutral-200 shadow-sm">
-                                <CardHeader>
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-2 bg-slate-100 text-slate-600 rounded-lg">
-                                            <Save className="w-5 h-5" />
-                                        </div>
-                                        <CardTitle className="text-lg">Dokumen Pendukung</CardTitle>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-0">
-                                    {[
-                                        { name: "dokumen_identifikasi_pemilik", label: "Dok. Identifikasi Pemilik" },
-                                        { name: "dokumen_asesment_mandiri", label: "Dok. Asesmen Mandiri" },
-                                        { name: "dokument_surat_pernyataan", label: "Dok. Surat Pernyataan" },
-                                        { name: "dokumen_keterangan_usaha", label: "Dok. Keterangan Usaha" },
-                                        { name: "dokumen_afiliasi_parpol", label: "Dok. Afiliasi Parpol" },
-                                        { name: "dokumen_rekomendasi_dinas", label: "Dok. Rekomendasi Dinas" },
-                                        { name: "dokumen_permohonan_pembentukan", label: "Dok. Permohonan Pembentukan" },
-                                        { name: "dokumen_permohonan_klasifikasi", label: "Dok. Permohonan Klasifikasi" },
-                                    ].map((doc) => (
+                                    </CardHeader>
+                                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 p-8 pt-4">
                                         <FormField
-                                            key={doc.name}
                                             control={form.control}
-                                            name={doc.name as any}
-                                            render={({ field: { value, onChange, ...fieldProps } }) => (
-                                                <FormItem>
-                                                    <FormLabel>{doc.label}</FormLabel>
+                                            name="nama_Ppmkp"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Nama Lembaga</FormLabel>
                                                     <FormControl>
-                                                        <Input
-                                                            {...fieldProps}
-                                                            type="file"
-                                                            accept=".pdf,.jpg,.jpeg,.png"
-                                                            onChange={(event) => {
-                                                                onChange(event.target.files);
-                                                            }}
-                                                        />
+                                                        <div className="relative group">
+                                                            <Building className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                                                            <Input placeholder="Nama lengkap lembaga secara resmi..." className="h-14 pl-14 bg-white/50 border-slate-200 rounded-2xl px-6 focus-visible:ring-blue-500/20 focus-visible:border-blue-500 font-medium transition-all shadow-sm" {...field} />
+                                                        </div>
+                                                    </FormControl>
+                                                    <FormMessage className="text-[10px] uppercase font-bold text-rose-500" />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="status_kepemilikan"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Status Kepemilikan</FormLabel>
+                                                    <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                                                        <FormControl>
+                                                            <SelectTrigger className="h-14 bg-white/50 border-slate-200 rounded-2xl px-6 focus:ring-blue-500/20 font-medium transition-all shadow-sm">
+                                                                <SelectValue placeholder="Pilih Status" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent className="rounded-2xl border-slate-200 shadow-2xl">
+                                                            <SelectItem value="Perserorangan">Perserorangan</SelectItem>
+                                                            <SelectItem value="Kelompok">Kelompok</SelectItem>
+                                                            <SelectItem value="Instansi Pemerintah">Instansi Pemerintah</SelectItem>
+                                                            <SelectItem value="Swasta">Swasta</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="nib"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Nomor Induk Berusaha (NIB)</FormLabel>
+                                                    <FormControl>
+                                                        <div className="relative group">
+                                                            <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors bg-slate-100 rounded p-1"><Briefcase size={14} /></div>
+                                                            <Input placeholder="Masukkan kode NIB..." className="h-14 pl-14 bg-white/50 border-slate-200 rounded-2xl px-6 focus-visible:ring-blue-500/20 focus-visible:border-blue-500 font-medium transition-all shadow-sm" {...field} />
+                                                        </div>
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
-                                    ))}
-                                </CardContent>
-                            </Card>
+                                        <FormField
+                                            control={form.control}
+                                            name="email"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Email Resmi</FormLabel>
+                                                    <FormControl>
+                                                        <div className="relative group">
+                                                            <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors uppercase font-black text-[10px] tracking-tighter bg-slate-100 rounded px-1.5 py-0.5">MAIL</div>
+                                                            <Input placeholder="contoh@lembaga.go.id" className="h-14 pl-16 bg-white/50 border-slate-200 rounded-2xl px-6 focus-visible:ring-blue-500/20 focus-visible:border-blue-500 font-medium transition-all shadow-sm" {...field} />
+                                                        </div>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="password"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Kata Sandi</FormLabel>
+                                                    <FormControl>
+                                                        <div className="relative group">
+                                                            <KeyRound className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                                                            <Input type="password" placeholder="Minimal 6 karakter..." className="h-14 pl-14 bg-white/50 border-slate-200 rounded-2xl px-6 focus-visible:ring-blue-500/20 focus-visible:border-blue-500 font-medium transition-all shadow-sm" {...field} />
+                                                        </div>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="no_telp"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Kontak Telepon</FormLabel>
+                                                    <FormControl>
+                                                        <div className="relative group">
+                                                            <div className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors font-bold text-xs tracking-tighter bg-slate-100 rounded px-1.5 py-0.5">+62</div>
+                                                            <Input placeholder="8XXXXXXXXXXX" className="h-14 pl-16 bg-white/50 border-slate-200 rounded-2xl px-6 focus-visible:ring-blue-500/20 focus-visible:border-blue-500 font-medium transition-all shadow-sm" {...field} />
+                                                        </div>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="is_lpk"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 ml-1">Status LPK</FormLabel>
+                                                    <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                                                        <FormControl>
+                                                            <SelectTrigger className="h-14 bg-white/50 border-slate-200 rounded-2xl px-6 focus:ring-blue-500/20 font-medium transition-all shadow-sm">
+                                                                <SelectValue placeholder="Pilih..." />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent className="rounded-2xl border-slate-200 shadow-2xl">
+                                                            <SelectItem value="Ya">Terdaftar LPK (Ya)</SelectItem>
+                                                            <SelectItem value="Tidak">Bukan LPK (Tidak)</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
 
-                            <div className="flex justify-end pt-4 gap-4">
-                                <Button type="button" variant="outline" onClick={() => router.back()}>
-                                    Batal
+                            {/* Section: Administration */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2 }}
+                            >
+                                <Card className="border-slate-200/60 shadow-xl shadow-slate-200/40 rounded-[2.5rem] overflow-hidden bg-white/80 backdrop-blur-sm">
+                                    <CardHeader className="p-8 pb-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-emerald-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                                                <Badge className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <CardTitle className="text-xl font-black italic uppercase tracking-tight text-slate-800">Administrasi & Penetapan</CardTitle>
+                                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Status Registrasi & Klasifikasi</p>
+                                            </div>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 p-8 pt-4">
+                                        <FormField
+                                            control={form.control}
+                                            name="status"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Status Akun</FormLabel>
+                                                    <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                                                        <FormControl>
+                                                            <SelectTrigger className="h-14 bg-slate-50/50 border-slate-200 rounded-2xl px-6 focus:ring-blue-500 font-medium italic">
+                                                                <SelectValue placeholder="Pilih Status" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent className="rounded-2xl border-slate-200 shadow-xl">
+                                                            <SelectItem value="Aktif">AKTIF</SelectItem>
+                                                            <SelectItem value="Tidak Aktif">TIDAK AKTIF</SelectItem>
+                                                            <SelectItem value="Calon">CALON</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage className="text-[10px] uppercase font-bold" />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="klasiikasi"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Klasifikasi</FormLabel>
+                                                    <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                                                        <FormControl>
+                                                            <SelectTrigger className="h-14 bg-slate-50/50 border-slate-200 rounded-2xl px-6 focus:ring-blue-500 font-medium">
+                                                                <SelectValue placeholder="Grade" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent className="rounded-2xl border-slate-200 shadow-xl">
+                                                            <SelectItem value="Pemula">PEMULA</SelectItem>
+                                                            <SelectItem value="Madya">MADYA</SelectItem>
+                                                            <SelectItem value="Utama">UTAMA</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage className="text-[10px] uppercase font-bold" />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="tahun_penetapan"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Tahun Penetapan</FormLabel>
+                                                    <FormControl>
+                                                        <Input placeholder="YYYY" type="number" className="h-14 bg-slate-50/50 border-slate-200 rounded-2xl px-6 focus-visible:ring-blue-500 font-medium" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage className="text-[10px] uppercase font-bold" />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="status_usaha"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Status Usaha</FormLabel>
+                                                    <FormControl>
+                                                        <Input placeholder="Aktif/Berjalan" className="h-14 bg-slate-50/50 border-slate-200 rounded-2xl px-6 focus-visible:ring-blue-500 font-medium italic" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage className="text-[10px] uppercase font-bold" />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
+
+                            {/* Section 2: Alamat */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.3 }}
+                            >
+                                <Card className="border-slate-200/60 shadow-xl shadow-slate-200/40 rounded-[2.5rem] overflow-hidden bg-white/80 backdrop-blur-sm">
+                                    <CardHeader className="p-8 pb-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/20">
+                                                <MapPin className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <CardTitle className="text-xl font-black italic uppercase tracking-tight text-slate-800">Geolokasi & Alamat</CardTitle>
+                                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Physical Facility Location</p>
+                                            </div>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent className="space-y-8 p-8 pt-4">
+                                        <FormField
+                                            control={form.control}
+                                            name="alamat"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Street Address</FormLabel>
+                                                    <FormControl>
+                                                        <Input placeholder="Nama jalan, nomor bangunan, RT/RW..." className="h-14 bg-slate-50/50 border-slate-200 rounded-2xl px-6 focus-visible:ring-blue-500 font-medium" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage className="text-[10px] uppercase font-bold" />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                            {[
+                                                { id: 'provinsi', label: 'Provinsi' },
+                                                { id: 'kota', label: 'Kota / Kabupaten' },
+                                                { id: 'kecamatan', label: 'Kecamatan' },
+                                                { id: 'kelurahan', label: 'Kelurahan' },
+                                                { id: 'kode_pos', label: 'Postal Code' },
+                                            ].map((item) => (
+                                                <FormField
+                                                    key={item.id}
+                                                    control={form.control}
+                                                    name={item.id as any}
+                                                    render={({ field }) => (
+                                                        <FormItem className="space-y-2">
+                                                            <FormLabel className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">{item.label}</FormLabel>
+                                                            <FormControl>
+                                                                <Input placeholder={`Entry ${item.label}...`} className="h-14 bg-slate-50/50 border-slate-200 rounded-2xl px-6 focus-visible:ring-blue-500 font-medium" {...field} />
+                                                            </FormControl>
+                                                            <FormMessage className="text-[10px] uppercase font-bold" />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                            ))}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
+
+                            {/* Section 3: Training Info */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.4 }}
+                            >
+                                <Card className="border-slate-200/60 shadow-xl shadow-slate-200/40 rounded-[2.5rem] overflow-hidden bg-white/80 backdrop-blur-sm">
+                                    <CardHeader className="p-8 pb-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                                                <Briefcase className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <CardTitle className="text-xl font-black italic uppercase tracking-tight text-slate-800">Sektor Pelatihan</CardTitle>
+                                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Core Educational Expertise</p>
+                                            </div>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-8 p-8 pt-4">
+                                        <FormField
+                                            control={form.control}
+                                            name="jenis_bidang_pelatihan"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Rumpun Pelatihan</FormLabel>
+                                                    <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                                                        <FormControl>
+                                                            <SelectTrigger className="h-14 bg-slate-50/50 border-slate-200 rounded-2xl px-6 focus:ring-blue-500 font-medium">
+                                                                <SelectValue placeholder={loadingRumpun ? "Loading cluster..." : "Direct Cluster Select"} />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent className="rounded-2xl border-slate-200 shadow-xl italic">
+                                                            {rumpunPelatihan?.map((item: any) => (
+                                                                <SelectItem key={item.id_rumpun_pelatihan} value={String(item.id_rumpun_pelatihan)}>
+                                                                    {item.name.toUpperCase()}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage className="text-[10px] uppercase font-bold" />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="jenis_pelatihan"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Sub-Kategori Pelatihan</FormLabel>
+                                                    <FormControl>
+                                                        <Input placeholder="Contoh: Budidaya Perikanan Darat" className="h-14 bg-slate-50/50 border-slate-200 rounded-2xl px-6 focus-visible:ring-blue-500 font-medium" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage className="text-[10px] uppercase font-bold" />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="status_peltihan"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Execution Status</FormLabel>
+                                                    <FormControl>
+                                                        <Input placeholder="Draft/Published/Running" className="h-14 bg-slate-50/50 border-slate-200 rounded-2xl px-6 focus-visible:ring-blue-500 font-medium italic" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage className="text-[10px] uppercase font-bold" />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
+
+                            {/* Section 5: Registar */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.5 }}
+                            >
+                                <Card className="border-slate-200/60 shadow-xl shadow-slate-200/40 rounded-[2.5rem] overflow-hidden bg-white/80 backdrop-blur-sm">
+                                    <CardHeader className="p-8 pb-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-fuchsia-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/20">
+                                                <User className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <CardTitle className="text-xl font-black italic uppercase tracking-tight text-slate-800">Penanggung Jawab</CardTitle>
+                                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Authorization & Contact Person</p>
+                                            </div>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8 pt-4">
+                                        <FormField
+                                            control={form.control}
+                                            name="nama_penanggung_jawab"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Full Legal Name</FormLabel>
+                                                    <FormControl>
+                                                        <Input placeholder="Nama penanggung jawab operasional..." className="h-14 bg-slate-50/50 border-slate-200 rounded-2xl px-6 focus-visible:ring-blue-500 font-medium" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage className="text-[10px] uppercase font-bold" />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="no_telp_penanggung_jawab"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Direct Mobile Number</FormLabel>
+                                                    <FormControl>
+                                                        <Input placeholder="08XXXXXXXXXX" className="h-14 bg-slate-50/50 border-slate-200 rounded-2xl px-6 focus-visible:ring-blue-500 font-medium" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage className="text-[10px] uppercase font-bold" />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
+
+                            {/* Section: Documents */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.6 }}
+                            >
+                                <Card className="border-slate-200/60 shadow-xl shadow-slate-200/40 rounded-[2.5rem] overflow-hidden bg-white/80 backdrop-blur-sm">
+                                    <CardHeader className="p-8 pb-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-gradient-to-br from-slate-700 to-slate-900 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-slate-500/20">
+                                                <Save className="w-6 h-6" />
+                                            </div>
+                                            <div>
+                                                <CardTitle className="text-xl font-black italic uppercase tracking-tight text-slate-800">Support Documents</CardTitle>
+                                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Verification Attachments Pool</p>
+                                            </div>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 p-8 pt-4">
+                                        {[
+                                            { name: "dokumen_identifikasi_pemilik", label: "Identity Verification" },
+                                            { name: "dokumen_asesment_mandiri", label: "Self-Assessment Matrix" },
+                                            { name: "dokument_surat_pernyataan", label: "Integrity Statement" },
+                                            { name: "dokumen_keterangan_usaha", label: "Business Permit (SKU)" },
+                                            { name: "dokumen_afiliasi_parpol", label: "Non-Political Affidavit" },
+                                            { name: "dokumen_rekomendasi_dinas", label: "Regency Recommendation" },
+                                            { name: "dokumen_permohonan_pembentukan", label: "Formation Proposal" },
+                                            { name: "dokumen_permohonan_klasifikasi", label: "Classification Request" },
+                                        ].map((doc) => (
+                                            <FormField
+                                                key={doc.name}
+                                                control={form.control}
+                                                name={doc.name as any}
+                                                render={({ field: { value, onChange, ...fieldProps } }) => (
+                                                    <FormItem className="space-y-3">
+                                                        <FormLabel className="text-[11px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
+                                                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                                                            {doc.label}
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <div className="group relative">
+                                                                <Input
+                                                                    {...fieldProps}
+                                                                    type="file"
+                                                                    accept=".pdf,.jpg,.jpeg,.png"
+                                                                    className="h-16 bg-white border-2 border-dashed border-slate-200 rounded-2xl px-6 py-4 cursor-pointer hover:border-blue-300 hover:bg-blue-50/20 transition-all file:hidden text-[11px] font-bold text-slate-400"
+                                                                    onChange={(event) => {
+                                                                        onChange(event.target.files);
+                                                                    }}
+                                                                />
+                                                                <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300 group-hover:text-blue-500 transition-colors">
+                                                                    <Save size={18} />
+                                                                </div>
+                                                            </div>
+                                                        </FormControl>
+                                                        <FormMessage className="text-[10px] uppercase font-bold" />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        ))}
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
+
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.8 }}
+                                className="flex flex-col sm:flex-row justify-end pt-6 gap-4"
+                            >
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    onClick={() => router.back()}
+                                    className="h-16 px-10 rounded-2xl font-bold uppercase tracking-widest text-[10px] text-slate-400 hover:text-slate-600 hover:bg-slate-100/50"
+                                >
+                                    Batalkan Perubahan
                                 </Button>
-                                <Button type="submit" disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-700 min-w-[150px]">
+                                <Button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="h-16 px-16 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-2xl shadow-blue-500/30 transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-70"
+                                >
                                     {isSubmitting ? (
-                                        <>
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Menyimpan...
-                                        </>
+                                        <div className="flex items-center gap-3">
+                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                            <span>Singkronisasi Data...</span>
+                                        </div>
                                     ) : (
-                                        <>
-                                            <Save className="mr-2 h-4 w-4" />
-                                            Simpan P2MKP
-                                        </>
+                                        <div className="flex items-center gap-3">
+                                            <Save size={18} />
+                                            <span>Daftarkan Entitas P2MKP</span>
+                                        </div>
                                     )}
                                 </Button>
-                            </div>
+                            </motion.div>
                         </form>
                     </Form>
                 </article>

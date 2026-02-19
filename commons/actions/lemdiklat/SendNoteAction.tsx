@@ -2,18 +2,34 @@
 
 import React, { useState, useEffect } from "react";
 import {
-    AlertDialog,
-    AlertDialogTrigger,
-    AlertDialogContent,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogCancel,
-    AlertDialogAction,
-} from "@/components/ui/alert-dialog";
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+    LayoutGrid,
+    MessageSquareText,
+    FileUp,
+    CheckCircle2,
+    Save,
+    X,
+    Users,
+    ShieldCheck,
+    AlertCircle,
+    Info,
+    FileText,
+    ExternalLink,
+    Send
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 import {
     Select,
     SelectTrigger,
@@ -198,155 +214,221 @@ const SendNoteAction: React.FC<SendNoteActionProps> = ({
         }
     };
 
+    const colorGradients: Record<string, string> = {
+        blue: "from-blue-600 to-indigo-700",
+        teal: "from-teal-500 to-emerald-700",
+        rose: "from-rose-500 to-pink-700",
+        amber: "from-amber-500 to-orange-700",
+        neutral: "from-slate-600 to-slate-800",
+    };
+
+    const gradient = colorGradients[buttonColor] || colorGradients.blue;
+
     return (
-        <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-            <AlertDialogTrigger asChild>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
                 <Button
-                    className={`flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all border bg-transparent border-${buttonColor}-500 text-${buttonColor}-500 hover:text-white hover:bg-${buttonColor}-500`}
+                    variant="outline"
+                    className={cn(
+                        " h-10 flex items-center gap-2.5 rounded-xl px-4 border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm font-bold text-xs transition-all duration-300 shadow-sm",
+                        buttonColor === "blue" && "hover:border-blue-500 hover:text-blue-600",
+                        buttonColor === "teal" && "hover:border-teal-500 hover:text-teal-600",
+                        buttonColor === "rose" && "hover:border-rose-500 hover:text-rose-600",
+                        buttonColor === "amber" && "hover:border-amber-500 hover:text-amber-600",
+                        buttonColor === "neutral" && "hover:border-slate-500 hover:text-slate-600"
+                    )}
                 >
-                    <Icon className="h-5 w-5" />
+                    <div className={cn(
+                        "p-1 rounded-lg transition-colors",
+                        buttonColor === "blue" && "bg-blue-50 text-blue-500 group-hover:bg-blue-500 ",
+                        buttonColor === "teal" && "bg-teal-50 text-teal-500 group-hover:bg-teal-500 ",
+                        buttonColor === "rose" && "bg-rose-50 text-rose-500 group-hover:bg-rose-500 ",
+                        buttonColor === "amber" && "bg-amber-50 text-amber-500 group-hover:bg-amber-500 ",
+                        buttonColor === "neutral" && "bg-slate-100 text-slate-500 group-hover:bg-slate-500 "
+                    )}>
+                        <Icon className="h-3.5 w-3.5" />
+                    </div>
                     <span>{buttonLabel}</span>
                 </Button>
-            </AlertDialogTrigger>
+            </DialogTrigger>
 
-            <AlertDialogContent className="max-w-md">
-                <AlertDialogHeader>
-                    <AlertDialogTitle>{title}</AlertDialogTitle>
-                    <AlertDialogDescription>{description}</AlertDialogDescription>
-                </AlertDialogHeader>
-
-                {/* Input Pesan */}
-                {
-                    (Cookies.get('Access')?.includes('supervisePelaksanaan') && (pelatihan?.StatusPenerbitan == "1") && title == "Pilih Verifikator") && <div>
-                        <Select
-                            value={verifikatorPelaksanaan?.toString() ?? ""}
-                            onValueChange={(value) => {
-                                setVerifikatorPelaksanaan(value);
-
-                                // Find the full object of selected verifikator
-                                const selected = adminPusatData.find(
-                                    (item) => item.IdAdminPusat.toString() === value
-                                );
-                                setSelectedVerifikator(selected ?? null);
-                            }}
-                            disabled={loading || loadingPusat}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Pilih Verifikator" />
-                            </SelectTrigger>
-
-                            <SelectContent position="popper" className="z-[9999999]">
-                                {loadingPusat ? (
-                                    <div className="p-2 text-sm text-muted-foreground">Memuat data...</div>
-                                ) : (
-                                    adminPusatData
-                                        .filter((item) => breakdownStatus(item.Status)[0] === "Verifikator")
-                                        .map((admin) => (
-                                            <SelectItem
-                                                key={admin.IdAdminPusat}
-                                                value={admin.IdAdminPusat.toString()}
-                                            >
-                                                {admin.Nama}
-                                            </SelectItem>
-                                        ))
-                                )}
-                            </SelectContent>
-                        </Select>
-
-                    </div>
-                }
-
-                {
-                    (pelatihan?.StatusPenerbitan == "1.25" || pelatihan?.StatusPenerbitan == "1.5" || pelatihan?.StatusPenerbitan == "5" || pelatihan?.StatusPenerbitan == "7" || pelatihan?.StatusPenerbitan == "9") && <>
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-800 mb-2">
-                                Upload Dokumen Penerbitan STTPL
-                            </label>
-
-                            <div className="relative">
-                                <input
-                                    type="file"
-                                    accept=".pdf,.doc,.docx"
-                                    onChange={handleFileChange}
-                                    disabled={loading}
-                                    className="peer block w-full cursor-pointer rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm transition 
-                 file:mr-4 file:cursor-pointer file:rounded-md file:border-0 
-                 file:bg-navy-500 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white 
-                 hover:file:bg-navy-600 
-                 focus:border-navy-400 focus:ring-2 focus:ring-navy-300 
-                 disabled:cursor-not-allowed disabled:opacity-60"
-                                />
+            <DialogContent className="w-[95vw] md:w-full max-w-lg p-0 bg-white/95 dark:bg-slate-950/95 backdrop-blur-3xl border-white/50 dark:border-slate-800 rounded-3xl md:rounded-[3rem] overflow-hidden shadow-2xl z-[99999]">
+                <div className="flex flex-col">
+                    <DialogHeader className="p-8 pb-4 space-y-6">
+                        <div className="flex flex-col md:flex-row items-center gap-6">
+                            <div className={cn(
+                                "w-20 h-20 shrink-0 rounded-[2rem] bg-gradient-to-br text-white flex items-center justify-center text-4xl shadow-2xl",
+                                gradient,
+                                buttonColor === "blue" && "shadow-blue-600/20",
+                                buttonColor === "teal" && "shadow-teal-400/20",
+                                buttonColor === "rose" && "shadow-rose-600/20",
+                                buttonColor === "amber" && "shadow-amber-600/20",
+                                buttonColor === "neutral" && "shadow-slate-600/20"
+                            )}>
+                                <Icon />
                             </div>
-
-                            <p className="mt-1 text-xs text-gray-500">
-                                Format file: <span className="font-medium">PDF, DOC, DOCX</span>
-                            </p>
-
-                            {/* Old file preview */}
-                            {oldFileUrl && (
-                                <div className="mt-3 flex items-center justify-between rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm shadow-sm">
-                                    <div className="flex items-center gap-2 text-gray-700">
-                                        📄
-                                        <span className="truncate max-w-[200px]">Dokumen Penerbitan STTPL</span>
-                                    </div>
-                                    <a
-                                        href={`${urlFileBeritaAcara} / ${oldFileUrl}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-navy-600 hover:text-navy-800 font-medium transition"
-                                    >
-                                        Lihat
-                                    </a>
+                            <div className="space-y-2 text-center md:text-left">
+                                <DialogTitle className="font-black text-2xl text-slate-900 dark:text-white tracking-tight leading-tight">
+                                    {title}
+                                </DialogTitle>
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-pulse" />
+                                    <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">{pelatihan.KodePelatihan}</span>
                                 </div>
-                            )}
+                            </div>
                         </div>
-                    </>
-                }
 
-                <div className="mb-2">
-                    <label
-                        className="block text-gray-800 text-sm font-medium mb-1"
-                        htmlFor="email"
-                    >
-                        Catatan
-                    </label>
-                    <Textarea
-                        placeholder="Tulis catatan atau pesan Anda di sini..."
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        disabled={loading}
-                    />
+                        <div className="relative p-6 rounded-[2rem] bg-slate-50 dark:bg-slate-900 shadow-inner border border-slate-100 dark:border-slate-800">
+                            <div className="absolute top-0 right-0 p-4 opacity-5">
+                                <Icon className="w-12 h-12" />
+                            </div>
+                            <DialogDescription className="text-sm text-slate-600 dark:text-slate-400 font-bold leading-relaxed">
+                                {description}
+                            </DialogDescription>
+                        </div>
+                    </DialogHeader>
+
+                    <div className="px-8 pb-8 space-y-6">
+                        {/* Verifikator Selection */}
+                        {(Cookies.get('Access')?.includes('supervisePelaksanaan') && (pelatihan?.StatusPenerbitan == "1") && title == "Pilih Verifikator") && (
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2">
+                                    <ShieldCheck className="w-4 h-4 text-indigo-500" />
+                                    <Label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Tunjuk Verifikator Pelaksanaan</Label>
+                                </div>
+                                <Select
+                                    value={verifikatorPelaksanaan?.toString() ?? ""}
+                                    onValueChange={(value) => {
+                                        setVerifikatorPelaksanaan(value);
+                                        const selected = adminPusatData.find((item) => item.IdAdminPusat.toString() === value);
+                                        setSelectedVerifikator(selected ?? null);
+                                    }}
+                                    disabled={loading || loadingPusat}
+                                >
+                                    <SelectTrigger className="h-12 rounded-2xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 font-bold text-sm">
+                                        <SelectValue placeholder="Pilih Nama Verifikator..." />
+                                    </SelectTrigger>
+                                    <SelectContent className="z-[999999]">
+                                        {loadingPusat ? (
+                                            <div className="p-4 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Memuat Data Pusat...</div>
+                                        ) : (
+                                            adminPusatData
+                                                .filter((item) => breakdownStatus(item.Status)[0] === "Verifikator")
+                                                .map((admin) => (
+                                                    <SelectItem key={admin.IdAdminPusat} value={admin.IdAdminPusat.toString()} className="font-bold py-3">
+                                                        {admin.Nama}
+                                                    </SelectItem>
+                                                ))
+                                        )}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
+
+                        {/* File Upload Section */}
+                        {(pelatihan?.StatusPenerbitan == "1.25" || pelatihan?.StatusPenerbitan == "1.5" || pelatihan?.StatusPenerbitan == "5" || pelatihan?.StatusPenerbitan == "7" || pelatihan?.StatusPenerbitan == "9") && (
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2">
+                                    <FileUp className="w-4 h-4 text-indigo-500" />
+                                    <Label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Unggah Dokumen Penerbitan STTPL</Label>
+                                </div>
+                                <div className="relative group/upload">
+                                    <input
+                                        type="file"
+                                        id="sttplDoc"
+                                        accept=".pdf,.doc,.docx"
+                                        onChange={handleFileChange}
+                                        disabled={loading}
+                                        className="hidden"
+                                    />
+                                    <label
+                                        htmlFor="sttplDoc"
+                                        className="flex flex-col items-center justify-center w-full h-28 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-900 hover:border-indigo-500 transition-all cursor-pointer overflow-hidden p-4 text-center"
+                                    >
+                                        <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 mb-2 flex items-center justify-center group-hover/upload:scale-110 transition-transform">
+                                            <FileText className="w-5 h-5" />
+                                        </div>
+                                        <p className="text-[10px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest truncate max-w-full px-4">
+                                            {beritaAcaraFile ? beritaAcaraFile.name : "Klik untuk Pilih File (PDF, DOC, DOCX)"}
+                                        </p>
+                                    </label>
+                                </div>
+                                {oldFileUrl && (
+                                    <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600">
+                                                <CheckCircle2 className="w-4 h-4" />
+                                            </div>
+                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">File Terupload Saat Ini</span>
+                                        </div>
+                                        <a href={`${urlFileBeritaAcara}/${oldFileUrl}`} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black text-indigo-600 underline underline-offset-4 hover:text-indigo-700 transition-colors uppercase">
+                                            Lihat Dokumen
+                                        </a>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Message/Notes Section */}
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-2">
+                                <MessageSquareText className="w-4 h-4 text-indigo-500" />
+                                <Label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Tambahkan Catatan atau Pesan Instansi</Label>
+                            </div>
+                            <Textarea
+                                placeholder="Jelaskan alasan pengajuan atau catatan perbaikan di sini..."
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                                disabled={loading}
+                                className="min-h-[100px] rounded-[1.5rem] bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 p-4 font-bold text-sm tracking-tight focus:ring-2 focus:ring-indigo-500"
+                            />
+                        </div>
+                    </div>
+
+                    <DialogFooter className="p-8 pt-4 bg-white/50 dark:bg-slate-950/50 backdrop-blur-sm border-t border-slate-100 dark:border-slate-800 shrink-0">
+                        <div className="flex flex-col sm:flex-row items-center justify-end gap-3 w-full">
+                            <Button
+                                variant="ghost"
+                                onClick={() => setIsOpen(false)}
+                                disabled={loading}
+                                className="w-full sm:w-auto h-12 px-8 rounded-2xl text-slate-500 font-black uppercase tracking-widest text-[10px] hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                            >
+                                <X className="w-4 h-4 mr-2" />
+                                Batalkan
+                            </Button>
+                            <Button
+                                onClick={handleSubmit}
+                                disabled={loading || !message || (title === "Ajukan Penerbitan STTPL" && !beritaAcaraFile)}
+                                className={cn(
+                                    "w-full sm:w-auto h-12 px-10 rounded-2xl text-white font-black uppercase tracking-[0.2em] text-[10px] shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3",
+                                    buttonColor === "blue" && "bg-blue-600 hover:bg-blue-700 shadow-blue-500/20",
+                                    buttonColor === "teal" && "bg-green-500 hover:bg-green-500 shadow-green-500/20",
+                                    buttonColor === "rose" && "bg-rose-600 hover:bg-rose-700 shadow-rose-500/20",
+                                    buttonColor === "amber" && "bg-amber-600 hover:bg-amber-700 shadow-amber-500/20",
+                                    buttonColor === "neutral" && "bg-slate-700 hover:bg-slate-800 shadow-slate-500/20"
+                                )}
+                            >
+                                {loading ? (
+                                    <>
+                                        <motion.div
+                                            animate={{ rotate: 360 }}
+                                            transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                                            className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                                        />
+                                        <span>Memproses Data...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Send className="w-4 h-4" />
+                                        <span>Konfirmasi & Kirim</span>
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+                    </DialogFooter>
                 </div>
-
-                <AlertDialogFooter>
-                    <AlertDialogCancel disabled={loading}>Batal</AlertDialogCancel>
-
-                    {title === "Ajukan Penerbitan STTPL" ? (
-                        <Button
-                            onClick={handleSubmit}
-                            variant="outline"
-                            className={`border-${buttonColor}-500 bg-transparent text-${buttonColor}-500 hover:bg-${buttonColor}-700 hover:text-white`}
-                            disabled={loading || !message || !beritaAcaraFile}
-                        >
-                            {loading ? "Memproses..." : "Kirim"}
-                        </Button>
-                    ) : (
-                        <Button
-                            onClick={handleSubmit}
-                            variant="outline"
-                            className={`border-${buttonColor}-500 bg-transparent text-${buttonColor}-500 hover:bg-${buttonColor}-700 hover:text-white`}
-                            disabled={loading || !message}
-                        >
-                            {loading ? "Memproses..." : "Kirim"}
-                        </Button>
-                    )}
-
-
-
-                </AlertDialogFooter>
-
-            </AlertDialogContent>
-        </AlertDialog >
+            </DialogContent>
+        </Dialog>
     );
 };
 

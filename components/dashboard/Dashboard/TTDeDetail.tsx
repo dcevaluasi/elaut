@@ -239,7 +239,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                         </div>
                         {total && (
                             <Badge className="bg-white/20 border-none text-white font-black text-[10px] tracking-widest px-2 py-0.5 rounded-full">
-                                {Math.round((current / total) * 100)}%
+                                {Math.round((current! / total) * 100)}%
                             </Badge>
                         )}
                     </div>

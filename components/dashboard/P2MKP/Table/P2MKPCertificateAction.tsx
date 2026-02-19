@@ -22,6 +22,8 @@ export const P2MKPCertificateAction = ({ p2mkp }: { p2mkp: P2MKP }) => {
     const certificateRef = useRef<HTMLDivElement>(null);
     const certificatePageRef = useRef<HTMLDivElement>(null);
 
+    const institutionName = p2mkp.nama_Ppmkp || p2mkp.nama_ppmkp || "Sertifikat_P2MKP";
+
     const handleDownloadPDF = async () => {
         if (!certificateRef.current || !p2mkp) return;
 
@@ -33,7 +35,7 @@ export const P2MKPCertificateAction = ({ p2mkp }: { p2mkp: P2MKP }) => {
             // Optimization for the established design
             const opt = {
                 margin: 0,
-                filename: `Sertifikat_P2MKP_${p2mkp.nama_Ppmkp.replace(/\s+/g, '_')}.pdf`,
+                filename: `Sertifikat_P2MKP_${institutionName.replace(/\s+/g, '_')}.pdf`,
                 image: { type: 'jpeg', quality: 1.0 },
                 html2canvas: {
                     scale: 2, // High resolution for premium look
@@ -64,7 +66,7 @@ export const P2MKPCertificateAction = ({ p2mkp }: { p2mkp: P2MKP }) => {
                 <Button
                     variant="outline"
                     size="sm"
-                    className="h-9 px-4 gap-2 border-blue-200 bg-blue-50 text-blue-600 rounded-xl text-[11px] font-black uppercase tracking-wider hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                    className="h-9 px-4 gap-2 border-primary-200 bg-primary-50 text-primary-600 rounded-xl text-[11px] font-black uppercase tracking-wider hover:bg-primary-600 hover:text-white transition-all shadow-sm"
                 >
                     <TbCertificate className="w-4 h-4" />
                     Sertifikat
@@ -76,7 +78,7 @@ export const P2MKPCertificateAction = ({ p2mkp }: { p2mkp: P2MKP }) => {
                     <div className="flex items-center justify-between px-8 py-4 bg-white/10 backdrop-blur-md border-b border-white/10 z-20">
                         <div className="flex flex-col">
                             <h3 className="text-white font-black text-sm uppercase tracking-widest">Pratinjau Sertifikat</h3>
-                            <p className="text-white/50 text-[10px] font-bold uppercase tracking-tight mt-1">{p2mkp.nama_Ppmkp}</p>
+                            <p className="text-white/50 text-[10px] font-bold uppercase tracking-tight mt-1 truncate max-w-xs md:max-w-md">{institutionName}</p>
                         </div>
                         <div className="flex items-center gap-3 text-white">
                             <Button

@@ -299,7 +299,7 @@ export default function LayoutAdminElaut({
                   <NavItem
                     href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/p2mkp/penetapan`}
                     icon={<TbGavel className="flex-shrink-0 w-5 h-6" />}
-                    label="Penetapan dan Klasifikasi"
+                    label="Penetapan"
                   />
                 </ul>
               )}
@@ -380,23 +380,15 @@ export function HeaderPageLayoutAdminElaut({ icon, title, description }: HeaderP
           <span className="relative z-10">{icon}</span>
         </div>
 
-        <div className="relative flex flex-col gap-1 text-center md:text-left">
+        <div className="relative flex flex-col text-center md:text-left">
           <div className="flex items-center gap-3 justify-center md:justify-start">
             <h1 id="page-caption" className="font-bold text-xl text-slate-900 tracking-tight">
               {title}
             </h1>
           </div>
-          <p className="font-medium text-slate-400 text-xs max-w-2xl leading-relaxed uppercase tracking-wider">
+          <p className="font-medium text-slate-400 text-sm max-w-2xl leading-relaxed tracking-wider">
             {description}
           </p>
-        </div>
-
-        <div className="hidden lg:flex flex-col items-end ml-auto pr-4 border-l border-slate-100 pl-6 space-y-0.5">
-          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Konsol Manajemen</span>
-          <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-            <span className="text-[10px] font-bold text-slate-700 uppercase">Sistem Aktif</span>
-          </div>
         </div>
       </header>
     </article>

@@ -1,6 +1,7 @@
 export interface P2MKP {
     IdPpmkp: number;
     nama_Ppmkp: string;
+    nama_ppmkp: string;
     status_kepemilikan: string;
     nib: string;
     alamat: string;
@@ -37,4 +38,26 @@ export interface P2MKP {
     status: string;
     create_at: string;
     update_at: string;
+}
+
+export interface PengajuanPenetapanP2MKP {
+    IdPengajuanPenetapanPpmkp: string;
+    id_Ppmkp: string;
+    tahun_penetapan: string;
+    nomor_surat: string;
+    nomor_sertifikat: string;
+    tanggal_surat: string;
+    tanggal_sertifikat: string;
+    status_usaha: string;
+    status_pelatihan: string;
+    is_lpk: string;
+    status: string;
+    create_at: string;
+    update_at: string;
+    // P2MKP Details (v-model or joined data)
+    nama_Ppmkp?: string;
+    nama_ppmkp?: string;
+    kota?: string;
+    provinsi?: string;
+    nama_penanggung_jawab?: string;
 }

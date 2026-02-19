@@ -50,7 +50,7 @@ export default function NotFound() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8 }}
-                    className="space-y-3"
+                    className="space-y-0"
                 >
                     {/* Visual Element */}
                     <div className="relative inline-block">
@@ -76,12 +76,12 @@ export default function NotFound() {
                     </div>
 
                     {/* Text Content */}
-                    <div className="space-y-2">
+                    <div className="space-y-0">
                         <motion.h1
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.8 }}
-                            className="text-3xl md:text-5xl font-calsans text-white tracking-tight"
+                            className="text-3xl md:text-5xl font-calsans text-white"
                         >
                             Kehilangan <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 italic">Koordinat</span>
                         </motion.h1>
@@ -89,7 +89,7 @@ export default function NotFound() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 1 }}
-                            className="text-gray-400 text-lg md:text-xl font-light max-w-lg mx-auto leading-relaxed"
+                            className="text-gray-400 text-md md:text-lg font-jakarta font-light max-w-lg mx-auto leading-relaxed"
                         >
                             Halaman yang Anda cari telah berlayar ke tempat lain atau koordinat yang dimasukkan tidak ditemukan di dalam sistem radar kami.
                         </motion.p>
@@ -106,7 +106,7 @@ export default function NotFound() {
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                className="group flex items-center gap-3 px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold tracking-widest shadow-2xl shadow-blue-500/20 transition-all border-none"
+                                className="group flex items-center gap-3 px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold shadow-2xl shadow-blue-500/20 transition-all border-none"
                             >
                                 <FiHome className="text-xl" /> KEMBALI KE BERANDA
                             </motion.button>
@@ -114,7 +114,7 @@ export default function NotFound() {
 
                         <button
                             onClick={() => window.history.back()}
-                            className="group flex items-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-2xl font-bold tracking-widest transition-all"
+                            className="group flex items-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-2xl font-bold transition-all"
                         >
                             <FiArrowLeft className="text-xl group-hover:-translate-x-1 transition-transform" /> SEBELUMNYA
                         </button>
@@ -128,7 +128,7 @@ export default function NotFound() {
                         className="pt-12 flex items-center justify-center gap-3 text-gray-500"
                     >
                         <FiAnchor size={16} />
-                        <span className="text-xs font-bold tracking-widest uppercase">E-LAUT Navigation System</span>
+                        <span className="text-xs font-bold uppercase">E-LAUT Navigation System</span>
                     </motion.div>
                 </motion.div>
             </main>

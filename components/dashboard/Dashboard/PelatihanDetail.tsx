@@ -81,7 +81,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
         return (
             <motion.div
                 whileHover={{ y: -5, scale: 1.02 }}
-                className={`group flex flex-col p-5 bg-gradient-to-br ${themes[theme]} rounded-3xl border backdrop-blur-sm transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-blue-500/5`}
+                className={`group flex flex-col p-4 md:p-5 bg-gradient-to-br ${themes[theme]} rounded-2xl md:rounded-3xl border backdrop-blur-sm transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-blue-500/5`}
             >
                 <div className="flex items-center gap-2.5 mb-3">
                     <div className="p-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm transition-transform group-hover:scale-110 group-hover:rotate-6">
@@ -107,20 +107,20 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
     }, [fetchInstrukturData])
 
     return (
-        <div className="w-full space-y-12 py-4">
+        <div className="w-full space-y-4 md:space-y-6 py-2">
             {/* Administrative Control Center */}
             <div className="relative group">
                 <div className="absolute inset-0 bg-blue-600/5 dark:bg-blue-600/10 rounded-[3rem] blur-2xl group-hover:blur-3xl transition-all duration-700" />
                 <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white dark:border-slate-800 rounded-[3rem] overflow-hidden shadow-2xl relative">
-                    <div className="px-10 py-8 border-b border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                        <div className="flex items-center gap-5">
-                            <div className="w-16 h-16 rounded-[1.5rem] bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center text-3xl shadow-xl shadow-blue-500/30 overflow-hidden relative group/icon">
+                    <div className="px-6 md:px-8 py-4 md:py-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
+                        <div className="flex items-center gap-4">
+                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center text-2xl shadow-xl shadow-blue-500/30 overflow-hidden relative group/icon">
                                 <LayoutGrid className="relative z-10 group-hover/icon:rotate-12 transition-transform duration-500" />
                                 <div className="absolute inset-0 bg-white/10 opacity-0 group-hover/icon:opacity-100 transition-opacity" />
                             </div>
                             <div>
-                                <h3 className="font-black text-2xl text-slate-900 dark:text-white tracking-tight">Pusat Kontrol Pelaksanaan</h3>
-                                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Kelola status, verifikasi, dan alur kerja pelaksanaan pelatihan</p>
+                                <h3 className="font-black text-lg md:text-xl text-slate-900 dark:text-white tracking-tight">Pusat Kontrol Pelaksanaan</h3>
+                                <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 font-medium">Kelola status, verifikasi, dan alur kerja pelaksanaan pelatihan</p>
                             </div>
                         </div>
 
@@ -134,17 +134,15 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                         </div>
                     </div>
 
-                    <div className="p-10 space-y-10">
+                    <div className="p-6 md:p-8 space-y-4">
                         {/* Action Toolbar */}
-                        <div className="space-y-6">
+                        <div className="space-y-2">
                             <div className="flex items-center gap-4">
-                                <div className="px-3 py-1 bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 rounded-lg">
-                                    <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">Tindakan Cepat</span>
-                                </div>
+
                                 <div className="h-px flex-1 bg-gradient-to-r from-slate-100 to-transparent dark:from-slate-800"></div>
                             </div>
 
-                            <div className="flex flex-wrap items-center gap-4">
+                            <div className="flex flex-wrap items-center gap-3 md:gap-4">
                                 {
                                     Cookies.get('Access')?.includes('createPelatihan') &&
                                     <>
@@ -294,38 +292,38 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                         </div>
 
                         {/* Status Grid */}
-                        <div className="space-y-6">
+                        <div className="space-y-3">
                             <div className="flex items-center gap-4">
                                 <div className="px-3 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg">
-                                    <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Garis Waktu & Verifikasi</span>
+                                    <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Status & Verifikasi</span>
                                 </div>
                                 <div className="h-px flex-1 bg-gradient-to-r from-slate-100 to-transparent dark:from-slate-800"></div>
                             </div>
 
                             {
                                 data.SuratPemberitahuan == "" ?
-                                    <div className="py-20 w-full bg-slate-50/50 dark:bg-slate-950/50 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-800 flex items-center flex-col justify-center gap-6 group">
+                                    <div className="py-10 w-full bg-slate-50/50 dark:bg-slate-950/50 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-800 flex items-center flex-col justify-center gap-4 group">
                                         <div className="relative">
                                             <div className="absolute inset-0 bg-slate-400/20 blur-2xl rounded-full scale-150 animate-pulse" />
-                                            <div className="w-20 h-20 rounded-[1.75rem] bg-white dark:bg-slate-900 flex items-center justify-center shadow-xl border border-slate-100 dark:border-slate-800 relative z-10">
-                                                <Lock className='w-10 h-10 text-slate-300' />
+                                            <div className="w-16 h-16 rounded-[1.5rem] bg-white dark:bg-slate-900 flex items-center justify-center shadow-xl border border-slate-100 dark:border-slate-800 relative z-10">
+                                                <Lock className='w-8 h-8 text-slate-300' />
                                             </div>
                                         </div>
-                                        <div className="text-center space-y-2 max-w-md">
+                                        <div className="text-center space-y-1 max-w-md">
                                             <h4 className="font-black text-slate-800 dark:text-white uppercase tracking-tight">Menunggu Administrasi</h4>
-                                            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed italic">
+                                            <p className="text-slate-500 dark:text-slate-400 text-xs font-medium leading-relaxed italic">
                                                 Harap mengupload surat pemberitahuan pelaksanaan pelatihan (Paling Lambat H-3) untuk mengaktifkan tahapan verifikasi selanjutnya.
                                             </p>
                                         </div>
                                     </div> :
-                                    <div className={`grid grid-cols-1 sm:grid-cols-2 ${adminPusatData != null ? 'lg:grid-cols-3' : ''} gap-6`}>
+                                    <div className={`grid grid-cols-1 sm:grid-cols-2 ${adminPusatData != null ? 'lg:grid-cols-3' : ''} gap-4`}>
                                         <motion.div
                                             whileHover={{ scale: 1.02 }}
-                                            className={`flex flex-col p-6 ${color} rounded-[2rem] shadow-2xl shadow-blue-500/20 border border-white/20 transition-all overflow-hidden relative group`}
+                                            className={`flex flex-col p-5 ${color} rounded-[2rem] shadow-2xl shadow-blue-500/20 border border-white/20 transition-all overflow-hidden relative group`}
                                         >
                                             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-150 transition-transform duration-700" />
                                             <span className="text-[11px] font-black text-white/70 uppercase tracking-[0.2em] mb-2 relative z-10 text-white">Status Saat Ini</span>
-                                            <span className="flex items-center gap-3 text-white font-black text-lg relative z-10">
+                                            <span className="flex items-center gap-3 text-white font-black text-base relative z-10">
                                                 {icon}
                                                 {label}
                                             </span>
@@ -371,7 +369,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
 
             <Accordion
                 type="multiple"
-                className="w-full space-y-10"
+                className="w-full space-y-4"
                 defaultValue={["pins", "publish", "peserta", "perangkat", "instruktur"]}
             >
                 {/* General Info */}
@@ -416,7 +414,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                 {
                     (Cookies.get('Access')?.includes('createPelatihan')) &&
                     <AccordionSection value="publish" title="Publish Informasi & Promosi" icon={<TbLayoutGrid className="text-indigo-600" />} description="Sesuaikan tampilan informasi pelatihan di website utama untuk menarik minat calon peserta.">
-                        <div className="flex flex-col w-full gap-10">
+                        <div className="flex flex-col w-full gap-6">
                             <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-950/50 p-2.5 rounded-2xl w-fit border border-slate-100 dark:border-slate-800">
                                 <EditPublishAction
                                     idPelatihan={data.IdPelatihan.toString()}
@@ -450,9 +448,9 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                             </div>
 
                             {data?.FotoPelatihan != "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" ? (
-                                <div className="flex flex-col lg:flex-row gap-12">
+                                <div className="flex flex-col lg:flex-row gap-8">
                                     <div className="w-full lg:w-[350px] flex-shrink-0">
-                                        <div className="relative group rounded-[3rem] overflow-hidden shadow-2xl border-[10px] border-white dark:border-slate-800 aspect-[3/4.5] bg-slate-100 dark:bg-slate-800">
+                                        <div className="relative group rounded-[2.5rem] overflow-hidden shadow-2xl border-[6px] border-white dark:border-slate-800 aspect-[3/4.5] bg-slate-100 dark:bg-slate-800">
                                             <Image
                                                 className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 group-hover:rotate-1"
                                                 alt={data.NamaPelatihan}
@@ -467,33 +465,33 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         </div>
                                     </div>
 
-                                    <div className="flex-1 flex flex-col gap-8">
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <div className="flex-1 flex flex-col gap-4">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <DetailCard label="Pendaftaran Dibuka" value={generateTanggalPelatihan(data.TanggalMulaiPendaftaran)} icon={TbCalendar} theme="blue" />
                                             <DetailCard label="Pendaftaran Ditutup" value={generateTanggalPelatihan(data.TanggalAkhirPendaftaran!)} icon={TbClock} theme="rose" />
                                         </div>
-                                        <div className="bg-white dark:bg-slate-950 rounded-[2.5rem] p-10 border border-slate-100 dark:border-slate-800 shadow-inner h-full flex flex-col gap-6 group">
+                                        <div className="bg-white dark:bg-slate-950 rounded-[2.5rem] p-6 border border-slate-100 dark:border-slate-800 shadow-inner h-full flex flex-col gap-3 group">
                                             <div className="flex items-center gap-3">
                                                 <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600">
                                                     <MdOutlineDescription className="w-5 h-5" />
                                                 </div>
                                                 <span className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Deskripsi Publikasi</span>
                                             </div>
-                                            <div className="text-base text-slate-700 dark:text-slate-300 leading-relaxed font-bold tracking-tight first-letter:text-4xl first-letter:font-black first-letter:text-blue-600 first-letter:mr-1">
+                                            <div className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-bold tracking-tight first-letter:text-3xl first-letter:font-black first-letter:text-blue-600 first-letter:mr-1">
                                                 {data.DetailPelatihan}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             ) : (
-                                <div className="py-24 w-full bg-slate-50/50 dark:bg-slate-950/30 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-8 group">
+                                <div className="py-10 w-full bg-slate-50/50 dark:bg-slate-950/30 rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-4 group">
                                     <div className="relative">
                                         <div className="absolute inset-0 bg-indigo-500/10 blur-3xl rounded-full scale-150 animate-pulse" />
-                                        <div className="w-24 h-24 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 shadow-xl relative z-10 group-hover:rotate-6 transition-transform">
-                                            <TbUserShare className="w-12 h-12" />
+                                        <div className="w-20 h-20 rounded-[1.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 shadow-xl relative z-10 group-hover:rotate-6 transition-transform">
+                                            <TbUserShare className="w-10 h-10" />
                                         </div>
                                     </div>
-                                    <div className="text-center max-w-sm space-y-3">
+                                    <div className="text-center max-w-sm space-y-1">
                                         <h4 className="font-black text-slate-800 dark:text-white uppercase tracking-tight text-xl">Promosi Belum Tersedia</h4>
                                         <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic">
                                             Lengkapi flyer visual dan deskripsi naratif untuk mulai mempromosikan kelas ini di portal utama E-LAUT.
@@ -507,7 +505,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
 
                 {/* Training Materials */}
                 <AccordionSection value="perangkat" title="Perangkat & Modul" icon={<TbUserCode className="text-emerald-600" />} description="Kelola modul pembelajaran, bahan tayang, dan materi pendukung lainnya yang akan diakses oleh peserta.">
-                    <div className="flex flex-col w-full gap-8">
+                    <div className="flex flex-col w-full gap-4">
                         <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-950/50 p-2.5 rounded-2xl w-fit border border-slate-100 dark:border-slate-800">
                             {
                                 ((data?.StatusPenerbitan == "0" || data?.StatusPenerbitan == "1.2" || data?.StatusPenerbitan == "3") && Cookies.get('Access')?.includes('createPelatihan')) &&
@@ -519,14 +517,14 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                         </div>
 
                         {data.ModuleMateri == "" ? (
-                            <div className="py-24 w-full bg-slate-50/50 dark:bg-slate-950/30 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-8 group">
+                            <div className="py-10 w-full bg-slate-50/50 dark:bg-slate-950/30 rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-4 group">
                                 <div className="relative">
                                     <div className="absolute inset-0 bg-emerald-500/10 blur-3xl rounded-full scale-150 animate-pulse" />
-                                    <div className="w-24 h-24 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 shadow-xl relative z-10 group-hover:rotate-6 transition-transform">
-                                        <TbUserCode className="w-12 h-12" />
+                                    <div className="w-20 h-20 rounded-[1.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 shadow-xl relative z-10 group-hover:rotate-6 transition-transform">
+                                        <TbUserCode className="w-10 h-10" />
                                     </div>
                                 </div>
-                                <div className="text-center max-w-sm space-y-3">
+                                <div className="text-center max-w-sm space-y-1">
                                     <h4 className="font-black text-slate-800 dark:text-white uppercase tracking-tight text-xl">Perangkat Belum Dipilih</h4>
                                     <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic">
                                         Silahkan mapping modul pelatihan dari Master Modul sebagai standar kompetensi pengajaran kelas ini.
@@ -534,27 +532,27 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 </div>
                             </div>
                         ) : (
-                            <div className="space-y-10">
+                            <div className="space-y-6">
                                 <motion.div
                                     whileHover={{ scale: 1.01 }}
-                                    className="relative overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-800 rounded-[3rem] p-12 text-white shadow-2xl border border-blue-400/30"
+                                    className="relative overflow-hidden bg-gradient-to-br from-blue-600 to-indigo-800 rounded-[2.5rem] p-8 text-white shadow-2xl border border-blue-400/30"
                                 >
                                     <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-10">
-                                        <div className="space-y-4">
+                                        <div className="space-y-2">
                                             <div className="flex items-center gap-3">
                                                 <Badge className="bg-white/20 text-white border-white/30 backdrop-blur-md uppercase font-black text-[10px] px-4 py-1.5 rounded-full">{modulPelatihan?.BidangMateriPelatihan}</Badge>
                                                 <div className="h-px w-8 bg-white/30" />
                                                 <span className="text-xs font-black text-blue-100 uppercase tracking-widest leading-none">TAHUN PROGRAM {modulPelatihan?.Tahun}</span>
                                             </div>
-                                            <h3 className="text-3xl lg:text-4xl font-black tracking-tight leading-tight max-w-3xl drop-shadow-md">{modulPelatihan?.NamaMateriPelatihan}</h3>
+                                            <h3 className="text-2xl lg:text-3xl font-black tracking-tight leading-tight max-w-3xl drop-shadow-md">{modulPelatihan?.NamaMateriPelatihan}</h3>
                                             <div className="flex items-center gap-2 text-blue-100/80 font-bold text-sm bg-black/10 w-fit px-4 py-2 rounded-xl backdrop-blur-sm border border-white/5">
                                                 <Settings className="w-4 h-4" />
                                                 <span>PRODUSEN: {modulPelatihan?.DeskripsiMateriPelatihan}</span>
                                             </div>
                                         </div>
-                                        <div className="flex flex-col items-center lg:items-end bg-white/10 p-6 rounded-[2.5rem] border border-white/10 backdrop-blur-md min-w-[180px]">
+                                        <div className="flex flex-col items-center lg:items-end bg-white/10 p-5 rounded-[2rem] border border-white/10 backdrop-blur-md min-w-[150px]">
                                             <span className="text-[10px] font-black text-blue-100/60 uppercase tracking-[0.2em] mb-1">TOTAL UNIT MODUL</span>
-                                            <span className="text-7xl font-black tabular-nums leading-none tracking-tighter">{modulPelatihan?.ModulPelatihan?.length || 0}</span>
+                                            <span className="text-5xl font-black tabular-nums leading-none tracking-tighter">{modulPelatihan?.ModulPelatihan?.length || 0}</span>
                                         </div>
                                     </div>
                                     {/* Abstract Decorations */}
@@ -562,7 +560,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-400/20 rounded-full -ml-16 -mb-16 blur-2xl pointer-events-none" />
                                 </motion.div>
 
-                                <div className="grid grid-cols-1 gap-6">
+                                <div className="grid grid-cols-1 gap-4">
                                     {modulPelatihan?.ModulPelatihan?.map((modul: ModulPelatihan, idx: number) => (
                                         <motion.div
                                             key={modul.IdModulPelatihan}
@@ -570,15 +568,15 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: idx * 0.1 }}
                                             onClick={() => toggleExpand(modul.IdModulPelatihan)}
-                                            className={`group bg-white dark:bg-slate-900 rounded-[2.5rem] border ${expanded === modul.IdModulPelatihan ? 'border-blue-200 dark:border-blue-800 shadow-2xl shadow-blue-500/5' : 'border-slate-100 dark:border-slate-800 shadow-sm'} p-8 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-none`}
+                                            className={`group bg-white dark:bg-slate-900 rounded-[2rem] border ${expanded === modul.IdModulPelatihan ? 'border-blue-200 dark:border-blue-800 shadow-2xl shadow-blue-500/5' : 'border-slate-100 dark:border-slate-800 shadow-sm'} p-6 transition-all duration-300 cursor-pointer hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-none`}
                                         >
                                             <div className="flex items-center justify-between gap-6">
                                                 <div className="flex items-center gap-6">
-                                                    <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-3xl transition-all duration-500 ${expanded === modul.IdModulPelatihan ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/30 rotate-3' : 'bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-600 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 group-hover:text-blue-600'}`}>
-                                                        <GraduationCap className="shrink-0" />
+                                                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl transition-all duration-500 ${expanded === modul.IdModulPelatihan ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/30 rotate-3' : 'bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-600 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 group-hover:text-blue-600'}`}>
+                                                        <GraduationCap className="shrink-0 w-6 h-6" />
                                                     </div>
                                                     <div>
-                                                        <h4 className={`font-black text-xl tracking-tight transition-colors ${expanded === modul.IdModulPelatihan ? 'text-blue-600' : 'text-slate-800 dark:text-white group-hover:text-blue-600'}`}>{modul.NamaModulPelatihan}</h4>
+                                                        <h4 className={`font-black text-lg tracking-tight transition-colors ${expanded === modul.IdModulPelatihan ? 'text-blue-600' : 'text-slate-800 dark:text-white group-hover:text-blue-600'}`}>{modul.NamaModulPelatihan}</h4>
                                                         <div className="flex items-center gap-4 mt-2">
                                                             <div className="flex items-center gap-2">
                                                                 <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">UNIT LOKASI:</span>
@@ -654,12 +652,15 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     <div className="p-3 rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-500/30 flex-shrink-0 animate-bounce-slow">
                                         <Info className="w-6 h-6" />
                                     </div>
-                                    <div className="space-y-1">
-                                        <p className="text-xs font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">Catatan Sinkronisasi</p>
-                                        <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed font-bold tracking-tight italic">
-                                            Penambahan perangkat belajar baru dilakukan melalui menu <span className="text-blue-600 dark:text-blue-400 underline decoration-dotted underline-offset-4 cursor-pointer">MASTER MODUL</span>. Segala perubahan data media pada master akan otomatis terupdate secara realtime pada dashboard pelatihan ini.
-                                        </p>
-                                    </div>
+                                    {
+                                        Cookies.get('Role') == 'Pengelola UPT' && <div className="space-y-1">
+                                            <p className="text-xs font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">Catatan Sinkronisasi</p>
+                                            <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed font-bold tracking-tight italic">
+                                                Penambahan perangkat belajar baru dilakukan melalui menu <span className="text-blue-600 dark:text-blue-400 underline decoration-dotted underline-offset-4 cursor-pointer">MASTER MODUL</span>. Segala perubahan data media pada master akan otomatis terupdate secara realtime pada dashboard pelatihan ini.
+                                            </p>
+                                        </div>
+                                    }
+
                                 </div>
                             </div>
                         )}
@@ -667,8 +668,8 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                 </AccordionSection>
 
                 {/* SDM - Instructors */}
-                <AccordionSection value="instruktur" title="Tenaga Ahli & Instruktur" icon={<TbUsers className="text-amber-600" />} description="Daftar tenaga pengajar ahli yang ditugaskan untuk menyampaikan materi dalam pelatihan ini.">
-                    <div className="flex flex-col w-full gap-8">
+                <AccordionSection value="instruktur" title="Tenaga Pelatih & Instruktur" icon={<TbUsers className="text-amber-600" />} description="Daftar tenaga pengajar ahli yang ditugaskan untuk menyampaikan materi dalam pelatihan ini.">
+                    <div className="flex flex-col w-full gap-4">
                         <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-950/50 p-2.5 rounded-2xl w-fit border border-slate-100 dark:border-slate-800">
                             <ChooseInstrukturAction
                                 idPelatihan={data.IdPelatihan.toString()}
@@ -677,14 +678,14 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                         </div>
 
                         {data?.Instruktur == "" ? (
-                            <div className="py-24 w-full bg-slate-50/50 dark:bg-slate-950/30 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-8 group">
+                            <div className="py-10 w-full bg-slate-50/50 dark:bg-slate-950/30 rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-4 group">
                                 <div className="relative">
                                     <div className="absolute inset-0 bg-amber-500/10 blur-3xl rounded-full scale-150 animate-pulse" />
-                                    <div className="w-24 h-24 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 shadow-xl relative z-10 group-hover:rotate-6 transition-transform">
-                                        <HiOutlineUserGroup className="w-12 h-12" />
+                                    <div className="w-20 h-20 rounded-[1.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 shadow-xl relative z-10 group-hover:rotate-6 transition-transform">
+                                        <HiOutlineUserGroup className="w-10 h-10" />
                                     </div>
                                 </div>
-                                <div className="text-center max-w-sm space-y-3">
+                                <div className="text-center max-w-sm space-y-1">
                                     <h4 className="font-black text-slate-800 dark:text-white uppercase tracking-tight text-xl">Instruktur Belum Mapping</h4>
                                     <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic">
                                         {data?.TtdSertifikat?.includes('Kepala Balai') ? 'Silahkan tentukan tim pengajar dari SDM Internal Lembaga Anda.' : 'Menunggu penunjukan tim instruktur ahli dari Manajemen Pusat.'}
@@ -699,20 +700,20 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         whileHover={{ y: -8 }}
                                         className="relative group bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[3rem] p-8 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden"
                                     >
-                                        <div className="relative z-10 space-y-8">
+                                        <div className="relative z-10 space-y-3">
                                             <div className="flex justify-between items-start">
-                                                <div className="flex items-center gap-6">
+                                                <div className="flex items-center gap-4">
                                                     <div className="relative">
                                                         <div className="absolute inset-0 bg-blue-500/20 blur-xl rounded-full group-hover:scale-150 transition-transform duration-500" />
-                                                        <div className="w-20 h-20 rounded-[1.75rem] bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center text-3xl font-black shadow-xl relative z-10 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500">
+                                                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center text-2xl font-black shadow-xl relative z-10 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500">
                                                             {item.nama.charAt(0)}
                                                         </div>
-                                                        <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-emerald-500 rounded-full border-4 border-white dark:border-slate-900 z-20 flex items-center justify-center pointer-events-none">
-                                                            <div className="w-1.5 h-1.5 bg-white rounded-full animate-ping" />
+                                                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 rounded-full border-[3px] border-white dark:border-slate-900 z-20 flex items-center justify-center pointer-events-none">
+                                                            <div className="w-1 h-1 bg-white rounded-full animate-ping" />
                                                         </div>
                                                     </div>
                                                     <div>
-                                                        <h3 className="font-black text-slate-900 dark:text-white text-2xl tracking-tight group-hover:text-blue-600 transition-colors leading-tight">{item.nama}</h3>
+                                                        <h3 className="font-black text-slate-900 dark:text-white text-xl tracking-tight group-hover:text-blue-600 transition-colors leading-tight">{item.nama}</h3>
                                                         <div className="inline-flex items-center gap-2 mt-2 px-3 py-1 bg-blue-50 dark:bg-blue-500/10 rounded-lg border border-blue-100 dark:border-blue-500/20">
                                                             <TbCertificate className="w-3.5 h-3.5 text-blue-600" />
                                                             <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest leading-none">{item.bidang_keahlian || "AHLI MATERI"}</span>
@@ -759,7 +760,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                 {
                     parseInt(data?.StatusPenerbitan) < 5 &&
                     <AccordionSection value="peserta" title="Manajemen Peserta Pelatihan" icon={<TbUsers className="text-rose-600" />} description="Daftar peserta yang terdaftar dalam pelatihan. Lakukan validasi data atau import peserta baru di sini.">
-                        <div className="flex flex-col w-full gap-10">
+                        <div className="flex flex-col w-full gap-6">
                             <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-950/50 p-2.5 rounded-2xl w-fit border border-slate-100 dark:border-slate-800">
                                 {
                                     (data?.StatusPenerbitan == "0" || data?.StatusPenerbitan == "1.2" || data?.StatusPenerbitan == "3") &&
@@ -784,21 +785,21 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 }
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <motion.div
                                     whileHover={{ scale: 1.02 }}
-                                    className="group relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-8 rounded-[3rem] shadow-xl shadow-slate-200/50 dark:shadow-none transition-all duration-500"
+                                    className="group relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-6 rounded-[2.5rem] shadow-xl shadow-slate-200/50 dark:shadow-none transition-all duration-500"
                                 >
                                     <div className="relative z-10 flex items-center justify-between">
                                         <div className="space-y-1">
-                                            <p className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] mb-2 leading-none">Total Peserta Terdaftar</p>
+                                            <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] mb-2 leading-none">Total Peserta Terdaftar</p>
                                             <div className="flex items-baseline gap-2">
-                                                <p className="text-6xl font-black text-slate-900 dark:text-white tabular-nums tracking-tighter">{data?.UserPelatihan?.length || 0}</p>
-                                                <span className="text-sm font-black text-slate-400 uppercase tracking-widest">Orang</span>
+                                                <p className="text-5xl font-black text-slate-900 dark:text-white tabular-nums tracking-tighter">{data?.UserPelatihan?.length || 0}</p>
+                                                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Orang</span>
                                             </div>
                                         </div>
-                                        <div className="w-20 h-20 rounded-[2rem] bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-4xl border border-blue-100 dark:border-blue-500/20 shadow-xl shadow-blue-500/10 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
-                                            <Users />
+                                        <div className="w-16 h-16 rounded-2xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl border border-blue-100 dark:border-blue-500/20 shadow-xl shadow-blue-500/10 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
+                                            <Users className="w-8 h-8" />
                                         </div>
                                     </div>
                                     <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
@@ -806,25 +807,25 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
 
                                 <motion.div
                                     whileHover={{ scale: 1.02 }}
-                                    className="group relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-8 rounded-[3rem] shadow-xl shadow-slate-200/50 dark:shadow-none transition-all duration-500"
+                                    className="group relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-6 rounded-[2.5rem] shadow-xl shadow-slate-200/50 dark:shadow-none transition-all duration-500"
                                 >
                                     <div className="relative z-10 flex items-center justify-between">
                                         <div className="space-y-1">
-                                            <p className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] mb-2 leading-none">Status Validasi System</p>
+                                            <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] mb-2 leading-none">Status Validasi System</p>
                                             <div className="flex items-baseline gap-2">
-                                                <p className="text-6xl font-black text-emerald-600 tabular-nums tracking-tighter">{countValidKeterangan(data?.UserPelatihan)}</p>
-                                                <span className="text-sm font-black text-slate-400 uppercase tracking-widest">VALID</span>
+                                                <p className="text-5xl font-black text-emerald-600 tabular-nums tracking-tighter">{countValidKeterangan(data?.UserPelatihan)}</p>
+                                                <span className="text-xs font-black text-slate-400 uppercase tracking-widest">VALID</span>
                                             </div>
                                         </div>
-                                        <div className="w-20 h-20 rounded-[2rem] bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-4xl border border-emerald-100 dark:border-emerald-500/20 shadow-xl shadow-emerald-500/10 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500">
-                                            <CheckCircle2 />
+                                        <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-2xl border border-emerald-100 dark:border-emerald-500/20 shadow-xl shadow-emerald-500/10 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500">
+                                            <CheckCircle2 className="w-8 h-8" />
                                         </div>
                                     </div>
                                     <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
                                 </motion.div>
                             </div>
 
-                            <div className="relative group/table mt-4 bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl rounded-[3rem] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-2xl transition-all duration-500 hover:shadow-blue-500/5">
+                            <div className="relative group/table mt-4 bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl rounded-[2.5rem] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-2xl transition-all duration-500 hover:shadow-blue-500/5">
                                 <div className="absolute inset-0 bg-gradient-to-b from-white/30 to-transparent dark:from-slate-800/20 -z-10" />
                                 <div className="p-2">
                                     <UserPelatihanTable pelatihan={data} data={data?.UserPelatihan || []} onSuccess={fetchData} />

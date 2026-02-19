@@ -1,15 +1,13 @@
 import { useState } from "react";
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { elautBaseUrl } from "@/constants/urls";
@@ -17,7 +15,8 @@ import Toast from "@/commons/Toast";
 import { DIALOG_TEXTS } from "@/constants/texts";
 import { Button } from "@/components/ui/button";
 import { UserPelatihan } from "@/types/product";
-import { FaUserCheck } from "react-icons/fa6";
+import { CheckCircle2, UserCheck, X, Save, AlertCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ValidateParticipantActionProps {
     data: UserPelatihan[];
@@ -32,7 +31,6 @@ export function ValidateParticipantAction({
     const [isIteratingProcess, setIsIteratingProcess] = useState(false);
 
     const handleValidasiPeserta = async () => {
-        setOpen(true);
         setIsIteratingProcess(true);
         try {
             for (const user of data) {
@@ -52,7 +50,7 @@ export function ValidateParticipantAction({
 
             Toast.fire({
                 icon: "success",
-                title: "Yeayyy!",
+                title: "Sinkronisasi Berhasil!",
                 text: `Berhasil memvalidasi ${data.length} peserta pelatihan!`,
             });
 
@@ -64,8 +62,8 @@ export function ValidateParticipantAction({
 
             Toast.fire({
                 icon: "error",
-                title: "Oopsss!",
-                text: `Gagal memvalidasi ${data.length} peserta pelatihan!`,
+                title: "Sinkronisasi Gagal!",
+                text: `Terjadi kendala saat memvalidasi ${data.length} peserta pelatihan.`,
             });
 
             setIsIteratingProcess(false);
@@ -74,51 +72,85 @@ export function ValidateParticipantAction({
         }
     };
 
-    return (
-        <AlertDialog open={open} onOpenChange={setOpen}>
-            <AlertDialogTrigger asChild>
-                <Button variant="outline" className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-gray-500 text-gray-500 hover:text-white hover:bg-gray-500">
-                    <FaUserCheck className="h-5 w-5" />
-                    Validasi Peserta
-                </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle className="flex items-center gap-2">
-                        {DIALOG_TEXTS["Validasi Grouping Peserta"].title}
-                    </AlertDialogTitle>
-                    <AlertDialogDescription className="-mt-2">
-                        {DIALOG_TEXTS["Validasi Grouping Peserta"].desc}
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
+    const dialogData = DIALOG_TEXTS["Validasi Grouping Peserta"];
 
-                <fieldset>
-                    <form autoComplete="off">
-                        <AlertDialogFooter className="mt-3">
-                            {isIteratingProcess ? (
-                                <Button
-                                    className="bg-green-600 hover:bg-green-700"
-                                    disabled
-                                >
-                                    Sedang diproses...
-                                </Button>
-                            ) : (
-                                <>
-                                    <AlertDialogCancel onClick={() => setOpen(false)}>
-                                        Cancel
-                                    </AlertDialogCancel>
-                                    <Button
-                                        className="bg-green-600 hover:bg-green-700"
-                                        onClick={handleValidasiPeserta}
-                                    >
-                                        Validasi
-                                    </Button>
-                                </>
-                            )}
-                        </AlertDialogFooter>
-                    </form>
-                </fieldset>
-            </AlertDialogContent>
-        </AlertDialog>
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button
+                    variant="outline"
+                    className="group h-10 flex items-center gap-2.5 rounded-xl px-4 border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm text-slate-600 dark:text-slate-400 font-bold text-xs hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all duration-300 shadow-sm"
+                >
+                    <div className="p-1 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <CheckCircle2 className="h-3.5 w-3.5" />
+                    </div>
+                    <span>Validasi Peserta</span>
+                </Button>
+            </DialogTrigger>
+
+            <DialogContent className="w-[95vw] md:w-full max-w-lg p-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-3xl border-white/50 dark:border-slate-800 rounded-3xl md:rounded-[3rem] overflow-hidden shadow-2xl z-[99999]">
+                <div className="flex flex-col">
+                    <DialogHeader className="p-8 pb-4 space-y-6 text-center md:text-left">
+                        <div className="flex flex-col md:flex-row items-center gap-6">
+                            <div className="w-20 h-20 shrink-0 rounded-[2rem] bg-gradient-to-br from-emerald-500 to-teal-700 text-white flex items-center justify-center text-4xl shadow-2xl shadow-emerald-500/20">
+                                <UserCheck />
+                            </div>
+                            <div className="space-y-2">
+                                <DialogTitle className="font-black text-2xl text-slate-900 dark:text-white tracking-tight leading-tight">
+                                    Konfirmasi Validasi Grouping
+                                </DialogTitle>
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                    <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">{data.length} Peserta Terpilih</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="relative p-6 rounded-[2rem] bg-slate-50 dark:bg-slate-950/50 border border-slate-100 dark:border-slate-800">
+                            <div className="absolute top-0 right-0 p-4 opacity-10">
+                                <AlertCircle className="w-12 h-12" />
+                            </div>
+                            <DialogDescription className="text-sm text-slate-600 dark:text-slate-400 font-bold leading-relaxed">
+                                {dialogData.desc}
+                            </DialogDescription>
+                        </div>
+                    </DialogHeader>
+
+                    <DialogFooter className="p-8 pt-4 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm border-t border-slate-100 dark:border-slate-800">
+                        <div className="flex flex-col sm:flex-row items-center justify-end gap-3 w-full">
+                            <Button
+                                variant="ghost"
+                                onClick={() => setOpen(false)}
+                                disabled={isIteratingProcess}
+                                className="w-full sm:w-auto h-12 px-8 rounded-2xl text-slate-500 font-black uppercase tracking-widest text-[10px] hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+                            >
+                                Batalkan
+                            </Button>
+                            <Button
+                                onClick={handleValidasiPeserta}
+                                disabled={isIteratingProcess}
+                                className="w-full sm:w-auto h-12 px-10 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-[0.2em] text-[10px] shadow-xl shadow-emerald-500/20 transition-all active:scale-95 flex items-center justify-center gap-3"
+                            >
+                                {isIteratingProcess ? (
+                                    <>
+                                        <motion.div
+                                            animate={{ rotate: 360 }}
+                                            transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                                            className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                                        />
+                                        <span>Proses Sinkronisasi...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Save className="w-4 h-4" />
+                                        <span>Ya, Validasikan</span>
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+                    </DialogFooter>
+                </div>
+            </DialogContent>
+        </Dialog>
     );
 }

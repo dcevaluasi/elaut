@@ -38,7 +38,8 @@ const HIDDEN_PATHS = [
   "p2mkp/laporan-kegiatan",
   "p2mkp/dashboard",
   "/login",
-  "/charts"
+  "/charts",
+  "/admin"
 ];
 
 function NavLinkDefault({

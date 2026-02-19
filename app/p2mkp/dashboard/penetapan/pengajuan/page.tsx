@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
     FiBox,
     FiActivity,
@@ -21,14 +21,16 @@ import {
     FiChevronRight,
     FiLayout,
     FiCalendar,
-    FiDatabase
+    FiDatabase,
+    FiEye,
+    FiCheckCircle
 } from 'react-icons/fi';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import axios from 'axios';
 import Swal from 'sweetalert2';
 import Cookies from 'js-cookie';
-
-import { Button } from '@/components/ui/button';
+import { elautBaseUrl } from '@/constants/urls';
 import {
     Form,
     FormControl,
@@ -37,8 +39,9 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
+    useFormField,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import { useFormContext } from 'react-hook-form';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
     DropdownMenu,
@@ -66,20 +69,65 @@ const formSchema = z.object({
     DokumenAfiliasiParpol: z.string().min(1, "Wajib diunggah"),
     DokumenRekomendasiDinas: z.string().min(1, "Wajib diunggah"),
     DokumenPermohonanPembentukan: z.string().min(1, "Wajib diunggah"),
-    DokumenPermohonanKlasifikasi: z.string().min(1, "Wajib diunggah"),
-    StatusUsaha: z.string().min(1, "Status usaha wajib diisi"),
-    StatusPeltihan: z.string().min(1, "Status pelatihan wajib diisi"),
 });
 
 export default function PengajuanPenetapanPage() {
     const router = useRouter();
-    const [isSubmitting, setIsSubmitting] = React.useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [loading, setLoading] = useState(true);
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            DokumenIdentifikasiPemilik: '',
+            DokumenAsesmentMandiri: '',
+            DokumentSuratPernyataan: '',
+            DokumenKeteranganUsaha: '',
+            DokumenAfiliasiParpol: '',
+            DokumenRekomendasiDinas: '',
+            DokumenPermohonanPembentukan: '',
+        },
+    });
+
+    const [p2mkpData, setP2mkpData] = useState<any>(null);
 
     useEffect(() => {
-        const timer = setTimeout(() => setLoading(false), 800);
-        return () => clearTimeout(timer);
-    }, []);
+        const fetchProfileData = async () => {
+            try {
+                const token = Cookies.get('XSRF091');
+                if (!token) {
+                    router.push('/p2mkp/login');
+                    return;
+                }
+
+                const response = await axios.get(`${elautBaseUrl}/p2mkp/get_p2mkp_jwt`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 200) {
+                    const data = response.data.data || response.data;
+                    setP2mkpData(data);
+
+                    form.reset({
+                        DokumenIdentifikasiPemilik: data.dokumen_identifikasi_pemilik || "",
+                        DokumenAsesmentMandiri: data.dokumen_asesment_mandiri || "",
+                        DokumentSuratPernyataan: data.dokument_surat_pernyataan || "",
+                        DokumenKeteranganUsaha: data.dokumen_keterangan_usaha || "",
+                        DokumenAfiliasiParpol: data.dokumen_afiliasi_parpol || "",
+                        DokumenRekomendasiDinas: data.dokumen_rekomendasi_dinas || "",
+                        DokumenPermohonanPembentukan: data.dokumen_permohonan_pembentukan || "",
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching profile:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProfileData();
+    }, [router, form]);
 
     // Sidebar State
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -107,37 +155,45 @@ export default function PengajuanPenetapanPage() {
         router.push('/p2mkp/login');
     };
 
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            DokumenIdentifikasiPemilik: '',
-            DokumenAsesmentMandiri: '',
-            DokumentSuratPernyataan: '',
-            DokumenKeteranganUsaha: '',
-            DokumenAfiliasiParpol: '',
-            DokumenRekomendasiDinas: '',
-            DokumenPermohonanPembentukan: '',
-            DokumenPermohonanKlasifikasi: '',
-            StatusUsaha: '',
-            StatusPeltihan: '',
-        },
-    });
+
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsSubmitting(true);
         try {
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            Toast.fire({
-                icon: 'success',
-                title: 'Submission Sent',
-                text: 'Pengajuan penetapan P2MKP Anda sedang diproses oleh sistem.'
+            const token = Cookies.get('XSRF091');
+            if (!token) {
+                router.push('/p2mkp/login');
+                return;
+            }
+
+            const payload = {
+                id_p2mkp: p2mkpData?.IdPpmkp || p2mkpData?.id_p2mkp || p2mkpData?.id,
+                tahun_penetapan: new Date().getFullYear().toString(),
+                status_usaha: p2mkpData?.status_usaha || "Aktif",
+                status_peltihan: p2mkpData?.status_peltihan || "Berjalan",
+                is_lpk: p2mkpData?.is_lpk || "Ya",
+                status: "Diajukan"
+            };
+
+            const response = await axios.post(`${elautBaseUrl}/p2mkp/create_pengjuan_penetapan_p2mkp`, payload, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
             });
-            router.push('/p2mkp/dashboard/penetapan');
-        } catch (error) {
+
+            if (response.status === 200 || response.status === 201) {
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Berhasil Diajukan',
+                    text: 'Pengajuan penetapan P2MKP Anda telah berhasil dikirim.'
+                });
+                router.push('/p2mkp/dashboard/penetapan');
+            }
+        } catch (error: any) {
             console.error('Submission error:', error);
             Swal.fire({
                 title: 'Operation Failed',
-                text: 'Gagal melakukan sinkronisasi dokumen pengajuan.',
+                text: error.response?.data?.message || 'Gagal melakukan pengajuan penetapan.',
                 icon: 'error',
                 background: '#0f172a',
                 color: '#fff',
@@ -177,7 +233,7 @@ export default function PengajuanPenetapanPage() {
                             </div>
                             <div>
                                 <h1 className="font-calsans text-2xl leading-none">P2MKP</h1>
-                                <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mt-1">Management</p>
+                                <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mt-1">Portal</p>
                             </div>
                         </div>
                         {isMobile && (
@@ -282,73 +338,18 @@ export default function PengajuanPenetapanPage() {
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                            <FormField
-                                                control={form.control}
-                                                name="StatusUsaha"
-                                                render={({ field }) => (
-                                                    <FormItem className="space-y-2">
-                                                        <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Status Operasi Usaha</FormLabel>
-                                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                            <FormControl>
-                                                                <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
-                                                                    <SelectValue placeholder="Pilih status usaha..." />
-                                                                </SelectTrigger>
-                                                            </FormControl>
-                                                            <SelectContent className="bg-[#0f172a] border-white/10 text-white backdrop-blur-3xl rounded-2xl">
-                                                                <SelectItem value="Aktif" className="hover:bg-blue-600/20 rounded-lg py-3 cursor-pointer text-xs font-bold">AKTIF</SelectItem>
-                                                                <SelectItem value="Tidak Aktif" className="hover:bg-blue-600/20 rounded-lg py-3 cursor-pointer text-xs font-medium">TIDAK AKTIF</SelectItem>
-                                                                <SelectItem value="Berkembang" className="hover:bg-blue-600/20 rounded-lg py-3 cursor-pointer text-xs font-medium">BERKEMBANG</SelectItem>
-                                                            </SelectContent>
-                                                        </Select>
-                                                        <FormMessage className="text-rose-400 text-[10px] font-bold mt-1" />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                            <FormField
-                                                control={form.control}
-                                                name="StatusPeltihan"
-                                                render={({ field }) => (
-                                                    <FormItem className="space-y-2">
-                                                        <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Status Kesiapan Pelatihan</FormLabel>
-                                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                            <FormControl>
-                                                                <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
-                                                                    <SelectValue placeholder="Pilih status pelatihan..." />
-                                                                </SelectTrigger>
-                                                            </FormControl>
-                                                            <SelectContent className="bg-[#0f172a] border-white/10 text-white backdrop-blur-3xl rounded-2xl">
-                                                                <SelectItem value="Aktif" className="hover:bg-indigo-600/20 rounded-lg py-3 cursor-pointer text-xs font-bold">AKTIF</SelectItem>
-                                                                <SelectItem value="Tidak Aktif" className="hover:bg-indigo-600/20 rounded-lg py-3 cursor-pointer text-xs font-medium">TIDAK AKTIF</SelectItem>
-                                                                <SelectItem value="Berkembang" className="hover:bg-indigo-600/20 rounded-lg py-3 cursor-pointer text-xs font-medium">BERKEMBANG</SelectItem>
-                                                            </SelectContent>
-                                                        </Select>
-                                                        <FormMessage className="text-rose-400 text-[10px] font-bold mt-1" />
-                                                    </FormItem>
-                                                )}
-                                            />
-                                        </div>
 
-                                        <div className="pt-10 space-y-8">
-                                            <div className="flex items-center gap-4 pb-6 border-b border-white/5">
-                                                <div className="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 border border-cyan-500/20">
-                                                    <FiFileText />
-                                                </div>
-                                                <div>
-                                                    <h3 className="text-xl font-calsans text-cyan-400">Digital Assets</h3>
-                                                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Document Registry System</p>
-                                                </div>
-                                            </div>
+
+                                        <div className="space-y-8">
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                <FileUploadField form={form} name="DokumenIdentifikasiPemilik" label="Identifikasi Pemilik" />
-                                                <FileUploadField form={form} name="DokumenAsesmentMandiri" label="Asesmen Mandiri" />
-                                                <FileUploadField form={form} name="DokumentSuratPernyataan" label="Surat Pernyataan Mutu" />
-                                                <FileUploadField form={form} name="DokumenKeteranganUsaha" label="Legalitas Usaha" />
-                                                <FileUploadField form={form} name="DokumenAfiliasiParpol" label="Afiliasi Politik" />
-                                                <FileUploadField form={form} name="DokumenRekomendasiDinas" label="Rekomendasi Satuan Kerja" />
-                                                <FileUploadField form={form} name="DokumenPermohonanPembentukan" label="Permohonan Pembentukan" />
-                                                <FileUploadField form={form} name="DokumenPermohonanKlasifikasi" label="Instrumen Klasifikasi" />
+                                                <FileUploadField name="DokumenIdentifikasiPemilik" label="Identifikasi Pemilik" />
+                                                <FileUploadField name="DokumenAsesmentMandiri" label="Asesmen Mandiri" />
+                                                <FileUploadField name="DokumentSuratPernyataan" label="Surat Pernyataan Mutu" />
+                                                <FileUploadField name="DokumenKeteranganUsaha" label="Legalitas Usaha" />
+                                                <FileUploadField name="DokumenAfiliasiParpol" label="Afiliasi Politik" />
+                                                <FileUploadField name="DokumenRekomendasiDinas" label="Rekomendasi Satuan Kerja" />
+                                                <FileUploadField name="DokumenPermohonanPembentukan" label="Permohonan Pembentukan" />
                                             </div>
                                         </div>
                                     </div>
@@ -370,7 +371,7 @@ export default function PengajuanPenetapanPage() {
                                             ) : (
                                                 <>
                                                     <FiSave size={20} className="group-hover:translate-x-1 transition-transform" />
-                                                    EXECUTE SUBMISSION
+                                                    AJUKAN PENETAPAN
                                                 </>
                                             )}
                                             <div className="absolute inset-0 w-12 bg-white/20 -skew-x-12 translate-x-[-200%] group-hover/btn:translate-x-[600%] transition-transform duration-1000" />
@@ -407,48 +408,73 @@ function SidebarItem({ href, icon, label, active }: any) {
 }
 
 // Premium File Upload Field
-function FileUploadField({ form, name, label }: any) {
-    const value = form.watch(name);
+function FileUploadField({ name, label }: any) {
+    const { watch, control } = useFormContext();
+    const value = watch(name);
 
     return (
         <FormField
-            control={form.control}
+            control={control}
             name={name}
-            render={({ field }) => (
+            render={({ field: { value: fieldValue, onChange, ...fieldProps } }) => (
                 <FormItem className="space-y-4">
                     <FormLabel className="text-[10px] font-black text-gray-500 uppercase tracking-widest pl-1">{label}</FormLabel>
                     <FormControl>
-                        <div
-                            className={`relative group/upload h-24 rounded-2xl border ${value ? 'border-blue-500/40 bg-blue-500/5' : 'border-dashed border-white/10 bg-white/5'} hover:border-blue-400/50 hover:bg-blue-400/5 transition-all cursor-pointer flex items-center px-6 gap-4`}
-                            onClick={() => {
-                                field.onChange("XSRF-DOC-" + Math.random().toString(36).substr(2, 9).toUpperCase() + ".pdf");
-                            }}
-                        >
-                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${value ? 'bg-blue-500 text-white' : 'bg-white/5 text-gray-600 group-hover/upload:text-blue-400'}`}>
-                                <FiUploadCloud size={24} />
-                            </div>
+                        <div className="flex items-center gap-3">
+                            <div
+                                className={`relative group/upload h-24 rounded-2xl border flex-1 transition-all flex items-center px-6 gap-4 overflow-hidden ${fieldValue ? 'border-blue-500/40 bg-blue-500/5' : 'border-dashed border-white/10 bg-white/5'} hover:border-blue-400/50 hover:bg-blue-400/5`}
+                            >
+                                <input
+                                    type="file"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            onChange(file.name);
+                                        }
+                                    }}
+                                    className="absolute inset-0 opacity-0 cursor-pointer z-20"
+                                    id={`file-upload-${name}`}
+                                    {...fieldProps}
+                                />
 
-                            <div className="flex-1 min-w-0">
-                                {value ? (
-                                    <div className="space-y-1">
-                                        <p className="text-xs font-bold text-white truncate">{value}</p>
-                                        <p className="text-[9px] text-gray-500 font-bold uppercase tracking-tighter">SUCCESSFULLY ATTACHED</p>
-                                    </div>
-                                ) : (
-                                    <div className="space-y-1">
-                                        <p className="text-xs font-medium text-gray-500 group-hover/upload:text-gray-400 transition-colors">Choose digital asset...</p>
-                                        <p className="text-[9px] text-gray-700 font-black tracking-widest uppercase">Max 10MB • PDF, JPG, PNG</p>
+                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${fieldValue ? 'bg-blue-500 text-white' : 'bg-white/5 text-gray-600 group-hover/upload:text-blue-400'}`}>
+                                    <FiUploadCloud size={24} />
+                                </div>
+
+                                <div className="flex-1 min-w-0">
+                                    {fieldValue ? (
+                                        <div className="space-y-1">
+                                            <p className="text-xs font-bold text-white truncate text-blue-400">
+                                                {typeof fieldValue === 'string' && fieldValue.includes('/') ? fieldValue.split('/').pop() : fieldValue}
+                                            </p>
+                                            <p className="text-[9px] text-gray-500 font-bold uppercase tracking-tighter">SUCCESSFULLY ATTACHED</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-1">
+                                            <p className="text-xs font-medium text-gray-500 group-hover/upload:text-gray-400 transition-colors">Choose digital asset...</p>
+                                            <p className="text-[9px] text-gray-700 font-black tracking-widest uppercase">Max 10MB • PDF, JPG, PNG</p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {fieldValue && (
+                                    <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-500 text-white text-[8px] font-black uppercase">
+                                        <FiCheckCircle /> VERIFIED
                                     </div>
                                 )}
                             </div>
 
-                            {value && (
-                                <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-500 text-white text-[8px] font-black uppercase">
-                                    <FiCheckCircle /> VERIFIED
-                                </div>
+                            {typeof fieldValue === 'string' && fieldValue && (
+                                <a
+                                    href={fieldValue.startsWith('http') ? fieldValue : `${elautBaseUrl}/storage/${fieldValue}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="h-24 w-16 shrink-0 bg-blue-600/10 border border-blue-500/20 rounded-2xl flex items-center justify-center text-blue-400 hover:bg-blue-600 hover:text-white transition-all shadow-lg shadow-blue-500/10 group active:scale-95"
+                                    title="View Document"
+                                >
+                                    <FiEye size={24} className="group-hover:scale-110 transition-transform" />
+                                </a>
                             )}
-
-                            <div className="absolute inset-0 bg-blue-400/5 opacity-0 group-hover/upload:opacity-100 rounded-2xl transition-opacity pointer-events-none" />
                         </div>
                     </FormControl>
                     <FormMessage className="text-rose-400 text-[10px] font-bold mt-1" />
@@ -458,4 +484,4 @@ function FileUploadField({ form, name, label }: any) {
     );
 }
 
-import { FiCheckCircle } from 'react-icons/fi';
+

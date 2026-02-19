@@ -82,10 +82,10 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
     }
 
     return (
-        <div className="w-full space-y-10 py-6">
+        <div className="w-full space-y-6 md:space-y-8 py-2 md:py-4">
             <Accordion
                 type="multiple"
-                className="w-full space-y-10"
+                className="w-full space-y-6 md:space-y-8"
                 defaultValue={["meta", "peserta"]}
             >
                 {/* Metadata Section */}
@@ -95,7 +95,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                     icon={<TbSettings className="text-blue-600" />}
                     description="Kelola metadata penerbitan, dokumen pengawasan, dan alur persetujuan STTPL digital."
                 >
-                    <div className="flex flex-col w-full gap-10">
+                    <div className="flex flex-col w-full gap-6 md:gap-8">
                         <div className="flex flex-wrap items-center gap-4">
                             <div className="px-4 py-1.5 bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 rounded-xl">
                                 <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">Tindakan Persetujuan</span>
@@ -122,7 +122,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             ) : (
                                                 <Button
                                                     variant="outline"
-                                                    className="h-12 flex items-center gap-3 rounded-[1.25rem] px-8 shadow-sm transition-all border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 font-black uppercase tracking-wider text-xs hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                                                    className="h-11 md:h-12 flex items-center gap-3 rounded-[1.125rem] md:rounded-[1.25rem] px-6 md:px-8 shadow-sm transition-all border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 font-black uppercase tracking-wider text-xs hover:bg-blue-50 dark:hover:bg-blue-900/30"
                                                     onClick={() => {
                                                         Toast.fire({
                                                             icon: "warning",
@@ -243,7 +243,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                         </div>
 
                         {/* Status Cards */}
-                        <div className="w-full space-y-8">
+                        <div className="w-full space-y-6">
                             <div className="flex items-center gap-4">
                                 <div className="px-3 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg">
                                     <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest leading-none">Status & Verifikasi</span>
@@ -253,16 +253,16 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
 
                             {
                                 data.SuratPemberitahuan == "" ?
-                                    <div className="py-24 w-full bg-slate-50/50 dark:bg-slate-950/30 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center flex-col justify-center gap-8 group">
+                                    <div className="py-12 md:py-20 w-full bg-slate-50/50 dark:bg-slate-950/30 rounded-[2.5rem] md:rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center flex-col justify-center gap-6 md:gap-8 group">
                                         <div className="relative">
                                             <div className="absolute inset-0 bg-slate-400/10 blur-3xl rounded-full scale-150 animate-pulse" />
-                                            <div className="w-24 h-24 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 shadow-xl relative z-10">
-                                                <Lock className='w-12 h-12' />
+                                            <div className="w-20 h-20 md:w-24 md:h-24 rounded-[1.5rem] md:rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 shadow-xl relative z-10">
+                                                <Lock className='w-10 h-10 md:w-12 md:h-12' />
                                             </div>
                                         </div>
-                                        <div className="text-center max-w-sm space-y-3">
-                                            <h4 className="font-black text-slate-800 dark:text-white uppercase tracking-tight text-xl">Tahapan Terkunci</h4>
-                                            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic">
+                                        <div className="text-center max-w-sm space-y-2 md:space-y-3">
+                                            <h4 className="font-black text-slate-800 dark:text-white uppercase tracking-tight text-lg md:text-xl">Tahapan Terkunci</h4>
+                                            <p className="text-[11px] md:text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic px-6">
                                                 Harap mengupload surat pemberitahuan pelaksanaan dan menunggu verifikasi operasional agar dapat memproses sertifikasi.
                                             </p>
                                         </div>
@@ -387,7 +387,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                         icon={<TbUsers className="text-rose-600" />}
                         description="Pantau kelulusan peserta, hasil verifikasi data, dan kelola proses pencetakan sertifikat digital."
                     >
-                        <div className="flex flex-col w-full gap-10">
+                        <div className="flex flex-col w-full gap-6 md:gap-8">
                             <div className="flex flex-wrap items-center gap-3">
                                 {
                                     countUserWithNoStatus(data?.UserPelatihan) != 0 && <PassedParticipantAction data={data?.UserPelatihan} onSuccess={fetchData} />
@@ -408,7 +408,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 )}
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                                 <MetricCard label="Target Kuota" value={data.KoutaPelatihan} color="blue" icon={<TbUsers />} />
                                 <MetricCard label="Total Register" value={data.UserPelatihan.length.toString()} color="slate" icon={<TbLayoutGrid />} />
                                 <MetricCard label="Kelulusan" value={`${countUserWithPassed(data.UserPelatihan)}/${data.UserPelatihan.length}`} color="emerald" icon={<TbPencilCheck />} />

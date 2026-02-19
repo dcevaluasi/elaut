@@ -65,18 +65,9 @@ export default function RootLayout({
 
   return (
     <UnitKerjaProvider>
-      <html lang="en">
-        <body
-          suppressHydrationWarning={false}
-          className={`${inter.className} ${myFont.variable} ${bosNormal.variable} ${plusSansJakarta.variable} ${bos.variable} ${bosBold.variable} ${bosItalic.variable}  ${delius.variable} `}
-        >
-
-          <div className="h-screen max-h-screen overflow-y-hidden">
-            {loading ? <Loader /> : children}
-          </div>
-        </body>
-      </html>
+      <div className={`${inter.className} ${myFont.variable} ${bosNormal.variable} ${plusSansJakarta.variable} ${bos.variable} ${bosBold.variable} ${bosItalic.variable} ${delius.variable} h-screen max-h-screen overflow-y-hidden`}>
+        {loading ? <Loader /> : children}
+      </div>
     </UnitKerjaProvider>
-
   );
 }

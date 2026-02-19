@@ -123,6 +123,7 @@ export function getStatusInfo(
         icon: <RiTimeLine className="w-4 h-4" />,
       };
     case "1.1":
+    case "4":
       return {
         label: "Approved Pelaksanaan",
         color: "bg-green-500 text-white",
@@ -171,12 +172,7 @@ export function getStatusInfo(
         color: "bg-rose-600 text-white",
         icon: <RiCloseCircleFill className="w-4 h-4" />,
       };
-    case "4":
-      return {
-        label: "Approved Pelaksanaan",
-        color: "bg-teal-500 text-white",
-        icon: <RiCheckboxCircleFill className="w-4 h-4" />,
-      };
+
     case "1.25":
     case "5":
       return {

@@ -4,9 +4,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription
 } from "@/components/ui/card";
 
 import Image from "next/image";
@@ -15,18 +12,14 @@ import Cookies from "js-cookie";
 import { Input } from "@/components/ui/input";
 import { generateTanggalPelatihan } from "@/utils/text";
 import { Button } from "@/components/ui/button";
-import {
-  PROGRAM_AKP,
-  PROGRAM_KELAUTAN,
-  PROGRAM_PERIKANAN,
-} from "@/constants/pelatihan";
-import { MdBusiness, MdClear, MdPeople, MdSchool, MdSearch } from "react-icons/md";
+import { MdSearch } from "react-icons/md";
 
 import { encryptValue } from "@/lib/utils";
 import { HashLoader } from "react-spinners";
 import { UPT } from "@/constants/nomenclatures";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useFetchDataPelatihanMasyarakat } from "@/hooks/elaut/pelatihan/useFetchDataPelatihanMasyarakat";
+import { useFetchDataProgramPelatihan } from "@/hooks/elaut/master/useFetchDataProgramPelatihan";
 import TabStatusPelatihanMasyarakat from "./TabStatusPelatihanMasyarakat";
 import TableDataPelatihanMasyarakat from "./Table/TableDataPelatihanMasyrakat";
 import { isPendingSigning, isSigned, isVerifyDiklat } from "@/utils/status";
@@ -37,6 +30,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PelatihanMasyarakat } from "@/types/product";
 
 const TableDataPelatihan: React.FC = () => {
   const {
@@ -51,45 +45,56 @@ const TableDataPelatihan: React.FC = () => {
     countSigned,
     refetch,
   } = useFetchDataPelatihanMasyarakat();
-  const isOperatorBalaiPelatihan = Cookies.get('Eselon') !== 'Operator Pusat'
+
+  const { data: programs } = useFetchDataProgramPelatihan();
 
   const [selectedStatusFilter, setSelectedStatusFilter] = React.useState<string>("All");
 
   // FILTERS
-  const [filterCategory, setFilterCategory] = React.useState<string>("");
-  const [filterCategoryPenyelenggara, setFilterCategoryPenyelenggara] = React.useState<string>("");
-  const [filterCategorySasaran, setFilterCategorySasaran] = React.useState<string>("");
+  const [filterCategory, setFilterCategory] = React.useState<string>("all");
+  const [filterCategoryPenyelenggara, setFilterCategoryPenyelenggara] = React.useState<string>("all");
+  const [filterCategorySasaran, setFilterCategorySasaran] = React.useState<string>("all");
   const [filterYear, setFilterYear] = React.useState<string>(new Date().getFullYear().toString());
+
+  // ROLE DETECTION
+  const access = Cookies.get('Access') || '';
+  const isSupervisor = access.includes('supervisePelaksanaan') && access.includes('superviseCertificate');
 
   // SEARCHING
   const [searchQuery, setSearchQuery] = React.useState<string>("");
 
-  const statusMapping: Record<string, (p: typeof data[number]) => boolean> = {
-    "Proses Pengajuan Sertifikat": p => p.StatusPenerbitan === "On Progress",
-    "Pending SPV": p => p.StatusPenerbitan === "1",
-    "Verifikasi Pelaksanaan": p => isVerifyDiklat(p.StatusPenerbitan),
-    "Pending Signing": p => isPendingSigning(p.StatusPenerbitan) && (Cookies.get('Role')?.includes(p.TtdSertifikat)! || Cookies.get('Role') == p.TtdSertifikat),
-    "Done": p => isSigned(p.StatusPenerbitan),
-    "Signed": p => isSigned(p.StatusPenerbitan) && (Cookies.get('Role')?.includes(p.TtdSertifikat)! || Cookies.get('Role') == p.TtdSertifikat),
+  const statusMapping: Record<string, (p: PelatihanMasyarakat) => boolean> = {
+    "Proses Pengajuan Sertifikat": p => String(p.StatusPenerbitan) === "On Progress",
+    "Pending SPV": p => String(p.StatusPenerbitan) === "1",
+    "Verifikasi Pelaksanaan": p => isVerifyDiklat(String(p.StatusPenerbitan)),
+    "Pending Signing": p => isPendingSigning(String(p.StatusPenerbitan)) && (!!Cookies.get('Role')?.includes(p.TtdSertifikat) || Cookies.get('Role') === p.TtdSertifikat),
+    "Done": p => isSigned(String(p.StatusPenerbitan)),
+    "Signed": p => isSigned(String(p.StatusPenerbitan)) && (!!Cookies.get('Role')?.includes(p.TtdSertifikat) || Cookies.get('Role') === p.TtdSertifikat),
     "Published": p => p.Status === "Publish",
-    "Approved": p => p.StatusPenerbitan === "1.1",
+    "Approved": p => String(p.StatusPenerbitan) === "1.1",
+  };
+
+  const getYearFromDate = (dateStr: string | undefined | null) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    return isNaN(date.getTime()) ? "" : date.getFullYear().toString();
   };
 
   const filteredData = useMemo(() => {
     return data.filter(p => {
-      const program = p.Program.toLowerCase();
-      const namaPelatihan = p.NamaPelatihan.toLowerCase();
-      const penyelenggara = p.PenyelenggaraPelatihan.toLowerCase();
-      const sasaran = p.AsalPelatihan.toLowerCase();
-      const pYear = p.TanggalMulaiPelatihan ? new Date(p.TanggalMulaiPelatihan).getFullYear().toString() : "";
+      const program = (p.Program || "").toLowerCase().trim();
+      const namaPelatihan = (p.NamaPelatihan || "").toLowerCase().trim();
+      const penyelenggara = (p.PenyelenggaraPelatihan || "").toLowerCase().trim();
+      const sasaran = (p.AsalPelatihan || "").toLowerCase().trim();
+      const pYear = getYearFromDate(p.TanggalMulaiPelatihan);
 
       const matchesYear = filterYear === "All" || pYear === filterYear;
 
       return (
-        (!filterCategory || program === filterCategory.toLowerCase()) &&
-        (!filterCategoryPenyelenggara || penyelenggara === filterCategoryPenyelenggara.toLowerCase()) &&
-        (!filterCategorySasaran || sasaran === filterCategorySasaran.toLowerCase()) &&
-        namaPelatihan.includes(searchQuery.toLowerCase()) &&
+        (!filterCategory || filterCategory === "all" || program.includes(filterCategory.toLowerCase().trim())) &&
+        (!filterCategoryPenyelenggara || filterCategoryPenyelenggara === "all" || penyelenggara.includes(filterCategoryPenyelenggara.toLowerCase().trim())) &&
+        (!filterCategorySasaran || filterCategorySasaran === "all" || sasaran.includes(filterCategorySasaran.toLowerCase().trim())) &&
+        namaPelatihan.includes(searchQuery.toLowerCase().trim()) &&
         matchesYear &&
         (
           selectedStatusFilter === "All" ||
@@ -100,11 +105,40 @@ const TableDataPelatihan: React.FC = () => {
     });
   }, [data, filterCategory, filterCategoryPenyelenggara, filterCategorySasaran, searchQuery, selectedStatusFilter, filterYear]);
 
+  const groupedPrograms = useMemo(() => {
+    const akp = programs.filter(p =>
+      p.name_indo.includes("ANKAPIN") ||
+      p.name_indo.includes("ATKAPIN") ||
+      p.name_indo.includes("BSTF") ||
+      p.name_indo.includes("Rating") ||
+      p.name_indo.includes("SKN") ||
+      p.name_indo.includes("SKPI") ||
+      p.name_indo.includes("SOPI") ||
+      p.name_indo.includes("Fishing Master") ||
+      p.abbrv_name?.includes("AKP")
+    );
+
+    const kelautan = programs.filter(p =>
+      p.name_indo.includes("BCL") ||
+      p.name_indo.includes("Sampah") ||
+      p.name_indo.includes("Ruang Laut") ||
+      p.name_indo.includes("Mitigasi") ||
+      p.name_indo.includes("Konservasi")
+    );
+
+    const perikanan = programs.filter(p =>
+      !akp.find(a => a.id_program_pelatihan === p.id_program_pelatihan) &&
+      !kelautan.find(k => k.id_program_pelatihan === p.id_program_pelatihan)
+    );
+
+    return { akp, perikanan, kelautan };
+  }, [programs]);
+
 
 
   // Year Options
   const yearOptions = useMemo(() => {
-    const years = new Set(data.map(p => p.TanggalMulaiPelatihan ? new Date(p.TanggalMulaiPelatihan).getFullYear().toString() : "").filter(Boolean));
+    const years = new Set(data.map(p => getYearFromDate(p.TanggalMulaiPelatihan)).filter(y => y && y.trim() !== ""));
     // Ensure current year is always available even if no data
     years.add(new Date().getFullYear().toString());
     return ["All", ...Array.from(years).sort((a, b) => parseInt(b) - parseInt(a))];
@@ -117,17 +151,20 @@ const TableDataPelatihan: React.FC = () => {
 
     // Distribution by Program
     const programDist = [
-      { name: "Prodi AKP", value: filteredData.filter(p => p.Program.includes("AKP")).length },
-      { name: "Prodi Perikanan", value: filteredData.filter(p => p.Program.includes("Perikanan")).length },
-      { name: "Prodi Kelautan", value: filteredData.filter(p => p.Program.includes("Kelautan")).length },
+      { name: "Prodi AKP", value: filteredData.filter(p => p.Program?.includes("AKP")).length },
+      { name: "Prodi Perikanan", value: filteredData.filter(p => p.Program?.includes("Perikanan")).length },
+      { name: "Prodi Kelautan", value: filteredData.filter(p => p.Program?.includes("Kelautan")).length },
     ].filter(d => d.value > 0);
 
     // Trend by Month (for the filtered data)
     const monthCounts: Record<string, number> = {};
     filteredData.forEach(p => {
       if (p.TanggalMulaiPelatihan) {
-        const month = new Date(p.TanggalMulaiPelatihan).toLocaleString('id-ID', { month: 'short' });
-        monthCounts[month] = (monthCounts[month] || 0) + 1;
+        const d = new Date(p.TanggalMulaiPelatihan);
+        if (!isNaN(d.getTime())) {
+          const month = d.toLocaleString('id-ID', { month: 'short' });
+          monthCounts[month] = (monthCounts[month] || 0) + 1;
+        }
       }
     });
 
@@ -144,18 +181,18 @@ const TableDataPelatihan: React.FC = () => {
   // Reactive Status Counts based on filtered total (except status itself)
   const tabCounts = useMemo(() => {
     const baseFiltered = data.filter(p => {
-      const program = p.Program.toLowerCase();
-      const namaPelatihan = p.NamaPelatihan.toLowerCase();
-      const penyelenggara = p.PenyelenggaraPelatihan.toLowerCase();
-      const sasaran = p.AsalPelatihan.toLowerCase();
-      const pYear = p.TanggalMulaiPelatihan ? new Date(p.TanggalMulaiPelatihan).getFullYear().toString() : "";
+      const program = (p.Program || "").toLowerCase().trim();
+      const namaPelatihan = (p.NamaPelatihan || "").toLowerCase().trim();
+      const penyelenggara = (p.PenyelenggaraPelatihan || "").toLowerCase().trim();
+      const sasaran = (p.AsalPelatihan || "").toLowerCase().trim();
+      const pYear = getYearFromDate(p.TanggalMulaiPelatihan);
       const matchesYear = filterYear === "All" || pYear === filterYear;
 
       return (
-        (!filterCategory || program === filterCategory.toLowerCase()) &&
-        (!filterCategoryPenyelenggara || penyelenggara === filterCategoryPenyelenggara.toLowerCase()) &&
-        (!filterCategorySasaran || sasaran === filterCategorySasaran.toLowerCase()) &&
-        namaPelatihan.includes(searchQuery.toLowerCase()) &&
+        (!filterCategory || program.includes(filterCategory.toLowerCase().trim())) &&
+        (!filterCategoryPenyelenggara || penyelenggara.includes(filterCategoryPenyelenggara.toLowerCase().trim())) &&
+        (!filterCategorySasaran || sasaran.includes(filterCategorySasaran.toLowerCase().trim())) &&
+        namaPelatihan.includes(searchQuery.toLowerCase().trim()) &&
         matchesYear
       );
     });
@@ -163,25 +200,25 @@ const TableDataPelatihan: React.FC = () => {
     return {
       all: baseFiltered.length,
       published: baseFiltered.filter(p => p.Status === "Publish").length,
-      verifying: baseFiltered.filter(p => isVerifyDiklat(p.StatusPenerbitan)).length,
-      done: baseFiltered.filter(p => isSigned(p.StatusPenerbitan)).length,
-      diklatSPV: baseFiltered.filter(p => p.StatusPenerbitan === "1").length,
+      verifying: baseFiltered.filter(p => isVerifyDiklat(String(p.StatusPenerbitan))).length,
+      done: baseFiltered.filter(p => isSigned(String(p.StatusPenerbitan))).length,
+      diklatSPV: baseFiltered.filter(p => String(p.StatusPenerbitan) === "1").length,
       pendingSigning: baseFiltered.filter(p =>
-        isPendingSigning(p.StatusPenerbitan) &&
-        (Cookies.get('Role')?.includes(p.TtdSertifikat)! || Cookies.get('Role') == p.TtdSertifikat)
+        isPendingSigning(String(p.StatusPenerbitan)) &&
+        (!!Cookies.get('Role')?.includes(p.TtdSertifikat) || Cookies.get('Role') === p.TtdSertifikat)
       ).length,
       signed: baseFiltered.filter(p =>
-        isSigned(p.StatusPenerbitan) &&
-        (Cookies.get('Role')?.includes(p.TtdSertifikat)! || Cookies.get('Role') == p.TtdSertifikat)
+        isSigned(String(p.StatusPenerbitan)) &&
+        (!!Cookies.get('Role')?.includes(p.TtdSertifikat) || Cookies.get('Role') === p.TtdSertifikat)
       ).length,
-      approved: baseFiltered.filter(p => p.StatusPenerbitan === "1.1").length,
+      approved: baseFiltered.filter(p => String(p.StatusPenerbitan) === "1.1").length,
     };
   }, [data, filterCategory, filterCategoryPenyelenggara, filterCategorySasaran, searchQuery, filterYear]);
 
   const [tabValue, setTabValue] = React.useState<string>("account");
 
   return (
-    <div className="space-y-2 pb-10">
+    <div className="space-y-2 pb-10 mt-10">
 
       {/* 2. Main Content (Filters + Table) */}
       <div className="space-y-6">
@@ -270,6 +307,7 @@ const TableDataPelatihan: React.FC = () => {
           selectedStatusFilter={selectedStatusFilter}
           setSelectedStatusFilter={setSelectedStatusFilter}
           activeYear={filterYear}
+          isSupervisor={isSupervisor}
         />
 
 
@@ -278,7 +316,7 @@ const TableDataPelatihan: React.FC = () => {
           <Tabs value={tabValue} onValueChange={setTabValue} className="w-full">
             {
               Cookies.get('Access')?.includes('createPelatihan') &&
-              <TabsList className="grid w-full grid-cols-2 bg-slate-100/50 p-1.5 rounded-2xl mb-8 border border-slate-200/50 backdrop-blur-sm">
+              <TabsList className="grid w-full grid-cols-2 bg-slate-100/50 p-1.5 h-fit rounded-2xl mb-8 border border-slate-200/50 backdrop-blur-sm">
                 <TabsTrigger
                   value="account"
                   onClick={() => refetch()}
@@ -343,39 +381,31 @@ const TableDataPelatihan: React.FC = () => {
                               )}
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent className="w-72 p-4 space-y-4" align="end">
+                          <DropdownMenuContent className="w-72 p-4 space-y-4" align="end" onPointerDown={(e) => e.stopPropagation()}>
                             <div className="space-y-2">
                               <label className="text-xs font-semibold text-slate-500">Program</label>
                               <Select value={filterCategory} onValueChange={setFilterCategory}>
-                                <SelectTrigger className="h-8 text-xs w-full"><SelectValue placeholder="Semua Program" /></SelectTrigger>
+                                <SelectTrigger className="h-8 text-xs w-full" onPointerDown={(e) => e.stopPropagation()}><SelectValue placeholder="Semua Program" /></SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="">Semua Program</SelectItem>
-                                  <SelectGroup>
-                                    <SelectLabel>AKP</SelectLabel>
-                                    {PROGRAM_AKP.map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}
-                                  </SelectGroup>
-                                  <SelectGroup>
-                                    <SelectLabel>Perikanan</SelectLabel>
-                                    {PROGRAM_PERIKANAN.map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}
-                                  </SelectGroup>
-                                  <SelectGroup>
-                                    <SelectLabel>Kelautan</SelectLabel>
-                                    {PROGRAM_KELAUTAN.map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}
-                                  </SelectGroup>
-                                </SelectContent>
-                              </Select>
-                            </div>
-
-                            <div className="space-y-2">
-                              <label className="text-xs font-semibold text-slate-500">Sasaran</label>
-                              <Select value={filterCategorySasaran} onValueChange={setFilterCategorySasaran}>
-                                <SelectTrigger className="h-8 text-xs w-full"><SelectValue placeholder="Semua Sasaran" /></SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="">Semua Sasaran</SelectItem>
-                                  <SelectItem value="Masyarakat Umum">Masyarakat Umum</SelectItem>
-                                  <SelectItem value="Peserta Didik Sekolah Usaha Perikanan Menengah">Peserta Didik SUPM</SelectItem>
-                                  <SelectItem value="Peserta Didik Politeknik Kelautan dan Perikanan">Peserta Didik Politeknik</SelectItem>
-                                  <SelectItem value="Karyawan/Pegawai/Mining Agent">Karyawan/Pegawai</SelectItem>
+                                  <SelectItem value="all">Semua Program</SelectItem>
+                                  {groupedPrograms.akp.length > 0 && (
+                                    <SelectGroup>
+                                      <SelectLabel>AKP</SelectLabel>
+                                      {groupedPrograms.akp.filter(item => item.name_indo && item.name_indo.trim() !== "").map((item) => <SelectItem key={item.id_program_pelatihan} value={item.name_indo}>{item.name_indo}</SelectItem>)}
+                                    </SelectGroup>
+                                  )}
+                                  {groupedPrograms.perikanan.length > 0 && (
+                                    <SelectGroup>
+                                      <SelectLabel>Perikanan</SelectLabel>
+                                      {groupedPrograms.perikanan.filter(item => item.name_indo && item.name_indo.trim() !== "").map((item) => <SelectItem key={item.id_program_pelatihan} value={item.name_indo}>{item.name_indo}</SelectItem>)}
+                                    </SelectGroup>
+                                  )}
+                                  {groupedPrograms.kelautan.length > 0 && (
+                                    <SelectGroup>
+                                      <SelectLabel>Kelautan</SelectLabel>
+                                      {groupedPrograms.kelautan.filter(item => item.name_indo && item.name_indo.trim() !== "").map((item) => <SelectItem key={item.id_program_pelatihan} value={item.name_indo}>{item.name_indo}</SelectItem>)}
+                                    </SelectGroup>
+                                  )}
                                 </SelectContent>
                               </Select>
                             </div>
@@ -383,25 +413,25 @@ const TableDataPelatihan: React.FC = () => {
                             <div className="space-y-2">
                               <label className="text-xs font-semibold text-slate-500">Penyelenggara</label>
                               <Select value={filterCategoryPenyelenggara} onValueChange={setFilterCategoryPenyelenggara}>
-                                <SelectTrigger className="h-8 text-xs w-full"><SelectValue placeholder="Semua Penyelenggara" /></SelectTrigger>
+                                <SelectTrigger className="h-8 text-xs w-full" onPointerDown={(e) => e.stopPropagation()}><SelectValue placeholder="Semua Penyelenggara" /></SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="">Semua Penyelenggara</SelectItem>
-                                  {UPT.map((item: string, index: number) => (
+                                  <SelectItem value="all">Semua Penyelenggara</SelectItem>
+                                  {Array.from(new Set(UPT || [])).filter(item => item && item.trim() !== "").map((item: string, index: number) => (
                                     <SelectItem key={index} value={item}>{item}</SelectItem>
                                   ))}
                                 </SelectContent>
                               </Select>
                             </div>
 
-                            {(filterCategory || filterCategoryPenyelenggara || filterCategorySasaran) && (
+                            {(filterCategory !== "all" || filterCategoryPenyelenggara !== "all" || filterCategorySasaran !== "all") && (
                               <Button
-                                variant="destructive"
+                                variant="outline"
                                 size="sm"
                                 className="w-full h-8 text-xs"
                                 onClick={() => {
-                                  setFilterCategory("");
-                                  setFilterCategoryPenyelenggara("");
-                                  setFilterCategorySasaran("");
+                                  setFilterCategory("all");
+                                  setFilterCategoryPenyelenggara("all");
+                                  setFilterCategorySasaran("all");
                                 }}
                               >
                                 Reset Filters

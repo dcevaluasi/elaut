@@ -38,8 +38,8 @@ const ManagePelatihan = () => {
                     <HashLoader color="#2563eb" size={65} />
                 </div>
                 <div className="flex flex-col items-center gap-1">
-                    <p className="text-slate-800 dark:text-white font-black text-lg tracking-tight">Syncing Operations...</p>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm font-medium animate-pulse uppercase tracking-widest">Memuat semesta pelatihan</p>
+                    <p className="text-slate-800 dark:text-white font-black text-lg tracking-tight">Loading ...</p>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm font-medium animate-pulse tracking-widest">Memuat detail pelatihan</p>
                 </div>
             </div>
         );
@@ -69,76 +69,62 @@ const ManagePelatihan = () => {
     const { label, color, icon } = getStatusInfo(dataPelatihan.StatusPenerbitan);
 
     return (
-        <section className="pb-32 flex flex-col gap-10">
+        <section className="pb-6 flex flex-col gap-6 w-full">
             {/* Action Bar */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pointer-events-none sticky top-0 z-50 py-2">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pointer-events-none sticky top-16 z-50 py-1">
                 <div className="pointer-events-auto">
                     <button
                         onClick={() => router.back()}
-                        className="group flex items-center gap-3 px-4 py-2.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white dark:border-slate-800 rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none hover:shadow-blue-500/10 hover:border-blue-200 dark:hover:border-blue-800/50 transition-all duration-300 transform active:scale-95"
+                        className="group flex items-center gap-2.5 px-4 py-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white dark:border-slate-800 rounded-xl shadow-lg shadow-slate-200/50 dark:shadow-none hover:shadow-blue-500/10 hover:border-blue-200 dark:hover:border-blue-800/50 transition-all duration-300 transform active:scale-95"
                     >
-                        <div className="p-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-500 group-hover:bg-blue-600 group-hover:text-white transition-all">
-                            <ChevronLeft className="w-5 h-5 shrink-0" />
+                        <div className="p-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-500 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                            <ChevronLeft className="w-4 h-4 shrink-0" />
                         </div>
-                        <span className="text-sm font-black text-slate-700 dark:text-slate-200 tracking-tight group-hover:text-blue-600 transition-colors uppercase tracking-[0.05em]">KEMBALI KE HUB</span>
+                        <span className="text-[10px] font-black text-slate-700 dark:text-slate-200 tracking-wider group-hover:text-blue-600 transition-colors uppercase">KEMBALI KE HUB</span>
                     </button>
                 </div>
 
-                <div className="pointer-events-auto flex items-center gap-3 px-6 py-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white dark:border-slate-800 rounded-full shadow-xl shadow-slate-200/50 dark:shadow-none">
+                <div className="pointer-events-auto flex items-center gap-3 px-5 py-2.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-white dark:border-slate-800 rounded-full shadow-lg shadow-slate-200/50 dark:shadow-none">
                     <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: color === "bg-blue-600" || color === "bg-blue-500" ? "#2563eb" : color === "bg-emerald-600" ? "#10b981" : "#f59e0b" }} />
-                        <span className="text-[10px] font-black text-slate-400 tracking-[0.2em] uppercase">Status Berjalan</span>
+                        <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: color === "bg-blue-600" || color === "bg-blue-500" ? "#2563eb" : color === "bg-emerald-600" ? "#10b981" : "#f59e0b" }} />
+                        <span className="text-[9px] font-black text-slate-400 tracking-[0.2em] uppercase">Status Berjalan</span>
                     </div>
-                    <div className="w-px h-4 bg-slate-200 dark:bg-slate-700" />
-                    <div className={`flex items-center gap-2 px-4 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-wider ${color.replace('bg-', 'bg-').replace('text-white', 'text-white')} shadow-lg shadow-blue-500/20 text-white`}>
-                        {icon}
+                    <div className="w-px h-3 bg-slate-200 dark:bg-slate-700" />
+                    <div className={`flex items-center gap-2 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${color.replace('bg-', 'bg-').replace('text-white', 'text-white')} shadow-md shadow-blue-500/10 text-white`}>
+                        {React.cloneElement(icon as React.ReactElement, { className: "w-3 h-3" })}
                         {label}
                     </div>
                 </div>
             </div>
 
             {/* Premium Page Header */}
-            <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-indigo-600/5 dark:from-blue-600/10 dark:to-indigo-600/10 rounded-[3rem] blur-2xl group-hover:blur-3xl transition-all duration-700" />
-                <div className="relative overflow-hidden w-full h-auto bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white dark:border-slate-800 shadow-2xl rounded-[3rem] p-8 lg:p-12 flex flex-col md:flex-row md:items-center justify-between gap-10">
+            <div className="relative group -mt-12">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-indigo-600/5 dark:from-blue-600/10 dark:to-indigo-600/10 rounded-[2.5rem] blur-xl group-hover:blur-2xl transition-all duration-700" />
+                <div className="relative overflow-hidden w-full h-auto bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white dark:border-slate-800 shadow-lg rounded-[2.5rem] p-6 lg:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
                     {/* Decorative Elements */}
-                    <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-500/5 rounded-full -mr-40 -mt-40 blur-[100px] pointer-events-none" />
-                    <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-indigo-500/5 rounded-full -ml-40 -mb-40 blur-[80px] pointer-events-none" />
+                    <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-500/5 rounded-full -mr-32 -mt-32 blur-[80px] pointer-events-none" />
+                    <div className="absolute bottom-0 left-0 w-[250px] h-[250px] bg-indigo-500/5 rounded-full -ml-32 -mb-32 blur-[60px] pointer-events-none" />
 
-                    <div className="flex flex-col lg:flex-row gap-8 items-start lg:items-center relative z-10 w-full">
+                    <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center relative z-10 w-full">
                         <div className="relative">
-                            <div className="w-24 h-24 lg:w-32 lg:h-32 rounded-[2.5rem] bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center text-4xl lg:text-5xl shadow-2xl shadow-blue-500/40 relative z-10 overflow-hidden transform group-hover:scale-105 transition-transform duration-500">
-                                <School className="relative z-20" />
+                            <div className="w-20 h-20 lg:w-24 lg:h-24 rounded-[2rem] bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center text-3xl lg:text-4xl shadow-xl shadow-blue-500/30 relative z-10 overflow-hidden transform group-hover:scale-105 transition-transform duration-500">
+                                <School size={40} className="relative z-20" />
                                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/20 to-transparent" />
                             </div>
-                            <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 shadow-xl flex items-center justify-center text-blue-600 border border-slate-100 dark:border-slate-700 z-20">
-                                <Settings className="w-5 h-5 animate-[spin_4s_linear_infinite]" />
+                            <div className="absolute -bottom-1.5 -right-1.5 w-8 h-8 rounded-xl bg-white dark:bg-slate-800 shadow-lg flex items-center justify-center text-blue-600 border border-slate-100 dark:border-slate-700 z-20">
+                                <Settings className="w-4 h-4 animate-[spin_4s_linear_infinite]" />
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-4 flex-1">
+                        <div className="flex flex-col gap-2 flex-1">
                             <div className="flex items-center gap-3">
-                                <div className="px-3 py-1 bg-blue-100 dark:bg-blue-500/10 rounded-lg border border-blue-200 dark:border-blue-500/20">
-                                    <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em]">KONSOL MANAJEMEN</span>
-                                </div>
-                                <div className="h-px w-12 bg-slate-200 dark:bg-slate-700" />
-                                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{dataPelatihan.PenyelenggaraPelatihan}</span>
+                                <div className="h-px w-8 bg-slate-200 dark:bg-slate-700" />
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{dataPelatihan.PenyelenggaraPelatihan}</span>
                             </div>
 
-                            <h1 className="font-black text-3xl md:text-4xl lg:text-5xl text-slate-900 dark:text-white tracking-tight leading-[1.1] max-w-3xl drop-shadow-sm">
+                            <h1 className="font-black text-2xl md:text-3xl lg:text-4xl text-slate-900 dark:text-white tracking-tight leading-tight max-w-4xl">
                                 {dataPelatihan.NamaPelatihan}
                             </h1>
-
-                            <div className="flex flex-wrap items-center gap-6 mt-2">
-                                <div className="flex items-center gap-2.5 px-4 py-2 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-inner group/chip">
-                                    <Settings className="w-4 h-4 text-blue-500 group-hover/chip:rotate-45 transition-transform" />
-                                    <span className="text-sm font-black text-slate-700 dark:text-slate-300 tracking-tight">{dataPelatihan.KodePelatihan}</span>
-                                </div>
-                                <div className="flex items-center gap-2.5 px-4 py-2 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-inner group/chip">
-                                    <ShieldCheck className="w-4 h-4 text-emerald-500 group-hover/chip:scale-110 transition-transform" />
-                                    <span className="text-sm font-black text-slate-700 dark:text-slate-300 tracking-tight text-center uppercase">Terverifikasi Pusat</span>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -148,35 +134,33 @@ const ManagePelatihan = () => {
             <Tabs
                 value={activeTab}
                 onValueChange={setActiveTab}
-                className="w-full flex flex-col gap-10"
+                className="w-full flex flex-col gap-6"
             >
                 <div className="flex justify-center">
-                    <TabsList className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border border-white/50 dark:border-slate-800 h-auto p-2.5 rounded-[3rem] shadow-[0_25px_60px_rgba(37,99,235,0.08)] dark:shadow-none flex flex-wrap md:flex-nowrap items-center gap-3 w-full max-w-3xl mx-auto">
+                    <TabsList className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border border-white/50 dark:border-slate-800 h-auto p-1.5 rounded-[2rem] shadow-xl dark:shadow-none flex flex-wrap md:flex-nowrap items-center gap-2 w-full mx-auto">
                         <TabsTrigger
                             value="1"
-                            className="flex-1 w-full rounded-[2.5rem] py-4 px-8 data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white data-[state=active]:shadow-[0_15px_40px_rgba(37,99,235,0.3)] text-slate-500 dark:text-slate-400 font-bold transition-all duration-500 flex flex-col items-center gap-1 group ring-0 outline-none hover:text-blue-600 dark:hover:text-blue-400"
+                            className="flex-1 rounded-[1.5rem] py-2.5 px-6 data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-blue-500/20 text-slate-500 dark:text-slate-400 font-bold transition-all duration-300 flex flex-col items-center group ring-0 outline-none"
                         >
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-blue-100/50 dark:bg-blue-500/10 group-data-[state=active]:bg-white/20 transition-all font-black text-sm">
+                            <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 flex items-center justify-center rounded-lg bg-blue-100/50 dark:bg-blue-500/10 group-data-[state=active]:bg-white/20 transition-all font-black text-[10px]">
                                     01
                                 </div>
-                                <span className="text-base tracking-tight font-black">Penyelenggaraan</span>
+                                <span className="text-sm tracking-tight font-black uppercase">Penyelenggaraan</span>
                             </div>
-                            <span className="text-[10px] opacity-60 group-data-[state=active]:opacity-80 font-bold uppercase tracking-[0.1em] mt-1">Kelola Teknis & Peserta</span>
                         </TabsTrigger>
 
                         <TabsTrigger
                             value="2"
                             disabled={parseInt(dataPelatihan?.StatusPenerbitan) < 5 || dataPelatihan?.StatusPenerbitan == ""}
-                            className="flex-1 w-full rounded-[2.5rem] py-4 px-8 data-[state=active]:bg-gradient-to-br data-[state=active]:from-indigo-600 data-[state=active]:to-violet-700 data-[state=active]:text-white data-[state=active]:shadow-[0_15px_40px_rgba(79,70,229,0.3)] text-slate-500 dark:text-slate-400 font-bold transition-all duration-500 flex flex-col items-center gap-1 group ring-0 outline-none hover:text-indigo-600 dark:hover:text-indigo-400 disabled:opacity-40 disabled:grayscale"
+                            className="flex-1 rounded-[1.5rem] py-2.5 px-6 data-[state=active]:bg-gradient-to-br data-[state=active]:from-indigo-600 data-[state=active]:to-violet-700 data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-indigo-500/20 text-slate-500 dark:text-slate-400 font-bold transition-all duration-300 flex flex-col items-center group ring-0 outline-none disabled:opacity-40 disabled:grayscale"
                         >
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 flex items-center justify-center rounded-xl bg-indigo-100/50 dark:bg-indigo-500/10 group-data-[state=active]:bg-white/20 transition-all font-black text-sm">
+                            <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 flex items-center justify-center rounded-lg bg-indigo-100/50 dark:bg-indigo-500/10 group-data-[state=active]:bg-white/20 transition-all font-black text-[10px]">
                                     02
                                 </div>
-                                <span className="text-base tracking-tight font-black">Sertifikasi</span>
+                                <span className="text-sm tracking-tight font-black uppercase">Sertifikasi</span>
                             </div>
-                            <span className="text-[10px] opacity-60 group-data-[state=active]:opacity-80 font-bold uppercase tracking-[0.1em] mt-1 text-center">Penerbitan STTPL Digital</span>
                         </TabsTrigger>
                     </TabsList>
                 </div>
@@ -197,34 +181,34 @@ const ManagePelatihan = () => {
 
                             <TabsContent value="2" className="mt-0 focus-visible:outline-none w-full">
                                 {parseInt(dataPelatihan?.StatusPenerbitan) < 5 ? (
-                                    <div className="group relative py-32 px-10 w-full max-w-3xl mx-auto flex flex-col items-center justify-center gap-8 bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-dashed border-slate-300 dark:border-slate-800 rounded-[3rem] transition-all duration-500 hover:border-slate-400 dark:hover:border-slate-600 hover:shadow-2xl hover:shadow-slate-200/50 dark:hover:shadow-none">
-                                        <div className="absolute inset-0 bg-gradient-to-b from-slate-50/50 to-transparent dark:from-slate-800/20 rounded-[3rem] -z-10" />
+                                    <div className="group relative py-12 md:py-20 px-6 md:px-10 w-full max-w-2xl mx-auto flex flex-col items-center justify-center gap-6 md:gap-8 bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-dashed border-slate-300 dark:border-slate-800 rounded-[2.5rem] md:rounded-[3rem] transition-all duration-500 hover:border-slate-400 dark:hover:border-slate-600 hover:shadow-2xl hover:shadow-slate-200/50 dark:hover:shadow-none">
+                                        <div className="absolute inset-0 bg-gradient-to-b from-slate-50/50 to-transparent dark:from-slate-800/20 rounded-[2.5rem] md:rounded-[3rem] -z-10" />
 
                                         <div className="relative">
                                             <div className="absolute inset-0 bg-slate-400/20 blur-3xl rounded-full scale-150 group-hover:bg-slate-400/30 transition-all duration-500" />
-                                            <div className="w-32 h-32 rounded-[2.5rem] bg-white dark:bg-slate-950 shadow-2xl flex items-center justify-center border border-slate-100 dark:border-slate-800 relative z-10 overflow-hidden group-hover:rotate-6 transition-transform duration-500">
-                                                <Lock className='w-14 h-14 text-slate-300 group-hover:text-amber-500 transition-colors duration-500' />
-                                                <div className="absolute top-0 right-0 w-12 h-12 bg-slate-50 dark:bg-slate-800/50 -mr-6 -mt-6 rounded-full" />
+                                            <div className="w-20 h-20 md:w-24 md:h-24 rounded-[1.5rem] md:rounded-[2rem] bg-white dark:bg-slate-950 shadow-2xl flex items-center justify-center border border-slate-100 dark:border-slate-800 relative z-10 overflow-hidden group-hover:rotate-6 transition-transform duration-500">
+                                                <Lock className='w-10 h-10 md:w-12 md:h-12 text-slate-300 group-hover:text-amber-500 transition-colors duration-500' />
+                                                <div className="absolute top-0 right-0 w-8 h-8 md:w-12 md:h-12 bg-slate-50 dark:bg-slate-800/50 -mr-4 -mt-4 md:-mr-6 md:-mt-6 rounded-full" />
                                             </div>
                                         </div>
 
-                                        <div className="text-center space-y-4 relative z-10 max-w-sm">
-                                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 rounded-full mb-2">
-                                                <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
-                                                <span className="text-[10px] font-black text-amber-600 uppercase tracking-widest">Akses Dibatasi</span>
+                                        <div className="text-center space-y-3 md:space-y-4 relative z-10 max-w-sm">
+                                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 rounded-full mb-1">
+                                                <ShieldCheck className="w-3 md:w-3.5 h-3 md:h-3.5 text-amber-600" />
+                                                <span className="text-[9px] md:text-[10px] font-black text-amber-600 uppercase tracking-widest">Akses Dibatasi</span>
                                             </div>
-                                            <h3 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight uppercase">Tahap Terkunci</h3>
-                                            <p className="text-slate-500 dark:text-slate-400 font-medium text-sm leading-relaxed">
+                                            <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white tracking-tight uppercase">Tahap Terkunci</h3>
+                                            <p className="text-slate-500 dark:text-slate-400 font-medium text-xs md:text-sm leading-relaxed px-4">
                                                 Modul penerbitan sertifikat digital belum dapat diakses. Selesaikan administrasi penyelenggaraan dan ajukan
-                                                <span className="text-slate-800 dark:text-white font-bold mx-1 uppercase">Verifikasi STTPL</span> kepada administrator pusat.
+                                                <span className="text-slate-800 dark:text-white font-black mx-1 uppercase">Verifikasi STTPL</span> kepada administrator pusat.
                                             </p>
                                         </div>
 
-                                        <div className="flex items-center gap-3 mt-4 opacity-50 grayscale group-hover:opacity-100 group-hover:grayscale-0 transition-all">
-                                            <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800">
-                                                <Info className="w-5 h-5 text-slate-400" />
+                                        <div className="flex items-center gap-3 mt-2 opacity-50 grayscale group-hover:opacity-100 group-hover:grayscale-0 transition-all">
+                                            <div className="p-1.5 md:p-2 rounded-lg md:rounded-xl bg-slate-100 dark:bg-slate-800">
+                                                <Info className="w-4 md:w-5 h-4 md:h-5 text-slate-400" />
                                             </div>
-                                            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Proses menunggu verifikasi</span>
+                                            <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest leading-none">Proses menunggu verifikasi</span>
                                         </div>
                                     </div>
                                 ) : (

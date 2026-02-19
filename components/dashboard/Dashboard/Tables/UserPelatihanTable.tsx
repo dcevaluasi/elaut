@@ -308,7 +308,20 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
             cell: ({ row }) => (
                 <div className="flex flex-col gap-0.5 min-w-[200px]">
                     <span className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">{row.original.Nama}</span>
-                    <span className="text-[10px] text-slate-400 font-bold tracking-widest">REG: {row.original.NoRegistrasi}</span>
+                    <span className="text-[10px] text-slate-400 font-bold tracking-widest">REG: {row.original.IdUserPelatihan}</span>
+                </div>
+            ),
+        },
+        {
+            accessorKey: "IdUsers",
+            header: () => (
+                <div className="flex flex-col items-center gap-1 text-slate-900 dark:text-white font-black uppercase tracking-widest text-[10px]">
+                    ID USER
+                </div>
+            ),
+            cell: ({ row }) => (
+                <div className="flex justify-center">
+                    <span className="text-md font-black text-slate-500 tabular-nums">{row.original.IdUsers}</span>
                 </div>
             ),
         },

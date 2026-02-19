@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import axios, { AxiosResponse } from 'axios'
 import Cookies from 'js-cookie'
 import { elautBaseUrl } from '@/constants/urls'
@@ -8,173 +8,49 @@ import { isPendingSigning, isSigned, isVerifyDiklat } from '@/utils/status'
 export function useFetchDataPelatihanMasyarakat() {
   const [data, setData] = useState<PelatihanMasyarakat[]>([])
   const [isFetching, setIsFetching] = useState(false)
-  const [countDone, setCountDone] = useState(0)
-  const [countPublished, setPublished] = useState(0)
-  const [countVerifying, setCountVerifying] = useState(0)
+  const fetchId = useRef(0)
 
-  const [countDiklatSPV, setCountDiklatSPV] = useState(0)
-
-
-  const [countPendingSigning, setCountPendingSigning] = useState(0)
-  const [countSigned, setCountSigned] = useState(0)
-
-  const idLemdik = Cookies.get('IDLemdik')
-  const idUnitKerja = Cookies.get('IDUnitKerja')
-  const token = Cookies.get('XSRF091')
-
-  const isLemdiklat =
-    Cookies.get('Access')?.includes('createPelatihan') &&
-    Cookies.get('Role') != 'Pengelola Pusat'
-  const isPusat =
-    Cookies.get('Access')?.includes('createPelatihan') &&
-    Cookies.get('Role') == 'Pengelola Pusat'
-  const isVerificator =
-    Cookies.get('Access')?.includes('verifyPelaksanaan') &&
-    Cookies.get('Access')?.includes('verifyCertificate')
-  const isSupervisor =
-    Cookies.get('Access')?.includes('supervisePelaksanaan') &&
-    Cookies.get('Access')?.includes('superviseCertificate')
-  const isEselonIII =
-    Cookies.get('Access')?.includes('isSigning') &&
-    Cookies.get('Access')?.includes('approveKabalai')
-  const isEselonII =
-    Cookies.get('Access')?.includes('isSigning') &&
-    Cookies.get('Access')?.includes('approveKapuslat')
-  const isEselonI =
-    Cookies.get('Access')?.includes('isSigning') &&
-    Cookies.get('Access')?.includes('approveKabadan')
-
-  const personalizeData = (items: PelatihanMasyarakat[]) => {
-    let filtered = [...items]
-
-    if (isLemdiklat) {
-      const satker = Cookies.get('Satker')
-      filtered = filtered.filter((p) => p.PenyelenggaraPelatihan === satker || p.IdUnitKerja == idUnitKerja)
-    }
-
-    if (isPusat) {
-      filtered = filtered
-    }
-
-    if (isVerificator) {
-      const idLemdik = Cookies.get('IDLemdik')
-      filtered = filtered.filter((p) => p.VerifikatorPelatihan === idLemdik)
-    }
-
-    // Supervisor, Eselon III/II/I → no filter, just full dataset
-    // but you can add extra personalization if needed
-    if (isEselonIII) {
-      const satker = Cookies.get('Satker')
-      filtered = filtered.filter((p) =>
-        satker?.includes(p.PenyelenggaraPelatihan),
-      )
-    }
-
-    if (isEselonI) {
-      const role = Cookies.get('Role')
-      filtered = filtered.filter(
-        (p) => role?.includes(p.TtdSertifikat) || role == p.TtdSertifikat,
-      )
-    }
-
-    return filtered.reverse()
-  }
   const fetchDataPelatihanMasyarakat = useCallback(async () => {
+    const currentFetchId = ++fetchId.current
     setIsFetching(true)
 
-    //  isPusat
-    //       ? `${elautBaseUrl}/lemdik/getPelatihanAdmin`
-    //       : `${elautBaseUrl}/lemdik/getPelatihanAdmin?id_lemdik=${idLemdik}`
+    const token = Cookies.get('XSRF091')
+    const role = Cookies.get('Role')
+    const satker = Cookies.get('Satker')
+    const idLemdik = Cookies.get('IDLemdik')
+    const idUnitKerja = Cookies.get('IDUnitKerja')
+    const access = Cookies.get('Access') || ''
+
     try {
-      const response: AxiosResponse<{
-        data: PelatihanMasyarakat[]
-      }> = await axios.get(`${elautBaseUrl}/lemdik/getPelatihanAdmin`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      const items = personalizeData(response.data?.data) || []
+      const response: AxiosResponse<{ data: PelatihanMasyarakat[] }> =
+        await axios.get(`${elautBaseUrl}/lemdik/getPelatihanAdmin`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
 
-      // verified diklat by verifikator
-      setCountVerifying(
-        items.filter((i) => isVerifyDiklat(i.StatusPenerbitan)).length,
-      )
+      if (currentFetchId !== fetchId.current) return
 
-      // signed by eselon 3,2,1
-      setCountDone(items.filter((i) => isSigned(i.StatusPenerbitan)).length)
-      setCountPendingSigning(
-        items.filter(
-          (i) =>
-            isPendingSigning(i.StatusPenerbitan) &&
-            (Cookies.get('Role')?.includes(i.TtdSertifikat)! ||
-              Cookies.get('Role') == i.TtdSertifikat),
-        ).length,
-      )
-      setCountSigned(
-        items.filter(
-          (i) =>
-            isSigned(i.StatusPenerbitan) &&
-            (Cookies.get('Role')?.includes(i.TtdSertifikat)! ||
-              Cookies.get('Role') == i.TtdSertifikat),
-        ).length,
-      )
+      const rawItems = response.data?.data || []
 
-      // published information
-      setPublished(items.filter((i) => i.Status === 'Publish').length)
+      // Flags for personalization
+      const isLemdiklat = access.includes('createPelatihan') && role !== 'Pengelola Pusat'
+      const isVerificator = access.includes('verifyPelaksanaan') && access.includes('verifyCertificate')
+      const isEselonIII = access.includes('isSigning') && access.includes('approveKabalai')
+      const isEselonI = access.includes('isSigning') && access.includes('approveKabadan')
 
-      setCountDiklatSPV(items.filter((i) => i.StatusPenerbitan === '1').length)
+      // Single-pass personalized filtering
+      const items = rawItems.filter(p => {
+        if (isLemdiklat && !(p.PenyelenggaraPelatihan === satker || p.IdUnitKerja == idUnitKerja)) return false
+        if (isVerificator && p.VerifikatorPelatihan !== idLemdik) return false
+        if (isEselonIII && !satker?.includes(p.PenyelenggaraPelatihan)) return false
+        if (isEselonI && !(role?.includes(p.TtdSertifikat) || role == p.TtdSertifikat)) return false
+        return true
+      }).reverse()
 
       setData(items)
-      setIsFetching(false)
     } catch (error) {
-      setIsFetching(false)
       console.error('Error fetching training data:', error)
-    }
-  }, [idLemdik, token])
-
-  useEffect(() => {
-    fetchDataPelatihanMasyarakat()
-  }, [fetchDataPelatihanMasyarakat])
-
-  return {
-    data,
-    isFetching,
-    setIsFetching,
-    countDone,
-    countDiklatSPV,
-    countPublished,
-    countVerifying,
-    countPendingSigning,
-    countSigned,
-    refetch: fetchDataPelatihanMasyarakat,
-  }
-}
-
-export function useFetchAllDataPelatihanMasyarakat() {
-  const [data, setData] = useState<PelatihanMasyarakat[]>([])
-  const [isFetching, setIsFetching] = useState(false)
-
-  const fetchDataPelatihanMasyarakat = useCallback(async () => {
-    setIsFetching(true)
-    const isPengelolaUPT = Cookies.get('Role') == 'Pengelola UPT'
-    const nameLemdiklat = Cookies.get('Satker')
-
-    try {
-      const response: AxiosResponse<{
-        data: PelatihanMasyarakat[]
-      }> = await axios.get(`${elautBaseUrl}/lemdik/getPelatihanAdmin`, {
-        headers: { Authorization: `Bearer ${Cookies.get('XSRF091')}` },
-      })
-
-      let filteredData: PelatihanMasyarakat[] = response.data.data
-      if (isPengelolaUPT) {
-        filteredData = filteredData.filter(
-          (item) => item.PenyelenggaraPelatihan === nameLemdiklat,
-        )
-      }
-      setData(filteredData)
-      setIsFetching(false)
-    } catch (error) {
-      setIsFetching(false)
-      console.error('Error fetching training data:', error)
+    } finally {
+      if (currentFetchId === fetchId.current) setIsFetching(false)
     }
   }, [])
 
@@ -182,9 +58,81 @@ export function useFetchAllDataPelatihanMasyarakat() {
     fetchDataPelatihanMasyarakat()
   }, [fetchDataPelatihanMasyarakat])
 
+  // Derive counts in a single pass over the data
+  const counts = useMemo(() => {
+    let done = 0, published = 0, verifying = 0, diklatSPV = 0, pendingSigning = 0, signed = 0
+    const role = Cookies.get('Role')
+
+    for (let i = 0; i < data.length; i++) {
+      const p = data[i]
+      const status = p.StatusPenerbitan
+
+      if (isSigned(status)) done++
+      if (p.Status === 'Publish') published++
+      if (isVerifyDiklat(status)) verifying++
+      if (status === '1') diklatSPV++
+
+      const isRoleMatch = role?.includes(p.TtdSertifikat) || role == p.TtdSertifikat
+      if (isPendingSigning(status) && isRoleMatch) pendingSigning++
+      if (isSigned(status) && isRoleMatch) signed++
+    }
+
+    return {
+      countDone: done,
+      countPublished: published,
+      countVerifying: verifying,
+      countDiklatSPV: diklatSPV,
+      countPendingSigning: pendingSigning,
+      countSigned: signed
+    }
+  }, [data])
+
   return {
     data,
     isFetching,
+    setIsFetching,
+    ...counts,
     refetch: fetchDataPelatihanMasyarakat,
   }
+}
+
+export function useFetchAllDataPelatihanMasyarakat() {
+  const [data, setData] = useState<PelatihanMasyarakat[]>([])
+  const [isFetching, setIsFetching] = useState(false)
+  const fetchId = useRef(0)
+
+  const fetchDataPelatihanMasyarakat = useCallback(async () => {
+    const currentFetchId = ++fetchId.current
+    setIsFetching(true)
+
+    try {
+      const token = Cookies.get('XSRF091')
+      const role = Cookies.get('Role')
+      const satker = Cookies.get('Satker')
+
+      const response: AxiosResponse<{ data: PelatihanMasyarakat[] }> =
+        await axios.get(`${elautBaseUrl}/lemdik/getPelatihanAdmin`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+
+      if (currentFetchId !== fetchId.current) return
+
+      const rawItems = response.data?.data || []
+      const filtered = role === 'Pengelola UPT'
+        ? rawItems.filter(item => item.PenyelenggaraPelatihan === satker)
+        : rawItems
+
+      setData(filtered)
+    } catch (error) {
+      console.error('Error fetching training data:', error)
+    } finally {
+      if (currentFetchId === fetchId.current) setIsFetching(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchDataPelatihanMasyarakat()
+  }, [fetchDataPelatihanMasyarakat])
+
+  return { data, isFetching, refetch: fetchDataPelatihanMasyarakat }
 }

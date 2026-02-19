@@ -24,7 +24,9 @@ import {
     FiActivity,
     FiLayout,
     FiCalendar,
-    FiDatabase
+    FiDatabase,
+    FiUpload,
+    FiEye
 } from 'react-icons/fi';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -64,9 +66,9 @@ import { HashLoader } from 'react-spinners';
 import Toast from '@/commons/Toast';
 
 const formSchema = z.object({
-    nama_Ppmkp: z.string().optional(),
+    nama_ppmkp: z.string().optional(),
     status_kepemilikan: z.string().optional(),
-    nib: z.string().optional(),
+    Nib: z.string().optional(),
     alamat: z.string().optional(),
     provinsi: z.string().optional(),
     kota: z.string().optional(),
@@ -74,7 +76,7 @@ const formSchema = z.object({
     kelurahan: z.string().optional(),
     kode_pos: z.string().optional(),
     no_telp: z.string().optional(),
-    email: z.string().email("Format email tidak valid").optional(),
+    email: z.string().email("Format email tidak valid").optional().or(z.literal("")),
     password: z.string().optional(),
     jenis_bidang_pelatihan: z.string().optional(),
     jenis_pelatihan: z.string().optional(),
@@ -83,14 +85,12 @@ const formSchema = z.object({
     tempat_tanggal_lahir: z.string().optional(),
     jenis_kelamin: z.string().optional(),
     pendidikan_terakhir: z.string().optional(),
-    dokumen_identifikasi_pemilik: z.string().optional(),
-    dokumen_asesment_mandiri: z.string().optional(),
-    dokument_surat_pernyataan: z.string().optional(),
-    dokumen_keterangan_usaha: z.string().optional(),
-    dokumen_afiliasi_parpol: z.string().optional(),
-    dokumen_rekomendasi_dinas: z.string().optional(),
-    dokumen_permohonan_pembentukan: z.string().optional(),
-    dokumen_permohonan_klasifikasi: z.string().optional(),
+    dokumen_identifikasi_pemilik: z.any().optional(),
+    dokumen_asesment_mandiri: z.any().optional(),
+    dokument_surat_pernyataan: z.any().optional(),
+    dokumen_keterangan_usaha: z.any().optional(),
+    dokumen_afiliasi_parpol: z.any().optional(),
+    dokumen_rekomendasi_dinas: z.any().optional(),
     skor_klasifikasi: z.union([z.string(), z.number()]).optional(),
     status_usaha: z.string().optional(),
     status_peltihan: z.string().optional(),
@@ -106,13 +106,111 @@ export default function CompleteProfilePage() {
     const [isSubmitting, setIsSubmitting] = React.useState(false);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const timer = setTimeout(() => setLoading(false), 800);
-        return () => clearTimeout(timer);
-    }, []);
-
+    const [profileId, setProfileId] = useState<string | number | null>(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [isMobile, setIsMobile] = useState(false);
+
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            nama_ppmkp: "",
+            status_kepemilikan: "Perserorangan",
+            Nib: "",
+            alamat: "",
+            provinsi: "",
+            kota: "",
+            kecamatan: "",
+            kelurahan: "",
+            kode_pos: "",
+            no_telp: "",
+            email: "",
+            password: "",
+            jenis_bidang_pelatihan: "4",
+            jenis_pelatihan: "",
+            nama_penanggung_jawab: "",
+            no_telp_penanggung_jawab: "",
+            tempat_tanggal_lahir: "",
+            jenis_kelamin: "",
+            pendidikan_terakhir: "",
+            dokumen_identifikasi_pemilik: null,
+            dokumen_asesment_mandiri: null,
+            dokument_surat_pernyataan: null,
+            dokumen_keterangan_usaha: null,
+            dokumen_afiliasi_parpol: null,
+            dokumen_rekomendasi_dinas: null,
+            skor_klasifikasi: 0,
+            status_usaha: "",
+            status_peltihan: "",
+            bidang_pelatihan: "",
+            is_lpk: "",
+            status: "",
+            create_at: "",
+            update_at: ""
+        },
+    });
+
+    useEffect(() => {
+        const fetchProfileData = async () => {
+            try {
+                const token = Cookies.get('XSRF091');
+                if (!token) {
+                    router.push('/p2mkp/login');
+                    return;
+                }
+
+                const response = await axios.get(`${elautBaseUrl}/p2mkp/get_p2mkp_jwt`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 200) {
+                    const data = response.data.data || response.data;
+                    setProfileId(data.IdPpmkp || data.id_p2mkp || data.id);
+                    form.reset({
+                        nama_ppmkp: data.nama_ppmkp || "",
+                        status_kepemilikan: data.status_kepemilikan || "Perserorangan",
+                        Nib: data.Nib || "",
+                        alamat: data.alamat || "",
+                        provinsi: data.provinsi || "",
+                        kota: data.kota || "",
+                        kecamatan: data.kecamatan || "",
+                        kelurahan: data.kelurahan || "",
+                        kode_pos: data.kode_pos || "",
+                        no_telp: data.no_telp || "",
+                        email: data.email || "",
+                        jenis_bidang_pelatihan: data.jenis_bidang_pelatihan || "4",
+                        jenis_pelatihan: data.jenis_pelatihan || "",
+                        nama_penanggung_jawab: data.nama_penanggung_jawab || "",
+                        no_telp_penanggung_jawab: data.no_telp_penanggung_jawab || "",
+                        tempat_tanggal_lahir: data.tempat_tanggal_lahir || "",
+                        jenis_kelamin: data.jenis_kelamin || "",
+                        pendidikan_terakhir: data.pendidikan_terakhir || "",
+                        dokumen_identifikasi_pemilik: data.dokumen_identifikasi_pemilik || null,
+                        dokumen_asesment_mandiri: data.dokumen_asesment_mandiri || null,
+                        dokument_surat_pernyataan: data.dokument_surat_pernyataan || null,
+                        dokumen_keterangan_usaha: data.dokumen_keterangan_usaha || null,
+                        dokumen_afiliasi_parpol: data.dokumen_afiliasi_parpol || null,
+                        dokumen_rekomendasi_dinas: data.dokumen_rekomendasi_dinas || null,
+                        skor_klasifikasi: data.skor_klasifikasi || 0,
+                        status_usaha: data.status_usaha || "",
+                        status_peltihan: data.status_peltihan || "",
+                        bidang_pelatihan: data.bidang_pelatihan || "",
+                        is_lpk: data.is_lpk || "",
+                        status: data.status || "",
+                        create_at: data.create_at || "",
+                        update_at: data.update_at || ""
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching profile:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProfileData();
+    }, [router, form]);
 
     const { data: rumpunPelatihan, loading: loadingRumpun } = useFetchDataRumpunPelatihan();
 
@@ -137,47 +235,6 @@ export default function CompleteProfilePage() {
         router.push('/p2mkp/login');
     };
 
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            nama_Ppmkp: "",
-            status_kepemilikan: "Perserorangan",
-            nib: "",
-            alamat: "",
-            provinsi: "",
-            kota: "",
-            kecamatan: "",
-            kelurahan: "",
-            kode_pos: "",
-            no_telp: "",
-            email: "dggama@gmail.com",
-            password: "",
-            jenis_bidang_pelatihan: "4",
-            jenis_pelatihan: "",
-            nama_penanggung_jawab: "",
-            no_telp_penanggung_jawab: "",
-            tempat_tanggal_lahir: "",
-            jenis_kelamin: "",
-            pendidikan_terakhir: "",
-            dokumen_identifikasi_pemilik: "",
-            dokumen_asesment_mandiri: "",
-            dokument_surat_pernyataan: "",
-            dokumen_keterangan_usaha: "",
-            dokumen_afiliasi_parpol: "",
-            dokumen_rekomendasi_dinas: "",
-            dokumen_permohonan_pembentukan: "",
-            dokumen_permohonan_klasifikasi: "",
-            skor_klasifikasi: 0,
-            status_usaha: "",
-            status_peltihan: "",
-            bidang_pelatihan: "",
-            is_lpk: "",
-            status: "",
-            create_at: "",
-            update_at: ""
-        },
-    });
-
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsSubmitting(true);
         try {
@@ -187,9 +244,26 @@ export default function CompleteProfilePage() {
                 return;
             }
 
-            const response = await axios.put(`${elautBaseUrl}/p2mkp/update_p2mkp?id=1`, values, {
+            if (!profileId) {
+                Toast.fire({
+                    icon: 'error',
+                    title: 'System Error',
+                    text: 'ID Profil tidak ditemukan. Silakan refresh halaman.'
+                });
+                return;
+            }
+
+            const formData = new FormData();
+            Object.entries(values).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
+                    formData.append(key, value as any);
+                }
+            });
+
+            const response = await axios.put(`${elautBaseUrl}/p2mkp/update_p2mkp?id=${profileId}`, formData, {
                 headers: {
-                    Authorization: `Bearer ${token}`
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
                 }
             });
 
@@ -245,7 +319,7 @@ export default function CompleteProfilePage() {
                             </div>
                             <div>
                                 <h1 className="font-calsans text-2xl leading-none">P2MKP</h1>
-                                <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mt-1">Management</p>
+                                <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mt-1">Portal</p>
                             </div>
                         </div>
                         {isMobile && (
@@ -328,16 +402,26 @@ export default function CompleteProfilePage() {
                     </div>
                 </header>
 
-                <div className="flex-1 overflow-y-auto p-8 lg:p-12 pt-4">
+                <div className="flex-1 overflow-y-auto p-8 lg:p-12 relative overflow-hidden">
+                    {/* Background Ambient Effects */}
+                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[120px] pointer-events-none" />
+                    <div className="absolute bottom-1/2 left-0 w-[400px] h-[400px] bg-indigo-500/5 rounded-full blur-[100px] pointer-events-none" />
+
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="max-w-5xl mx-auto space-y-12 pb-24"
+                        className="max-w-5xl mx-auto space-y-16 pb-32 relative z-10"
                     >
-                        <div className="space-y-4">
-                            <h1 className="text-4xl md:text-5xl font-calsans">Complete <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Registry</span></h1>
-                            <p className="text-gray-500 text-sm max-w-2xl font-light italic leading-relaxed">
-                                Mohon lengkapi seluruh data kredensial lembaga dan penanggung jawab untuk proses verifikasi standarisasi P2MKP.
+                        <div className="space-y-6 pt-6">
+                            <div className="flex items-center gap-4">
+                                <span className="h-[2px] w-12 bg-blue-500/50 rounded-full" />
+                                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-400">Gerbang Registrasi</span>
+                            </div>
+                            <h1 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-none text-white">
+                                Lengkapi <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500">Profil</span>
+                            </h1>
+                            <p className="text-gray-500 text-lg max-w-3xl font-medium leading-relaxed italic opacity-80 mt-6">
+                                Mohon lengkapi parameter kredensial lembaga dan otorisasi penanggung jawab untuk finalisasi sertifikasi standarisasi P2MKP.
                             </p>
                         </div>
 
@@ -351,14 +435,14 @@ export default function CompleteProfilePage() {
                                     color="blue"
                                 >
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <FormFieldItem label="Nama P2MKP" name="nama_Ppmkp" control={form.control} placeholder="Masukkan Nama Resmi..." icon={<FiBriefcase />} />
+                                        <FormFieldItem label="Nama P2MKP" name="nama_ppmkp" control={form.control} placeholder="Masukkan Nama Resmi..." icon={<FiBriefcase />} />
                                         <FormField
                                             control={form.control}
                                             name="status_kepemilikan"
                                             render={({ field }) => (
                                                 <FormItem className="space-y-2">
                                                     <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Status Kepemilikan</FormLabel>
-                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <Select onValueChange={field.onChange} value={field.value}>
                                                         <FormControl>
                                                             <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
                                                                 <SelectValue placeholder="Pilih Status..." />
@@ -373,9 +457,9 @@ export default function CompleteProfilePage() {
                                                 </FormItem>
                                             )}
                                         />
-                                        <FormFieldItem label="NIB (Nomor Induk Berusaha)" name="nib" control={form.control} placeholder="Enter NIB Code..." icon={<FiFileText />} />
-                                        <FormFieldItem label="Email Official" name="email" control={form.control} placeholder="admin@p2mkp.go.id" icon={<FiMail />} type="email" />
-                                        <FormFieldItem label="Update Password" name="password" control={form.control} placeholder="Leave blank to keep current..." icon={<FiGlobe />} type="password" />
+                                        <FormFieldItem label="Nomor Induk Berusaha (NIB)" name="Nib" control={form.control} placeholder="Masukkan Kode NIB..." icon={<FiFileText />} />
+                                        <FormFieldItem label="Email Resmi" name="email" control={form.control} placeholder="admin@p2mkp.go.id" icon={<FiMail />} type="email" />
+                                        <FormFieldItem label="Ubah Kata Sandi" name="password" control={form.control} placeholder="Kosongkan jika tidak diubah..." icon={<FiGlobe />} type="password" />
                                         <FormFieldItem label="Kontak Telepon" name="no_telp" control={form.control} placeholder="08XXXXXXXXXX" icon={<FiPhone />} />
                                         <FormField
                                             control={form.control}
@@ -383,7 +467,7 @@ export default function CompleteProfilePage() {
                                             render={({ field }) => (
                                                 <FormItem className="space-y-2">
                                                     <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Apakah Lembaga LPK?</FormLabel>
-                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <Select onValueChange={field.onChange} value={field.value}>
                                                         <FormControl>
                                                             <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
                                                                 <SelectValue placeholder="Konfirmasi LPK..." />
@@ -433,10 +517,10 @@ export default function CompleteProfilePage() {
                                             render={({ field }) => (
                                                 <FormItem className="space-y-2">
                                                     <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Rumpun Utama</FormLabel>
-                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <Select onValueChange={field.onChange} value={field.value}>
                                                         <FormControl>
                                                             <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
-                                                                <SelectValue placeholder={loadingRumpun ? "Syncing..." : "Pilih Rumpun..."} />
+                                                                <SelectValue placeholder={loadingRumpun ? "Singkronisasi..." : "Pilih Rumpun..."} />
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent className="bg-[#0f172a] border-white/10 text-white backdrop-blur-3xl rounded-2xl">
@@ -463,16 +547,14 @@ export default function CompleteProfilePage() {
                                 >
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         {[
-                                            { name: "dokumen_identifikasi_pemilik", label: "ID Pemilik" },
-                                            { name: "dokumen_asesment_mandiri", label: "Self Asesmen" },
-                                            { name: "dokument_surat_pernyataan", label: "Surat Pernyataan" },
-                                            { name: "dokumen_keterangan_usaha", label: "Izin Usaha" },
-                                            { name: "dokumen_afiliasi_parpol", label: "Non-Parpol Statement" },
+                                            { name: "dokumen_identifikasi_pemilik", label: "Verifikasi Identitas" },
+                                            { name: "dokumen_asesment_mandiri", label: "Matriks Asesmen Mandiri" },
+                                            { name: "dokument_surat_pernyataan", label: "Surat Pernyataan Integritas" },
+                                            { name: "dokumen_keterangan_usaha", label: "Izin Usaha (SKU/NIB)" },
+                                            { name: "dokumen_afiliasi_parpol", label: "Afiliasi Non-Parpol" },
                                             { name: "dokumen_rekomendasi_dinas", label: "Rekomendasi Dinas" },
-                                            { name: "dokumen_permohonan_pembentukan", label: "Surat Permohonan" },
-                                            { name: "dokumen_permohonan_klasifikasi", label: "Kuesioner Klasifikasi" },
                                         ].map((doc) => (
-                                            <FormFieldItem key={doc.name} label={doc.label} name={doc.name} control={form.control} placeholder="Cloud Drive Link..." icon={<FiGlobe />} />
+                                            <FormFieldFileItem key={doc.name} label={doc.label} name={doc.name} control={form.control} icon={<FiUpload />} />
                                         ))}
                                     </div>
                                 </FormCard>
@@ -485,16 +567,16 @@ export default function CompleteProfilePage() {
                                     color="purple"
                                 >
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <FormFieldItem label="Nama Lengkap & Gelar" name="nama_penanggung_jawab" control={form.control} placeholder="Full legal name..." icon={<FiUser />} />
-                                        <FormFieldItem label="Kontak PIC" name="no_telp_penanggung_jawab" control={form.control} placeholder="WhatsApp/Phone..." icon={<FiPhone />} />
-                                        <FormFieldItem label="Tempat, Tanggal Lahir" name="tempat_tanggal_lahir" control={form.control} placeholder="City, DD-MM-YYYY" icon={<FiCalendar />} />
+                                        <FormFieldItem label="Nama Lengkap & Gelar" name="nama_penanggung_jawab" control={form.control} placeholder="Nama lengkap sesuai identitas..." icon={<FiUser />} />
+                                        <FormFieldItem label="Kontak PIC" name="no_telp_penanggung_jawab" control={form.control} placeholder="WhatsApp/Telepon..." icon={<FiPhone />} />
+                                        <FormFieldItem label="Tempat, Tanggal Lahir" name="tempat_tanggal_lahir" control={form.control} placeholder="Kota, HH-BB-TTTT" icon={<FiCalendar />} />
                                         <FormField
                                             control={form.control}
                                             name="jenis_kelamin"
                                             render={({ field }) => (
                                                 <FormItem className="space-y-2">
-                                                    <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Gender</FormLabel>
-                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Jenis Kelamin</FormLabel>
+                                                    <Select onValueChange={field.onChange} value={field.value}>
                                                         <FormControl>
                                                             <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
                                                                 <SelectValue placeholder="Pilih..." />
@@ -514,7 +596,7 @@ export default function CompleteProfilePage() {
                                             render={({ field }) => (
                                                 <FormItem className="space-y-2">
                                                     <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Pendidikan Terakhir</FormLabel>
-                                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                    <Select onValueChange={field.onChange} value={field.value}>
                                                         <FormControl>
                                                             <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
                                                                 <SelectValue placeholder="Kualifikasi..." />
@@ -543,7 +625,7 @@ export default function CompleteProfilePage() {
                                         ) : (
                                             <>
                                                 <FiSave size={20} className="group-hover:translate-y-[-2px] transition-transform" />
-                                                SUBMIT UPDATED PROFILE
+                                                SIMPAN PERUBAHAN PROFIL
                                             </>
                                         )}
                                         <div className="absolute inset-0 w-12 bg-white/20 -skew-x-12 translate-x-[-200%] group-hover/save:translate-x-[600%] transition-transform duration-1000" />
@@ -625,18 +707,79 @@ function FormFieldItem({ label, name, control, placeholder, icon, type = "text",
             control={control}
             name={name}
             render={({ field }) => (
-                <FormItem className="space-y-2">
-                    <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">{label}</FormLabel>
+                <FormItem className="space-y-3">
+                    <FormLabel className="text-[10px] font-black italic text-gray-400 uppercase tracking-[0.2em] pl-1 flex items-center gap-2">
+                        {label}
+                    </FormLabel>
                     <FormControl>
                         <div className="relative group/input">
-                            {icon && <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/input:text-blue-400 transition-colors">{icon}</span>}
+                            {icon && <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/input:text-blue-400 transition-all duration-300 z-10">{icon}</span>}
                             <Input
                                 placeholder={placeholder}
                                 type={type}
                                 {...field}
                                 {...props}
-                                className={`w-full ${icon ? 'pl-12' : 'pl-5'} pr-5 py-6 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all placeholder:text-gray-600 h-14`}
+                                className={`w-full ${icon ? 'pl-14' : 'pl-6'} pr-6 bg-white/[0.03] border border-white/10 rounded-[1.25rem] text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 outline-none transition-all duration-300 text-gray-200 placeholder:text-gray-600 h-14 italic font-medium group-hover/input:border-white/20`}
                             />
+                        </div>
+                    </FormControl>
+                    <FormMessage className="text-[9px] uppercase font-bold text-rose-500/80 tracking-widest pl-1 mt-1" />
+                </FormItem>
+            )}
+        />
+    );
+}
+
+// File Input Field Item
+function FormFieldFileItem({ label, name, control, icon, ...props }: any) {
+    return (
+        <FormField
+            control={control}
+            name={name}
+            render={({ field: { value, onChange, ...fieldProps } }) => (
+                <FormItem className="space-y-2">
+                    <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">{label}</FormLabel>
+                    <FormControl>
+                        <div className="flex items-center gap-3">
+                            <div className="relative group/input flex-1">
+                                <div className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within/input:text-blue-400 transition-colors z-10">
+                                    {icon}
+                                </div>
+                                <input
+                                    type="file"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        onChange(file);
+                                    }}
+                                    {...fieldProps}
+                                    className="hidden"
+                                    id={`file-upload-${name}`}
+                                />
+                                <label
+                                    htmlFor={`file-upload-${name}`}
+                                    className={`w-full pl-12 pr-5 py-4 bg-white/5 border border-dashed rounded-2xl text-sm transition-all cursor-pointer flex items-center h-14 overflow-hidden ${value ? 'border-blue-500/50 bg-blue-500/10 shadow-inner' : 'border-white/10 hover:border-blue-500/50'}`}
+                                >
+                                    <span className={`truncate ${value ? 'text-blue-400 font-bold' : 'text-gray-400'}`}>
+                                        {value instanceof File
+                                            ? value.name
+                                            : (typeof value === 'string' && value
+                                                ? value.split('/').pop()
+                                                : 'Unggah Dokumen...')}
+                                    </span>
+                                </label>
+                            </div>
+
+                            {typeof value === 'string' && value && (
+                                <a
+                                    href={value.startsWith('http') ? value : `${elautBaseUrl}/storage/${value}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="h-14 w-14 shrink-0 bg-blue-600/10 border border-blue-500/20 rounded-2xl flex items-center justify-center text-blue-400 hover:bg-blue-600 hover:text-white transition-all shadow-lg shadow-blue-500/10 group"
+                                    title="Lihat Dokumen Saat Ini"
+                                >
+                                    <FiEye size={20} className="group-hover:scale-110 transition-transform" />
+                                </a>
+                            )}
                         </div>
                     </FormControl>
                     <FormMessage className="text-rose-400 text-[10px] font-bold mt-1" />

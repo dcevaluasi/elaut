@@ -105,13 +105,6 @@ const TableDataPelatihanMasyarakat: React.FC<TableDataPelatihanMasyarakatProps> 
                                     {paginatedData.map((pelatihan: PelatihanMasyarakat, index: number) => {
                                         const { label, color, icon } = getStatusInfo(String(pelatihan.StatusPenerbitan));
 
-                                        // Status based accent color
-                                        const statusAccent =
-                                            label.toLowerCase().includes('pending') ? 'border-amber-400' :
-                                                label.toLowerCase().includes('perbaikan') ? 'border-rose-500' :
-                                                    label.toLowerCase().includes('done') || label.toLowerCase().includes('signed') ? 'border-emerald-500' :
-                                                        'border-blue-500';
-
                                         return (
                                             <motion.tr
                                                 key={pelatihan.IdPelatihan}
