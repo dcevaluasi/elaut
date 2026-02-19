@@ -100,6 +100,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
 
         await Promise.all(workers);
 
+        fetchData();
         setOpen(true);
         setIsUploading(false);
     };
@@ -357,7 +358,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                     <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-[0.3em]">DAFTAR VERIFIKASI SERTIFIKAT</h4>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
                     {data.UserPelatihan.map((item, i) => (
                         <div key={item.IdUserPelatihan ?? i} className="group p-5 rounded-[1.5rem] bg-white border border-slate-100 hover:border-blue-200 transition-all shadow-sm hover:shadow-md flex flex-col gap-4">
                             <div className="flex items-center justify-between gap-3">
@@ -393,7 +394,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 </Link>
                             )}
 
-                            <div className="hidden">
+                            <div>
                                 <DialogSertifikatPelatihan
                                     ref={refs.current[i]}
                                     pelatihan={data}
