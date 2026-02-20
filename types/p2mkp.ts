@@ -35,6 +35,7 @@ export interface P2MKP {
     status_peltihan: string;
     bidang_pelatihan: string;
     is_lpk: string;
+    no_sertifikat?: string;
     status: string;
     create_at: string;
     update_at: string;

@@ -3,7 +3,7 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState, useEffect, useMemo } from "react";
 import QRCode from "react-qr-code";
 import './styles/certificate.css';
-import { P2MKP } from "@/types/p2mkp";
+import { P2MKP, PengajuanPenetapanP2MKP } from "@/types/p2mkp";
 import { ESELON_1 } from "@/constants/nomenclatures";
 import { useFetchDataRumpunPelatihan } from "@/hooks/elaut/master/useFetchDataRumpunPelatihan";
 
@@ -51,7 +51,7 @@ function QRCodeImage({ value }: { value: string }) {
 }
 
 const FormatSertifikatP2MKP = forwardRef(
-    ({ p2mkp, idPenetapan, refPage }: { p2mkp: P2MKP; idPenetapan: string; refPage?: any }, ref: any) => {
+    ({ p2mkp, penetapan, idPenetapan, refPage }: { p2mkp: P2MKP; penetapan?: PengajuanPenetapanP2MKP; idPenetapan: string; refPage?: any }, ref: any) => {
         const { data: rumpunList } = useFetchDataRumpunPelatihan();
 
         const bidangPelatihanComputed = useMemo(() => {
@@ -88,6 +88,13 @@ const FormatSertifikatP2MKP = forwardRef(
                     style={{ width: '297mm', height: '210mm', minWidth: '297mm', minHeight: '210mm' }}
                     className="pdf-page flex flex-col relative items-center justify-center bg-white shadow-2xl print:shadow-none mx-auto overflow-hidden p-[15mm] border-[1px] border-slate-100"
                 >
+                    {/* Top Right Reference Number */}
+                    <div className="absolute top-[10mm] right-[15mm] text-right">
+                        <p className="text-[10px] font-bosBold uppercase tracking-tight">
+                            No. Penetapan : {penetapan?.nomor_sertifikat || "-"}
+                        </p>
+                    </div>
+
                     <div className="w-full mt-12 flex-1 flex flex-col justify-between py-2">
                         {/* Header Section */}
                         <div className="space-y-0 leading-none gap-0">
@@ -214,8 +221,8 @@ export type DialogSertifikatP2MKPHandle = {
     downloadPdf: () => Promise<void>;
 };
 
-const DialogSertifikatP2MKP = forwardRef<DialogSertifikatP2MKPHandle, { p2mkp: P2MKP; idPenetapan: string }>(
-    ({ p2mkp, idPenetapan }, ref) => {
+const DialogSertifikatP2MKP = forwardRef<DialogSertifikatP2MKPHandle, { p2mkp: P2MKP; penetapan?: PengajuanPenetapanP2MKP; idPenetapan: string }>(
+    ({ p2mkp, penetapan, idPenetapan }, ref) => {
         const certificateRef = useRef<HTMLDivElement>(null);
         const certificatePageRef = useRef<HTMLDivElement>(null);
         let html2pdfInstance: any = null;
@@ -265,6 +272,7 @@ const DialogSertifikatP2MKP = forwardRef<DialogSertifikatP2MKPHandle, { p2mkp: P
             <div className="max-h-[800px] scale-95 bg-white flex flex-col gap-2 overflow-y-auto scroll-smooth no-scrollbar py-10">
                 <FormatSertifikatP2MKP
                     p2mkp={p2mkp}
+                    penetapan={penetapan}
                     idPenetapan={idPenetapan}
                     ref={certificateRef}
                     refPage={certificatePageRef}

@@ -3,7 +3,7 @@
 import LayoutAdminElaut, { HeaderPageLayoutAdminElaut } from "@/components/dashboard/Layouts/LayoutAdminElaut";
 import DialogSertifikatP2MKP, { DialogSertifikatP2MKPHandle } from "@/components/sertifikat/dialogSertifikatP2MKP";
 import { elautBaseUrl } from "@/constants/urls";
-import { P2MKP } from "@/types/p2mkp";
+import { P2MKP, PengajuanPenetapanP2MKP } from "@/types/p2mkp";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useParams, useSearchParams } from "next/navigation";
@@ -20,20 +20,36 @@ export default function Page() {
 
     const [isDownloading, setIsDownloading] = useState(false);
     const [fullP2MKP, setFullP2MKP] = useState<P2MKP | null>(null);
+    const [penetapan, setPenetapan] = useState<PengajuanPenetapanP2MKP | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const certificateRef = useRef<DialogSertifikatP2MKPHandle>(null);
 
     const fetchMasterData = async () => {
-        if (!idPpmkp) return;
+        if (!idPpmkp || !id) return;
         setIsLoading(true);
         try {
             const token = Cookies.get("XSRF091");
-            const response = await axios.get(`${elautBaseUrl}/p2mkp/get_p2mkp_by_id?id=${idPpmkp}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setFullP2MKP(response.data.data);
+            const [p2mkpRes, penetapanRes] = await Promise.all([
+                axios.get(`${elautBaseUrl}/p2mkp/get_p2mkp_by_id?id=${idPpmkp}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                }),
+                axios.get(`${elautBaseUrl}/p2mkp/get_pengjuan_penetapan_p2mkp`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                })
+            ]);
+
+            setFullP2MKP(p2mkpRes.data.data);
+
+            const penetapanList: PengajuanPenetapanP2MKP[] = Array.isArray(penetapanRes.data)
+                ? penetapanRes.data
+                : (penetapanRes.data.data || []);
+
+            const currentPenetapan = penetapanList.find(p => String(p.IdPengajuanPenetapanPpmkp) === String(id));
+            if (currentPenetapan) {
+                setPenetapan(currentPenetapan);
+            }
         } catch (err) {
-            console.error("Failed to fetch P2MKP master data:", err);
+            console.error("Failed to fetch P2MKP data:", err);
         } finally {
             setIsLoading(false);
         }
@@ -41,7 +57,7 @@ export default function Page() {
 
     useEffect(() => {
         fetchMasterData();
-    }, [idPpmkp]);
+    }, [idPpmkp, id]);
 
     const handleDownloadPDF = async () => {
         if (!certificateRef.current) return;
@@ -93,6 +109,7 @@ export default function Page() {
                             <div className="w-full">
                                 <DialogSertifikatP2MKP
                                     p2mkp={fullP2MKP}
+                                    penetapan={penetapan!}
                                     idPenetapan={id as string}
                                     ref={certificateRef}
                                 />
