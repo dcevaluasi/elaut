@@ -299,7 +299,7 @@ export default function LayoutAdminElaut({
                   <NavItem
                     href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/p2mkp/penetapan`}
                     icon={<TbGavel className="flex-shrink-0 w-5 h-6" />}
-                    label="Penetapan"
+                    label="Pengajuan Penetapan"
                   />
                 </ul>
               )}
