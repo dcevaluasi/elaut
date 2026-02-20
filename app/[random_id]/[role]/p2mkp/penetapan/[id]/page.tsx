@@ -95,7 +95,7 @@ export default function DetailPenetapanPage() {
         }
     }, [pengajuanList, p2mkpList, id]);
 
-    const handleUpdateStatus = async (status: "Disetujui" | "Perbaikan") => {
+    const handleUpdateStatus = async (status: "Approved" | "Perbaikan") => {
         if (!matchedData) return;
         setIsUpdating(true);
 
@@ -107,9 +107,17 @@ export default function DetailPenetapanPage() {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
+            if (status === "Approved") {
+                await axios.put(
+                    `${elautBaseUrl}/p2mkp/update_p2mkp?id=${matchedData.pengajuan.id_Ppmkp}`,
+                    { status: "Approved" },
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+            }
+
             // Add History Note to Firestore
             const idPpmkp = matchedData.pengajuan.id_Ppmkp;
-            const docRef = doc(getFirestore(firebaseApp), 'historical-training-notes', idPpmkp);
+            const docRef = doc(getFirestore(firebaseApp), 'historical-p2mkp-notes', idPpmkp);
             const docSnap = await getDoc(docRef);
             let existingHistory = [];
             if (docSnap.exists()) {
@@ -133,7 +141,7 @@ export default function DetailPenetapanPage() {
             Toast.fire({
                 icon: "success",
                 title: "Pembaruan Berhasil",
-                text: `Pengajuan telah ${status === "Disetujui" ? "disetujui" : "dikembalikan untuk perbaikan"}.`,
+                text: `Pengajuan telah ${status === "Approved" ? "disetujui" : "dikembalikan untuk perbaikan"}.`,
             });
 
             setIsApprovalOpen(false);
@@ -192,7 +200,7 @@ export default function DetailPenetapanPage() {
         const normalizedStatus = !status ? "diajukan" : status.toLowerCase();
         switch (normalizedStatus) {
             case "disetujui":
-                return <Badge className="bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest"><FiCheckCircle className="w-4 h-4 mr-2" /> Disetujui</Badge>;
+                return <Badge className="bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest"><FiCheckCircle className="w-4 h-4 mr-2" /> Approved</Badge>;
             case "perbaikan":
                 return <Badge className="bg-rose-50 text-rose-600 border border-rose-100 shadow-sm px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest"><FiAlertCircle className="w-4 h-4 mr-2" /> Perbaikan</Badge>;
             default:
@@ -223,7 +231,7 @@ export default function DetailPenetapanPage() {
 
                         <div className="flex items-center gap-4">
                             {getStatusBadge(pengajuan.status)}
-                            {pengajuan.status !== "Disetujui" && (
+                            {pengajuan.status !== "Approved" && (
                                 <Button
                                     onClick={() => setIsApprovalOpen(true)}
                                     className="h-14 px-8 gap-3 bg-slate-900 text-white hover:bg-slate-800 rounded-[2rem] text-[10px] font-black uppercase tracking-widest shadow-xl shadow-slate-200 transition-all active:scale-95"
@@ -430,7 +438,7 @@ export default function DetailPenetapanPage() {
                                     Kembalikan (Perbaikan)
                                 </Button>
                                 <Button
-                                    onClick={() => handleUpdateStatus("Disetujui")}
+                                    onClick={() => handleUpdateStatus("Approved")}
                                     disabled={isUpdating}
                                     className="h-16 rounded-2xl bg-emerald-600 text-white hover:bg-emerald-700 font-black uppercase text-[10px] tracking-widest gap-3 shadow-xl shadow-emerald-200 transition-all active:scale-95"
                                 >

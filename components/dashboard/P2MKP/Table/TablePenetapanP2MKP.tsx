@@ -163,7 +163,7 @@ const TablePenetapanP2MKP = () => {
         }
     };
 
-    const handleUpdateStatus = async (status: "Disetujui" | "Perbaikan") => {
+    const handleUpdateStatus = async (status: "Approved" | "Perbaikan") => {
         if (!selectedPengajuan) return;
         setIsUpdating(true);
 
@@ -201,7 +201,7 @@ const TablePenetapanP2MKP = () => {
             Toast.fire({
                 icon: "success",
                 title: "Pembaruan Berhasil",
-                text: `Pengajuan telah ${status === "Disetujui" ? "disetujui" : "dikembalikan untuk perbaikan"}.`,
+                text: `Pengajuan telah ${status === "Approved" ? "disetujui" : "dikembalikan untuk perbaikan"}.`,
             });
 
             setIsApprovalOpen(false);
@@ -292,7 +292,7 @@ const TablePenetapanP2MKP = () => {
 
         switch (normalizedStatus) {
             case "disetujui":
-                return <Badge className="bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest"><CheckCircle2 className="w-3.5 h-3.5 mr-1.5" /> Disetujui</Badge>;
+                return <Badge className="bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest"><CheckCircle2 className="w-3.5 h-3.5 mr-1.5" /> Approved</Badge>;
             case "pending":
             case "diajukan":
                 return (
@@ -363,12 +363,12 @@ const TablePenetapanP2MKP = () => {
                                 <span className="text-[9px] font-bold text-emerald-100 uppercase tracking-widest opacity-80">Validasi</span>
                                 <div className="flex items-center gap-1.5">
                                     <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-                                    <span className="text-[8px] font-bold text-white uppercase tracking-wider">Disetujui</span>
+                                    <span className="text-[8px] font-bold text-white uppercase tracking-wider">Approved</span>
                                 </div>
                             </div>
                         </div>
                         <div className="space-y-0.5">
-                            <p className="text-[10px] font-bold text-emerald-100 uppercase tracking-wider opacity-80">Lembaga Disetujui</p>
+                            <p className="text-[10px] font-bold text-emerald-100 uppercase tracking-wider opacity-80">Lembaga Approved</p>
                             <div className="flex items-baseline gap-1.5">
                                 <span className="text-3xl font-black text-white tracking-tighter">{stats.approved}</span>
                                 <span className="text-[10px] font-bold text-emerald-200 uppercase tracking-tighter">Unit</span>
@@ -400,7 +400,7 @@ const TablePenetapanP2MKP = () => {
 
             {/* Status Filter Bar */}
             <div className="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar no-scrollbar">
-                {["All", "Diajukan", "Pending", "Disetujui", "Perbaikan"].map((status) => (
+                {["All", "Diajukan", "Pending", "Approved", "Perbaikan"].map((status) => (
                     <button
                         key={status}
                         onClick={() => setSelectedStatusFilter(status)}
@@ -498,7 +498,7 @@ const TablePenetapanP2MKP = () => {
                                         </TableCell>
                                         <TableCell className="text-center">
                                             <div className="flex items-center justify-center gap-2.5">
-                                                {row.status === "Disetujui" ? (
+                                                {row.status === "Approved" ? (
                                                     <P2MKPCertificateAction p2mkp={row as unknown as P2MKP} />
                                                 ) : (
                                                     <Button
@@ -689,7 +689,7 @@ const TablePenetapanP2MKP = () => {
                                 Revisi
                             </Button>
                             <Button
-                                onClick={() => handleUpdateStatus("Disetujui")}
+                                onClick={() => handleUpdateStatus("Approved")}
                                 disabled={isUpdating || !catatan}
                                 className="h-14 flex-1 bg-gradient-to-r from-blue-600 to-indigo-700 hover:shadow-2xl hover:shadow-blue-500/30 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all flex items-center justify-center gap-3 group"
                             >

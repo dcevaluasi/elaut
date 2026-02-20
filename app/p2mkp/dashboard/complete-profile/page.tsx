@@ -69,6 +69,7 @@ const formSchema = z.object({
     nama_ppmkp: z.string().optional(),
     status_kepemilikan: z.string().optional(),
     Nib: z.string().optional(),
+    nib: z.string().optional(),
     alamat: z.string().optional(),
     provinsi: z.string().optional(),
     kota: z.string().optional(),
@@ -115,7 +116,7 @@ export default function CompleteProfilePage() {
         defaultValues: {
             nama_ppmkp: "",
             status_kepemilikan: "Perserorangan",
-            Nib: "",
+            nib: "",
             alamat: "",
             provinsi: "",
             kota: "",
@@ -125,7 +126,7 @@ export default function CompleteProfilePage() {
             no_telp: "",
             email: "",
             password: "",
-            jenis_bidang_pelatihan: "4",
+            jenis_bidang_pelatihan: "",
             jenis_pelatihan: "",
             nama_penanggung_jawab: "",
             no_telp_penanggung_jawab: "",
@@ -170,7 +171,7 @@ export default function CompleteProfilePage() {
                     form.reset({
                         nama_ppmkp: data.nama_ppmkp || "",
                         status_kepemilikan: data.status_kepemilikan || "Perserorangan",
-                        Nib: data.Nib || "",
+                        nib: data.nib || data.Nib || "",
                         alamat: data.alamat || "",
                         provinsi: data.provinsi || "",
                         kota: data.kota || "",
@@ -179,7 +180,7 @@ export default function CompleteProfilePage() {
                         kode_pos: data.kode_pos || "",
                         no_telp: data.no_telp || "",
                         email: data.email || "",
-                        jenis_bidang_pelatihan: data.jenis_bidang_pelatihan || "4",
+                        jenis_bidang_pelatihan: data.jenis_bidang_pelatihan || "",
                         jenis_pelatihan: data.jenis_pelatihan || "",
                         nama_penanggung_jawab: data.nama_penanggung_jawab || "",
                         no_telp_penanggung_jawab: data.no_telp_penanggung_jawab || "",
@@ -213,6 +214,27 @@ export default function CompleteProfilePage() {
     }, [router, form]);
 
     const { data: rumpunPelatihan, loading: loadingRumpun } = useFetchDataRumpunPelatihan();
+
+    const watchedJenis = form.watch("jenis_bidang_pelatihan");
+    const watchedBidang = form.watch("bidang_pelatihan");
+
+    useEffect(() => {
+        if (!loadingRumpun && rumpunPelatihan.length > 0) {
+            // Check if watchedJenis is an ID and convert to name
+            const matchedJenis = rumpunPelatihan.find(r => String(r.id_rumpun_pelatihan) === String(watchedJenis));
+            if (matchedJenis) {
+                const targetName = matchedJenis.name || matchedJenis.nama_rumpun_pelatihan || "";
+                form.setValue("jenis_bidang_pelatihan", targetName);
+            }
+
+            // Check if watchedBidang is an ID and convert to name
+            const matchedBidang = rumpunPelatihan.find(r => String(r.id_rumpun_pelatihan) === String(watchedBidang));
+            if (matchedBidang) {
+                const targetName = matchedBidang.name || matchedBidang.nama_rumpun_pelatihan || "";
+                form.setValue("bidang_pelatihan", targetName);
+            }
+        }
+    }, [loadingRumpun, rumpunPelatihan, watchedJenis, watchedBidang, form]);
 
     useEffect(() => {
         const handleResize = () => {
@@ -255,8 +277,15 @@ export default function CompleteProfilePage() {
 
             const formData = new FormData();
             Object.entries(values).forEach(([key, value]) => {
-                if (value !== undefined && value !== null) {
-                    formData.append(key, value as any);
+                if (value === undefined || value === null || value === "") return;
+
+                // Handle file fields
+                if (key.startsWith('dokumen') || key.startsWith('dokument')) {
+                    if (value instanceof File) {
+                        formData.append(key, value);
+                    }
+                } else {
+                    formData.append(key, String(value));
                 }
             });
 
@@ -457,7 +486,7 @@ export default function CompleteProfilePage() {
                                                 </FormItem>
                                             )}
                                         />
-                                        <FormFieldItem label="Nomor Induk Berusaha (NIB)" name="Nib" control={form.control} placeholder="Masukkan Kode NIB..." icon={<FiFileText />} />
+                                        <FormFieldItem label="Nomor Induk Berusaha (NIB)" name="nib" control={form.control} placeholder="Masukkan Kode NIB..." icon={<FiFileText />} />
                                         <FormFieldItem label="Email Resmi" name="email" control={form.control} placeholder="admin@p2mkp.go.id" icon={<FiMail />} type="email" />
                                         <FormFieldItem label="Ubah Kata Sandi" name="password" control={form.control} placeholder="Kosongkan jika tidak diubah..." icon={<FiGlobe />} type="password" />
                                         <FormFieldItem label="Kontak Telepon" name="no_telp" control={form.control} placeholder="08XXXXXXXXXX" icon={<FiPhone />} />
@@ -517,15 +546,21 @@ export default function CompleteProfilePage() {
                                             render={({ field }) => (
                                                 <FormItem className="space-y-2">
                                                     <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Rumpun Utama</FormLabel>
-                                                    <Select onValueChange={field.onChange} value={field.value}>
+                                                    <Select
+                                                        onValueChange={(val) => {
+                                                            field.onChange(val);
+                                                            form.setValue("bidang_pelatihan", val, { shouldValidate: true });
+                                                        }}
+                                                        value={field.value || ""}
+                                                    >
                                                         <FormControl>
                                                             <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
                                                                 <SelectValue placeholder={loadingRumpun ? "Singkronisasi..." : "Pilih Rumpun..."} />
                                                             </SelectTrigger>
                                                         </FormControl>
-                                                        <SelectContent className="bg-[#0f172a] border-white/10 text-white backdrop-blur-3xl rounded-2xl">
+                                                        <SelectContent className="bg-[#0f172a] border-white/10 text-white backdrop-blur-3xl rounded-4xl">
                                                             {rumpunPelatihan?.map((item: any) => (
-                                                                <SelectItem key={item.id_rumpun_pelatihan} value={String(item.id_rumpun_pelatihan)} className="hover:bg-cyan-600/20 rounded-lg py-3 cursor-pointer">
+                                                                <SelectItem key={item.id_rumpun_pelatihan} value={item.name} className="hover:bg-cyan-600/20 rounded-lg py-3 cursor-pointer">
                                                                     {item.name}
                                                                 </SelectItem>
                                                             ))}

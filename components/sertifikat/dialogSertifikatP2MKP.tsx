@@ -1,10 +1,11 @@
 "use client";
 
-import React, { forwardRef, useImperativeHandle, useRef, useState, useEffect } from "react";
+import React, { forwardRef, useImperativeHandle, useRef, useState, useEffect, useMemo } from "react";
 import QRCode from "react-qr-code";
 import './styles/certificate.css';
 import { P2MKP } from "@/types/p2mkp";
 import { ESELON_1 } from "@/constants/nomenclatures";
+import { useFetchDataRumpunPelatihan } from "@/hooks/elaut/master/useFetchDataRumpunPelatihan";
 
 function QRCodeImage({ value }: { value: string }) {
     const [imgUrl, setImgUrl] = useState("");
@@ -51,6 +52,21 @@ function QRCodeImage({ value }: { value: string }) {
 
 const FormatSertifikatP2MKP = forwardRef(
     ({ p2mkp, idPenetapan, refPage }: { p2mkp: P2MKP; idPenetapan: string; refPage?: any }, ref: any) => {
+        const { data: rumpunList } = useFetchDataRumpunPelatihan();
+
+        const bidangPelatihanComputed = useMemo(() => {
+            const val = p2mkp?.bidang_pelatihan || p2mkp?.jenis_bidang_pelatihan;
+            if (!val) return "-";
+
+            const matched = rumpunList.find(r =>
+                String(r.id_rumpun_pelatihan) === String(val) ||
+                r.name === val ||
+                r.nama_rumpun_pelatihan === val
+            );
+
+            return matched?.nama_rumpun_pelatihan || matched?.name || val;
+        }, [rumpunList, p2mkp]);
+
         const alamatParts = [
             p2mkp?.alamat,
             p2mkp?.kelurahan,
@@ -129,7 +145,7 @@ const FormatSertifikatP2MKP = forwardRef(
                                             <span className="font-bosBold text-sm uppercase block">Bidang Pelatihan</span>
                                             <span className="font-bos italic text-xs text-gray-700 block -mt-1">Training Category</span>
                                         </td>
-                                        <td className="w-[70%] text-lg font-bosBold uppercase">: {p2mkp?.bidang_pelatihan || p2mkp?.jenis_bidang_pelatihan || "-"}</td>
+                                        <td className="w-[70%] text-lg font-bosBold uppercase">: {bidangPelatihanComputed}</td>
                                     </tr>
                                     <tr>
                                         <td className="align-top pt-1">

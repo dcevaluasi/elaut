@@ -298,18 +298,24 @@ function FormPelatihan({ edit = false, onSuccess }: { edit: boolean, onSuccess?:
                         </FormField>
 
                         <FormField label="Klaster Pelatihan" required icon={<TbLayoutGrid className="text-indigo-500" />} description="Kategori spesifik rumpun ilmu.">
-                          <Select value={bidangPelatihan} onValueChange={(v) => {
-                            setBidangPelatihan(v);
-                            const found = dataRumpunPelatihan.find(r => r.name === v);
-                            setSelectedRumpunPelatihan(found || null);
-                            setProgram(""); // Reset program on cluster change
-                          }}>
+                          <Select
+                            value={String(selectedRumpunPelatihan?.id_rumpun_pelatihan || "")}
+                            onValueChange={(v) => {
+                              const found = dataRumpunPelatihan?.find(r => String(r.id_rumpun_pelatihan) === String(v));
+                              if (found) {
+                                setSelectedRumpunPelatihan(found);
+                                setBidangPelatihan(found.name || found.nama_rumpun_pelatihan || "");
+                                setProgram(""); // Reset program on cluster change
+                              }
+                            }}>
                             <SelectTrigger className="w-full bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/5 h-[58px] rounded-2xl px-5 font-bold uppercase tracking-tight">
                               <SelectValue placeholder="Pilih Klaster" />
                             </SelectTrigger>
                             <SelectContent className="rounded-2xl max-h-[300px]">
-                              {dataRumpunPelatihan.map((item) => (
-                                <SelectItem key={item.id_rumpun_pelatihan} value={item.name} className="font-bold py-3 uppercase text-xs">{item.name}</SelectItem>
+                              {dataRumpunPelatihan?.map((item) => (
+                                <SelectItem key={item.id_rumpun_pelatihan} value={String(item.id_rumpun_pelatihan)} className="font-bold py-3 uppercase text-xs">
+                                  {item.nama_rumpun_pelatihan || item.name}
+                                </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
@@ -328,8 +334,10 @@ function FormPelatihan({ edit = false, onSuccess }: { edit: boolean, onSuccess?:
                                 <SelectValue placeholder={bidangPelatihan ? `Pilih Program ${bidangPelatihan}` : "Pilih Klaster Terlebih Dahulu"} />
                               </SelectTrigger>
                               <SelectContent className="rounded-2xl max-h-[300px]">
-                                {selectedRumpunPelatihan?.programs.map((p) => (
-                                  <SelectItem key={p.id_program_pelatihan} value={p.name_indo} className="font-bold py-3 uppercase text-xs">{p.name_indo}</SelectItem>
+                                {selectedRumpunPelatihan?.programs?.map((p) => (
+                                  <SelectItem key={p.id_program_pelatihan} value={p.name_indo || String(p.id_program_pelatihan)} className="font-bold py-3 uppercase text-xs">
+                                    {p.name_indo}
+                                  </SelectItem>
                                 ))}
                                 <div className="border-t border-gray-100 dark:border-white/5 my-2" />
                                 <SelectItem value="__add_new__" className="text-blue-500 font-extrabold py-3 text-xs">
