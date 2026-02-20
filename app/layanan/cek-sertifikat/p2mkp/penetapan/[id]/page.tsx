@@ -48,7 +48,7 @@ const P2MKPPenetapanCheckPage = () => {
                 }
 
                 // SECURITY CHECK: Only show if status is "Disetujui" as per user request
-                if (currentPengajuan.status?.toLowerCase() !== "disetujui") {
+                if (currentPengajuan.status?.toLowerCase() !== "Approved") {
                     setError("Sertifikat penetapan ini belum disetujui atau sedang dalam masa tinjauan resmi.");
                     return;
                 }
