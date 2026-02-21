@@ -41,14 +41,15 @@ const P2MKPPenetapanCheckPage = () => {
                 const p2mkpList: P2MKP[] = Array.isArray(p2mkpRes.data) ? p2mkpRes.data : (p2mkpRes.data.data || []);
 
                 const currentPengajuan = pengajuanList.find(p => String(p.IdPengajuanPenetapanPpmkp) === String(id));
-
+                console.log({ pengajuanList })
+                console.log({ currentPengajuan })
                 if (!currentPengajuan) {
                     setError("Data penetapan tidak ditemukan dalam pangkala data kami.");
                     return;
                 }
 
                 // SECURITY CHECK: Only show if status is "Disetujui" as per user request
-                if (currentPengajuan.status?.toLowerCase() !== "Approved") {
+                if (currentPengajuan.status !== "Approved") {
                     setError("Sertifikat penetapan ini belum disetujui atau sedang dalam masa tinjauan resmi.");
                     return;
                 }
@@ -139,9 +140,8 @@ const P2MKPPenetapanCheckPage = () => {
                                     <div className="grid grid-cols-1 gap-4">
                                         <DetailRow icon={<FiHome />} label="Nama Lembaga" value={data.master.nama_ppmkp} />
                                         <DetailRow icon={<FiUser />} label="Penanggung Jawab" value={data.master.nama_penanggung_jawab} />
-                                        <DetailRow icon={<FiActivity />} label="Bidang Pelatihan" value={data.master.bidang_pelatihan} />
+                                        <DetailRow icon={<FiActivity />} label="Bidang Pelatihan" value={data.master.jenis_bidang_pelatihan} />
                                         <DetailRow icon={<FiMapPin />} label="Lokasi" value={`${data.master.kota}, ${data.master.provinsi}`} />
-                                        <DetailRow icon={<TbCertificate />} label="Nomor Surat Penetapan" value={data.pengajuan.nomor_surat} />
                                         <DetailRow icon={<FiCalendar />} label="Tanggal Penetapan" value={data.pengajuan.tanggal_sertifikat} />
                                         <DetailRow icon={<FiShield />} label="Periode Berlaku" value={`Tahun ${data.pengajuan.tahun_penetapan}`} />
                                     </div>
