@@ -275,7 +275,7 @@ const TablePenetapanP2MKP = () => {
         const validData = combinedData.filter(d => !!(d.id_Ppmkp || d.nama_Ppmkp));
         return {
             total: validData.length,
-            approved: validData.filter(d => d.status?.toLowerCase() === "disetujui").length,
+            approved: validData.filter(d => d.status?.toLowerCase() === "approved").length,
             pending: validData.filter(d => !d.status || d.status === "" || d.status?.toLowerCase() === "pending" || d.status?.toLowerCase() === "diajukan").length,
             revision: validData.filter(d => d.status?.toLowerCase() === "perbaikan").length,
         };
@@ -291,7 +291,7 @@ const TablePenetapanP2MKP = () => {
         const normalizedStatus = status === "" || !status ? "diajukan" : status.toLowerCase();
 
         switch (normalizedStatus) {
-            case "disetujui":
+            case "approved":
                 return <Badge className="bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest"><CheckCircle2 className="w-3.5 h-3.5 mr-1.5" /> Approved</Badge>;
             case "pending":
             case "diajukan":

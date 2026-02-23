@@ -26,10 +26,10 @@ export const P2MKPCertificateAction = ({ p2mkp }: { p2mkp: P2MKP }) => {
             variant="outline"
             size="sm"
             onClick={handleNavigate}
-            className="h-10 px-5 gap-2 border-primary-200 bg-primary-50 text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all shadow-sm"
+            className="group/btn relative w-full text-center overflow-hidden flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-xl text-[10px] font-bold shadow-md hover:shadow-lg transition-all"
         >
             <TbCertificate className="w-4 h-4" />
-            Sertifikat
+            SERTIFIKAT PENETAPAN
         </Button>
     );
 };

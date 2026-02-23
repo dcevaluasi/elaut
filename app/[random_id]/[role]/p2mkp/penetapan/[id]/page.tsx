@@ -143,7 +143,7 @@ export default function DetailPenetapanPage() {
             Toast.fire({
                 icon: "success",
                 title: "Pembaruan Berhasil",
-                text: `Pengajuan telah ${status === "Approved" ? "disetujui" : "dikembalikan untuk perbaikan"}.`,
+                text: `Pengajuan telah ${status === "Approved" ? "approved" : "dikembalikan untuk perbaikan"}.`,
             });
 
             setIsApprovalOpen(false);
