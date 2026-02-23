@@ -86,18 +86,18 @@ const FormatSertifikatP2MKP = forwardRef(
                 <div
                     ref={refPage}
                     style={{ width: '297mm', height: '210mm', minWidth: '297mm', minHeight: '210mm' }}
-                    className="pdf-page flex flex-col relative items-center justify-center bg-white shadow-2xl print:shadow-none mx-auto overflow-hidden p-[15mm] border-[1px] border-slate-100"
+                    className="pdf-page bg-white  flex flex-col relative items-center justify-center mx-auto overflow-hidden p-[15mm]"
                 >
                     {/* Top Right Reference Number */}
-                    <div className="absolute top-[10mm] right-[15mm] text-right">
-                        <p className="text-[10px] font-bosBold uppercase tracking-tight">
+                    <div className="absolute top-[5mm] right-[15mm] text-right">
+                        <p className="text-[13px] font-bosBold uppercase tracking-tight">
                             No. Penetapan : {penetapan?.nomor_sertifikat || "-"}
                         </p>
                     </div>
 
-                    <div className="w-full mt-12 flex-1 flex flex-col justify-between py-2">
+                    <div className="w-full scale-[1.05] -mt-7 flex-0 gap-0 flex flex-col justify-between py-2 space-y-0">
                         {/* Header Section */}
-                        <div className="space-y-0 leading-none gap-0">
+                        <div className="space-y-0 leading-none py-0 gap-0">
                             <div className="flex flex-col items-center justify-center">
                                 <h1 className="text-sm font-bosBold  leading-none text-center tracking-tight">
                                     KEMENTERIAN KELAUTAN DAN PERIKANAN
@@ -107,7 +107,7 @@ const FormatSertifikatP2MKP = forwardRef(
                                 </p>
                             </div>
 
-                            <div className="flex flex-col items-center justify-center space-y-0 leading-none -mt-4">
+                            <div className="flex flex-col items-center justify-center space-y-0 leading-none -mt-6">
                                 <h1 className="text-sm font-bosBold text-center px-10 leading-none">
                                     BADAN PENYULUHAN DAN PENGEMBANGAN SUMBER DAYA MANUSIA KELAUTAN
                                     DAN PERIKANAN
@@ -120,16 +120,16 @@ const FormatSertifikatP2MKP = forwardRef(
                         </div>
 
                         {/* Certificate Title */}
-                        <div className="flex flex-col -mt-10 items-center py-0 justify-center space-y-0 leading-none">
-                            <h1 className="text-2xl font-bosBold leading-none text-[#001d3d]">
+                        <div className="flex flex-col pb-5 items-center justify-center space-y-0">
+                            <h1 className="text-2xl font-bosBold  leading-none text-[#001d3d]">
                                 SERTIFIKAT PENETAPAN
                             </h1>
                             <p className="text-sm font-bosItalic text-gray-700">Certificate of Designation</p>
                         </div>
 
                         {/* Statement Paragraph */}
-                        <div className="flex w-full flex-col space-y-1 max-w-[240mm] -mt-8 mx-auto items-center text-center font-bos">
-                            <span className="text-sm leading-none font-bosNormal">
+                        <div className="flex w-full py-0 flex-col mt-10 space-y-1 max-w-[240mm] h-[20mm]  mx-auto items-center text-center font-bos">
+                            <span className="text-sm -mt-5 leading-none font-bosNormal">
                                 Berdasarkan Peraturan Menteri Kelautan dan Perikanan Nomor 18 Tahun 2024 tentang Pusat Pelatihan Mandiri Kelautan dan Perikanan dan Keputusan Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan Nomor 393 Tahun 2025 tentang Penetapan Pusat Pelatihan Mandiri Kelautan dan Perikanan, menyatakan bahwa:
                             </span>
                             <span className="text-xs text-gray-700 font-bosItalic leading-none">
@@ -137,38 +137,47 @@ const FormatSertifikatP2MKP = forwardRef(
                         </div>
 
                         {/* Institutional Details Table */}
-                        <div className="w-full px-24 py-0 -mt-5">
-                            <table className="w-full border-separate border-spacing-y-2" cellPadding={0} cellSpacing={0}>
+                        <div className="w-full px-24 py-0  -mb-20">
+                            <table className="w-full border-collapse" cellPadding={0} cellSpacing={0}>
                                 <tbody>
-                                    <tr>
-                                        <td className="w-[30%]">
+                                    <tr className="mb-4">
+                                        <td className="w-[28%] align-top py-1">
                                             <span className="font-bosBold text-sm uppercase block">Nama Lembaga</span>
-                                            <span className="font-bos italic text-xs text-gray-700 block -mt-1">Institution Name</span>
+                                            <span className="font-bos italic text-[10px] text-gray-700 block -mt-1 leading-tight">Institution Name</span>
                                         </td>
-                                        <td className="w-[70%] text-lg font-bosBold uppercase text-blue-900">: {p2mkp?.nama_Ppmkp || p2mkp?.nama_ppmkp || "-"}</td>
+                                        <td className="w-[3%] align-top py-1 text-lg font-bosBold text-blue-900">:</td>
+                                        <td className="w-[69%] align-top py-1 text-lg font-bosBold uppercase text-blue-900 leading-tight">
+                                            {p2mkp?.nama_Ppmkp || p2mkp?.nama_ppmkp || "-"}
+                                        </td>
                                     </tr>
-                                    <tr>
-                                        <td>
+                                    <tr className="mb-4">
+                                        <td className="w-[28%] align-top py-1">
                                             <span className="font-bosBold text-sm uppercase block">Bidang Pelatihan</span>
-                                            <span className="font-bos italic text-xs text-gray-700 block -mt-1">Training Category</span>
+                                            <span className="font-bos italic text-[10px] text-gray-700 block -mt-1 leading-tight">Training Category</span>
                                         </td>
-                                        <td className="w-[70%] text-lg font-bosBold uppercase">: {bidangPelatihanComputed}</td>
+                                        <td className="w-[3%] align-top py-1 text-lg font-bosBold">:</td>
+                                        <td className="w-[69%] align-top py-1 text-lg font-bosBold uppercase leading-tight">
+                                            {bidangPelatihanComputed}
+                                        </td>
                                     </tr>
-                                    <tr>
-                                        <td className="align-top pt-1">
+                                    <tr className="mb-4">
+                                        <td className="w-[28%] align-top py-1">
                                             <span className="font-bosBold text-sm uppercase block">Alamat</span>
-                                            <span className="font-bos italic text-xs text-gray-700 block -mt-1">Address</span>
+                                            <span className="font-bos italic text-[10px] text-gray-700 block -mt-1 leading-tight">Address</span>
                                         </td>
-                                        <td className="w-[70%] text-lg font-bosBold uppercase leading-snug">: {alamatFull || "-"}</td>
+                                        <td className="w-[3%] align-top py-1 text-lg font-bosBold">:</td>
+                                        <td className="w-[69%] align-top py-1 text-lg font-bosBold uppercase leading-tight">
+                                            {alamatFull || "-"}
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
 
                         {/* Validity Footer Text */}
-                        <div className="text-center flex flex-col items-center space-y-2 -mt-7">
-                            <p className="text-sm font-bosNormal italic text-gray-700">Sebagai / <span className="italic">As</span></p>
-                            <h3 className="text-2xl font-bosBold text-[#003566]  uppercase">
+                        <div className="text-center leading-none flex flex-col items-center space-y-2 -mt-20">
+                            <p className="text-sm font-bosNormal leading-none italic text-gray-700">Sebagai / <span className="italic">As</span></p>
+                            <h3 className="text-2xl font-bosBold leading-none text-[#003566]  uppercase">
                                 Pusat Pelatihan Mandiri Kelautan dan Perikanan (P2MKP)
                             </h3>
                             <p className="text-sm font-bosNormal leading-none text-gray-700 max-w-[200mm]">
@@ -179,13 +188,13 @@ const FormatSertifikatP2MKP = forwardRef(
                         </div>
 
                         {/* Signature & QR Section */}
-                        <div className="flex flex-row items-end justify-center px-20 -mt-9 w-full h-[50mm] relative">
+                        <div className="flex flex-row items-end justify-center px-20 -mt-20 w-full h-[50mm] relative">
                             <div className="shrink-0 absolute left-20 bottom-5 mb-6 bg-slate-50 p-2 rounded-xl border border-slate-100">
                                 <QRCodeImage value={String(idPenetapan || "")} />
                             </div>
 
                             <div className="flex flex-col items-center text-center  max-w-[450px]">
-                                <p className="text-sm font-bosNormal">Jakarta, {p2mkp?.tahun_penetapan || new Date().getFullYear()}</p>
+                                <p className="text-sm font-bosNormal">Jakarta, {penetapan?.tanggal_sertifikat}</p>
                                 <div className="space-y-1">
                                     <p className="text-sm font-bosBold uppercase leading-none text-slate-900">
                                         Kepala Badan Penyuluhan dan Pengembangan
@@ -200,10 +209,10 @@ const FormatSertifikatP2MKP = forwardRef(
                                 </div>
 
                                 <div className="flex flex-col items-center mt-16">
-                                    <p className="text-sm font-bosBold border-b-2 border-slate-900 pb-2 px-8 mb-1 uppercase tracking-tight">
+                                    <p className="text-sm font-bosBold px-8 mb-2 uppercase tracking-tight">
                                         {ESELON_1.currentPerson}
                                     </p>
-                                    <p className="text-sm font-bosBold -mt-3">NIP. {ESELON_1.nip}</p>
+                                    <p className="text-sm font-bosNormal -mt-3">NIP. {ESELON_1.nip}</p>
                                 </div>
                             </div>
                         </div>
@@ -234,7 +243,7 @@ const DialogSertifikatP2MKP = forwardRef<DialogSertifikatP2MKPHandle, { p2mkp: P
                     html2pdfInstance = (await import("html2pdf.js")).default;
                 }
 
-                const element = certificateRef.current;
+                const element = certificatePageRef.current; // Target the exact mm-sized container
                 if (!element) return;
 
                 const name = p2mkp.nama_Ppmkp || p2mkp.nama_ppmkp || "Sertifikat";
@@ -243,7 +252,7 @@ const DialogSertifikatP2MKP = forwardRef<DialogSertifikatP2MKPHandle, { p2mkp: P
                     filename: `Sertifikat_P2MKP_${name.replace(/\s+/g, '_')}.pdf`,
                     image: { type: 'jpeg', quality: 1.0 },
                     html2canvas: {
-                        scale: 3,
+                        scale: 4, // Higher scale for better quality
                         useCORS: true,
                         logging: false,
                         letterRendering: true,

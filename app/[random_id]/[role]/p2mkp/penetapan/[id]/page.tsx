@@ -75,6 +75,7 @@ export default function DetailPenetapanPage() {
     const [isApprovalOpen, setIsApprovalOpen] = useState(false);
     const [catatan, setCatatan] = useState("");
     const [tahunPenetapan, setTahunPenetapan] = useState("");
+    const [tanggalSertifikat, setTanggalSertifikat] = useState("");
     const [isUpdating, setIsUpdating] = useState(false);
 
     const isLoading = loadingPengajuan || loadingP2MKP;
@@ -91,6 +92,7 @@ export default function DetailPenetapanPage() {
                     master: currentMaster
                 });
                 setTahunPenetapan(currentPengajuan.tahun_penetapan || new Date().getFullYear().toString());
+                setTanggalSertifikat(currentPengajuan.tanggal_sertifikat || "");
             }
         }
     }, [pengajuanList, p2mkpList, id]);
@@ -103,7 +105,7 @@ export default function DetailPenetapanPage() {
             const token = Cookies.get("XSRF091");
             await axios.put(
                 `${elautBaseUrl}/p2mkp/update_pengjuan_penetapan_p2mkp?id=${matchedData.pengajuan.IdPengajuanPenetapanPpmkp}`,
-                { status, tahun_penetapan: tahunPenetapan },
+                { status, tahun_penetapan: tahunPenetapan, tanggal_sertifikat: tanggalSertifikat },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
@@ -409,6 +411,18 @@ export default function DetailPenetapanPage() {
                                         className="h-14 rounded-2xl bg-slate-50 border-slate-100 font-bold text-slate-700"
                                     />
                                 </div>
+                                <div className="space-y-3">
+                                    <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tanggal Sertifikatasi</Label>
+                                    <Input
+                                        type="date"
+                                        value={tanggalSertifikat}
+                                        onChange={(e) => setTanggalSertifikat(e.target.value)}
+                                        className="h-14 rounded-2xl bg-slate-50 border-slate-100 font-bold text-slate-700"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-8">
                                 <div className="space-y-1">
                                     <Label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Institusi</Label>
                                     <div className="h-14 flex items-center px-4 bg-blue-50 rounded-2xl border border-blue-100/50">

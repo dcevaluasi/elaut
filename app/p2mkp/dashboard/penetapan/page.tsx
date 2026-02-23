@@ -80,7 +80,9 @@ export default function PenetapanP2MKPPage() {
                     ];
 
                     const isComplete = essentialFields.every(field => {
-                        const value = data[field];
+                        const pascalField = field.charAt(0).toUpperCase() + field.slice(1);
+                        const snakeField = field.toLowerCase();
+                        const value = data[pascalField] || data[field] || data[snakeField];
                         return value !== null && value !== undefined && value !== "" && value !== "null";
                     });
 
@@ -107,6 +109,7 @@ export default function PenetapanP2MKPPage() {
 
         const fetchPenetapanData = async (id: string, token: string) => {
             setIsDataLoading(true);
+            console.log({ id })
             try {
                 const response = await axios.get(`${elautBaseUrl}/p2mkp/get_pengjuan_penetapan_p2mkp?id_p2mkp=${id}`, {
                     headers: {
@@ -115,7 +118,10 @@ export default function PenetapanP2MKPPage() {
                 });
                 if (response.status === 200) {
                     const data = response.data.data || (Array.isArray(response.data) ? response.data : []);
-                    setPenetapanData(data);
+                    const filteredData = data.filter((item: any) =>
+                        String(item.id_Ppmkp) === String(id)
+                    );
+                    setPenetapanData(filteredData);
                 }
             } catch (error) {
                 console.error('Error fetching penetapan data:', error);

@@ -66,38 +66,41 @@ import { HashLoader } from 'react-spinners';
 import Toast from '@/commons/Toast';
 
 const formSchema = z.object({
-    nama_ppmkp: z.string().optional(),
-    status_kepemilikan: z.string().optional(),
+    NamaPpmkp: z.string().optional(),
+    StatusKepemilikan: z.string().optional(),
     Nib: z.string().optional(),
-    nib: z.string().optional(),
-    alamat: z.string().optional(),
-    provinsi: z.string().optional(),
-    kota: z.string().optional(),
-    kecamatan: z.string().optional(),
-    kelurahan: z.string().optional(),
-    kode_pos: z.string().optional(),
-    no_telp: z.string().optional(),
-    email: z.string().email("Format email tidak valid").optional().or(z.literal("")),
-    password: z.string().optional(),
-    jenis_bidang_pelatihan: z.string().optional(),
-    jenis_pelatihan: z.string().optional(),
-    nama_penanggung_jawab: z.string().optional(),
-    no_telp_penanggung_jawab: z.string().optional(),
-    tempat_tanggal_lahir: z.string().optional(),
-    jenis_kelamin: z.string().optional(),
-    pendidikan_terakhir: z.string().optional(),
+    Alamat: z.string().optional(),
+    Provinsi: z.string().optional(),
+    Kota: z.string().optional(),
+    Kecamatan: z.string().optional(),
+    Kelurahan: z.string().optional(),
+    KodePos: z.string().optional(),
+    NoTelp: z.string().optional(),
+    Email: z.string().email("Format email tidak valid").optional().or(z.literal("")),
+    Password: z.string().optional(),
+    JenisBidangPelatihan: z.string().optional(),
+    JenisPelatihan: z.string().optional(),
+    NamaPenanggungJawab: z.string().optional(),
+    NoTelpPenanggungJawab: z.string().optional(),
+    TempatTanggalLahir: z.string().optional(),
+    JenisKelamin: z.string().optional(),
+    PendidikanTerakhir: z.string().optional(),
     dokumen_identifikasi_pemilik: z.any().optional(),
     dokumen_asesment_mandiri: z.any().optional(),
     dokument_surat_pernyataan: z.any().optional(),
     dokumen_keterangan_usaha: z.any().optional(),
     dokumen_afiliasi_parpol: z.any().optional(),
     dokumen_rekomendasi_dinas: z.any().optional(),
-    skor_klasifikasi: z.union([z.string(), z.number()]).optional(),
-    status_usaha: z.string().optional(),
-    status_peltihan: z.string().optional(),
-    bidang_pelatihan: z.string().optional(),
-    is_lpk: z.string().optional(),
-    status: z.string().optional(),
+    dokumen_permohonan_pembentukan: z.any().optional(),
+    dokumen_permohonan_klasifikasi: z.any().optional(),
+    Klasifikasi: z.string().optional(),
+    SkorKlasifikasi: z.union([z.string(), z.number()]).optional(),
+    TahunPenetapan: z.string().optional(),
+    StatusUsaha: z.string().optional(),
+    StatusPelatihan: z.string().optional(),
+    BidangPelatihan: z.string().optional(),
+    IsLpk: z.string().optional(),
+    Status: z.string().optional(),
     create_at: z.string().optional(),
     update_at: z.string().optional(),
 });
@@ -114,37 +117,41 @@ export default function CompleteProfilePage() {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            nama_ppmkp: "",
-            status_kepemilikan: "Perserorangan",
-            nib: "",
-            alamat: "",
-            provinsi: "",
-            kota: "",
-            kecamatan: "",
-            kelurahan: "",
-            kode_pos: "",
-            no_telp: "",
-            email: "",
-            password: "",
-            jenis_bidang_pelatihan: "",
-            jenis_pelatihan: "",
-            nama_penanggung_jawab: "",
-            no_telp_penanggung_jawab: "",
-            tempat_tanggal_lahir: "",
-            jenis_kelamin: "",
-            pendidikan_terakhir: "",
+            NamaPpmkp: "",
+            StatusKepemilikan: "Perserorangan",
+            Nib: "",
+            Alamat: "",
+            Provinsi: "",
+            Kota: "",
+            Kecamatan: "",
+            Kelurahan: "",
+            KodePos: "",
+            NoTelp: "",
+            Email: "",
+            Password: "",
+            JenisBidangPelatihan: "",
+            JenisPelatihan: "",
+            NamaPenanggungJawab: "",
+            NoTelpPenanggungJawab: "",
+            TempatTanggalLahir: "",
+            JenisKelamin: "",
+            PendidikanTerakhir: "",
             dokumen_identifikasi_pemilik: null,
             dokumen_asesment_mandiri: null,
             dokument_surat_pernyataan: null,
             dokumen_keterangan_usaha: null,
             dokumen_afiliasi_parpol: null,
             dokumen_rekomendasi_dinas: null,
-            skor_klasifikasi: 0,
-            status_usaha: "",
-            status_peltihan: "",
-            bidang_pelatihan: "",
-            is_lpk: "",
-            status: "",
+            dokumen_permohonan_pembentukan: null,
+            dokumen_permohonan_klasifikasi: null,
+            Klasifikasi: "",
+            SkorKlasifikasi: 0,
+            TahunPenetapan: "",
+            StatusUsaha: "",
+            StatusPelatihan: "",
+            BidangPelatihan: "",
+            IsLpk: "",
+            Status: "",
             create_at: "",
             update_at: ""
         },
@@ -169,36 +176,40 @@ export default function CompleteProfilePage() {
                     const data = response.data.data || response.data;
                     setProfileId(data.IdPpmkp || data.id_p2mkp || data.id);
                     form.reset({
-                        nama_ppmkp: data.nama_ppmkp || "",
-                        status_kepemilikan: data.status_kepemilikan || "Perserorangan",
-                        nib: data.nib || data.Nib || "",
-                        alamat: data.alamat || "",
-                        provinsi: data.provinsi || "",
-                        kota: data.kota || "",
-                        kecamatan: data.kecamatan || "",
-                        kelurahan: data.kelurahan || "",
-                        kode_pos: data.kode_pos || "",
-                        no_telp: data.no_telp || "",
-                        email: data.email || "",
-                        jenis_bidang_pelatihan: data.jenis_bidang_pelatihan || "",
-                        jenis_pelatihan: data.jenis_pelatihan || "",
-                        nama_penanggung_jawab: data.nama_penanggung_jawab || "",
-                        no_telp_penanggung_jawab: data.no_telp_penanggung_jawab || "",
-                        tempat_tanggal_lahir: data.tempat_tanggal_lahir || "",
-                        jenis_kelamin: data.jenis_kelamin || "",
-                        pendidikan_terakhir: data.pendidikan_terakhir || "",
+                        NamaPpmkp: data.NamaPpmkp || data.nama_ppmkp || "",
+                        StatusKepemilikan: data.StatusKepemilikan || data.status_kepemilikan || "Perserorangan",
+                        Nib: data.Nib || data.nib || "",
+                        Alamat: data.Alamat || data.alamat || "",
+                        Provinsi: data.Provinsi || data.provinsi || "",
+                        Kota: data.Kota || data.kota || "",
+                        Kecamatan: data.Kecamatan || data.kecamatan || "",
+                        Kelurahan: data.Kelurahan || data.kelurahan || "",
+                        KodePos: data.KodePos || data.kode_pos || "",
+                        NoTelp: data.NoTelp || data.no_telp || "",
+                        Email: data.Email || data.email || "",
+                        JenisBidangPelatihan: data.JenisBidangPelatihan || data.jenis_bidang_pelatihan || "",
+                        JenisPelatihan: data.JenisPelatihan || data.jenis_pelatihan || "",
+                        NamaPenanggungJawab: data.NamaPenanggungJawab || data.nama_penanggung_jawab || "",
+                        NoTelpPenanggungJawab: data.NoTelpPenanggungJawab || data.no_telp_penanggung_jawab || "",
+                        TempatTanggalLahir: data.TempatTanggalLahir || data.tempat_tanggal_lahir || "",
+                        JenisKelamin: data.JenisKelamin || data.jenis_kelamin || "",
+                        PendidikanTerakhir: data.PendidikanTerakhir || data.pendidikan_terakhir || "",
                         dokumen_identifikasi_pemilik: data.dokumen_identifikasi_pemilik || null,
                         dokumen_asesment_mandiri: data.dokumen_asesment_mandiri || null,
                         dokument_surat_pernyataan: data.dokument_surat_pernyataan || null,
                         dokumen_keterangan_usaha: data.dokumen_keterangan_usaha || null,
                         dokumen_afiliasi_parpol: data.dokumen_afiliasi_parpol || null,
                         dokumen_rekomendasi_dinas: data.dokumen_rekomendasi_dinas || null,
-                        skor_klasifikasi: data.skor_klasifikasi || 0,
-                        status_usaha: data.status_usaha || "",
-                        status_peltihan: data.status_peltihan || "",
-                        bidang_pelatihan: data.bidang_pelatihan || "",
-                        is_lpk: data.is_lpk || "",
-                        status: data.status || "",
+                        dokumen_permohonan_pembentukan: data.dokumen_permohonan_pembentukan || null,
+                        dokumen_permohonan_klasifikasi: data.dokumen_permohonan_klasifikasi || null,
+                        Klasifikasi: data.Klasifikasi || data.klasifikasi || "",
+                        SkorKlasifikasi: data.SkorKlasifikasi || data.skor_klasifikasi || 0,
+                        TahunPenetapan: data.TahunPenetapan || data.tahun_penetapan || "",
+                        StatusUsaha: data.StatusUsaha || data.status_usaha || "",
+                        StatusPelatihan: data.StatusPelatihan || data.status_pelatihan || data.status_peltihan || "",
+                        BidangPelatihan: data.BidangPelatihan || data.bidang_pelatihan || "",
+                        IsLpk: data.IsLpk || data.is_lpk || "",
+                        Status: data.Status || data.status || "",
                         create_at: data.create_at || "",
                         update_at: data.update_at || ""
                     });
@@ -215,8 +226,8 @@ export default function CompleteProfilePage() {
 
     const { data: rumpunPelatihan, loading: loadingRumpun } = useFetchDataRumpunPelatihan();
 
-    const watchedJenis = form.watch("jenis_bidang_pelatihan");
-    const watchedBidang = form.watch("bidang_pelatihan");
+    const watchedJenis = form.watch("JenisBidangPelatihan");
+    const watchedBidang = form.watch("BidangPelatihan");
 
     useEffect(() => {
         if (!loadingRumpun && rumpunPelatihan.length > 0) {
@@ -224,14 +235,14 @@ export default function CompleteProfilePage() {
             const matchedJenis = rumpunPelatihan.find(r => String(r.id_rumpun_pelatihan) === String(watchedJenis));
             if (matchedJenis) {
                 const targetName = matchedJenis.name || matchedJenis.nama_rumpun_pelatihan || "";
-                form.setValue("jenis_bidang_pelatihan", targetName);
+                form.setValue("JenisBidangPelatihan", targetName);
             }
 
             // Check if watchedBidang is an ID and convert to name
             const matchedBidang = rumpunPelatihan.find(r => String(r.id_rumpun_pelatihan) === String(watchedBidang));
             if (matchedBidang) {
                 const targetName = matchedBidang.name || matchedBidang.nama_rumpun_pelatihan || "";
-                form.setValue("bidang_pelatihan", targetName);
+                form.setValue("BidangPelatihan", targetName);
             }
         }
     }, [loadingRumpun, rumpunPelatihan, watchedJenis, watchedBidang, form]);
@@ -464,10 +475,10 @@ export default function CompleteProfilePage() {
                                     color="blue"
                                 >
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <FormFieldItem label="Nama P2MKP" name="nama_ppmkp" control={form.control} placeholder="Masukkan Nama Resmi..." icon={<FiBriefcase />} />
+                                        <FormFieldItem label="Nama P2MKP" name="NamaPpmkp" control={form.control} placeholder="Masukkan Nama Resmi..." icon={<FiBriefcase />} />
                                         <FormField
                                             control={form.control}
-                                            name="status_kepemilikan"
+                                            name="StatusKepemilikan"
                                             render={({ field }) => (
                                                 <FormItem className="space-y-2">
                                                     <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Status Kepemilikan</FormLabel>
@@ -486,13 +497,13 @@ export default function CompleteProfilePage() {
                                                 </FormItem>
                                             )}
                                         />
-                                        <FormFieldItem label="Nomor Induk Berusaha (NIB)" name="nib" control={form.control} placeholder="Masukkan Kode NIB..." icon={<FiFileText />} />
-                                        <FormFieldItem label="Email Resmi" name="email" control={form.control} placeholder="admin@p2mkp.go.id" icon={<FiMail />} type="email" />
-                                        <FormFieldItem label="Ubah Kata Sandi" name="password" control={form.control} placeholder="Kosongkan jika tidak diubah..." icon={<FiGlobe />} type="password" />
-                                        <FormFieldItem label="Kontak Telepon" name="no_telp" control={form.control} placeholder="08XXXXXXXXXX" icon={<FiPhone />} />
+                                        <FormFieldItem label="Nomor Induk Berusaha (NIB)" name="Nib" control={form.control} placeholder="Masukkan Kode NIB..." icon={<FiFileText />} />
+                                        <FormFieldItem label="Email Resmi" name="Email" control={form.control} placeholder="admin@p2mkp.go.id" icon={<FiMail />} type="email" />
+                                        <FormFieldItem label="Ubah Kata Sandi" name="Password" control={form.control} placeholder="Kosongkan jika tidak diubah..." icon={<FiGlobe />} type="password" />
+                                        <FormFieldItem label="Kontak Telepon" name="NoTelp" control={form.control} placeholder="08XXXXXXXXXX" icon={<FiPhone />} />
                                         <FormField
                                             control={form.control}
-                                            name="is_lpk"
+                                            name="IsLpk"
                                             render={({ field }) => (
                                                 <FormItem className="space-y-2">
                                                     <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Apakah Lembaga LPK?</FormLabel>
@@ -521,13 +532,13 @@ export default function CompleteProfilePage() {
                                     color="indigo"
                                 >
                                     <div className="space-y-8">
-                                        <FormFieldItem label="Alamat Spesifik" name="alamat" control={form.control} placeholder="Jalan, No, RT/RW..." icon={<FiMapPin />} />
+                                        <FormFieldItem label="Alamat Spesifik" name="Alamat" control={form.control} placeholder="Jalan, No, RT/RW..." icon={<FiMapPin />} />
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                            <FormFieldItem label="Provinsi" name="provinsi" control={form.control} placeholder="Nama Provinsi..." />
-                                            <FormFieldItem label="Kota/Kabupaten" name="kota" control={form.control} placeholder="Nama Kota..." />
-                                            <FormFieldItem label="Kecamatan" name="kecamatan" control={form.control} placeholder="Kecamatan..." />
-                                            <FormFieldItem label="Kelurahan" name="kelurahan" control={form.control} placeholder="Kelurahan..." />
-                                            <FormFieldItem label="Kode Pos" name="kode_pos" control={form.control} placeholder="5 Digit..." maxlength={5} />
+                                            <FormFieldItem label="Provinsi" name="Provinsi" control={form.control} placeholder="Nama Provinsi..." />
+                                            <FormFieldItem label="Kota/Kabupaten" name="Kota" control={form.control} placeholder="Nama Kota..." />
+                                            <FormFieldItem label="Kecamatan" name="Kecamatan" control={form.control} placeholder="Kecamatan..." />
+                                            <FormFieldItem label="Kelurahan" name="Kelurahan" control={form.control} placeholder="Kelurahan..." />
+                                            <FormFieldItem label="Kode Pos" name="KodePos" control={form.control} placeholder="5 Digit..." maxlength={5} />
                                         </div>
                                     </div>
                                 </FormCard>
@@ -542,14 +553,14 @@ export default function CompleteProfilePage() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         <FormField
                                             control={form.control}
-                                            name="jenis_bidang_pelatihan"
+                                            name="JenisBidangPelatihan"
                                             render={({ field }) => (
                                                 <FormItem className="space-y-2">
                                                     <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Rumpun Utama</FormLabel>
                                                     <Select
                                                         onValueChange={(val) => {
                                                             field.onChange(val);
-                                                            form.setValue("bidang_pelatihan", val, { shouldValidate: true });
+                                                            form.setValue("BidangPelatihan", val, { shouldValidate: true });
                                                         }}
                                                         value={field.value || ""}
                                                     >
@@ -569,7 +580,7 @@ export default function CompleteProfilePage() {
                                                 </FormItem>
                                             )}
                                         />
-                                        <FormFieldItem label="Spesifikasi Pelatihan" name="jenis_pelatihan" control={form.control} placeholder="Contoh: Budidaya Ikan Nila..." icon={<FiAward />} />
+                                        <FormFieldItem label="Spesifikasi Pelatihan" name="JenisPelatihan" control={form.control} placeholder="Contoh: Budidaya Ikan Nila..." icon={<FiAward />} />
                                     </div>
                                 </FormCard>
 
@@ -602,12 +613,12 @@ export default function CompleteProfilePage() {
                                     color="purple"
                                 >
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <FormFieldItem label="Nama Lengkap & Gelar" name="nama_penanggung_jawab" control={form.control} placeholder="Nama lengkap sesuai identitas..." icon={<FiUser />} />
-                                        <FormFieldItem label="Kontak PIC" name="no_telp_penanggung_jawab" control={form.control} placeholder="WhatsApp/Telepon..." icon={<FiPhone />} />
-                                        <FormFieldItem label="Tempat, Tanggal Lahir" name="tempat_tanggal_lahir" control={form.control} placeholder="Kota, HH-BB-TTTT" icon={<FiCalendar />} />
+                                        <FormFieldItem label="Nama Lengkap & Gelar" name="NamaPenanggungJawab" control={form.control} placeholder="Nama lengkap sesuai identitas..." icon={<FiUser />} />
+                                        <FormFieldItem label="Kontak PIC" name="NoTelpPenanggungJawab" control={form.control} placeholder="WhatsApp/Telepon..." icon={<FiPhone />} />
+                                        <FormFieldItem label="Tempat, Tanggal Lahir" name="TempatTanggalLahir" control={form.control} placeholder="Kota, HH-BB-TTTT" icon={<FiCalendar />} />
                                         <FormField
                                             control={form.control}
-                                            name="jenis_kelamin"
+                                            name="JenisKelamin"
                                             render={({ field }) => (
                                                 <FormItem className="space-y-2">
                                                     <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Jenis Kelamin</FormLabel>
@@ -627,7 +638,7 @@ export default function CompleteProfilePage() {
                                         />
                                         <FormField
                                             control={form.control}
-                                            name="pendidikan_terakhir"
+                                            name="PendidikanTerakhir"
                                             render={({ field }) => (
                                                 <FormItem className="space-y-2">
                                                     <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Pendidikan Terakhir</FormLabel>

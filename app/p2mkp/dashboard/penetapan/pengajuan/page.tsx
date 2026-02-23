@@ -169,9 +169,9 @@ export default function PengajuanPenetapanPage() {
             const payload = {
                 id_p2mkp: p2mkpData?.IdPpmkp || p2mkpData?.id_p2mkp || p2mkpData?.id,
                 tahun_penetapan: new Date().getFullYear().toString(),
-                status_usaha: p2mkpData?.status_usaha || "Aktif",
-                status_peltihan: p2mkpData?.status_peltihan || "Berjalan",
-                is_lpk: p2mkpData?.is_lpk || "Ya",
+                status_usaha: p2mkpData?.StatusUsaha || p2mkpData?.status_usaha || "Aktif",
+                status_peltihan: p2mkpData?.StatusPelatihan || p2mkpData?.status_peltihan || "Berjalan",
+                is_lpk: p2mkpData?.IsLpk || p2mkpData?.is_lpk || "Ya",
                 status: "Diajukan"
             };
 
