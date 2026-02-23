@@ -18,12 +18,14 @@ import {
   HiOutlineUsers,
   HiOutlineBuildingOffice2,
   HiOutlineShieldCheck,
+  HiOutlineAcademicCap,
+  HiOutlineGlobeAlt,
+  HiOutlineLifebuoy,
 } from "react-icons/hi2";
 import Cookies from "js-cookie";
 import MobileMenu from "./mobile-menu";
 import DropdownUserPelatihan from "../dashboard/Header/DropdownUserPelatihan";
 import { Button } from "./button";
-import LanguageSwitcher from "./LanguageSwitcher";
 import { useLanguage } from "@/context/LanguageContext";
 
 const COOKIE_FIRST_TIMER = "XSRF087";
@@ -39,7 +41,9 @@ const HIDDEN_PATHS = [
   "p2mkp/dashboard",
   "/login",
   "/charts",
-  "/admin"
+  "/admin",
+  "/lemdiklat",
+  "/pusat"
 ];
 
 function NavLinkDefault({
@@ -77,6 +81,7 @@ export default function Header() {
   const [top, setTop] = React.useState(true);
   const [openLayanan, setOpenLayanan] = React.useState(false);
   const [openLogin, setOpenLogin] = React.useState(false);
+  const [openKategori, setOpenKategori] = React.useState(false);
 
   const router = useRouter();
   const pathname = usePathname();
@@ -151,6 +156,58 @@ export default function Header() {
                 icon={<HiHome />}
                 isActive={pathname === "/"}
               />
+
+
+
+              {/* Kategori Pelatihan Dropdown */}
+              <li className="relative">
+                <button
+                  onMouseEnter={() => setOpenKategori(true)}
+                  onMouseLeave={() => setOpenKategori(false)}
+                  className={`group relative px-4 py-2 flex items-center gap-2 font-medium transition-all duration-300 ${pathname.startsWith("/layanan/pelatihan") ? "text-blue-400" : "text-gray-300 hover:text-white"
+                    }`}
+                >
+                  <HiOutlineAcademicCap className="text-lg" />
+                  <span className="text-sm tracking-wide">Kategori Pelatihan</span>
+                  <HiMiniChevronDown
+                    className={`transition-transform duration-300 ${openKategori ? "rotate-180" : ""}`}
+                  />
+
+                  <AnimatePresence>
+                    {openKategori && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="absolute left-0 top-full mt-2 w-72 rounded-3xl overflow-hidden bg-[#0f172a]/95 backdrop-blur-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] ring-1 ring-white/10"
+                      >
+                        <div className="p-2 space-y-1">
+
+                          <DropdownItem
+                            href="/layanan/pelatihan/program/perikanan"
+                            label="Perikanan"
+                            subLabel="Budidaya, Pengolahan & Pemasaran"
+                            icon={<span className="text-lg">🐟</span>}
+                          />
+                          <DropdownItem
+                            href="/layanan/pelatihan/program/kelautan"
+                            label="Kelautan"
+                            subLabel="Pengelolaan Ruang Laut, Konservasi"
+                            icon={<HiOutlineGlobeAlt />}
+                          />
+                          <DropdownItem
+                            href="/layanan/pelatihan/program/akp"
+                            label="Awak Kapal Perikanan"
+                            subLabel="Peningkatan dan Pembentukan AKP"
+                            icon={<HiOutlineLifebuoy />}
+                          />
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </button>
+              </li>
 
               <NavLinkDefault
                 href="/layanan/cek-sertifikat"
@@ -314,7 +371,7 @@ function DropdownItem({
       <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 group-hover/item:bg-blue-500 group-hover/item:text-white transition-all duration-300">
         <span className="text-xl">{icon}</span>
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col text-left">
         <span className="text-sm font-semibold text-white group-hover/item:text-blue-400 transition-colors">
           {label}
         </span>

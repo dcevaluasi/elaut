@@ -199,9 +199,9 @@ export default function DetailPenetapanPage() {
     const { pengajuan, master } = matchedData;
 
     const getStatusBadge = (status: string) => {
-        const normalizedStatus = !status ? "diajukan" : status.toLowerCase();
+        const normalizedStatus = !status ? "approved" : status.toLowerCase();
         switch (normalizedStatus) {
-            case "disetujui":
+            case "approved":
                 return <Badge className="bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest"><FiCheckCircle className="w-4 h-4 mr-2" /> Approved</Badge>;
             case "perbaikan":
                 return <Badge className="bg-rose-50 text-rose-600 border border-rose-100 shadow-sm px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest"><FiAlertCircle className="w-4 h-4 mr-2" /> Perbaikan</Badge>;

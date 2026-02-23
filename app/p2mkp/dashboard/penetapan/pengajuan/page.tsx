@@ -23,7 +23,8 @@ import {
     FiCalendar,
     FiDatabase,
     FiEye,
-    FiCheckCircle
+    FiCheckCircle,
+    FiEdit
 } from 'react-icons/fi';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -58,25 +59,84 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { FiInfo } from 'react-icons/fi';
 import { HashLoader } from 'react-spinners';
 import Toast from '@/commons/Toast';
 
+const pdfSchema = z.string()
+    .min(1, "Dokumen wajib diunggah")
+    .refine((val) => val.toLowerCase().endsWith('.pdf'), {
+        message: "Hanya format PDF yang diperbolehkan"
+    });
+
 const formSchema = z.object({
-    DokumenIdentifikasiPemilik: z.string().min(1, "Wajib diunggah"),
-    DokumenAsesmentMandiri: z.string().min(1, "Wajib diunggah"),
-    DokumentSuratPernyataan: z.string().min(1, "Wajib diunggah"),
-    DokumenKeteranganUsaha: z.string().min(1, "Wajib diunggah"),
-    DokumenAfiliasiParpol: z.string().min(1, "Wajib diunggah"),
-    DokumenRekomendasiDinas: z.string().min(1, "Wajib diunggah"),
-    DokumenPermohonanPembentukan: z.string().min(1, "Wajib diunggah"),
+    DokumenIdentifikasiPemilik: pdfSchema,
+    DokumenAsesmentMandiri: pdfSchema,
+    DokumentSuratPernyataan: pdfSchema,
+    DokumenKeteranganUsaha: pdfSchema,
+    DokumenAfiliasiParpol: pdfSchema,
+    DokumenRekomendasiDinas: pdfSchema,
+    DokumenPermohonanPembentukan: pdfSchema,
 });
 
 export default function PengajuanPenetapanPage() {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [loading, setLoading] = useState(true);
+
+    const [alertConfig, setAlertConfig] = React.useState<{
+        isOpen: boolean;
+        title: string;
+        description: string;
+        type: 'success' | 'error' | 'warning';
+        onConfirm?: () => void;
+        showCancel?: boolean;
+    }>({
+        isOpen: false,
+        title: '',
+        description: '',
+        type: 'warning',
+        showCancel: false
+    });
+
+    const showAlert = (title: string, description: string, type: 'success' | 'error' | 'warning', onConfirm?: () => void, showCancel?: boolean) => {
+        setAlertConfig({ isOpen: true, title, description, type, onConfirm, showCancel });
+    };
+
     const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
+        resolver: async (data) => {
+            try {
+                const result = formSchema.safeParse(data);
+                if (result.success) {
+                    return { values: result.data, errors: {} };
+                }
+
+                const errors: any = {};
+                result.error.issues.forEach((issue) => {
+                    const path = issue.path.join('.');
+                    if (!errors[path]) {
+                        errors[path] = {
+                            type: issue.code,
+                            message: issue.message,
+                        };
+                    }
+                });
+
+                return { values: {}, errors };
+            } catch (err) {
+                console.error("Validation error:", err);
+                return { values: {}, errors: { root: { message: "Gagal melakukan validasi" } } };
+            }
+        },
         defaultValues: {
             DokumenIdentifikasiPemilik: '',
             DokumenAsesmentMandiri: '',
@@ -158,6 +218,16 @@ export default function PengajuanPenetapanPage() {
 
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
+        showAlert(
+            "Konfirmasi Pengajuan",
+            "Penetapan Hanya diajukan sekali, pastikan dokumen yang telah diupload sudah sesuai ketentuan dan lengkap, pastikan juga profile lembaga sudah sesuai dan edit kembali pada Profile Lembaga apabila terdapat penyesuaian.",
+            "warning",
+            () => handleConfirmSubmit(values),
+            true
+        );
+    }
+
+    async function handleConfirmSubmit(values: z.infer<typeof formSchema>) {
         setIsSubmitting(true);
         try {
             const token = Cookies.get('XSRF091');
@@ -191,18 +261,39 @@ export default function PengajuanPenetapanPage() {
             }
         } catch (error: any) {
             console.error('Submission error:', error);
-            Swal.fire({
-                title: 'Operation Failed',
-                text: error.response?.data?.message || 'Gagal melakukan pengajuan penetapan.',
-                icon: 'error',
-                background: '#0f172a',
-                color: '#fff',
-                confirmButtonColor: '#3b82f6',
-            });
+            showAlert(
+                'Operation Failed',
+                error.response?.data?.message || 'Gagal melakukan pengajuan penetapan.',
+                'error'
+            );
         } finally {
             setIsSubmitting(false);
         }
     }
+
+    const onInvalid = (errors: any) => {
+        const values = form.getValues();
+        const isEmpty = !values.DokumenIdentifikasiPemilik && !values.DokumenAsesmentMandiri && !values.DokumentSuratPernyataan;
+
+        if (isEmpty) {
+            showAlert(
+                'Data Masih Kosong',
+                'Silakan lengkapi seluruh dokumen instrument yang diperlukan.',
+                'warning'
+            );
+        } else {
+            const errorKeys = Object.keys(errors);
+            if (errorKeys.length > 0) {
+                const firstKey = errorKeys[0];
+                const firstError = errors[firstKey];
+                showAlert(
+                    'Data Belum Sesuai',
+                    firstError?.message || 'Mohon periksa kembali inputan Anda.',
+                    'error'
+                );
+            }
+        }
+    };
 
     if (loading) {
         return (
@@ -317,24 +408,24 @@ export default function PengajuanPenetapanPage() {
                                 </button>
                             </Link>
                             <div className="space-y-1">
-                                <h1 className="text-4xl md:text-5xl font-calsans">Penetapan <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Submission</span></h1>
+                                <h1 className="text-3xl leading-none md:text-4xl font-calsans">Form Pengajuan <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Penetapan P2MKP</span></h1>
                                 <p className="text-gray-500 text-sm font-light italic leading-relaxed">Form pengajuan standarisasi dan verifikasi instrumen P2MKP Terpadu.</p>
                             </div>
                         </div>
 
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
+                            <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-10">
                                 {/* Form Container */}
                                 <div className="p-8 md:p-12 rounded-[3.5rem] bg-[#0f172a]/40 backdrop-blur-3xl border border-white/5 shadow-2xl space-y-12 relative overflow-hidden transition-all duration-700 hover:border-white/10">
 
                                     <div className="space-y-10">
                                         <div className="flex items-center gap-4 pb-6 border-b border-white/5">
-                                            <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 border border-blue-500/20">
+                                            <div className="w-20 h-16 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 border border-blue-500/20">
                                                 <FiActivity />
                                             </div>
                                             <div>
-                                                <h3 className="text-xl font-calsans">Core Instruments</h3>
-                                                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Operational Metadata</p>
+                                                <h3 className="text-xl font-calsans">Dokumen Persyaratan</h3>
+                                                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Lengkapi dan Upload Dokumen Permohonan Penetapan P2MKP dan Ikuti Format sebagaimana tercantum pada link.</p>
                                             </div>
                                         </div>
 
@@ -343,13 +434,13 @@ export default function PengajuanPenetapanPage() {
                                         <div className="space-y-8">
 
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                <FileUploadField name="DokumenIdentifikasiPemilik" label="Identifikasi Pemilik" />
-                                                <FileUploadField name="DokumenAsesmentMandiri" label="Asesmen Mandiri" />
-                                                <FileUploadField name="DokumentSuratPernyataan" label="Surat Pernyataan Mutu" />
-                                                <FileUploadField name="DokumenKeteranganUsaha" label="Legalitas Usaha" />
-                                                <FileUploadField name="DokumenAfiliasiParpol" label="Afiliasi Politik" />
-                                                <FileUploadField name="DokumenRekomendasiDinas" label="Rekomendasi Satuan Kerja" />
-                                                <FileUploadField name="DokumenPermohonanPembentukan" label="Permohonan Pembentukan" />
+                                                <FileUploadField name="DokumenIdentifikasiPemilik" label="Identifikasi Calon P2MKP" />
+                                                <FileUploadField name="DokumenAsesmentMandiri" label="Indentifikasi Asesmen Mandiri" />
+                                                <FileUploadField name="DokumentSuratPernyataan" label="Surat Pernyataan Calon P2MKP" />
+                                                <FileUploadField name="DokumenKeteranganUsaha" label="Surat Legalitas Usaha" />
+                                                <FileUploadField name="DokumenAfiliasiParpol" label="Surat Tidak Afiliasi Partai Politik" />
+                                                <FileUploadField name="DokumenRekomendasiDinas" label="Surat Rekomendasi Dinas" />
+                                                <FileUploadField name="DokumenPermohonanPembentukan" label="Surat Permohonan Pembentukan" />
                                             </div>
                                         </div>
                                     </div>
@@ -382,6 +473,38 @@ export default function PengajuanPenetapanPage() {
                         </Form>
                     </motion.div>
                 </div>
+
+                <AlertDialog open={alertConfig.isOpen} onOpenChange={(open) => setAlertConfig(prev => ({ ...prev, isOpen: open }))}>
+                    <AlertDialogContent className="bg-[#0f172a] border-white/10 text-white font-jakarta">
+                        <AlertDialogHeader>
+                            <AlertDialogTitle className="flex items-center gap-2">
+                                {alertConfig.type === 'error' && <FiShield className="text-rose-500" />}
+                                {alertConfig.type === 'warning' && <FiInfo className="text-amber-500" />}
+                                {alertConfig.type === 'success' && <FiCheckCircle className="text-emerald-500" />}
+                                {alertConfig.title}
+                            </AlertDialogTitle>
+                            <AlertDialogDescription className="text-gray-400">
+                                {alertConfig.description}
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter className="border-t border-white/5 pt-4">
+                            {alertConfig.showCancel && (
+                                <button
+                                    onClick={() => setAlertConfig(prev => ({ ...prev, isOpen: false }))}
+                                    className="px-6 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-sm font-bold transition-colors"
+                                >
+                                    BATAL
+                                </button>
+                            )}
+                            <AlertDialogAction
+                                onClick={alertConfig.onConfirm}
+                                className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 border-none"
+                            >
+                                {alertConfig.showCancel ? 'YA, LANJUTKAN' : 'MENGERTI'}
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             </div>
         </div>
     );
@@ -447,24 +570,24 @@ function FileUploadField({ name, label }: any) {
                                             <p className="text-xs font-bold text-white truncate text-blue-400">
                                                 {typeof fieldValue === 'string' && fieldValue.includes('/') ? fieldValue.split('/').pop() : fieldValue}
                                             </p>
-                                            <p className="text-[9px] text-gray-500 font-bold uppercase tracking-tighter">SUCCESSFULLY ATTACHED</p>
+                                            <p className="text-[9px] text-gray-500 font-bold uppercase tracking-tighter">BERHASIL DIUPLOAD</p>
                                         </div>
                                     ) : (
                                         <div className="space-y-1">
-                                            <p className="text-xs font-medium text-gray-500 group-hover/upload:text-gray-400 transition-colors">Choose digital asset...</p>
-                                            <p className="text-[9px] text-gray-700 font-black tracking-widest uppercase">Max 10MB • PDF, JPG, PNG</p>
+                                            <p className="text-xs font-medium text-gray-500 group-hover/upload:text-gray-400 transition-colors">Upload Dokumen...</p>
+                                            <p className="text-[9px] text-gray-700 font-black tracking-widest uppercase">Max 10MB • PDF</p>
                                         </div>
                                     )}
                                 </div>
 
                                 {fieldValue && (
-                                    <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-500 text-white text-[8px] font-black uppercase">
-                                        <FiCheckCircle /> VERIFIED
+                                    <div className="absolute top-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded-lg bg-blue-600 text-white text-[8px] font-black uppercase shadow-lg shadow-blue-500/20">
+                                        <FiEdit size={10} /> EDITABLE
                                     </div>
                                 )}
                             </div>
 
-                            {typeof fieldValue === 'string' && fieldValue && (
+                            {typeof fieldValue === 'string' && fieldValue?.includes('elaut-bppsdm.kkp.go.id') && (
                                 <a
                                     href={fieldValue.startsWith('http') ? fieldValue : `${elautBaseUrl}/storage/${fieldValue}`}
                                     target="_blank"

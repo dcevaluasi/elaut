@@ -17,7 +17,8 @@ import {
     FiShield,
     FiChevronRight,
     FiGlobe,
-    FiCheckCircle
+    FiCheckCircle,
+    FiInfo
 } from 'react-icons/fi';
 import Link from 'next/link';
 
@@ -38,6 +39,15 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useFetchDataRumpunPelatihan } from '@/hooks/elaut/master/useFetchDataRumpunPelatihan';
 import Footer from '@/components/ui/footer';
 import Header from '@/components/ui/header';
@@ -51,11 +61,18 @@ import Toast from '@/commons/Toast';
 import Image from 'next/image';
 
 const formSchema = z.object({
-    nama_Ppmkp: z.string().min(1, 'Nama P2MKP wajib diisi'),
+    nama_Ppmkp: z.string().min(1, 'Nama Lembaga atau Usaha wajib diisi'),
     email: z.string().email('Format email tidak valid'),
-    password: z.string().min(6, 'Password minimal 6 karakter'),
-    confirm_password: z.string().min(6, 'Konfirmasi password minimal 6 karakter'),
-    no_telpon: z.string().min(10, 'Nomor telepon minimal 10 digit'),
+    password: z.string()
+        .min(8, 'Kata sandi minimal 8 karakter')
+        .regex(/[0-9]/, 'Kata sandi harus mengandung minimal satu angka')
+        .regex(/[^A-Za-z0-9]/, 'Kata sandi harus mengandung minimal satu karakter spesial')
+        .regex(/[a-z]/, 'Kata sandi harus mengandung minimal satu huruf kecil')
+        .regex(/[A-Z]/, 'Kata sandi harus mengandung minimal satu huruf besar'),
+    confirm_password: z.string().min(8, 'Konfirmasi password minimal 8 karakter'),
+    no_telp: z.string()
+        .min(10, 'Nomor telepon minimal 10 digit')
+        .regex(/^08/, 'Nomor telepon harus diawali dengan 08'),
     status_kepemilikan: z.enum(
         [
             'Koperasi',
@@ -80,14 +97,55 @@ export default function RegistrasiP2MKPPage() {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = React.useState(false);
 
+    // Alert State
+    const [alertConfig, setAlertConfig] = React.useState<{
+        isOpen: boolean;
+        title: string;
+        description: string;
+        type: 'success' | 'error' | 'warning';
+    }>({
+        isOpen: false,
+        title: '',
+        description: '',
+        type: 'warning',
+    });
+
+    const showAlert = (title: string, description: string, type: 'success' | 'error' | 'warning') => {
+        setAlertConfig({ isOpen: true, title, description, type });
+    };
+
     const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
+        resolver: async (data) => {
+            try {
+                const result = formSchema.safeParse(data);
+                if (result.success) {
+                    return { values: result.data, errors: {} };
+                }
+
+                // Manually map Zod errors to avoid version mismatch issue with zodResolver
+                const errors: any = {};
+                result.error.issues.forEach((issue) => {
+                    const path = issue.path.join('.');
+                    if (!errors[path]) {
+                        errors[path] = {
+                            type: issue.code,
+                            message: issue.message,
+                        };
+                    }
+                });
+
+                return { values: {}, errors };
+            } catch (err) {
+                console.error("Validation error:", err);
+                return { values: {}, errors: { root: { message: "Gagal melakukan validasi" } } };
+            }
+        },
         defaultValues: {
             nama_Ppmkp: '',
             email: '',
             password: '',
             confirm_password: '',
-            no_telpon: '',
+            no_telp: '',
             status_kepemilikan: undefined,
             jenis_bidang_pelatihan: '',
         },
@@ -100,7 +158,7 @@ export default function RegistrasiP2MKPPage() {
                 nama_Ppmkp: values.nama_Ppmkp,
                 email: values.email,
                 password: values.password,
-                no_telpon: values.no_telpon,
+                no_telp: values.no_telp,
                 status_kepemilikan: values.status_kepemilikan,
                 jenis_bidang_pelatihan: values.jenis_bidang_pelatihan
             });
@@ -115,18 +173,40 @@ export default function RegistrasiP2MKPPage() {
             }
         } catch (error: any) {
             console.error('Registration error:', error);
-            Swal.fire({
-                title: 'Registrasi Gagal',
-                text: error.response?.data?.message || 'Terjadi kesalahan saat mendaftar. Silakan coba lagi.',
-                icon: 'error',
-                background: '#0f172a',
-                color: '#fff',
-                confirmButtonColor: '#3b82f6',
-            });
+            showAlert(
+                'Registrasi Gagal',
+                error.response?.data?.message || 'Terjadi kesalahan saat mendaftar. Silakan coba lagi.',
+                'error'
+            );
         } finally {
             setIsSubmitting(false);
         }
     }
+
+    const onInvalid = (errors: any) => {
+        const values = form.getValues();
+        const isEmpty = !values.nama_Ppmkp && !values.email && !values.no_telp && !values.password && !values.confirm_password && !values.status_kepemilikan && !values.jenis_bidang_pelatihan;
+
+        if (isEmpty) {
+            showAlert(
+                'Data Masih Kosong',
+                'Silakan isi formulir registrasi terlebih dahulu.',
+                'warning'
+            );
+        } else {
+            // Get the first error message to show in the alert
+            const errorKeys = Object.keys(errors);
+            if (errorKeys.length > 0) {
+                const firstKey = errorKeys[0];
+                const firstError = errors[firstKey];
+                showAlert(
+                    'Data Belum Sesuai',
+                    firstError?.message || 'Mohon periksa kembali inputan Anda.',
+                    'error'
+                );
+            }
+        }
+    };
 
     return (
         <section className="min-h-screen bg-[#020617] text-white selection:bg-blue-500/30 font-jakarta overflow-x-hidden">
@@ -140,7 +220,7 @@ export default function RegistrasiP2MKPPage() {
 
             <Header />
 
-            <main className="relative z-10 pt-24 pb-12 px-4 md:px-8 max-w-3xl mx-auto min-h-screen flex flex-col justify-center">
+            <main className="relative z-10 pt-30 pb-12 px-4 md:px-8 max-w-3xl mx-auto min-h-screen flex flex-col justify-center">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -156,14 +236,14 @@ export default function RegistrasiP2MKPPage() {
                             className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[9px] font-bold uppercase tracking-widest"
                         >
                             <span className="w-1 h-1 rounded-full bg-blue-500 animate-pulse" />
-                            Daftar Lembaga Baru
+                            Daftarkan Lembaga atau Usaha Anda
                         </motion.div>
                         <h1 className="text-2xl md:text-4xl font-calsans leading-none tracking-tight">
                             MARI BERGABUNG
                             <span className="text-transparent bg-clip-text bg-gradient-to-br from-blue-400 via-indigo-400 to-cyan-400"> MENJADI P2MKP.</span>
                         </h1>
                         <p className="text-gray-400 text-[10px] md:text-xs max-w-lg mx-auto leading-relaxed">
-                            Mulai langkah Anda untuk menjadi bagian dari pusat pelatihan mandiri kelautan dan perikanan yang berkualitas dan terpercaya.
+                            Mulai langkah Anda untuk menjadi bagian dari pusat pelatihan mandiri kelautan dan perikanan dalam membangun usaha dan peningkatan SDM di Sektor Kelautan dan Perikanan.
                         </p>
                     </div>
 
@@ -173,7 +253,7 @@ export default function RegistrasiP2MKPPage() {
 
                         <div className="relative bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[2rem] p-6 md:p-8 shadow-2xl">
                             <Form {...form}>
-                                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                                <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <FormField
                                             control={form.control}
@@ -181,12 +261,12 @@ export default function RegistrasiP2MKPPage() {
                                             render={({ field }) => (
                                                 <FormItem className="md:col-span-2">
                                                     <FormLabel className="text-[9px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-1">
-                                                        <FiBriefcase className="text-blue-500" /> Nama P2MKP
+                                                        <FiBriefcase className="text-blue-500" /> Nama Lembaga/Usaha
                                                     </FormLabel>
                                                     <FormControl>
                                                         <Input
                                                             {...field}
-                                                            placeholder="Contoh: P2MKP Sinar Mandiri"
+                                                            placeholder="Contoh: Sinar Mandiri"
                                                             className="h-10 bg-white/5 border-white/10 text-white text-xs rounded-lg focus:ring-blue-500/20 focus:border-blue-500/50 transition-all"
                                                         />
                                                     </FormControl>
@@ -211,6 +291,7 @@ export default function RegistrasiP2MKPPage() {
                                                             className="h-10 bg-white/5 border-white/10 text-white text-xs rounded-lg focus:ring-blue-500/20 focus:border-blue-500/50 transition-all"
                                                         />
                                                     </FormControl>
+                                                    <p className="text-[10px] italic text-gray-500">*Email aktif pengelola atau perusahaan/lembaga</p>
                                                     <FormMessage className="text-rose-500 text-[9px] font-bold" />
                                                 </FormItem>
                                             )}
@@ -218,7 +299,7 @@ export default function RegistrasiP2MKPPage() {
 
                                         <FormField
                                             control={form.control}
-                                            name="no_telpon"
+                                            name="no_telp"
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel className="text-[9px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-1">
@@ -231,6 +312,8 @@ export default function RegistrasiP2MKPPage() {
                                                             className="h-10 bg-white/5 border-white/10 text-white text-xs rounded-lg focus:ring-blue-500/20 focus:border-blue-500/50 transition-all"
                                                         />
                                                     </FormControl>
+                                                    <p className="text-[10px] italic text-gray-500">*No Telepon aktif pengelola atau perusahaan/lembaga</p>
+
                                                     <FormMessage className="text-rose-500 text-[9px] font-bold" />
                                                 </FormItem>
                                             )}
@@ -284,7 +367,7 @@ export default function RegistrasiP2MKPPage() {
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel className="text-[9px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-1">
-                                                        <FiGlobe className="text-blue-500" /> Status Kepemilikan
+                                                        <FiGlobe className="text-blue-500" /> Status Kepemilikan Usaha
                                                     </FormLabel>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                         <FormControl>
@@ -311,12 +394,12 @@ export default function RegistrasiP2MKPPage() {
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel className="text-[9px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-1">
-                                                        <FiAward className="text-blue-500" /> Rumpun Pelatihan
+                                                        <FiAward className="text-blue-500" /> Bidang Usaha atau Pelatihan
                                                     </FormLabel>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loadingRumpun}>
                                                         <FormControl>
                                                             <SelectTrigger className="h-10 bg-white/5 border-white/10 text-white text-xs rounded-lg focus:ring-blue-500/20 transition-all">
-                                                                <SelectValue placeholder={loadingRumpun ? "Memuat..." : "Pilih Rumpun..."} />
+                                                                <SelectValue placeholder={loadingRumpun ? "Memuat..." : "Pilih Bidang Usaha atau Pelatihan..."} />
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent className="bg-[#0f172a] border-white/10 text-white max-h-[200px]">
@@ -327,6 +410,8 @@ export default function RegistrasiP2MKPPage() {
                                                             ))}
                                                         </SelectContent>
                                                     </Select>
+                                                    <p className="text-[10px] italic text-gray-500">*Pilih bidang yang paling menonjol pada usaha atau pelatihan</p>
+
                                                     <FormMessage className="text-rose-500 text-[9px] font-bold" />
                                                 </FormItem>
                                             )}
@@ -344,7 +429,7 @@ export default function RegistrasiP2MKPPage() {
                                             ) : (
                                                 <>
                                                     <FiSave className="text-base" />
-                                                    KIRIM PENDAFTARAN
+                                                    BUAT AKUN
                                                 </>
                                             )}
                                         </button>
@@ -377,6 +462,27 @@ export default function RegistrasiP2MKPPage() {
             </main>
 
             <Footer />
+
+            <AlertDialog open={alertConfig.isOpen} onOpenChange={(open) => setAlertConfig(prev => ({ ...prev, isOpen: open }))}>
+                <AlertDialogContent className="bg-[#0f172a] border-white/10 text-white font-jakarta">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2">
+                            {alertConfig.type === 'error' && <FiShield className="text-rose-500" />}
+                            {alertConfig.type === 'warning' && <FiInfo className="text-amber-500" />}
+                            {alertConfig.type === 'success' && <FiCheckCircle className="text-emerald-500" />}
+                            {alertConfig.title}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-gray-400">
+                            {alertConfig.description}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="border-t border-white/5 pt-4">
+                        <AlertDialogAction className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 border-none">
+                            MENGERTI
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </section>
     );
 }

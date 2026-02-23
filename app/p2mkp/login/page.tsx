@@ -23,6 +23,15 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import Footer from '@/components/ui/footer';
 import Header from '@/components/ui/header';
 import { elautBaseUrl } from '@/constants/urls';
@@ -39,8 +48,48 @@ export default function P2MKPLoginPage() {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = React.useState(false);
 
+    // Alert State
+    const [alertConfig, setAlertConfig] = React.useState<{
+        isOpen: boolean;
+        title: string;
+        description: string;
+        type: 'success' | 'error' | 'warning';
+    }>({
+        isOpen: false,
+        title: '',
+        description: '',
+        type: 'warning',
+    });
+
+    const showAlert = (title: string, description: string, type: 'success' | 'error' | 'warning') => {
+        setAlertConfig({ isOpen: true, title, description, type });
+    };
+
     const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
+        resolver: async (data) => {
+            try {
+                const result = formSchema.safeParse(data);
+                if (result.success) {
+                    return { values: result.data, errors: {} };
+                }
+
+                const errors: any = {};
+                result.error.issues.forEach((issue) => {
+                    const path = issue.path.join('.');
+                    if (!errors[path]) {
+                        errors[path] = {
+                            type: issue.code,
+                            message: issue.message,
+                        };
+                    }
+                });
+
+                return { values: {}, errors };
+            } catch (err) {
+                console.error("Validation error:", err);
+                return { values: {}, errors: { root: { message: "Gagal melakukan validasi" } } };
+            }
+        },
         defaultValues: {
             email: '',
             password: '',
@@ -71,18 +120,39 @@ export default function P2MKPLoginPage() {
                 router.push('/p2mkp/dashboard');
             }
         } catch (error: any) {
-            Swal.fire({
-                title: 'Otentikasi Gagal',
-                text: error.response?.data?.message || 'Email atau password yang Anda masukkan salah.',
-                icon: 'error',
-                background: '#0f172a',
-                color: '#fff',
-                confirmButtonColor: '#3b82f6',
-            });
+            showAlert(
+                'Otentikasi Gagal',
+                error.response?.data?.message || 'Email atau password yang Anda masukkan salah.',
+                'error'
+            );
         } finally {
             setIsSubmitting(false);
         }
     }
+
+    const onInvalid = (errors: any) => {
+        const values = form.getValues();
+        const isEmpty = !values.email && !values.password;
+
+        if (isEmpty) {
+            showAlert(
+                'Data Masih Kosong',
+                'Silakan masukkan email dan kata sandi Anda.',
+                'warning'
+            );
+        } else {
+            const errorKeys = Object.keys(errors);
+            if (errorKeys.length > 0) {
+                const firstKey = errorKeys[0];
+                const firstError = errors[firstKey];
+                showAlert(
+                    'Data Belum Sesuai',
+                    firstError?.message || 'Mohon periksa kembali inputan Anda.',
+                    'error'
+                );
+            }
+        }
+    };
 
     return (
         <section className="min-h-screen bg-[#020617] text-white selection:bg-blue-500/30 font-jakarta overflow-x-hidden">
@@ -104,7 +174,7 @@ export default function P2MKPLoginPage() {
                     className="w-full"
                 >
                     {/* Header Section */}
-                    <div className="text-center mb-10 space-y-4 w-full">
+                    <div className="text-center mb-10 space-y-3 w-full">
                         <motion.div
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
@@ -114,12 +184,12 @@ export default function P2MKPLoginPage() {
                             <span className="w-1 h-1 rounded-full bg-blue-500 animate-pulse" />
                             Akses Masuk
                         </motion.div>
-                        <h1 className="text-2xl md:text-4xl leading-none font-calsans min-w-full">
+                        <h1 className="text-2xl md:text-4xl leading-none font-calsans mb-0 pb-0 min-w-full">
                             MASUK
                             <span className="text-transparent leading-none bg-clip-text bg-gradient-to-br from-blue-400 via-indigo-400 to-cyan-400"> PORTAL P2MKP.</span>
                         </h1>
-                        <p className="text-gray-400 text-[10px] leading-none md:text-xs max-w-xs mx-auto -mt-3">
-                            Silakan masukkan email dan kata sandi lembaga Anda untuk masuk ke dalam sistem.
+                        <p className="text-gray-400 text-[10px] -mt-2 leading-none md:text-xs max-w-xs mx-auto -mt-3">
+                            Silakan masukkan email dan kata sandi akun Anda untuk masuk ke dalam sistem.
                         </p>
                     </div>
 
@@ -129,20 +199,20 @@ export default function P2MKPLoginPage() {
 
                         <div className="relative bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[2rem] p-6 md:p-8 shadow-2xl">
                             <Form {...form}>
-                                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                                <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-4">
                                     <FormField
                                         control={form.control}
                                         name="email"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel className="text-[9px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-1.5">
-                                                    <FiMail className="text-blue-500" /> Alamat Email Akun
+                                                    <FiMail className="text-blue-500" /> Alamat Email
                                                 </FormLabel>
                                                 <FormControl>
                                                     <Input
                                                         {...field}
                                                         type="email"
-                                                        placeholder="lembaga@p2mkp.id"
+                                                        placeholder="@mail.com"
                                                         className="h-10 bg-white/5 border-white/10 text-white text-xs rounded-lg focus:ring-blue-500/20 focus:border-blue-500/50 transition-all"
                                                     />
                                                 </FormControl>
@@ -157,7 +227,7 @@ export default function P2MKPLoginPage() {
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel className="text-[9px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-1.5">
-                                                    <FiLock className="text-blue-500" /> Kata Sandi Akun
+                                                    <FiLock className="text-blue-500" /> Kata Sandi
                                                 </FormLabel>
                                                 <FormControl>
                                                     <Input
@@ -183,7 +253,7 @@ export default function P2MKPLoginPage() {
                                             ) : (
                                                 <>
                                                     <FiLogIn className="text-base" />
-                                                    MASUK KE DASHBOARD
+                                                    MASUK KE PORTAL
                                                 </>
                                             )}
                                         </button>
@@ -216,6 +286,27 @@ export default function P2MKPLoginPage() {
             </main>
 
             <Footer />
+
+            <AlertDialog open={alertConfig.isOpen} onOpenChange={(open) => setAlertConfig(prev => ({ ...prev, isOpen: open }))}>
+                <AlertDialogContent className="bg-[#0f172a] border-white/10 text-white font-jakarta">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2">
+                            {alertConfig.type === 'error' && <FiShield className="text-rose-500" />}
+                            {alertConfig.type === 'warning' && <FiInfo className="text-amber-500" />}
+                            {alertConfig.type === 'success' && <FiCheckCircle className="text-emerald-500" />}
+                            {alertConfig.title}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-gray-400">
+                            {alertConfig.description}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="border-t border-white/5 pt-4">
+                        <AlertDialogAction className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 border-none">
+                            MENGERTI
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </section>
     );
 }

@@ -52,7 +52,7 @@ export default function Hero() {
   }, [images.length]);
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-[#020617] font-jakarta">
+    <div className="relative pt-20 min-h-screen w-full overflow-hidden bg-[#020617] font-jakarta">
       <div className="absolute inset-0 z-0">
         <AnimatePresence mode="wait">
           <motion.div

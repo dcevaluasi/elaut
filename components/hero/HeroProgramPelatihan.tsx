@@ -89,7 +89,7 @@ export default function HeroProgramPelatihan({ program }: { program: string }) {
   }, [images.length]);
 
   return (
-    <div className="relative min-h-[75vh] md:min-h-[85vh] w-full overflow-hidden bg-[#020617] font-jakarta">
+    <div className="relative pt-20 min-h-[75vh] md:min-h-[85vh] w-full overflow-hidden bg-[#020617] font-jakarta">
       {/* Background Section */}
       <div className="absolute inset-0 z-0">
         <AnimatePresence mode="wait">

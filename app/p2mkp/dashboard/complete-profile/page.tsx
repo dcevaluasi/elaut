@@ -2,39 +2,30 @@
 
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
-    FiBox,
     FiUser,
     FiBriefcase,
     FiAward,
-    FiLogOut,
-    FiMenu,
-    FiX,
-    FiMapPin,
     FiInfo,
     FiSave,
     FiFileText,
     FiGlobe,
     FiMail,
     FiPhone,
-    FiChevronRight,
     FiActivity,
-    FiLayout,
     FiCalendar,
-    FiDatabase,
-    FiUpload,
-    FiEye
+    FiEye,
+    FiShield,
+    FiCheckCircle,
+    FiMapPin
 } from 'react-icons/fi';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
-import Swal from 'sweetalert2';
 import Cookies from 'js-cookie';
+import DashboardLayout from '../DashboardLayout';
 
-import { Button } from '@/components/ui/button';
 import {
     Form,
     FormControl,
@@ -44,15 +35,6 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import {
     Select,
     SelectContent,
@@ -60,46 +42,55 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useFetchDataRumpunPelatihan } from '@/hooks/elaut/master/useFetchDataRumpunPelatihan';
 import { elautBaseUrl } from '@/constants/urls';
 import { HashLoader } from 'react-spinners';
-import Toast from '@/commons/Toast';
 
 const formSchema = z.object({
-    NamaPpmkp: z.string().optional(),
-    StatusKepemilikan: z.string().optional(),
-    Nib: z.string().optional(),
-    Alamat: z.string().optional(),
-    Provinsi: z.string().optional(),
-    Kota: z.string().optional(),
-    Kecamatan: z.string().optional(),
-    Kelurahan: z.string().optional(),
-    KodePos: z.string().optional(),
-    NoTelp: z.string().optional(),
-    Email: z.string().email("Format email tidak valid").optional().or(z.literal("")),
-    Password: z.string().optional(),
-    JenisBidangPelatihan: z.string().optional(),
-    JenisPelatihan: z.string().optional(),
-    NamaPenanggungJawab: z.string().optional(),
-    NoTelpPenanggungJawab: z.string().optional(),
-    TempatTanggalLahir: z.string().optional(),
-    JenisKelamin: z.string().optional(),
-    PendidikanTerakhir: z.string().optional(),
-    dokumen_identifikasi_pemilik: z.any().optional(),
-    dokumen_asesment_mandiri: z.any().optional(),
-    dokument_surat_pernyataan: z.any().optional(),
-    dokumen_keterangan_usaha: z.any().optional(),
-    dokumen_afiliasi_parpol: z.any().optional(),
-    dokumen_rekomendasi_dinas: z.any().optional(),
-    dokumen_permohonan_pembentukan: z.any().optional(),
-    dokumen_permohonan_klasifikasi: z.any().optional(),
+    NamaPpmkp: z.string().min(1, "Nama Lembaga atau Usaha wajib diisi"),
+    StatusKepemilikan: z.string().min(1, "Status kepemilikan wajib dipilih"),
+    Nib: z.string().min(1, "NIB wajib diisi"),
+    Alamat: z.string().min(1, "Alamat wajib diisi"),
+    Provinsi: z.string().min(1, "Provinsi wajib diisi"),
+    Kota: z.string().min(1, "Kota/Kabupaten wajib diisi"),
+    Kecamatan: z.string().min(1, "Kecamatan wajib diisi"),
+    Kelurahan: z.string().min(1, "Kelurahan wajib diisi"),
+    KodePos: z.string().min(5, "Kode pos minimal 5 digit"),
+    NoTelp: z.string()
+        .min(10, "Nomor telepon minimal 10 digit")
+        .regex(/^08/, 'Nomor telepon harus diawali dengan 08'),
+    Email: z.string().email("Format email tidak valid").min(1, "Email wajib diisi"),
+    Password: z.string()
+        .optional()
+        .refine((val) => !val || (val.length >= 8 && /[0-9]/.test(val) && /[^A-Za-z0-9]/.test(val) && /[a-z]/.test(val) && /[A-Z]/.test(val)), {
+            message: "Kata sandi harus 8+ karakter, mengandung angka, karakter spesial, huruf besar & kecil"
+        }),
+    JenisBidangPelatihan: z.string().min(1, "Rumpun pelatihan wajib dipilih"),
+    JenisPelatihan: z.string().min(1, "Spesifikasi pelatihan wajib diisi"),
+    NamaPenanggungJawab: z.string().min(1, "Nama penanggung jawab wajib diisi"),
+    NoTelpPenanggungJawab: z.string()
+        .min(10, "Nomor telepon penanggung jawab minimal 10 digit")
+        .regex(/^08/, "Nomor telepon penanggung jawab harus diawali dengan 08"),
+    TempatTanggalLahir: z.string().min(1, "Tempat & tanggal lahir wajib diisi"),
+    JenisKelamin: z.string().min(1, "Jenis kelamin wajib dipilih"),
+    PendidikanTerakhir: z.string().min(1, "Pendidikan terakhir wajib dipilih"),
+
     Klasifikasi: z.string().optional(),
     SkorKlasifikasi: z.union([z.string(), z.number()]).optional(),
     TahunPenetapan: z.string().optional(),
     StatusUsaha: z.string().optional(),
     StatusPelatihan: z.string().optional(),
     BidangPelatihan: z.string().optional(),
-    IsLpk: z.string().optional(),
+    IsLpk: z.string().min(1, "Status LPK wajib dipilih"),
     Status: z.string().optional(),
     create_at: z.string().optional(),
     update_at: z.string().optional(),
@@ -110,12 +101,49 @@ export default function CompleteProfilePage() {
     const [isSubmitting, setIsSubmitting] = React.useState(false);
     const [loading, setLoading] = useState(true);
 
+    const [alertConfig, setAlertConfig] = React.useState<{
+        isOpen: boolean;
+        title: string;
+        description: string;
+        type: 'success' | 'error' | 'warning';
+    }>({
+        isOpen: false,
+        title: '',
+        description: '',
+        type: 'warning',
+    });
+
+    const showAlert = (title: string, description: string, type: 'success' | 'error' | 'warning') => {
+        setAlertConfig({ isOpen: true, title, description, type });
+    };
+
     const [profileId, setProfileId] = useState<string | number | null>(null);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [isMobile, setIsMobile] = useState(false);
 
     const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
+        resolver: async (data) => {
+            try {
+                const result = formSchema.safeParse(data);
+                if (result.success) {
+                    return { values: result.data, errors: {} };
+                }
+
+                const errors: any = {};
+                result.error.issues.forEach((issue) => {
+                    const path = issue.path.join('.');
+                    if (!errors[path]) {
+                        errors[path] = {
+                            type: issue.code,
+                            message: issue.message,
+                        };
+                    }
+                });
+
+                return { values: {}, errors };
+            } catch (err) {
+                console.error("Validation error:", err);
+                return { values: {}, errors: { root: { message: "Gagal melakukan validasi" } } };
+            }
+        },
         defaultValues: {
             NamaPpmkp: "",
             StatusKepemilikan: "Perserorangan",
@@ -136,19 +164,7 @@ export default function CompleteProfilePage() {
             TempatTanggalLahir: "",
             JenisKelamin: "",
             PendidikanTerakhir: "",
-            dokumen_identifikasi_pemilik: null,
-            dokumen_asesment_mandiri: null,
-            dokument_surat_pernyataan: null,
-            dokumen_keterangan_usaha: null,
-            dokumen_afiliasi_parpol: null,
-            dokumen_rekomendasi_dinas: null,
-            dokumen_permohonan_pembentukan: null,
-            dokumen_permohonan_klasifikasi: null,
-            Klasifikasi: "",
-            SkorKlasifikasi: 0,
-            TahunPenetapan: "",
-            StatusUsaha: "",
-            StatusPelatihan: "",
+
             BidangPelatihan: "",
             IsLpk: "",
             Status: "",
@@ -176,7 +192,7 @@ export default function CompleteProfilePage() {
                     const data = response.data.data || response.data;
                     setProfileId(data.IdPpmkp || data.id_p2mkp || data.id);
                     form.reset({
-                        NamaPpmkp: data.NamaPpmkp || data.nama_ppmkp || "",
+                        NamaPpmkp: data.nama_ppmkp,
                         StatusKepemilikan: data.StatusKepemilikan || data.status_kepemilikan || "Perserorangan",
                         Nib: data.Nib || data.nib || "",
                         Alamat: data.Alamat || data.alamat || "",
@@ -194,22 +210,8 @@ export default function CompleteProfilePage() {
                         TempatTanggalLahir: data.TempatTanggalLahir || data.tempat_tanggal_lahir || "",
                         JenisKelamin: data.JenisKelamin || data.jenis_kelamin || "",
                         PendidikanTerakhir: data.PendidikanTerakhir || data.pendidikan_terakhir || "",
-                        dokumen_identifikasi_pemilik: data.dokumen_identifikasi_pemilik || null,
-                        dokumen_asesment_mandiri: data.dokumen_asesment_mandiri || null,
-                        dokument_surat_pernyataan: data.dokument_surat_pernyataan || null,
-                        dokumen_keterangan_usaha: data.dokumen_keterangan_usaha || null,
-                        dokumen_afiliasi_parpol: data.dokumen_afiliasi_parpol || null,
-                        dokumen_rekomendasi_dinas: data.dokumen_rekomendasi_dinas || null,
-                        dokumen_permohonan_pembentukan: data.dokumen_permohonan_pembentukan || null,
-                        dokumen_permohonan_klasifikasi: data.dokumen_permohonan_klasifikasi || null,
-                        Klasifikasi: data.Klasifikasi || data.klasifikasi || "",
-                        SkorKlasifikasi: data.SkorKlasifikasi || data.skor_klasifikasi || 0,
-                        TahunPenetapan: data.TahunPenetapan || data.tahun_penetapan || "",
-                        StatusUsaha: data.StatusUsaha || data.status_usaha || "",
-                        StatusPelatihan: data.StatusPelatihan || data.status_pelatihan || data.status_peltihan || "",
                         BidangPelatihan: data.BidangPelatihan || data.bidang_pelatihan || "",
                         IsLpk: data.IsLpk || data.is_lpk || "",
-                        Status: data.Status || data.status || "",
                         create_at: data.create_at || "",
                         update_at: data.update_at || ""
                     });
@@ -247,27 +249,6 @@ export default function CompleteProfilePage() {
         }
     }, [loadingRumpun, rumpunPelatihan, watchedJenis, watchedBidang, form]);
 
-    useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth < 1024) {
-                setIsMobile(true);
-                setIsSidebarOpen(false);
-            } else {
-                setIsMobile(false);
-                setIsSidebarOpen(true);
-            }
-        };
-        handleResize();
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
-    const handleLogout = () => {
-        Cookies.remove('XSRF091');
-        Cookies.remove('Access');
-        router.push('/p2mkp/login');
-    };
-
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsSubmitting(true);
         try {
@@ -278,11 +259,11 @@ export default function CompleteProfilePage() {
             }
 
             if (!profileId) {
-                Toast.fire({
-                    icon: 'error',
-                    title: 'System Error',
-                    text: 'ID Profil tidak ditemukan. Silakan refresh halaman.'
-                });
+                showAlert(
+                    'System Error',
+                    'ID Profil tidak ditemukan. Silakan refresh halaman.',
+                    'error'
+                );
                 return;
             }
 
@@ -290,14 +271,7 @@ export default function CompleteProfilePage() {
             Object.entries(values).forEach(([key, value]) => {
                 if (value === undefined || value === null || value === "") return;
 
-                // Handle file fields
-                if (key.startsWith('dokumen') || key.startsWith('dokument')) {
-                    if (value instanceof File) {
-                        formData.append(key, value);
-                    }
-                } else {
-                    formData.append(key, String(value));
-                }
+                formData.append(key, String(value));
             });
 
             const response = await axios.put(`${elautBaseUrl}/p2mkp/update_p2mkp?id=${profileId}`, formData, {
@@ -308,403 +282,302 @@ export default function CompleteProfilePage() {
             });
 
             if (response.status === 200) {
-                Toast.fire({
-                    icon: 'success',
-                    title: 'Profil Terupdate',
-                    text: 'Seluruh perubahan data profil Anda telah disimpan.'
-                });
-                router.push('/p2mkp/dashboard');
+                showAlert(
+                    'Profil Terupdate',
+                    'Seluruh perubahan data profil Anda telah disimpan ke server pusat.',
+                    'success'
+                );
+                setTimeout(() => {
+                    router.push('/p2mkp/dashboard');
+                }, 1500);
             }
         } catch (error: any) {
             console.error('Submission error:', error);
-            Swal.fire({
-                title: 'Operation Failed',
-                text: error.response?.data?.message || 'Gagal sinkronisasi data profil.',
-                icon: 'error',
-                background: '#0f172a',
-                color: '#fff',
-                confirmButtonColor: '#3b82f6',
-            });
+            showAlert(
+                'Operation Failed',
+                error.response?.data?.message || 'Gagal sinkronisasi data profil.',
+                'error'
+            );
         } finally {
             setIsSubmitting(false);
         }
     }
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center">
-                <HashLoader color="#3b82f6" size={50} />
-                <p className="mt-6 text-gray-500 text-[10px] font-black uppercase tracking-[0.4em]">Decrypting Profile Core...</p>
-            </div>
-        );
-    }
+    const onInvalid = (errors: any) => {
+        const values = form.getValues();
+        const isEmpty = !values.NamaPpmkp && !values.Alamat && !values.NoTelp && !values.Email;
+
+        if (isEmpty) {
+            showAlert(
+                'Data Masih Kosong',
+                'Silakan lengkapi informasi profil Anda terlebih dahulu.',
+                'warning'
+            );
+        } else {
+            const errorKeys = Object.keys(errors);
+            if (errorKeys.length > 0) {
+                const firstKey = errorKeys[0];
+                const firstError = errors[firstKey];
+                showAlert(
+                    'Data Belum Sesuai',
+                    firstError?.message || 'Mohon periksa kembali inputan Anda.',
+                    'error'
+                );
+            }
+        }
+    };
 
     return (
-        <div className="min-h-screen bg-[#020617] text-white flex font-jakarta overflow-hidden">
-            {/* Ambient Ambient */}
-            <div className="fixed inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px]" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px]" />
-            </div>
+        <DashboardLayout>
+            <div className="relative overflow-hidden">
+                {/* Background Ambient Effects */}
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[120px] pointer-events-none" />
+                <div className="absolute bottom-1/2 left-0 w-[400px] h-[400px] bg-indigo-500/5 rounded-full blur-[100px] pointer-events-none" />
 
-            {/* Shared Sidebar */}
-            <aside
-                className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-[#0f172a]/60 backdrop-blur-3xl border-r border-white/5 transition-transform duration-500 ease-out shadow-2xl ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}
-            >
-                <div className="h-full flex flex-col pt-8">
-                    <div className="px-8 pb-10 flex items-center justify-between">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="max-w-5xl mx-auto space-y-16 pb-32 relative z-10"
+                >
+                    <div className="space-y-6 pt-6">
                         <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                                <FiBox className="text-2xl text-white" />
-                            </div>
-                            <div>
-                                <h1 className="font-calsans text-2xl leading-none">P2MKP</h1>
-                                <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mt-1">Portal</p>
-                            </div>
+                            <span className="h-[2px] w-12 bg-blue-500/50 rounded-full" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-400">Gerbang Registrasi</span>
                         </div>
-                        {isMobile && (
-                            <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-gray-500 hover:text-white">
-                                <FiX size={24} />
-                            </button>
-                        )}
+                        <h1 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-none text-white">
+                            Lengkapi <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500">Profil</span>
+                        </h1>
+                        <p className="text-gray-500 text-lg max-w-3xl font-medium leading-relaxed italic opacity-80 mt-6">
+                            Mohon lengkapi parameter kredensial lembaga dan otorisasi penanggung jawab untuk finalisasi sertifikasi standarisasi P2MKP.
+                        </p>
                     </div>
 
-                    <div className="flex-1 px-4 space-y-8">
-                        <div className="space-y-1">
-                            <p className="px-4 text-[10px] font-black text-gray-600 uppercase tracking-widest mb-4">Core Menu</p>
-                            <SidebarItem href="/p2mkp/dashboard" icon={<FiActivity />} label="Overview" />
-                            <SidebarItem href="/p2mkp/dashboard/penetapan" icon={<FiAward />} label="Penetapan P2MKP" />
-                        </div>
-
-                        <div className="space-y-1">
-                            <p className="px-4 text-[10px] font-black text-gray-600 uppercase tracking-widest mb-4">Reports</p>
-                            <SidebarItem href="/p2mkp/laporan-kegiatan" icon={<FiFileText />} label="Create Report" />
-                            <SidebarItem href="/p2mkp/laporan-kegiatan/report" icon={<FiDatabase />} label="Report History" />
-                        </div>
-
-                        <div className="space-y-1">
-                            <p className="px-4 text-[10px] font-black text-gray-600 uppercase tracking-widest mb-4">Account</p>
-                            <SidebarItem href="/p2mkp/dashboard/complete-profile" icon={<FiUser />} label="Profile Lembaga" active />
-                        </div>
-                    </div>
-
-                    <div className="p-6">
-                        <div className="bg-white/5 rounded-[2rem] border border-white/5 p-6 relative overflow-hidden group">
-                            <div className="relative z-10 space-y-3 font-bold text-center">
-                                <p className="text-[10px] text-gray-500 uppercase tracking-widest">Profile Completion</p>
-                                <div className="text-2xl font-calsans text-blue-400">85%</div>
-                                <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-                                    <div className="w-[85%] h-full bg-blue-500" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </aside>
-
-            {/* Main Content Area */}
-            <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Header Top */}
-                <header className="h-24 bg-transparent flex items-center justify-between px-8 lg:px-12 shrink-0 z-20">
-                    <div className="flex items-center gap-6">
-                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl lg:hidden text-blue-400 border border-white/5">
-                            <FiMenu size={20} />
-                        </button>
-                        <div className="hidden md:flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest">
-                            <Link href="/p2mkp/dashboard" className="text-gray-500 hover:text-white transition-colors">Dashboard</Link>
-                            <span className="text-gray-700">/</span>
-                            <span className="text-blue-400">Complete Profile</span>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-8">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <button className="flex items-center gap-4 hover:bg-white/5 p-1.5 rounded-2xl transition-all border border-transparent hover:border-white/10">
-                                    <div className="text-right hidden sm:block">
-                                        <p className="text-xs font-bold text-white leading-none">Admin P2MKP</p>
-                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter mt-1">Institutional Lead</p>
-                                    </div>
-                                    <Avatar className="h-10 w-10 border-2 border-white/10 shadow-xl rounded-2xl overflow-hidden">
-                                        <AvatarImage src="https://github.com/shadcn.png" className="rounded-2xl" />
-                                        <AvatarFallback>AD</AvatarFallback>
-                                    </Avatar>
-                                </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-64 bg-[#0f172a]/95 backdrop-blur-3xl border-white/10 text-white p-2 rounded-[2rem] mt-2 shadow-2xl">
-                                <DropdownMenuLabel className="px-4 py-4 font-calsans text-lg text-blue-400">Portal Akses</DropdownMenuLabel>
-                                <DropdownMenuSeparator className="bg-white/5" />
-                                <DropdownMenuItem onClick={handleLogout} className="p-3 rounded-xl hover:bg-rose-500/10 cursor-pointer text-rose-400 text-xs font-black tracking-widest">
-                                    <FiLogOut className="mr-3" size={16} /> LOGOUT SESSION
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                </header>
-
-                <div className="flex-1 overflow-y-auto p-8 lg:p-12 relative overflow-hidden">
-                    {/* Background Ambient Effects */}
-                    <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[120px] pointer-events-none" />
-                    <div className="absolute bottom-1/2 left-0 w-[400px] h-[400px] bg-indigo-500/5 rounded-full blur-[100px] pointer-events-none" />
-
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="max-w-5xl mx-auto space-y-16 pb-32 relative z-10"
-                    >
-                        <div className="space-y-6 pt-6">
-                            <div className="flex items-center gap-4">
-                                <span className="h-[2px] w-12 bg-blue-500/50 rounded-full" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-400">Gerbang Registrasi</span>
-                            </div>
-                            <h1 className="text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-none text-white">
-                                Lengkapi <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500">Profil</span>
-                            </h1>
-                            <p className="text-gray-500 text-lg max-w-3xl font-medium leading-relaxed italic opacity-80 mt-6">
-                                Mohon lengkapi parameter kredensial lembaga dan otorisasi penanggung jawab untuk finalisasi sertifikasi standarisasi P2MKP.
-                            </p>
-                        </div>
-
-                        <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
-                                {/* Section 1: Data Umum Kelembagaan */}
-                                <FormCard
-                                    icon={<FiBriefcase />}
-                                    title="Informasi Kelembagaan"
-                                    subtitle="Identitas inti dan legalitas lembaga P2MKP"
-                                    color="blue"
-                                >
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <FormFieldItem label="Nama P2MKP" name="NamaPpmkp" control={form.control} placeholder="Masukkan Nama Resmi..." icon={<FiBriefcase />} />
-                                        <FormField
-                                            control={form.control}
-                                            name="StatusKepemilikan"
-                                            render={({ field }) => (
-                                                <FormItem className="space-y-2">
-                                                    <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Status Kepemilikan</FormLabel>
-                                                    <Select onValueChange={field.onChange} value={field.value}>
-                                                        <FormControl>
-                                                            <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
-                                                                <SelectValue placeholder="Pilih Status..." />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent className="bg-[#0f172a] border-white/10 text-white backdrop-blur-3xl rounded-2xl">
-                                                            {['Perserorangan', 'Kelompok', 'Instansi Pemerintah', 'Swasta'].map(val => (
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-10">
+                            {/* Section 1: Data Umum Kelembagaan */}
+                            <FormCard
+                                icon={<FiBriefcase />}
+                                title="Informasi Kelembagaan"
+                                subtitle="Identitas inti dan legalitas lembaga atau usaha"
+                                color="blue"
+                            >
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <FormFieldItem label="Nama Lembaga/Usaha" name="NamaPpmkp" control={form.control} placeholder="Masukkan Nama Resmi..." icon={<FiBriefcase />} />
+                                    <FormField
+                                        control={form.control}
+                                        name="StatusKepemilikan"
+                                        render={({ field }) => (
+                                            <FormItem className="space-y-2">
+                                                <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Status Kepemilikan</FormLabel>
+                                                <Select onValueChange={field.onChange} value={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
+                                                            <SelectValue placeholder="Pilih Status..." />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent className="bg-[#0f172a] border-white/10 text-white backdrop-blur-3xl rounded-2xl">
+                                                        {['Koperasi',
+                                                            'BUMN',
+                                                            'Persero',
+                                                            'Perusahaan Umum',
+                                                            'Badan Usaha Milik Swasta',
+                                                            'Perserorangan',].map(val => (
                                                                 <SelectItem key={val} value={val} className="hover:bg-blue-600/20 rounded-lg py-3 cursor-pointer">{val}</SelectItem>
                                                             ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormFieldItem label="Nomor Induk Berusaha (NIB)" name="Nib" control={form.control} placeholder="Masukkan Kode NIB..." icon={<FiFileText />} />
-                                        <FormFieldItem label="Email Resmi" name="Email" control={form.control} placeholder="admin@p2mkp.go.id" icon={<FiMail />} type="email" />
-                                        <FormFieldItem label="Ubah Kata Sandi" name="Password" control={form.control} placeholder="Kosongkan jika tidak diubah..." icon={<FiGlobe />} type="password" />
-                                        <FormFieldItem label="Kontak Telepon" name="NoTelp" control={form.control} placeholder="08XXXXXXXXXX" icon={<FiPhone />} />
-                                        <FormField
-                                            control={form.control}
-                                            name="IsLpk"
-                                            render={({ field }) => (
-                                                <FormItem className="space-y-2">
-                                                    <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Apakah Lembaga LPK?</FormLabel>
-                                                    <Select onValueChange={field.onChange} value={field.value}>
-                                                        <FormControl>
-                                                            <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
-                                                                <SelectValue placeholder="Konfirmasi LPK..." />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent className="bg-[#0f172a] border-white/10 text-white backdrop-blur-3xl rounded-2xl">
-                                                            <SelectItem value="Ya" className="hover:bg-blue-600/20 rounded-lg py-3 cursor-pointer">Ya, Terdaftar LPK</SelectItem>
-                                                            <SelectItem value="Tidak" className="hover:bg-blue-600/20 rounded-lg py-3 cursor-pointer">Tidak</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
-                                </FormCard>
-
-                                {/* Section 2: Alamat */}
-                                <FormCard
-                                    icon={<FiMapPin />}
-                                    title="Lokasi Operasional"
-                                    subtitle="Koordinat dan alamat fisik kantor pusat"
-                                    color="indigo"
-                                >
-                                    <div className="space-y-8">
-                                        <FormFieldItem label="Alamat Spesifik" name="Alamat" control={form.control} placeholder="Jalan, No, RT/RW..." icon={<FiMapPin />} />
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                            <FormFieldItem label="Provinsi" name="Provinsi" control={form.control} placeholder="Nama Provinsi..." />
-                                            <FormFieldItem label="Kota/Kabupaten" name="Kota" control={form.control} placeholder="Nama Kota..." />
-                                            <FormFieldItem label="Kecamatan" name="Kecamatan" control={form.control} placeholder="Kecamatan..." />
-                                            <FormFieldItem label="Kelurahan" name="Kelurahan" control={form.control} placeholder="Kelurahan..." />
-                                            <FormFieldItem label="Kode Pos" name="KodePos" control={form.control} placeholder="5 Digit..." maxlength={5} />
-                                        </div>
-                                    </div>
-                                </FormCard>
-
-                                {/* Section 3: Bidang Pelatihan */}
-                                <FormCard
-                                    icon={<FiActivity />}
-                                    title="Spesialisasi Pelatihan"
-                                    subtitle="Cakupan rumpun dan jenis kompetensi"
-                                    color="cyan"
-                                >
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <FormField
-                                            control={form.control}
-                                            name="JenisBidangPelatihan"
-                                            render={({ field }) => (
-                                                <FormItem className="space-y-2">
-                                                    <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Rumpun Utama</FormLabel>
-                                                    <Select
-                                                        onValueChange={(val) => {
-                                                            field.onChange(val);
-                                                            form.setValue("BidangPelatihan", val, { shouldValidate: true });
-                                                        }}
-                                                        value={field.value || ""}
-                                                    >
-                                                        <FormControl>
-                                                            <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
-                                                                <SelectValue placeholder={loadingRumpun ? "Singkronisasi..." : "Pilih Rumpun..."} />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent className="bg-[#0f172a] border-white/10 text-white backdrop-blur-3xl rounded-4xl">
-                                                            {rumpunPelatihan?.map((item: any) => (
-                                                                <SelectItem key={item.id_rumpun_pelatihan} value={item.name} className="hover:bg-cyan-600/20 rounded-lg py-3 cursor-pointer">
-                                                                    {item.name}
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormFieldItem label="Spesifikasi Pelatihan" name="JenisPelatihan" control={form.control} placeholder="Contoh: Budidaya Ikan Nila..." icon={<FiAward />} />
-                                    </div>
-                                </FormCard>
-
-                                {/* Section 4: Document Links */}
-                                <FormCard
-                                    icon={<FiFileText />}
-                                    title="Kumpulan Dokumentasi"
-                                    subtitle="Link verifikasi berkas pendukung"
-                                    color="emerald"
-                                >
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        {[
-                                            { name: "dokumen_identifikasi_pemilik", label: "Verifikasi Identitas" },
-                                            { name: "dokumen_asesment_mandiri", label: "Matriks Asesmen Mandiri" },
-                                            { name: "dokument_surat_pernyataan", label: "Surat Pernyataan Integritas" },
-                                            { name: "dokumen_keterangan_usaha", label: "Izin Usaha (SKU/NIB)" },
-                                            { name: "dokumen_afiliasi_parpol", label: "Afiliasi Non-Parpol" },
-                                            { name: "dokumen_rekomendasi_dinas", label: "Rekomendasi Dinas" },
-                                        ].map((doc) => (
-                                            <FormFieldFileItem key={doc.name} label={doc.label} name={doc.name} control={form.control} icon={<FiUpload />} />
-                                        ))}
-                                    </div>
-                                </FormCard>
-
-                                {/* Section 5: Penanggung Jawab */}
-                                <FormCard
-                                    icon={<FiUser />}
-                                    title="Penanggung Jawab"
-                                    subtitle="Personal data penanggung jawab lembaga"
-                                    color="purple"
-                                >
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <FormFieldItem label="Nama Lengkap & Gelar" name="NamaPenanggungJawab" control={form.control} placeholder="Nama lengkap sesuai identitas..." icon={<FiUser />} />
-                                        <FormFieldItem label="Kontak PIC" name="NoTelpPenanggungJawab" control={form.control} placeholder="WhatsApp/Telepon..." icon={<FiPhone />} />
-                                        <FormFieldItem label="Tempat, Tanggal Lahir" name="TempatTanggalLahir" control={form.control} placeholder="Kota, HH-BB-TTTT" icon={<FiCalendar />} />
-                                        <FormField
-                                            control={form.control}
-                                            name="JenisKelamin"
-                                            render={({ field }) => (
-                                                <FormItem className="space-y-2">
-                                                    <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Jenis Kelamin</FormLabel>
-                                                    <Select onValueChange={field.onChange} value={field.value}>
-                                                        <FormControl>
-                                                            <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
-                                                                <SelectValue placeholder="Pilih..." />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent className="bg-[#0f172a] border-white/10 text-white backdrop-blur-3xl rounded-2xl">
-                                                            <SelectItem value="Laki-laki" className="hover:bg-purple-600/20 rounded-lg py-3 cursor-pointer">Laki-laki</SelectItem>
-                                                            <SelectItem value="Perempuan" className="hover:bg-purple-600/20 rounded-lg py-3 cursor-pointer">Perempuan</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="PendidikanTerakhir"
-                                            render={({ field }) => (
-                                                <FormItem className="space-y-2">
-                                                    <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Pendidikan Terakhir</FormLabel>
-                                                    <Select onValueChange={field.onChange} value={field.value}>
-                                                        <FormControl>
-                                                            <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
-                                                                <SelectValue placeholder="Kualifikasi..." />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent className="bg-[#0f172a] border-white/10 text-white backdrop-blur-3xl rounded-2xl">
-                                                            {['SD', 'SMP', 'SMA', 'D3', 'S1', 'S2', 'S3', 'Lainnya'].map(val => (
-                                                                <SelectItem key={val} value={val} className="hover:bg-purple-600/20 rounded-lg py-3 cursor-pointer">{val}</SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                </FormItem>
-                                            )}
-                                        />
-                                    </div>
-                                </FormCard>
-
-                                <div className="pt-10 flex justify-end">
-                                    <button
-                                        type="submit"
-                                        disabled={isSubmitting}
-                                        className="group/save relative w-full md:w-auto min-w-[300px] h-16 bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90 text-white rounded-[2rem] font-black tracking-[0.2em] shadow-2xl transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50 overflow-hidden"
-                                    >
-                                        {isSubmitting ? (
-                                            <HashLoader color="#fff" size={24} />
-                                        ) : (
-                                            <>
-                                                <FiSave size={20} className="group-hover:translate-y-[-2px] transition-transform" />
-                                                SIMPAN PERUBAHAN PROFIL
-                                            </>
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormItem>
                                         )}
-                                        <div className="absolute inset-0 w-12 bg-white/20 -skew-x-12 translate-x-[-200%] group-hover/save:translate-x-[600%] transition-transform duration-1000" />
-                                    </button>
+                                    />
+                                    <FormFieldItem label="Nomor Induk Berusaha (NIB)" name="Nib" control={form.control} placeholder="Masukkan Kode NIB..." icon={<FiFileText />} />
+                                    <FormFieldItem label="Email Resmi" name="Email" control={form.control} placeholder="admin@p2mkp.go.id" icon={<FiMail />} type="email" />
+                                    <FormFieldItem label="Ubah Kata Sandi" name="Password" control={form.control} placeholder="Kosongkan jika tidak diubah..." icon={<FiGlobe />} type="password" />
+                                    <FormFieldItem label="Kontak Telepon" name="NoTelp" control={form.control} placeholder="08XXXXXXXXXX" icon={<FiPhone />} />
+                                    <FormField
+                                        control={form.control}
+                                        name="IsLpk"
+                                        render={({ field }) => (
+                                            <FormItem className="space-y-2">
+                                                <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Apakah Lembaga LPK?</FormLabel>
+                                                <Select onValueChange={field.onChange} value={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
+                                                            <SelectValue placeholder="Konfirmasi LPK..." />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent className="bg-[#0f172a] border-white/10 text-white backdrop-blur-3xl rounded-2xl">
+                                                        <SelectItem value="Ya" className="hover:bg-blue-600/20 rounded-lg py-3 cursor-pointer">Ya, Terdaftar LPK</SelectItem>
+                                                        <SelectItem value="Tidak" className="hover:bg-blue-600/20 rounded-lg py-3 cursor-pointer">Tidak</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormItem>
+                                        )}
+                                    />
                                 </div>
-                            </form>
-                        </Form>
-                    </motion.div>
-                </div>
+                            </FormCard>
+
+                            {/* Section 2: Alamat */}
+                            <FormCard
+                                icon={<FiMapPin />}
+                                title="Lokasi Operasional"
+                                subtitle="Koordinat dan alamat fisik kantor pusat"
+                                color="indigo"
+                            >
+                                <div className="space-y-8">
+                                    <FormFieldItem label="Alamat Spesifik" name="Alamat" control={form.control} placeholder="Jalan, No, RT/RW..." icon={<FiMapPin />} />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                        <FormFieldItem label="Provinsi" name="Provinsi" control={form.control} placeholder="Nama Provinsi..." />
+                                        <FormFieldItem label="Kota/Kabupaten" name="Kota" control={form.control} placeholder="Nama Kota..." />
+                                        <FormFieldItem label="Kecamatan" name="Kecamatan" control={form.control} placeholder="Kecamatan..." />
+                                        <FormFieldItem label="Kelurahan" name="Kelurahan" control={form.control} placeholder="Kelurahan..." />
+                                        <FormFieldItem label="Kode Pos" name="KodePos" control={form.control} placeholder="5 Digit..." maxlength={5} />
+                                    </div>
+                                </div>
+                            </FormCard>
+
+                            {/* Section 3: Bidang Pelatihan */}
+                            <FormCard
+                                icon={<FiActivity />}
+                                title="Spesialisasi Pelatihan"
+                                subtitle="Cakupan rumpun dan jenis kompetensi"
+                                color="cyan"
+                            >
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <FormField
+                                        control={form.control}
+                                        name="JenisBidangPelatihan"
+                                        render={({ field }) => (
+                                            <FormItem className="space-y-2">
+                                                <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Rumpun Utama</FormLabel>
+                                                <Select
+                                                    onValueChange={(val) => {
+                                                        field.onChange(val);
+                                                        form.setValue("BidangPelatihan", val, { shouldValidate: true });
+                                                    }}
+                                                    value={field.value || ""}
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
+                                                            <SelectValue placeholder={loadingRumpun ? "Singkronisasi..." : "Pilih Rumpun..."} />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent className="bg-[#0f172a] border-white/10 text-white backdrop-blur-3xl rounded-4xl">
+                                                        {rumpunPelatihan?.map((item: any) => (
+                                                            <SelectItem key={item.id_rumpun_pelatihan} value={item.name} className="hover:bg-cyan-600/20 rounded-lg py-3 cursor-pointer">
+                                                                {item.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormFieldItem label="Spesifikasi Pelatihan" name="JenisPelatihan" control={form.control} placeholder="Contoh: Budidaya Ikan Nila..." icon={<FiAward />} />
+                                </div>
+                            </FormCard>
+
+                            {/* Section 5: Penanggung Jawab */}
+                            <FormCard
+                                icon={<FiUser />}
+                                title="Penanggung Jawab"
+                                subtitle="Personal data penanggung jawab lembaga"
+                                color="purple"
+                            >
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <FormFieldItem label="Nama Lengkap & Gelar" name="NamaPenanggungJawab" control={form.control} placeholder="Nama lengkap sesuai identitas..." icon={<FiUser />} />
+                                    <FormFieldItem label="Kontak PIC" name="NoTelpPenanggungJawab" control={form.control} placeholder="WhatsApp/Telepon..." icon={<FiPhone />} />
+                                    <FormFieldItem label="Tempat, Tanggal Lahir" name="TempatTanggalLahir" control={form.control} placeholder="Kota, HH-BB-TTTT" icon={<FiCalendar />} />
+                                    <FormField
+                                        control={form.control}
+                                        name="JenisKelamin"
+                                        render={({ field }) => (
+                                            <FormItem className="space-y-2">
+                                                <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Jenis Kelamin</FormLabel>
+                                                <Select onValueChange={field.onChange} value={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
+                                                            <SelectValue placeholder="Pilih..." />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent className="bg-[#0f172a] border-white/10 text-white backdrop-blur-3xl rounded-2xl">
+                                                        <SelectItem value="Laki-laki" className="hover:bg-purple-600/20 rounded-lg py-3 cursor-pointer">Laki-laki</SelectItem>
+                                                        <SelectItem value="Perempuan" className="hover:bg-purple-600/20 rounded-lg py-3 cursor-pointer">Perempuan</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="PendidikanTerakhir"
+                                        render={({ field }) => (
+                                            <FormItem className="space-y-2">
+                                                <FormLabel className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">Pendidikan Terakhir</FormLabel>
+                                                <Select onValueChange={field.onChange} value={field.value}>
+                                                    <FormControl>
+                                                        <SelectTrigger className="w-full h-14 bg-white/5 border-white/10 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all text-gray-300">
+                                                            <SelectValue placeholder="Kualifikasi..." />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent className="bg-[#0f172a] border-white/10 text-white backdrop-blur-3xl rounded-2xl">
+                                                        {['SD', 'SMP', 'SMA', 'D3', 'S1', 'S2', 'S3', 'Lainnya'].map(val => (
+                                                            <SelectItem key={val} value={val} className="hover:bg-purple-600/20 rounded-lg py-3 cursor-pointer">{val}</SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            </FormCard>
+
+                            <div className="pt-5 flex justify-end">
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="group/save relative w-full md:w-auto min-w-[330px] px-5 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90 text-white rounded-[2rem] font-black tracking-[0.2em] shadow-2xl transition-all flex items-center justify-center gap-3 active:scale-95 text-sm disabled:opacity-50 overflow-hidden"
+                                >
+                                    {isSubmitting ? (
+                                        <HashLoader color="#fff" size={24} />
+                                    ) : (
+                                        <>
+                                            <FiSave size={20} className="group-hover:translate-y-[-2px] transition-transform" />
+                                            SIMPAN PERUBAHAN PROFIL
+                                        </>
+                                    )}
+                                    <div className="absolute inset-0 w-12 bg-white/20 -skew-x-12 translate-x-[-200%] group-hover/save:translate-x-[600%] transition-transform duration-1000" />
+                                </button>
+                            </div>
+                        </form>
+                    </Form>
+                </motion.div>
             </div>
-        </div>
+
+            <AlertDialog open={alertConfig.isOpen} onOpenChange={(open) => setAlertConfig(prev => ({ ...prev, isOpen: open }))}>
+                <AlertDialogContent className="bg-[#0f172a] border-white/10 text-white font-jakarta">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2">
+                            {alertConfig.type === 'error' && <FiShield className="text-rose-500" />}
+                            {alertConfig.type === 'warning' && <FiInfo className="text-amber-500" />}
+                            {alertConfig.type === 'success' && <FiCheckCircle className="text-emerald-500" />}
+                            {alertConfig.title}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-gray-400">
+                            {alertConfig.description}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="border-t border-white/5 pt-4">
+                        <AlertDialogAction className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 border-none">
+                            MENGERTI
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </DashboardLayout>
     );
 }
 
-// Visual Sidebar Item
-function SidebarItem({ href, icon, label, active }: any) {
-    return (
-        <Link href={href} className="block px-4">
-            <motion.div
-                whileHover={{ x: 5 }}
-                className={`flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all duration-300 relative group ${active ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20' : 'text-gray-500 hover:bg-white/5 hover:text-gray-200'}`}
-            >
-                <span className={`text-xl transition-transform group-hover:scale-110 ${active ? 'text-white' : 'text-gray-600 group-hover:text-blue-400'}`}>
-                    {icon}
-                </span>
-                <span className={`text-xs font-bold tracking-wide ${active ? 'font-black' : ''}`}>{label}</span>
-                {active && (
-                    <motion.div layoutId="navBar" className="absolute left-0 w-1 h-6 bg-white rounded-full ml-1" />
-                )}
-            </motion.div>
-        </Link>
-    );
-}
+
 
 // Premium Form Card Container
 function FormCard({ icon, title, subtitle, children, color }: any) {

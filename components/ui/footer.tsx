@@ -73,11 +73,11 @@ export default function Footer() {
           </div>
 
           <div className="sm:col-span-6 md:col-span-3 lg:col-span-2">
-            <h6 className="text-gray-300 font-bold mb-2">Program Pelatihan</h6>
+            <h6 className="text-gray-300 font-bold mb-2">Kategori Pelatihan</h6>
             <ul className="text-sm">
-              <FooterLink href="/layanan/program/perikanan">Perikanan</FooterLink>
-              <FooterLink href="/layanan/program/akp">Awak Kapal Perikanan</FooterLink>
-              <FooterLink href="/layanan/program/kelautan">Kelautan</FooterLink>
+              <FooterLink href="/layanan/pelatihan/program/perikanan">Perikanan</FooterLink>
+              <FooterLink href="/layanan/pelatihan/program/akp">Awak Kapal Perikanan</FooterLink>
+              <FooterLink href="/layanan/pelatihan/program/kelautan">Kelautan</FooterLink>
             </ul>
           </div>
 
