@@ -95,7 +95,7 @@ const FormatSertifikatP2MKP = forwardRef(
                         </p>
                     </div>
 
-                    <div className="w-full scale-[1.05] -mt-7 flex-0 gap-0 flex flex-col justify-between py-2 space-y-0">
+                    <div className="w-full scale-[1.03] -mt-7 flex-0 gap-0 flex flex-col justify-between py-2 space-y-0">
                         {/* Header Section */}
                         <div className="space-y-0 leading-none py-0 gap-0">
                             <div className="flex flex-col items-center justify-center">
