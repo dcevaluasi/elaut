@@ -145,19 +145,19 @@ const FormatSertifikatP2MKP = forwardRef(
                                             <span className="font-bosBold text-sm uppercase block">Nama Lembaga</span>
                                             <span className="font-bos italic text-[10px] text-gray-700 block -mt-1 leading-tight">Institution Name</span>
                                         </td>
-                                        <td className="w-[3%] align-top py-1 text-lg font-bosBold text-blue-900">:</td>
-                                        <td className="w-[69%] align-top py-1 text-lg font-bosBold uppercase text-blue-900 leading-tight">
+                                        <td className="w-[3%] align-top py-1 text-md font-bosBold text-blue-900">:</td>
+                                        <td className="w-[69%] align-top py-1 text-md font-bosBold uppercase text-blue-900 leading-tight">
                                             {p2mkp?.nama_Ppmkp || p2mkp?.nama_ppmkp || "-"}
                                         </td>
                                     </tr>
                                     <tr className="mb-4">
                                         <td className="w-[28%] align-top py-1">
-                                            <span className="font-bosBold text-sm uppercase block">Bidang Pelatihan</span>
+                                            <span className="font-bosBold text-sm uppercase block">Jenis Pelatihan</span>
                                             <span className="font-bos italic text-[10px] text-gray-700 block -mt-1 leading-tight">Training Category</span>
                                         </td>
-                                        <td className="w-[3%] align-top py-1 text-lg font-bosBold">:</td>
-                                        <td className="w-[69%] align-top py-1 text-lg font-bosBold uppercase leading-tight">
-                                            {bidangPelatihanComputed}
+                                        <td className="w-[3%] align-top py-1 text-md font-bosBold">:</td>
+                                        <td className="w-[69%] align-top py-1 text-md font-bosBold uppercase leading-tight">
+                                            {p2mkp?.jenis_pelatihan}
                                         </td>
                                     </tr>
                                     <tr className="mb-4">
@@ -165,8 +165,8 @@ const FormatSertifikatP2MKP = forwardRef(
                                             <span className="font-bosBold text-sm uppercase block">Alamat</span>
                                             <span className="font-bos italic text-[10px] text-gray-700 block -mt-1 leading-tight">Address</span>
                                         </td>
-                                        <td className="w-[3%] align-top py-1 text-lg font-bosBold">:</td>
-                                        <td className="w-[69%] align-top py-1 text-lg font-bosBold uppercase leading-tight">
+                                        <td className="w-[3%] align-top py-1 text-md font-bosBold">:</td>
+                                        <td className="w-[69%] align-top py-1 text-md font-bosBold uppercase leading-tight">
                                             {alamatFull || "-"}
                                         </td>
                                     </tr>
@@ -209,8 +209,8 @@ const FormatSertifikatP2MKP = forwardRef(
                                 </div>
 
                                 <div className="flex flex-col items-center mt-16">
-                                    <p className="text-sm font-bosBold px-8 mb-2 uppercase tracking-tight">
-                                        {ESELON_1.currentPerson}
+                                    <p className="text-sm font-bosBold px-8 mb-2  tracking-tight">
+                                        Dr. I NYOMAN RADIARTA, S.Pi., M.Sc.
                                     </p>
                                     <p className="text-sm font-bosNormal -mt-3">NIP. {ESELON_1.nip}</p>
                                 </div>
