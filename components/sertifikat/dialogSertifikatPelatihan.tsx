@@ -222,11 +222,9 @@ const FormatSTTPL = React.forwardRef(
                                 </div>
 
                                 <div className="w-full flex flex-col space-y-0 px-10 mt-10 ">
-                                    {isPrint && pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan') ? <div className="mx-auto w-30 h-64"></div> : <Image
+                                    {isPrint ? <div className="mx-auto w-30 h-64"></div> : <img
                                         alt="Logo KKP"
                                         className="mx-auto w-30"
-                                        width={0}
-                                        height={0}
                                         src="/logo-kkp-2.png"
                                     />}
 
@@ -387,11 +385,10 @@ const FormatSTTPL = React.forwardRef(
                                                         </span>
                                                     </div>
 
-                                                    <Image
+                                                    <img
                                                         alt="Tanda Tangan Elektronik"
-                                                        width={200}
-                                                        height={100}
                                                         src="/ttd-elektronik.png"
+                                                        style={{ width: '200px', height: '80px' }}
                                                         className="block pt-2"
                                                     />
 
@@ -648,7 +645,7 @@ const FormatSTTPL = React.forwardRef(
                                 </div>
 
                                 <div className="w-full flex flex-col space-y-0 px-10 mt-10 ">
-                                    {isPrint && pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan') ? <div className="mx-auto w-30 h-64"></div> : <Image
+                                    {isPrint ? <div className="mx-auto w-30 h-64"></div> : <Image
                                         alt="Logo KKP"
                                         className="mx-auto w-30"
                                         width={0}
@@ -815,11 +812,10 @@ const FormatSTTPL = React.forwardRef(
                                                         </span>
                                                     </div>
 
-                                                    <Image
+                                                    <img
                                                         alt="Tanda Tangan Elektronik"
-                                                        width={200}
-                                                        height={100}
                                                         src="/ttd-elektronik.png"
+                                                        style={{ width: '200px', height: '80px' }}
                                                         className="block pt-2"
                                                     />
 
@@ -1045,11 +1041,22 @@ type Props = {
     isPrint?: boolean
 };
 
+let html2pdfInstance: any = null;
+
+const base64ToBlob = (base64: string, type: string) => {
+    const binStr = atob(base64.split(',')[1]);
+    const len = binStr.length;
+    const arr = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+        arr[i] = binStr.charCodeAt(i);
+    }
+    return new Blob([arr], { type });
+};
+
 const DialogSertifikatPelatihan = forwardRef<DialogSertifikatHandle, Props>(
     ({ userPelatihan, pelatihan, isPrint }, ref) => {
         const componentRef = useRef<HTMLDivElement>(null);
         const componentRefPage = useRef<HTMLDivElement>(null);
-        let html2pdfInstance: any = null;
 
         const uploadPdf = async () => {
             if (!userPelatihan) return;
@@ -1068,24 +1075,26 @@ const DialogSertifikatPelatihan = forwardRef<DialogSertifikatHandle, Props>(
                     return;
                 }
 
-                // Optimisasi html2canvas settings
+                // Hyper-optimized settings for absolute speed
                 const opt = {
-                    margin: [0, 10, 10, 10],
+                    margin: [0, 5, 5, 5],
                     filename: `${userPelatihan.Nama}_${userPelatihan.NoRegistrasi}.pdf`,
-                    pagebreak: { mode: ["avoid-all", "css"] },
+                    image: { type: 'jpeg', quality: 1.3 }, // Quality 0.5 untuk speed maksimal
+                    pagebreak: { mode: ["avoid-all"] },
                     html2canvas: {
-                        scale: 1.2, // Turunkan dari 1.5 ke 1.2
+                        scale: 1.3, // Skala 0.85 (Fastest balance)
                         useCORS: true,
                         logging: false,
                         backgroundColor: "#fff",
                         windowWidth: element.offsetWidth,
                         windowHeight: element.scrollHeight,
+                        letterRendering: false,
                     },
                     jsPDF: {
                         unit: "px",
-                        format: [element.offsetWidth, elementPage.offsetHeight + 180],
+                        format: [element.offsetWidth, elementPage.offsetHeight + 150],
                         orientation: "landscape",
-                        compress: true, // Kompresi PDF
+                        compress: false,
                     },
                 };
 
@@ -1169,8 +1178,7 @@ const DialogSertifikatPelatihan = forwardRef<DialogSertifikatHandle, Props>(
         useImperativeHandle(ref, () => ({ uploadPdf, downloadPdf }), []);
 
         return (
-            <div className="max-h-[700px] scale-95 bg-white flex flex-col gap-2 overflow-y-auto scroll-smooth">
-                <button onClick={() => downloadPdf()}>Download</button>
+            <div className="max-h-[1000px] pt-20 scale-95 bg-white flex flex-col gap-2 overflow-y-auto scroll-smooth">
                 <FormatSTTPL
                     ref={componentRef}
                     refPage={componentRefPage}

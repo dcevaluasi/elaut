@@ -3,7 +3,7 @@
 import React, { useRef } from "react";
 import { PelatihanMasyarakat, UserPelatihan } from "@/types/product";
 import Cookies from "js-cookie";
-import { TbCalendar, TbPencilCheck } from "react-icons/tb";
+import { TbCalendar, TbPencilCheck, TbExternalLink } from "react-icons/tb";
 import { Button } from "@/components/ui/button";
 import DialogSertifikatPelatihan, { DialogSertifikatHandle } from "@/components/sertifikat/dialogSertifikatPelatihan";
 import { elautBaseUrl } from "@/constants/urls";
@@ -31,7 +31,7 @@ import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { MdLock, MdOutlineHistoryEdu } from "react-icons/md";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Key, ShieldCheck, FileCheck, CheckCircle2, AlertCircle, ChevronRight, Hash, User as UserIcon } from "lucide-react";
+import { Clock, Key, ShieldCheck, FileCheck, CheckCircle2, AlertCircle, ChevronRight, Hash, User as UserIcon, FileText } from "lucide-react";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -51,6 +51,46 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
     const [counter, setCounter] = React.useState<number>(0);
     const [isUploading, setIsUploading] = React.useState<boolean>(false);
 
+    const [drafCount, setDrafCount] = React.useState<number>(0);
+    const [certifiedCount, setCertifiedCount] = React.useState<number>(0);
+    const [tanggalCount, setTanggalCount] = React.useState<number>(0);
+
+    const [searchTerm, setSearchTerm] = React.useState("");
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const itemsPerPage = 100;
+
+    React.useEffect(() => {
+        setDrafCount(countUserWithDrafCertificate(data.UserPelatihan));
+        setCertifiedCount(countUserWithCertificate(data.UserPelatihan));
+        setTanggalCount(countUserWithTanggalSertifikat(data.UserPelatihan));
+    }, [data.UserPelatihan]);
+
+    const filteredUsers = React.useMemo(() => {
+        return data.UserPelatihan.filter(user =>
+            user.Nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.NoRegistrasi.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [data.UserPelatihan, searchTerm]);
+
+    const paginatedUsers = React.useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        return filteredUsers.slice(startIndex, startIndex + itemsPerPage);
+    }, [filteredUsers, currentPage]);
+
+    const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+
+    // Reset page when search changes
+    React.useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm]);
+
+    const isCurrentPageReady = React.useMemo(() => {
+        return paginatedUsers.every(user => user.FileSertifikat && user.FileSertifikat !== "");
+    }, [paginatedUsers]);
+
+    const drafCountInPage = React.useMemo(() => countUserWithDrafCertificate(paginatedUsers), [paginatedUsers]);
+    const certifiedCountInPage = React.useMemo(() => countUserWithCertificate(paginatedUsers), [paginatedUsers]);
+
     const refs = useRef<React.RefObject<DialogSertifikatHandle>[]>([]);
 
     if (refs.current.length !== data.UserPelatihan.length) {
@@ -62,8 +102,11 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
         setProgress(0);
         setCounter(0);
 
-        const toUpload = refs.current
-            .map((ref, i) => ({ ref, index: i, userPel: data.UserPelatihan[i] }))
+        const toUpload = paginatedUsers
+            .map(user => {
+                const originalIndex = data.UserPelatihan.findIndex(u => u.IdUserPelatihan === user.IdUserPelatihan);
+                return { ref: refs.current[originalIndex], index: originalIndex, userPel: user };
+            })
             .filter(({ userPel }) => !userPel.FileSertifikat || userPel.FileSertifikat === "");
 
         if (toUpload.length === 0) {
@@ -74,10 +117,14 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
 
         let completed = 0;
         const total = toUpload.length;
-        const MAX_CONCURRENCY = 8;
+        const MAX_CONCURRENCY = 6; // Nilai optimal untuk html2canvas agar tidak mencekik main thread
         const pool = [...toUpload];
 
-        const executeWorker = async () => {
+        let lastUpdate = Date.now();
+        const executeWorker = async (workerIndex: number) => {
+            // Stagger awal worker agar tidak memproses barengan di milidetik yang sama
+            await new Promise(resolve => setTimeout(resolve, workerIndex * 300));
+
             while (pool.length > 0) {
                 const item = pool.shift();
                 if (!item) break;
@@ -88,15 +135,20 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                     console.error("Upload failed for index", item.index, err);
                 } finally {
                     completed++;
-                    setProgress((completed / total) * 100);
-                    setCounter(completed);
+                    // Throttle ganti ke 50ms agar progress bar lebih smooth
+                    const now = Date.now();
+                    if (now - lastUpdate > 50 || completed === total) {
+                        setProgress((completed / total) * 100);
+                        setCounter(completed);
+                        lastUpdate = now;
+                    }
                 }
             }
         };
 
         const workers = Array(Math.min(MAX_CONCURRENCY, total))
             .fill(null)
-            .map(() => executeWorker());
+            .map((_, i) => executeWorker(i));
 
         await Promise.all(workers);
 
@@ -270,7 +322,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                 <div className="flex items-center gap-3">
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
-                            {countUserWithTanggalSertifikat(data.UserPelatihan) === 0 && (
+                            {tanggalCount === 0 && (
                                 <Button
                                     variant="outline"
                                     className="h-12 flex items-center gap-2 rounded-2xl px-6 border-slate-200 text-slate-600 font-black uppercase tracking-widest text-[10px] hover:bg-slate-50 transition-all shadow-sm group"
@@ -317,7 +369,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                         <Button
                             onClick={() => {
                                 setOpen(true);
-                                if (countUserWithDrafCertificate(data?.UserPelatihan) != data?.UserPelatihan.length) {
+                                if (!isCurrentPageReady) {
                                     handleUploadAll();
                                 }
                             }}
@@ -336,16 +388,16 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                 <MetricCard
                     icon={FileCheck}
                     label="Draft Sertifikat Siap"
-                    value={`${countUserWithDraftCertificate(data?.UserPelatihan)}/${data?.UserPelatihan.length}`}
-                    current={countUserWithDraftCertificate(data?.UserPelatihan)}
+                    value={`${drafCount}/${data?.UserPelatihan.length}`}
+                    current={drafCount}
                     total={data?.UserPelatihan.length}
                     color="amber"
                 />
                 <MetricCard
                     icon={ShieldCheck}
                     label="Tuntas Di-TTDe"
-                    value={`${countUserWithCertificate(data?.UserPelatihan)}/${data?.UserPelatihan.length}`}
-                    current={countUserWithCertificate(data?.UserPelatihan)}
+                    value={`${certifiedCount}/${data?.UserPelatihan.length}`}
+                    current={certifiedCount}
                     total={data?.UserPelatihan.length}
                     color="emerald"
                 />
@@ -353,58 +405,157 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
 
             {/* Participant List */}
             <div className="space-y-6">
-                <div className="flex items-center gap-3 pb-2 border-b border-slate-100 dark:border-slate-800 w-fit">
-                    <UserIcon className="w-4 h-4 text-blue-600" />
-                    <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-[0.3em]">DAFTAR VERIFIKASI SERTIFIKAT</h4>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-3 w-fit">
+                        <UserIcon className="w-4 h-4 text-blue-600" />
+                        <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-[0.3em]">DAFTAR VERIFIKASI SERTIFIKAT</h4>
+                    </div>
+
+                    <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+                        <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Sertifikat Siap:</span>
+                            <span className="text-[10px] font-black text-amber-600">{drafCountInPage}/{paginatedUsers.length}</span>
+                            <div className="w-[1px] h-3 bg-slate-200 dark:bg-slate-700 mx-1" />
+                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Tuntas TTDe:</span>
+                            <span className="text-[10px] font-black text-emerald-600">{certifiedCountInPage}/{paginatedUsers.length}</span>
+                        </div>
+
+                        <div className="relative group max-w-xs w-full">
+                            <input
+                                type="text"
+                                placeholder="CARI NAMA..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full h-10 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 px-4 pl-10 text-[10px] font-bold uppercase tracking-widest outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                            />
+                            <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                        </div>
+                    </div>
                 </div>
+
+                {totalPages > 1 && (
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 bg-blue-50/30 dark:bg-blue-900/10 rounded-2xl border border-blue-100/50 dark:border-blue-800/30">
+                        <p className="text-[10px] font-black text-blue-600/60 uppercase tracking-widest">
+                            Menampilkan <span className="text-blue-600">{paginatedUsers.length}</span> dari <span className="text-blue-600">{filteredUsers.length}</span> Peserta
+                        </p>
+                        <div className="flex items-center gap-2 relative z-50">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={currentPage === 1 || isUploading || isSigning}
+                                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                className="h-8 px-3 rounded-lg border-slate-200 text-[9px] font-black uppercase tracking-widest disabled:opacity-50 cursor-pointer bg-white"
+                            >
+                                SBLM
+                            </Button>
+                            <div className="flex items-center gap-1">
+                                {[...Array(totalPages)].map((_, idx) => {
+                                    const pageNum = idx + 1;
+                                    if (
+                                        pageNum === 1 ||
+                                        pageNum === totalPages ||
+                                        Math.abs(pageNum - currentPage) <= 1
+                                    ) {
+                                        return (
+                                            <button
+                                                key={idx}
+                                                disabled={isUploading || isSigning}
+                                                onClick={() => setCurrentPage(pageNum)}
+                                                className={`w-8 h-8 rounded-lg text-[9px] font-black transition-all cursor-pointer ${currentPage === pageNum
+                                                    ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                                                    : "bg-white text-slate-400 hover:bg-slate-50 border border-slate-100 disabled:opacity-50"
+                                                    }`}
+                                            >
+                                                {pageNum}
+                                            </button>
+                                        );
+                                    } else if (
+                                        Math.abs(pageNum - currentPage) === 2
+                                    ) {
+                                        return <span key={idx} className="text-slate-300 text-[10px]">..</span>;
+                                    }
+                                    return null;
+                                })}
+                            </div>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                disabled={currentPage >= totalPages || isUploading || isSigning}
+                                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                className="h-8 px-3 rounded-lg border-slate-200 text-[9px] font-black uppercase tracking-widest disabled:opacity-50 cursor-pointer bg-white"
+                            >
+                                BRKT
+                            </Button>
+                        </div>
+                    </div>
+                )}
 
                 <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-4">
-                    {data.UserPelatihan.map((item, i) => (
-                        <div key={item.IdUserPelatihan ?? i} className="group p-5 rounded-[1.5rem] bg-white border border-slate-100 hover:border-blue-200 transition-all shadow-sm hover:shadow-md flex flex-col gap-4">
-                            <div className="flex items-center justify-between gap-3">
-                                <div className="flex items-center gap-3 overflow-hidden">
-                                    <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-xs font-black text-slate-400 shrink-0">
-                                        {i + 1}
+                    {paginatedUsers.length > 0 ? paginatedUsers.map((item, i) => {
+                        const originalIndex = data.UserPelatihan.findIndex(u => u.IdUserPelatihan === item.IdUserPelatihan);
+                        return (
+                            <div key={item.IdUserPelatihan ?? i} className="group p-5 rounded-[1.5rem] bg-white border border-slate-100 hover:border-blue-200 transition-all shadow-sm hover:shadow-md flex flex-col gap-4">
+                                <div className="flex items-center justify-between gap-3">
+                                    <div className="flex items-center gap-3 overflow-hidden">
+                                        <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-xs font-black text-slate-400 shrink-0">
+                                            {originalIndex !== -1 ? originalIndex + 1 : i + 1}
+                                        </div>
+                                        <div className="overflow-hidden">
+                                            <p className="text-sm font-black text-slate-900 truncate uppercase leading-none mb-1">{item.Nama}</p>
+                                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{item.NoRegistrasi}</p>
+                                        </div>
                                     </div>
-                                    <div className="overflow-hidden">
-                                        <p className="text-sm font-black text-slate-900 truncate uppercase leading-none mb-1">{item.Nama}</p>
-                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{item.NoRegistrasi}</p>
-                                    </div>
+                                    {item.FileSertifikat?.includes('signed') ? (
+                                        <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-sm">
+                                            <CheckCircle2 className="w-5 h-5" />
+                                        </div>
+                                    ) : (
+                                        <div className="w-8 h-8 rounded-full bg-slate-50 text-slate-300 flex items-center justify-center">
+                                            <Clock className="w-4 h-4" />
+                                        </div>
+                                    )}
                                 </div>
-                                {item.FileSertifikat?.includes('signed') ? (
-                                    <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-sm">
-                                        <CheckCircle2 className="w-5 h-5" />
-                                    </div>
+
+                                {item.FileSertifikat?.includes('signed') && (
+                                    <Link
+                                        target="_blank"
+                                        href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${item.FileSertifikat}`}
+                                        className="flex items-center justify-center gap-2 h-10 rounded-xl bg-blue-50/50 text-blue-600 text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all group/btn"
+                                    >
+                                        <RiVerifiedBadgeFill className="h-4 w-4" />
+                                        <span>LIHAT e-STTPL</span>
+                                        <ChevronRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
+                                    </Link>
+                                )}
+
+                                {item.FileSertifikat && item.StatusPenandatangan == "Spesimen" ? (
+                                    <Link
+                                        target="_blank"
+                                        href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-raw/${item.FileSertifikat}`}
+                                        className="flex items-center justify-center gap-2 h-10 rounded-xl bg-slate-50 text-slate-600 text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all group/preview border border-slate-100"
+                                    >
+                                        <FileText className="h-4 w-4 text-slate-400 group-hover/preview:text-white" />
+                                        <span>Pratinjau Dokumen</span>
+                                        <TbExternalLink className="w-3.5 h-3.5 opacity-50" />
+                                    </Link>
                                 ) : (
-                                    <div className="w-8 h-8 rounded-full bg-slate-50 text-slate-300 flex items-center justify-center">
-                                        <Clock className="w-4 h-4" />
-                                    </div>
+                                    <DialogSertifikatPelatihan
+                                        ref={refs.current[originalIndex]}
+                                        pelatihan={data}
+                                        userPelatihan={item}
+                                        handleFetchingData={fetchData}
+                                        isPrint={false}
+                                    />
                                 )}
                             </div>
-
-                            {item.FileSertifikat?.includes('signed') && (
-                                <Link
-                                    target="_blank"
-                                    href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${item.FileSertifikat}`}
-                                    className="flex items-center justify-center gap-2 h-10 rounded-xl bg-blue-50/50 text-blue-600 text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all group/btn"
-                                >
-                                    <RiVerifiedBadgeFill className="h-4 w-4" />
-                                    <span>LIHAT e-STTPL</span>
-                                    <ChevronRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
-                                </Link>
-                            )}
-
-                            <div>
-                                <DialogSertifikatPelatihan
-                                    ref={refs.current[i]}
-                                    pelatihan={data}
-                                    userPelatihan={item}
-                                    handleFetchingData={fetchData}
-                                />
-                            </div>
+                        );
+                    }) : (
+                        <div className="flex flex-col items-center justify-center py-20 bg-slate-50 dark:bg-slate-900/50 rounded-[2rem] border border-dashed border-slate-200 dark:border-slate-800">
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Tidak Ada Peserta Ditemukan</p>
                         </div>
-                    ))}
+                    )}
                 </div>
+
             </div>
 
             {/* signing Modal */}
@@ -416,12 +567,12 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                         </div>
                         <AlertDialogTitle className="font-black text-3xl text-slate-900 dark:text-white tracking-tight leading-tight">Otentikasi Tanda Tangan Digital</AlertDialogTitle>
                         <AlertDialogDescription className="text-xs text-slate-500 font-medium leading-relaxed uppercase tracking-widest">
-                            {countUserWithTanggalSertifikat(data.UserPelatihan) === 0 ? "Prasyarat Belum Terpenuhi" : "Penyematan Segel Elektronik Bersertifikat"}
+                            {tanggalCount === 0 ? "Prasyarat Belum Terpenuhi" : "Penyematan Segel Elektronik Bersertifikat"}
                         </AlertDialogDescription>
                     </div>
 
                     <div className="p-10 pt-0 flex-1 overflow-y-auto min-h-[200px] flex flex-col justify-center">
-                        {countUserWithTanggalSertifikat(data.UserPelatihan) === 0 ? (
+                        {tanggalCount === 0 ? (
                             <div className="flex flex-col items-center justify-center p-8 bg-amber-50 rounded-[2rem] border border-amber-100 text-center gap-4">
                                 <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center text-amber-500 text-2xl shadow-sm">
                                     <AlertCircle />
@@ -433,14 +584,14 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                             </div>
                         ) : (
                             <div className="space-y-8">
-                                {(isUploading || countUserWithDrafCertificate(data?.UserPelatihan) != data?.UserPelatihan.length) ? (
+                                {(isUploading || !isCurrentPageReady) ? (
                                     <div className="space-y-6">
                                         <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest">
                                             <span className="text-blue-600">Generating Blast...</span>
-                                            <span className="text-slate-400">{Math.round(progress)}% ({counter}/{data.UserPelatihan.length})</span>
+                                            <span className="text-slate-400">{Math.round(progress)}% ({counter}/{paginatedUsers.length})</span>
                                         </div>
                                         <Progress value={progress} className="h-2 rounded-full bg-slate-100 fill-blue-600" />
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center italic">Mohon jangan menutup jendela ini...</p>
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center italic">Memproses {paginatedUsers.length} data pada halaman ini...</p>
                                     </div>
                                 ) : (
                                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
@@ -491,7 +642,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                     </div>
                 </AlertDialogContent>
             </AlertDialog>
-        </div>
+        </div >
     );
 };
 
