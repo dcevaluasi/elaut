@@ -4,6 +4,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { verifyPDFBSrEUrl } from "@/constants/urls";
 import { FaRegCircleQuestion } from "react-icons/fa6";
@@ -17,27 +18,14 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { UserPelatihan } from "@/types/user";
 import {
     sanitizedDangerousChars,
     validateIsDangerousChars,
 } from "@/utils/input";
 import Toast from "../toast";
-import axios, { isAxiosError } from "axios";
-import { RiVerifiedBadgeFill } from "react-icons/ri";
-import { addFiveYears } from "@/utils/pelatihan";
-import { generateTanggalPelatihan } from "@/utils/text";
-
-interface PelatihanByNik {
-    nama: string;
-    nik: string;
-    nama_pelatihan: string;
-    bidang_pelatihan: string;
-    no_sertifikat: string;
-    no_registrasi: string;
-}
 
 const CertificateCheckFeature = () => {
+    const router = useRouter();
     const certificates: Record<string, any>[] = [
         {
             title: "Cek Sertifikat di E-LAUT",
@@ -93,20 +81,10 @@ const CertificateCheckFeature = () => {
         React.useState<boolean>(false);
     const [noRegistrasi, setNoRegistrasi] = React.useState<string>("");
     const [nik, setNik] = React.useState<string>("");
-    const [validSertifikat, setValidSertifikat] =
-        React.useState<UserPelatihan | null>(null);
-    const [pelatihanByNik, setPelatihanByNik] =
-        React.useState<PelatihanByNik[] | null>(null);
-    const [isShowValidForm, setIsShowValidForm] =
-        React.useState<boolean>(false);
-    const [isShowPelatihanByNikForm, setIsShowPelatihanByNikForm] =
-        React.useState<boolean>(false);
     const [isLoadingSertifikat, setIsLoadingSertifikat] =
         React.useState<boolean>(false);
-    const [isLoadingPelatihanByNik, setIsLoadingPelatihanByNik] =
-        React.useState<boolean>(false);
 
-    const handleCekValiditasSertifikat = async () => {
+    const handleCekValiditasSertifikat = () => {
         if (validateIsDangerousChars(noRegistrasi)) {
             Toast.fire({
                 icon: "error",
@@ -117,41 +95,13 @@ const CertificateCheckFeature = () => {
             return;
         }
 
-        setIsLoadingSertifikat(true);
-        try {
-            const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/cekSertifikat`,
-                {
-                    no_registrasi: sanitizedDangerousChars(noRegistrasi),
-                }
-            );
-            setValidSertifikat(response.data.data);
-            setIsShowValidForm(true);
-            setNoRegistrasi("");
-            setOpenPopUpVerifyCertificateFeature(false);
-        } catch (error) {
-            if (isAxiosError(error)) {
-                const errorMessage = error.response?.data?.Pesan || "Data sertifikat tidak ditemukan";
-                Toast.fire({
-                    icon: "error",
-                    title: "Data Tidak Ditemukan",
-                    text: errorMessage,
-                });
-            } else {
-                Toast.fire({
-                    icon: "error",
-                    title: "Oopsss!",
-                    text: "Terjadi kesalahan yang tidak diketahui",
-                });
-            }
-            setValidSertifikat(null);
-            setIsShowValidForm(false);
-        } finally {
-            setIsLoadingSertifikat(false);
-        }
+        const sanitized = sanitizedDangerousChars(noRegistrasi);
+        setNoRegistrasi("");
+        setOpenPopUpVerifyCertificateFeature(false);
+        router.push(`/layanan/cek-sertifikat/${encodeURIComponent(sanitized)}`);
     };
 
-    const handleCekPelatihanByNik = async () => {
+    const handleCekPelatihanByNik = () => {
         if (validateIsDangerousChars(nik)) {
             Toast.fire({
                 icon: "error",
@@ -162,51 +112,10 @@ const CertificateCheckFeature = () => {
             return;
         }
 
-        setIsLoadingPelatihanByNik(true);
-        try {
-            const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_BASE_URL}/getPelatihanByNik`,
-                {
-                    nik: sanitizedDangerousChars(nik),
-                }
-            );
-
-            const filteredData = response.data.data?.filter((item: PelatihanByNik) => item.no_sertifikat && item.no_sertifikat !== "") || [];
-
-            if (filteredData.length > 0) {
-                setPelatihanByNik(filteredData);
-                setIsShowPelatihanByNikForm(true);
-                setNik("");
-                setOpenPopUpVerifyByNik(false);
-            } else {
-                Toast.fire({
-                    icon: "warning",
-                    title: "Data Tidak Ditemukan",
-                    text: "Tidak ada riwayat pelatihan dengan sertifikat ditemukan untuk NIK yang dimasukkan",
-                });
-                setPelatihanByNik(null);
-                setIsShowPelatihanByNikForm(false);
-            }
-        } catch (error) {
-            if (isAxiosError(error)) {
-                const errorMessage = error.response?.data?.Pesan || "Data pelatihan tidak ditemukan untuk NIK yang dimasukkan";
-                Toast.fire({
-                    icon: "error",
-                    title: "Data Tidak Ditemukan",
-                    text: "Nomor STTPL tidak dapat ditemukan, kamu belum mengikuti pelatihan!",
-                });
-            } else {
-                Toast.fire({
-                    icon: "error",
-                    title: "Oopsss!",
-                    text: "Terjadi kesalahan yang tidak diketahui",
-                });
-            }
-            setPelatihanByNik(null);
-            setIsShowPelatihanByNikForm(false);
-        } finally {
-            setIsLoadingPelatihanByNik(false);
-        }
+        const sanitized = sanitizedDangerousChars(nik);
+        setNik("");
+        setOpenPopUpVerifyByNik(false);
+        router.push(`/layanan/cek-sertifikat/nik/${encodeURIComponent(sanitized)}`);
     };
 
     return (
@@ -371,50 +280,7 @@ const CertificateCheckFeature = () => {
                                 </AlertDialogContent>
                             </AlertDialog>
 
-                            {/* Verification Result Dialogs */}
-                            {validSertifikat != null && (
-                                <AlertDialog open={isShowValidForm}>
-                                    <AlertDialogContent className="max-w-md max-h-[90vh] overflow-y-auto bg-[#0f172a]/95 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] shadow-3xl text-white scrollbar-hide">
-                                        <AlertDialogHeader className="items-center">
-                                            <div className="w-24 h-24 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-6">
-                                                <RiVerifiedBadgeFill className="h-12 w-12 text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
-                                            </div>
-                                            <AlertDialogTitle className="text-center">
-                                                <span className="block text-blue-400 font-mono text-xl mb-2">{validSertifikat?.NoRegistrasi}</span>
-                                                <span className="text-2xl font-bold font-calsans">Sertifikat Valid</span>
-                                            </AlertDialogTitle>
-                                            <AlertDialogDescription className="text-center text-gray-400 text-sm font-light mt-4">
-                                                Data terverifikasi telah mengikuti pelatihan <span className="text-white font-medium">{validSertifikat?.NamaPelatihan}</span>.
-                                            </AlertDialogDescription>
-                                        </AlertDialogHeader>
 
-                                        <div className="space-y-1 mt-6">
-                                            {[
-                                                { label: "Nama Lengkap", value: validSertifikat?.Nama },
-                                                { label: "Bidang", value: validSertifikat?.BidangPelatihan },
-                                                { label: "Periode", value: `${generateTanggalPelatihan(validSertifikat?.TanggalMulai)} - ${generateTanggalPelatihan(validSertifikat?.TanggalBerakhir)}` },
-                                                { label: "Diterbitkan", value: validSertifikat?.TanggalSertifikat }
-                                            ].map((item, i) => (
-                                                <div key={i} className="flex flex-col p-4 border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors">
-                                                    <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">{item.label}</span>
-                                                    <span className="text-sm text-gray-200">{item.value}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-
-                                        <p className="mt-6 text-[10px] text-gray-500 text-center italic">
-                                            * Valid hingga {addFiveYears(validSertifikat?.TanggalSertifikat!)}
-                                        </p>
-
-                                        <AlertDialogAction
-                                            onClick={() => setIsShowValidForm(false)}
-                                            className="mt-8 w-full h-12 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-500 shadow-lg shadow-blue-600/20"
-                                        >
-                                            Selesai
-                                        </AlertDialogAction>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                            )}
 
                             {/* Cek STTPL Input Dialog */}
                             <AlertDialog open={openPopUpVerifyCertificateFeature} onOpenChange={setOpenPopUpVerifyCertificateFeature}>
@@ -475,70 +341,17 @@ const CertificateCheckFeature = () => {
                                     <AlertDialogFooter className="mt-10 sm:justify-between gap-4">
                                         <AlertDialogCancel className="h-12 flex-1 rounded-xl bg-white/5 border-white/10 text-white hover:bg-white/10 hover:text-white transition-all">Batal</AlertDialogCancel>
                                         <AlertDialogAction
-                                            disabled={nik.length !== 16 || isLoadingPelatihanByNik}
+                                            disabled={nik.length !== 16}
                                             onClick={handleCekPelatihanByNik}
                                             className="h-12 flex-grow-[2] rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-500 disabled:opacity-50"
                                         >
-                                            {isLoadingPelatihanByNik ? "Mencari Data..." : "Telusuri Riwayat"}
+                                            Telusuri Riwayat
                                         </AlertDialogAction>
                                     </AlertDialogFooter>
                                 </AlertDialogContent>
                             </AlertDialog>
 
-                            {/* Pelatihan by NIK Results Table/List */}
-                            {pelatihanByNik != null && (
-                                <AlertDialog open={isShowPelatihanByNikForm}>
-                                    <AlertDialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#0f172a]/98 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] shadow-3xl text-white scrollbar-hide">
-                                        <AlertDialogHeader className="sticky top-0 bg-[#0f172a]/95 backdrop-blur-md z-10 py-6 mb-4 border-b border-white/5">
-                                            <div className="flex gap-4 items-center">
-                                                <div className="w-12 h-12 rounded-2xl bg-blue-600/20 flex items-center justify-center">
-                                                    <RiVerifiedBadgeFill className="h-6 w-6 text-blue-400" />
-                                                </div>
-                                                <div className="text-left">
-                                                    <AlertDialogTitle className="text-2xl font-bold font-calsans">Riwayat Pelatihan</AlertDialogTitle>
-                                                    <AlertDialogDescription className="text-gray-400">NIK: <span className="font-mono text-blue-400">{pelatihanByNik[0]?.nik}</span> • <span className="text-white font-medium">{pelatihanByNik.length} Kegiatan</span></AlertDialogDescription>
-                                                </div>
-                                            </div>
-                                        </AlertDialogHeader>
 
-                                        <div className="grid grid-cols-1 gap-4 py-4">
-                                            {pelatihanByNik.map((pelatihan, index) => (
-                                                <motion.div
-                                                    key={index}
-                                                    initial={{ opacity: 0, x: -10 }}
-                                                    animate={{ opacity: 1, x: 0 }}
-                                                    transition={{ delay: index * 0.05 }}
-                                                    className="p-6 rounded-[2rem] bg-white/5 border border-white/5 hover:border-blue-500/30 hover:bg-white/10 transition-all duration-300 group"
-                                                >
-                                                    <div className="flex flex-col md:flex-row gap-6 md:items-center justify-between">
-                                                        <div className="flex flex-col gap-1">
-                                                            <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">{pelatihan.bidang_pelatihan}</span>
-                                                            <h3 className="text-lg font-bold text-white group-hover:text-blue-300 transition-colors leading-tight">{pelatihan.nama_pelatihan}</h3>
-                                                            <div className="flex items-center gap-2 mt-2 text-xs text-gray-400">
-                                                                <span className="font-mono text-gray-500">STTPL:</span>
-                                                                <span className="text-blue-400 font-semibold">{pelatihan.no_registrasi}</span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex flex-col md:text-right gap-1">
-                                                            <span className="text-sm font-bold text-gray-200">{pelatihan.nama}</span>
-                                                            <span className="text-xs text-gray-500">Peserta Pelatihan</span>
-                                                        </div>
-                                                    </div>
-                                                </motion.div>
-                                            ))}
-                                        </div>
-
-                                        <AlertDialogFooter className="mt-8 pt-6 border-t border-white/5">
-                                            <AlertDialogAction
-                                                onClick={() => setIsShowPelatihanByNikForm(false)}
-                                                className="w-full h-12 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all font-bold"
-                                            >
-                                                Tutup Laporan
-                                            </AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                            )}
                         </div>
                     </section>
                 </div>
