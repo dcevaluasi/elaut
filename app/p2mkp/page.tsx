@@ -21,12 +21,45 @@ import {
     FiCpu,
     FiPlus,
     FiMinus,
-    FiChevronDown
+    FiChevronDown,
+    FiPlay,
+    FiX,
+    FiYoutube
 } from 'react-icons/fi';
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
 const REGULATION = "Peraturan Menteri Kelautan dan Perikanan Republik Indonesia No. 18 Tahun 2024"
+
+// --- Video Gallery Data ---
+
+const VIDEO_GALLERY = [
+    {
+        id: 'vWf0UgE980A',
+        title: 'P2MKP Kirno Bersaudara',
+        description: 'Pengenalan Pusat Pelatihan Mandiri Kelautan dan Perikanan sebagai lembaga pelatihan berbasis masyarakat.'
+    },
+    {
+        id: 'vOw6zO_8aM0',
+        title: 'P2MKP Tambakan Sukses Budi Daya Gurame Nila, Mas, dan Lele',
+        description: 'Panduan lengkap tahapan pengajuan dan penetapan resmi lembaga P2MKP oleh BPPP.'
+    },
+    {
+        id: 'RpcS1lG0rfw',
+        title: 'Cerita Sukses Bisnis Ikan Lele',
+        description: 'Memahami tingkatan klasifikasi P2MKP: Pratama, Muda, Madya, dan Utama.'
+    },
+    {
+        id: 'P9TQ10UTyIA',
+        title: 'Kisah Sukses Budi Daya Ikan Nila, P2MKP Mina Tarna Bakti Sleman',
+        description: 'Keuntungan dan manfaat menjadi bagian dari jaringan P2MKP nasional di bidang kelautan dan perikanan.'
+    },
+    {
+        id: 'msBCLWDD4E0',
+        title: 'P2MKP Citra Handycraft - Pembuatan Hiasan Kerang',
+        description: 'Kisah sukses dan pengalaman nyata dari para pengelola dan peserta P2MKP di seluruh Indonesia.'
+    },
+];
 
 // --- Helper Components ---
 
@@ -169,9 +202,9 @@ const FAQ_TABS = [
                     <div className="space-y-4">
                         {[
                             { title: "Persiapan", desc: "Penyusunan dokumen & asesmen mandiri di portal." },
-                            { title: "Verifikasi", desc: "Pemeriksaan kelayakan administrasi oleh Pusat." },
-                            { title: "Visitasi", desc: "Peninjauan langsung fasilitas & sarana lapangan." },
-                            { title: "Penetapan", desc: "Sidang pleno & penerbitan sertifikat resmi." }
+                            { title: "Verifikasi", desc: "Pemeriksaan kelayakan administrasi oleh Pusat Pelatihan KP." },
+                            { title: "Visitasi", desc: "Peninjauan langsung fasilitas & sarana prasarana." },
+                            { title: "Penetapan", desc: "Penetapan dan penerbitan sertifikata resmi sebagai P2MKP." }
                         ].map((step, idx) => (
                             <div key={idx} className="flex gap-4 group">
                                 <div className="w-8 h-8 shrink-0 rounded-lg bg-blue-600 flex items-center justify-center text-[10px] font-bold shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform text-white">
@@ -478,7 +511,7 @@ export default function P2MKPPage() {
                                 className="text-2xl md:text-4xl lg:text-5xl font-calsans leading-[1] tracking-tight"
                             >
                                 PUSAT PELATIHAN MANDIRI <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-br from-blue-400 via-indigo-400 to-cyan-400">KELAUTAN DAN PERIKANAN.</span>
+                                <span className="text-transparent bg-clip-text bg-gradient-to-br from-blue-400 via-indigo-400 to-cyan-400">KELAUTAN DAN PERIKANAN (P2MKP)</span>
                             </motion.h1>
                             <motion.p
                                 initial={{ opacity: 0 }}
@@ -540,21 +573,21 @@ export default function P2MKPPage() {
                                     number="02"
                                     icon={<FiCheckCircle />}
                                     title="Verifikasi"
-                                    desc="Pemeriksaan kelayakan administrasi oleh Pusat."
+                                    desc="Pemeriksaan kelayakan administrasi oleh Pusat Pelatihan KP."
                                     tags={["Review"]}
                                 />
                                 <FlowStep
                                     number="03"
                                     icon={<FiMapPin />}
                                     title="Visitasi"
-                                    desc="Peninjauan langsung fasilitas & sarana lapangan."
+                                    desc="Peninjauan langsung fasilitas & sarana prasarana."
                                     tags={["Survey"]}
                                 />
                                 <FlowStep
                                     number="04"
                                     icon={<FiAward />}
                                     title="Penetapan"
-                                    desc="Sidang pleno & penerbitan sertifikat resmi."
+                                    desc="Penetapan dan penerbitan sertifikat resmi sebagai P2MKP."
                                     tags={["Final"]}
                                     highlight={true}
                                 />
@@ -562,6 +595,9 @@ export default function P2MKPPage() {
                         </div>
                     </div>
                 </div>
+
+                {/* Video Gallery Section */}
+                <VideoGallerySection />
 
                 {/* FAQ Section */}
                 <div id="faq" className="py-24 px-4 relative overflow-hidden">
@@ -613,6 +649,200 @@ export default function P2MKPPage() {
                 <Footer />
             </div>
         </section>
+    );
+}
+
+// --- Video Gallery Component ---
+
+function VideoGallerySection() {
+    const [activeVideo, setActiveVideo] = React.useState<string | null>(null);
+
+    // Close on Escape key
+    React.useEffect(() => {
+        const handleKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setActiveVideo(null);
+        };
+        window.addEventListener('keydown', handleKey);
+        return () => window.removeEventListener('keydown', handleKey);
+    }, []);
+
+    return (
+        <div id="video" className="py-24 px-4 relative overflow-hidden">
+            {/* Ambient glows */}
+            <div className="absolute top-[10%] left-[-5%] w-[40%] h-[40%] bg-cyan-600/8 rounded-full blur-[130px] pointer-events-none" />
+            <div className="absolute bottom-0 right-[-5%] w-[35%] h-[35%] bg-blue-600/8 rounded-full blur-[110px] pointer-events-none" />
+
+            <div className="max-w-7xl mx-auto relative z-10">
+                <SectionTitle
+                    subtitle="Galeri Video"
+                    title="Galeri P2MKP"
+                    description="Tonton video panduan, informasi, cerita sukses seputar Pusat Pelatihan Mandiri Kelautan dan Perikanan (P2MKP)."
+                    light={true}
+                />
+
+                {/* Featured video (first) + 4 grid */}
+                <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    {/* Featured */}
+                    <motion.div
+                        initial={{ opacity: 0, x: -30 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5 }}
+                        className="lg:row-span-2"
+                    >
+                        <VideoCard
+                            video={VIDEO_GALLERY[0]}
+                            featured
+                            onClick={() => setActiveVideo(VIDEO_GALLERY[0].id)}
+                        />
+                    </motion.div>
+
+                    {/* Side grid */}
+                    <div className="grid grid-cols-2 gap-5">
+                        {VIDEO_GALLERY.slice(1).map((video, i) => (
+                            <motion.div
+                                key={video.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.4, delay: i * 0.1 }}
+                            >
+                                <VideoCard
+                                    video={video}
+                                    onClick={() => setActiveVideo(video.id)}
+                                />
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* Popup Player */}
+            <AnimatePresence>
+                {activeVideo && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+                        onClick={() => setActiveVideo(null)}
+                    >
+                        {/* Backdrop */}
+                        <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
+
+                        {/* Modal */}
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.88, y: 30 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.88, y: 30 }}
+                            transition={{ type: 'spring', bounce: 0.25, duration: 0.5 }}
+                            className="relative w-full max-w-4xl z-10 rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/20 border border-white/10 bg-[#050d1a]"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Close button */}
+                            <button
+                                onClick={() => setActiveVideo(null)}
+                                className="absolute top-4 right-4 z-20 w-9 h-9 rounded-xl bg-white/10 hover:bg-red-500/80 border border-white/10 flex items-center justify-center text-white transition-all duration-200 hover:scale-110"
+                            >
+                                <FiX size={16} />
+                            </button>
+
+                            {/* YouTube embed */}
+                            <div className="aspect-video w-full">
+                                <iframe
+                                    src={`https://www.youtube.com/embed/${activeVideo}?autoplay=1&rel=0&modestbranding=1`}
+                                    allow="autoplay; encrypted-media"
+                                    allowFullScreen
+                                    className="w-full h-full"
+                                    title="P2MKP Video"
+                                />
+                            </div>
+
+                            {/* Video info strip */}
+                            {(() => {
+                                const vid = VIDEO_GALLERY.find(v => v.id === activeVideo);
+                                return vid ? (
+                                    <div className="px-6 py-4 flex items-start gap-3 border-t border-white/5">
+                                        <div className="w-8 h-8 shrink-0 rounded-lg bg-red-600/20 border border-red-500/30 flex items-center justify-center">
+                                            <FiYoutube size={14} className="text-red-400" />
+                                        </div>
+                                    </div>
+                                ) : null;
+                            })()}
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
+
+function VideoCard({ video, featured = false, onClick }: {
+    video: typeof VIDEO_GALLERY[0];
+    featured?: boolean;
+    onClick: () => void;
+}) {
+    const [hovered, setHovered] = React.useState(false);
+    const thumbnailUrl = `https://img.youtube.com/vi/${video.id}/maxresdefault.jpg`;
+    const fallbackUrl = `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`;
+
+    return (
+        <motion.div
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            className={`relative group cursor-pointer rounded-3xl overflow-hidden border border-white/10 hover:border-blue-500/40 transition-colors duration-300 bg-white/5 ${featured ? 'h-full min-h-[300px]' : 'h-[170px]'
+                }`}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+            onClick={onClick}
+        >
+            {/* Thumbnail */}
+            <img
+                src={thumbnailUrl}
+                alt={video.title}
+                onError={(e) => { (e.target as HTMLImageElement).src = fallbackUrl; }}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300" />
+
+            {/* Play button */}
+            <div className="absolute inset-0 flex items-center justify-center">
+                <motion.div
+                    animate={{ scale: hovered ? 1.15 : 1 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                    className="w-14 h-14 rounded-full bg-blue-600/90 backdrop-blur-sm border border-blue-400/40 flex items-center justify-center shadow-2xl shadow-blue-500/40 group-hover:shadow-blue-500/60 transition-shadow duration-300"
+                >
+                    <FiPlay size={20} className="text-white translate-x-0.5" fill="white" />
+                </motion.div>
+            </div>
+
+            {/* YouTube badge */}
+            <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-sm border border-white/10">
+                <FiYoutube size={11} className="text-red-400" />
+                <span className="text-[9px] text-gray-300 font-bold uppercase tracking-wider">YouTube</span>
+            </div>
+
+            {/* Text */}
+            <div className="absolute bottom-0 left-0 right-0 p-4">
+                {featured && (
+                    <span className="inline-block mb-2 text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-blue-600/80 text-white border border-blue-400/30">
+                        Video Utama
+                    </span>
+                )}
+                <h4 className={`font-bold text-white leading-snug ${featured ? 'text-base md:text-lg' : 'text-xs'
+                    }`}>
+                    {video.title}
+                </h4>
+                {featured && (
+                    <p className="text-gray-300 text-xs mt-1 leading-relaxed line-clamp-2">
+                        {video.description}
+                    </p>
+                )}
+            </div>
+        </motion.div>
     );
 }
 
