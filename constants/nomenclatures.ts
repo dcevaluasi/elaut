@@ -55,7 +55,7 @@ export const ESELON_1: ESELON = {
   fullNameEselon:
     'Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan',
   currentPerson: 'Dr. I Nyoman Radiarta, S.Pi, M.Sc',
-  nip: '19730501 200212 1 001',
+  nip: '19720402 199803 1 005',
 }
 
 export const ESELON_2: ESELON = {
