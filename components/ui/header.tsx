@@ -277,6 +277,23 @@ export default function Header() {
                             label="Masukan & Saran"
                             icon={<HiOutlineChatBubbleBottomCenterText />}
                           />
+                          <DropdownItem
+                            href="https://www.lapor.go.id/"
+                            label="e-LAPOR"
+                            subLabel="e-LAPOR"
+                            icon={<HiOutlineChatBubbleLeftRight />}
+                          />
+                          <DropdownItem
+                            href="https://gol.kpk.go.id/login"
+                            label="GOL KPK"
+                            subLabel="GOL KPK"
+                            icon={<HiOutlineChartBar />}
+                          />
+                          <DropdownItem
+                            href="https://wbs.kkp.go.id/register"
+                            label="WBS"
+                            icon={<HiOutlineChatBubbleBottomCenterText />}
+                          />
                         </div>
                       </motion.div>
                     )}
