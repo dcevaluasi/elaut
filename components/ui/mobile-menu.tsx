@@ -180,6 +180,25 @@ export default function MobileMenu({ isTop }: { isTop: boolean }) {
                             icon={<HiOutlineChatBubbleBottomCenterText />}
                             onClick={() => setMobileNavOpen(false)}
                           />
+                          <MobileDropdownSubItem
+                            href="ttps://www.lapor.go.id"
+                            label="e-Lapor"
+                            icon={<HiOutlineChatBubbleBottomCenterText />}
+                            onClick={() => setMobileNavOpen(false)}
+                          />
+                          <MobileDropdownSubItem
+                            href="https://gol.kpk.go.id/login"
+                            label="GOL KPK"
+                            icon={<HiOutlineChatBubbleBottomCenterText />}
+                            onClick={() => setMobileNavOpen(false)}
+                          />
+                          <MobileDropdownSubItem
+                            href="https://wbs.kkp.go.id/register"
+                            label="WBS"
+                            icon={<HiOutlineChatBubbleBottomCenterText />}
+                            onClick={() => setMobileNavOpen(false)}
+                          />
+
                         </motion.ul>
                       )}
                     </AnimatePresence>
