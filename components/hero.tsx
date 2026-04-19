@@ -21,15 +21,20 @@ const extractYoutubeId = (url: string) => {
 
 export default function Hero() {
   const [videoPelatihan, setVideoPelatihan] = React.useState<any[]>([]);
+  const [isLoadingVideos, setIsLoadingVideos] = React.useState(true);
 
   React.useEffect(() => {
     const fetchVideos = async () => {
       try {
+        setIsLoadingVideos(true);
         const data = await getAllVideoPelatihans();
-        // Take latest 5 videos for Hero section
-        setVideoPelatihan(data.slice(0, 5));
+        // Reverse array to show oldest first
+        const oldestFirst = [...data].reverse();
+        setVideoPelatihan(oldestFirst.slice(0, 5));
       } catch (error) {
         console.error(error);
+      } finally {
+        setIsLoadingVideos(false);
       }
     };
     fetchVideos();
@@ -280,7 +285,22 @@ export default function Hero() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 z-10 relative">
-              {videoPelatihan.length > 0 && (
+              {isLoadingVideos ? (
+                <>
+                  <div className="lg:row-span-2">
+                      <div className="w-full h-full min-h-[300px] rounded-3xl bg-[#1e293b]/40 animate-pulse border border-white/5 relative overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+                      </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-5">
+                      {[1, 2, 3, 4].map((i) => (
+                          <div key={i} className="w-full h-[170px] rounded-3xl bg-[#1e293b]/40 animate-pulse border border-white/5 relative overflow-hidden">
+                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+                          </div>
+                      ))}
+                  </div>
+                </>
+              ) : videoPelatihan.length > 0 && (
                 <>
                   <motion.div
                       initial={{ opacity: 0, x: -30 }}

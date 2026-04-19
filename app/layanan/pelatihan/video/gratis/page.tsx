@@ -3,7 +3,7 @@
 import React from "react";
 import Footer from "@/components/ui/footer";
 import Header from "@/components/ui/header";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { FiPlay, FiYoutube, FiX, FiSearch, FiFilter } from "react-icons/fi";
 import { getAllVideoPelatihans, incrementVideoClick } from "@/utils/videoPelatihan";
 
@@ -19,17 +19,26 @@ const extractYoutubeId = (url: string) => {
 }
 
 export default function VideoGratisPage() {
+    const { scrollYProgress } = useScroll();
+    const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
+    const heroScale = useTransform(scrollYProgress, [0, 0.3], [1, 0.9]);
+
     const [activeVideo, setActiveVideo] = React.useState<string | null>(null);
     const [searchQuery, setSearchQuery] = React.useState("");
     const [videoLayanan, setVideoLayanan] = React.useState<any[]>([]);
+    const [isLoadingVideos, setIsLoadingVideos] = React.useState(true);
 
     React.useEffect(() => {
         const fetchVideos = async () => {
             try {
+                setIsLoadingVideos(true);
                 const data = await getAllVideoPelatihans();
-                setVideoLayanan(data);
+                // Reverse array to show oldest first
+                setVideoLayanan([...data].reverse());
             } catch (error) {
                 console.error(error);
+            } finally {
+                setIsLoadingVideos(false);
             }
         };
         fetchVideos();
@@ -43,67 +52,81 @@ export default function VideoGratisPage() {
         return () => window.removeEventListener("keydown", handleKey);
     }, []);
 
-    const filteredVideos = videoLayanan.filter(v =>
-        (v.namaPelatihan || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (v.programPelatihan || v.jenisProgramPelatihan || "").toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredVideos = videoLayanan.filter(v => {
+        const query = searchQuery.toLowerCase();
+        return (v.namaPelatihan?.toLowerCase() || "").includes(query) ||
+               (v.programPelatihan?.toLowerCase() || "").includes(query) ||
+               (v.jenisProgramPelatihan?.toLowerCase() || "").includes(query) ||
+               (v.penyelenggara?.toLowerCase() || "").includes(query) ||
+               (v.descriptionVideo?.toLowerCase() || "").includes(query);
+    });
 
     const handleVideoClick = async (video: any) => {
         const ytId = extractYoutubeId(video.linkPelatihan);
         setActiveVideo(ytId);
         try {
             await incrementVideoClick(video.id);
-        } catch (e) {}
+        } catch (e) { }
     };
 
     return (
-        <section className="pt-24 min-h-screen bg-[#020617] text-white font-jakarta overflow-x-hidden flex flex-col">
+        <section className="pt-16 min-h-screen bg-[#020617] text-white selection:bg-blue-500/30 font-jakarta overflow-x-hidden flex flex-col">
 
-            {/* Ambient Backgrounds */}
+            {/* Immersive Background System */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
                 <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-blue-600/15 rounded-full blur-[140px] animate-pulse" />
                 <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-600/15 rounded-full blur-[140px]" />
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-15 contrast-150 brightness-100 mix-blend-overlay" />
+                <div className="absolute top-[30%] right-[0%] w-[40%] h-[40%] bg-cyan-600/10 rounded-full blur-[110px]" />
+                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-15 contrast-150 brightness-100" />
             </div>
 
             <main className="flex-1 relative z-10 flex flex-col mt-8">
                 {/* Hero Title Section */}
-                <div className="max-w-7xl mx-auto w-full px-4 md:px-8 mb-16 text-center">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="inline-flex items-center leading-none gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold tracking-[0.2em] uppercase mb-6"
-                    >
-                        <FiYoutube className="animate-pulse" /> Edukasi E-LAUT
-                    </motion.div>
+                <motion.div
+                    style={{ opacity: heroOpacity, scale: heroScale }}
+                    className="relative pt-18 pb-6 px-4 md:px-8 max-w-6xl mx-auto text-center"
+                >
+                    <div className="text-center space-y-5">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="inline-flex items-center leading-none gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold tracking-[0.2em] uppercase"
+                        >
+                            <FiYoutube className="animate-pulse" /> Edukasi E-LAUT
+                        </motion.div>
 
-                    <motion.h1
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="text-4xl md:text-5xl leading-none lg:text-6xl font-calsans leading-tight mb-6"
-                    >
-                        Koleksi Video <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-indigo-400">
-                            Pelatihan Gratis
-                        </span>
-                    </motion.h1>
+                        <div className="space-y-4">
+                            <motion.h1
+                                initial={{ opacity: 0, y: 30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.1 }}
+                                className="text-2xl md:text-4xl lg:text-5xl font-calsans leading-[1] tracking-tight"
+                            >
+                                KOLEKSI VIDEO <br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-indigo-400">
+                                    PELATIHAN GRATIS
+                                </span>
+                            </motion.h1>
 
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.3 }}
-                        className="text-gray-400 text-sm md:text-base max-w-2xl mx-auto leading-relaxed font-light"
-                    >
-                        Akses ratusan modul video pembelajaran secara gratis. Tingkatkan keahlian Kelautan dan Perikanan Anda dari mana saja bersama instruktur profesional kami.
-                    </motion.p>
+                            <motion.p
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.3 }}
+                                className="text-gray-400 text-xs md:text-sm max-w-xl mx-auto leading-relaxed font-light"
+                            >
+                                Akses ratusan modul video pembelajaran secara gratis. Tingkatkan keahlian Kelautan dan Perikanan Anda dari mana saja bersama instruktur profesional.
+                            </motion.p>
+                        </div>
+                    </div>
+                </motion.div>
 
-                    {/* Search and Filter */}
+                {/* Search and Filter */}
+                <div className="mt-8 mb-16 text-center">
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.4 }}
-                        className="mt-10 max-w-2xl mx-auto flex items-center bg-[#1e293b]/50 border border-white/10 rounded-2xl p-2 backdrop-blur-xl focus-within:border-blue-500/50 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all"
+                        className="max-w-xl mx-auto flex items-center bg-[#1e293b]/50 border border-white/10 rounded-2xl p-2 backdrop-blur-xl focus-within:border-blue-500/50 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all shadow-2xl relative z-20"
                     >
                         <div className="pl-4 pr-2 text-gray-400">
                             <FiSearch size={20} />
@@ -123,7 +146,20 @@ export default function VideoGratisPage() {
 
                 {/* Video Grid Area */}
                 <div className="max-w-7xl mx-auto w-full px-4 md:px-8 pb-24">
-                    {filteredVideos.length > 0 ? (
+                    {isLoadingVideos ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {[1, 2, 3, 4, 5, 6].map((i) => (
+                                <div key={i} className="rounded-[2rem] aspect-video w-full min-h-[300px] bg-[#1e293b]/40 animate-pulse border border-white/5 relative overflow-hidden">
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+                                    <div className="absolute bottom-0 left-0 right-0 p-6 space-y-4">
+                                        <div className="h-6 w-3/4 bg-white/10 rounded-lg" />
+                                        <div className="h-4 w-full bg-white/10 rounded-lg" />
+                                        <div className="h-4 w-1/2 bg-white/10 rounded-lg" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : filteredVideos.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {filteredVideos.map((video, idx) => (
                                 <motion.div
