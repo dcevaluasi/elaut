@@ -12,7 +12,7 @@ import React, { ReactNode, useEffect, useState } from "react";
 import DropdownUser from "../Header/DropdownUser";
 import { LucideLayoutDashboard } from "lucide-react";
 import { IoAlbumsOutline, IoBookOutline, IoDocumentOutline, IoFolderOpenOutline, IoPieChartOutline, IoSchoolOutline } from "react-icons/io5";
-import { FiMenu, FiLogOut, FiChevronDown, FiChevronRight } from "react-icons/fi";
+import { FiMenu, FiLogOut, FiChevronDown, FiChevronRight, FiYoutube } from "react-icons/fi";
 import { HiOutlineInbox, HiOutlineUserGroup } from "react-icons/hi2";
 import { TbBuildingEstate, TbBuildingSkyscraper, TbChartPie, TbDatabaseEdit, TbGavel, TbSchool } from "react-icons/tb";
 import Link from "next/link";
@@ -34,6 +34,7 @@ export default function LayoutAdminElaut({
   const [submenuSubOpen, setSubmenuSubOpen] = useState(false);
   const [menuP2MKPOpen, setMenuP2MKPOpen] = useState(false);
   const [subMenuP2MKPOpen, setSubMenuP2MKPOpen] = useState(false);
+  const [subMenuPelatihanOpen, setSubMenuPelatihanOpen] = useState(false);
 
   const [pusatData, setPusatData] = useState<PusatDetailInfo | null>(null);
   const [lemdikData, setLemdikData] = useState<LemdiklatDetailInfo | null>(null);
@@ -169,7 +170,7 @@ export default function LayoutAdminElaut({
 
         <div className="flex-1 overflow-y-auto py-6 px-3 space-y-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
           {/* Dashboard */}
-          <li>
+          <li className="list-none">
             <a
               href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/dashboard/`}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${pathname.includes(`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/dashboard`)
@@ -184,7 +185,7 @@ export default function LayoutAdminElaut({
 
           {/* Master Pelatihan */}
           {
-            (Cookies.get('Role')?.includes('Pengelola') || Cookies.get('Access')?.includes('superAdmin')) && <li>
+            (Cookies.get('Role')?.includes('Pengelola') || Cookies.get('Access')?.includes('superAdmin')) && <li className="list-none">
               <button
                 onClick={() => { setSubmenuOpen(!submenuOpen) }}
                 className={`flex items-center justify-between w-full px-3 py-2.5 rounded-lg transition-all duration-200 group ${pathname.includes("master")
@@ -272,7 +273,7 @@ export default function LayoutAdminElaut({
 
           {/* Pusat Pelatihan Mandiri KP */}
           {
-            (Cookies.get('Access')?.includes('superAdmin')) && <li>
+            (Cookies.get('Access')?.includes('superAdmin')) && <li className="list-none">
               <button
                 onClick={() => { setSubMenuP2MKPOpen(!subMenuP2MKPOpen) }}
                 className={`flex items-center justify-between w-full px-3 py-2.5 rounded-lg transition-all duration-200 group ${pathname.includes("p2mkp")
@@ -307,22 +308,44 @@ export default function LayoutAdminElaut({
           }
 
           {/* Penyelenggaraan Pelatihan */}
-          <li>
-            <a
-              href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/pelatihan`}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${pathname.includes(`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/pelatihan`)
+          <li className="list-none">
+            <button
+              onClick={() => { setSubMenuPelatihanOpen(!subMenuPelatihanOpen) }}
+              className={`flex items-center justify-between w-full px-3 py-2.5 rounded-lg transition-all duration-200 group ${pathname.includes("pelatihan")
                 ? "bg-blue-600 text-white shadow-lg shadow-blue-900/40"
                 : "hover:bg-slate-800 hover:text-white"
                 }`}
             >
-              <TbSchool className={`flex-shrink-0 w-6 h-6 ${pathname.includes("pelatihan") ? "text-white" : "text-slate-400 group-hover:text-white"}`} />
-              {sidebarOpen && <span className="text-sm font-medium">Penyelenggaraan Pelatihan</span>}
-            </a>
+              <div className="flex items-center gap-3">
+                <TbSchool className={`w-6 h-6 flex-shrink-0 ${pathname.includes("pelatihan") ? "text-white" : "text-slate-400 group-hover:text-white"}`} />
+                {sidebarOpen && (
+                  <span className="text-sm font-medium text-left">Penyelenggaraan Pelatihan</span>
+                )}
+              </div>
+              {sidebarOpen && (subMenuPelatihanOpen ? <FiChevronDown className="opacity-70" /> : <FiChevronRight className="opacity-70" />)}
+            </button>
+            {subMenuPelatihanOpen && sidebarOpen && (
+              <ul className="ml-4 mt-1 pl-3 border-l border-slate-700 space-y-1">
+                <NavItem
+                  href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/pelatihan`}
+                  icon={<TbSchool className="flex-shrink-0 w-5 -ml-0.5 h-6" />}
+                  label="Kelas Pelatihan"
+                />
+                {
+                  Cookies.get('Access')?.includes('superAdmin') &&
+                  <NavItem
+                    href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/pelatihan/video`}
+                    icon={<FiYoutube className="flex-shrink-0 w-5 -ml-0.5 h-6" />}
+                    label="Video Pelatihan"
+                  />
+                }
+              </ul>
+            )}
           </li>
 
           {/* Layanan Publik */}
           {
-            Cookies.get('Access')?.includes('superAdmin') && <li>
+            Cookies.get('Access')?.includes('superAdmin') && <li className="list-none">
               <a
                 href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/layanan/`}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${pathname.includes(`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/layanan`)
@@ -405,10 +428,10 @@ type NavItemProps = {
 const NavItem: React.FC<NavItemProps> = ({ href, icon, label, compact }) => {
   const pathname = usePathname();
 
-  const isActive = pathname.includes(href);
+  const isActive = pathname == href;
 
   return (
-    <li>
+    <li className="list-none">
       <Link
         href={href}
         className={`flex gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 items-center ${isActive
