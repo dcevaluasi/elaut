@@ -820,7 +820,7 @@ const FormatSTTPL = React.forwardRef(
                                                     />
 
                                                     <span className="font-bosBold text-base -mt-2">
-                                                        Dr. Lilly Aprilya Pregiwati, S.Pi., M.Si
+                                                        Dr. Joni Haryadi D, S.Pi., M.Sc
                                                     </span>
                                                 </div>
                                             </div>
