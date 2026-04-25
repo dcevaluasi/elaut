@@ -87,10 +87,7 @@ const SummaryPelatihan: React.FC = () => {
       const itemIdx = quarters.indexOf(getQuarter(itemMonth || 0));
       const matchQuarter = !triwulan || itemIdx <= selectedIdx;
 
-      // Filter by having at least one signed participant
-      const hasSigned = item.UserPelatihan?.some(u => u.FileSertifikat?.includes("signed"));
-
-      return matchYear && matchQuarter && hasSigned;
+      return matchYear && matchQuarter;
     });
   }, [data, tahun, triwulan]);
 

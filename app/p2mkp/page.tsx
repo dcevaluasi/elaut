@@ -1,38 +1,21 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Footer from '@/components/ui/footer';
 import Header from '@/components/ui/header';
-import {
-    FiBriefcase,
-    FiUsers,
-    FiAnchor,
-    FiTarget,
-    FiAward,
-    FiFileText,
-    FiCheckCircle,
-    FiMapPin,
-    FiArrowRight,
-    FiUserCheck,
-    FiActivity,
-    FiShield,
-    FiLayers,
-    FiTrendingUp,
-    FiCpu,
-    FiPlus,
-    FiMinus,
-    FiChevronDown,
-    FiPlay,
-    FiX,
-    FiYoutube
-} from 'react-icons/fi';
+import dynamic from 'next/dynamic';
+import { FiBriefcase, FiUsers, FiAnchor, FiTarget, FiAward, FiFileText, FiCheckCircle, FiMapPin, FiArrowRight, FiUserCheck, FiActivity, FiShield, FiLayers, FiTrendingUp, FiCpu, FiPlus, FiMinus, FiChevronDown, FiPlay, FiX, FiYoutube } from 'react-icons/fi';
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import axios from 'axios';
+import { useCountUp } from 'react-countup';
+import { elautBaseUrl } from '@/constants/urls';
+import { P2MKP } from '@/types/p2mkp';
+import type { P2MKPPin } from '@/components/ui/P2MKPLeafletMap';
 
 const REGULATION = "Peraturan Menteri Kelautan dan Perikanan Republik Indonesia No. 18 Tahun 2024"
 
 // --- Video Gallery Data ---
-
 const VIDEO_GALLERY = [
     {
         id: 'vWf0UgE980A',
@@ -47,7 +30,7 @@ const VIDEO_GALLERY = [
     {
         id: 'RpcS1lG0rfw',
         title: 'Cerita Sukses Bisnis Ikan Lele',
-        description: 'Memahami tingkatan klasifikasi P2MKP: Pratama, Muda, Madya, dan Utama.'
+        description: 'Memahami tingkatan klasifikasi P2MKP: Pemula, Muda, Madya, dan Utama.'
     },
     {
         id: 'P9TQ10UTyIA',
@@ -61,35 +44,31 @@ const VIDEO_GALLERY = [
     },
 ];
 
+const ISLAND_GROUPS = [
+    { name: 'Sumatera', icon: '🌴', color: 'from-emerald-500 to-teal-600', provinces: ['Aceh', 'Sumatera Utara', 'Sumatera Barat', 'Riau', 'Kepulauan Riau', 'Jambi', 'Sumatera Selatan', 'Kepulauan Bangka Belitung', 'Bengkulu', 'Lampung'] },
+    { name: 'Jawa & Bali', icon: '🏯', color: 'from-blue-500 to-indigo-600', provinces: ['DKI Jakarta', 'Jawa Barat', 'Banten', 'Jawa Tengah', 'DI Yogyakarta', 'Jawa Timur', 'Bali'] },
+    { name: 'Kalimantan', icon: '🌿', color: 'from-amber-500 to-orange-600', provinces: ['Kalimantan Barat', 'Kalimantan Tengah', 'Kalimantan Selatan', 'Kalimantan Timur', 'Kalimantan Utara'] },
+    { name: 'Sulawesi', icon: '🐚', color: 'from-cyan-500 to-blue-600', provinces: ['Sulawesi Utara', 'Gorontalo', 'Sulawesi Tengah', 'Sulawesi Barat', 'Sulawesi Selatan', 'Sulawesi Tenggara'] },
+    { name: 'Nusa Tenggara', icon: '🦎', color: 'from-violet-500 to-purple-600', provinces: ['Nusa Tenggara Barat', 'Nusa Tenggara Timur'] },
+    { name: 'Maluku & Papua', icon: '🦜', color: 'from-rose-500 to-pink-600', provinces: ['Maluku', 'Maluku Utara', 'Papua Barat', 'Papua Barat Daya', 'Papua Tengah', 'Papua Pegunungan', 'Papua Selatan', 'Papua'] },
+];
+
+const P2MKPLeafletMap = dynamic(() => import('@/components/ui/P2MKPLeafletMap'), {
+    ssr: false,
+    loading: () => (
+        <div className="w-full h-full flex items-center justify-center bg-[#020617] rounded-[2rem]">
+            <div className="flex flex-col items-center gap-3">
+                <div className="w-8 h-8 border-2 border-blue-500/40 border-t-blue-400 rounded-full animate-spin" />
+                <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Memuat Peta...</span>
+            </div>
+        </div>
+    ),
+});
+
 // --- Helper Components ---
 
 const AnimatedCounter = ({ value, duration = 2 }: { value: number; duration?: number }) => {
-    const [count, setCount] = React.useState(0);
-    const nodeRef = useRef(null);
-    const isInView = useInView(nodeRef, { once: true });
-
-    React.useEffect(() => {
-        if (isInView) {
-            let start = 0;
-            const end = value;
-            const totalSteps = 60;
-            const stepTime = (duration * 1000) / totalSteps;
-            const increment = end / totalSteps;
-
-            const timer = setInterval(() => {
-                start += increment;
-                if (start >= end) {
-                    setCount(end);
-                    clearInterval(timer);
-                } else {
-                    setCount(Math.floor(start));
-                }
-            }, stepTime);
-            return () => clearInterval(timer);
-        }
-    }, [isInView, value, duration]);
-
-    return <span ref={nodeRef}>{count.toLocaleString()}</span>;
+    return <span>{value.toLocaleString()}</span>;
 };
 
 const SectionTitle = ({ subtitle, title, description, light = false }: any) => (
@@ -308,7 +287,7 @@ const FAQ_TABS = [
                     <div className="space-y-3">
                         <p className="text-gray-500 text-xs pb-2">Klasifikasi P2MKP terdiri dari 4 (empat) tingkatan, dari yang terendah hingga tertinggi:</p>
                         {[
-                            { rank: "4", title: "Pratama", badge: "🥉", color: "amber", desc: "Tingkat pertama (terendah). Bagi P2MKP yang baru ditetapkan dengan kapasitas dan fasilitas dasar sesuai standar minimal." },
+                            { rank: "4", title: "Pemula", badge: "🥉", color: "amber", desc: "Tingkat Pemula (terendah). Bagi P2MKP yang baru ditetapkan dengan kapasitas dan fasilitas dasar sesuai standar minimal." },
                             { rank: "3", title: "Muda", badge: "🥈", color: "blue", desc: "Tingkat kedua. P2MKP yang telah menunjukkan perkembangan kapasitas SDM dan sarana penyelenggaraan pelatihan." },
                             { rank: "2", title: "Madya", badge: "🥇", color: "indigo", desc: "Tingkat ketiga. P2MKP dengan kapasitas, manajemen, dan kurikulum pelatihan yang lebih komprehensif." },
                             { rank: "1", title: "Utama", badge: "🏆", color: "purple", desc: "Tingkat tertinggi. P2MKP unggulan dengan standar fasilitas, SDM, manajemen, dan kemitraan yang excellent." }
@@ -359,7 +338,7 @@ const FAQ_TABS = [
                         </p>
                         <div className="space-y-3">
                             {[
-                                { level: "Pratama", duration: "2 (dua) tahun", badge: "🥉", accent: "border-amber-500/30 bg-amber-500/5" },
+                                { level: "Pemula", duration: "2 (dua) tahun", badge: "🥉", accent: "border-amber-500/30 bg-amber-500/5" },
                                 { level: "Muda", duration: "3 (tiga) tahun", badge: "🥈", accent: "border-blue-500/30 bg-blue-500/5" },
                                 { level: "Madya", duration: "4 (empat) tahun", badge: "🥇", accent: "border-indigo-500/30 bg-indigo-500/5" },
                                 { level: "Utama", duration: "5 (lima) tahun", badge: "🏆", accent: "border-purple-500/30 bg-purple-500/5" },
@@ -426,13 +405,11 @@ function FAQTabs() {
                             : 'text-gray-500 hover:text-gray-200 hover:bg-white/5'
                             }`}
                     >
-                        {activeTab === tab.id && (
-                            <motion.div
-                                layoutId="activeTabBg"
+                        {activeTab === tab.id ? (
+                            <div
                                 className="absolute inset-0 rounded-[1.5rem] bg-blue-600 -z-10"
-                                transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
                             />
-                        )}
+                        ) : null}
                         <span className="text-base">{tab.icon}</span>
                         {tab.label}
                         <span className={`ml-1 text-[9px] px-1.5 py-0.5 rounded-full font-bold ${activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-white/5 text-gray-600'
@@ -444,29 +421,24 @@ function FAQTabs() {
             </div>
 
             {/* Tab Content */}
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={activeTab}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -16 }}
-                    transition={{ duration: 0.3, ease: 'easeOut' }}
-                    className="space-y-4"
-                >
-                    {/* Active tab label */}
-                    <div className="flex items-center gap-3 px-2">
-                        <span className="text-2xl">{activeData.icon}</span>
-                        <div>
-                            <h3 className="text-base font-black text-white uppercase tracking-widest">{activeData.label}</h3>
-                            <p className="text-[10px] text-gray-500 font-medium">{activeData.items.length} pertanyaan tersedia</p>
+            <div className="space-y-4">
+                {activeData ? (
+                    <div className="space-y-4">
+                        {/* Active tab label */}
+                        <div className="flex items-center gap-3 px-2">
+                            <span className="text-2xl">{activeData.icon}</span>
+                            <div>
+                                <h3 className="text-base font-black text-white uppercase tracking-widest">{activeData.label}</h3>
+                                <p className="text-[10px] text-gray-500 font-medium">{activeData.items.length} pertanyaan tersedia</p>
+                            </div>
                         </div>
-                    </div>
 
-                    {activeData.items.map((item, index) => (
-                        <FAQItem key={index} question={item.question} answer={item.answer} />
-                    ))}
-                </motion.div>
-            </AnimatePresence>
+                        {activeData.items.map((item, index) => (
+                            <FAQItem key={`faq-${activeTab}-${index}`} question={item.question} answer={item.answer} />
+                        ))}
+                    </div>
+                ) : null}
+            </div>
         </div>
     );
 }
@@ -474,9 +446,6 @@ function FAQTabs() {
 // --- Main Page ---
 
 export default function P2MKPPage() {
-    const { scrollYProgress } = useScroll();
-    const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
-    const heroScale = useTransform(scrollYProgress, [0, 0.3], [1, 0.9]);
 
     return (
         <section className="pt-16 min-h-screen bg-[#020617] text-white selection:bg-blue-500/30 font-jakarta overflow-x-hidden">
@@ -491,7 +460,9 @@ export default function P2MKPPage() {
             <div className="relative z-10">
                 {/* Hero Section */}
                 <motion.div
-                    style={{ opacity: heroOpacity, scale: heroScale }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
                     className="relative pt-24 pb-12 px-4 md:px-8 max-w-6xl mx-auto"
                 >
                     <div className="text-center space-y-8">
@@ -599,6 +570,9 @@ export default function P2MKPPage() {
                 {/* Video Gallery Section */}
                 <VideoGallerySection />
 
+                {/* Indonesia Map Section */}
+                <IndonesiaMapSection />
+
                 {/* FAQ Section */}
                 <div id="faq" className="py-24 px-4 relative overflow-hidden">
                     <div className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 rounded-full blur-[120px] pointer-events-none" />
@@ -620,10 +594,10 @@ export default function P2MKPPage() {
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[150px] z-0" />
 
                     <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        className="max-w-4xl mx-auto relative z-10 text-center space-y-2"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8 }}
+                        className="max-w-5xl mx-auto px-4 text-center space-y-2"
                     >
                         <h2 className="text-2xl md:text-4xl font-calsans leading-tight">
                             SIAP UNTUK <br />
@@ -649,6 +623,353 @@ export default function P2MKPPage() {
                 <Footer />
             </div>
         </section>
+    );
+}
+
+/** Parse coordinates from a free-text field robustly */
+function parseCoords(raw: string): { lat: number; lng: number } | null {
+    if (!raw) return null;
+
+    // Extract all numbers (integers or decimals, positive or negative)
+    const matches = Array.from(raw.matchAll(/-?\d+(?:\.\d+)?/g)).map(m => parseFloat(m[0]));
+
+    if (matches.length < 2) return null;
+
+    // Search consecutive pairs for a valid coordinate
+    for (let i = 0; i < matches.length - 1; i++) {
+        let n1 = matches[i];
+        let n2 = matches[i + 1];
+
+        let lat = n1;
+        let lng = n2;
+
+        // Auto-correct if user inputted (Longitude, Latitude)
+        if (Math.abs(n1) > 90) {
+            lng = n1;
+            lat = n2;
+        }
+
+        // Indonesia's rough bounding box
+        if (lat >= -12 && lat <= 8 && lng >= 94 && lng <= 142) {
+            return { lat, lng };
+        }
+    }
+
+    return null;
+}
+
+function normalizeProvinsi(raw: string): string {
+    if (!raw) return '';
+    const s = raw.trim().toLowerCase();
+    if (s.includes('aceh')) return 'Aceh';
+    if (s.includes('sumatera utara') || s.includes('sumut')) return 'Sumatera Utara';
+    if (s.includes('sumatera barat') || s.includes('sumbar')) return 'Sumatera Barat';
+    if (s.includes('kepulauan riau') || s.includes('kepri')) return 'Kepulauan Riau';
+    if (s.includes('riau')) return 'Riau';
+    if (s.includes('jambi')) return 'Jambi';
+    if (s.includes('bangka') || s.includes('babel')) return 'Kepulauan Bangka Belitung';
+    if (s.includes('sumatera selatan') || s.includes('sumsel')) return 'Sumatera Selatan';
+    if (s.includes('bengkulu')) return 'Bengkulu';
+    if (s.includes('lampung')) return 'Lampung';
+    if (s.includes('jakarta') || s.includes('dki')) return 'DKI Jakarta';
+    if (s.includes('jawa barat') || s.includes('jabar')) return 'Jawa Barat';
+    if (s.includes('banten')) return 'Banten';
+    if (s.includes('jawa tengah') || s.includes('jateng')) return 'Jawa Tengah';
+    if (s.includes('yogyakarta') || s.includes('diy')) return 'DI Yogyakarta';
+    if (s.includes('jawa timur') || s.includes('jatim')) return 'Jawa Timur';
+    if (s.includes('bali')) return 'Bali';
+    if (s.includes('kalimantan barat') || s.includes('kalbar')) return 'Kalimantan Barat';
+    if (s.includes('kalimantan tengah') || s.includes('kalteng')) return 'Kalimantan Tengah';
+    if (s.includes('kalimantan selatan') || s.includes('kalsel')) return 'Kalimantan Selatan';
+    if (s.includes('kalimantan utara') || s.includes('kaltara')) return 'Kalimantan Utara';
+    if (s.includes('kalimantan timur') || s.includes('kaltim')) return 'Kalimantan Timur';
+    if (s.includes('sulawesi utara') || s.includes('sulut')) return 'Sulawesi Utara';
+    if (s.includes('gorontalo')) return 'Gorontalo';
+    if (s.includes('sulawesi tengah') || s.includes('sulteng')) return 'Sulawesi Tengah';
+    if (s.includes('sulawesi barat') || s.includes('sulbar')) return 'Sulawesi Barat';
+    if (s.includes('sulawesi selatan') || s.includes('sulsel')) return 'Sulawesi Selatan';
+    if (s.includes('sulawesi tenggara') || s.includes('sultra')) return 'Sulawesi Tenggara';
+    if (s.includes('nusa tenggara barat') || s.includes('ntb')) return 'Nusa Tenggara Barat';
+    if (s.includes('nusa tenggara timur') || s.includes('ntt')) return 'Nusa Tenggara Timur';
+    if (s.includes('maluku utara')) return 'Maluku Utara';
+    if (s.includes('maluku')) return 'Maluku';
+    if (s.includes('papua barat daya')) return 'Papua Barat Daya';
+    if (s.includes('papua barat')) return 'Papua Barat';
+    if (s.includes('papua tengah')) return 'Papua Tengah';
+    if (s.includes('papua pegunungan')) return 'Papua Pegunungan';
+    if (s.includes('papua selatan')) return 'Papua Selatan';
+    if (s.includes('papua')) return 'Papua';
+    return raw.trim();
+}
+
+function IndonesiaMapSection() {
+    const [p2mkpList, setP2mkpList] = useState<P2MKP[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [activeGroup, setActiveGroup] = useState<string | null>(null);
+    const [highlightProv, setHighlightProv] = useState<string | null>(null);
+
+    useEffect(() => {
+        axios.get(`${elautBaseUrl}/p2mkp/get_p2mkp`)
+            .then(res => {
+                const raw = res.data?.data ?? res.data ?? [];
+                if (Array.isArray(raw)) {
+                    // Filter only raw.status approved
+                    const approvedData = raw.filter(item =>
+                        item.status && (item.status.toLowerCase() === 'approved' || item.status.toLowerCase().includes('approve'))
+                    );
+                    setP2mkpList(approvedData);
+                } else {
+                    setP2mkpList([]);
+                }
+            })
+            .catch(() => setP2mkpList([]))
+            .finally(() => setLoading(false));
+    }, []);
+
+    // Build all pins from items that have valid coordinates in bidang_pelatihan
+    const allPins: P2MKPPin[] = p2mkpList.flatMap(item => {
+        const coords = parseCoords(item.bidang_pelatihan || '');
+        if (!coords) return [];
+        return [{
+            id: item.IdPpmkp,
+            lat: coords.lat,
+            lng: coords.lng,
+            nama: item.nama_Ppmkp || item.nama_ppmkp || 'P2MKP',
+            kota: item.kota || '',
+            provinsi: item.provinsi || '',
+            pj: item.nama_penanggung_jawab || '',
+            status: item.status || '',
+            alamat: item.alamat || '',
+            noTelp: item.no_telp_penanggung_jawab || item.no_telp || '',
+            jenisPelatihan: item.jenis_pelatihan || item.jenis_bidang_pelatihan || '',
+            klasifikasi: item.klasiikasi || 'Belum Klasifikasi',
+            tahunPenetapan: item.tahun_penetapan || '-',
+        }];
+    });
+
+    // Province count for all data
+    const provinceCount: Record<string, number> = {};
+    p2mkpList.forEach(item => {
+        const prov = normalizeProvinsi(item.provinsi || '');
+        if (prov) provinceCount[prov] = (provinceCount[prov] || 0) + 1;
+    });
+
+    const withCoords = allPins.length;
+    const totalLembaga = p2mkpList.length;
+    const totalProvinsi = Object.keys(provinceCount).length;
+
+    // Filter pins to ONLY show 'Approved' status, and optionally by highlighted province
+    const displayPins = allPins.filter(p => {
+        const isApproved = p.status?.toLowerCase().includes('approve') || p.status?.toLowerCase() === 'approved';
+        if (!isApproved) return false; // Enforce approved status
+
+        if (highlightProv) {
+            return normalizeProvinsi(p.provinsi) === highlightProv;
+        }
+        return true;
+    });
+
+    const activeGroupData = ISLAND_GROUPS.find(g => g.name === activeGroup);
+
+    const LEGEND = [
+        { label: 'Utama', color: '#10b981' },
+        { label: 'Madya', color: '#3b82f6' },
+        { label: 'Muda', color: '#f59e0b' },
+        { label: 'Pemula', color: '#6366f1' },
+        { label: 'Lainnya', color: '#94a3b8' },
+    ];
+
+    return (
+        <div id="sebaran" className="py-24 px-4 relative overflow-hidden">
+            {/* Ambient glows */}
+            <div className="absolute top-0 left-[-5%] w-[45%] h-[50%] bg-blue-600/8 rounded-full blur-[140px] pointer-events-none" />
+            <div className="absolute bottom-0 right-[-5%] w-[40%] h-[45%] bg-indigo-600/8 rounded-full blur-[120px] pointer-events-none" />
+
+            <div className="max-w-7xl mx-auto relative z-10 space-y-8">
+                <SectionTitle
+                    subtitle="Sebaran Nasional"
+                    title="Peta P2MKP Indonesia"
+                    description="Persebaran Pusat Pelatihan Mandiri Kelautan dan Perikanan di seluruh kepulauan nusantara."
+                    light={true}
+                />
+
+                {/* Top stats row */}
+                <motion.div
+                    variants={{
+                        hidden: { opacity: 0, y: 20 },
+                        visible: { opacity: 1, y: 0 }
+                    }}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-80px" }}
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                    className="grid grid-cols-2 md:grid-cols-3 gap-4"
+                >
+                    <StatCard icon={<FiBriefcase />} label="Total Lembaga" value={totalLembaga} suffix="" />
+                    <StatCard icon={<FiMapPin />} label="Provinsi Aktif" value={totalProvinsi} suffix="" />
+                    <StatCard icon={<FiTarget />} label="Titik Dipetakan" value={withCoords} suffix="" />
+                </motion.div>
+
+                {/* Map + Sidebar layout */}
+                <motion.div
+                    variants={{
+                        hidden: { opacity: 0, y: 30 },
+                        visible: { opacity: 1, y: 0 }
+                    }}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-80px" }}
+                    transition={{ duration: 0.6, delay: 0.25 }}
+                    className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4"
+                >
+                    {/* ── Map ── */}
+                    <div className="relative rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl shadow-blue-500/5" style={{ height: '520px' }}>
+                        {loading ? (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#030d1a] gap-4">
+                                <div className="w-10 h-10 border-2 border-blue-500/30 border-t-blue-400 rounded-full animate-spin" />
+                                <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest animate-pulse">Memuat data peta...</p>
+                            </div>
+                        ) : (
+                            <>
+                                <P2MKPLeafletMap pins={displayPins} />
+                                {/* Legend overlay */}
+                                <div className="absolute bottom-4 left-4 z-[1000] flex flex-col gap-1.5 p-3 rounded-2xl bg-black/70 backdrop-blur-md border border-white/10">
+                                    <p className="text-[8px] font-black uppercase tracking-widest text-gray-500 mb-1">Status</p>
+                                    {LEGEND.map(l => (
+                                        <div key={l.label} className="flex items-center gap-2">
+                                            <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: l.color }} />
+                                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">{l.label}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                                {/* Filter badge */}
+                                {highlightProv && (
+                                    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-2 px-4 py-2 rounded-2xl bg-blue-600/90 backdrop-blur-md border border-blue-400/30 shadow-xl">
+                                        <FiMapPin size={11} />
+                                        <span className="text-[10px] font-black text-white uppercase tracking-wider">{highlightProv}</span>
+                                        <button
+                                            onClick={() => setHighlightProv(null)}
+                                            className="w-4 h-4 rounded-full bg-white/20 hover:bg-white/40 flex items-center justify-center transition-all"
+                                        >
+                                            <FiX size={8} />
+                                        </button>
+                                    </div>
+                                )}
+                                {/* No coords notice */}
+                                {!loading && withCoords === 0 && (
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-[999]">
+                                        <div className="text-center space-y-2">
+                                            <div className="text-3xl">📍</div>
+                                            <p className="text-sm font-black text-white uppercase tracking-wider">Belum ada data koordinat</p>
+                                            <p className="text-[10px] text-gray-400">Data koordinat belum tersedia di field bidang_pelatihan</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </div>
+
+                    {/* ── Sidebar: Gugus Kepulauan ── */}
+                    <div className="flex flex-col gap-3 max-h-[520px] overflow-y-auto no-scrollbar pr-1">
+                        <p className="text-[9px] font-black uppercase tracking-widest text-gray-600 px-1">Filter Gugus Kepulauan</p>
+
+                        {ISLAND_GROUPS.map((group, gi) => {
+                            const groupTotal = group.provinces.reduce((s, p) => s + (provinceCount[p] || 0), 0);
+                            const coveredCount = group.provinces.filter(p => (provinceCount[p] || 0) > 0).length;
+                            const isOpen = activeGroup === group.name;
+
+                            return (
+                                <div key={group.name} className="rounded-[1.5rem] overflow-hidden border border-white/10">
+                                    {/* Group header */}
+                                    <motion.button
+                                        whileTap={{ scale: 0.98 }}
+                                        onClick={() => {
+                                            setActiveGroup(isOpen ? null : group.name);
+                                            setHighlightProv(null);
+                                        }}
+                                        className={`w-full flex items-center justify-between gap-3 p-4 transition-all duration-300 ${isOpen ? 'bg-white/10' : 'bg-white/5 hover:bg-white/8'}`}
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-xl">{group.icon}</span>
+                                            <div className="text-left">
+                                                <p className="text-[11px] font-black text-white uppercase tracking-wider leading-tight">{group.name}</p>
+                                                <p className="text-[9px] text-gray-600 font-bold mt-0.5">{coveredCount}/{group.provinces.length} prov</p>
+                                            </div>
+                                        </div>
+                                        {groupTotal > 0 && (
+                                            <span className={`text-[9px] font-black px-2.5 py-1 rounded-full bg-gradient-to-r ${group.color} text-white`}>
+                                                {groupTotal}
+                                            </span>
+                                        )}
+                                    </motion.button>
+
+                                    {/* Province list */}
+                                    <AnimatePresence initial={false}>
+                                        {isOpen && (
+                                            <motion.div
+                                                key={`group-list-${group.name}`}
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: 'auto', opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
+                                                className="overflow-hidden border-t border-white/5"
+                                            >
+                                                <div className="p-2 space-y-1">
+                                                    {group.provinces.map(prov => {
+                                                        const count = provinceCount[prov] || 0;
+                                                        const isActive = highlightProv === prov;
+                                                        return (
+                                                            <button
+                                                                key={prov}
+                                                                disabled={count === 0}
+                                                                onClick={() => setHighlightProv(isActive ? null : prov)}
+                                                                className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-left transition-all text-[10px] font-bold ${count === 0 ? 'text-gray-700 cursor-not-allowed' :
+                                                                    isActive ? `bg-gradient-to-r ${group.color} text-white` :
+                                                                        'text-gray-400 hover:bg-white/10 hover:text-white'
+                                                                    }`}
+                                                            >
+                                                                <div className="flex items-center gap-2">
+                                                                    <div className={`w-1.5 h-1.5 rounded-full ${count > 0 ? `bg-gradient-to-br ${group.color}` : 'bg-white/10'}`} />
+                                                                    <span className="uppercase tracking-wider truncate">{prov}</span>
+                                                                </div>
+                                                                {count > 0 && (
+                                                                    <span className={`text-[8px] px-1.5 py-0.5 rounded-full font-black shrink-0 ${isActive ? 'bg-white/20' : 'bg-white/10 text-gray-500'}`}>{count}</span>
+                                                                )}
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </motion.div>
+
+                {/* Bottom info bar */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.7 }}
+                    className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-[1.5rem] bg-white/5 border border-white/10"
+                >
+
+                    <div className="flex items-center gap-2">
+                        {highlightProv && (
+                            <span className="text-[9px] px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 font-black uppercase tracking-wider border border-blue-500/30">
+                                Filter: {highlightProv}
+                            </span>
+                        )}
+                        <span className="text-[9px] px-3 py-1 rounded-full bg-white/5 text-gray-600 font-black uppercase tracking-wider">
+                            {displayPins.length} titik aktif
+                        </span>
+                    </div>
+                </motion.div>
+            </div>
+        </div>
     );
 }
 
@@ -718,62 +1039,52 @@ function VideoGallerySection() {
             </div>
 
             {/* Popup Player */}
-            <AnimatePresence>
-                {activeVideo && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.25 }}
-                        className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-                        onClick={() => setActiveVideo(null)}
+            {activeVideo ? (
+                <div
+                    className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+                    onClick={() => setActiveVideo(null)}
+                >
+                    {/* Backdrop */}
+                    <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
+
+                    {/* Modal */}
+                    <div
+                        className="relative w-full max-w-4xl z-10 rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/20 border border-white/10 bg-[#050d1a]"
+                        onClick={(e) => e.stopPropagation()}
                     >
-                        {/* Backdrop */}
-                        <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
-
-                        {/* Modal */}
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.88, y: 30 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.88, y: 30 }}
-                            transition={{ type: 'spring', bounce: 0.25, duration: 0.5 }}
-                            className="relative w-full max-w-4xl z-10 rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/20 border border-white/10 bg-[#050d1a]"
-                            onClick={(e) => e.stopPropagation()}
+                        {/* Close button */}
+                        <button
+                            onClick={() => setActiveVideo(null)}
+                            className="absolute top-4 right-4 z-20 w-9 h-9 rounded-xl bg-white/10 hover:bg-red-500/80 border border-white/10 flex items-center justify-center text-white transition-all duration-200 hover:scale-110"
                         >
-                            {/* Close button */}
-                            <button
-                                onClick={() => setActiveVideo(null)}
-                                className="absolute top-4 right-4 z-20 w-9 h-9 rounded-xl bg-white/10 hover:bg-red-500/80 border border-white/10 flex items-center justify-center text-white transition-all duration-200 hover:scale-110"
-                            >
-                                <FiX size={16} />
-                            </button>
+                            <FiX size={16} />
+                        </button>
 
-                            {/* YouTube embed */}
-                            <div className="aspect-video w-full">
-                                <iframe
-                                    src={`https://www.youtube.com/embed/${activeVideo}?autoplay=1&rel=0&modestbranding=1`}
-                                    allow="autoplay; encrypted-media"
-                                    allowFullScreen
-                                    className="w-full h-full"
-                                    title="P2MKP Video"
-                                />
-                            </div>
+                        {/* YouTube embed */}
+                        <div className="aspect-video w-full">
+                            <iframe
+                                src={`https://www.youtube.com/embed/${activeVideo}?autoplay=1&rel=0&modestbranding=1`}
+                                allow="autoplay; encrypted-media"
+                                allowFullScreen
+                                className="w-full h-full"
+                                title="P2MKP Video"
+                            />
+                        </div>
 
-                            {/* Video info strip */}
-                            {(() => {
-                                const vid = VIDEO_GALLERY.find(v => v.id === activeVideo);
-                                return vid ? (
-                                    <div className="px-6 py-4 flex items-start gap-3 border-t border-white/5">
-                                        <div className="w-8 h-8 shrink-0 rounded-lg bg-red-600/20 border border-red-500/30 flex items-center justify-center">
-                                            <FiYoutube size={14} className="text-red-400" />
-                                        </div>
+                        {/* Video info strip */}
+                        {(() => {
+                            const vid = VIDEO_GALLERY.find(v => v.id === activeVideo);
+                            return vid ? (
+                                <div key="video-info-strip" className="px-6 py-4 flex items-start gap-3 border-t border-white/5">
+                                    <div className="w-8 h-8 shrink-0 rounded-lg bg-red-600/20 border border-red-500/30 flex items-center justify-center">
+                                        <FiYoutube size={14} className="text-red-400" />
                                     </div>
-                                ) : null;
-                            })()}
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                                </div>
+                            ) : null;
+                        })()}
+                    </div>
+                </div>
+            ) : null}
         </div>
     );
 }
@@ -908,7 +1219,7 @@ function FAQItem({ question, answer }: { question: string, answer: React.ReactNo
 
     return (
         <motion.div
-            initial={false}
+            initial={{ opacity: 1 }}
             className={`rounded-3xl border transition-all duration-500 overflow-hidden ${isOpen ? 'bg-white/10 border-blue-500/30 shadow-2xl shadow-blue-500/10' : 'bg-white/5 border-white/10 hover:border-white/20'}`}
         >
             <button
@@ -926,6 +1237,7 @@ function FAQItem({ question, answer }: { question: string, answer: React.ReactNo
             <AnimatePresence initial={false}>
                 {isOpen && (
                     <motion.div
+                        key="faq-content"
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}

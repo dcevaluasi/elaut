@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import LayoutAdminElaut, { HeaderPageLayoutAdminElaut } from "@/components/dashboard/Layouts/LayoutAdminElaut";
 import { MdFeedback, MdSearch, MdClear, MdCalendarToday, MdPerson, MdBusiness, MdStar, MdEdit, MdDelete, MdAdd, MdOutlineMessage } from "react-icons/md";
 import { getAllFeedbacks, getAllMaklumatPelayanan, saveMaklumatPelayanan, updateMaklumatPelayanan, deleteMaklumatPelayanan } from "@/utils/feedback";
+import { getRegulasi, createRegulasi, updateRegulasi, deleteRegulasi, RegulasiData } from "@/utils/regulasi";
 import { getDirectImageUrl } from "@/utils/imageHelper";
 import { HashLoader } from "react-spinners";
 import { Input } from "@/components/ui/input";
@@ -26,7 +27,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { IoAlbumsOutline, IoInformationOutline } from "react-icons/io5";
-import { MessageSquare, Star, TrendingUp, TrendingDown, Image as ImageIcon, Calendar, User, Building, Search, X, Info, Plus, ChevronRight } from "lucide-react";
+import { MessageSquare, Star, TrendingUp, TrendingDown, Image as ImageIcon, Calendar, User, Building, Search, X, Info, Plus, ChevronRight, Book, Upload } from "lucide-react";
+import { FiExternalLink } from "react-icons/fi";
 import Image from "next/image";
 
 interface FeedbackData {
@@ -78,10 +80,48 @@ export default function LayananPage() {
         imageUrl: ""
     });
 
+    const getRegulasiFileUrl = (fileName: string) => {
+        if (!fileName) return "";
+        if (fileName.startsWith('http')) return fileName;
+        return `https://elaut-bppsdm.kkp.go.id/api-elaut/public/regulasi_pelatihan/${fileName}`;
+    };
+
+    const [regulasiList, setRegulasiList] = useState<RegulasiData[]>([]);
+    const [loadingRegulasi, setLoadingRegulasi] = useState(true);
+    const [showRegulasiForm, setShowRegulasiForm] = useState(false);
+    const [editingRegulasi, setEditingRegulasi] = useState<RegulasiData | null>(null);
+    const [savingRegulasi, setSavingRegulasi] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [regulasiForm, setRegulasiForm] = useState<Omit<RegulasiData, 'id' | 'created_at' | 'updated_at'>>({
+        kategori_regulasi: "",
+        tanggal_pengundangan: "",
+        tahun: "",
+        no_peraturan: "",
+        judul: "",
+        ruang_lingkup: "",
+        sumber: "",
+        status: "",
+        perubahan_turunan_terkait: "",
+        file: ""
+    });
+
     useEffect(() => {
         fetchFeedbacks();
         fetchMaklumat();
+        fetchRegulasiList();
     }, []);
+
+    const fetchRegulasiList = async () => {
+        try {
+            setLoadingRegulasi(true);
+            const data = await getRegulasi();
+            setRegulasiList(data || []);
+        } catch (error) {
+            console.error("Error fetching regulasi:", error);
+        } finally {
+            setLoadingRegulasi(false);
+        }
+    };
 
     const fetchFeedbacks = async () => {
         try {
@@ -218,6 +258,104 @@ export default function LayananPage() {
         setMaklumatForm({ title: "", description: "", imageUrl: "" });
     };
 
+    const handleSaveRegulasi = async () => {
+        if (!regulasiForm.judul || !regulasiForm.no_peraturan || !regulasiForm.kategori_regulasi) {
+            alert("Harap lengkapi judul, no peraturan, dan kategori!");
+            return;
+        }
+
+        try {
+            setSavingRegulasi(true);
+            
+            const formData = new FormData();
+            formData.append('kategori_regulasi', regulasiForm.kategori_regulasi);
+            formData.append('tanggal_pengundangan', regulasiForm.tanggal_pengundangan);
+            formData.append('tahun', regulasiForm.tahun.toString());
+            formData.append('no_peraturan', regulasiForm.no_peraturan);
+            formData.append('judul', regulasiForm.judul);
+            formData.append('ruang_lingkup', regulasiForm.ruang_lingkup);
+            formData.append('sumber', regulasiForm.sumber);
+            formData.append('status', regulasiForm.status);
+            formData.append('perubahan_turunan_terkait', regulasiForm.perubahan_turunan_terkait);
+            
+            if (selectedFile) {
+                formData.append('file', selectedFile);
+            } else if (regulasiForm.file) {
+                // Keep the old file string if we didn't select a new one
+                formData.append('file', regulasiForm.file);
+            }
+
+            if (editingRegulasi && editingRegulasi.id) {
+                formData.append('id', editingRegulasi.id.toString());
+                await updateRegulasi(formData);
+            } else {
+                await createRegulasi(formData);
+            }
+            
+            cancelRegulasiForm();
+            await fetchRegulasiList();
+        } catch (error: any) {
+            console.error("Error saving regulasi:", error);
+            alert(error?.message || "Gagal menyimpan regulasi");
+        } finally {
+            setSavingRegulasi(false);
+        }
+    };
+
+    const handleEditRegulasi = (item: RegulasiData) => {
+        setEditingRegulasi(item);
+        setRegulasiForm({
+            kategori_regulasi: item.kategori_regulasi || "",
+            tanggal_pengundangan: item.tanggal_pengundangan || "",
+            tahun: item.tahun || "",
+            no_peraturan: item.no_peraturan || "",
+            judul: item.judul || "",
+            ruang_lingkup: item.ruang_lingkup || "",
+            sumber: item.sumber || "",
+            status: item.status || "",
+            perubahan_turunan_terkait: item.perubahan_turunan_terkait || "",
+            file: item.file || ""
+        });
+        setSelectedFile(null);
+        setShowRegulasiForm(true);
+    };
+
+    const handleDeleteRegulasi = async (item: RegulasiData) => {
+        if (!item.id) return;
+        if (!confirm(`Hapus regulasi ${item.no_peraturan}?`)) return;
+        try {
+            await deleteRegulasi(item.id);
+            await fetchRegulasiList();
+        } catch (error: any) {
+            console.error("Error deleting regulasi:", error);
+            alert(error?.message || "Gagal menghapus regulasi");
+        }
+    };
+
+    const cancelRegulasiForm = () => {
+        setShowRegulasiForm(false);
+        setEditingRegulasi(null);
+        setRegulasiForm({
+            kategori_regulasi: "",
+            tanggal_pengundangan: "",
+            tahun: "",
+            no_peraturan: "",
+            judul: "",
+            ruang_lingkup: "",
+            sumber: "",
+            status: "",
+            perubahan_turunan_terkait: "",
+            file: ""
+        });
+        setSelectedFile(null);
+    };
+
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setSelectedFile(file);
+    };
+
     return (
         <LayoutAdminElaut>
             <div className="flex flex-col w-full h-full gap-2">
@@ -255,6 +393,19 @@ export default function LayananPage() {
                                         <span className="text-sm tracking-tight">Maklumat</span>
                                     </div>
                                     <span className="text-[10px] opacity-60 group-data-[state=active]:opacity-80 font-medium uppercase tracking-widest leading-none mt-1">Publikasi Layanan</span>
+                                </TabsTrigger>
+
+                                <TabsTrigger
+                                    value="regulasi"
+                                    className="flex-1 w-full rounded-[2rem] py-3.5 px-6 data-[state=active]:bg-gradient-to-br data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=active]:shadow-indigo-500/30 text-slate-500 dark:text-slate-400 font-bold transition-all duration-500 flex flex-col items-center gap-1 group ring-0 outline-none hover:text-indigo-600 dark:hover:text-indigo-400"
+                                >
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="p-1.5 bg-indigo-100/50 dark:bg-indigo-500/10 rounded-xl group-data-[state=active]:bg-white/20 transition-colors">
+                                            <Book className="w-4 h-4" />
+                                        </div>
+                                        <span className="text-sm tracking-tight">Regulasi</span>
+                                    </div>
+                                    <span className="text-[10px] opacity-60 group-data-[state=active]:opacity-80 font-medium uppercase tracking-widest leading-none mt-1">Hukum & Kebijakan</span>
                                 </TabsTrigger>
                             </TabsList>
                         </div>
@@ -627,6 +778,282 @@ export default function LayananPage() {
                                                     </div>
                                                 </article>
                                             ))
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </TabsContent>
+
+                        <TabsContent value="regulasi" className="space-y-10 outline-none">
+                            {loadingRegulasi ? (
+                                <div className="py-32 w-full flex flex-col items-center justify-center gap-4">
+                                    <HashLoader color="#6366f1" size={60} />
+                                    <p className="text-sm font-medium text-slate-500 animate-pulse tracking-wide">Memuat regulasi...</p>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col gap-10">
+                                    {/* Action Header */}
+                                    <div className="flex flex-col sm:flex-row justify-between items-center bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800 shadow-sm rounded-[2rem] p-6 lg:p-8 gap-6">
+                                        <div className="flex items-center gap-5">
+                                            <div className="h-14 w-14 rounded-2xl bg-indigo-600/10 flex items-center justify-center text-indigo-600 shrink-0 border border-indigo-600/20 shadow-sm">
+                                                <Book className="w-7 h-7" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight">Regulasi Pelatihan</h3>
+                                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Kelola dasar hukum dan regulasi terkait pelatihan!</p>
+                                            </div>
+                                        </div>
+                                        {!showRegulasiForm && (
+                                            <Button
+                                                onClick={() => setShowRegulasiForm(true)}
+                                                className="h-14 px-8 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white font-bold uppercase tracking-wider shadow-lg shadow-indigo-500/30 hover:-translate-y-1 transition-all w-full sm:w-auto"
+                                            >
+                                                <Plus className="w-5 h-5 mr-3" /> Tambah Regulasi
+                                            </Button>
+                                        )}
+                                    </div>
+
+                                    {showRegulasiForm && (
+                                        <Card className="rounded-[2.5rem] border-slate-200/60 dark:border-slate-800 overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+                                            <CardHeader className="p-8 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                                                <div className="flex items-center justify-between">
+                                                    <div>
+                                                        <CardTitle className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight">
+                                                            {editingRegulasi ? "Modifikasi Regulasi" : "Tambah Regulasi Baru"}
+                                                        </CardTitle>
+                                                        <CardDescription className="text-slate-500 font-medium">Lengkapi detail dokumen regulasi di bawah ini!</CardDescription>
+                                                    </div>
+                                                    <Button variant="ghost" size="icon" onClick={cancelRegulasiForm} className="rounded-full hover:bg-rose-50 hover:text-rose-500">
+                                                        <X className="w-5 h-5" />
+                                                    </Button>
+                                                </div>
+                                            </CardHeader>
+                                            <CardContent className="p-8 space-y-6">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                    <div className="space-y-2.5">
+                                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Kategori Regulasi <span className="text-rose-500">*</span></label>
+                                                        <select
+                                                            value={regulasiForm.kategori_regulasi}
+                                                            onChange={(e) => setRegulasiForm({ ...regulasiForm, kategori_regulasi: e.target.value })}
+                                                            className="w-full h-12 px-3 rounded-xl bg-slate-50 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                                        >
+                                                            <option value="">Pilih Kategori</option>
+                                                            <option value="Undang-Undang">Undang-Undang</option>
+                                                            <option value="Peraturan Pemerintah">Peraturan Pemerintah</option>
+                                                            <option value="Peraturan Menteri">Peraturan Menteri</option>
+                                                            <option value="Keputusan Menteri">Keputusan Menteri</option>
+                                                            <option value="Peraturan Kepala Badan">Peraturan Kepala Badan</option>
+                                                            <option value="Keputusan Kepala Badan">Keputusan Kepala Badan</option>
+                                                            <option value="Peraturan Kepala Pusat">Peraturan Kepala Pusat</option>
+                                                            <option value="Keputusan Kepala Pusat">Keputusan Kepala Pusat</option>
+                                                            <option value="Edaran">Edaran</option>
+                                                        </select>
+                                                    </div>
+                                                    <div className="space-y-2.5">
+                                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">No Peraturan <span className="text-rose-500">*</span></label>
+                                                        <Input
+                                                            value={regulasiForm.no_peraturan}
+                                                            onChange={(e) => setRegulasiForm({ ...regulasiForm, no_peraturan: e.target.value })}
+                                                            placeholder="Contoh: Nomor 12 Tahun 2023"
+                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 transition-all font-medium"
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2.5">
+                                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Tahun</label>
+                                                        <Input
+                                                            type="number"
+                                                            value={regulasiForm.tahun}
+                                                            onChange={(e) => setRegulasiForm({ ...regulasiForm, tahun: e.target.value })}
+                                                            placeholder="Contoh: 2023"
+                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 transition-all font-medium"
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2.5 lg:col-span-3">
+                                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Judul / Tentang <span className="text-rose-500">*</span></label>
+                                                        <Input
+                                                            value={regulasiForm.judul}
+                                                            onChange={(e) => setRegulasiForm({ ...regulasiForm, judul: e.target.value })}
+                                                            placeholder="Judul lengkap peraturan..."
+                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 transition-all font-medium"
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2.5 lg:col-span-3">
+                                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Ruang Lingkup</label>
+                                                        <textarea
+                                                            value={regulasiForm.ruang_lingkup}
+                                                            onChange={(e) => setRegulasiForm({ ...regulasiForm, ruang_lingkup: e.target.value })}
+                                                            className="w-full p-4 text-sm font-medium bg-slate-50 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 min-h-[100px] transition-all"
+                                                            placeholder="Ruang lingkup peraturan..."
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2.5">
+                                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Tanggal Pengundangan</label>
+                                                        <Input
+                                                            type="date"
+                                                            value={regulasiForm.tanggal_pengundangan}
+                                                            onChange={(e) => setRegulasiForm({ ...regulasiForm, tanggal_pengundangan: e.target.value })}
+                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 transition-all font-medium"
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2.5">
+                                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Status</label>
+                                                        <select
+                                                            value={regulasiForm.status}
+                                                            onChange={(e) => setRegulasiForm({ ...regulasiForm, status: e.target.value })}
+                                                            className="w-full h-12 px-3 rounded-xl bg-slate-50 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                                        >
+                                                            <option value="">Pilih Status</option>
+                                                            <option value="Berlaku">Berlaku</option>
+                                                            <option value="Dicabut">Dicabut</option>
+                                                            <option value="Harmonisasi">Harmonisasi</option>
+                                                            <option value="Draft">Draft</option>
+                                                        </select>
+                                                    </div>
+                                                    <div className="space-y-2.5">
+                                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Sumber</label>
+                                                        <Input
+                                                            value={regulasiForm.sumber}
+                                                            onChange={(e) => setRegulasiForm({ ...regulasiForm, sumber: e.target.value })}
+                                                            placeholder="Contoh: LN.2023/No.12"
+                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 transition-all font-medium"
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2.5 lg:col-span-2">
+                                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Perubahan / Turunan Terkait</label>
+                                                        <Input
+                                                            value={regulasiForm.perubahan_turunan_terkait}
+                                                            onChange={(e) => setRegulasiForm({ ...regulasiForm, perubahan_turunan_terkait: e.target.value })}
+                                                            placeholder="Catatan peraturan turunan..."
+                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 transition-all font-medium"
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-2.5">
+                                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">File Dokumen</label>
+                                                        <div className="relative group">
+                                                            <input
+                                                                type="file"
+                                                                accept=".pdf,.doc,.docx"
+                                                                onChange={handleFileUpload}
+                                                                className="hidden"
+                                                                id="upload-regulasi"
+                                                            />
+                                                            <label
+                                                                htmlFor="upload-regulasi"
+                                                                className={`h-12 w-full px-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between cursor-pointer transition-all bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 dark:hover:bg-slate-900`}
+                                                            >
+                                                                <span className="text-sm font-medium text-slate-500 truncate pr-4">
+                                                                    {selectedFile ? selectedFile.name : regulasiForm.file ? "File Tersimpan (Pilih baru untuk ganti)" : "Pilih Dokumen PDF/Doc"}
+                                                                </span>
+                                                                <div className={`p-2 rounded-lg ${selectedFile || regulasiForm.file ? 'bg-emerald-100 text-emerald-600' : 'bg-indigo-100 text-indigo-600'}`}>
+                                                                    <Upload className="w-4 h-4" />
+                                                                </div>
+                                                            </label>
+                                                        </div>
+                                                        {(!selectedFile && regulasiForm.file) && (
+                                                            <a href={getRegulasiFileUrl(regulasiForm.file)} target="_blank" rel="noreferrer" className="text-[10px] font-bold text-emerald-500 hover:text-emerald-600 uppercase tracking-wider flex items-center gap-1 mt-2">
+                                                                <FiExternalLink /> Pratinjau Dokumen
+                                                            </a>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-4 justify-end pt-6 border-t border-slate-100 dark:border-slate-800">
+                                                    <Button type="button" onClick={cancelRegulasiForm} variant="outline" className="h-12 px-8 rounded-xl font-bold uppercase tracking-wider">
+                                                        Batal
+                                                    </Button>
+                                                    <Button
+                                                        type="button"
+                                                        onClick={handleSaveRegulasi}
+                                                        disabled={savingRegulasi}
+                                                        className="h-12 px-10 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white font-black uppercase tracking-widest shadow-lg shadow-indigo-500/20"
+                                                    >
+                                                        {savingRegulasi ? "Memproses..." : editingRegulasi ? "Simpan Perubahan" : "Simpan Regulasi"}
+                                                    </Button>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    )}
+
+                                    <div className="grid grid-cols-1 gap-6">
+                                        {regulasiList.length === 0 ? (
+                                            <div className="col-span-full py-20 bg-white/40 dark:bg-slate-900/40 rounded-[2rem] border border-dashed border-slate-300 dark:border-slate-800 flex flex-col items-center justify-center gap-4">
+                                                <Book className="w-16 h-16 text-slate-300" />
+                                                <p className="font-bold text-slate-400 uppercase tracking-widest text-xs">Belum ada regulasi yang ditambahkan</p>
+                                            </div>
+                                        ) : (
+                                            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-200/60 dark:border-slate-800 overflow-hidden">
+                                                <div className="overflow-x-auto">
+                                                    <Table>
+                                                        <TableHeader className="bg-slate-50/50 dark:bg-slate-800/30">
+                                                            <TableRow className="hover:bg-transparent border-slate-100 dark:border-slate-800">
+                                                                <TableHead className="w-16 text-center font-black text-[10px] uppercase tracking-widest text-slate-400 py-6">No</TableHead>
+                                                                <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-400 py-6">Identitas Regulasi</TableHead>
+                                                                <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-400 py-6">Kategori & Tahun</TableHead>
+                                                                <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-400 py-6 text-center">Status</TableHead>
+                                                                <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-400 py-6 text-center">Aksi</TableHead>
+                                                            </TableRow>
+                                                        </TableHeader>
+                                                        <TableBody>
+                                                            {regulasiList.map((item, index) => (
+                                                                <TableRow key={item.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/20 border-slate-100 dark:border-slate-800 transition-colors">
+                                                                    <TableCell className="text-center font-bold text-xs text-slate-400">{index + 1}</TableCell>
+                                                                    <TableCell className="py-6 max-w-md">
+                                                                        <div className="flex flex-col gap-1.5">
+                                                                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-tight">
+                                                                                {item.no_peraturan}
+                                                                            </span>
+                                                                            <span className="text-sm font-black text-slate-800 dark:text-white line-clamp-2 leading-tight">
+                                                                                {item.judul}
+                                                                            </span>
+                                                                            {item.file && (
+                                                                                <a href={getRegulasiFileUrl(item.file)} target="_blank" rel="noreferrer" className="text-[10px] font-bold text-indigo-500 hover:text-indigo-600 uppercase tracking-wider flex items-center gap-1 mt-1 w-fit">
+                                                                                    <FiExternalLink /> Lihat Dokumen
+                                                                                </a>
+                                                                            )}
+                                                                        </div>
+                                                                    </TableCell>
+                                                                    <TableCell>
+                                                                        <div className="flex flex-col gap-1.5">
+                                                                            <Badge variant="outline" className="w-fit text-[10px] uppercase tracking-wider bg-indigo-50/50 text-indigo-600 border-indigo-200">
+                                                                                {item.kategori_regulasi}
+                                                                            </Badge>
+                                                                            <span className="text-xs font-bold text-slate-500">
+                                                                                Tahun: {item.tahun || "-"}
+                                                                            </span>
+                                                                        </div>
+                                                                    </TableCell>
+                                                                    <TableCell className="text-center">
+                                                                        <Badge className={`${item.status?.toLowerCase() === 'dicabut' ? 'bg-rose-100 text-rose-600 border-rose-200' : 'bg-emerald-100 text-emerald-600 border-emerald-200'} font-bold px-3 py-1 rounded-xl uppercase tracking-widest text-[10px]`}>
+                                                                            {item.status || "Berlaku"}
+                                                                        </Badge>
+                                                                    </TableCell>
+                                                                    <TableCell className="text-center">
+                                                                        <div className="flex gap-2 justify-center">
+                                                                            <Button
+                                                                                type="button"
+                                                                                onClick={() => handleEditRegulasi(item)}
+                                                                                size="icon"
+                                                                                variant="outline"
+                                                                                className="h-10 w-10 rounded-xl border-slate-200 text-slate-600 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all"
+                                                                            >
+                                                                                <MdEdit className="w-4 h-4" />
+                                                                            </Button>
+                                                                            <Button
+                                                                                type="button"
+                                                                                onClick={() => handleDeleteRegulasi(item)}
+                                                                                size="icon"
+                                                                                variant="outline"
+                                                                                className="h-10 w-10 rounded-xl border-slate-200 text-slate-600 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all"
+                                                                            >
+                                                                                <MdDelete className="w-4 h-4" />
+                                                                            </Button>
+                                                                        </div>
+                                                                    </TableCell>
+                                                                </TableRow>
+                                                            ))}
+                                                        </TableBody>
+                                                    </Table>
+                                                </div>
+                                            </div>
                                         )}
                                     </div>
                                 </div>

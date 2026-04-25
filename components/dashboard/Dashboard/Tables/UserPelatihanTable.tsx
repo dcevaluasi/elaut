@@ -553,7 +553,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                                 idPeserta={row.original.IdUsers.toString()}
                             />
 
-                            {(pelatihan?.StatusPenerbitan == "0" || pelatihan?.StatusPenerbitan == "1.2" || pelatihan?.StatusPenerbitan == "3" || pelatihan?.StatusPenerbitan == "7" || pelatihan?.StatusPenerbitan == "9") && (
+                            {(parseInt(pelatihan?.StatusPenerbitan) <= 5) && (
                                 <Button
                                     variant="outline"
                                     size="icon"

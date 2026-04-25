@@ -90,8 +90,8 @@ const TrainingChartCard: React.FC<ChartCardProps> = ({
   const paginatedData = chartData.slice(startIndex, endIndex);
 
   const chartHeight = chartType === "horizontal"
-    ? Math.max(300, paginatedData.length * barHeight)
-    : Math.max(350, 400);
+    ? Math.max(200, paginatedData.length * (barHeight + 10) + 80)
+    : 380;
 
   // Calculate total for this chart
   const totalVisitors = chartData.reduce((sum, item) => sum + item.visitors, 0);
@@ -106,131 +106,194 @@ const TrainingChartCard: React.FC<ChartCardProps> = ({
     setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
 
+  const truncateLabel = (value: string, maxLength = 22) => {
+    if (!value || typeof value !== 'string') return value;
+    return value.length > maxLength ? value.substring(0, maxLength) + '...' : value;
+  };
+
+  // Custom Tooltip for Modern Look
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      const displayName = payload[0].payload?.name || label;
+      return (
+        <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl p-4 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border border-slate-100 dark:border-slate-800">
+          {displayName && (
+            <p className="text-[13px] font-bold text-slate-800 dark:text-slate-200 mb-2 border-b border-slate-100 dark:border-slate-800 pb-2">{displayName}</p>
+          )}
+          <div className="flex items-center gap-2.5">
+            <div className="w-3 h-3 rounded-full shadow-inner" style={{ backgroundColor: payload[0].payload?.colorHex || payload[0].fill }} />
+            <p className="text-sm font-black text-slate-700 dark:text-slate-300">
+              {payload[0].value.toLocaleString()} <span className="text-xs font-medium text-slate-500">peserta</span>
+            </p>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // Enhance paginatedData with colors and gradient IDs
+  const enhancedData = paginatedData.map((item, index) => {
+    const colorIndex = (startIndex + index) % barColors.length;
+    return {
+      ...item,
+      colorHex: barColors[colorIndex],
+      gradId: chartType === "horizontal" ? `grad-h-${colorIndex}` : `grad-v-${colorIndex}`
+    };
+  });
+
   return (
-    <Card className="flex flex-col w-full shadow-sm hover:shadow-md transition-all duration-300 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl overflow-hidden group hover:ring-1 hover:ring-blue-100 dark:hover:ring-blue-900">
-      <CardHeader className="pb-4 pt-6 bg-gradient-to-r from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-800/50 border-b border-slate-100 dark:border-slate-800">
-        <div className="flex justify-between items-start mb-4">
-          <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
-            <div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-indigo-500 rounded-full"></div>
-            {title}
-          </CardTitle>
+    <Card className="flex flex-col w-full shadow-[0_2px_20px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.06)] transition-all duration-500 border border-slate-100/80 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-[2rem] overflow-hidden group">
+      <CardHeader className="pb-2 pt-8 px-8 border-none">
+        <div className="flex justify-between items-start mb-6">
+          <div className="flex flex-col gap-1.5">
+            <CardTitle className="text-xl font-black text-slate-800 dark:text-white tracking-tight flex items-center gap-3">
+              <div className="w-2.5 h-8 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-full shadow-sm shadow-blue-200"></div>
+              {title}
+            </CardTitle>
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium ml-5">Statistik distribusi masyarakat dilatih</p>
+          </div>
           {totalPages > 1 && (
-            <div className="text-xs text-slate-500 font-semibold bg-slate-100 px-3 py-1.5 rounded-full">
-              {startIndex + 1}-{Math.min(endIndex, chartData.length)} of {chartData.length}
+            <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 px-4 py-2 rounded-full shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+              <span className="text-xs text-slate-600 dark:text-slate-300 font-bold tracking-wide">
+                Hal {currentPage} / {totalPages}
+              </span>
             </div>
           )}
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-3 gap-3">
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-3 border border-slate-200 dark:border-slate-700 hover:border-blue-400 transition-all duration-200">
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">Total</p>
-            <p className="text-2xl font-bold text-slate-800 dark:text-white">{totalVisitors.toLocaleString()}</p>
+        {/* Modern Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 dark:from-slate-800/40 dark:to-slate-800/10 rounded-2xl p-4 border border-slate-100 dark:border-slate-700/50 relative overflow-hidden group/stat">
+            <div className="absolute -right-4 -top-4 w-16 h-16 bg-blue-500/5 rounded-full blur-xl group-hover/stat:bg-blue-500/10 transition-colors" />
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1.5">Total Keseluruhan</p>
+            <p className="text-3xl font-black text-slate-800 dark:text-white tracking-tighter">{totalVisitors.toLocaleString()}</p>
           </div>
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-3 border border-slate-200 dark:border-slate-700 hover:border-emerald-400 transition-all duration-200">
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">Kategori</p>
-            <p className="text-2xl font-bold text-slate-800 dark:text-white">{chartData.length}</p>
+          <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 dark:from-slate-800/40 dark:to-slate-800/10 rounded-2xl p-4 border border-slate-100 dark:border-slate-700/50 relative overflow-hidden group/stat">
+            <div className="absolute -right-4 -top-4 w-16 h-16 bg-emerald-500/5 rounded-full blur-xl group-hover/stat:bg-emerald-500/10 transition-colors" />
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1.5">Kategori / Segmen</p>
+            <p className="text-3xl font-black text-slate-800 dark:text-white tracking-tighter">{chartData.length}</p>
           </div>
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-3 border border-slate-200 dark:border-slate-700 hover:border-amber-400 transition-all duration-200">
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">Tertinggi</p>
-            <p className="text-2xl font-bold text-slate-800 dark:text-white">{highestValue.toLocaleString()}</p>
+          <div className="bg-gradient-to-br from-indigo-50 to-blue-50/50 dark:from-indigo-900/20 dark:to-blue-900/10 rounded-2xl p-4 border border-indigo-100 dark:border-indigo-800/50 relative overflow-hidden group/stat">
+            <div className="absolute -right-4 -top-4 w-16 h-16 bg-indigo-500/10 rounded-full blur-xl group-hover/stat:bg-indigo-500/20 transition-colors" />
+            <p className="text-[10px] text-indigo-600/80 dark:text-indigo-400 font-bold uppercase tracking-widest mb-1.5">Capaian Tertinggi</p>
+            <p className="text-3xl font-black text-indigo-700 dark:text-indigo-300 tracking-tighter">{highestValue.toLocaleString()}</p>
           </div>
         </div>
 
         {topItem && (
-          <div className="mt-3 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 rounded-xl p-3 border border-indigo-200 dark:border-indigo-800">
-            <div className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-              <p className="text-xs font-semibold text-indigo-900">
-                Top: <span className="text-blue-500">{topItem.name}</span> ({topItem.visitors.toLocaleString()} peserta)
-              </p>
+          <div className="flex items-center gap-3 bg-white dark:bg-slate-800 rounded-2xl p-3.5 border border-slate-100 dark:border-slate-700 shadow-sm mt-2">
+            <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-500/20 flex items-center justify-center">
+              <span className="text-orange-600 dark:text-orange-400 text-lg">🏆</span>
             </div>
+            <p className="text-sm font-semibold text-slate-600 dark:text-slate-300 leading-tight">
+              Kategori terbanyak adalah <span className="font-bold text-slate-800 dark:text-white">{topItem.name}</span> dengan total <span className="text-blue-600 dark:text-blue-400 font-bold">{topItem.visitors.toLocaleString()}</span> peserta.
+            </p>
           </div>
         )}
       </CardHeader>
 
-      <CardContent className="flex-1 pb-6">
+      <CardContent className="flex-1 pb-4 pt-4 px-6">
         <ChartContainer config={chartConfig} className="mx-auto w-full">
           <ResponsiveContainer width="100%" height={chartHeight}>
             {chartType === "pie" ? (
               <PieChart>
-                <Tooltip
-                  content={<ChartTooltipContent hideLabel />}
-                  cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
-                />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
                 <Pie
-                  data={paginatedData}
+                  data={enhancedData}
                   dataKey="visitors"
                   nameKey="name"
+                  innerRadius={80}
                   outerRadius={120}
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  labelLine={true}
+                  paddingAngle={5}
+                  cornerRadius={10}
+                  label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                  labelLine={{ stroke: '#cbd5e1', strokeWidth: 1.5 }}
+                  animationDuration={1500}
+                  animationEasing="ease-out"
                 >
-                  {paginatedData.map((_, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={barColors[(startIndex + index) % barColors.length]}
-                    />
+                  {enhancedData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.colorHex} className="hover:opacity-80 transition-all duration-300 cursor-pointer" />
                   ))}
                 </Pie>
               </PieChart>
             ) : (
               <BarChart
-                data={paginatedData}
+                data={enhancedData}
                 layout={chartType === "horizontal" ? "vertical" : "horizontal"}
                 margin={{
-                  top: 20,
-                  right: chartType === "horizontal" ? 30 : 20,
-                  left: chartType === "vertical" ? 0 : 10,
-                  bottom: chartType === "vertical" ? 40 : 5
+                  top: 10,
+                  right: chartType === "horizontal" ? 50 : 20,
+                  left: chartType === "vertical" ? 0 : 20,
+                  bottom: chartType === "vertical" ? 80 : 0
                 }}
+                barCategoryGap={chartType === "horizontal" ? "20%" : "30%"}
               >
+                <defs>
+                  {barColors.map((color, idx) => (
+                    <React.Fragment key={idx}>
+                      <linearGradient id={`grad-h-${idx}`} x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stopColor={color} stopOpacity={0.6}/>
+                        <stop offset="100%" stopColor={color} stopOpacity={1}/>
+                      </linearGradient>
+                      <linearGradient id={`grad-v-${idx}`} x1="0" y1="1" x2="0" y2="0">
+                        <stop offset="0%" stopColor={color} stopOpacity={0.6}/>
+                        <stop offset="100%" stopColor={color} stopOpacity={1}/>
+                      </linearGradient>
+                    </React.Fragment>
+                  ))}
+                </defs>
                 <CartesianGrid
-                  strokeDasharray="3 3"
-                  opacity={0.2}
-                  stroke="#e5e7eb"
+                  strokeDasharray="4 4"
+                  opacity={0.3}
+                  stroke="#cbd5e1"
                   vertical={chartType === "vertical"}
                   horizontal={chartType === "horizontal"}
                 />
                 <XAxis
                   type={chartType === "horizontal" ? "number" : "category"}
                   dataKey={chartType === "vertical" ? "name" : undefined}
-                  axisLine={{ stroke: '#d1d5db' }}
+                  axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 12, fill: '#6b7280' }}
+                  tick={{ fontSize: 11, fill: '#64748b', fontWeight: 600 }}
+                  tickFormatter={chartType === "vertical" ? (val) => truncateLabel(val, 15) : undefined}
                   angle={chartType === "vertical" ? -45 : 0}
                   textAnchor={chartType === "vertical" ? "end" : "middle"}
-                  height={chartType === "vertical" ? 80 : 30}
+                  height={chartType === "vertical" ? 100 : 30}
+                  interval={chartType === "vertical" ? 0 : "preserveEnd"}
+                  dy={chartType === "vertical" ? 10 : 0}
                 />
                 <YAxis
                   type={chartType === "horizontal" ? "category" : "number"}
                   dataKey={chartType === "horizontal" ? "name" : undefined}
                   width={chartType === "horizontal" ? 180 : 50}
-                  tick={{ fontSize: 12, fill: '#6b7280' }}
+                  tick={{ fontSize: 12, fill: '#475569', fontWeight: 600 }}
+                  tickFormatter={chartType === "horizontal" ? (val) => truncateLabel(val, 20) : undefined}
                   tickLine={false}
-                  axisLine={{ stroke: '#d1d5db' }}
+                  axisLine={false}
+                  dx={chartType === "horizontal" ? -10 : 0}
                 />
-                <Tooltip
-                  content={<ChartTooltipContent />}
-                  cursor={{ fill: 'rgba(0, 0, 0, 0.05)' }}
-                />
+                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(241, 245, 249, 0.5)', radius: 12 }} />
                 <Bar
                   dataKey="visitors"
-                  radius={chartType === "horizontal" ? [0, 8, 8, 0] : [8, 8, 0, 0]}
-                  maxBarSize={chartType === "horizontal" ? 35 : 50}
+                  radius={chartType === "horizontal" ? [0, 100, 100, 0] : [100, 100, 0, 0]}
+                  barSize={chartType === "horizontal" ? 22 : 46}
                   label={{
                     position: chartType === "horizontal" ? "right" : "top",
-                    fill: "#374151",
+                    fill: "#334155",
                     fontSize: 12,
-                    fontWeight: 600,
+                    fontWeight: 800,
+                    formatter: (value: number) => value > 0 ? value : '',
                   }}
+                  animationDuration={1500}
+                  animationEasing="ease-out"
                 >
-                  {paginatedData.map((_, index) => (
+                  {enhancedData.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
-                      fill={barColors[(startIndex + index) % barColors.length]}
+                      fill={`url(#${entry.gradId})`}
+                      className="hover:brightness-110 transition-all duration-300 cursor-pointer"
                     />
                   ))}
                 </Bar>
@@ -240,56 +303,51 @@ const TrainingChartCard: React.FC<ChartCardProps> = ({
         </ChartContainer>
       </CardContent>
 
-      <CardFooter className="flex-col gap-4 text-sm items-start bg-gradient-to-b from-slate-50 to-gray-50 border-t border-slate-200 pt-5 pb-5">
-        <div className="w-full">
-          <p className="text-xs font-bold text-slate-700 mb-3 uppercase tracking-wide flex items-center gap-2">
-            <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-            </svg>
+      <CardFooter className="flex flex-col gap-5 px-8 pb-8 pt-5 bg-white/50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800">
+        <div className="w-full flex flex-col gap-3">
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
             Legend
           </p>
-          <div className="flex gap-3 flex-wrap">
-            {paginatedData.map((entry, index) => (
-              <div key={entry.name} className="flex gap-2 items-center group bg-white px-3 py-2 rounded-lg border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all duration-200">
+          <div className="flex gap-2 flex-wrap">
+            {enhancedData.map((entry) => (
+              <div key={entry.name} className="flex items-center gap-2.5 bg-white dark:bg-slate-800 px-3.5 py-1.5 rounded-full border border-slate-200/60 dark:border-slate-700 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 cursor-default">
                 <div
-                  className="w-4 h-4 rounded-md shadow-md group-hover:scale-110 transition-transform duration-200"
-                  style={{
-                    backgroundColor: barColors[(startIndex + index) % barColors.length],
-                  }}
+                  className="w-2.5 h-2.5 rounded-full shadow-sm"
+                  style={{ backgroundColor: entry.colorHex }}
                 />
-                <span className="text-sm text-slate-700 font-semibold">
-                  {entry.name} <span className="text-slate-500 font-normal">({entry.visitors})</span>
+                <span className="text-[13px] text-slate-700 dark:text-slate-200 font-semibold">
+                  {entry.name} <span className="text-slate-400 font-medium ml-1">({entry.visitors})</span>
                 </span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Pagination Controls for Chart */}
+        {/* Modern Pagination */}
         {totalPages > 1 && (
-          <div className="w-full flex items-center justify-between pt-4 border-t border-slate-200">
+          <div className="w-full flex items-center justify-between pt-5 border-t border-slate-100 dark:border-slate-800 mt-2">
             <button
               onClick={goToPreviousPage}
               disabled={currentPage === 1}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 ${currentPage === 1
-                ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                : "bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-indigo-700 hover:to-blue-700 shadow-lg hover:shadow-xl"
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-bold transition-all duration-300 ${currentPage === 1
+                ? "bg-slate-50 text-slate-300 border border-slate-100 cursor-not-allowed"
+                : "bg-white text-slate-700 border border-slate-200 hover:border-blue-300 hover:text-blue-600 hover:shadow-[0_4px_15px_-3px_rgba(59,130,246,0.15)] active:scale-95"
                 }`}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
               </svg>
-              Previous
+              Sebelumnya
             </button>
 
-            <div className="flex items-center gap-2">
+            <div className="hidden sm:flex items-center gap-2">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`w-9 h-9 rounded-xl text-xs font-bold transition-all duration-200 ${currentPage === page
-                    ? "bg-gradient-to-br from-blue-600 to-blue-500 text-white shadow-lg scale-110"
-                    : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-300 hover:border-indigo-400"
+                  className={`w-9 h-9 rounded-full text-[13px] font-bold transition-all duration-300 ${currentPage === page
+                    ? "bg-blue-600 text-white shadow-[0_4px_15px_-3px_rgba(59,130,246,0.4)]"
+                    : "bg-transparent text-slate-500 hover:bg-slate-100 hover:text-slate-800"
                     }`}
                 >
                   {page}
@@ -300,14 +358,14 @@ const TrainingChartCard: React.FC<ChartCardProps> = ({
             <button
               onClick={goToNextPage}
               disabled={currentPage === totalPages}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 ${currentPage === totalPages
-                ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                : "bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-indigo-700 hover:to-blue-700 shadow-lg hover:shadow-xl"
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-bold transition-all duration-300 ${currentPage === totalPages
+                ? "bg-slate-50 text-slate-300 border border-slate-100 cursor-not-allowed"
+                : "bg-blue-600 text-white shadow-[0_4px_15px_-3px_rgba(59,130,246,0.3)] hover:shadow-[0_8px_20px_-4px_rgba(59,130,246,0.4)] hover:bg-blue-700 hover:-translate-y-0.5 active:scale-95"
                 }`}
             >
-              Next
+              Selanjutnya
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
               </svg>
             </button>
           </div>
