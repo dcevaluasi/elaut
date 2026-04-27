@@ -9,14 +9,14 @@ import { FiPlay, FiYoutube, FiX } from "react-icons/fi";
 import { getAllVideoPelatihans, incrementVideoClick } from "@/utils/videoPelatihan";
 
 const extractYoutubeId = (url: string) => {
-    if (!url) return "";
-    try {
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|live\/)([^#&?]*).*/;
-        const match = url.match(regExp);
-        return (match && match[2].length === 11) ? match[2] : url;
-    } catch (e) {
-        return url;
-    }
+  if (!url) return "";
+  try {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|live\/)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : url;
+  } catch (e) {
+    return url;
+  }
 }
 
 export default function Hero() {
@@ -45,7 +45,7 @@ export default function Hero() {
     setActiveVideo(ytId);
     try {
       await incrementVideoClick(video.id);
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const programPelatihan = [
@@ -102,13 +102,21 @@ export default function Hero() {
   }, [images.length]);
 
   return (
-    <div className="relative pt-20 min-h-screen w-full overflow-hidden bg-[#020617] font-jakarta">
+    <div className="relative pt-20 min-h-screen w-full overflow-hidden bg-[#020617] font-jakarta selection:bg-blue-500/30 -mb-20">
+      {/* Immersive Background System (Matching P2MKP style) */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-blue-600/15 rounded-full blur-[140px] animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-600/15 rounded-full blur-[140px]" />
+        <div className="absolute top-[30%] right-[0%] w-[40%] h-[40%] bg-cyan-600/10 rounded-full blur-[110px]" />
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-15 contrast-150 brightness-100" />
+      </div>
+
       <div className="absolute inset-0 z-0">
         <AnimatePresence mode="wait">
           <motion.div
             key={imageIndex}
             initial={{ opacity: 0, scale: 1.1 }}
-            animate={{ opacity: 0.25, scale: 1 }}
+            animate={{ opacity: 0.15, scale: 1 }} // Reduced opacity for better blend with noise
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 2, ease: "easeInOut" }}
             className="absolute inset-0"
@@ -126,14 +134,14 @@ export default function Hero() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#020617]/40 to-[#020617]" />
       </div>
 
-      {/* Modern Animated Gradient Blobs */}
+      {/* Modern Animated Gradient Blobs - Kept for extra depth */}
       <motion.div
         animate={{
           x: [0, 50, 0],
           y: [0, -30, 0],
         }}
         transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        className="pointer-events-none absolute -top-24 -left-24 h-[40rem] w-[40rem] rounded-full bg-blue-600/20 blur-[120px] z-1"
+        className="pointer-events-none absolute -top-24 -left-24 h-[40rem] w-[40rem] rounded-full bg-blue-600/10 blur-[120px] z-1"
       />
       <motion.div
         animate={{
@@ -141,7 +149,7 @@ export default function Hero() {
           y: [0, 40, 0],
         }}
         transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-        className="pointer-events-none absolute -bottom-48 -right-48 h-[45rem] w-[45rem] rounded-full bg-cyan-500/15 blur-[150px] z-1"
+        className="pointer-events-none absolute -bottom-48 -right-48 h-[45rem] w-[45rem] rounded-full bg-cyan-500/10 blur-[150px] z-1"
       />
 
       {/* Hero Content Area */}
@@ -259,14 +267,14 @@ export default function Hero() {
           <div className="w-full pt-12 border-t border-white/10 mt-12 relative z-10">
             <div className="text-center md:text-left space-y-2 mb-8">
               <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[9px] font-bold uppercase tracking-widest"
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[9px] font-bold uppercase tracking-widest"
               >
-                  Galeri Video
+                Galeri Video
               </motion.div>
-              <motion.h2 
+              <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -275,12 +283,12 @@ export default function Hero() {
                 Video Pelatihan Gratis
               </motion.h2>
               <motion.p
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  className="text-gray-400 text-xs md:text-sm max-w-xl md:mx-0 mx-auto leading-relaxed"
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="text-gray-400 text-xs md:text-sm max-w-xl md:mx-0 mx-auto leading-relaxed"
               >
-                  Tonton panduan, informasi, dan teknik mutakhir dari program pelatihan unggulan kami.
+                Tonton panduan, informasi, dan teknik mutakhir dari program pelatihan unggulan kami.
               </motion.p>
             </div>
 
@@ -288,62 +296,62 @@ export default function Hero() {
               {isLoadingVideos ? (
                 <>
                   <div className="lg:row-span-2">
-                      <div className="w-full h-full min-h-[300px] rounded-3xl bg-[#1e293b]/40 animate-pulse border border-white/5 relative overflow-hidden">
-                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
-                      </div>
+                    <div className="w-full h-full min-h-[300px] rounded-3xl bg-[#1e293b]/40 animate-pulse border border-white/5 relative overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+                    </div>
                   </div>
                   <div className="grid grid-cols-2 gap-5">
-                      {[1, 2, 3, 4].map((i) => (
-                          <div key={i} className="w-full h-[170px] rounded-3xl bg-[#1e293b]/40 animate-pulse border border-white/5 relative overflow-hidden">
-                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
-                          </div>
-                      ))}
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="w-full h-[170px] rounded-3xl bg-[#1e293b]/40 animate-pulse border border-white/5 relative overflow-hidden">
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+                      </div>
+                    ))}
                   </div>
                 </>
               ) : videoPelatihan.length > 0 && (
                 <>
                   <motion.div
-                      initial={{ opacity: 0, x: -30 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.5 }}
-                      className="lg:row-span-2"
+                    initial={{ opacity: 0, x: -30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                    className="lg:row-span-2"
                   >
-                      <VideoCard
-                          video={videoPelatihan[0]}
-                          featured
-                          onClick={() => handleVideoClick(videoPelatihan[0])}
-                      />
+                    <VideoCard
+                      video={videoPelatihan[0]}
+                      featured
+                      onClick={() => handleVideoClick(videoPelatihan[0])}
+                    />
                   </motion.div>
 
                   <div className="grid grid-cols-2 gap-5">
-                      {videoPelatihan.slice(1).map((video, i) => (
-                          <motion.div
-                              key={video.id}
-                              initial={{ opacity: 0, y: 20 }}
-                              whileInView={{ opacity: 1, y: 0 }}
-                              viewport={{ once: true }}
-                              transition={{ duration: 0.4, delay: i * 0.1 }}
-                          >
-                              <VideoCard
-                                  video={video}
-                                  onClick={() => handleVideoClick(video)}
-                              />
-                          </motion.div>
-                      ))}
+                    {videoPelatihan.slice(1).map((video, i) => (
+                      <motion.div
+                        key={video.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.4, delay: i * 0.1 }}
+                      >
+                        <VideoCard
+                          video={video}
+                          onClick={() => handleVideoClick(video)}
+                        />
+                      </motion.div>
+                    ))}
                   </div>
                 </>
               )}
             </div>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.3 }}
               className="mt-10 flex justify-center w-full relative z-10"
             >
-              <Link 
+              <Link
                 href="/layanan/pelatihan/video/gratis"
                 className="group/btn relative px-8 py-3.5 rounded-2xl bg-[#1e293b]/40 text-blue-400 border border-blue-500/30 overflow-hidden transition-all duration-300 flex justify-center hover:border-transparent hover:bg-blue-600 shadow-xl shadow-transparent hover:shadow-blue-500/20"
               >

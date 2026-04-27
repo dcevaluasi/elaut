@@ -105,13 +105,23 @@ export default function MobileMenu({ isTop }: { isTop: boolean }) {
                     active={pathname === "/"}
                     onClick={() => setMobileNavOpen(false)}
                   />
-                  <MobileNavItem
-                    href="/layanan/cek-sertifikat"
-                    label="Cek Sertifikat"
-                    icon={<HiIdentification />}
-                    active={pathname === "/layanan/cek-sertifikat"}
-                    onClick={() => setMobileNavOpen(false)}
-                  />
+                  {pathname.includes('/p2mkp') ? (
+                    <MobileNavItem
+                      href="/p2mkp/registrasi"
+                      label="Ajukan Penetapan"
+                      icon={<HiOutlineDocumentText />}
+                      active={pathname === "/p2mkp/registrasi"}
+                      onClick={() => setMobileNavOpen(false)}
+                    />
+                  ) : (
+                    <MobileNavItem
+                      href="/layanan/cek-sertifikat"
+                      label="Cek Sertifikat"
+                      icon={<HiIdentification />}
+                      active={pathname === "/layanan/cek-sertifikat"}
+                      onClick={() => setMobileNavOpen(false)}
+                    />
+                  )}
 
                   <li>
                     <button

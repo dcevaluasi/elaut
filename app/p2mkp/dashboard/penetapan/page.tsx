@@ -45,10 +45,10 @@ const FAQ_DATA = [
                     "Tidak berafiliasi dengan partai politik."
                 ].map((item, idx) => (
                     <div key={idx} className="flex gap-4 group">
-                        <div className="w-8 h-8 shrink-0 rounded-lg bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-[10px] font-bold text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                        <div className="w-8 h-8 shrink-0 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-[10px] font-bold text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
                             {String(idx + 1).padStart(2, '0')}
                         </div>
-                        <p className="text-gray-400 text-sm leading-relaxed group-hover:text-white transition-colors">{item}</p>
+                        <p className="text-slate-600 text-sm leading-relaxed group-hover:text-slate-900 transition-colors">{item}</p>
                     </div>
                 ))}
             </div>
@@ -69,8 +69,8 @@ const FAQ_DATA = [
                             {String(idx + 1).padStart(2, '0')}
                         </div>
                         <div className="space-y-1">
-                            <p className="font-bold text-white text-sm group-hover:text-blue-400 transition-colors uppercase tracking-wider">{step.title}</p>
-                            <p className="text-gray-400 text-sm leading-relaxed">{step.desc}</p>
+                            <p className="font-bold text-slate-800 text-sm group-hover:text-blue-600 transition-colors uppercase tracking-wider">{step.title}</p>
+                            <p className="text-slate-500 text-sm leading-relaxed">{step.desc}</p>
                         </div>
                     </div>
                 ))}
@@ -87,12 +87,12 @@ const FAQ_DATA = [
                     { title: "Keputusan Tahap Awal", desc: "Jika dokumen tetap tidak lengkap setelah batas waktu perbaikan, permohonan dengan berat hati harus ditolak." }
                 ].map((step, idx) => (
                     <div key={idx} className="flex gap-4 group">
-                        <div className="w-8 h-8 shrink-0 rounded-lg bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-[10px] font-bold text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                        <div className="w-8 h-8 shrink-0 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-[10px] font-bold text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
                             {String(idx + 1).padStart(2, '0')}
                         </div>
                         <div className="space-y-1">
-                            <p className="font-bold text-white text-sm group-hover:text-blue-400 transition-colors uppercase tracking-wider">{step.title}</p>
-                            <p className="text-gray-400 text-sm leading-relaxed">{step.desc}</p>
+                            <p className="font-bold text-slate-800 text-sm group-hover:text-blue-600 transition-colors uppercase tracking-wider">{step.title}</p>
+                            <p className="text-slate-500 text-sm leading-relaxed">{step.desc}</p>
                         </div>
                     </div>
                 ))}
@@ -110,12 +110,12 @@ const FAQ_DATA = [
                     { title: "Masa Perbaikan (7 Hari)", desc: "Jika ada temuan yang belum sesuai, Anda diberi waktu 7 hari untuk melakukan penyesuaian sebelum keputusan akhir." }
                 ].map((step, idx) => (
                     <div key={idx} className="flex gap-4 group">
-                        <div className="w-8 h-8 shrink-0 rounded-lg bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-[10px] font-bold text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                        <div className="w-8 h-8 shrink-0 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-[10px] font-bold text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
                             {String(idx + 1).padStart(2, '0')}
                         </div>
                         <div className="space-y-1">
-                            <p className="font-bold text-white text-sm group-hover:text-blue-400 transition-colors uppercase tracking-wider">{step.title}</p>
-                            <p className="text-gray-400 text-sm leading-relaxed">{step.desc}</p>
+                            <p className="font-bold text-slate-800 text-sm group-hover:text-blue-600 transition-colors uppercase tracking-wider">{step.title}</p>
+                            <p className="text-slate-500 text-sm leading-relaxed">{step.desc}</p>
                         </div>
                     </div>
                 ))}
@@ -134,16 +134,16 @@ function FAQItem({ question, answer }: { question: string, answer: React.ReactNo
     return (
         <motion.div
             initial={false}
-            className={`rounded-3xl border transition-all duration-500 overflow-hidden ${isOpen ? 'bg-white/10 border-blue-500/30 shadow-2xl shadow-blue-500/10' : 'bg-white/5 border-white/10 hover:border-white/20'}`}
+            className={`rounded-3xl border transition-all duration-500 overflow-hidden ${isOpen ? 'bg-white border-blue-200 shadow-xl shadow-blue-500/5' : 'bg-white border-slate-200 hover:border-slate-300'}`}
         >
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-full px-8 py-6 flex items-center justify-between text-left group"
             >
-                <span className={`text-sm md:text-base font-bold transition-colors duration-300 ${isOpen ? 'text-blue-400' : 'text-gray-200'}`}>
+                <span className={`text-sm md:text-base font-bold transition-colors duration-300 ${isOpen ? 'text-blue-600' : 'text-slate-700'}`}>
                     {question}
                 </span>
-                <div className={`p-2 rounded-xl transition-all duration-500 ${isOpen ? 'bg-blue-600 text-white rotate-180' : 'bg-white/5 text-gray-500 group-hover:text-white'}`}>
+                <div className={`p-2 rounded-xl transition-all duration-500 ${isOpen ? 'bg-blue-600 text-white rotate-180' : 'bg-slate-50 text-slate-500 group-hover:text-slate-900 group-hover:bg-slate-100'}`}>
                     <FiChevronDown size={18} />
                 </div>
             </button>
@@ -156,7 +156,7 @@ function FAQItem({ question, answer }: { question: string, answer: React.ReactNo
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
                     >
-                        <div className="px-8 pb-8 text-gray-400 text-xs md:text-sm leading-relaxed border-t border-white/5 pt-4">
+                        <div className="px-8 pb-8 text-slate-600 text-xs md:text-sm leading-relaxed border-t border-slate-100 pt-4">
                             {answer}
                         </div>
                     </motion.div>
@@ -223,6 +223,12 @@ export default function PenetapanP2MKPPage() {
         return ['diajukan', 'dikirim', 'proses', 'diverifikasi', 'pending', 'menunggu', 'perbaikan'].includes(s);
     });
 
+    const statusP2mkp = p2mkpData?.StatusP2mkp || p2mkpData?.status_p2mkp || p2mkpData?.Status || p2mkpData?.status || p2mkpData?.StatusPpmkp || p2mkpData?.status_ppmkp;
+    const isApproved = statusP2mkp === 'Approved' || statusP2mkp === 'Disetujui' || statusP2mkp === 'Aktif';
+    const klasifikasi = p2mkpData?.Klasifikasi || p2mkpData?.klasifikasi;
+    const isTidakTerklasifikasi = !klasifikasi || klasifikasi === 'TIDAK TERKLASIFIKASI';
+    const approvedSubmission = penetapanData.find(item => item.status?.toLowerCase() === 'disetujui' || item.status?.toLowerCase() === 'approved') || penetapanData[0];
+
     return (
         <DashboardLayout>
             <motion.div
@@ -232,10 +238,10 @@ export default function PenetapanP2MKPPage() {
             >
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
                     <div className="space-y-0">
-                        <h1 className="text-4xl md:text-5xl leading-none font-calsans">Penetapan <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">P2MKP</span></h1>
-                        <p className="text-gray-500 text-sm font-light italic leading-relaxed mt-2">Kelola legalitas dan status sertifikasi lembaga Anda dalam satu pusat kontrol.</p>
+                        <h1 className="text-4xl md:text-5xl leading-none font-calsans text-slate-900">Penetapan <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">P2MKP</span></h1>
+                        <p className="text-slate-500 text-sm font-light italic leading-relaxed mt-2">Kelola legalitas dan status sertifikasi lembaga Anda dalam satu pusat kontrol.</p>
                     </div>
-                    {!isDataLoading && !hasPending && (
+                    {!isDataLoading && !hasPending && !isApproved && (
                         <Link href="/p2mkp/dashboard/penetapan/pengajuan">
                             <button className="group relative h-14 px-8 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black tracking-widest shadow-xl shadow-blue-500/20 transition-all flex items-center gap-3 overflow-hidden active:scale-95">
                                 <FiPlus size={20} className="group-hover:rotate-90 transition-transform" />
@@ -246,7 +252,57 @@ export default function PenetapanP2MKPPage() {
                     )}
                 </div>
 
-                {/* Submissions List */}
+                {isApproved ? (
+                    <div className="grid gap-8">
+                        <div className="p-8 rounded-[2rem] bg-white border border-slate-200 shadow-sm">
+                            <h2 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                                <FiAward className="text-blue-600" /> Sertifikat Penetapan P2MKP
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <DetailMetaCard label="Nama P2MKP" value={p2mkpData?.NamaPpmkp || p2mkpData?.nama_ppmkp || '-'} />
+                                <DetailMetaCard label="Tahun Penetapan" value={approvedSubmission?.tahun_penetapan || p2mkpData?.TahunPenetapan || '-'} />
+                                <DetailMetaCard label="Penanggung Jawab" value={p2mkpData?.NamaPenanggungJawab || p2mkpData?.nama_penanggung_jawab || p2mkpData?.Ketua || '-'} />
+                                <DetailMetaCard label="Alamat" value={p2mkpData?.Alamat || p2mkpData?.alamat || '-'} />
+                                <DetailMetaCard label="Bidang Pelatihan" value={p2mkpData?.JenisBidangPelatihan || p2mkpData?.jenis_bidang_pelatihan || '-'} />
+                                <DetailMetaCard label="Jenis Pelatihan" value={p2mkpData?.JenisPelatihan || p2mkpData?.jenis_pelatihan || '-'} />
+                                <DetailMetaCard label="Nomor Sertifikat" value={p2mkpData?.NomorSertifikat || p2mkpData?.nomor_sertifikat || approvedSubmission?.nomor_sertifikat || '-'} highlight status="Disetujui" />
+                                <DetailMetaCard label="Tanggal Sertifikat" value={p2mkpData?.TanggalSertifikat || p2mkpData?.tanggal_sertifikat || approvedSubmission?.tanggal_sertifikat || '-'} />
+                            </div>
+
+                            {isTidakTerklasifikasi && (
+                                <div className="mt-8 pt-8 border-t border-slate-100 flex justify-end">
+                                    <Link href="/p2mkp/dashboard/klasifikasi">
+                                        <button className="h-14 px-8 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold tracking-widest shadow-xl shadow-blue-500/20 transition-all flex items-center gap-3 active:scale-95">
+                                            <FiAward size={20} />
+                                            AJUKAN KLASIFIKASI
+                                        </button>
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="p-8 rounded-[2rem] bg-white border border-slate-200 shadow-sm">
+                            <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                                <FiFileText className="text-blue-600" /> Dokumen Penetapan
+                            </h2>
+                            {approvedSubmission ? (
+                                <div className="grid gap-3">
+                                    <DocumentLink label="Identifikasi Calon P2MKP" url={approvedSubmission.DokumenIdentifikasiPemilik} />
+                                    <DocumentLink label="Identifikasi Asesmen Mandiri" url={approvedSubmission.DokumenAsesmentMandiri} />
+                                    <DocumentLink label="Surat Pernyataan Calon P2MKP" url={approvedSubmission.DokumentSuratPernyataan} />
+                                    <DocumentLink label="Surat Legalitas Usaha" url={approvedSubmission.DokumenKeteranganUsaha} />
+                                    <DocumentLink label="Surat Tidak Afiliasi Partai Politik" url={approvedSubmission.DokumenAfiliasiParpol} />
+                                    <DocumentLink label="Surat Rekomendasi Dinas" url={approvedSubmission.DokumenRekomendasiDinas} />
+                                    <DocumentLink label="Surat Permohonan Pembentukan" url={approvedSubmission.DokumenPermohonanPembentukan} />
+                                </div>
+                            ) : (
+                                <p className="text-slate-500 italic text-sm">Data dokumen pengajuan tidak ditemukan.</p>
+                            )}
+                        </div>
+                    </div>
+                ) : (
+                    <>
+                        {/* Submissions List */}
                 {isDataLoading ? (
                     <div className="flex items-center justify-center py-24">
                         <HashLoader color="#3b82f6" size={40} />
@@ -258,15 +314,15 @@ export default function PenetapanP2MKPPage() {
                                 key={item.IdPengajuan || index}
                                 whileHover={{ y: -5 }}
                                 onClick={() => { setSelectedSubmission(item); setIsDetailOpen(true); }}
-                                className="group p-6 rounded-[2rem] bg-[#0f172a]/40 backdrop-blur-3xl border border-white/5 hover:border-white/10 transition-all cursor-pointer flex flex-col md:flex-row items-center justify-between gap-6"
+                                className="group p-6 rounded-[2rem] bg-white border border-slate-200 hover:border-slate-300 shadow-sm transition-all cursor-pointer flex flex-col md:flex-row items-center justify-between gap-6"
                             >
                                 <div className="flex items-center gap-6">
-                                    <div className="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-2xl group-hover:bg-blue-500 group-hover:text-white transition-all">
+                                    <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 text-2xl group-hover:bg-blue-600 group-hover:text-white transition-all">
                                         <FiFileText />
                                     </div>
                                     <div className="space-y-1">
-                                        <h3 className="font-calsans text-xl text-white">Pengajuan Penetapan P2MKP {item.tahun_penetapan || new Date().getFullYear()}</h3>
-                                        <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest flex items-center gap-2">
+                                        <h3 className="font-bold text-xl text-slate-800">Pengajuan Penetapan P2MKP {item.tahun_penetapan || new Date().getFullYear()}</h3>
+                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest flex items-center gap-2">
                                             <FiCalendar /> {item.create_at ? new Date(item.create_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Baru saja'}
                                         </p>
                                     </div>
@@ -283,7 +339,7 @@ export default function PenetapanP2MKPPage() {
                                     <div className={`px-4 py-2 rounded-xl border text-[10px] font-black uppercase tracking-[0.2em] ${getStatusStyle(item.status || 'Diajukan')}`}>
                                         {item.status || 'Diajukan'}
                                     </div>
-                                    <div className="p-3 bg-white/5 rounded-xl text-gray-500 hover:text-white transition-colors">
+                                    <div className="p-3 bg-slate-50 rounded-xl text-slate-400 group-hover:text-slate-900 group-hover:bg-slate-100 transition-colors">
                                         <FiChevronRight size={20} />
                                     </div>
                                 </div>
@@ -294,19 +350,19 @@ export default function PenetapanP2MKPPage() {
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="p-16 rounded-[3.5rem] bg-[#0f172a]/40 backdrop-blur-3xl border border-dashed border-white/10 flex flex-col items-center justify-center text-center space-y-8"
+                        className="p-16 rounded-[2rem] bg-white border border-dashed border-slate-300 flex flex-col items-center justify-center text-center space-y-8 shadow-sm"
                     >
-                        <div className="w-24 h-24 bg-white/5 rounded-[2.5rem] flex items-center justify-center text-gray-600">
+                        <div className="w-24 h-24 bg-slate-50 rounded-[2.5rem] flex items-center justify-center text-slate-400">
                             <FiFileText size={48} className="animate-pulse" />
                         </div>
                         <div className="space-y-1">
-                            <h3 className="text-2xl font-calsans">Belum Ada Pengajuan</h3>
-                            <p className="text-gray-500 text-sm max-w-xl font-light leading-relaxed">
+                            <h3 className="text-2xl font-bold text-slate-800">Belum Ada Pengajuan</h3>
+                            <p className="text-slate-500 text-sm max-w-xl font-light leading-relaxed">
                                 Anda belum memiliki record pengajuan penetapan. Lakukan pengajuan pertama Anda untuk menetapkan lembaga atau usaha anda sebagai P2MKP.
                             </p>
                         </div>
                         <Link href="/p2mkp/dashboard/penetapan/pengajuan">
-                            <button className="h-14 px-10 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-2xl font-black tracking-widest transition-all flex items-center gap-3">
+                            <button className="h-14 px-10 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-2xl font-black tracking-widest transition-all flex items-center gap-3 shadow-sm">
                                 <FiPlus size={20} /> AJUKAN PENETAPAN
                             </button>
                         </Link>
@@ -320,10 +376,10 @@ export default function PenetapanP2MKPPage() {
                 </div>
 
                 {/* FAQ Section */}
-                <div className="space-y-8">
+                <div className="space-y-8 pt-8">
                     <div className="flex flex-col gap-2">
-                        <h1 className="text-3xl font-calsans">Frequently Asked <span className="text-blue-400">Questions</span></h1>
-                        <p className="text-gray-500 text-sm font-light leading-relaxed">Informasi lengkap mengenai proses penetapan dan verifikasi P2MKP.</p>
+                        <h1 className="text-3xl font-bold text-slate-900">Frequently Asked <span className="text-blue-600">Questions</span></h1>
+                        <p className="text-slate-500 text-sm font-light leading-relaxed">Informasi lengkap mengenai proses penetapan dan verifikasi P2MKP.</p>
                     </div>
                     <div className="grid gap-4">
                         {FAQ_DATA.map((item, index) => (
@@ -331,34 +387,36 @@ export default function PenetapanP2MKPPage() {
                         ))}
                     </div>
                 </div>
+                    </>
+                )}
             </motion.div>
 
             {/* Detail Overlay Modal */}
             <AnimatePresence>
                 {isDetailOpen && selectedSubmission && (
-                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 text-white">
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                         <motion.div
                             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                             onClick={() => setIsDetailOpen(false)}
-                            className="absolute inset-0 bg-[#020617]/80 backdrop-blur-md"
+                            className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
                         />
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                            className="relative w-full max-w-2xl bg-[#0f172a] border border-white/10 rounded-[3rem] shadow-2xl overflow-hidden"
+                            className="relative w-full max-w-2xl bg-white border border-slate-200 rounded-[2rem] shadow-2xl overflow-hidden"
                         >
-                            <div className="p-8 border-b border-white/5 flex items-center justify-between bg-gradient-to-r from-blue-600/10 to-transparent">
+                            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-blue-500/20 flex items-center justify-center text-blue-400 border border-blue-500/20">
+                                    <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100">
                                         <FiFileText size={20} />
                                     </div>
                                     <div>
-                                        <h2 className="text-xl font-calsans">Detail <span className="text-blue-400 font-bold">Pengajuan</span></h2>
-                                        <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest leading-none mt-1">Detail Pengajuan Penetapan P2MKP</p>
+                                        <h2 className="text-xl font-bold text-slate-800">Detail <span className="text-blue-600">Pengajuan</span></h2>
+                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-none mt-1">Detail Pengajuan Penetapan P2MKP</p>
                                     </div>
                                 </div>
-                                <button onClick={() => setIsDetailOpen(false)} className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors text-gray-400">
+                                <button onClick={() => setIsDetailOpen(false)} className="p-3 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl transition-colors text-slate-500">
                                     <FiX size={20} />
                                 </button>
                             </div>
@@ -382,8 +440,8 @@ export default function PenetapanP2MKPPage() {
                                 </div>
                             </div>
 
-                            <div className="p-8 bg-[#020617]/50 border-t border-white/5 flex justify-end">
-                                <button onClick={() => setIsDetailOpen(false)} className="px-8 h-12 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                            <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-end">
+                                <button onClick={() => setIsDetailOpen(false)} className="px-8 h-12 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
                                     TUTUP
                                 </button>
                             </div>
@@ -401,14 +459,14 @@ function DetailMetaCard({ label, value, highlight, status }: any) {
             case 'dikirim': case 'diajukan': return 'text-blue-400';
             case 'diverifikasi': case 'proses': return 'text-amber-400';
             case 'disetujui': case 'aktif': return 'text-emerald-400';
-            case 'ditolak': return 'text-rose-400';
-            default: return 'text-white';
+            case 'ditolak': return 'text-rose-600';
+            default: return 'text-slate-800';
         }
     };
     return (
-        <div className="p-5 rounded-2xl bg-white/5 border border-white/5 space-y-1 hover:bg-white/[0.07] transition-colors">
-            <p className="text-[9px] text-gray-500 font-black uppercase tracking-tighter">{label}</p>
-            <p className={`text-sm font-bold ${highlight ? getStatusStyle(status) : 'text-white'} uppercase tracking-wider`}>{value}</p>
+        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1 hover:bg-slate-100 transition-colors shadow-sm">
+            <p className="text-[9px] text-slate-500 font-bold uppercase tracking-widest">{label}</p>
+            <p className={`text-sm font-bold ${highlight ? getStatusStyle(status) : 'text-slate-800'} uppercase tracking-wider`}>{value}</p>
         </div>
     );
 }
@@ -418,20 +476,20 @@ function DocumentLink({ label, url }: { label: string, url: string }) {
     const fullUrl = url.startsWith('http') ? url : `${elautBaseUrl}/storage/${url}`;
     return (
         <a href={fullUrl} target="_blank" rel="noopener noreferrer"
-            className="group flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-blue-500/30 hover:bg-blue-600/10 transition-all active:scale-[0.98]"
+            className="group flex items-center justify-between p-4 rounded-xl bg-white border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-all active:scale-[0.98] shadow-sm"
         >
             <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all">
                     <FiEye size={18} />
                 </div>
                 <div className="flex flex-col">
-                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter">Dokumen</span>
-                    <span className="text-xs font-bold text-gray-300 group-hover:text-white transition-colors">{label}</span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Dokumen</span>
+                    <span className="text-xs font-bold text-slate-700 group-hover:text-blue-700 transition-colors">{label}</span>
                 </div>
             </div>
             <div className="flex items-center gap-3">
-                <span className="text-[9px] font-black text-blue-500/40 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">PREVIEW</span>
-                <FiChevronRight className="text-gray-700 group-hover:text-blue-400 transition-colors" />
+                <span className="text-[9px] font-bold text-blue-600 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">PREVIEW</span>
+                <FiChevronRight className="text-slate-400 group-hover:text-blue-600 transition-colors" />
             </div>
         </a>
     );
@@ -439,14 +497,14 @@ function DocumentLink({ label, url }: { label: string, url: string }) {
 
 function InfoCard({ icon, title, description, color }: any) {
     const colors: any = {
-        amber: "text-amber-400 bg-amber-400/10 border-amber-400/20",
-        emerald: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+        amber: "text-amber-600 bg-amber-50 border-amber-100",
+        emerald: "text-emerald-600 bg-emerald-50 border-emerald-100",
     };
     return (
-        <div className="p-8 rounded-[2.5rem] bg-[#0f172a]/40 backdrop-blur-3xl border border-white/5 space-y-4 text-white">
+        <div className="p-8 rounded-[2rem] bg-white border border-slate-200 shadow-sm space-y-4 text-slate-800">
             <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl border ${colors[color]}`}>{icon}</div>
-            <h4 className="text-xl font-calsans">{title}</h4>
-            <p className="text-xs text-gray-500 font-light leading-relaxed">{description}</p>
+            <h4 className="text-xl font-bold">{title}</h4>
+            <p className="text-sm text-slate-500 font-medium leading-relaxed">{description}</p>
         </div>
     );
 }

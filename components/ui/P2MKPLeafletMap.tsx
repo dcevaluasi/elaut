@@ -23,9 +23,8 @@ export interface P2MKPPin {
 const STATUS_COLOR: Record<string, string> = {
     'Utama': '#10b981',    // Emerald-500
     'Madya': '#3b82f6',    // Blue-500
-    'Muda': '#f59e0b',      // Amber-500
     'Pemula': '#6366f1',   // Indigo-500
-    'Belum Klasifikasi': '#94a3b8'   // Slate-400
+    'Tidak Terklasifikasi': '#94a3b8'   // Slate-400
 };
 
 function MapContent({ pins, getColor }: { pins: P2MKPPin[], getColor: (s: string) => string }) {
@@ -73,7 +72,7 @@ function MapContent({ pins, getColor }: { pins: P2MKPPin[], getColor: (s: string
                                         border: `1px solid ${markerColor}40`,
                                         display: 'inline-block'
                                     }}>
-                                        ⭐ {pin.klasifikasi || 'Belum Klasifikasi'}
+                                        ⭐ {pin.klasifikasi || 'Tidak Terklasifikasi'}
                                     </span>
                                     {pin.tahunPenetapan && pin.tahunPenetapan !== '-' && (
                                         <span style={{
@@ -142,9 +141,8 @@ export default function P2MKPLeafletMap({ pins }: { pins: P2MKPPin[] }) {
         const k = (klasifikasi || '').toLowerCase();
         if (k.includes('utama')) return STATUS_COLOR['Utama'];
         if (k.includes('madya')) return STATUS_COLOR['Madya'];
-        if (k.includes('muda')) return STATUS_COLOR['Muda'];
         if (k.includes('pemula')) return STATUS_COLOR['Pemula'];
-        return STATUS_COLOR['Belum Klasifikasi'];
+        return STATUS_COLOR['Tidak Terklasifikasi'];
     };
 
     return (

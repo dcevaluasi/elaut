@@ -53,6 +53,14 @@ const ISLAND_GROUPS = [
     { name: 'Maluku & Papua', icon: '🦜', color: 'from-rose-500 to-pink-600', provinces: ['Maluku', 'Maluku Utara', 'Papua Barat', 'Papua Barat Daya', 'Papua Tengah', 'Papua Pegunungan', 'Papua Selatan', 'Papua'] },
 ];
 
+const BPPP_GROUPS = [
+    { name: 'BPPP Medan', icon: '🌊', color: 'from-emerald-500 to-teal-600', provinces: ['Aceh', 'Sumatera Utara', 'Sumatera Barat', 'Kepulauan Riau', 'Riau', 'Jambi', 'Bengkulu', 'Kepulauan Bangka Belitung', 'Sumatera Selatan'] },
+    { name: 'BPPP Tegal', icon: '⚓', color: 'from-blue-500 to-indigo-600', provinces: ['Lampung', 'Banten', 'Jawa Barat', 'DKI Jakarta', 'Jawa Tengah', 'DI Yogyakarta', 'Kalimantan Barat'] },
+    { name: 'BPPP Banyuwangi', icon: '⛵', color: 'from-amber-500 to-orange-600', provinces: ['Jawa Timur', 'Bali', 'Nusa Tenggara Barat', 'Nusa Tenggara Timur', 'Kalimantan Selatan', 'Kalimantan Tengah'] },
+    { name: 'BPPP Bitung', icon: '🐠', color: 'from-cyan-500 to-blue-600', provinces: ['Sulawesi Utara', 'Gorontalo', 'Sulawesi Tengah', 'Sulawesi Barat', 'Sulawesi Selatan', 'Kalimantan Timur', 'Kalimantan Utara'] },
+    { name: 'BPPP Ambon', icon: '🏝️', color: 'from-rose-500 to-pink-600', provinces: ['Papua', 'Papua Barat', 'Papua Barat Daya', 'Papua Tengah', 'Papua Pegunungan', 'Papua Selatan', 'Maluku', 'Maluku Utara', 'Sulawesi Tenggara'] },
+];
+
 const P2MKPLeafletMap = dynamic(() => import('@/components/ui/P2MKPLeafletMap'), {
     ssr: false,
     loading: () => (
@@ -285,11 +293,10 @@ const FAQ_TABS = [
                 question: "Apa saja tingkatan klasifikasi P2MKP?",
                 answer: (
                     <div className="space-y-3">
-                        <p className="text-gray-500 text-xs pb-2">Klasifikasi P2MKP terdiri dari 4 (empat) tingkatan, dari yang terendah hingga tertinggi:</p>
+                        <p className="text-gray-500 text-xs pb-2">Klasifikasi P2MKP terdiri dari 3 (tiga) tingkatan, dari yang terendah hingga tertinggi:</p>
                         {[
-                            { rank: "4", title: "Pemula", badge: "🥉", color: "amber", desc: "Tingkat Pemula (terendah). Bagi P2MKP yang baru ditetapkan dengan kapasitas dan fasilitas dasar sesuai standar minimal." },
-                            { rank: "3", title: "Muda", badge: "🥈", color: "blue", desc: "Tingkat kedua. P2MKP yang telah menunjukkan perkembangan kapasitas SDM dan sarana penyelenggaraan pelatihan." },
-                            { rank: "2", title: "Madya", badge: "🥇", color: "indigo", desc: "Tingkat ketiga. P2MKP dengan kapasitas, manajemen, dan kurikulum pelatihan yang lebih komprehensif." },
+                            { rank: "3", title: "Pemula", badge: "🥉", color: "amber", desc: "Tingkat Pemula (terendah). Bagi P2MKP yang baru ditetapkan dengan kapasitas dan fasilitas dasar sesuai standar minimal." },
+                            { rank: "2", title: "Madya", badge: "🥇", color: "indigo", desc: "Tingkat kedua. P2MKP dengan kapasitas, manajemen, dan kurikulum pelatihan yang lebih komprehensif." },
                             { rank: "1", title: "Utama", badge: "🏆", color: "purple", desc: "Tingkat tertinggi. P2MKP unggulan dengan standar fasilitas, SDM, manajemen, dan kemitraan yang excellent." }
                         ].map((level, idx) => (
                             <div key={idx} className="flex gap-4 items-start group p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-blue-500/30 hover:bg-blue-500/5 transition-all">
@@ -339,7 +346,6 @@ const FAQ_TABS = [
                         <div className="space-y-3">
                             {[
                                 { level: "Pemula", duration: "2 (dua) tahun", badge: "🥉", accent: "border-amber-500/30 bg-amber-500/5" },
-                                { level: "Muda", duration: "3 (tiga) tahun", badge: "🥈", accent: "border-blue-500/30 bg-blue-500/5" },
                                 { level: "Madya", duration: "4 (empat) tahun", badge: "🥇", accent: "border-indigo-500/30 bg-indigo-500/5" },
                                 { level: "Utama", duration: "5 (lima) tahun", badge: "🏆", accent: "border-purple-500/30 bg-purple-500/5" },
                             ].map((item, idx) => (
@@ -445,7 +451,39 @@ function FAQTabs() {
 
 // --- Main Page ---
 
+import MarqueeLogos from '@/components/marquee-logos';
+
 export default function P2MKPPage() {
+    const [p2mkpList, setP2mkpList] = useState<P2MKP[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [totalProvinsi, setTotalProvinsi] = useState(0);
+
+    useEffect(() => {
+        axios.get(`${elautBaseUrl}/p2mkp/get_p2mkp`)
+            .then(res => {
+                const raw = res.data?.data ?? res.data ?? [];
+                if (Array.isArray(raw)) {
+                    const approvedData = raw.filter(item =>
+                        item.status && (item.status.toLowerCase() === 'approved' || item.status.toLowerCase().includes('approve'))
+                    );
+                    setP2mkpList(approvedData);
+
+                    const allApprovedProv = new Set<string>();
+                    approvedData.forEach(item => {
+                        const prov = normalizeProvinsi(item.provinsi || '');
+                        if (prov) allApprovedProv.add(prov);
+                    });
+                    setTotalProvinsi(allApprovedProv.size);
+                }
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error("Failed to fetch P2MKP:", err);
+                setLoading(false);
+            });
+    }, []);
+
+    const totalLembaga = p2mkpList.length;
 
     return (
         <section className="pt-16 min-h-screen bg-[#020617] text-white selection:bg-blue-500/30 font-jakarta overflow-x-hidden">
@@ -506,14 +544,25 @@ export default function P2MKPPage() {
                                     <FiArrowRight className="group-hover:translate-x-1 transition-transform" />
                                 </button>
                             </Link>
+
+                            <a
+                                href="/files/Standar Pelayanan P2MKP.pdf"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <button className="group px-6 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold tracking-wider flex items-center gap-2 transition-all hover:bg-white/10 hover:scale-105 backdrop-blur-sm">
+                                    STANDAR PELAYANAN
+                                    <FiFileText className="group-hover:scale-110 transition-transform text-blue-400" />
+                                </button>
+                            </a>
                         </motion.div>
                     </div>
 
                     {/* Simple Visualization in Hero */}
                     <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-                        <StatCard icon={<FiUsers />} label="Lembaga P2MKP" value={107} suffix="+" />
-                        <StatCard icon={<FiAward />} label="SDM Sertifikat" value={12000} suffix="+" />
-                        <StatCard icon={<FiMapPin />} label="Tersebar di" value={34} suffix=" Prov" />
+                        <StatCard icon={<FiUsers />} label="Lembaga P2MKP" value={totalLembaga || 0} suffix="" />
+                        <StatCard icon={<FiAward />} label="SDM Terlatih" value={10000} suffix="+" />
+                        <StatCard icon={<FiMapPin />} label="Tersebar di" value={totalProvinsi || 0} suffix=" Prov" />
                         <StatCard icon={<FiTrendingUp />} label="Pertumbuhan" value={15} suffix="%" />
                     </div>
                 </motion.div>
@@ -571,7 +620,7 @@ export default function P2MKPPage() {
                 <VideoGallerySection />
 
                 {/* Indonesia Map Section */}
-                <IndonesiaMapSection />
+                <IndonesiaMapSection p2mkpList={p2mkpList} loading={loading} />
 
                 {/* FAQ Section */}
                 <div id="faq" className="py-24 px-4 relative overflow-hidden">
@@ -620,6 +669,7 @@ export default function P2MKPPage() {
                     </motion.div>
                 </div>
 
+                <MarqueeLogos />
                 <Footer />
             </div>
         </section>
@@ -702,29 +752,12 @@ function normalizeProvinsi(raw: string): string {
     return raw.trim();
 }
 
-function IndonesiaMapSection() {
-    const [p2mkpList, setP2mkpList] = useState<P2MKP[]>([]);
-    const [loading, setLoading] = useState(true);
+function IndonesiaMapSection({ p2mkpList, loading }: { p2mkpList: P2MKP[], loading: boolean }) {
     const [activeGroup, setActiveGroup] = useState<string | null>(null);
     const [highlightProv, setHighlightProv] = useState<string | null>(null);
+    const [activeKlasifikasi, setActiveKlasifikasi] = useState<string | null>(null);
+    const [regionTab, setRegionTab] = useState<'bppp' | 'kepulauan'>('bppp');
 
-    useEffect(() => {
-        axios.get(`${elautBaseUrl}/p2mkp/get_p2mkp`)
-            .then(res => {
-                const raw = res.data?.data ?? res.data ?? [];
-                if (Array.isArray(raw)) {
-                    // Filter only raw.status approved
-                    const approvedData = raw.filter(item =>
-                        item.status && (item.status.toLowerCase() === 'approved' || item.status.toLowerCase().includes('approve'))
-                    );
-                    setP2mkpList(approvedData);
-                } else {
-                    setP2mkpList([]);
-                }
-            })
-            .catch(() => setP2mkpList([]))
-            .finally(() => setLoading(false));
-    }, []);
 
     // Build all pins from items that have valid coordinates in bidang_pelatihan
     const allPins: P2MKPPin[] = p2mkpList.flatMap(item => {
@@ -742,41 +775,56 @@ function IndonesiaMapSection() {
             alamat: item.alamat || '',
             noTelp: item.no_telp_penanggung_jawab || item.no_telp || '',
             jenisPelatihan: item.jenis_pelatihan || item.jenis_bidang_pelatihan || '',
-            klasifikasi: item.klasiikasi || 'Belum Klasifikasi',
+            klasifikasi: item.klasiikasi || 'Tidak Terklasifikasi',
             tahunPenetapan: item.tahun_penetapan || '-',
         }];
     });
 
-    // Province count for all data
+    // Province count for pins with valid coordinates
     const provinceCount: Record<string, number> = {};
+    allPins.forEach(item => {
+        if (item.status?.toLowerCase().includes('approve') || item.status?.toLowerCase() === 'approved') {
+            const prov = normalizeProvinsi(item.provinsi || '');
+            if (prov) provinceCount[prov] = (provinceCount[prov] || 0) + 1;
+        }
+    });
+
+    // Province count for stats (all approved data)
+    const allApprovedProv: Set<string> = new Set();
     p2mkpList.forEach(item => {
-        const prov = normalizeProvinsi(item.provinsi || '');
-        if (prov) provinceCount[prov] = (provinceCount[prov] || 0) + 1;
+        if (item.status?.toLowerCase().includes('approve') || item.status?.toLowerCase() === 'approved') {
+            const prov = normalizeProvinsi(item.provinsi || '');
+            if (prov) allApprovedProv.add(prov);
+        }
     });
 
     const withCoords = allPins.length;
     const totalLembaga = p2mkpList.length;
-    const totalProvinsi = Object.keys(provinceCount).length;
+    const totalProvinsi = allApprovedProv.size;
 
-    // Filter pins to ONLY show 'Approved' status, and optionally by highlighted province
+    // Filter pins to ONLY show 'Approved' status, optionally by highlighted province, and optionally by klasifikasi
     const displayPins = allPins.filter(p => {
         const isApproved = p.status?.toLowerCase().includes('approve') || p.status?.toLowerCase() === 'approved';
         if (!isApproved) return false; // Enforce approved status
 
-        if (highlightProv) {
-            return normalizeProvinsi(p.provinsi) === highlightProv;
+        if (highlightProv && normalizeProvinsi(p.provinsi) !== highlightProv) {
+            return false;
         }
+
+        if (activeKlasifikasi) {
+            const isBelumKlasifikasi = !p.klasifikasi || p.klasifikasi.toLowerCase() === 'tidak terklasifikasi' || p.klasifikasi.toLowerCase() === 'lainnya';
+            if (activeKlasifikasi === 'Tidak Terklasifikasi' && !isBelumKlasifikasi) return false;
+            if (activeKlasifikasi !== 'Tidak Terklasifikasi' && p.klasifikasi?.toLowerCase() !== activeKlasifikasi.toLowerCase()) return false;
+        }
+
         return true;
     });
-
-    const activeGroupData = ISLAND_GROUPS.find(g => g.name === activeGroup);
 
     const LEGEND = [
         { label: 'Utama', color: '#10b981' },
         { label: 'Madya', color: '#3b82f6' },
-        { label: 'Muda', color: '#f59e0b' },
         { label: 'Pemula', color: '#6366f1' },
-        { label: 'Lainnya', color: '#94a3b8' },
+        { label: 'Tidak Terklasifikasi', color: '#94a3b8' },
     ];
 
     return (
@@ -820,10 +868,10 @@ function IndonesiaMapSection() {
                     whileInView="visible"
                     viewport={{ once: true, margin: "-80px" }}
                     transition={{ duration: 0.6, delay: 0.25 }}
-                    className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4"
+                    className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6"
                 >
                     {/* ── Map ── */}
-                    <div className="relative rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl shadow-blue-500/5" style={{ height: '520px' }}>
+                    <div className="relative rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl shadow-blue-500/5" style={{ height: '680px' }}>
                         {loading ? (
                             <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#030d1a] gap-4">
                                 <div className="w-10 h-10 border-2 border-blue-500/30 border-t-blue-400 rounded-full animate-spin" />
@@ -869,17 +917,71 @@ function IndonesiaMapSection() {
                         )}
                     </div>
 
-                    {/* ── Sidebar: Gugus Kepulauan ── */}
-                    <div className="flex flex-col gap-3 max-h-[520px] overflow-y-auto no-scrollbar pr-1">
-                        <p className="text-[9px] font-black uppercase tracking-widest text-gray-600 px-1">Filter Gugus Kepulauan</p>
+                    {/* ── Sidebar: Gugus Kepulauan & Klasifikasi ── */}
+                    <div className="flex flex-col gap-3 max-h-[680px] overflow-y-auto pr-2 pb-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/20">
+                        {/* Filter Klasifikasi */}
+                        <p className="text-[9px] font-black uppercase tracking-widest text-gray-600 px-1 shrink-0">Filter Klasifikasi</p>
+                        <div className="grid grid-cols-2 gap-2 mb-2 shrink-0">
+                            {LEGEND.map(k => {
+                                const count = allPins.filter(p => {
+                                    const isApproved = p.status?.toLowerCase().includes('approve') || p.status?.toLowerCase() === 'approved';
+                                    if (!isApproved) return false;
+                                    const isBelumKlasifikasi = !p.klasifikasi || p.klasifikasi.toLowerCase() === 'tidak terklasifikasi' || p.klasifikasi.toLowerCase() === 'lainnya';
+                                    if (k.label === 'Tidak Terklasifikasi') return isBelumKlasifikasi;
+                                    return p.klasifikasi?.toLowerCase() === k.label.toLowerCase();
+                                }).length;
 
-                        {ISLAND_GROUPS.map((group, gi) => {
+                                const isActive = activeKlasifikasi === k.label;
+
+                                return (
+                                    <button
+                                        key={k.label}
+                                        onClick={() => setActiveKlasifikasi(isActive ? null : k.label)}
+                                        disabled={count === 0}
+                                        className={`flex items-center justify-between gap-1 px-2 py-2 rounded-xl border text-left transition-all ${count === 0 ? 'border-white/5 opacity-50 cursor-not-allowed' :
+                                            isActive ? 'border-[var(--color)] bg-[var(--color)]/10' : 'border-white/10 hover:bg-white/5'
+                                            }`}
+                                        style={{ '--color': k.color } as React.CSSProperties}
+                                    >
+                                        <div className="flex items-center gap-1.5 overflow-hidden">
+                                            <div className="w-2 h-2 shrink-0 rounded-full shadow-sm" style={{ backgroundColor: k.color }} />
+                                            <span className={`text-[9px] font-bold uppercase tracking-wider truncate ${isActive ? 'text-white' : 'text-gray-400'}`}>{k.label}</span>
+                                        </div>
+                                        {count > 0 && (
+                                            <span className={`text-[8px] px-1.5 py-0.5 shrink-0 rounded-full font-black ${isActive ? 'bg-[var(--color)]/20 text-white' : 'bg-white/10 text-gray-500'}`}>
+                                                {count}
+                                            </span>
+                                        )}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {/* Filter Regional */}
+                        <p className="text-[9px] font-black uppercase tracking-widest text-gray-600 px-1 mt-2 shrink-0">Filter Wilayah</p>
+
+                        <div className="flex items-center gap-2 mt-1 mb-2 px-1 shrink-0">
+                            <button
+                                onClick={() => { setRegionTab('bppp'); setActiveGroup(null); setHighlightProv(null); }}
+                                className={`flex-1 text-[9px] font-black uppercase tracking-widest py-2 rounded-xl transition-all ${regionTab === 'bppp' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'bg-white/5 text-gray-500 hover:text-white hover:bg-white/10'}`}
+                            >
+                                BPPP
+                            </button>
+                            <button
+                                onClick={() => { setRegionTab('kepulauan'); setActiveGroup(null); setHighlightProv(null); }}
+                                className={`flex-1 text-[9px] font-black uppercase tracking-widest py-2 rounded-xl transition-all ${regionTab === 'kepulauan' ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'bg-white/5 text-gray-500 hover:text-white hover:bg-white/10'}`}
+                            >
+                                Kepulauan
+                            </button>
+                        </div>
+
+                        {(regionTab === 'kepulauan' ? ISLAND_GROUPS : BPPP_GROUPS).map((group, gi) => {
                             const groupTotal = group.provinces.reduce((s, p) => s + (provinceCount[p] || 0), 0);
                             const coveredCount = group.provinces.filter(p => (provinceCount[p] || 0) > 0).length;
                             const isOpen = activeGroup === group.name;
 
                             return (
-                                <div key={group.name} className="rounded-[1.5rem] overflow-hidden border border-white/10">
+                                <div key={group.name} className="shrink-0 rounded-[1.5rem] overflow-hidden border border-white/10">
                                     {/* Group header */}
                                     <motion.button
                                         whileTap={{ scale: 0.98 }}
@@ -957,10 +1059,21 @@ function IndonesiaMapSection() {
                     className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-[1.5rem] bg-white/5 border border-white/10"
                 >
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                        {activeKlasifikasi && (
+                            <span className="flex items-center gap-1.5 text-[9px] px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 font-black uppercase tracking-wider border border-blue-500/30">
+                                Klasifikasi: {activeKlasifikasi}
+                                <button onClick={() => setActiveKlasifikasi(null)} className="hover:text-white transition-colors">
+                                    <FiX size={10} />
+                                </button>
+                            </span>
+                        )}
                         {highlightProv && (
-                            <span className="text-[9px] px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 font-black uppercase tracking-wider border border-blue-500/30">
+                            <span className="flex items-center gap-1.5 text-[9px] px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 font-black uppercase tracking-wider border border-blue-500/30">
                                 Filter: {highlightProv}
+                                <button onClick={() => setHighlightProv(null)} className="hover:text-white transition-colors">
+                                    <FiX size={10} />
+                                </button>
                             </span>
                         )}
                         <span className="text-[9px] px-3 py-1 rounded-full bg-white/5 text-gray-600 font-black uppercase tracking-wider">
@@ -1157,7 +1270,6 @@ function VideoCard({ video, featured = false, onClick }: {
     );
 }
 
-// --- Sub-components (Premium Styling) ---
 
 function StatCard({ icon, label, value, suffix }: any) {
     return (
@@ -1169,22 +1281,6 @@ function StatCard({ icon, label, value, suffix }: any) {
     );
 }
 
-function CorePillarCard({ icon, title, desc }: any) {
-    return (
-        <motion.div
-            whileHover={{ y: -5 }}
-            className="p-6 rounded-[2rem] bg-slate-50 border border-slate-200 transition-all flex flex-col items-start gap-4 group"
-        >
-            <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white text-2xl shadow-md group-hover:rotate-6 transition-transform">
-                {icon}
-            </div>
-            <div className="space-y-1">
-                <h3 className="text-lg font-calsans text-slate-900">{title}</h3>
-                <p className="text-slate-500 text-xs leading-relaxed">{desc}</p>
-            </div>
-        </motion.div>
-    );
-}
 
 function FlowStep({ number, icon, title, desc, tags, highlight = false }: any) {
     return (
@@ -1249,21 +1345,6 @@ function FAQItem({ question, answer }: { question: string, answer: React.ReactNo
                     </motion.div>
                 )}
             </AnimatePresence>
-        </motion.div>
-    );
-}
-
-function BidangGridItem({ title, icon, count }: any) {
-    return (
-        <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="p-4 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-xl hover:bg-white/10 transition-all flex flex-col items-center text-center gap-2 cursor-default group"
-        >
-            <div className="text-3xl group-hover:scale-110 transition-transform duration-300">{icon}</div>
-            <div className="space-y-0.5">
-                <h5 className="text-xs font-bold text-white leading-tight">{title}</h5>
-                <p className="text-[9px] text-blue-400 font-medium tracking-wider uppercase">{count}</p>
-            </div>
         </motion.div>
     );
 }

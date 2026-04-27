@@ -209,12 +209,21 @@ export default function Header() {
                 </button>
               </li>
 
-              <NavLinkDefault
-                href="/layanan/cek-sertifikat"
-                name={"Cek Sertifikat"}
-                icon={<HiIdentification />}
-                isActive={pathname === "/layanan/cek-sertifikat"}
-              />
+              {pathname.includes('/p2mkp') ? (
+                <NavLinkDefault
+                  href="/p2mkp/registrasi"
+                  name={"Ajukan Penetapan"}
+                  icon={<HiOutlineDocumentText />}
+                  isActive={pathname === "/p2mkp/registrasi"}
+                />
+              ) : (
+                <NavLinkDefault
+                  href="/layanan/cek-sertifikat"
+                  name={"Cek Sertifikat"}
+                  icon={<HiIdentification />}
+                  isActive={pathname === "/layanan/cek-sertifikat"}
+                />
+              )}
 
               <li className="relative">
                 <button

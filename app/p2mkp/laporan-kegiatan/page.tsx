@@ -22,7 +22,8 @@ import {
     FiLink,
     FiLayout,
     FiStar,
-    FiDatabase
+    FiDatabase,
+    FiEye
 } from 'react-icons/fi';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -37,10 +38,15 @@ import {
     DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { HashLoader } from 'react-spinners';
+import { collection, getDocs, query, orderBy, getFirestore, where } from 'firebase/firestore';
+import firebaseApp from '@/firebase/config';
+import DashboardLayout from '../dashboard/DashboardLayout';
+import Toast from '@/commons/Toast';
 import axios from 'axios';
 import { elautBaseUrl } from '@/constants/urls';
-import Toast from '@/commons/Toast';
 import { saveReport } from '@/utils/p2mkp';
+
+const db = getFirestore(firebaseApp);
 
 // Types
 interface Pelatih {
@@ -132,6 +138,9 @@ export default function P2MKPReportApp() {
     const [step, setStep] = useState(1);
     const [saving, setSaving] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [activeView, setActiveView] = useState<'form' | 'history'>('form');
+    const [reports, setReports] = useState<ReportData[]>([]);
+    const [userData, setUserData] = useState<any>(null);
 
     useEffect(() => {
         const timer = setTimeout(() => setLoading(false), 800);
@@ -154,7 +163,15 @@ export default function P2MKPReportApp() {
                 });
 
                 if (response.status === 200) {
-                    const data = response.data.data || response.data;
+                    const profileData = response.data.data || response.data;
+                    setUserData(profileData);
+
+                    // Autofill name
+                    setData(prev => ({
+                        ...prev,
+                        namaP2MKP: profileData.nama_ppmkp || profileData.NamaPpmkp || ''
+                    }));
+
                     const essentialFields = [
                         'nama_ppmkp', 'Nib', 'alamat', 'provinsi', 'kota',
                         'kecamatan', 'kelurahan', 'no_telp',
@@ -162,7 +179,7 @@ export default function P2MKPReportApp() {
                     ];
 
                     const isComplete = essentialFields.every(field => {
-                        const value = data[field];
+                        const value = profileData[field];
                         return value !== null && value !== undefined && value !== "" && value !== "null";
                     });
 
@@ -174,9 +191,33 @@ export default function P2MKPReportApp() {
                         });
                         router.push('/p2mkp/dashboard/complete-profile');
                     }
+
+                    // Fetch Reports
+                    try {
+                        const userName = profileData.nama_ppmkp || profileData.NamaPpmkp;
+                        if (userName) {
+                            const q = query(
+                                collection(db, 'reports'),
+                                where('namaP2MKP', '==', userName),
+                                orderBy('createdAt', 'desc')
+                            );
+                            const querySnapshot = await getDocs(q);
+                            const loadedReports: any[] = [];
+                            querySnapshot.forEach((doc) => {
+                                loadedReports.push({ id: doc.id, ...doc.data() });
+                            });
+                            setReports(loadedReports);
+                        }
+                    } catch (reportError: any) {
+                        console.error('Failed to fetch reports (likely missing index):', reportError);
+                    }
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Profile check error:', error);
+                if (axios.isAxiosError(error) && error.response?.status === 401) {
+                    Cookies.remove('XSRF091');
+                    router.push('/p2mkp/login');
+                }
             }
         };
 
@@ -185,29 +226,6 @@ export default function P2MKPReportApp() {
         }
     }, [loading, router]);
 
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [isMobile, setIsMobile] = useState(false);
-
-    useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth < 1024) {
-                setIsMobile(true);
-                setIsSidebarOpen(false);
-            } else {
-                setIsMobile(false);
-                setIsSidebarOpen(true);
-            }
-        };
-        handleResize();
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
-    const handleLogout = () => {
-        Cookies.remove('XSRF091');
-        Cookies.remove('Access');
-        router.push('/p2mkp/login');
-    };
 
     const [data, setData] = useState<ReportData>({
         namaP2MKP: '',
@@ -258,20 +276,52 @@ export default function P2MKPReportApp() {
     const saveReportUI = async () => {
         setSaving(true);
         try {
-            await saveReport(data);
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            // 1. Sanitize data: remove 'id' if it exists to avoid Firestore document conflicts
+            const { id, ...cleanData } = data as any;
+            
+            // 2. Save to Firestore
+            await saveReport(cleanData);
+            
+            // 3. Success Feedback immediately after save succeeds
             Toast.fire({
                 icon: 'success',
-                title: 'Data Archetyped',
-                text: 'Laporan kerja berhasil disinkronisasi ke server pusat.'
+                title: 'Laporan Tersimpan',
+                text: 'Data Anda telah berhasil diamankan di server.'
             });
-        } catch (error) {
+            
+            // 4. Try to refresh history list (silently handle index errors)
+            try {
+                if (userData?.nama_ppmkp || userData?.NamaPpmkp) {
+                    const userName = userData.nama_ppmkp || userData.NamaPpmkp;
+                    const q = query(
+                        collection(db, 'reports'),
+                        where('namaP2MKP', '==', userName),
+                        orderBy('createdAt', 'desc')
+                    );
+                    const querySnapshot = await getDocs(q);
+                    const loadedReports: any[] = [];
+                    querySnapshot.forEach((doc) => {
+                        loadedReports.push({ id: doc.id, ...doc.data() });
+                    });
+                    setReports(loadedReports);
+                }
+            } catch (indexError: any) {
+                console.warn("Index not ready yet, history will update soon:", indexError);
+                // We don't show an error toast here to keep the user experience smooth,
+                // as the primary save operation was already successful.
+            }
+            
+            setActiveView('history');
+
+        } catch (error: any) {
+            console.error("Save Error:", error);
             Toast.fire({
                 icon: 'error',
-                title: 'Connection Lost',
-                text: 'Gagal mengamankan data laporan.'
+                title: 'Gagal Menyimpan',
+                text: error.message.includes('index') 
+                    ? 'Firestore memerlukan index baru. Silakan klik link di console browser Anda.' 
+                    : 'Gagal mengamankan data laporan. Periksa koneksi Anda.'
             });
-            console.error(error);
         } finally {
             setSaving(false);
         }
@@ -280,10 +330,6 @@ export default function P2MKPReportApp() {
     const generatePDF = () => {
         const printWindow = window.open('', '_blank');
         if (!printWindow) return;
-
-        const allTantangan = [...data.tantangan, ...data.tantanganCustom].filter(Boolean);
-        const allUpaya = [...data.upaya, ...data.upayaCustom].filter(Boolean);
-        const allDampak = [...data.dampak, ...data.dampakCustom].filter(Boolean);
 
         const htmlContent = `
       <!DOCTYPE html>
@@ -339,9 +385,9 @@ export default function P2MKPReportApp() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#020617] flex flex-col items-center justify-center">
+            <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center">
                 <HashLoader color="#3b82f6" size={50} />
-                <p className="mt-6 text-gray-500 text-[10px] font-black uppercase tracking-[0.4em]">Compiling Activity Logs...</p>
+                <p className="mt-6 text-slate-500 text-[10px] font-black uppercase tracking-[0.4em]">Compiling Activity Logs...</p>
             </div>
         );
     }
@@ -355,150 +401,136 @@ export default function P2MKPReportApp() {
     ];
 
     return (
-        <div className="min-h-screen bg-[#020617] text-white flex font-jakarta overflow-hidden">
-            {/* Ambient Ambient */}
-            <div className="fixed inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px]" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px]" />
-            </div>
-
-            {/* Shared Sidebar */}
-            <aside
-                className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-[#0f172a]/60 backdrop-blur-3xl border-r border-white/5 transition-transform duration-500 ease-out shadow-2xl ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}
+        <DashboardLayout>
+            <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="max-w-6xl mx-auto space-y-12 pb-24"
             >
-                <div className="h-full flex flex-col pt-8">
-                    <div className="px-8 pb-10 flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                                <FiBox className="text-2xl text-white" />
-                            </div>
-                            <div>
-                                <h1 className="font-calsans text-2xl leading-none">P2MKP</h1>
-                                <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest mt-1">Portal</p>
-                            </div>
-                        </div>
-                        {isMobile && (
-                            <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-gray-500 hover:text-white">
-                                <FiX size={24} />
+                {/* Header Top Replacement */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                    <div className="space-y-2">
+                        <h1 className="text-4xl md:text-5xl font-calsans text-slate-900">Activity <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Archiver</span></h1>
+                        <p className="text-slate-500 text-sm font-light italic leading-relaxed max-w-2xl">Digitalisasi laporan periodik untuk monitoring efektivitas pelatihan P2MKP Terpadu.</p>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                        <div className="flex bg-slate-100 p-1 rounded-2xl border border-slate-200 mr-4">
+                            <button
+                                onClick={() => setActiveView('form')}
+                                className={`px-6 py-2.5 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all ${activeView === 'form' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
+                            >
+                                NEW REPORT
                             </button>
+                            <button
+                                onClick={() => setActiveView('history')}
+                                className={`px-6 py-2.5 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all ${activeView === 'history' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
+                            >
+                                HISTORY ({reports.length})
+                            </button>
+                        </div>
+
+                        {activeView === 'form' && (
+                            <>
+                                <button
+                                    onClick={saveReportUI}
+                                    disabled={saving}
+                                    className="h-12 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-[10px] tracking-widest uppercase transition-all flex items-center gap-2 disabled:opacity-50 shadow-lg shadow-blue-500/20"
+                                >
+                                    <FiSave /> {saving ? 'SYNCING...' : 'PERSIST'}
+                                </button>
+                                <button
+                                    onClick={generatePDF}
+                                    className="h-12 px-6 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-xl font-bold text-[10px] tracking-widest uppercase transition-all flex items-center gap-2 shadow-sm"
+                                >
+                                    <FiDownload /> EXPORT PDF
+                                </button>
+                            </>
                         )}
                     </div>
-
-                    <div className="flex-1 px-4 space-y-8">
-                        <div className="space-y-1">
-                            <p className="px-4 text-[10px] font-black text-gray-600 uppercase tracking-widest mb-4">Core Menu</p>
-                            <SidebarItem href="/p2mkp/dashboard" icon={<FiActivity />} label="Overview" />
-                            <SidebarItem href="/p2mkp/dashboard/penetapan" icon={<FiAward />} label="Penetapan P2MKP" />
-                        </div>
-
-                        <div className="space-y-1">
-                            <p className="px-4 text-[10px] font-black text-gray-600 uppercase tracking-widest mb-4">Reports</p>
-                            <SidebarItem href="/p2mkp/laporan-kegiatan" icon={<FiFileText />} label="Create Report" active />
-                            <SidebarItem href="/p2mkp/laporan-kegiatan/report" icon={<FiDatabase />} label="Report History" />
-                        </div>
-
-                        <div className="space-y-1">
-                            <p className="px-4 text-[10px] font-black text-gray-600 uppercase tracking-widest mb-4">Account</p>
-                            <SidebarItem href="/p2mkp/dashboard/complete-profile" icon={<FiUser />} label="Profile Lembaga" />
-                        </div>
-                    </div>
                 </div>
-            </aside>
 
-            {/* Main Content Area */}
-            <div className="flex-1 flex flex-col h-screen overflow-hidden">
-                {/* Header Top */}
-                <header className="h-24 bg-transparent flex items-center justify-between px-8 lg:px-12 shrink-0 z-20">
-                    <div className="flex items-center gap-6">
-                        <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl lg:hidden text-blue-400 border border-white/5">
-                            <FiMenu size={20} />
+
+
+
+                {/* Step Navigator */}
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    {steps.map((s, i) => (
+                        <button
+                            key={i}
+                            onClick={() => setStep(i + 1)}
+                            className={`relative p-5 rounded-2xl border transition-all duration-300 group overflow-hidden ${step === i + 1
+                                ? 'bg-blue-600 border-blue-400 shadow-xl shadow-blue-600/20'
+                                : 'bg-white border-slate-200 hover:bg-slate-50'}`}
+                        >
+                            <div className="relative z-10 flex flex-col items-center gap-3">
+                                <div className={`text-xl transition-transform group-hover:scale-110 ${step === i + 1 ? 'text-white' : 'text-slate-400 group-hover:text-blue-600'}`}>
+                                    {s.icon}
+                                </div>
+                                <div className="text-center">
+                                    <p className={`text-[10px] font-black tracking-widest ${step === i + 1 ? 'text-blue-100' : 'text-slate-400'}`}>STEP 0{i + 1}</p>
+                                    <p className={`text-xs font-bold ${step === i + 1 ? 'text-white' : 'text-slate-500'}`}>{s.sub}</p>
+                                </div>
+                            </div>
+                            {step === i + 1 && (
+                                <motion.div layoutId="stepGlow" className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-none" />
+                            )}
                         </button>
-                        <div className="hidden md:flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest">
-                            <Link href="/p2mkp/dashboard" className="text-gray-500 hover:text-white transition-colors">Dashboard</Link>
-                            <span className="text-gray-700">/</span>
-                            <span className="text-blue-400">Activity Report</span>
-                        </div>
-                    </div>
+                    ))}
+                </div>
 
-                    <div className="flex items-center gap-6">
-                        <div className="hidden sm:flex gap-3">
-                            <button
-                                onClick={saveReportUI}
-                                disabled={saving}
-                                className="h-12 px-6 bg-blue-600/10 hover:bg-blue-600/20 border border-blue-500/20 text-blue-400 rounded-xl font-bold text-[10px] tracking-widest uppercase transition-all flex items-center gap-2 disabled:opacity-50"
+                {/* Form Container */}
+                <div className="p-8 md:p-12 rounded-[3.5rem] bg-white border border-slate-200 shadow-2xl relative overflow-hidden transition-all duration-700 hover:border-slate-300 min-h-[500px]">
+
+                    <AnimatePresence mode="wait">
+                        {activeView === 'history' ? (
+                            <motion.div
+                                key="history"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className="space-y-8"
                             >
-                                <FiSave /> {saving ? 'SYNCING...' : 'PERSIST'}
-                            </button>
-                            <button
-                                onClick={generatePDF}
-                                className="h-12 px-6 bg-emerald-600/10 hover:bg-emerald-600/20 border border-emerald-500/20 text-emerald-400 rounded-xl font-bold text-[10px] tracking-widest uppercase transition-all flex items-center gap-2"
-                            >
-                                <FiDownload /> EXPORT PDF
-                            </button>
-                        </div>
+                                <SectionHeader icon={<FiDatabase />} title="Report History" subtitle="Arsip laporan yang telah anda sinkronisasi" />
 
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <button className="flex items-center gap-4 hover:bg-white/5 p-1.5 rounded-2xl transition-all border border-transparent hover:border-white/10">
-                                    <Avatar className="h-10 w-10 border-2 border-white/10 shadow-xl rounded-2xl overflow-hidden">
-                                        <AvatarImage src="https://github.com/shadcn.png" className="rounded-2xl" />
-                                        <AvatarFallback>AD</AvatarFallback>
-                                    </Avatar>
-                                </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-64 bg-[#0f172a]/95 backdrop-blur-3xl border-white/10 text-white p-2 rounded-[2rem] mt-2 shadow-2xl">
-                                <DropdownMenuLabel className="px-4 py-4 font-calsans text-lg text-blue-400">Portal Akses</DropdownMenuLabel>
-                                <DropdownMenuSeparator className="bg-white/5" />
-                                <DropdownMenuItem onClick={handleLogout} className="p-3 rounded-xl hover:bg-rose-500/10 cursor-pointer text-rose-400 text-xs font-black tracking-widest">
-                                    <FiLogOut className="mr-3" size={16} /> LOGOUT SESSION
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                </header>
-
-                <div className="flex-1 overflow-y-auto p-8 lg:p-12 pt-4">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="max-w-6xl mx-auto space-y-12 pb-24"
-                    >
-                        {/* Title Section */}
-                        <div className="space-y-2">
-                            <h1 className="text-4xl md:text-5xl font-calsans">Activity <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Archiver</span></h1>
-                            <p className="text-gray-500 text-sm font-light italic leading-relaxed max-w-2xl">Digitalisasi laporan periodik untuk monitoring efektivitas pelatihan P2MKP Terpadu.</p>
-                        </div>
-
-                        {/* Step Navigator */}
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                            {steps.map((s, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => setStep(i + 1)}
-                                    className={`relative p-5 rounded-2xl border transition-all duration-300 group overflow-hidden ${step === i + 1
-                                        ? 'bg-blue-600 border-blue-400 shadow-xl shadow-blue-600/20'
-                                        : 'bg-white/5 border-white/5 hover:bg-white/10'}`}
-                                >
-                                    <div className="relative z-10 flex flex-col items-center gap-3">
-                                        <div className={`text-xl transition-transform group-hover:scale-110 ${step === i + 1 ? 'text-white' : 'text-gray-600 group-hover:text-blue-400'}`}>
-                                            {s.icon}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {reports.length === 0 ? (
+                                        <div className="col-span-2 py-20 flex flex-col items-center justify-center text-center space-y-4">
+                                            <div className="w-20 h-20 rounded-[2rem] bg-slate-50 border border-dashed border-slate-200 flex items-center justify-center text-slate-300">
+                                                <FiDatabase size={32} />
+                                            </div>
+                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No reports archived yet.</p>
                                         </div>
-                                        <div className="text-center">
-                                            <p className={`text-[10px] font-black tracking-widest ${step === i + 1 ? 'text-blue-100' : 'text-gray-600'}`}>STEP 0{i + 1}</p>
-                                            <p className={`text-xs font-bold ${step === i + 1 ? 'text-white' : 'text-gray-400'}`}>{s.sub}</p>
-                                        </div>
-                                    </div>
-                                    {step === i + 1 && (
-                                        <motion.div layoutId="stepGlow" className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-none" />
+                                    ) : (
+                                        reports.map((r: any) => (
+                                            <div key={r.id} className="p-6 rounded-[2rem] bg-slate-50 border border-slate-200 hover:border-blue-300 transition-all group flex items-center justify-between shadow-sm">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 shadow-sm">
+                                                        <FiFileText size={20} />
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-xs font-bold text-slate-800">{r.namaP2MKP}</h4>
+                                                        <p className="text-[10px] text-slate-500 font-medium">{new Date(r.createdAt?.toDate ? r.createdAt.toDate() : r.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() => {
+                                                        // Populate form with this data if needed, or just download
+                                                        setData(r);
+                                                        setActiveView('form');
+                                                        Toast.fire({ icon: 'success', title: 'Data Loaded', text: 'Detail laporan telah dimuat ke form.' });
+                                                    }}
+                                                    className="p-3 bg-white hover:bg-blue-600 hover:text-white rounded-xl text-blue-600 transition-all border border-slate-100 shadow-sm"
+                                                >
+                                                    <FiEye />
+                                                </button>
+                                            </div>
+                                        ))
                                     )}
-                                </button>
-                            ))}
-                        </div>
-
-                        {/* Form Container */}
-                        <div className="p-8 md:p-12 rounded-[3.5rem] bg-[#0f172a]/40 backdrop-blur-3xl border border-white/5 shadow-2xl relative overflow-hidden transition-all duration-700 hover:border-white/10 min-h-[500px]">
-
-                            <AnimatePresence mode="wait">
+                                </div>
+                            </motion.div>
+                        ) : (
+                            <>
                                 {/* BAB I */}
                                 {step === 1 && (
                                     <motion.div
@@ -518,6 +550,7 @@ export default function P2MKPReportApp() {
                                                     onChange={(v: any) => setData({ ...data, namaP2MKP: v })}
                                                     placeholder="Nama resmi lembaga..."
                                                     icon={<FiBox />}
+                                                    readOnly
                                                 />
                                             </div>
 
@@ -539,12 +572,12 @@ export default function P2MKPReportApp() {
                                                     </button>
                                                 </div>
                                                 {data.pelatih.map((p, i) => (
-                                                    <div key={i} className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 bg-white/5 border border-white/5 rounded-3xl relative group">
+                                                    <div key={i} className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 bg-slate-50 border border-slate-200 rounded-3xl relative group">
                                                         <CustomInput value={p.nama} onChange={(v: any) => updateItem('pelatih', i, { ...p, nama: v })} placeholder="Full Name" />
                                                         <CustomInput value={p.keahlian} onChange={(v: any) => updateItem('pelatih', i, { ...p, keahlian: v })} placeholder="Core Expertise" />
                                                         <div className="flex gap-2">
                                                             <CustomInput value={p.sertifikasi} onChange={(v: any) => updateItem('pelatih', i, { ...p, sertifikasi: v })} placeholder="Certification" className="flex-1" />
-                                                            <button onClick={() => removeItem('pelatih', i)} className="p-4 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white rounded-xl transition-all">
+                                                            <button onClick={() => removeItem('pelatih', i)} className="p-4 bg-rose-50 hover:bg-rose-500 text-rose-500 hover:text-white rounded-xl transition-all border border-rose-100">
                                                                 <FiTrash2 />
                                                             </button>
                                                         </div>
@@ -560,12 +593,12 @@ export default function P2MKPReportApp() {
                                                     </button>
                                                 </div>
                                                 {data.penghargaan.map((p, i) => (
-                                                    <div key={i} className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 bg-white/5 border border-white/5 rounded-3xl relative group">
+                                                    <div key={i} className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 bg-slate-50 border border-slate-200 rounded-3xl relative group">
                                                         <CustomInput value={p.nama} onChange={(v: any) => updateItem('penghargaan', i, { ...p, nama: v })} placeholder="Award Name" />
                                                         <CustomInput value={p.instansi} onChange={(v: any) => updateItem('penghargaan', i, { ...p, instansi: v })} placeholder="Issuing Authority" />
                                                         <div className="flex gap-2">
                                                             <CustomInput value={p.tahun} onChange={(v: any) => updateItem('penghargaan', i, { ...p, tahun: v })} placeholder="Year" />
-                                                            <button onClick={() => removeItem('penghargaan', i)} className="p-4 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white rounded-xl transition-all">
+                                                            <button onClick={() => removeItem('penghargaan', i)} className="p-4 bg-rose-50 hover:bg-rose-500 text-rose-500 hover:text-white rounded-xl transition-all border border-rose-100">
                                                                 <FiTrash2 />
                                                             </button>
                                                         </div>
@@ -596,7 +629,7 @@ export default function P2MKPReportApp() {
                                             </div>
 
                                             {data.pelatihan.map((p, i) => (
-                                                <div key={i} className="p-8 bg-white/5 border border-white/5 rounded-[2.5rem] relative group space-y-8">
+                                                <div key={i} className="p-8 bg-slate-50 border border-slate-200 rounded-[2.5rem] relative group space-y-8">
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                         <CustomInput value={p.jenis} onChange={(v: any) => updateItem('pelatihan', i, { ...p, jenis: v })} label="Tipe Pelatihan" placeholder="Ex: Budidaya..." />
                                                         <CustomInput value={p.waktu} onChange={(v: any) => updateItem('pelatihan', i, { ...p, waktu: v })} label="Timeline" placeholder="DD-MM-YYYY" />
@@ -614,19 +647,19 @@ export default function P2MKPReportApp() {
                                                         </div>
                                                         <div className="flex flex-wrap gap-3">
                                                             {p.materi.map((m, j) => (
-                                                                <div key={j} className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-xl group/materi border border-white/5 hover:border-blue-500/30 transition-all">
+                                                                <div key={j} className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl group/materi border border-slate-200 hover:border-blue-500/30 transition-all shadow-sm">
                                                                     <input value={m} onChange={(e) => {
                                                                         const nM = [...p.materi]; nM[j] = e.target.value; updateItem('pelatihan', i, { ...p, materi: nM });
-                                                                    }} className="bg-transparent border-none outline-none text-xs text-white placeholder:text-gray-700 w-32" placeholder="Subject..." />
+                                                                    }} className="bg-transparent border-none outline-none text-xs text-slate-800 placeholder:text-slate-400 w-32" placeholder="Subject..." />
                                                                     <button onClick={() => {
                                                                         const nM = p.materi.filter((_, x) => x !== j); updateItem('pelatihan', i, { ...p, materi: nM });
-                                                                    }} className="text-gray-700 hover:text-rose-500"><FiX /></button>
+                                                                    }} className="text-slate-400 hover:text-rose-500"><FiX /></button>
                                                                 </div>
                                                             ))}
                                                         </div>
                                                     </div>
 
-                                                    <button onClick={() => removeItem('pelatihan', i)} className="absolute top-6 right-6 p-3 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white rounded-xl transition-all">
+                                                    <button onClick={() => removeItem('pelatihan', i)} className="absolute top-6 right-6 p-3 bg-rose-50 hover:bg-rose-500 text-rose-500 hover:text-white rounded-xl transition-all border border-rose-100 shadow-sm">
                                                         <FiTrash2 />
                                                     </button>
                                                 </div>
@@ -668,7 +701,7 @@ export default function P2MKPReportApp() {
                                             </div>
                                         </div>
 
-                                        <div className="pt-8 border-t border-white/5 space-y-8">
+                                        <div className="pt-8 border-t border-slate-100 space-y-8">
                                             <Label text="Dampak Terhadap Masyarakat" />
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-3">
                                                 {DAMPAK_OPTIONS.map(opt => (
@@ -700,12 +733,12 @@ export default function P2MKPReportApp() {
                                             </div>
 
                                             {data.mitra.map((m, i) => (
-                                                <div key={i} className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8 bg-white/5 border border-white/5 rounded-[2rem] relative group">
+                                                <div key={i} className="grid grid-cols-1 md:grid-cols-3 gap-6 p-8 bg-slate-50 border border-slate-200 rounded-[2rem] relative group">
                                                     <CustomInput value={m.nama} onChange={(v: any) => updateItem('mitra', i, { ...m, nama: v })} label="Nama Entitas" placeholder="Company / Group..." />
                                                     <CustomInput value={m.alamat} onChange={(v: any) => updateItem('mitra', i, { ...m, alamat: v })} label="Domisili" placeholder="Location..." />
                                                     <div className="flex gap-4">
                                                         <CustomInput value={m.jenisKemitraan} onChange={(v: any) => updateItem('mitra', i, { ...m, jenisKemitraan: v })} label="Tipe Kerjasama" placeholder="Pemasaran/Modal..." className="flex-1" />
-                                                        <button onClick={() => removeItem('mitra', i)} className="mt-8 p-4 bg-rose-500/10 hover:bg-rose-500 text-rose-500 hover:text-white rounded-xl transition-all">
+                                                        <button onClick={() => removeItem('mitra', i)} className="mt-8 p-4 bg-rose-50 hover:bg-rose-500 text-rose-500 hover:text-white rounded-xl transition-all border border-rose-100 shadow-sm">
                                                             <FiTrash2 />
                                                         </button>
                                                     </div>
@@ -758,101 +791,86 @@ export default function P2MKPReportApp() {
                                             </div>
                                         </div>
 
-                                        <div className="pt-12 flex flex-col items-center justify-center text-center space-y-8 bg-blue-500/5 rounded-[3rem] p-12 border border-blue-500/10">
+                                        <div className="pt-12 flex flex-col items-center justify-center text-center space-y-8 bg-blue-50 rounded-[3rem] p-12 border border-blue-100">
                                             <div className="w-16 h-16 rounded-2xl bg-blue-500 flex items-center justify-center text-3xl shadow-lg shadow-blue-500/20">
                                                 <FiSave />
                                             </div>
                                             <div className="space-y-2">
-                                                <h3 className="text-2xl font-calsans uppercase tracking-tighter">Ready for Archiving</h3>
-                                                <p className="text-gray-500 text-sm max-w-sm">Pastikan seluruh data yang dimasukkan telah akurat dan sesuai dengan fakta di lapangan.</p>
+                                                <h3 className="text-2xl font-calsans text-slate-900 uppercase tracking-tighter">Ready for Archiving</h3>
+                                                <p className="text-slate-500 text-sm max-w-sm">Pastikan seluruh data yang dimasukkan telah akurat dan sesuai dengan fakta di lapangan.</p>
                                             </div>
                                             <button
                                                 onClick={saveReportUI}
                                                 disabled={saving}
-                                                className="group relative h-16 px-12 bg-white text-black rounded-2xl font-black tracking-widest transition-all hover:scale-105 active:scale-95 disabled:opacity-50 flex items-center gap-3"
+                                                className="group relative h-16 px-12 bg-blue-600 text-white rounded-2xl font-black tracking-widest transition-all hover:scale-105 active:scale-95 disabled:opacity-50 flex items-center gap-3 shadow-xl shadow-blue-500/20"
                                             >
-                                                {saving ? <HashLoader size={20} /> : <><FiSave /> PERSIST & SYNC</>}
+                                                {saving ? <HashLoader size={20} color="#fff" /> : <><FiSave /> PERSIST & SYNC</>}
                                             </button>
                                         </div>
                                     </motion.div>
                                 )}
-                            </AnimatePresence>
+                            </>
+                        )}
+                    </AnimatePresence>
 
-                            {/* Footer Navigation Buttons Layered Inside for Style */}
-                            <div className="mt-12 pt-12 flex justify-between border-t border-white/5 relative z-10">
-                                <button
-                                    onClick={() => setStep(Math.max(1, step - 1))}
-                                    disabled={step === 1}
-                                    className="flex items-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 text-gray-500 hover:text-white rounded-2xl transition-all font-bold text-[10px] tracking-widest uppercase disabled:opacity-20 disabled:pointer-events-none"
-                                >
-                                    <FiChevronLeft /> BACKPLANE
-                                </button>
-                                {step < 5 && (
-                                    <button
-                                        onClick={() => setStep(Math.min(5, step + 1))}
-                                        className="flex items-center gap-3 px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl transition-all font-bold text-[10px] tracking-widest uppercase shadow-xl shadow-blue-600/20"
-                                    >
-                                        NEXT CORE <FiChevronRight />
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    </motion.div>
+                    {/* Footer Navigation Buttons Layered Inside for Style */}
+                    <div className="mt-12 pt-12 flex justify-between border-t border-slate-100 relative z-10">
+                        <button
+                            onClick={() => setStep(Math.max(1, step - 1))}
+                            disabled={step === 1 || activeView === 'history'}
+                            className="flex items-center gap-3 px-8 py-4 bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 rounded-2xl transition-all font-bold text-[10px] tracking-widest uppercase disabled:opacity-20 disabled:pointer-events-none"
+                        >
+                            <FiChevronLeft /> BACKPLANE
+                        </button>
+                        {step < 5 && activeView === 'form' && (
+                            <button
+                                onClick={() => setStep(Math.min(5, step + 1))}
+                                className="flex items-center gap-3 px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl transition-all font-bold text-[10px] tracking-widest uppercase shadow-xl shadow-blue-600/20"
+                            >
+                                NEXT CORE <FiChevronRight />
+                            </button>
+                        )}
+                    </div>
                 </div>
-            </div>
-        </div>
+            </motion.div>
+        </DashboardLayout>
     );
 }
 
 // Internal Components
-function SidebarItem({ href, icon, label, active }: any) {
-    return (
-        <Link href={href} className="block px-4">
-            <motion.div
-                whileHover={{ x: 5 }}
-                className={`flex items-center gap-4 px-5 py-3.5 rounded-2xl transition-all duration-300 relative group ${active ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20' : 'text-gray-500 hover:bg-white/5 hover:text-gray-200'}`}
-            >
-                <span className={`text-xl transition-transform group-hover:scale-110 ${active ? 'text-white' : 'text-gray-600 group-hover:text-blue-400'}`}>
-                    {icon}
-                </span>
-                <span className={`text-xs font-bold tracking-wide ${active ? 'font-black' : ''}`}>{label}</span>
-                {active && (
-                    <motion.div layoutId="navBar" className="absolute left-0 w-1 h-6 bg-white rounded-full ml-1" />
-                )}
-            </motion.div>
-        </Link>
-    );
-}
 
 function SectionHeader({ icon, title, subtitle }: any) {
     return (
         <div className="flex items-center gap-6">
-            <div className="w-16 h-16 rounded-[1.5rem] bg-white/5 border border-white/10 flex items-center justify-center text-3xl text-blue-400">
+            <div className="w-16 h-16 rounded-[1.5rem] bg-blue-50 border border-blue-100 flex items-center justify-center text-3xl text-blue-600 shadow-sm">
                 {icon}
             </div>
-            <div className="space-y-1">
-                <h2 className="text-3xl font-calsans text-white">{title}</h2>
-                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-[0.2em]">{subtitle}</p>
+            <div className="space-y-1 flex-1">
+                <div className="flex items-center justify-between">
+                    <h2 className="text-3xl font-calsans text-slate-900">{title}</h2>
+                    <FiEye className="text-slate-200" />
+                </div>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">{subtitle}</p>
             </div>
         </div>
     );
 }
 
 function Label({ text }: any) {
-    return <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest pl-1">{text}</p>;
+    return <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">{text}</p>;
 }
 
 function CustomInput({ value, onChange, placeholder, icon, label, className = "", ...props }: any) {
     return (
         <div className={`space-y-2 ${className}`}>
-            {label && <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1">{label}</p>}
+            {label && <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">{label}</p>}
             <div className="relative group/input">
-                {icon && <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within/input:text-blue-400 transition-colors">{icon}</span>}
+                {icon && <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within/input:text-blue-600 transition-colors">{icon}</span>}
                 <input
                     value={value}
                     onChange={(e) => onChange(e.target.value)}
                     placeholder={placeholder}
-                    className={`w-full ${icon ? 'pl-12' : 'pl-5'} pr-5 py-6 bg-white/5 border-white/10 rounded-2xl text-xs focus:ring-2 focus:ring-blue-500/50 outline-none transition-all placeholder:text-gray-700 text-white h-14`}
+                    className={`w-full ${icon ? 'pl-12' : 'pl-5'} pr-5 py-6 bg-white border border-slate-200 rounded-2xl text-xs focus:ring-2 focus:ring-blue-500/50 outline-none transition-all placeholder:text-slate-400 text-slate-800 h-14 shadow-sm`}
                     {...props}
                 />
             </div>
@@ -867,30 +885,30 @@ function CustomTextArea({ value, onChange, placeholder, rows = 3 }: any) {
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
             rows={rows}
-            className="w-full px-5 py-4 bg-white/5 border-white/10 rounded-2xl text-xs focus:ring-2 focus:ring-blue-500/50 outline-none transition-all placeholder:text-gray-700 text-white resize-none"
+            className="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl text-xs focus:ring-2 focus:ring-blue-500/50 outline-none transition-all placeholder:text-slate-400 text-slate-800 resize-none shadow-sm"
         />
     );
 }
 
 function Checkbox({ label, checked, onChange, color = "blue" }: any) {
     const colors: any = {
-        blue: "text-blue-500 focus:ring-blue-500 bg-blue-500/10",
-        indigo: "text-indigo-500 focus:ring-indigo-500 bg-indigo-500/10",
-        emerald: "text-emerald-500 focus:ring-emerald-500 bg-emerald-500/10"
+        blue: "text-blue-600 focus:ring-blue-500 bg-blue-50",
+        indigo: "text-indigo-600 focus:ring-indigo-500 bg-indigo-50",
+        emerald: "text-emerald-600 focus:ring-emerald-500 bg-emerald-50"
     };
 
     return (
-        <label className="flex items-start gap-4 p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 transition-all cursor-pointer group">
+        <label className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 hover:bg-white border border-transparent hover:border-slate-200 transition-all cursor-pointer group shadow-sm">
             <div className="relative flex items-center justify-center mt-1">
                 <input
                     type="checkbox"
                     checked={checked}
                     onChange={onChange}
-                    className="appearance-none w-5 h-5 rounded-lg border border-white/20 bg-white/5 checked:bg-blue-600 checked:border-blue-500 transition-all cursor-pointer"
+                    className="appearance-none w-5 h-5 rounded-lg border border-slate-300 bg-white checked:bg-blue-600 checked:border-blue-600 transition-all cursor-pointer"
                 />
                 {checked && <FiX className="absolute text-white pointer-events-none scale-75 rotate-45" />}
             </div>
-            <span className={`text-xs font-medium transition-colors ${checked ? 'text-white' : 'text-gray-500 group-hover:text-gray-300'}`}>{label}</span>
+            <span className={`text-xs font-medium transition-colors ${checked ? 'text-slate-900 font-bold' : 'text-slate-500 group-hover:text-slate-700'}`}>{label}</span>
         </label>
     );
 }
@@ -899,18 +917,18 @@ function CustomPillInput({ values, onChange, placeholder, color = "blue" }: any)
     const [temp, setTemp] = useState('');
 
     const colors: any = {
-        blue: "text-blue-400 bg-blue-500/10 border-blue-500/20",
-        indigo: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20",
-        emerald: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
+        blue: "text-blue-600 bg-blue-50 border-blue-100",
+        indigo: "text-indigo-600 bg-indigo-50 border-indigo-100",
+        emerald: "text-emerald-600 bg-emerald-50 border-emerald-100"
     };
 
     return (
         <div className="space-y-4">
             <div className="flex flex-wrap gap-2">
                 {values.map((v: string, i: number) => (
-                    <div key={i} className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[10px] font-bold ${colors[color]}`}>
+                    <div key={i} className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[10px] font-bold ${colors[color]} shadow-sm`}>
                         {v}
-                        <button onClick={() => onChange(values.filter((_: any, idx: number) => idx !== i))} className="hover:text-white"><FiX /></button>
+                        <button onClick={() => onChange(values.filter((_: any, idx: number) => idx !== i))} className="hover:text-rose-500 transition-colors"><FiX /></button>
                     </div>
                 ))}
             </div>
@@ -925,11 +943,11 @@ function CustomPillInput({ values, onChange, placeholder, color = "blue" }: any)
                         }
                     }}
                     placeholder={placeholder}
-                    className="w-full pl-5 pr-12 py-3 bg-white/5 border-white/10 rounded-xl text-[10px] focus:ring-2 focus:ring-blue-500/50 outline-none transition-all placeholder:text-gray-700 text-white"
+                    className="w-full pl-5 pr-12 py-3 bg-white border border-slate-200 rounded-xl text-[10px] focus:ring-2 focus:ring-blue-500/50 outline-none transition-all placeholder:text-slate-400 text-slate-800 shadow-sm"
                 />
                 <button
                     onClick={() => { if (temp.trim()) { onChange([...values, temp.trim()]); setTemp(''); } }}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-blue-400"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600"
                 >
                     <FiPlus />
                 </button>
