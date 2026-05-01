@@ -7,6 +7,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import Logo from "@/components/ui/logo";
 import { FiPlay, FiYoutube, FiX } from "react-icons/fi";
 import { getAllVideoPelatihans, incrementVideoClick } from "@/utils/videoPelatihan";
+import ProgramKhususSection from "./ProgramKhususSection";
+import P2MKPSection from "./P2MKPSection";
 
 const extractYoutubeId = (url: string) => {
   if (!url) return "";
@@ -263,6 +265,9 @@ export default function Hero() {
             ))}
           </div>
 
+          {/* Program Khusus Section */}
+          <ProgramKhususSection />
+
           {/* Video Pelatihan Gratis Section */}
           <div className="w-full pt-12 border-t border-white/10 mt-12 relative z-10">
             <div className="text-center md:text-left space-y-2 mb-8">
@@ -360,6 +365,8 @@ export default function Hero() {
               </Link>
             </motion.div>
           </div>
+
+          <P2MKPSection />
 
         </div>
       </section>

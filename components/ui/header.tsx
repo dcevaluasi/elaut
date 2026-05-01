@@ -21,6 +21,7 @@ import {
   HiOutlineAcademicCap,
   HiOutlineGlobeAlt,
   HiOutlineLifebuoy,
+  HiOutlineInformationCircle,
 } from "react-icons/hi2";
 import Cookies from "js-cookie";
 import MobileMenu from "./mobile-menu";
@@ -157,7 +158,12 @@ export default function Header() {
                 isActive={pathname === "/"}
               />
 
-
+              <NavLinkDefault
+                href="/tentang"
+                name="Tentang"
+                icon={<HiOutlineInformationCircle />}
+                isActive={pathname === "/tentang"}
+              />
 
               {/* Kategori Pelatihan Dropdown */}
               <li className="relative">
