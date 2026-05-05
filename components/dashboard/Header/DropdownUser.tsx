@@ -596,7 +596,7 @@ const DropdownUser = ({
                 ? dataAdminPusat!.Nama
                 : ""}
           </span>
-          <span className=" gap-1 text-xs text-right">
+          <span className="text-slate-700 gap-1 text-xs text-right">
 
             {pathname.includes("lemdiklat")
               ? `${Cookies.get('Nama')} - ${Cookies.get('Eselon')}`

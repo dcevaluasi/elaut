@@ -102,13 +102,13 @@ export default function TableProgramPelatihan() {
     return (
         <div className="space-y-8 pb-20">
             {/* Action Bar */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl p-6 rounded-[32px] border border-gray-100 dark:border-white/5 shadow-sm mt-8">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 bg-white/50 backdrop-blur-xl p-6 rounded-[32px] border border-gray-100 shadow-sm mt-8">
                 <div className="flex items-center gap-4">
                     <div className="w-20 h-16 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
                         <TbBook size={24} />
                     </div>
                     <div>
-                        <h2 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight leading-none">Program Pelatihan</h2>
+                        <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight leading-none">Program Pelatihan</h2>
                         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Manajemen data program pelatihan serta materi atau struktur kurikulum</p>
                     </div>
                 </div>
@@ -121,7 +121,7 @@ export default function TableProgramPelatihan() {
                             placeholder="Cari program pelatihan..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-11 h-12 rounded-2xl border-gray-100 bg-gray-50/50 dark:bg-white/5 font-bold text-sm focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-400"
+                            className="pl-11 h-12 rounded-2xl border-gray-100 bg-gray-50/50 font-bold text-sm focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-400"
                         />
                     </div>
                     <ManageProgramPelatihanAction onSuccess={fetchProgramPelatihan} />
@@ -136,11 +136,11 @@ export default function TableProgramPelatihan() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.05 }}
-                        className="group overflow-hidden bg-white dark:bg-slate-900 rounded-[32px] border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-500"
+                        className="group overflow-hidden bg-white rounded-[32px] border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-500"
                     >
                         {/* Rumpun Accordion Header */}
                         <button
-                            className={`w-full flex items-center justify-between px-6 py-5 transition-all ${openRumpun === rumpunName ? "bg-blue-500/5" : "hover:bg-gray-50/50 dark:hover:bg-white/5"}`}
+                            className={`w-full flex items-center justify-between px-6 py-5 transition-all ${openRumpun === rumpunName ? "bg-blue-500/5" : "hover:bg-gray-50/50"}`}
                             onClick={() => setOpenRumpun(openRumpun === rumpunName ? null : rumpunName)}
                         >
                             <div className="flex items-center gap-4">
@@ -148,8 +148,8 @@ export default function TableProgramPelatihan() {
                                     {rumpunIcons[rumpunName] || rumpunIcons.default}
                                 </div>
                                 <div className="text-left">
-                                    <span className="block text-sm font-black text-slate-800 dark:text-white uppercase tracking-tight">{rumpunName}</span>
-                                    <span className="text-[10px] font-black text-blue-500/60 dark:text-blue-400/60 uppercase tracking-widest">{programs.length} Specialized Programs</span>
+                                    <span className="block text-sm font-black text-slate-800 uppercase tracking-tight">{rumpunName}</span>
+                                    <span className="text-[10px] font-black text-blue-500/60 uppercase tracking-widest">{programs.length} Specialized Programs</span>
                                 </div>
                             </div>
                             <div className={`transition-transform duration-500 ${openRumpun === rumpunName ? "rotate-180" : ""}`}>
@@ -164,30 +164,30 @@ export default function TableProgramPelatihan() {
                                     initial={{ height: 0, opacity: 0 }}
                                     animate={{ height: "auto", opacity: 1 }}
                                     exit={{ height: 0, opacity: 0 }}
-                                    className="overflow-hidden bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-white/5"
+                                    className="overflow-hidden bg-white border-t border-gray-100"
                                 >
                                     <div className="p-4 md:p-6 space-y-4">
                                         {programs.map((row: ProgramPelatihan, pIdx) => (
                                             <div key={row.id_program_pelatihan} className="relative group/row">
-                                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-5 bg-gray-50/50 dark:bg-white/5 rounded-2xl border border-transparent hover:border-blue-500/20 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg hover:shadow-blue-500/5 transition-all">
+                                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-5 bg-gray-50/50 rounded-2xl border border-transparent hover:border-blue-500/20 hover:bg-white hover:shadow-lg hover:shadow-blue-500/5 transition-all">
 
                                                     {/* Program Info */}
                                                     <div className="flex-1 space-y-1">
                                                         <div className="flex items-center gap-2 mb-1">
                                                             <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest bg-blue-50 px-2 py-0.5 rounded-full">{row.abbrv_name || "N/A"}</span>
                                                         </div>
-                                                        <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight leading-tight">{row.name_indo}</h3>
+                                                        <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight leading-tight">{row.name_indo}</h3>
                                                         <p className="text-[11px] font-medium text-slate-400 italic font-serif tracking-wide">{row.name_english}</p>
                                                     </div>
 
                                                     {/* Control Buttons */}
                                                     <div className="flex items-center gap-2">
-                                                        <div className="h-8 w-[1px] bg-slate-200 dark:bg-white/10 mx-2 hidden md:block" />
+                                                        <div className="h-8 w-[1px] bg-slate-200 mx-2 hidden md:block" />
 
                                                         <Link
                                                             href={`/admin/lemdiklat/master/program-pelatihan/materi/${row.name_indo}`}
                                                             target="_blank"
-                                                            className="flex items-center gap-2 h-10 px-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-blue-500 hover:text-blue-500 transition-all text-xs font-black uppercase tracking-widest group/link"
+                                                            className="flex items-center gap-2 h-10 px-4 rounded-xl bg-white border border-slate-200 text-slate-600 hover:border-blue-500 hover:text-blue-500 transition-all text-xs font-black uppercase tracking-widest group/link"
                                                         >
                                                             <FiBookOpen className="group-hover/link:translate-y-[-1px] transition-transform" />
                                                             Materi
@@ -195,14 +195,14 @@ export default function TableProgramPelatihan() {
 
                                                         <button
                                                             onClick={() => setOpenRowId(openRowId === row.id_program_pelatihan ? null : row.id_program_pelatihan)}
-                                                            className={`flex items-center gap-2 h-10 px-4 rounded-xl border transition-all text-xs font-black uppercase tracking-widest ${openRowId === row.id_program_pelatihan ? "bg-slate-900 text-white border-slate-900" : "bg-white dark:bg-slate-900 border-slate-200 dark:border-white/10 text-slate-600 hover:border-slate-400"}`}
+                                                            className={`flex items-center gap-2 h-10 px-4 rounded-xl border transition-all text-xs font-black uppercase tracking-widest ${openRowId === row.id_program_pelatihan ? "bg-slate-900 text-white border-slate-900" : "bg-white border-slate-200 text-slate-600 hover:border-slate-400"}`}
                                                         >
                                                             Description
                                                             <FiChevronDown className={`transition-transform duration-300 ${openRowId === row.id_program_pelatihan ? "rotate-180" : ""}`} />
                                                         </button>
 
                                                         {(canManageProgram(rumpunName) || canManageProgramUPT(rumpunName)) && (
-                                                            <div className="flex items-center gap-2 pl-2 border-l border-slate-100 dark:border-white/5">
+                                                            <div className="flex items-center gap-2 pl-2 border-l border-slate-100">
                                                                 <ManageProgramPelatihanAction
                                                                     onSuccess={fetchProgramPelatihan}
                                                                     initialData={row}

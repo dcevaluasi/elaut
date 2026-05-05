@@ -189,9 +189,9 @@ const TableDataPelatihan: React.FC = () => {
       const matchesYear = filterYear === "All" || pYear === filterYear;
 
       return (
-        (!filterCategory || program.includes(filterCategory.toLowerCase().trim())) &&
-        (!filterCategoryPenyelenggara || penyelenggara.includes(filterCategoryPenyelenggara.toLowerCase().trim())) &&
-        (!filterCategorySasaran || sasaran.includes(filterCategorySasaran.toLowerCase().trim())) &&
+        (!filterCategory || filterCategory === "all" || program.includes(filterCategory.toLowerCase().trim())) &&
+        (!filterCategoryPenyelenggara || filterCategoryPenyelenggara === "all" || penyelenggara.includes(filterCategoryPenyelenggara.toLowerCase().trim())) &&
+        (!filterCategorySasaran || filterCategorySasaran === "all" || sasaran.includes(filterCategorySasaran.toLowerCase().trim())) &&
         namaPelatihan.includes(searchQuery.toLowerCase().trim()) &&
         matchesYear
       );

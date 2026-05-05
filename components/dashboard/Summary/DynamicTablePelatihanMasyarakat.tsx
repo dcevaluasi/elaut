@@ -181,14 +181,14 @@ export function DynamicTablePelatihanMasyarakat({
     }
     // 
     return (
-        <Card className="w-full shadow-[0_4px_20px_rgba(0,0,0,0.03)] border-none bg-white dark:bg-slate-900 rounded-[10px] overflow-hidden">
-            <CardHeader className="flex flex-col md:flex-row justify-between items-center gap-4 bg-slate-50/50 dark:bg-white/5 border-b border-slate-100 dark:border-white/5 pb-4">
+        <Card className="w-full shadow-[0_4px_20px_rgba(0,0,0,0.03)] border-none bg-white rounded-[10px] overflow-hidden">
+            <CardHeader className="flex flex-col md:flex-row justify-between items-center gap-4 bg-slate-50/50 border-b border-slate-100 pb-4">
                 <div className="flex items-center gap-4 w-full md:w-auto">
-                    <div className="h-10 w-10 rounded-2xl bg-white dark:bg-white/10 shadow-sm border border-slate-100 dark:border-white/5 flex items-center justify-center text-blue-600">
+                    <div className="h-10 w-10 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-blue-600">
                         <HiUserGroup size={20} />
                     </div>
                     <div className="space-y-0.5">
-                        <CardTitle className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider leading-none">
+                        <CardTitle className="text-sm font-black text-slate-800 uppercase tracking-wider leading-none">
                             {title}
                         </CardTitle>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{rowKey} vs {colKey}</p>
@@ -198,50 +198,50 @@ export function DynamicTablePelatihanMasyarakat({
                     size="sm"
                     onClick={exportToExcel}
                     variant="outline"
-                    className="h-10 px-5 rounded-xl border-slate-200 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 font-bold text-xs uppercase tracking-wider transition-all w-full md:w-auto"
+                    className="h-10 px-5 rounded-xl border-slate-200 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 font-bold text-xs uppercase tracking-wider transition-all w-full md:w-auto"
                 >
                     Export Excel
                 </Button>
             </CardHeader>
 
             <CardContent className="p-0 flex flex-col h-full">
-                <div className="overflow-auto custom-scrollbar max-h-[500px] border-b border-slate-100 dark:border-white/5">
+                <div className="overflow-auto custom-scrollbar max-h-[500px] border-b border-slate-100">
                     <Table>
-                        <TableHeader className="sticky top-0 z-20 bg-slate-50 dark:bg-slate-900 shadow-sm">
-                            <TableRow className="bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-sm hover:bg-slate-100/80 border-b border-slate-100 dark:border-white/5">
+                        <TableHeader className="sticky top-0 z-20 bg-slate-50 shadow-sm">
+                            <TableRow className="bg-slate-50/90 backdrop-blur-sm hover:bg-slate-100/80 border-b border-slate-100">
                                 <TableHead className="w-16 text-center font-black text-[10px] uppercase tracking-widest text-slate-400 py-4">No</TableHead>
                                 <TableHead className="text-left font-black text-[10px] uppercase tracking-widest text-slate-400 py-4 min-w-[200px]">{rowKey}</TableHead>
                                 {columns.map((col) => (
                                     <TableHead key={col} className="text-center font-black text-[10px] uppercase tracking-widest text-slate-400 py-4 min-w-[100px]">{col}</TableHead>
                                 ))}
-                                <TableHead className="text-center font-black text-[10px] uppercase tracking-widest text-slate-800 dark:text-white bg-slate-100/50 dark:bg-white/5 py-4 w-28">Total</TableHead>
+                                <TableHead className="text-center font-black text-[10px] uppercase tracking-widest text-slate-800 bg-slate-100/50 py-4 w-28">Total</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {groupedData.map((row, index) => (
-                                <TableRow key={row.row} className="hover:bg-blue-50/30 dark:hover:bg-blue-500/5 transition-colors border-b border-slate-50 dark:border-white/5 last:border-0 group">
+                                <TableRow key={row.row} className="hover:bg-blue-50/30 transition-colors border-b border-slate-50 last:border-0 group">
                                     <TableCell className="text-center font-bold text-xs text-slate-500">{index + 1}</TableCell>
-                                    <TableCell className="font-bold text-xs text-slate-700 dark:text-slate-300 group-hover:text-blue-600 transition-colors uppercase">{row.row}</TableCell>
+                                    <TableCell className="font-bold text-xs text-slate-700 group-hover:text-blue-600 transition-colors uppercase">{row.row}</TableCell>
                                     {columns.map((col) => (
-                                        <TableCell key={col} className="text-center text-xs font-semibold text-slate-600 dark:text-slate-400">
+                                        <TableCell key={col} className="text-center text-xs font-semibold text-slate-600">
                                             {row[col] > 0 ? (
-                                                <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-white/10 group-hover:bg-blue-100 dark:group-hover:bg-blue-500/20 group-hover:text-blue-700 transition-colors">
+                                                <span className="px-2 py-0.5 rounded-md bg-slate-100 group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">
                                                     {row[col]}
                                                 </span>
                                             ) : "-"}
                                         </TableCell>
                                     ))}
-                                    <TableCell className="text-center font-black text-xs text-slate-800 dark:text-white bg-slate-50/30 dark:bg-white/5">{row.total}</TableCell>
+                                    <TableCell className="text-center font-black text-xs text-slate-800 bg-slate-50/30">{row.total}</TableCell>
                                 </TableRow>
                             ))}
-                            <TableRow className="bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 border-none">
+                            <TableRow className="bg-slate-900 hover:bg-slate-800 border-none">
                                 <TableCell className="text-center font-black text-white" colSpan={2}>GRAND TOTAL</TableCell>
                                 {columns.map((col) => (
                                     <TableCell key={col} className="text-center font-black text-white text-xs">
                                         {totals[col]}
                                     </TableCell>
                                 ))}
-                                <TableCell className="text-center font-black text-white text-sm bg-slate-800 dark:bg-slate-700 py-4">{totals.total}</TableCell>
+                                <TableCell className="text-center font-black text-white text-sm bg-slate-800 py-4">{totals.total}</TableCell>
                             </TableRow>
                         </TableBody>
                     </Table>

@@ -146,4 +146,26 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /* Force dark text on white/light backgrounds in dark mode */
+  .bg-white,
+  .bg-white\/95,
+  .bg-white\/90,
+  .bg-white\/80,
+  .bg-white\/75,
+  .bg-white\/70,
+  .bg-white\/65,
+  .bg-white\/60,
+  .bg-white\/55,
+  .bg-white\/50,
+  .bg-white\/45,
+  .bg-white\/40,
+  .bg-slate-50,
+  .bg-slate-100,
+  .bg-blue-50,
+  .bg-emerald-50,
+  .bg-amber-50,
+  .bg-rose-50 {
+    @apply dark:text-slate-950 !important;
+  }
 }

@@ -43,10 +43,10 @@ const SummaryKinerja: React.FC = () => {
             ) : dataDukung.length != 0 ? (
                 <>
                     {/* Dashboard Header */}
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl p-8 rounded-[2rem] border border-slate-200/50 dark:border-slate-800 shadow-sm transition-all duration-500 hover:shadow-md">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/60 backdrop-blur-xl p-8 rounded-[2rem] border border-slate-200/50 shadow-sm transition-all duration-500 hover:shadow-md">
                         <div className="space-y-1">
-                            <h2 className="text-3xl font-black text-slate-800 dark:text-white tracking-tighter">Indikator Kinerja</h2>
-                            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Analisis capaian dan output pelatihan secara komprehensif!</p>
+                            <h2 className="text-3xl font-black text-slate-800 tracking-tighter">Indikator Kinerja</h2>
+                            <p className="text-sm font-medium text-slate-500">Analisis capaian dan output pelatihan secara komprehensif!</p>
                         </div>
                         <div className="flex items-center gap-3">
                             <div className="p-4 bg-amber-600/10 rounded-2xl border border-amber-600/20">
@@ -56,14 +56,14 @@ const SummaryKinerja: React.FC = () => {
                     </div>
 
                     {/* Filter Section */}
-                    <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 shadow-sm rounded-[2rem] p-6">
+                    <div className="bg-white/60 backdrop-blur-xl border border-slate-200/50 shadow-sm rounded-[2rem] p-6">
                         <div className="flex flex-col xl:flex-row items-center justify-between gap-6">
                             <div className="flex items-center gap-4">
                                 <div className="h-12 w-12 rounded-2xl bg-blue-600/10 flex items-center justify-center text-blue-600 border border-blue-600/20">
                                     <TbFilter size={24} />
                                 </div>
                                 <div className="hidden sm:block">
-                                    <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-tight">Parameter Data</h3>
+                                    <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight">Parameter Data</h3>
                                     <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Periode Aktif: {triwulan} {tahun}</p>
                                 </div>
                             </div>
@@ -71,7 +71,7 @@ const SummaryKinerja: React.FC = () => {
                             <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto overflow-x-auto pb-1 xl:pb-0 scrollbar-hide">
                                 <div className="flex-1 min-w-[120px]">
                                     <Select value={String(tahun)} onValueChange={(val) => setTahun(Number(val))}>
-                                        <SelectTrigger className="h-12 w-full rounded-2xl bg-white border-slate-200 font-bold text-xs focus:ring-4 focus:ring-blue-500/10 dark:bg-slate-950 dark:border-white/10 shadow-sm transition-all">
+                                        <SelectTrigger className="h-12 w-full rounded-2xl bg-white border-slate-200 font-bold text-xs focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all">
                                             <SelectValue placeholder="Tahun" />
                                         </SelectTrigger>
                                         <SelectContent className="rounded-2xl border-none shadow-2xl">
@@ -86,7 +86,7 @@ const SummaryKinerja: React.FC = () => {
 
                                 <div className="flex-1 min-w-[120px]">
                                     <Select value={triwulan} onValueChange={setTriwulan}>
-                                        <SelectTrigger className="h-12 w-full rounded-2xl bg-white border-slate-200 font-bold text-xs focus:ring-4 focus:ring-blue-500/10 dark:bg-slate-950 dark:border-white/10 shadow-sm transition-all">
+                                        <SelectTrigger className="h-12 w-full rounded-2xl bg-white border-slate-200 font-bold text-xs focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all">
                                             <SelectValue placeholder="Triwulan" />
                                         </SelectTrigger>
                                         <SelectContent className="rounded-2xl border-none shadow-2xl">
@@ -104,7 +104,7 @@ const SummaryKinerja: React.FC = () => {
                                             value={includePusat ? "true" : "false"}
                                             onValueChange={(value) => setIncludePusat(value === "true")}
                                         >
-                                            <SelectTrigger className="h-12 w-full rounded-2xl bg-white border-slate-200 font-bold text-xs focus:ring-4 focus:ring-blue-500/10 dark:bg-slate-950 dark:border-white/10 shadow-sm transition-all">
+                                            <SelectTrigger className="h-12 w-full rounded-2xl bg-white border-slate-200 font-bold text-xs focus:ring-4 focus:ring-blue-500/10 shadow-sm transition-all">
                                                 <SelectValue placeholder="Scope Data" />
                                             </SelectTrigger>
                                             <SelectContent className="rounded-2xl border-none shadow-2xl">
@@ -130,10 +130,10 @@ const SummaryKinerja: React.FC = () => {
                                     <TbUsers className="text-2xl" />
                                 </div>
                                 <div className="space-y-0.5">
-                                    <h3 className="text-xl font-black text-slate-800 dark:text-white tracking-tight uppercase">Demografi Peserta</h3>
+                                    <h3 className="text-xl font-black text-slate-800 tracking-tight uppercase">Demografi Peserta</h3>
                                     <p className="text-sm font-medium text-slate-500">Analisis profil dan latar belakang pendidikan peserta!</p>
                                 </div>
-                                <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent dark:from-slate-800 ml-4 hidden sm:block"></div>
+                                <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent ml-4 hidden sm:block"></div>
                             </div>
                             <div className="grid grid-cols-1 gap-8">
                                 <DynamicTablePelatihanMasyarakat
@@ -162,10 +162,10 @@ const SummaryKinerja: React.FC = () => {
                                     <TbMapPin className="text-2xl" />
                                 </div>
                                 <div className="space-y-0.5">
-                                    <h3 className="text-xl font-black text-slate-800 dark:text-white tracking-tight uppercase">Sebaran Geografis</h3>
+                                    <h3 className="text-xl font-black text-slate-800 tracking-tight uppercase">Sebaran Geografis</h3>
                                     <p className="text-sm font-medium text-slate-500">Pemetaan asal wilayah peserta dan jangkauan pelatihan!</p>
                                 </div>
-                                <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent dark:from-slate-800 ml-4 hidden sm:block"></div>
+                                <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent ml-4 hidden sm:block"></div>
                             </div>
                             <div className="grid grid-cols-1 gap-8">
                                 <DynamicTablePelatihanMasyarakat
@@ -194,10 +194,10 @@ const SummaryKinerja: React.FC = () => {
                                     <TbCertificate className="text-2xl" />
                                 </div>
                                 <div className="space-y-0.5">
-                                    <h3 className="text-xl font-black text-slate-800 dark:text-white tracking-tight uppercase">Analisis Pelatihan</h3>
+                                    <h3 className="text-xl font-black text-slate-800 tracking-tight uppercase">Analisis Pelatihan</h3>
                                     <p className="text-sm font-medium text-slate-500">Output pelaksanaan berdasarkan program dan sektor kerja!</p>
                                 </div>
-                                <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent dark:from-slate-800 ml-4 hidden sm:block"></div>
+                                <div className="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent ml-4 hidden sm:block"></div>
                             </div>
 
                             <DynamicTablePelatihanMasyarakat
@@ -248,7 +248,7 @@ const SummaryKinerja: React.FC = () => {
                 </>
             ) : (
                 <div className="relative max-w-7xl w-full mx-auto mt-20">
-                    <div className="flex flex-col items-center bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl p-12 rounded-[3rem] border border-slate-200/50 dark:border-slate-800">
+                    <div className="flex flex-col items-center bg-white/60 backdrop-blur-xl p-12 rounded-[3rem] border border-slate-200/50">
                         <Image
                             src={"/illustrations/not-found.png"}
                             alt="Not Found"
@@ -257,8 +257,8 @@ const SummaryKinerja: React.FC = () => {
                             className="w-[300px] md:w-[350px]"
                         />
                         <div className="max-w-md mx-auto text-center mt-4">
-                            <h1 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">Data Belum Tersedia</h1>
-                            <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium leading-relaxed">
+                            <h1 className="text-2xl font-black text-slate-800 tracking-tight">Data Belum Tersedia</h1>
+                            <p className="text-slate-500 mt-2 font-medium leading-relaxed">
                                 Capaian indikator kinerja belum dapat ditampilkan untuk periode ini. Pastikan data penyelenggaraan telah terinput dengan benar.
                             </p>
                         </div>

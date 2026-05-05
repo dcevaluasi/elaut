@@ -32,8 +32,8 @@ const StatusButton = ({
         onClick={onClick}
         className={`relative flex flex-col items-start gap-1 px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all duration-500 min-w-[180px] group overflow-hidden
       ${isSelected
-                ? "text-blue-600 dark:text-blue-400"
-                : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+                ? "text-blue-600"
+                : "text-slate-500 hover:text-slate-900"
             }
     `}
     >
@@ -41,7 +41,7 @@ const StatusButton = ({
             <>
                 <motion.div
                     layoutId="activeSegment"
-                    className="absolute inset-0 bg-white dark:bg-slate-800 shadow-sm border border-slate-200/60 dark:border-white/10"
+                    className="absolute inset-0 bg-white shadow-sm border border-slate-200/60"
                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                 />
             </>
@@ -181,8 +181,8 @@ export default function TabStatusPelatihanMasyarakat({
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 px-1">
                 <div className="flex items-center gap-4">
                     <div className="relative group/info">
-                        <div className="relative p-3 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-white/5">
-                            <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        <div className="relative p-3 bg-white rounded-2xl shadow-sm border border-slate-200">
+                            <Info className="w-5 h-5 text-blue-600" />
                         </div>
                     </div>
                     <div className="space-y-0.5">
@@ -190,7 +190,7 @@ export default function TabStatusPelatihanMasyarakat({
                             <span className="text-[9px] font-bold text-blue-500 uppercase tracking-widest">Informasi Peran</span>
                             <div className="w-6 h-px bg-blue-500/20" />
                         </div>
-                        <h2 className="text-lg font-bold text-slate-800 dark:text-white tracking-tight">
+                        <h2 className="text-lg font-bold text-slate-800 tracking-tight">
                             Workflow Peran: <span className="text-blue-600">{getRoleContext}</span>
                         </h2>
                         <div className="flex items-center gap-2 text-[10px] text-slate-400 font-medium">
@@ -200,13 +200,13 @@ export default function TabStatusPelatihanMasyarakat({
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-xl shadow-sm">
-                    <div className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600">
+                <div className="flex items-center gap-3 px-4 py-2 bg-white border border-slate-200 rounded-xl shadow-sm">
+                    <div className="p-1.5 rounded-lg bg-blue-50 text-blue-600">
                         <Calendar size={14} />
                     </div>
                     <div className="flex flex-col">
                         <span className="text-[8px] font-bold text-slate-300 uppercase tracking-widest">Periode Aktif</span>
-                        <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-tighter">
+                        <span className="text-[10px] font-bold text-slate-700 uppercase tracking-tighter">
                             {activeYear === "All" ? "Seluruh Data" : `Tahun ${activeYear}`}
                         </span>
                     </div>
@@ -214,7 +214,7 @@ export default function TabStatusPelatihanMasyarakat({
             </div>
 
             <div className="overflow-x-auto scrollbar-hide pb-2">
-                <nav className="inline-flex items-center gap-2 p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-3xl shadow-sm">
+                <nav className="inline-flex items-center gap-2 p-2 bg-white border border-slate-200 rounded-3xl shadow-sm">
                     <StatusButton
                         {...getTabMetadata("All")}
                         count={dataLength}

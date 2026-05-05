@@ -308,13 +308,13 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
     return (
         <div className="space-y-10">
             {/* Action Toolbar */}
-            <div className="flex flex-wrap items-center justify-between gap-6 p-8 rounded-[2.5rem] bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-slate-100 dark:border-slate-800 shadow-xl">
+            <div className="flex flex-wrap items-center justify-between gap-6 p-8 rounded-[2.5rem] bg-white/40 backdrop-blur-2xl border border-slate-100 shadow-xl">
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-blue-100 dark:bg-blue-500/10 text-blue-600 flex items-center justify-center text-xl shadow-inner">
+                    <div className="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl shadow-inner">
                         <MdOutlineHistoryEdu />
                     </div>
                     <div>
-                        <h4 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-tight">KONTROL PENANDATANGAN</h4>
+                        <h4 className="text-sm font-black text-slate-800 uppercase tracking-tight">KONTROL PENANDATANGAN</h4>
                         <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-1">Kelola Validasi & Tanda Tangan Digital</p>
                     </div>
                 </div>
@@ -332,12 +332,12 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 </Button>
                             )}
                         </AlertDialogTrigger>
-                        <AlertDialogContent className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border-white dark:border-slate-800 rounded-[3rem] p-10 max-w-md shadow-2xl">
+                        <AlertDialogContent className="bg-white/80 backdrop-blur-2xl border-white rounded-[3rem] p-10 max-w-md shadow-2xl">
                             <AlertDialogHeader className="space-y-4">
-                                <div className="w-16 h-16 rounded-[1.5rem] bg-blue-50 dark:bg-blue-500/10 text-blue-600 flex items-center justify-center text-3xl shadow-xl shadow-blue-500/5">
+                                <div className="w-16 h-16 rounded-[1.5rem] bg-blue-50 text-blue-600 flex items-center justify-center text-3xl shadow-xl shadow-blue-500/5">
                                     <TbCalendar />
                                 </div>
-                                <AlertDialogTitle className="font-black text-2xl text-slate-900 dark:text-white tracking-tight leading-tight">Setting Jadwal Penandatanganan</AlertDialogTitle>
+                                <AlertDialogTitle className="font-black text-2xl text-slate-900 tracking-tight leading-tight">Setting Jadwal Penandatanganan</AlertDialogTitle>
                                 <AlertDialogDescription className="text-xs text-slate-500 font-medium leading-relaxed uppercase tracking-widest">
                                     Pastikan tanggal yang dipilih sesuai dengan hari pelaksanaan tanda tangan digital untuk menjaga integritas waktu dokumen.
                                 </AlertDialogDescription>
@@ -348,7 +348,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pilih Tanggal Sertifikat</label>
                                     <input
                                         type="date"
-                                        className="w-full h-14 rounded-2xl border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 px-5 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                                        className="w-full h-14 rounded-2xl border-slate-100 bg-white px-5 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all outline-none"
                                         value={tanggalSertifikat}
                                         onChange={(e) => setTanggalSertifikat(e.target.value)}
                                     />
@@ -405,17 +405,17 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
 
             {/* Participant List */}
             <div className="space-y-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-100">
                     <div className="flex items-center gap-3 w-fit">
                         <UserIcon className="w-4 h-4 text-blue-600" />
-                        <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-[0.3em]">DAFTAR VERIFIKASI SERTIFIKAT</h4>
+                        <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-[0.3em]">DAFTAR VERIFIKASI SERTIFIKAT</h4>
                     </div>
 
                     <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-                        <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100">
                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Sertifikat Siap:</span>
                             <span className="text-[10px] font-black text-amber-600">{drafCountInPage}/{paginatedUsers.length}</span>
-                            <div className="w-[1px] h-3 bg-slate-200 dark:bg-slate-700 mx-1" />
+                            <div className="w-[1px] h-3 bg-slate-200 mx-1" />
                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Tuntas TTDe:</span>
                             <span className="text-[10px] font-black text-emerald-600">{certifiedCountInPage}/{paginatedUsers.length}</span>
                         </div>
@@ -426,7 +426,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 placeholder="CARI NAMA..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full h-10 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 px-4 pl-10 text-[10px] font-bold uppercase tracking-widest outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                className="w-full h-10 rounded-xl bg-slate-50 border border-slate-100 px-4 pl-10 text-[10px] font-bold uppercase tracking-widest outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                             />
                             <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                         </div>
@@ -434,7 +434,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                 </div>
 
                 {totalPages > 1 && (
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 bg-blue-50/30 dark:bg-blue-900/10 rounded-2xl border border-blue-100/50 dark:border-blue-800/30">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 bg-blue-50/30 rounded-2xl border border-blue-100/50">
                         <p className="text-[10px] font-black text-blue-600/60 uppercase tracking-widest">
                             Menampilkan <span className="text-blue-600">{paginatedUsers.length}</span> dari <span className="text-blue-600">{filteredUsers.length}</span> Peserta
                         </p>
@@ -550,7 +550,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                             </div>
                         );
                     }) : (
-                        <div className="flex flex-col items-center justify-center py-20 bg-slate-50 dark:bg-slate-900/50 rounded-[2rem] border border-dashed border-slate-200 dark:border-slate-800">
+                        <div className="flex flex-col items-center justify-center py-20 bg-slate-50 rounded-[2rem] border border-dashed border-slate-200">
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Tidak Ada Peserta Ditemukan</p>
                         </div>
                     )}
@@ -560,12 +560,12 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
 
             {/* signing Modal */}
             <AlertDialog open={open} onOpenChange={setOpen}>
-                <AlertDialogContent className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border-white dark:border-slate-800 rounded-[3rem] p-0 max-w-lg shadow-2xl overflow-hidden flex flex-col">
+                <AlertDialogContent className="bg-white/80 backdrop-blur-2xl border-white rounded-[3rem] p-0 max-w-lg shadow-2xl overflow-hidden flex flex-col">
                     <div className="p-10 pb-6 space-y-4">
-                        <div className="w-16 h-16 rounded-[1.5rem] bg-blue-50 dark:bg-blue-500/10 text-blue-600 flex items-center justify-center text-3xl shadow-xl shadow-blue-500/5 transition-transform hover:rotate-6">
+                        <div className="w-16 h-16 rounded-[1.5rem] bg-blue-50 text-blue-600 flex items-center justify-center text-3xl shadow-xl shadow-blue-500/5 transition-transform hover:rotate-6">
                             <TbPencilCheck />
                         </div>
-                        <AlertDialogTitle className="font-black text-3xl text-slate-900 dark:text-white tracking-tight leading-tight">Otentikasi Tanda Tangan Digital</AlertDialogTitle>
+                        <AlertDialogTitle className="font-black text-3xl text-slate-900 tracking-tight leading-tight">Otentikasi Tanda Tangan Digital</AlertDialogTitle>
                         <AlertDialogDescription className="text-xs text-slate-500 font-medium leading-relaxed uppercase tracking-widest">
                             {tanggalCount === 0 ? "Prasyarat Belum Terpenuhi" : "Penyematan Segel Elektronik Bersertifikat"}
                         </AlertDialogDescription>
@@ -603,7 +603,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                 <input
                                                     disabled={isSigning}
                                                     type={isShowPassphrase ? "text" : "password"}
-                                                    className="w-full h-14 rounded-2xl border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 px-5 text-sm font-black focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                                                    className="w-full h-14 rounded-2xl border-slate-100 bg-white px-5 text-sm font-black focus:ring-2 focus:ring-blue-500 transition-all outline-none"
                                                     required
                                                     autoComplete="new-password"
                                                     value={passphrase}

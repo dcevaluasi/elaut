@@ -167,11 +167,11 @@ export default function LayananPage() {
     };
 
     const getRatingColor = (rating: number) => {
-        if (rating === 0) return "bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400";
-        if (rating <= 2.5) return "bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20";
-        if (rating <= 3.5) return "bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20";
-        if (rating <= 4.5) return "bg-blue-50 text-blue-600 border-blue-100 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20";
-        return "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20";
+        if (rating === 0) return "bg-slate-100 text-slate-500 border-slate-200";
+        if (rating <= 2.5) return "bg-rose-50 text-rose-600 border-rose-100";
+        if (rating <= 3.5) return "bg-amber-50 text-amber-600 border-amber-100";
+        if (rating <= 4.5) return "bg-blue-50 text-blue-600 border-blue-100";
+        return "bg-emerald-50 text-emerald-600 border-emerald-100";
     };
 
     const getRatingLabel = (rating: number) => {
@@ -368,13 +368,13 @@ export default function LayananPage() {
                 <div className="space-y-10 py-4">
                     <Tabs defaultValue="masukan-saran" className="w-full">
                         <div className="flex justify-center mb-10">
-                            <TabsList className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border border-white/50 dark:border-slate-800 h-auto p-2 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex flex-wrap md:flex-nowrap items-center gap-2 w-full">
+                            <TabsList className="bg-white/80 backdrop-blur-2xl border border-white/50 h-auto p-2 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)],0,0,0.3)] flex flex-wrap md:flex-nowrap items-center gap-2 w-full">
                                 <TabsTrigger
                                     value="masukan-saran"
-                                    className="flex-1 w-full rounded-[2rem] py-3.5 px-6 data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=active]:shadow-blue-500/30 text-slate-500 dark:text-slate-400 font-bold transition-all duration-500 flex flex-col items-center gap-1 group ring-0 outline-none hover:text-blue-600 dark:hover:text-blue-400"
+                                    className="flex-1 w-full rounded-[2rem] py-3.5 px-6 data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=active]:shadow-blue-500/30 text-slate-500 font-bold transition-all duration-500 flex flex-col items-center gap-1 group ring-0 outline-none hover:text-blue-600"
                                 >
                                     <div className="flex items-center gap-2.5">
-                                        <div className="p-1.5 bg-blue-100/50 dark:bg-blue-500/10 rounded-xl group-data-[state=active]:bg-white/20 transition-colors">
+                                        <div className="p-1.5 bg-blue-100/50 rounded-xl group-data-[state=active]:bg-white/20 transition-colors">
                                             <MessageSquare className="w-4 h-4" />
                                         </div>
                                         <span className="text-sm tracking-tight">Masukan & Saran</span>
@@ -384,10 +384,10 @@ export default function LayananPage() {
 
                                 <TabsTrigger
                                     value="maklumat-pelayanan"
-                                    className="flex-1 w-full rounded-[2rem] py-3.5 px-6 data-[state=active]:bg-gradient-to-br data-[state=active]:from-emerald-500 data-[state=active]:to-teal-600 data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=active]:shadow-emerald-500/30 text-slate-500 dark:text-slate-400 font-bold transition-all duration-500 flex flex-col items-center gap-1 group ring-0 outline-none hover:text-emerald-600 dark:hover:text-emerald-400"
+                                    className="flex-1 w-full rounded-[2rem] py-3.5 px-6 data-[state=active]:bg-gradient-to-br data-[state=active]:from-emerald-500 data-[state=active]:to-teal-600 data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=active]:shadow-emerald-500/30 text-slate-500 font-bold transition-all duration-500 flex flex-col items-center gap-1 group ring-0 outline-none hover:text-emerald-600"
                                 >
                                     <div className="flex items-center gap-2.5">
-                                        <div className="p-1.5 bg-emerald-100/50 dark:bg-emerald-500/10 rounded-xl group-data-[state=active]:bg-white/20 transition-colors">
+                                        <div className="p-1.5 bg-emerald-100/50 rounded-xl group-data-[state=active]:bg-white/20 transition-colors">
                                             <ImageIcon className="w-4 h-4" />
                                         </div>
                                         <span className="text-sm tracking-tight">Maklumat</span>
@@ -397,10 +397,10 @@ export default function LayananPage() {
 
                                 <TabsTrigger
                                     value="regulasi"
-                                    className="flex-1 w-full rounded-[2rem] py-3.5 px-6 data-[state=active]:bg-gradient-to-br data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=active]:shadow-indigo-500/30 text-slate-500 dark:text-slate-400 font-bold transition-all duration-500 flex flex-col items-center gap-1 group ring-0 outline-none hover:text-indigo-600 dark:hover:text-indigo-400"
+                                    className="flex-1 w-full rounded-[2rem] py-3.5 px-6 data-[state=active]:bg-gradient-to-br data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=active]:shadow-indigo-500/30 text-slate-500 font-bold transition-all duration-500 flex flex-col items-center gap-1 group ring-0 outline-none hover:text-indigo-600"
                                 >
                                     <div className="flex items-center gap-2.5">
-                                        <div className="p-1.5 bg-indigo-100/50 dark:bg-indigo-500/10 rounded-xl group-data-[state=active]:bg-white/20 transition-colors">
+                                        <div className="p-1.5 bg-indigo-100/50 rounded-xl group-data-[state=active]:bg-white/20 transition-colors">
                                             <Book className="w-4 h-4" />
                                         </div>
                                         <span className="text-sm tracking-tight">Regulasi</span>
@@ -420,7 +420,7 @@ export default function LayananPage() {
                                 <div className="flex flex-col gap-10">
                                     {/* Metrics Grid */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-2xl shadow-blue-200 dark:shadow-none transition-all duration-500 hover:scale-[1.02] group">
+                                        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-2xl shadow-blue-200 transition-all duration-500 hover:scale-[1.02] group">
                                             <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
                                             <div className="relative z-10 space-y-4">
                                                 <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 w-fit">
@@ -433,7 +433,7 @@ export default function LayananPage() {
                                             </div>
                                         </div>
 
-                                        <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-2xl shadow-amber-200 dark:shadow-none transition-all duration-500 hover:scale-[1.02] group">
+                                        <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-2xl shadow-amber-200 transition-all duration-500 hover:scale-[1.02] group">
                                             <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
                                             <div className="relative z-10 space-y-4">
                                                 <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 w-fit">
@@ -450,7 +450,7 @@ export default function LayananPage() {
                                             </div>
                                         </div>
 
-                                        <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-2xl shadow-emerald-200 dark:shadow-none transition-all duration-500 hover:scale-[1.02] group">
+                                        <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-2xl shadow-emerald-200 transition-all duration-500 hover:scale-[1.02] group">
                                             <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
                                             <div className="relative z-10 space-y-4">
                                                 <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 w-fit">
@@ -467,7 +467,7 @@ export default function LayananPage() {
                                             </div>
                                         </div>
 
-                                        <div className="bg-gradient-to-br from-rose-500 to-red-600 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-2xl shadow-rose-200 dark:shadow-none transition-all duration-500 hover:scale-[1.02] group">
+                                        <div className="bg-gradient-to-br from-rose-500 to-red-600 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-2xl shadow-rose-200 transition-all duration-500 hover:scale-[1.02] group">
                                             <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
                                             <div className="relative z-10 space-y-4">
                                                 <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 w-fit">
@@ -486,7 +486,7 @@ export default function LayananPage() {
                                     </div>
 
                                     {/* Action Bar */}
-                                    <div className="bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800 shadow-sm rounded-[2rem] p-4 flex flex-col md:flex-row items-center gap-4">
+                                    <div className="bg-white/60 backdrop-blur-xl border border-slate-200/60 shadow-sm rounded-[2rem] p-4 flex flex-col md:flex-row items-center gap-4">
                                         <div className="relative flex-1 group w-full">
                                             <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                                             <Input
@@ -494,14 +494,14 @@ export default function LayananPage() {
                                                 placeholder="Cari masukan berdasarkan nama, instansi, atau kata kunci..."
                                                 value={searchQuery}
                                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                                className="w-full h-14 pl-14 pr-6 bg-white dark:bg-slate-950 border-slate-200/60 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 transition-all font-medium text-sm"
+                                                className="w-full h-14 pl-14 pr-6 bg-white border-slate-200/60 rounded-2xl focus:ring-4 focus:ring-blue-500/10 transition-all font-medium text-sm"
                                             />
                                         </div>
                                         {searchQuery && (
                                             <Button
                                                 variant="outline"
                                                 onClick={() => setSearchQuery("")}
-                                                className="h-14 px-8 rounded-2xl border-slate-200 dark:border-slate-800 font-bold text-xs uppercase tracking-wider hover:bg-slate-50 transition-all"
+                                                className="h-14 px-8 rounded-2xl border-slate-200 font-bold text-xs uppercase tracking-wider hover:bg-slate-50 transition-all"
                                             >
                                                 <X className="w-4 h-4 mr-2" /> Reset
                                             </Button>
@@ -509,11 +509,11 @@ export default function LayananPage() {
                                     </div>
 
                                     {/* Table View */}
-                                    <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-200/60 dark:border-slate-800 overflow-hidden">
+                                    <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-200/60 overflow-hidden">
                                         <div className="overflow-x-auto">
                                             <Table>
-                                                <TableHeader className="bg-slate-50/50 dark:bg-slate-800/30">
-                                                    <TableRow className="hover:bg-transparent border-slate-100 dark:border-slate-800">
+                                                <TableHeader className="bg-slate-50/50">
+                                                    <TableRow className="hover:bg-transparent border-slate-100">
                                                         <TableHead className="w-16 text-center font-black text-[10px] uppercase tracking-widest text-slate-400 py-6">No</TableHead>
                                                         <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-400 py-6">
                                                             <div className="flex items-center gap-2">
@@ -538,7 +538,7 @@ export default function LayananPage() {
                                                         <TableRow>
                                                             <TableCell colSpan={5} className="py-20 text-center">
                                                                 <div className="flex flex-col items-center gap-3">
-                                                                    <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400">
+                                                                    <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-400">
                                                                         <MessageSquare className="w-8 h-8" />
                                                                     </div>
                                                                     <p className="font-bold text-slate-400 uppercase tracking-widest text-xs">
@@ -551,11 +551,11 @@ export default function LayananPage() {
                                                         filteredFeedbacks.map((feedback, index) => {
                                                             const avgRating = calculateAverageRating(feedback.ratings);
                                                             return (
-                                                                <TableRow key={feedback.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/20 border-slate-100 dark:border-slate-800 transition-colors">
+                                                                <TableRow key={feedback.id} className="group hover:bg-slate-50/50 border-slate-100 transition-colors">
                                                                     <TableCell className="text-center font-bold text-xs text-slate-400">{index + 1}</TableCell>
                                                                     <TableCell className="py-6">
                                                                         <div className="flex flex-col gap-0.5">
-                                                                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-tight">
+                                                                            <span className="text-xs font-bold text-slate-700 uppercase tracking-tight">
                                                                                 {formatDate(feedback.createdAt).split(' pukul ')[0]}
                                                                             </span>
                                                                             <span className="text-[10px] text-slate-400 font-medium tracking-wider">
@@ -565,10 +565,10 @@ export default function LayananPage() {
                                                                     </TableCell>
                                                                     <TableCell>
                                                                         <div className="flex flex-col gap-0.5">
-                                                                            <span className="text-sm font-black text-slate-800 dark:text-white uppercase group-hover:text-blue-600 transition-colors">
+                                                                            <span className="text-sm font-black text-slate-800 uppercase group-hover:text-blue-600 transition-colors">
                                                                                 {feedback.nama}
                                                                             </span>
-                                                                            <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                                                                            <div className="flex items-center gap-1.5 text-slate-500">
                                                                                 <Building className="w-3 h-3" />
                                                                                 <span className="text-[11px] font-medium tracking-tight">
                                                                                     {feedback.asalInstansi}
@@ -582,7 +582,7 @@ export default function LayananPage() {
                                                                                 <span className={`text-[11px] font-black`}>
                                                                                     {avgRating > 0 ? `${avgRating} / 5.0` : "N/A"}
                                                                                 </span>
-                                                                                <div className="w-1 h-3 bg-slate-200 dark:bg-slate-700 rounded-full" />
+                                                                                <div className="w-1 h-3 bg-slate-200 rounded-full" />
                                                                                 <span className={`text-[10px] font-bold uppercase tracking-widest`}>
                                                                                     {getRatingLabel(avgRating)}
                                                                                 </span>
@@ -619,14 +619,14 @@ export default function LayananPage() {
                             ) : (
                                 <div className="flex flex-col gap-10">
                                     {/* Action Header */}
-                                    <div className="flex flex-col sm:flex-row justify-between items-center bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800 shadow-sm rounded-[2rem] p-6 lg:p-8 gap-6">
+                                    <div className="flex flex-col sm:flex-row justify-between items-center bg-white/60 backdrop-blur-xl border border-slate-200/60 shadow-sm rounded-[2rem] p-6 lg:p-8 gap-6">
                                         <div className="flex items-center gap-5">
                                             <div className="h-14 w-14 rounded-2xl bg-emerald-600/10 flex items-center justify-center text-emerald-600 shrink-0 border border-emerald-600/20 shadow-sm">
                                                 <ImageIcon className="w-7 h-7" />
                                             </div>
                                             <div>
-                                                <h3 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight">Maklumat Pelayanan</h3>
-                                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Kelola publikasi standar pelayanan aplikasi!</p>
+                                                <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">Maklumat Pelayanan</h3>
+                                                <p className="text-sm font-medium text-slate-500">Kelola publikasi standar pelayanan aplikasi!</p>
                                             </div>
                                         </div>
                                         {!showMaklumatForm && (
@@ -640,11 +640,11 @@ export default function LayananPage() {
                                     </div>
 
                                     {showMaklumatForm && (
-                                        <Card className="rounded-[2.5rem] border-slate-200/60 dark:border-slate-800 overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-300">
-                                            <CardHeader className="p-8 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                                        <Card className="rounded-[2.5rem] border-slate-200/60 overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+                                            <CardHeader className="p-8 border-b border-slate-100 bg-slate-50/50">
                                                 <div className="flex items-center justify-between">
                                                     <div>
-                                                        <CardTitle className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight">
+                                                        <CardTitle className="text-xl font-black text-slate-800 uppercase tracking-tight">
                                                             {editingMaklumat ? "Modifikasi Maklumat" : "Buat Maklumat Baru"}
                                                         </CardTitle>
                                                         <CardDescription className="text-slate-500 font-medium">Lengkapi detail publikasi di bawah ini!</CardDescription>
@@ -663,7 +663,7 @@ export default function LayananPage() {
                                                                 value={maklumatForm.title}
                                                                 onChange={(e) => setMaklumatForm({ ...maklumatForm, title: e.target.value })}
                                                                 placeholder="Contoh: Maklumat Pelayanan Utama..."
-                                                                className="h-12 rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 focus:ring-4 focus:ring-emerald-500/10 transition-all font-medium"
+                                                                className="h-12 rounded-xl bg-slate-50 border-slate-200 focus:ring-4 focus:ring-emerald-500/10 transition-all font-medium"
                                                             />
                                                         </div>
                                                         <div className="space-y-2.5">
@@ -671,7 +671,7 @@ export default function LayananPage() {
                                                             <textarea
                                                                 value={maklumatForm.description}
                                                                 onChange={(e) => setMaklumatForm({ ...maklumatForm, description: e.target.value })}
-                                                                className="w-full p-4 text-sm font-medium bg-slate-50 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 min-h-[120px] transition-all"
+                                                                className="w-full p-4 text-sm font-medium bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 min-h-[120px] transition-all"
                                                                 placeholder="Deskripsikan secara detail isi maklumat..."
                                                             />
                                                         </div>
@@ -681,13 +681,13 @@ export default function LayananPage() {
                                                                 value={maklumatForm.imageUrl}
                                                                 onChange={(e) => setMaklumatForm({ ...maklumatForm, imageUrl: e.target.value })}
                                                                 placeholder="https://example.com/poster.jpg"
-                                                                className="h-12 rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 transition-all font-medium"
+                                                                className="h-12 rounded-xl bg-slate-50 border-slate-200 transition-all font-medium"
                                                             />
                                                         </div>
                                                     </div>
                                                     <div className="flex flex-col gap-4">
                                                         <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1 text-center">Preview Visual</label>
-                                                        <div className="flex-1 bg-slate-100 dark:bg-slate-950 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden relative group">
+                                                        <div className="flex-1 bg-slate-100 rounded-2xl border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden relative group">
                                                             {maklumatForm.imageUrl ? (
                                                                 <img
                                                                     src={getDirectImageUrl(maklumatForm.imageUrl)}
@@ -704,7 +704,7 @@ export default function LayananPage() {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div className="flex gap-4 justify-end pt-6 border-t border-slate-100 dark:border-slate-800">
+                                                <div className="flex gap-4 justify-end pt-6 border-t border-slate-100">
                                                     <Button onClick={cancelMaklumatForm} variant="outline" className="h-12 px-8 rounded-xl font-bold uppercase tracking-wider">
                                                         Batal
                                                     </Button>
@@ -722,13 +722,13 @@ export default function LayananPage() {
 
                                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                         {maklumatList.length === 0 ? (
-                                            <div className="col-span-full py-20 bg-white/40 dark:bg-slate-900/40 rounded-[2rem] border border-dashed border-slate-300 dark:border-slate-800 flex flex-col items-center justify-center gap-4">
+                                            <div className="col-span-full py-20 bg-white/40 rounded-[2rem] border border-dashed border-slate-300 flex flex-col items-center justify-center gap-4">
                                                 <ImageIcon className="w-16 h-16 text-slate-300" />
                                                 <p className="font-bold text-slate-400 uppercase tracking-widest text-xs">Belum ada maklumat dipublikasikan</p>
                                             </div>
                                         ) : (
                                             maklumatList.map((maklumat) => (
-                                                <article key={maklumat.id} className="group bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-200/60 dark:border-slate-800 overflow-hidden flex flex-col md:flex-row transition-all duration-500 hover:shadow-2xl hover:shadow-slate-200 dark:hover:shadow-none hover:-translate-y-1">
+                                                <article key={maklumat.id} className="group bg-white rounded-[2.5rem] shadow-sm border border-slate-200/60 overflow-hidden flex flex-col md:flex-row transition-all duration-500 hover:shadow-2xl hover:shadow-slate-200 hover:-translate-y-1">
                                                     <div className="relative w-full md:w-52 h-48 md:h-auto overflow-hidden shrink-0 transition-all duration-500 group-hover:w-full md:group-hover:w-60">
                                                         <img
                                                             src={getDirectImageUrl(maklumat.imageUrl)}
@@ -739,19 +739,19 @@ export default function LayananPage() {
                                                     </div>
                                                     <div className="p-6 md:p-8 flex flex-col flex-1 gap-4">
                                                         <div className="space-y-2">
-                                                            <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 mb-1">
+                                                            <div className="flex items-center gap-2 text-emerald-600 mb-1">
                                                                 <ImageIcon className="w-3.5 h-3.5" />
                                                                 <span className="text-[10px] font-black uppercase tracking-widest">Dipublikasikan</span>
                                                             </div>
-                                                            <h3 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight leading-tight group-hover:text-blue-600 transition-colors">
+                                                            <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight leading-tight group-hover:text-blue-600 transition-colors">
                                                                 {maklumat.title}
                                                             </h3>
-                                                            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed line-clamp-2">
+                                                            <p className="text-sm text-slate-500 font-medium leading-relaxed line-clamp-2">
                                                                 {maklumat.description}
                                                             </p>
                                                         </div>
 
-                                                        <div className="mt-auto flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
+                                                        <div className="mt-auto flex items-center justify-between pt-4 border-t border-slate-100">
                                                             <div className="flex items-center gap-2 text-slate-400">
                                                                 <Calendar className="w-3.5 h-3.5" />
                                                                 <span className="text-[10px] font-bold uppercase tracking-wider">{formatDate(maklumat.createdAt).split(' pukul ')[0]}</span>
@@ -793,14 +793,14 @@ export default function LayananPage() {
                             ) : (
                                 <div className="flex flex-col gap-10">
                                     {/* Action Header */}
-                                    <div className="flex flex-col sm:flex-row justify-between items-center bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800 shadow-sm rounded-[2rem] p-6 lg:p-8 gap-6">
+                                    <div className="flex flex-col sm:flex-row justify-between items-center bg-white/60 backdrop-blur-xl border border-slate-200/60 shadow-sm rounded-[2rem] p-6 lg:p-8 gap-6">
                                         <div className="flex items-center gap-5">
                                             <div className="h-14 w-14 rounded-2xl bg-indigo-600/10 flex items-center justify-center text-indigo-600 shrink-0 border border-indigo-600/20 shadow-sm">
                                                 <Book className="w-7 h-7" />
                                             </div>
                                             <div>
-                                                <h3 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight">Regulasi Pelatihan</h3>
-                                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Kelola dasar hukum dan regulasi terkait pelatihan!</p>
+                                                <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">Regulasi Pelatihan</h3>
+                                                <p className="text-sm font-medium text-slate-500">Kelola dasar hukum dan regulasi terkait pelatihan!</p>
                                             </div>
                                         </div>
                                         {!showRegulasiForm && (
@@ -814,11 +814,11 @@ export default function LayananPage() {
                                     </div>
 
                                     {showRegulasiForm && (
-                                        <Card className="rounded-[2.5rem] border-slate-200/60 dark:border-slate-800 overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-300">
-                                            <CardHeader className="p-8 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                                        <Card className="rounded-[2.5rem] border-slate-200/60 overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+                                            <CardHeader className="p-8 border-b border-slate-100 bg-slate-50/50">
                                                 <div className="flex items-center justify-between">
                                                     <div>
-                                                        <CardTitle className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight">
+                                                        <CardTitle className="text-xl font-black text-slate-800 uppercase tracking-tight">
                                                             {editingRegulasi ? "Modifikasi Regulasi" : "Tambah Regulasi Baru"}
                                                         </CardTitle>
                                                         <CardDescription className="text-slate-500 font-medium">Lengkapi detail dokumen regulasi di bawah ini!</CardDescription>
@@ -835,7 +835,7 @@ export default function LayananPage() {
                                                         <select
                                                             value={regulasiForm.kategori_regulasi}
                                                             onChange={(e) => setRegulasiForm({ ...regulasiForm, kategori_regulasi: e.target.value })}
-                                                            className="w-full h-12 px-3 rounded-xl bg-slate-50 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                                            className="w-full h-12 px-3 rounded-xl bg-slate-50 border border-slate-200 transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                                                         >
                                                             <option value="">Pilih Kategori</option>
                                                             <option value="Undang-Undang">Undang-Undang</option>
@@ -855,7 +855,7 @@ export default function LayananPage() {
                                                             value={regulasiForm.no_peraturan}
                                                             onChange={(e) => setRegulasiForm({ ...regulasiForm, no_peraturan: e.target.value })}
                                                             placeholder="Contoh: Nomor 12 Tahun 2023"
-                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 transition-all font-medium"
+                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 transition-all font-medium"
                                                         />
                                                     </div>
                                                     <div className="space-y-2.5">
@@ -865,7 +865,7 @@ export default function LayananPage() {
                                                             value={regulasiForm.tahun}
                                                             onChange={(e) => setRegulasiForm({ ...regulasiForm, tahun: e.target.value })}
                                                             placeholder="Contoh: 2023"
-                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 transition-all font-medium"
+                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 transition-all font-medium"
                                                         />
                                                     </div>
                                                     <div className="space-y-2.5 lg:col-span-3">
@@ -874,7 +874,7 @@ export default function LayananPage() {
                                                             value={regulasiForm.judul}
                                                             onChange={(e) => setRegulasiForm({ ...regulasiForm, judul: e.target.value })}
                                                             placeholder="Judul lengkap peraturan..."
-                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 transition-all font-medium"
+                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 transition-all font-medium"
                                                         />
                                                     </div>
                                                     <div className="space-y-2.5 lg:col-span-3">
@@ -882,7 +882,7 @@ export default function LayananPage() {
                                                         <textarea
                                                             value={regulasiForm.ruang_lingkup}
                                                             onChange={(e) => setRegulasiForm({ ...regulasiForm, ruang_lingkup: e.target.value })}
-                                                            className="w-full p-4 text-sm font-medium bg-slate-50 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 min-h-[100px] transition-all"
+                                                            className="w-full p-4 text-sm font-medium bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 min-h-[100px] transition-all"
                                                             placeholder="Ruang lingkup peraturan..."
                                                         />
                                                     </div>
@@ -892,7 +892,7 @@ export default function LayananPage() {
                                                             type="date"
                                                             value={regulasiForm.tanggal_pengundangan}
                                                             onChange={(e) => setRegulasiForm({ ...regulasiForm, tanggal_pengundangan: e.target.value })}
-                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 transition-all font-medium"
+                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 transition-all font-medium"
                                                         />
                                                     </div>
                                                     <div className="space-y-2.5">
@@ -900,7 +900,7 @@ export default function LayananPage() {
                                                         <select
                                                             value={regulasiForm.status}
                                                             onChange={(e) => setRegulasiForm({ ...regulasiForm, status: e.target.value })}
-                                                            className="w-full h-12 px-3 rounded-xl bg-slate-50 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                                            className="w-full h-12 px-3 rounded-xl bg-slate-50 border border-slate-200 transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                                                         >
                                                             <option value="">Pilih Status</option>
                                                             <option value="Berlaku">Berlaku</option>
@@ -915,7 +915,7 @@ export default function LayananPage() {
                                                             value={regulasiForm.sumber}
                                                             onChange={(e) => setRegulasiForm({ ...regulasiForm, sumber: e.target.value })}
                                                             placeholder="Contoh: LN.2023/No.12"
-                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 transition-all font-medium"
+                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 transition-all font-medium"
                                                         />
                                                     </div>
                                                     <div className="space-y-2.5 lg:col-span-2">
@@ -924,7 +924,7 @@ export default function LayananPage() {
                                                             value={regulasiForm.perubahan_turunan_terkait}
                                                             onChange={(e) => setRegulasiForm({ ...regulasiForm, perubahan_turunan_terkait: e.target.value })}
                                                             placeholder="Catatan peraturan turunan..."
-                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 transition-all font-medium"
+                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 transition-all font-medium"
                                                         />
                                                     </div>
                                                     <div className="space-y-2.5">
@@ -939,7 +939,7 @@ export default function LayananPage() {
                                                             />
                                                             <label
                                                                 htmlFor="upload-regulasi"
-                                                                className={`h-12 w-full px-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between cursor-pointer transition-all bg-slate-50 hover:bg-slate-100 dark:bg-slate-950 dark:hover:bg-slate-900`}
+                                                                className={`h-12 w-full px-4 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition-all bg-slate-50 hover:bg-slate-100`}
                                                             >
                                                                 <span className="text-sm font-medium text-slate-500 truncate pr-4">
                                                                     {selectedFile ? selectedFile.name : regulasiForm.file ? "File Tersimpan (Pilih baru untuk ganti)" : "Pilih Dokumen PDF/Doc"}
@@ -956,7 +956,7 @@ export default function LayananPage() {
                                                         )}
                                                     </div>
                                                 </div>
-                                                <div className="flex gap-4 justify-end pt-6 border-t border-slate-100 dark:border-slate-800">
+                                                <div className="flex gap-4 justify-end pt-6 border-t border-slate-100">
                                                     <Button type="button" onClick={cancelRegulasiForm} variant="outline" className="h-12 px-8 rounded-xl font-bold uppercase tracking-wider">
                                                         Batal
                                                     </Button>
@@ -975,16 +975,16 @@ export default function LayananPage() {
 
                                     <div className="grid grid-cols-1 gap-6">
                                         {regulasiList.length === 0 ? (
-                                            <div className="col-span-full py-20 bg-white/40 dark:bg-slate-900/40 rounded-[2rem] border border-dashed border-slate-300 dark:border-slate-800 flex flex-col items-center justify-center gap-4">
+                                            <div className="col-span-full py-20 bg-white/40 rounded-[2rem] border border-dashed border-slate-300 flex flex-col items-center justify-center gap-4">
                                                 <Book className="w-16 h-16 text-slate-300" />
                                                 <p className="font-bold text-slate-400 uppercase tracking-widest text-xs">Belum ada regulasi yang ditambahkan</p>
                                             </div>
                                         ) : (
-                                            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-200/60 dark:border-slate-800 overflow-hidden">
+                                            <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-200/60 overflow-hidden">
                                                 <div className="overflow-x-auto">
                                                     <Table>
-                                                        <TableHeader className="bg-slate-50/50 dark:bg-slate-800/30">
-                                                            <TableRow className="hover:bg-transparent border-slate-100 dark:border-slate-800">
+                                                        <TableHeader className="bg-slate-50/50">
+                                                            <TableRow className="hover:bg-transparent border-slate-100">
                                                                 <TableHead className="w-16 text-center font-black text-[10px] uppercase tracking-widest text-slate-400 py-6">No</TableHead>
                                                                 <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-400 py-6">Identitas Regulasi</TableHead>
                                                                 <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-400 py-6">Kategori & Tahun</TableHead>
@@ -994,14 +994,14 @@ export default function LayananPage() {
                                                         </TableHeader>
                                                         <TableBody>
                                                             {regulasiList.map((item, index) => (
-                                                                <TableRow key={item.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/20 border-slate-100 dark:border-slate-800 transition-colors">
+                                                                <TableRow key={item.id} className="group hover:bg-slate-50/50 border-slate-100 transition-colors">
                                                                     <TableCell className="text-center font-bold text-xs text-slate-400">{index + 1}</TableCell>
                                                                     <TableCell className="py-6 max-w-md">
                                                                         <div className="flex flex-col gap-1.5">
-                                                                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-tight">
+                                                                            <span className="text-xs font-bold text-slate-700 uppercase tracking-tight">
                                                                                 {item.no_peraturan}
                                                                             </span>
-                                                                            <span className="text-sm font-black text-slate-800 dark:text-white line-clamp-2 leading-tight">
+                                                                            <span className="text-sm font-black text-slate-800 line-clamp-2 leading-tight">
                                                                                 {item.judul}
                                                                             </span>
                                                                             {item.file && (
@@ -1070,21 +1070,21 @@ export default function LayananPage() {
                     onClick={() => setSelectedFeedback(null)}
                 >
                     <div
-                        className="bg-white dark:bg-slate-900 rounded-[3rem] max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200/60 dark:border-slate-800 animate-in slide-in-from-bottom-5 duration-500"
+                        className="bg-white rounded-[3rem] max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200/60 animate-in slide-in-from-bottom-5 duration-500"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Modal Header */}
-                        <div className="sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800 p-8 z-10 flex items-center justify-between">
+                        <div className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-slate-100 p-8 z-10 flex items-center justify-between">
                             <div className="flex items-center gap-4">
                                 <div className="h-14 w-14 rounded-2xl bg-blue-600/10 flex items-center justify-center text-blue-600 border border-blue-600/20 shadow-sm">
                                     <MessageSquare className="w-7 h-7" />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight">Detail Masukan</h2>
+                                    <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">Detail Masukan</h2>
                                     <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{formatDate(selectedFeedback.createdAt)}</p>
                                 </div>
                             </div>
-                            <Button variant="ghost" size="icon" onClick={() => setSelectedFeedback(null)} className="rounded-full h-12 w-12 hover:bg-slate-100 dark:hover:bg-slate-800">
+                            <Button variant="ghost" size="icon" onClick={() => setSelectedFeedback(null)} className="rounded-full h-12 w-12 hover:bg-slate-100">
                                 <X className="w-5 h-5" />
                             </Button>
                         </div>
@@ -1092,19 +1092,19 @@ export default function LayananPage() {
                         <div className="p-8 space-y-10">
                             {/* Profile Card */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="p-6 bg-slate-50 dark:bg-slate-950 rounded-3xl border border-slate-200/60 dark:border-slate-800 space-y-2">
+                                <div className="p-6 bg-slate-50 rounded-3xl border border-slate-200/60 space-y-2">
                                     <div className="flex items-center gap-2 text-slate-400 mb-1">
                                         <User className="w-3.5 h-3.5" />
                                         <span className="text-[10px] font-black uppercase tracking-widest">Nama Lengkap</span>
                                     </div>
-                                    <p className="text-base font-black text-slate-800 dark:text-white uppercase">{selectedFeedback.nama}</p>
+                                    <p className="text-base font-black text-slate-800 uppercase">{selectedFeedback.nama}</p>
                                 </div>
-                                <div className="p-6 bg-slate-50 dark:bg-slate-950 rounded-3xl border border-slate-200/60 dark:border-slate-800 space-y-2">
+                                <div className="p-6 bg-slate-50 rounded-3xl border border-slate-200/60 space-y-2">
                                     <div className="flex items-center gap-2 text-slate-400 mb-1">
                                         <Building className="w-3.5 h-3.5" />
                                         <span className="text-[10px] font-black uppercase tracking-widest">Asal Instansi</span>
                                     </div>
-                                    <p className="text-base font-black text-slate-800 dark:text-white uppercase">{selectedFeedback.asalInstansi}</p>
+                                    <p className="text-base font-black text-slate-800 uppercase">{selectedFeedback.asalInstansi}</p>
                                 </div>
                             </div>
 
@@ -1113,14 +1113,14 @@ export default function LayananPage() {
                                 <div className="flex items-center justify-between">
                                     <div className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-3">
                                         <span>Masukan & Kritik</span>
-                                        <div className="h-px w-20 bg-slate-200 dark:bg-slate-800" />
+                                        <div className="h-px w-20 bg-slate-200" />
                                     </div>
                                     <Badge className={`${getRatingColor(calculateAverageRating(selectedFeedback.ratings))} font-bold px-4 rounded-xl border`}>
                                         SKOR: {calculateAverageRating(selectedFeedback.ratings)} / 5.0
                                     </Badge>
                                 </div>
-                                <div className="p-8 bg-blue-50/30 dark:bg-blue-900/10 rounded-[2rem] border border-blue-100/50 dark:border-blue-500/10 shadow-inner">
-                                    <p className="text-slate-700 dark:text-slate-300 font-medium leading-relaxed italic text-lg text-center">
+                                <div className="p-8 bg-blue-50/30 rounded-[2rem] border border-blue-100/50 shadow-inner">
+                                    <p className="text-slate-700 font-medium leading-relaxed italic text-lg text-center">
                                         "{selectedFeedback.masukanSaran}"
                                     </p>
                                 </div>
@@ -1130,7 +1130,7 @@ export default function LayananPage() {
                             <div className="space-y-6">
                                 <div className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-3">
                                     <span>Skor Indikator</span>
-                                    <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
+                                    <div className="h-px flex-1 bg-slate-200" />
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     {RATING_QUESTIONS.map((question) => {
@@ -1138,9 +1138,9 @@ export default function LayananPage() {
                                         return (
                                             <div
                                                 key={question.key}
-                                                className="flex items-center justify-between p-5 bg-white dark:bg-slate-950 rounded-2xl border border-slate-100 dark:border-slate-800 transition-all hover:border-blue-200 hover:shadow-lg hover:shadow-blue-500/5"
+                                                className="flex items-center justify-between p-5 bg-white rounded-2xl border border-slate-100 transition-all hover:border-blue-200 hover:shadow-lg hover:shadow-blue-500/5"
                                             >
-                                                <span className="text-xs font-bold text-slate-600 dark:text-slate-400">
+                                                <span className="text-xs font-bold text-slate-600">
                                                     {question.label}
                                                 </span>
                                                 <div className="flex items-center gap-2">
@@ -1158,7 +1158,7 @@ export default function LayananPage() {
                             <div className="flex justify-end pt-4">
                                 <Button
                                     onClick={() => setSelectedFeedback(null)}
-                                    className="h-14 px-10 rounded-2xl bg-slate-900 dark:bg-slate-800 hover:bg-black text-white font-black uppercase tracking-widest transition-all shadow-xl shadow-slate-900/20"
+                                    className="h-14 px-10 rounded-2xl bg-slate-900 hover:bg-black text-white font-black uppercase tracking-widest transition-all shadow-xl shadow-slate-900/20"
                                 >
                                     Tutup Detail
                                 </Button>

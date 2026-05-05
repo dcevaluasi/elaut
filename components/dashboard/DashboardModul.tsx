@@ -29,10 +29,10 @@ export default function DashboardModul() {
     return (
         <div className="flex flex-col gap-8 w-full">
             {/* Dashboard Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl p-8 rounded-[2rem] border border-slate-200/50 dark:border-slate-800 shadow-sm transition-all duration-500 hover:shadow-md">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/60 backdrop-blur-xl p-8 rounded-[2rem] border border-slate-200/50 shadow-sm transition-all duration-500 hover:shadow-md">
                 <div className="space-y-1">
-                    <h2 className="text-3xl font-black text-slate-800 dark:text-white tracking-tighter">Perangkat Pelatihan</h2>
-                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Monitoring distribusi modul dan materi pelatihan terpusat!</p>
+                    <h2 className="text-3xl font-black text-slate-800 tracking-tighter">Perangkat Pelatihan</h2>
+                    <p className="text-sm font-medium text-slate-500">Monitoring distribusi modul dan materi pelatihan terpusat!</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="p-4 bg-emerald-600/10 rounded-2xl border border-emerald-600/20">
@@ -43,7 +43,7 @@ export default function DashboardModul() {
 
             {/* Quick Metrics Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-blue-200 dark:shadow-none group transition-all duration-500 hover:scale-[1.02]">
+                <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-blue-200 group transition-all duration-500 hover:scale-[1.02]">
                     <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
                     <div className="relative z-10">
                         <div className="flex items-center gap-4 mb-6">
@@ -62,7 +62,7 @@ export default function DashboardModul() {
                     </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-violet-600 to-purple-700 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-violet-200 dark:shadow-none group transition-all duration-500 hover:scale-[1.02]">
+                <div className="bg-gradient-to-br from-violet-600 to-purple-700 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-violet-200 group transition-all duration-500 hover:scale-[1.02]">
                     <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
                     <div className="relative z-10">
                         <div className="flex items-center gap-4 mb-6">
@@ -81,7 +81,7 @@ export default function DashboardModul() {
                     </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-emerald-200 dark:shadow-none group transition-all duration-500 hover:scale-[1.02]">
+                <div className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-emerald-200 group transition-all duration-500 hover:scale-[1.02]">
                     <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
                     <div className="relative z-10">
                         <div className="flex items-center gap-4 mb-6">

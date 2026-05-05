@@ -124,13 +124,13 @@ function UnitKerjaList({ data, fetchData }: Props) {
     return (
         <div className="space-y-8 pb-20">
             {/* Action Header */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl p-6 rounded-[32px] border border-gray-100 dark:border-white/5 shadow-sm mt-4">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 bg-white/50 backdrop-blur-xl p-6 rounded-[32px] border border-gray-100 shadow-sm mt-4">
                 <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
                         <TbBuildingSkyscraper size={24} />
                     </div>
                     <div>
-                        <h2 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight leading-none">Satuan Kerja</h2>
+                        <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight leading-none">Satuan Kerja</h2>
                         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Operational Unit Registry</p>
                     </div>
                 </div>
@@ -143,7 +143,7 @@ function UnitKerjaList({ data, fetchData }: Props) {
                             placeholder="Cari Unit Kerja..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="pl-11 h-12 rounded-2xl border-gray-100 bg-gray-50/50 dark:bg-white/5 font-bold text-sm focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-400"
+                            className="pl-11 h-12 rounded-2xl border-gray-100 bg-gray-50/50 font-bold text-sm focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-400"
                         />
                     </div>
                     {Cookies.get('Access')?.includes('superAdmin') && (
@@ -163,7 +163,7 @@ function UnitKerjaList({ data, fetchData }: Props) {
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
                             transition={{ duration: 0.2, delay: idx * 0.05 }}
-                            className="group relative bg-white dark:bg-slate-900 rounded-[28px] border border-gray-100 dark:border-white/5 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 flex flex-col overflow-hidden"
+                            className="group relative bg-white rounded-[28px] border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 flex flex-col overflow-hidden"
                         >
                             {/* Card Header / Status Strip */}
                             <div className={`h-1.5 w-full ${row.status === 'Active' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
@@ -172,7 +172,7 @@ function UnitKerjaList({ data, fetchData }: Props) {
                                 {/* Title & Type */}
                                 <div className="space-y-3">
                                     <div className="flex items-start justify-between">
-                                        <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-gray-50 border border-gray-100 dark:bg-white/5 dark:border-white/5 w-fit">
+                                        <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-gray-50 border border-gray-100 w-fit">
                                             {getTypeIcon(row.tipe)}
                                             <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{row.tipe}</span>
                                         </div>
@@ -190,7 +190,7 @@ function UnitKerjaList({ data, fetchData }: Props) {
                                         </div>
 
                                     </div>
-                                    <h3 className="text-lg font-black text-slate-800 dark:text-white leading-tight uppercase tracking-tight line-clamp-2" title={row.nama}>
+                                    <h3 className="text-lg font-black text-slate-800 leading-tight uppercase tracking-tight line-clamp-2" title={row.nama}>
                                         {row.nama}
                                     </h3>
                                 </div>
@@ -199,23 +199,23 @@ function UnitKerjaList({ data, fetchData }: Props) {
                                 <div className="space-y-4">
                                     <div className="flex gap-3">
                                         <div className="mt-0.5"><TbMapPin className="text-slate-400 shrink-0" size={16} /></div>
-                                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2">{row.alamat || "Alamat tidak tersedia"}</p>
+                                        <p className="text-xs font-medium text-slate-500 leading-relaxed line-clamp-2">{row.alamat || "Alamat tidak tersedia"}</p>
                                     </div>
                                     <div className="flex gap-3 items-center">
                                         <TbPhone className="text-slate-400 shrink-0" size={16} />
-                                        <p className="text-xs font-bold text-slate-600 dark:text-slate-300">{row.call_center || "-"}</p>
+                                        <p className="text-xs font-bold text-slate-600">{row.call_center || "-"}</p>
                                     </div>
                                 </div>
 
                                 {/* Leadership Section */}
-                                <div className="mt-auto pt-6 border-t border-dashed border-gray-100 dark:border-white/5">
+                                <div className="mt-auto pt-6 border-t border-dashed border-gray-100">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0">
+                                        <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500 shrink-0">
                                             <TbUser size={18} />
                                         </div>
                                         <div className="overflow-hidden">
                                             <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-0.5">Pimpinan</p>
-                                            <p className="text-xs font-bold text-slate-800 dark:text-white truncate" title={parseLeadership(row.pimpinan).name}>
+                                            <p className="text-xs font-bold text-slate-800 truncate" title={parseLeadership(row.pimpinan).name}>
                                                 {parseLeadership(row.pimpinan).name}
                                             </p>
                                             <p className="text-[10px] font-medium text-slate-500 truncate italic">
@@ -243,7 +243,7 @@ function UnitKerjaList({ data, fetchData }: Props) {
 
             {/* Pagination */}
             {totalPages > 1 && (
-                <div className="flex items-center justify-between pt-6 border-t border-gray-100 dark:border-white/5">
+                <div className="flex items-center justify-between pt-6 border-t border-gray-100">
                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
                         Page {currentPage} of {totalPages}
                     </p>

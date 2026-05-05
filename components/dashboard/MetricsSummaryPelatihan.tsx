@@ -145,16 +145,16 @@ const MetricsSummaryPelatihan: React.FC<MetricsSummaryPelatihanProps> = ({ data,
     return (
         <div className="flex flex-col gap-4 w-full h-full">
             {metrics.map((item) => (
-                <Card key={item.title} className={`shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl overflow-hidden hover:border-${item.color}-200 transition-colors group`}>
+                <Card key={item.title} className={`shadow-none border border-slate-200 bg-white rounded-2xl overflow-hidden hover:border-${item.color}-200 transition-colors group`}>
                     <CardContent className="p-5 flex items-center justify-between">
                         <div className="space-y-1">
-                            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{item.title}</p>
-                            <div className="text-2xl font-black text-slate-800 dark:text-white flex items-baseline gap-1">
+                            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{item.title}</p>
+                            <div className="text-2xl font-black text-slate-800 flex items-baseline gap-1">
                                 {item.value}
                                 <span className="text-xs font-medium text-slate-400">Total</span>
                             </div>
                         </div>
-                        <div className={`p-3 rounded-xl bg-${item.color}-50 dark:bg-${item.color}-900/20 text-${item.color}-600 dark:text-${item.color}-400 group-hover:scale-110 transition-transform`}>
+                        <div className={`p-3 rounded-xl bg-${item.color}-50}-900/20 text-${item.color}-600}-400 group-hover:scale-110 transition-transform`}>
                             <item.icon className="h-6 w-6" />
                         </div>
                     </CardContent>
@@ -162,9 +162,9 @@ const MetricsSummaryPelatihan: React.FC<MetricsSummaryPelatihanProps> = ({ data,
             ))}
 
             {/* Ongoing Training Snippet */}
-            <Card className="shadow-none border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl flex-1 flex flex-col">
-                <CardHeader className="p-5 pb-2 border-b border-slate-50 dark:border-slate-800">
-                    <CardTitle className="text-sm font-bold text-slate-800 dark:text-white">Pelatihan Berlangsung</CardTitle>
+            <Card className="shadow-none border border-slate-200 bg-white rounded-2xl flex-1 flex flex-col">
+                <CardHeader className="p-5 pb-2 border-b border-slate-50">
+                    <CardTitle className="text-sm font-bold text-slate-800">Pelatihan Berlangsung</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0 flex-1 overflow-auto max-h-[300px] custom-scrollbar">
                     {ongoingTrainings.length === 0 ? (
@@ -175,11 +175,11 @@ const MetricsSummaryPelatihan: React.FC<MetricsSummaryPelatihanProps> = ({ data,
                             </p>
                         </div>
                     ) : (
-                        <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                        <div className="divide-y divide-slate-100">
                             {ongoingTrainings.map((training) => (
-                                <div key={training.id} className="p-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                <div key={training.id} className="p-4 hover:bg-slate-50 transition-colors">
                                     <div className="flex justify-between items-start mb-2">
-                                        <Link href={`/admin/${usePathname().includes('pusat') ? 'pusat' : 'lemdiklat'}/pelatihan/detail/${training.code}/${encryptValue(training.id.toString())}`} className="font-bold text-sm text-slate-800 dark:text-white line-clamp-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                                        <Link href={`/admin/${usePathname().includes('pusat') ? 'pusat' : 'lemdiklat'}/pelatihan/detail/${training.code}/${encryptValue(training.id.toString())}`} className="font-bold text-sm text-slate-800 line-clamp-1 hover:text-blue-600 transition-colors">
                                             {training.title}
                                         </Link>
                                     </div>

@@ -279,14 +279,14 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
         {
             accessorKey: "index",
             header: () => (
-                <div className="flex items-center justify-center gap-2 text-slate-900 dark:text-white font-black uppercase tracking-widest text-[10px]">
+                <div className="flex items-center justify-center gap-2 text-slate-900 font-black uppercase tracking-widest text-[10px]">
                     <Hash className="w-3 h-3" />
                     No
                 </div>
             ),
             cell: ({ row }) => (
                 <div className="flex items-center justify-center">
-                    <span className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-xs font-black text-slate-500 tabular-nums border border-slate-100 dark:border-slate-700">
+                    <span className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-xs font-black text-slate-500 tabular-nums border border-slate-100">
                         {row.index + 1}
                     </span>
                 </div>
@@ -297,7 +297,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
             header: ({ column }) => (
                 <Button
                     variant="ghost"
-                    className="flex items-center gap-2 text-slate-900 dark:text-white font-black uppercase tracking-widest text-[10px] hover:bg-transparent p-0"
+                    className="flex items-center gap-2 text-slate-900 font-black uppercase tracking-widest text-[10px] hover:bg-transparent p-0"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                 >
                     <UserIcon className="w-3 h-3" />
@@ -307,7 +307,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
             ),
             cell: ({ row }) => (
                 <div className="flex flex-col gap-0.5 min-w-[200px]">
-                    <span className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">{row.original.Nama}</span>
+                    <span className="text-sm font-black text-slate-900 uppercase tracking-tight">{row.original.Nama}</span>
                     <span className="text-[10px] text-slate-400 font-bold tracking-widest">REG: {row.original.IdUserPelatihan}</span>
                 </div>
             ),
@@ -315,7 +315,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
         {
             accessorKey: "IdUsers",
             header: () => (
-                <div className="flex flex-col items-center gap-1 text-slate-900 dark:text-white font-black uppercase tracking-widest text-[10px]">
+                <div className="flex flex-col items-center gap-1 text-slate-900 font-black uppercase tracking-widest text-[10px]">
                     ID USER
                 </div>
             ),
@@ -330,7 +330,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                 {
                     accessorKey: "IsActice",
                     header: () => (
-                        <div className="flex flex-col items-center gap-1 text-slate-900 dark:text-white font-black uppercase tracking-widest text-[10px]">
+                        <div className="flex flex-col items-center gap-1 text-slate-900 font-black uppercase tracking-widest text-[10px]">
                             <Award className="w-3 h-3 text-blue-600" />
                             Status Kelulusan
                         </div>
@@ -368,7 +368,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                 {
                     accessorKey: "StatusPenandatangan",
                     header: () => (
-                        <div className="flex flex-col items-center gap-1 text-slate-900 dark:text-white font-black uppercase tracking-widest text-[10px]">
+                        <div className="flex flex-col items-center gap-1 text-slate-900 font-black uppercase tracking-widest text-[10px]">
                             <RefreshCw className="w-3 h-3 text-amber-600" />
                             Revisi
                         </div>
@@ -398,7 +398,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                 {
                     accessorKey: "Keterangan",
                     header: () => (
-                        <div className="flex flex-col items-center gap-1 text-slate-900 dark:text-white font-black uppercase tracking-widest text-[10px]">
+                        <div className="flex flex-col items-center gap-1 text-slate-900 font-black uppercase tracking-widest text-[10px]">
                             <ShieldCheck className="w-3 h-3 text-emerald-600" />
                             Validitas Data
                         </div>
@@ -427,7 +427,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                 {
                     accessorKey: "sttpl_render",
                     header: () => (
-                        <div className="flex flex-col items-center gap-1 text-slate-900 dark:text-white font-black uppercase tracking-widest text-[10px]">
+                        <div className="flex flex-col items-center gap-1 text-slate-900 font-black uppercase tracking-widest text-[10px]">
                             <TbCertificate className="w-3.5 h-3.5 text-blue-600" />
                             e-STTPL
                         </div>
@@ -468,7 +468,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
             {
                 accessorKey: "PreTest",
                 header: () => (
-                    <div className="flex flex-col items-center gap-1 text-slate-900 dark:text-white font-black uppercase tracking-widest text-[10px]">
+                    <div className="flex flex-col items-center gap-1 text-slate-900 font-black uppercase tracking-widest text-[10px]">
                         Pre-Test
                     </div>
                 ),
@@ -495,7 +495,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
             {
                 accessorKey: "PostTest",
                 header: () => (
-                    <div className="flex flex-col items-center gap-1 text-slate-900 dark:text-white font-black uppercase tracking-widest text-[10px]">
+                    <div className="flex flex-col items-center gap-1 text-slate-900 font-black uppercase tracking-widest text-[10px]">
                         Post-Test
                     </div>
                 ),
@@ -523,7 +523,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
         {
             id: "actions",
             header: () => (
-                <div className="flex items-center justify-center text-slate-900 dark:text-white font-black uppercase tracking-widest text-[10px]">
+                <div className="flex items-center justify-center text-slate-900 font-black uppercase tracking-widest text-[10px]">
                     Menu
                 </div>
             ),
@@ -604,11 +604,11 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
 
     return (
         <div className="w-full">
-            <div className="overflow-hidden bg-white/40 dark:bg-slate-900/40 backdrop-blur-3xl rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl overflow-x-auto">
+            <div className="overflow-hidden bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-slate-100 shadow-xl overflow-x-auto">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-transparent px-6">
+                            <TableRow key={headerGroup.id} className="border-b border-slate-100 hover:bg-transparent px-6">
                                 {headerGroup.headers.map((header) => (
                                     <TableHead key={header.id} className="h-16 px-6 align-middle">
                                         {header.isPlaceholder
@@ -631,7 +631,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: idx * 0.03 }}
-                                        className="group border-b border-slate-50 dark:border-slate-800/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-all duration-300"
+                                        className="group border-b border-slate-50 hover:bg-slate-50/50 transition-all duration-300"
                                     >
                                         {row.getVisibleCells().map((cell) => (
                                             <TableCell key={cell.id} className="px-6 py-4 align-middle">
@@ -650,11 +650,11 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                                         className="h-72 text-center"
                                     >
                                         <div className="flex flex-col items-center justify-center gap-4">
-                                            <div className="w-20 h-20 rounded-[2rem] bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-300 animate-pulse">
+                                            <div className="w-20 h-20 rounded-[2rem] bg-slate-50 flex items-center justify-center text-slate-300 animate-pulse">
                                                 <Search className="w-10 h-10" />
                                             </div>
                                             <div className="space-y-1">
-                                                <p className="font-black text-slate-800 dark:text-white uppercase tracking-tight">Tidak Ada Data Peserta</p>
+                                                <p className="font-black text-slate-800 uppercase tracking-tight">Tidak Ada Data Peserta</p>
                                                 <p className="text-xs text-slate-400 font-bold uppercase tracking-widest italic">Lakukan import peserta melalui dashboard utama.</p>
                                             </div>
                                         </div>
@@ -668,14 +668,14 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
 
             {/* Dialogs */}
             <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
-                <AlertDialogContent className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border-white dark:border-slate-800 rounded-[3rem] p-10 max-w-md shadow-2xl">
+                <AlertDialogContent className="bg-white/80 backdrop-blur-2xl border-white rounded-[3rem] p-10 max-w-md shadow-2xl">
                     <AlertDialogHeader className="space-y-4">
-                        <div className="w-16 h-16 rounded-[1.5rem] bg-amber-50 dark:bg-amber-500/10 text-amber-600 flex items-center justify-center text-3xl shadow-xl shadow-amber-500/5">
+                        <div className="w-16 h-16 rounded-[1.5rem] bg-amber-50 text-amber-600 flex items-center justify-center text-3xl shadow-xl shadow-amber-500/5">
                             <RefreshCw className="animate-spin-slow" />
                         </div>
-                        <AlertDialogTitle className="font-black text-2xl text-slate-900 dark:text-white tracking-tight">Inisiasi Revisi Data?</AlertDialogTitle>
+                        <AlertDialogTitle className="font-black text-2xl text-slate-900 tracking-tight">Inisiasi Revisi Data?</AlertDialogTitle>
                         <AlertDialogDescription className="text-sm text-slate-500 font-medium leading-relaxed">
-                            Dengan mengaktifkan mode revisi pada <span className="text-slate-900 dark:text-white font-black underline decoration-amber-500/30 underline-offset-4">{selectedRow?.Nama}</span>, e-STTPL yang sudah terbit akan dibatalkan/dihapus secara otomatis dari system. Anda dapat mengupdate data peserta dan mengajukan penerbitan ulang.
+                            Dengan mengaktifkan mode revisi pada <span className="text-slate-900 font-black underline decoration-amber-500/30 underline-offset-4">{selectedRow?.Nama}</span>, e-STTPL yang sudah terbit akan dibatalkan/dihapus secara otomatis dari system. Anda dapat mengupdate data peserta dan mengajukan penerbitan ulang.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="mt-8 gap-3 sm:gap-0">
@@ -696,19 +696,19 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
             </AlertDialog>
 
             <Dialog open={openDialogTanggalSertifikatRevisi} onOpenChange={setOpenDialogTanggalSertifikatRevisi}>
-                <DialogContent className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border-white dark:border-slate-800 rounded-[3rem] p-10 max-w-md shadow-2xl">
+                <DialogContent className="bg-white/80 backdrop-blur-2xl border-white rounded-[3rem] p-10 max-w-md shadow-2xl">
                     <DialogHeader className="space-y-4">
-                        <div className="w-16 h-16 rounded-[1.5rem] bg-blue-50 dark:bg-blue-500/10 text-blue-600 flex items-center justify-center text-3xl shadow-xl shadow-blue-500/5">
+                        <div className="w-16 h-16 rounded-[1.5rem] bg-blue-50 text-blue-600 flex items-center justify-center text-3xl shadow-xl shadow-blue-500/5">
                             <Calendar />
                         </div>
-                        <DialogTitle className="font-black text-2xl text-slate-900 dark:text-white tracking-tight">Tetapkan Tanggal Revisi</DialogTitle>
+                        <DialogTitle className="font-black text-2xl text-slate-900 tracking-tight">Tetapkan Tanggal Revisi</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-6 my-6">
                         <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tanggal Baru Penandatanganan</label>
                             <input
                                 type="date"
-                                className="w-full h-14 rounded-2xl border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 px-5 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                                className="w-full h-14 rounded-2xl border-slate-100 bg-white px-5 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all outline-none"
                                 value={tanggalSertifikatRevisi}
                                 onChange={(e) => setTanggalSertifikatRevisi(e.target.value)}
                             />
@@ -763,38 +763,38 @@ const DetailPesertaDialog = ({ pesertaId, userPelatihanId }: { pesertaId: number
 
     const InfoRow = ({ icon, label, value, theme = "slate" }: { icon: any; label: string; value?: string; theme?: string }) => {
         const themes: any = {
-            slate: "bg-slate-50 dark:bg-slate-800/40 text-slate-500",
-            blue: "bg-blue-50 dark:bg-blue-500/5 text-blue-600",
-            emerald: "bg-emerald-50 dark:bg-emerald-500/5 text-emerald-600",
+            slate: "bg-slate-50 text-slate-500",
+            blue: "bg-blue-50 text-blue-600",
+            emerald: "bg-emerald-50 text-emerald-600",
         };
         return (
             <div className="flex items-start gap-4 group">
-                <div className={`p-2.5 rounded-xl ${themes[theme]} border border-white dark:border-slate-700 shadow-sm group-hover:scale-110 transition-transform`}>
+                <div className={`p-2.5 rounded-xl ${themes[theme]} border border-white shadow-sm group-hover:scale-110 transition-transform`}>
                     {icon}
                 </div>
                 <div className="space-y-0.5">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{label}</p>
-                    <p className="text-sm font-black text-slate-900 dark:text-white tracking-tight">{value || "-"}</p>
+                    <p className="text-sm font-black text-slate-900 tracking-tight">{value || "-"}</p>
                 </div>
             </div>
         );
     };
 
     return (
-        <AlertDialogContent className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl border-white dark:border-slate-800 rounded-[3rem] p-0 max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
+        <AlertDialogContent className="bg-white/90 backdrop-blur-3xl border-white rounded-[3rem] p-0 max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
             <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[100px] -mr-40 -mt-40 pointer-events-none" />
 
-            <div className="p-8 lg:p-12 border-b border-slate-100 dark:border-slate-800 bg-white/20 dark:bg-slate-800/20 backdrop-blur-sm relative overflow-hidden shrink-0">
+            <div className="p-8 lg:p-12 border-b border-slate-100 bg-white/20 backdrop-blur-sm relative overflow-hidden shrink-0">
                 <div className="flex items-center justify-between gap-6 relative z-10">
                     <div className="flex items-center gap-6">
                         <div className="w-20 h-20 rounded-[2rem] bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center text-3xl shadow-2xl shadow-blue-500/30 font-black">
                             {peserta?.Nama?.charAt(0) || 'P'}
                         </div>
                         <div className="space-y-1">
-                            <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none uppercase">{peserta?.Nama || 'Loading...'}</h2>
+                            <h2 className="text-3xl font-black text-slate-900 tracking-tight leading-none uppercase">{peserta?.Nama || 'Loading...'}</h2>
                             <div className="flex items-center gap-3">
-                                <Badge className="bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-none font-black text-[10px] tracking-widest px-3 py-1 uppercase">{peserta?.Nik || 'NIK TIDAK TERSEDIA'}</Badge>
-                                <div className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700" />
+                                <Badge className="bg-blue-50 text-blue-600 border-none font-black text-[10px] tracking-widest px-3 py-1 uppercase">{peserta?.Nik || 'NIK TIDAK TERSEDIA'}</Badge>
+                                <div className="w-1.5 h-1.5 rounded-full bg-slate-300" />
                                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{peserta?.Instansi || 'Masyarakat Umum'}</span>
                             </div>
                         </div>
@@ -813,7 +813,7 @@ const DetailPesertaDialog = ({ pesertaId, userPelatihanId }: { pesertaId: number
                         {/* Information Grid */}
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
                             <div className="space-y-8">
-                                <h4 className="flex items-center gap-2 text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-[0.3em] pb-3 border-b border-slate-100 dark:border-slate-800 w-fit">
+                                <h4 className="flex items-center gap-2 text-[11px] font-black text-slate-800 uppercase tracking-[0.3em] pb-3 border-b border-slate-100 w-fit">
                                     <div className="w-2 h-2 rounded-full bg-blue-600" /> Kontak & Domisili
                                 </h4>
                                 <div className="space-y-6">
@@ -824,7 +824,7 @@ const DetailPesertaDialog = ({ pesertaId, userPelatihanId }: { pesertaId: number
                             </div>
 
                             <div className="space-y-8">
-                                <h4 className="flex items-center gap-2 text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-[0.3em] pb-3 border-b border-slate-100 dark:border-slate-800 w-fit">
+                                <h4 className="flex items-center gap-2 text-[11px] font-black text-slate-800 uppercase tracking-[0.3em] pb-3 border-b border-slate-100 w-fit">
                                     <div className="w-2 h-2 rounded-full bg-indigo-600" /> Pendidikan & Bio
                                 </h4>
                                 <div className="space-y-6">
@@ -835,7 +835,7 @@ const DetailPesertaDialog = ({ pesertaId, userPelatihanId }: { pesertaId: number
                             </div>
 
                             <div className="space-y-8">
-                                <h4 className="flex items-center gap-2 text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-[0.3em] pb-3 border-b border-slate-100 dark:border-slate-800 w-fit">
+                                <h4 className="flex items-center gap-2 text-[11px] font-black text-slate-800 uppercase tracking-[0.3em] pb-3 border-b border-slate-100 w-fit">
                                     <div className="w-2 h-2 rounded-full bg-emerald-600" /> Status Pelaksana
                                 </h4>
                                 <div className="space-y-6">
@@ -847,38 +847,38 @@ const DetailPesertaDialog = ({ pesertaId, userPelatihanId }: { pesertaId: number
                         </div>
 
                         {/* Documents Section */}
-                        <div className="space-y-8 bg-slate-50 dark:bg-slate-950/30 p-10 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-inner">
-                            <h4 className="text-[11px] font-black text-slate-800 dark:text-white uppercase tracking-[0.3em]">Vault Dokumen Digital</h4>
+                        <div className="space-y-8 bg-slate-50 p-10 rounded-[2.5rem] border border-slate-100 shadow-inner">
+                            <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-[0.3em]">Vault Dokumen Digital</h4>
                             <div className="grid sm:grid-cols-2 gap-6">
                                 {peserta?.Foto && peserta.Foto !== "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/" ? (
-                                    <Link target="_blank" href={peserta.Foto} className="group/doc relative flex items-center justify-between p-6 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 hover:border-blue-200 transition-all shadow-sm">
+                                    <Link target="_blank" href={peserta.Foto} className="group/doc relative flex items-center justify-between p-6 bg-white rounded-[2rem] border border-slate-100 hover:border-blue-200 transition-all shadow-sm">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 flex items-center justify-center text-xl">
+                                            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
                                                 <Download />
                                             </div>
                                             <div>
-                                                <p className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-tight">Pas Foto Resmi</p>
+                                                <p className="text-xs font-black text-slate-800 uppercase tracking-tight">Pas Foto Resmi</p>
                                                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Format Gambar / PDF</p>
                                             </div>
                                         </div>
                                         <ChevronRight className="w-5 h-5 text-slate-300 group-hover/doc:translate-x-1 group-hover/doc:text-blue-600 transition-all" />
                                     </Link>
                                 ) : (
-                                    <div className="flex items-center gap-4 p-6 bg-slate-100/50 dark:bg-slate-800/20 rounded-[2rem] border border-dashed border-slate-200 dark:border-slate-700">
-                                        <div className="w-12 h-12 rounded-2xl bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-400">
+                                    <div className="flex items-center gap-4 p-6 bg-slate-100/50 rounded-[2rem] border border-dashed border-slate-200">
+                                        <div className="w-12 h-12 rounded-2xl bg-slate-200 flex items-center justify-center text-slate-400">
                                             <X />
                                         </div>
                                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Foto Tidak Tersedia</p>
                                     </div>
                                 )}
 
-                                <Link target="_blank" href={peserta?.Ktp || '#'} className="group/doc relative flex items-center justify-between p-6 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 hover:border-blue-200 transition-all shadow-sm">
+                                <Link target="_blank" href={peserta?.Ktp || '#'} className="group/doc relative flex items-center justify-between p-6 bg-white rounded-[2rem] border border-slate-100 hover:border-blue-200 transition-all shadow-sm">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 flex items-center justify-center text-xl">
+                                        <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl">
                                             <Download />
                                         </div>
                                         <div>
-                                            <p className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-tight">Scan Kartu Identitas</p>
+                                            <p className="text-xs font-black text-slate-800 uppercase tracking-tight">Scan Kartu Identitas</p>
                                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Identitas NIK Terverifikasi</p>
                                         </div>
                                     </div>
@@ -890,7 +890,7 @@ const DetailPesertaDialog = ({ pesertaId, userPelatihanId }: { pesertaId: number
                 )}
             </div>
 
-            <AlertDialogFooter className="p-8 lg:p-10 shrink-0 border-t border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
+            <AlertDialogFooter className="p-8 lg:p-10 shrink-0 border-t border-slate-100 bg-white/50 backdrop-blur-sm">
                 <AlertDialogCancel className="w-full h-14 rounded-2xl border-none bg-slate-100 text-slate-600 font-black uppercase tracking-[0.2em] text-[10px] hover:bg-slate-200 transition-all">Tutup Jendela Informasi</AlertDialogCancel>
             </AlertDialogFooter>
         </AlertDialogContent>
@@ -930,12 +930,12 @@ const UploadNilaiDialog: React.FC<UploadNilaiDialogProps> = ({
             <DialogTrigger asChild>
                 {trigger}
             </DialogTrigger>
-            <DialogContent className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border-white dark:border-slate-800 rounded-[3rem] p-10 max-w-md shadow-2xl">
+            <DialogContent className="bg-white/80 backdrop-blur-2xl border-white rounded-[3rem] p-10 max-w-md shadow-2xl">
                 <DialogHeader className="space-y-4">
-                    <div className="w-16 h-16 rounded-[1.5rem] bg-blue-50 dark:bg-blue-500/10 text-blue-600 flex items-center justify-center text-3xl shadow-xl shadow-blue-500/5 transition-transform hover:rotate-6">
+                    <div className="w-16 h-16 rounded-[1.5rem] bg-blue-50 text-blue-600 flex items-center justify-center text-3xl shadow-xl shadow-blue-500/5 transition-transform hover:rotate-6">
                         <Edit3 />
                     </div>
-                    <DialogTitle className="font-black text-2xl text-slate-900 dark:text-white tracking-tight leading-tight">Input Penilaian Academic</DialogTitle>
+                    <DialogTitle className="font-black text-2xl text-slate-900 tracking-tight leading-tight">Input Penilaian Academic</DialogTitle>
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{user?.Nama}</p>
                 </DialogHeader>
 
@@ -946,7 +946,7 @@ const UploadNilaiDialog: React.FC<UploadNilaiDialogProps> = ({
                             type="number"
                             value={pre}
                             onChange={(e) => setPre(e.target.value)}
-                            className="w-full h-14 rounded-2xl border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 px-5 text-sm font-black focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                            className="w-full h-14 rounded-2xl border-slate-100 bg-white px-5 text-sm font-black focus:ring-2 focus:ring-blue-500 transition-all outline-none"
                             placeholder="00.00"
                         />
                     </div>
@@ -957,7 +957,7 @@ const UploadNilaiDialog: React.FC<UploadNilaiDialogProps> = ({
                             type="number"
                             value={post}
                             onChange={(e) => setPost(e.target.value)}
-                            className="w-full h-14 rounded-2xl border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 px-5 text-sm font-black focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                            className="w-full h-14 rounded-2xl border-slate-100 bg-white px-5 text-sm font-black focus:ring-2 focus:ring-blue-500 transition-all outline-none"
                             placeholder="00.00"
                         />
                     </div>

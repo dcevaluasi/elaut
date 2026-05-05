@@ -139,41 +139,41 @@ export default function StatsModulPelatihan({ data, stats }: { data: any[]; stat
         const accentGradient = schemeColors[colorScheme as keyof typeof schemeColors] || schemeColors.blue;
 
         return (
-            <Card className="flex flex-col w-full shadow-sm hover:shadow-md transition-all duration-300 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-[2rem] overflow-hidden group hover:ring-1 hover:ring-slate-100 dark:hover:ring-slate-800">
-                <CardHeader className="pb-4 pt-6 bg-gradient-to-r from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+            <Card className="flex flex-col w-full shadow-sm hover:shadow-md transition-all duration-300 border border-slate-200 bg-white rounded-[2rem] overflow-hidden group hover:ring-1 hover:ring-slate-100">
+                <CardHeader className="pb-4 pt-6 bg-gradient-to-r from-white to-slate-50/50 border-b border-slate-100">
                     <div className="flex justify-between items-start mb-4">
-                        <CardTitle className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                        <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
                             <div className={`w-1 h-6 bg-gradient-to-b ${accentGradient} rounded-full`}></div>
                             {title}
                         </CardTitle>
                         {totalPages > 1 && (
-                            <div className="text-[10px] text-slate-500 font-bold bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full uppercase tracking-wider">
+                            <div className="text-[10px] text-slate-500 font-bold bg-slate-100 px-3 py-1.5 rounded-full uppercase tracking-wider">
                                 {startIndex + 1}-{Math.min(endIndex, chartData.length)} of {chartData.length}
                             </div>
                         )}
                     </div>
 
                     <div className="grid grid-cols-3 gap-3">
-                        <div className="bg-white dark:bg-slate-950 rounded-2xl p-3 border border-slate-100 dark:border-slate-800">
+                        <div className="bg-white rounded-2xl p-3 border border-slate-100">
                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Total</p>
-                            <p className="text-xl font-black text-slate-800 dark:text-white">{totalVisitors.toLocaleString()}</p>
+                            <p className="text-xl font-black text-slate-800">{totalVisitors.toLocaleString()}</p>
                         </div>
-                        <div className="bg-white dark:bg-slate-950 rounded-2xl p-3 border border-slate-100 dark:border-slate-800">
+                        <div className="bg-white rounded-2xl p-3 border border-slate-100">
                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Kategori</p>
-                            <p className="text-xl font-black text-slate-800 dark:text-white">{chartData.length}</p>
+                            <p className="text-xl font-black text-slate-800">{chartData.length}</p>
                         </div>
-                        <div className="bg-white dark:bg-slate-950 rounded-2xl p-3 border border-slate-100 dark:border-slate-800">
+                        <div className="bg-white rounded-2xl p-3 border border-slate-100">
                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Tertinggi</p>
-                            <p className="text-xl font-black text-slate-800 dark:text-white">{highestValue.toLocaleString()}</p>
+                            <p className="text-xl font-black text-slate-800">{highestValue.toLocaleString()}</p>
                         </div>
                     </div>
 
                     {topItem && chartType !== "pie" && (
-                        <div className="mt-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-100 dark:border-slate-800">
+                        <div className="mt-3 bg-slate-50 rounded-xl p-3 border border-slate-100">
                             <div className="flex items-center gap-2">
                                 <TrendingUp className="w-3.5 h-3.5 text-blue-500" />
-                                <p className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-tight">
-                                    Dominan: <span className="text-blue-600 dark:text-blue-400">{topItem.name}</span>
+                                <p className="text-[10px] font-bold text-slate-600 uppercase tracking-tight">
+                                    Dominan: <span className="text-blue-600">{topItem.name}</span>
                                 </p>
                             </div>
                         </div>
@@ -247,11 +247,11 @@ export default function StatsModulPelatihan({ data, stats }: { data: any[]; stat
                 </CardContent>
 
                 {totalPages > 1 && (
-                    <CardFooter className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/20 border-t border-slate-100 dark:border-slate-800 py-4 px-6">
+                    <CardFooter className="flex justify-between items-center bg-slate-50 border-t border-slate-100 py-4 px-6">
                         <button
                             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                             disabled={currentPage === 1}
-                            className="p-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 disabled:opacity-50"
+                            className="p-2 rounded-xl bg-white border border-slate-200 disabled:opacity-50"
                         >
                             <div className="w-4 h-4 text-slate-600 flex items-center justify-center">←</div>
                         </button>
@@ -259,7 +259,7 @@ export default function StatsModulPelatihan({ data, stats }: { data: any[]; stat
                         <button
                             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                             disabled={currentPage === totalPages}
-                            className="p-2 rounded-xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 disabled:opacity-50"
+                            className="p-2 rounded-xl bg-white border border-slate-200 disabled:opacity-50"
                         >
                             <div className="w-4 h-4 text-slate-600 flex items-center justify-center">→</div>
                         </button>

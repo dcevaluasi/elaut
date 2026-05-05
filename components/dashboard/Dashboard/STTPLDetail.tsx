@@ -97,8 +97,8 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                 >
                     <div className="flex flex-col w-full gap-6 md:gap-8">
                         <div className="flex flex-wrap items-center gap-4">
-                            <div className="px-4 py-1.5 bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 rounded-xl">
-                                <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">Tindakan Persetujuan</span>
+                            <div className="px-4 py-1.5 bg-blue-50 border border-blue-100 rounded-xl">
+                                <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Tindakan Persetujuan</span>
                             </div>
 
                             {/* Action Buttons */}
@@ -122,7 +122,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                             ) : (
                                                 <Button
                                                     variant="outline"
-                                                    className="h-11 md:h-12 flex items-center gap-3 rounded-[1.125rem] md:rounded-[1.25rem] px-6 md:px-8 shadow-sm transition-all border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 font-black uppercase tracking-wider text-xs hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                                                    className="h-11 md:h-12 flex items-center gap-3 rounded-[1.125rem] md:rounded-[1.25rem] px-6 md:px-8 shadow-sm transition-all border-blue-200 text-blue-600 font-black uppercase tracking-wider text-xs hover:bg-blue-50"
                                                     onClick={() => {
                                                         Toast.fire({
                                                             icon: "warning",
@@ -245,24 +245,24 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                         {/* Status Cards */}
                         <div className="w-full space-y-6">
                             <div className="flex items-center gap-4">
-                                <div className="px-3 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg">
-                                    <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest leading-none">Status & Verifikasi</span>
+                                <div className="px-3 py-1 bg-slate-100 border border-slate-200 rounded-lg">
+                                    <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">Status & Verifikasi</span>
                                 </div>
-                                <div className="h-px flex-1 bg-gradient-to-r from-slate-100 to-transparent dark:from-slate-800"></div>
+                                <div className="h-px flex-1 bg-gradient-to-r from-slate-100 to-transparent"></div>
                             </div>
 
                             {
                                 data.SuratPemberitahuan == "" ?
-                                    <div className="py-12 md:py-20 w-full bg-slate-50/50 dark:bg-slate-950/30 rounded-[2.5rem] md:rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center flex-col justify-center gap-6 md:gap-8 group">
+                                    <div className="py-12 md:py-20 w-full bg-slate-50/50 rounded-[2.5rem] md:rounded-[3rem] border-2 border-dashed border-slate-200 flex items-center flex-col justify-center gap-6 md:gap-8 group">
                                         <div className="relative">
                                             <div className="absolute inset-0 bg-slate-400/10 blur-3xl rounded-full scale-150 animate-pulse" />
-                                            <div className="w-20 h-20 md:w-24 md:h-24 rounded-[1.5rem] md:rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 shadow-xl relative z-10">
+                                            <div className="w-20 h-20 md:w-24 md:h-24 rounded-[1.5rem] md:rounded-[2rem] bg-white border border-slate-100 flex items-center justify-center text-slate-300 shadow-xl relative z-10">
                                                 <Lock className='w-10 h-10 md:w-12 md:h-12' />
                                             </div>
                                         </div>
                                         <div className="text-center max-w-sm space-y-2 md:space-y-3">
-                                            <h4 className="font-black text-slate-800 dark:text-white uppercase tracking-tight text-lg md:text-xl">Tahapan Terkunci</h4>
-                                            <p className="text-[11px] md:text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic px-6">
+                                            <h4 className="font-black text-slate-800 uppercase tracking-tight text-lg md:text-xl">Tahapan Terkunci</h4>
+                                            <p className="text-[11px] md:text-sm text-slate-500 font-medium leading-relaxed italic px-6">
                                                 Harap mengupload surat pemberitahuan pelaksanaan dan menunggu verifikasi operasional agar dapat memproses sertifikasi.
                                             </p>
                                         </div>
@@ -284,15 +284,15 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         {/* Penandatangan */}
                                         <motion.div
                                             whileHover={{ y: -5 }}
-                                            className="flex flex-col p-6 bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none group"
+                                            className="flex flex-col p-6 bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 group"
                                         >
                                             <div className="flex items-center gap-3 mb-2">
-                                                <div className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600">
+                                                <div className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600">
                                                     <TbCertificate className="w-4 h-4" />
                                                 </div>
-                                                <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Penandatangan</span>
+                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Penandatangan</span>
                                             </div>
-                                            <span className="text-sm font-black text-slate-800 dark:text-white tracking-tight leading-snug">
+                                            <span className="text-sm font-black text-slate-800 tracking-tight leading-snug">
                                                 {data?.TtdSertifikat}
                                             </span>
                                         </motion.div>
@@ -301,15 +301,15 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         {data?.BeritaAcara != "" && (
                                             <motion.div
                                                 whileHover={{ y: -5 }}
-                                                className="flex flex-col p-6 bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none group"
+                                                className="flex flex-col p-6 bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 group"
                                             >
                                                 <div className="flex items-center gap-3 mb-2">
-                                                    <div className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600">
+                                                    <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600">
                                                         <FileText className="w-4 h-4" />
                                                     </div>
-                                                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Dokumen Penerbitan</span>
+                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Dokumen Penerbitan</span>
                                                 </div>
-                                                <Link target="_blank" href={`${urlFileBeritaAcara}/${data?.BeritaAcara}`} className="text-sm font-black text-blue-600 dark:text-blue-400 truncate hover:translate-x-1 transition-transform inline-flex items-center gap-2 underline decoration-blue-500/30 underline-offset-4">
+                                                <Link target="_blank" href={`${urlFileBeritaAcara}/${data?.BeritaAcara}`} className="text-sm font-black text-blue-600 truncate hover:translate-x-1 transition-transform inline-flex items-center gap-2 underline decoration-blue-500/30 underline-offset-4">
                                                     {truncateText(data?.BeritaAcara, 15, '...')}
                                                     <TbDownload className="w-4 h-4 shrink-0" />
                                                 </Link>
@@ -320,13 +320,13 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         {data?.MemoPusat != "" && (
                                             <motion.div
                                                 whileHover={{ y: -5 }}
-                                                className="flex flex-col p-6 bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none group"
+                                                className="flex flex-col p-6 bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 group"
                                             >
                                                 <div className="flex items-center gap-3 mb-2">
-                                                    <div className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-500/10 text-amber-600">
+                                                    <div className="p-1.5 rounded-lg bg-amber-50 text-amber-600">
                                                         <TbShieldCheck className="w-4 h-4" />
                                                     </div>
-                                                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Pengawasan STTPL</span>
+                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Pengawasan STTPL</span>
                                                 </div>
                                                 <Link target="_blank" href={`${urlFileLapwas}/${data?.MemoPusat}`} className="text-sm font-black text-amber-600 hover:translate-x-1 transition-transform inline-flex items-center gap-2 underline decoration-amber-500/30 underline-offset-4">
                                                     Lihat Dokumen Lapwas
@@ -339,15 +339,15 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         {adminPusatData != null && (
                                             <motion.div
                                                 whileHover={{ y: -5 }}
-                                                className="flex flex-col p-6 bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none group"
+                                                className="flex flex-col p-6 bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50 group"
                                             >
                                                 <div className="flex items-center gap-3 mb-2">
-                                                    <div className="p-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-400">
+                                                    <div className="p-1.5 rounded-lg bg-slate-50 text-slate-400">
                                                         <ShieldCheck className="w-4 h-4" />
                                                     </div>
-                                                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Verifikator</span>
+                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Verifikator</span>
                                                 </div>
-                                                <span className="text-sm font-black text-slate-800 dark:text-white tracking-tight">
+                                                <span className="text-sm font-black text-slate-800 tracking-tight">
                                                     {adminPusatData.Nama}
                                                 </span>
                                             </motion.div>
@@ -372,7 +372,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                 {
                     Cookies.get('Role')?.includes(data?.TtdSertifikat) && Cookies.get('Access')?.includes('isSigning') && (parseInt(data.StatusPenerbitan) >= 7 && parseInt(data.StatusPenerbitan) <= 15) && (
                         <div className="relative group">
-                            <div className="absolute inset-0 bg-blue-600/5 dark:bg-blue-600/10 rounded-[3rem] blur-2xl" />
+                            <div className="absolute inset-0 bg-blue-600/5 rounded-[3rem] blur-2xl" />
                             <TTDeDetail data={data} fetchData={fetchData} />
                         </div>
                     )
@@ -398,7 +398,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         onClick={handleDownloadZip}
                                         disabled={isZipping}
                                         variant="outline"
-                                        className="h-12 flex items-center gap-3 rounded-[1.25rem] px-8 shadow-sm transition-all border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 font-black uppercase tracking-wider text-xs hover:bg-indigo-50 dark:hover:bg-indigo-900/30"
+                                        className="h-12 flex items-center gap-3 rounded-[1.25rem] px-8 shadow-sm transition-all border-indigo-200 text-indigo-600 font-black uppercase tracking-wider text-xs hover:bg-indigo-50"
                                     >
                                         <Download className="h-4 w-4" />
                                         <span>
@@ -418,10 +418,10 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                             <div className="w-full space-y-6">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-500/10 text-rose-600">
+                                        <div className="p-1.5 rounded-lg bg-rose-50 text-rose-600">
                                             <TbLayoutGrid className="w-4 h-4" />
                                         </div>
-                                        <h4 className="font-black text-slate-800 dark:text-white uppercase tracking-tight">Data Tabel Peserta</h4>
+                                        <h4 className="font-black text-slate-800 uppercase tracking-tight">Data Tabel Peserta</h4>
                                     </div>
 
                                     <div className="flex items-center gap-2">
@@ -429,16 +429,16 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     </div>
                                 </div>
 
-                                <div className="relative group/table bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl rounded-[3rem] border border-slate-100 dark:border-slate-800 overflow-hidden shadow-2xl transition-all duration-500 hover:shadow-blue-500/5 p-2">
+                                <div className="relative group/table bg-white/40 backdrop-blur-2xl rounded-[3rem] border border-slate-100 overflow-hidden shadow-2xl transition-all duration-500 hover:shadow-blue-500/5 p-2">
                                     {isPrinting ? (
                                         <div className="space-y-6 p-6">
                                             {isUploading && (
-                                                <div className="space-y-4 bg-slate-50 dark:bg-slate-800/55 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-700 shadow-inner">
+                                                <div className="space-y-4 bg-slate-50 p-8 rounded-[2rem] border border-slate-200 shadow-inner">
                                                     <div className="flex justify-between items-center mb-2">
-                                                        <span className="text-xs font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">Generating Digital Vault...</span>
+                                                        <span className="text-xs font-black text-blue-600 uppercase tracking-widest">Generating Digital Vault...</span>
                                                         <span className="text-xs font-black text-slate-500 tabular-nums">{Math.round(progress)}%</span>
                                                     </div>
-                                                    <Progress value={progress} className="h-3 rounded-full bg-slate-200 dark:bg-slate-700" />
+                                                    <Progress value={progress} className="h-3 rounded-full bg-slate-200" />
                                                     <p className="text-[11px] text-slate-500 text-center font-bold tracking-tight">Memproses {counter} dari {data.UserPelatihan.length} Berkas STTPL</p>
                                                 </div>
                                             )}
@@ -448,7 +448,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                     onClick={handleDownloadAll}
                                                     variant="outline"
                                                     disabled={isUploading}
-                                                    className="h-12 flex items-center gap-3 rounded-[1.25rem] px-8 shadow-sm transition-all border-slate-800 dark:border-slate-200 text-slate-800 dark:text-slate-200 font-black uppercase tracking-wider text-xs hover:bg-slate-900 dark:hover:bg-slate-100 hover:text-white dark:hover:text-black"
+                                                    className="h-12 flex items-center gap-3 rounded-[1.25rem] px-8 shadow-sm transition-all border-slate-800 text-slate-800 font-black uppercase tracking-wider text-xs hover:bg-slate-900 hover:text-white"
                                                 >
                                                     <Printer className="h-4 w-4" />
                                                     <span>{isUploading ? 'Syncing...' : 'Download File Massal'}</span>
@@ -470,14 +470,14 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                         initial={{ opacity: 0, x: -20 }}
                                                         animate={{ opacity: 1, x: 0 }}
                                                         transition={{ delay: i * 0.05 }}
-                                                        className="flex items-center justify-between p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-blue-200 transition-all shadow-sm"
+                                                        className="flex items-center justify-between p-5 bg-white rounded-2xl border border-slate-100 hover:border-blue-200 transition-all shadow-sm"
                                                     >
                                                         <div className="flex items-center gap-4">
-                                                            <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center font-black text-slate-400 text-xs">
+                                                            <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center font-black text-slate-400 text-xs">
                                                                 {i + 1}
                                                             </div>
                                                             <div>
-                                                                <p className="font-black text-slate-800 dark:text-white text-sm uppercase tracking-tight">{item.Nama}</p>
+                                                                <p className="font-black text-slate-800 text-sm uppercase tracking-tight">{item.Nama}</p>
                                                                 <p className="text-[10px] text-slate-400 font-bold tracking-[0.1em] mt-0.5">{item.NoRegistrasi}</p>
                                                             </div>
                                                         </div>
@@ -486,7 +486,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                                                 <Link
                                                                     target="_blank"
                                                                     href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${item.FileSertifikat}`}
-                                                                    className="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-xl border border-blue-100 dark:border-blue-500/20 text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                                                                    className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl border border-blue-100 text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-sm"
                                                                 >
                                                                     <RiVerifiedBadgeFill className="h-4 w-4" />
                                                                     Lihat e-STTPL
@@ -519,22 +519,22 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
 
 const MetricCard = ({ label, value, color, icon }: { label: string; value: string; color: string; icon: React.ReactNode }) => {
     const colors: any = {
-        blue: "bg-blue-50 text-blue-600 border-blue-100 dark:bg-blue-500/5 dark:border-blue-500/10",
-        emerald: "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/5 dark:border-emerald-500/10",
-        amber: "bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-500/5 dark:border-amber-500/10",
-        slate: "bg-slate-50 text-slate-600 border-slate-100 dark:bg-slate-800 dark:border-slate-700",
+        blue: "bg-blue-50 text-blue-600 border-blue-100",
+        emerald: "bg-emerald-50 text-emerald-600 border-emerald-100",
+        amber: "bg-amber-50 text-amber-600 border-amber-100",
+        slate: "bg-slate-50 text-slate-600 border-slate-100",
     };
 
     return (
         <motion.div
             whileHover={{ y: -5 }}
-            className={`flex flex-col p-6 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none group overflow-hidden relative`}
+            className={`flex flex-col p-6 bg-white rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50 group overflow-hidden relative`}
         >
             <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-slate-500/5 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
             <div className="relative z-10 flex items-center justify-between gap-4">
                 <div className="space-y-1">
-                    <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-1 leading-none">{label}</p>
-                    <p className="text-3xl font-black text-slate-900 dark:text-white tabular-nums tracking-tighter">{value}</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1 leading-none">{label}</p>
+                    <p className="text-3xl font-black text-slate-900 tabular-nums tracking-tighter">{value}</p>
                 </div>
                 <div className={`w-12 h-12 rounded-2xl ${colors[color]} flex items-center justify-center text-2xl border group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
                     {icon}

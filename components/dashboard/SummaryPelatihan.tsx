@@ -224,7 +224,7 @@ const SummaryPelatihan: React.FC = () => {
   }, [filteredDataPelatihan, filteredDataDukung]);
 
   return (
-    <div className="w-full min-h-screen bg-slate-50/50 dark:bg-slate-950/50">
+    <div className="w-full min-h-screen bg-slate-50/50">
       {isFetching || isFetchingDataDukung ? (
         <div className="w-full h-[60vh] flex items-center justify-center">
           <div className="flex flex-col items-center gap-4">
@@ -235,29 +235,29 @@ const SummaryPelatihan: React.FC = () => {
       ) : data != null ? (
         <div className="flex flex-col gap-8 max-w-[1920px] mx-auto">
           {/* Dashboard Header with Global Year Filter */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl p-6 rounded-[2rem] border border-slate-200/50 dark:border-slate-800 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/60 backdrop-blur-xl p-6 rounded-[2rem] border border-slate-200/50 shadow-sm">
             <div>
-              <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">Ringkasan Capaian</h2>
+              <h2 className="text-2xl font-black text-slate-800 tracking-tight">Ringkasan Capaian</h2>
               <p className="text-sm font-medium text-slate-500">Periode Pelaksanaan {tahun}</p>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-2xl border border-slate-200 dark:border-slate-700">
+              <div className="flex items-center gap-2 bg-slate-100 px-4 py-2 rounded-2xl border border-slate-200">
                 <FiFilter className="text-blue-600" />
-                <span className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Tahun Anggaran</span>
+                <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Tahun Anggaran</span>
               </div>
               <Select value={tahun.toString()} onValueChange={(val) => setTahun(parseInt(val))}>
-                <SelectTrigger className="w-[120px] h-12 rounded-2xl border-slate-200 bg-white shadow-sm text-sm font-bold hover:bg-slate-50 transition-all focus:ring-2 focus:ring-blue-100 dark:bg-slate-950 dark:border-slate-800">
+                <SelectTrigger className="w-[120px] h-12 rounded-2xl border-slate-200 bg-white shadow-sm text-sm font-bold hover:bg-slate-50 transition-all focus:ring-2 focus:ring-blue-100 text-slate-700">
                   <SelectValue placeholder="Pilih Tahun" />
                 </SelectTrigger>
                 <SelectContent className="rounded-2xl border-none shadow-2xl">
                   {tahunList.sort((a, b) => b - a).map((t) => (
-                    <SelectItem key={t} value={t.toString()} className="font-bold cursor-pointer text-xs py-3">{t}</SelectItem>
+                    <SelectItem key={t} value={t.toString()} className="font-bold cursor-pointer text-slate-700 text-xs py-3">{t}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
 
               <Select value={triwulan} onValueChange={setTriwulan}>
-                <SelectTrigger className="w-[120px] h-12 rounded-2xl border-slate-200 bg-white shadow-sm text-sm font-bold hover:bg-slate-50 transition-all focus:ring-2 focus:ring-blue-100 dark:bg-slate-950 dark:border-slate-800">
+                <SelectTrigger className="w-[120px] h-12 rounded-2xl border-slate-200 bg-white shadow-sm text-sm font-bold hover:bg-slate-50 transition-all focus:ring-2 focus:ring-blue-100">
                   <SelectValue placeholder="Triwulan" />
                 </SelectTrigger>
                 <SelectContent className="rounded-2xl border-none shadow-2xl">
@@ -272,7 +272,7 @@ const SummaryPelatihan: React.FC = () => {
 
           {/* Quick Metrics Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-blue-200 dark:shadow-none group transition-all duration-500 hover:scale-[1.02]">
+            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-blue-200 group transition-all duration-500 hover:scale-[1.02]">
               <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
               <div className="relative z-10">
                 <div className="flex items-center gap-4 mb-6">
@@ -291,7 +291,7 @@ const SummaryPelatihan: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-violet-600 to-purple-700 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-violet-200 dark:shadow-none group transition-all duration-500 hover:scale-[1.02]">
+            <div className="bg-gradient-to-br from-violet-600 to-purple-700 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-violet-200 group transition-all duration-500 hover:scale-[1.02]">
               <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
               <div className="relative z-10">
                 <div className="flex items-center gap-4 mb-6">
@@ -310,7 +310,7 @@ const SummaryPelatihan: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-emerald-200 dark:shadow-none group transition-all duration-500 hover:scale-[1.02]">
+            <div className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-emerald-200 group transition-all duration-500 hover:scale-[1.02]">
               <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
               <div className="relative z-10">
                 <div className="flex items-center gap-4 mb-6">
@@ -345,15 +345,15 @@ const SummaryPelatihan: React.FC = () => {
           {/* Top Section: Monthly Trend & Status Metrics */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 w-full">
             {/* Left Panel - Monthly Trend (Takes 2/3 width on large screens) */}
-            <div className="xl:col-span-2 bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col">
-              <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-gradient-to-r from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-800/50">
+            <div className="xl:col-span-2 bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+              <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-white to-slate-50/50">
                 <div className="flex items-center gap-4">
-                  <div className="p-2.5 bg-blue-50 dark:bg-blue-500/10 rounded-xl ring-1 ring-blue-100 dark:ring-blue-500/20">
+                  <div className="p-2.5 bg-blue-50 rounded-xl ring-1 ring-blue-100">
                     <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-slate-800 dark:text-white tracking-tight">Trend Pelatihan</h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Statistik bulanan masyarakat dilatih</p>
+                    <h3 className="text-lg font-bold text-slate-800 tracking-tight">Trend Pelatihan</h3>
+                    <p className="text-sm text-slate-500 font-medium">Statistik bulanan masyarakat dilatih</p>
                   </div>
                 </div>
               </div>
@@ -369,15 +369,15 @@ const SummaryPelatihan: React.FC = () => {
           </div>
 
           {/* Stats Section - Full Width */}
-          <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-            <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-800/50">
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-white to-slate-50/50">
               <div className="flex items-center gap-4">
-                <div className="p-2.5 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl ring-1 ring-emerald-100 dark:ring-emerald-500/20">
+                <div className="p-2.5 bg-emerald-50 rounded-xl ring-1 ring-emerald-100">
                   <div className="w-1.5 h-6 bg-emerald-600 rounded-full"></div>
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-800 dark:text-white tracking-tight">Statistik Status</h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Distribusi status penyelenggaraan pelatihan</p>
+                  <h3 className="text-lg font-bold text-slate-800 tracking-tight">Statistik Status</h3>
+                  <p className="text-sm text-slate-500 font-medium">Distribusi status penyelenggaraan pelatihan</p>
                 </div>
               </div>
             </div>
@@ -386,15 +386,15 @@ const SummaryPelatihan: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-            <div className="px-6 py-5 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-gradient-to-r from-white to-slate-50/50 dark:from-slate-900 dark:to-slate-800/50">
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-white to-slate-50/50">
               <div className="flex items-center gap-4">
-                <div className="p-2.5 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl ring-1 ring-indigo-100 dark:ring-indigo-500/20">
+                <div className="p-2.5 bg-indigo-50 rounded-xl ring-1 ring-indigo-100">
                   <div className="w-1.5 h-6 bg-indigo-600 rounded-full"></div>
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-slate-800 dark:text-white tracking-tight">Detail Realisasi</h3>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Rincian data pelatihan per triwulan</p>
+                  <h3 className="text-lg font-bold text-slate-800 tracking-tight">Detail Realisasi</h3>
+                  <p className="text-sm text-slate-500 font-medium">Rincian data pelatihan per triwulan</p>
                 </div>
               </div>
             </div>

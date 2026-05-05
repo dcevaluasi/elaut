@@ -65,7 +65,7 @@ export default function RootLayout({
 
   return (
     <UnitKerjaProvider>
-      <div className={`${inter.className} ${myFont.variable} ${bosNormal.variable} ${plusSansJakarta.variable} ${bos.variable} ${bosBold.variable} ${bosItalic.variable} ${delius.variable} h-screen max-h-screen overflow-y-hidden`}>
+      <div className={`${inter.className} ${myFont.variable} ${bosNormal.variable} ${plusSansJakarta.variable} ${bos.variable} ${bosBold.variable} ${bosItalic.variable} ${delius.variable} h-screen max-h-screen overflow-y-hidden text-slate-700`}>
         {loading ? <Loader /> : children}
       </div>
     </UnitKerjaProvider>

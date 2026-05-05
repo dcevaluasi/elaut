@@ -205,7 +205,7 @@ export default function VideoPelatihanAdminPage() {
                 <div className="space-y-10 py-6">
                     {/* Top Analytics */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-2xl shadow-blue-200 dark:shadow-none transition-all duration-500 hover:scale-[1.02] group">
+                        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-2xl shadow-blue-200 transition-all duration-500 hover:scale-[1.02] group">
                             <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
                             <div className="relative z-10 space-y-4">
                                 <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 w-fit">
@@ -218,7 +218,7 @@ export default function VideoPelatihanAdminPage() {
                             </div>
                         </div>
 
-                        <div className="bg-gradient-to-br from-rose-500 to-red-600 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-2xl shadow-rose-200 dark:shadow-none transition-all duration-500 hover:scale-[1.02] group">
+                        <div className="bg-gradient-to-br from-rose-500 to-red-600 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-2xl shadow-rose-200 transition-all duration-500 hover:scale-[1.02] group">
                             <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
                             <div className="relative z-10 space-y-4">
                                 <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 w-fit">
@@ -233,7 +233,7 @@ export default function VideoPelatihanAdminPage() {
                             </div>
                         </div>
 
-                        <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-2xl shadow-emerald-200 dark:shadow-none transition-all duration-500 hover:scale-[1.02] group">
+                        <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-2xl shadow-emerald-200 transition-all duration-500 hover:scale-[1.02] group">
                             <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
                             <div className="relative z-10 space-y-4">
                                 <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 w-fit">
@@ -250,14 +250,14 @@ export default function VideoPelatihanAdminPage() {
                     </div>
 
                     {/* Action Header */}
-                    <div className="flex flex-col sm:flex-row justify-between items-center bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800 shadow-sm rounded-[2rem] p-6 lg:p-8 gap-6">
+                    <div className="flex flex-col sm:flex-row justify-between items-center bg-white/60 backdrop-blur-xl border border-slate-200/60 shadow-sm rounded-[2rem] p-6 lg:p-8 gap-6">
                         <div className="flex items-center gap-5">
                             <div className="h-14 w-14 rounded-2xl bg-blue-600/10 flex items-center justify-center text-blue-600 shrink-0 border border-blue-600/20 shadow-sm">
                                 <LayoutList className="w-7 h-7" />
                             </div>
                             <div>
-                                <h3 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight">Daftar Video Pelatihan</h3>
-                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Manage data, link integrasi, dan thumbnail konten!</p>
+                                <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">Daftar Video Pelatihan</h3>
+                                <p className="text-sm font-medium text-slate-500">Manage data, link integrasi, dan thumbnail konten!</p>
                             </div>
                         </div>
                         {!showForm && (
@@ -272,11 +272,11 @@ export default function VideoPelatihanAdminPage() {
 
                     {/* Form Section */}
                     {showForm && (
-                        <Card className="rounded-[2.5rem] border-slate-200/60 dark:border-slate-800 overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-300">
-                            <CardHeader className="p-8 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                        <Card className="rounded-[2.5rem] border-slate-200/60 overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+                            <CardHeader className="p-8 border-b border-slate-100 bg-slate-50/50">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <CardTitle className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight">
+                                        <CardTitle className="text-xl font-black text-slate-800 uppercase tracking-tight">
                                             {editingVideo ? "Modifikasi Video" : "Upoad Video Baru"}
                                         </CardTitle>
                                         <CardDescription className="text-slate-500 font-medium">Lengkapi video pelatihan gratis di bawah ini!</CardDescription>
@@ -295,7 +295,7 @@ export default function VideoPelatihanAdminPage() {
                                                 value={videoForm.namaPelatihan}
                                                 onChange={(e) => setVideoForm({ ...videoForm, namaPelatihan: e.target.value })}
                                                 placeholder="Contoh: Teknik Pembenihan Lele..."
-                                                className="h-12 rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 focus:ring-4 focus:ring-blue-500/10 transition-all font-medium"
+                                                className="h-12 rounded-xl bg-slate-50 border-slate-200 focus:ring-4 focus:ring-blue-500/10 transition-all font-medium"
                                                 required
                                             />
                                         </div>
@@ -313,7 +313,7 @@ export default function VideoPelatihanAdminPage() {
                                                     });
                                                 }}
                                                 placeholder="https://www.youtube.com/watch?v=..."
-                                                className="h-12 rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 transition-all font-medium"
+                                                className="h-12 rounded-xl bg-slate-50 border-slate-200 transition-all font-medium"
                                                 required
                                             />
                                         </div>
@@ -333,7 +333,7 @@ export default function VideoPelatihanAdminPage() {
                                                             });
                                                         }
                                                     }}>
-                                                    <SelectTrigger className="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 h-12 rounded-xl px-5 font-bold uppercase tracking-tight">
+                                                    <SelectTrigger className="w-full bg-slate-50 border-slate-200 h-12 rounded-xl px-5 font-bold uppercase tracking-tight">
                                                         <SelectValue placeholder="Pilih Klaster" />
                                                     </SelectTrigger>
                                                     <SelectContent className="rounded-2xl max-h-[300px]">
@@ -351,7 +351,7 @@ export default function VideoPelatihanAdminPage() {
                                                     value={videoForm.programPelatihan} 
                                                     onValueChange={(v) => setVideoForm({ ...videoForm, programPelatihan: v })}
                                                 >
-                                                    <SelectTrigger className="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 h-12 rounded-xl px-5 font-bold uppercase tracking-tight text-left truncate">
+                                                    <SelectTrigger className="w-full bg-slate-50 border-slate-200 h-12 rounded-xl px-5 font-bold uppercase tracking-tight text-left truncate">
                                                         <SelectValue placeholder={videoForm.jenisProgramPelatihan ? `Pilih Program` : "Pilih Klaster Dulu"} />
                                                     </SelectTrigger>
                                                     <SelectContent className="rounded-2xl max-h-[300px]">
@@ -370,7 +370,7 @@ export default function VideoPelatihanAdminPage() {
                                             <div className="space-y-2.5">
                                                 <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-1.5"><TbLayoutGrid className="text-indigo-500" /> Nama Penyelenggara</label>
                                                 <Select value={videoForm.penyelenggara} onValueChange={(v) => setVideoForm({ ...videoForm, penyelenggara: v })}>
-                                                    <SelectTrigger className="w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 h-12 rounded-xl px-5 font-bold uppercase truncate text-left">
+                                                    <SelectTrigger className="w-full bg-slate-50 border-slate-200 h-12 rounded-xl px-5 font-bold uppercase truncate text-left">
                                                         <SelectValue placeholder="Pilih penyelenggara" />
                                                     </SelectTrigger>
                                                     <SelectContent className="rounded-2xl max-h-[300px]">
@@ -385,7 +385,7 @@ export default function VideoPelatihanAdminPage() {
                                                     disabled
                                                     onChange={(e) => setVideoForm({ ...videoForm, idPelatihan: e.target.value })}
                                                     placeholder="(Opsional) Hubungkan dg Pelatihan Sistem"
-                                                    className="h-12 rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800 transition-all font-medium"
+                                                    className="h-12 rounded-xl bg-slate-50 border-slate-200 transition-all font-medium"
                                                 />
                                             </div>
                                         </div>
@@ -394,14 +394,14 @@ export default function VideoPelatihanAdminPage() {
                                             <textarea
                                                 value={videoForm.descriptionVideo}
                                                 onChange={(e) => setVideoForm({ ...videoForm, descriptionVideo: e.target.value })}
-                                                className="w-full p-4 text-sm font-medium bg-slate-50 border border-slate-200 dark:bg-slate-950 dark:border-slate-800 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 min-h-[120px] transition-all"
+                                                className="w-full p-4 text-sm font-medium bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 min-h-[120px] transition-all"
                                                 placeholder="Tuliskan deskripsi pembelajaran..."
                                             />
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="flex gap-4 justify-end pt-6 border-t border-slate-100 dark:border-slate-800">
+                                <div className="flex gap-4 justify-end pt-6 border-t border-slate-100">
                                     <Button onClick={cancelVideoForm} variant="outline" className="h-12 px-8 rounded-xl font-bold uppercase tracking-wider">
                                         Batal
                                     </Button>
@@ -418,7 +418,7 @@ export default function VideoPelatihanAdminPage() {
                     )}
 
                     {/* Action Bar (Search) */}
-                    <div className="bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200/60 dark:border-slate-800 shadow-sm rounded-[2rem] p-4 flex flex-col md:flex-row items-center gap-4">
+                    <div className="bg-white/60 backdrop-blur-xl border border-slate-200/60 shadow-sm rounded-[2rem] p-4 flex flex-col md:flex-row items-center gap-4">
                         <div className="relative flex-1 group w-full">
                             <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                             <Input
@@ -426,14 +426,14 @@ export default function VideoPelatihanAdminPage() {
                                 placeholder="Cari berdasarkan nama pelatihan, program, atau penyelenggara..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full h-14 pl-14 pr-6 bg-white dark:bg-slate-950 border-slate-200/60 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-blue-500/10 transition-all font-medium text-sm"
+                                className="w-full h-14 pl-14 pr-6 bg-white border-slate-200/60 rounded-2xl focus:ring-4 focus:ring-blue-500/10 transition-all font-medium text-sm"
                             />
                         </div>
                         {searchQuery && (
                             <Button
                                 variant="outline"
                                 onClick={() => setSearchQuery("")}
-                                className="h-14 px-8 rounded-2xl border-slate-200 dark:border-slate-800 font-bold text-xs uppercase tracking-wider hover:bg-slate-50 transition-all"
+                                className="h-14 px-8 rounded-2xl border-slate-200 font-bold text-xs uppercase tracking-wider hover:bg-slate-50 transition-all"
                             >
                                 <X className="w-4 h-4 mr-2" /> Reset
                             </Button>
@@ -441,7 +441,7 @@ export default function VideoPelatihanAdminPage() {
                     </div>
 
                     {/* Data Table Wrapper */}
-                    <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-200/60 dark:border-slate-800 overflow-hidden">
+                    <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-200/60 overflow-hidden">
                         {loadingVideos ? (
                             <div className="py-32 w-full flex flex-col items-center justify-center gap-4">
                                 <HashLoader color="#3b82f6" size={60} />
@@ -450,8 +450,8 @@ export default function VideoPelatihanAdminPage() {
                         ) : (
                             <div className="overflow-x-auto">
                                 <Table>
-                                    <TableHeader className="bg-slate-50/50 dark:bg-slate-800/30">
-                                        <TableRow className="hover:bg-transparent border-slate-100 dark:border-slate-800">
+                                    <TableHeader className="bg-slate-50/50">
+                                        <TableRow className="hover:bg-transparent border-slate-100">
                                             <TableHead className="w-16 text-center font-black text-[10px] uppercase tracking-widest text-slate-400 py-6">No</TableHead>
                                             <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-400 py-6">
                                                 <div className="flex items-center gap-2">
@@ -476,7 +476,7 @@ export default function VideoPelatihanAdminPage() {
                                             <TableRow>
                                                 <TableCell colSpan={5} className="py-20 text-center">
                                                     <div className="flex flex-col items-center gap-3">
-                                                        <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400">
+                                                        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-400">
                                                             <Youtube className="w-8 h-8" />
                                                         </div>
                                                         <p className="font-bold text-slate-400 uppercase tracking-widest text-xs">
@@ -487,11 +487,11 @@ export default function VideoPelatihanAdminPage() {
                                             </TableRow>
                                         ) : (
                                             filteredVideos.map((video, index) => (
-                                                <TableRow key={video.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/20 border-slate-100 dark:border-slate-800 transition-colors">
+                                                <TableRow key={video.id} className="group hover:bg-slate-50/50 border-slate-100 transition-colors">
                                                     <TableCell className="text-center font-bold text-xs text-slate-400 px-6">{index + 1}</TableCell>
                                                     <TableCell className="py-6">
                                                         <div className="flex items-start gap-4">
-                                                            <div className="w-24 h-16 shrink-0 bg-slate-100 dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 relative flex items-center justify-center group-hover:border-blue-300 transition-colors">
+                                                            <div className="w-24 h-16 shrink-0 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 relative flex items-center justify-center group-hover:border-blue-300 transition-colors">
                                                                 <img
                                                                     src={`https://img.youtube.com/vi/${extractYoutubeId(video.linkPelatihan)}/hqdefault.jpg`}
                                                                     alt="Preview"
@@ -503,10 +503,10 @@ export default function VideoPelatihanAdminPage() {
                                                                 </div>
                                                             </div>
                                                             <div className="flex flex-col gap-1.5 flex-1 max-w-sm">
-                                                                <span className="text-sm font-black text-slate-800 dark:text-white uppercase group-hover:text-blue-600 transition-colors leading-tight line-clamp-2">
+                                                                <span className="text-sm font-black text-slate-800 uppercase group-hover:text-blue-600 transition-colors leading-tight line-clamp-2">
                                                                     {video.namaPelatihan}
                                                                 </span>
-                                                                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium line-clamp-1">
+                                                                <p className="text-[11px] text-slate-500 font-medium line-clamp-1">
                                                                     {video.descriptionVideo || "Tidak ada deskripsi detail tambahan"}
                                                                 </p>
                                                             </div>
@@ -515,10 +515,10 @@ export default function VideoPelatihanAdminPage() {
                                                     <TableCell>
                                                         <div className="flex flex-col gap-2">
                                                             <div className="flex flex-wrap gap-1.5">
-                                                                <Badge className="bg-indigo-50 text-indigo-600 border-indigo-100 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 uppercase text-[9px] font-bold tracking-wider rounded-lg">
+                                                                <Badge className="bg-indigo-50 text-indigo-600 border-indigo-100 hover:bg-indigo-100 uppercase text-[9px] font-bold tracking-wider rounded-lg">
                                                                     {video.programPelatihan || "Umum"}
                                                                 </Badge>
-                                                                <Badge className="bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 uppercase text-[9px] font-bold tracking-wider rounded-lg">
+                                                                <Badge className="bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200 uppercase text-[9px] font-bold tracking-wider rounded-lg">
                                                                     {video.penyelenggara || "E-LAUT System"}
                                                                 </Badge>
                                                             </div>
@@ -529,15 +529,15 @@ export default function VideoPelatihanAdminPage() {
                                                         </div>
                                                     </TableCell>
                                                     <TableCell className="text-center">
-                                                        <div className="inline-flex items-center gap-3 px-3 py-1.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
+                                                        <div className="inline-flex items-center gap-3 px-3 py-1.5 rounded-xl border border-slate-100 bg-slate-50">
                                                             <div className="flex items-center gap-1.5">
                                                                 <MousePointerClick className="w-3.5 h-3.5 text-blue-500" />
-                                                                <span className="font-bold text-sm text-slate-700 dark:text-slate-300">{video.videoClicked || 0}</span>
+                                                                <span className="font-bold text-sm text-slate-700">{video.videoClicked || 0}</span>
                                                             </div>
-                                                            <div className="w-[1px] h-3 bg-slate-300 dark:bg-slate-700" />
+                                                            <div className="w-[1px] h-3 bg-slate-300" />
                                                             <div className="flex items-center gap-1.5">
                                                                 <MessageSquare className="w-3.5 h-3.5 text-emerald-500" />
-                                                                <span className="font-bold text-sm text-slate-700 dark:text-slate-300">{video.responses?.length || 0}</span>
+                                                                <span className="font-bold text-sm text-slate-700">{video.responses?.length || 0}</span>
                                                             </div>
                                                         </div>
                                                     </TableCell>
@@ -587,25 +587,25 @@ export default function VideoPelatihanAdminPage() {
                     onClick={() => setSelectedVideo(null)}
                 >
                     <div
-                        className="bg-white dark:bg-slate-900 rounded-[3rem] max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200/60 dark:border-slate-800 animate-in slide-in-from-bottom-5 duration-500"
+                        className="bg-white rounded-[3rem] max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200/60 animate-in slide-in-from-bottom-5 duration-500"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800 p-8 z-10 flex items-center justify-between">
+                        <div className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-slate-100 p-8 z-10 flex items-center justify-between">
                             <div className="flex items-center gap-4">
                                 <div className="h-14 w-14 rounded-2xl bg-blue-600/10 flex items-center justify-center text-blue-600 border border-blue-600/20 shadow-sm">
                                     <Youtube className="w-7 h-7" />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight">Detail Video</h2>
+                                    <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">Detail Video</h2>
                                     <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{selectedVideo.idPelatihan || "No ID"}</p>
                                 </div>
                             </div>
-                            <Button variant="ghost" size="icon" onClick={() => setSelectedVideo(null)} className="rounded-full h-12 w-12 hover:bg-slate-100 dark:hover:bg-slate-800">
+                            <Button variant="ghost" size="icon" onClick={() => setSelectedVideo(null)} className="rounded-full h-12 w-12 hover:bg-slate-100">
                                 <X className="w-5 h-5" />
                             </Button>
                         </div>
                         <div className="p-8 space-y-8">
-                            <div className="w-full aspect-video bg-black rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-lg relative">
+                            <div className="w-full aspect-video bg-black rounded-3xl overflow-hidden border border-slate-200 shadow-lg relative">
                                 <iframe
                                     src={`https://www.youtube.com/embed/${extractYoutubeId(selectedVideo.linkPelatihan)}`}
                                     className="w-full h-full absolute inset-0"
@@ -613,35 +613,35 @@ export default function VideoPelatihanAdminPage() {
                                 />
                             </div>
                             <div className="space-y-4">
-                                <h3 className="text-2xl font-black text-slate-800 dark:text-white font-calsans leading-tight">
+                                <h3 className="text-2xl font-black text-slate-800 font-calsans leading-tight">
                                     {selectedVideo.namaPelatihan}
                                 </h3>
-                                <p className="text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                                <p className="text-slate-500 leading-relaxed font-medium">
                                     {selectedVideo.descriptionVideo || "Belum ada penjabaran detail teknis yang disertakan pada objek video ini."}
                                 </p>
                             </div>
-                            <div className="grid grid-cols-2 gap-4 bg-slate-50 dark:bg-slate-950 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800">
+                            <div className="grid grid-cols-2 gap-4 bg-slate-50 p-6 rounded-[2rem] border border-slate-100">
                                 <div>
                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Penyelenggara</p>
-                                    <p className="text-sm font-bold text-slate-700 dark:text-slate-300">{selectedVideo.penyelenggara || "-"}</p>
+                                    <p className="text-sm font-bold text-slate-700">{selectedVideo.penyelenggara || "-"}</p>
                                 </div>
                                 <div>
                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Program</p>
-                                    <p className="text-sm font-bold text-slate-700 dark:text-slate-300">{selectedVideo.programPelatihan || "-"}</p>
+                                    <p className="text-sm font-bold text-slate-700">{selectedVideo.programPelatihan || "-"}</p>
                                 </div>
                                 <div>
                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total View</p>
-                                    <p className="text-sm font-bold text-slate-700 dark:text-slate-300">{selectedVideo.videoClicked || 0} Clicked</p>
+                                    <p className="text-sm font-bold text-slate-700">{selectedVideo.videoClicked || 0} Clicked</p>
                                 </div>
                                 <div>
                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Response Data</p>
-                                    <p className="text-sm font-bold text-slate-700 dark:text-slate-300">{selectedVideo.responses?.length || 0} Feedback</p>
+                                    <p className="text-sm font-bold text-slate-700">{selectedVideo.responses?.length || 0} Feedback</p>
                                 </div>
                             </div>
                             <div className="flex justify-end pt-4">
                                 <Button
                                     onClick={() => setSelectedVideo(null)}
-                                    className="h-14 px-10 rounded-2xl bg-slate-900 dark:bg-slate-800 hover:bg-black text-white font-black uppercase tracking-widest transition-all shadow-xl shadow-slate-900/20"
+                                    className="h-14 px-10 rounded-2xl bg-slate-900 hover:bg-black text-white font-black uppercase tracking-widest transition-all shadow-xl shadow-slate-900/20"
                                 >
                                     Tutup Detail
                                 </Button>

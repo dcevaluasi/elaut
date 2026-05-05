@@ -84,8 +84,8 @@ export function StatsMetricStatus({ data, tahun }: Props) {
                             className={`
                                 relative flex flex-col items-start justify-between
                                 min-w-[200px] h-[110px] p-5
-                                bg-white dark:bg-slate-900 
-                                rounded-3xl border border-slate-100 dark:border-slate-800
+                                bg-white 
+                                rounded-3xl border border-slate-100
                                 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)]
                                 transition-all duration-300 ease-out
                                 group cursor-default overflow-hidden
@@ -94,7 +94,7 @@ export function StatsMetricStatus({ data, tahun }: Props) {
                             <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${theme.gradientFrom} to-transparent opacity-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110`} />
 
                             <div className="flex justify-between items-start w-full relative z-10">
-                                <span className={`text-[11px] font-bold uppercase tracking-wider ${theme.text} bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm px-2 py-1 rounded-lg border ${theme.border}`}>
+                                <span className={`text-[11px] font-bold uppercase tracking-wider ${theme.text} bg-white/80 backdrop-blur-sm px-2 py-1 rounded-lg border ${theme.border}`}>
                                     {label}
                                 </span>
                                 <div className={`p-2.5 rounded-xl ${theme.iconBg} ${theme.text} bg-opacity-30`}>
@@ -105,7 +105,7 @@ export function StatsMetricStatus({ data, tahun }: Props) {
                             </div>
 
                             <div className="relative z-10 mt-auto">
-                                <span className="text-3xl font-black text-slate-800 dark:text-white tracking-tight leading-none group-hover:scale-105 origin-left transition-transform duration-300 block">
+                                <span className="text-3xl font-black text-slate-800 tracking-tight leading-none group-hover:scale-105 origin-left transition-transform duration-300 block">
                                     {count}
                                 </span>
                             </div>

@@ -154,26 +154,26 @@ const DataDukungPelatihanTable = ({ data, tahun, triwulan }: { data: UserPelatih
 
     return (
         <div className="space-y-6">
-            <Card className="shadow-[0_4px_20px_rgba(0,0,0,0.05)] border-none bg-white dark:bg-slate-900 rounded-[28px] overflow-hidden">
-                <CardHeader className="pb-4 bg-slate-50/50 dark:bg-slate-800/20 border-b border-slate-100 dark:border-white/5">
+            <Card className="shadow-[0_4px_20px_rgba(0,0,0,0.05)] border-none bg-white rounded-[28px] overflow-hidden">
+                <CardHeader className="pb-4 bg-slate-50/50 border-b border-slate-100">
                     <CardTitle className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600 mb-1">
+                        <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 mb-1">
                             <FiBarChart2 size={22} />
                         </div>
                         <div>
-                            <h3 className="text-lg font-black text-slate-800 dark:text-white uppercase tracking-tight">Data Dukung Peserta</h3>
+                            <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight">Data Dukung Peserta</h3>
                             <p className="text-xs font-medium text-slate-400 normal-case tracking-normal">Rekapitulasi total peserta dilatih <span className="italic">(By Name By Address)</span></p>
                         </div>
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                        <div className="flex items-center gap-6 w-full md:w-auto p-4 rounded-2xl bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-500/10">
+                        <div className="flex items-center gap-6 w-full md:w-auto p-4 rounded-2xl bg-blue-50/50 border border-blue-100">
                             <div>
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Periode</p>
-                                <p className="text-sm font-bold text-slate-700 dark:text-slate-300">{tahun} - {triwulan}</p>
+                                <p className="text-sm font-bold text-slate-700">{tahun} - {triwulan}</p>
                             </div>
-                            <div className="w-px h-8 bg-blue-200 dark:bg-blue-500/20" />
+                            <div className="w-px h-8 bg-blue-200" />
                             <div>
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Peserta</p>
                                 <p className="text-2xl font-black text-blue-600 leading-none">{totalData.toLocaleString('id-ID')}</p>
