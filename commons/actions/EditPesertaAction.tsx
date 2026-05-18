@@ -196,7 +196,7 @@ const EditPesertaAction: React.FC<EditPesertaActionProps> = ({
                                         <Input
                                             value={nama}
                                             onChange={(e) => setNama(e.target.value)}
-                                            className="h-12 rounded-2xl border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 px-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                                            className="h-12 rounded-2xl border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 px-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-500 transition-all outline-none"
                                             placeholder="Masukkan nama lengkap"
                                         />
                                     </div>
@@ -205,7 +205,7 @@ const EditPesertaAction: React.FC<EditPesertaActionProps> = ({
                                         <Input
                                             value={nik}
                                             onChange={(e) => setNik(e.target.value)}
-                                            className="h-12 rounded-2xl border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 px-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                                            className="h-12 rounded-2xl border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 px-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-500 transition-all outline-none"
                                             placeholder="16 digit NIK"
                                         />
                                     </div>
@@ -223,7 +223,7 @@ const EditPesertaAction: React.FC<EditPesertaActionProps> = ({
                                         <Input
                                             value={noTelpon}
                                             onChange={(e) => setNoTelpon(e.target.value)}
-                                            className="h-12 rounded-2xl border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 px-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                                            className="h-12 rounded-2xl border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 px-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-500 transition-all outline-none"
                                             placeholder="0812..."
                                         />
                                     </div>
@@ -232,7 +232,7 @@ const EditPesertaAction: React.FC<EditPesertaActionProps> = ({
                                         <Input
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
-                                            className="h-12 rounded-2xl border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 px-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                                            className="h-12 rounded-2xl border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 px-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-500 transition-all outline-none"
                                             placeholder="nama@email.com"
                                         />
                                     </div>
@@ -267,7 +267,7 @@ const EditPesertaAction: React.FC<EditPesertaActionProps> = ({
                                         <Input
                                             value={alamat}
                                             onChange={(e) => setAlamat(e.target.value)}
-                                            className="h-12 rounded-2xl border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 px-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                                            className="h-12 rounded-2xl border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 px-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-500 transition-all outline-none"
                                             placeholder="Jl. Nama Jalan No. XX..."
                                         />
                                     </div>
@@ -285,7 +285,7 @@ const EditPesertaAction: React.FC<EditPesertaActionProps> = ({
                                         <Input
                                             value={tempatLahir}
                                             onChange={(e) => setTempatLahir(e.target.value)}
-                                            className="h-12 rounded-2xl border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 px-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                                            className="h-12 rounded-2xl border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 px-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-500 transition-all outline-none"
                                             placeholder="Kota Kelahiran"
                                         />
                                     </div>
@@ -294,7 +294,7 @@ const EditPesertaAction: React.FC<EditPesertaActionProps> = ({
                                         <Input
                                             value={tanggalLahir}
                                             onChange={(e) => setTanggalLahir(e.target.value)}
-                                            className="h-12 rounded-2xl border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 px-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                                            className="h-12 rounded-2xl border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 px-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-500 transition-all outline-none"
                                             placeholder="YYYY-MM-DD"
                                         />
                                     </div>
@@ -328,7 +328,7 @@ const EditPesertaAction: React.FC<EditPesertaActionProps> = ({
                                         <Input
                                             value={institusi}
                                             onChange={(e) => setInstitusi(e.target.value)}
-                                            className="h-12 rounded-2xl border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 px-4 text-sm font-bold focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                                            className="h-12 rounded-2xl border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-950/50 px-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-500 transition-all outline-none"
                                             placeholder="Nama instansi atau sekolah"
                                         />
                                     </div>

@@ -81,7 +81,7 @@ const FormatSertifikatP2MKP = forwardRef(
         return (
             <div
                 ref={ref}
-                className="w-full h-full flex flex-col items-center justify-center font-bos leading-[115%]"
+                className="w-full h-full flex flex-col items-center justify-center font-bos leading-[115%] text-black"
             >
                 <div
                     ref={refPage}
@@ -102,7 +102,7 @@ const FormatSertifikatP2MKP = forwardRef(
                                 <h1 className="text-sm font-bosBold  leading-none text-center tracking-tight">
                                     KEMENTERIAN KELAUTAN DAN PERIKANAN
                                 </h1>
-                                <p className="text-xs text-gray-700 font-bosItalic text-center">
+                                <p className="text-xs text-black font-bosItalic text-center">
                                     MINISTRY OF MARINE AFFAIRS AND FISHERIES
                                 </p>
                             </div>
@@ -112,7 +112,7 @@ const FormatSertifikatP2MKP = forwardRef(
                                     BADAN PENYULUHAN DAN PENGEMBANGAN SUMBER DAYA MANUSIA KELAUTAN
                                     DAN PERIKANAN
                                 </h1>
-                                <p className="text-xs text-gray-700 font-bosItalic text-center px-20 ">
+                                <p className="text-xs text-black font-bosItalic text-center px-20 ">
                                     THE AGENCY FOR MARINE AND FISHERIES EXTENSION AND HUMAN
                                     RESOURCES DEVELOPMENT
                                 </p>
@@ -121,10 +121,10 @@ const FormatSertifikatP2MKP = forwardRef(
 
                         {/* Certificate Title */}
                         <div className="flex flex-col pb-5 items-center justify-center space-y-0">
-                            <h1 className="text-2xl font-bosBold  leading-none text-[#001d3d]">
+                            <h1 className="text-2xl font-bosBold  leading-none text-black">
                                 SERTIFIKAT PENETAPAN
                             </h1>
-                            <p className="text-sm font-bosItalic text-gray-700">Certificate of Designation</p>
+                            <p className="text-sm font-bosItalic text-black">Certificate of Designation</p>
                         </div>
 
                         {/* Statement Paragraph */}
@@ -132,7 +132,7 @@ const FormatSertifikatP2MKP = forwardRef(
                             <span className="text-sm -mt-5 leading-none font-bosNormal">
                                 Berdasarkan Peraturan Menteri Kelautan dan Perikanan Nomor 18 Tahun 2024 tentang Pusat Pelatihan Mandiri Kelautan dan Perikanan dan Keputusan Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan Nomor 393 Tahun 2025 tentang Penetapan Pusat Pelatihan Mandiri Kelautan dan Perikanan, menyatakan bahwa:
                             </span>
-                            <span className="text-xs text-gray-700 font-bosItalic leading-none">
+                            <span className="text-xs text-black font-bosItalic leading-none">
                                 Based on Regulation of the Minister of Marine Affairs and Fisheries Number 18 of 2024 concerning Independent Marine and Fisheries Training Centers and Decree of the Head of the Agency for Extension and Human Resource Development in Marine Affairs and Fisheries Number 393 of 2025 concerning the Establishment of Independent Marine and Fisheries Training Centers, it is stated that:                            </span>
                         </div>
 
@@ -143,17 +143,17 @@ const FormatSertifikatP2MKP = forwardRef(
                                     <tr className="mb-4">
                                         <td className="w-[28%] align-top py-1">
                                             <span className="font-bosBold text-sm uppercase block">Nama Lembaga</span>
-                                            <span className="font-bos italic text-[10px] text-gray-700 block -mt-1 leading-tight">Institution Name</span>
+                                            <span className="font-bos italic text-[10px] text-black block -mt-1 leading-tight">Institution Name</span>
                                         </td>
-                                        <td className="w-[3%] align-top py-1 text-md font-bosBold text-blue-900">:</td>
-                                        <td className="w-[69%] align-top py-1 text-md font-bosBold uppercase text-blue-900 leading-tight">
+                                        <td className="w-[3%] align-top py-1 text-md font-bosBold text-black">:</td>
+                                        <td className="w-[69%] align-top py-1 text-md font-bosBold uppercase text-black leading-tight">
                                             {p2mkp?.nama_Ppmkp || p2mkp?.nama_ppmkp || "-"}
                                         </td>
                                     </tr>
                                     <tr className="mb-4">
                                         <td className="w-[28%] align-top py-1">
                                             <span className="font-bosBold text-sm uppercase block">Jenis Pelatihan</span>
-                                            <span className="font-bos italic text-[10px] text-gray-700 block -mt-1 leading-tight">Training Category</span>
+                                            <span className="font-bos italic text-[10px] text-black block -mt-1 leading-tight">Training Category</span>
                                         </td>
                                         <td className="w-[3%] align-top py-1 text-md font-bosBold">:</td>
                                         <td className="w-[69%] align-top py-1 text-md font-bosBold uppercase leading-tight">
@@ -163,7 +163,7 @@ const FormatSertifikatP2MKP = forwardRef(
                                     <tr className="mb-4">
                                         <td className="w-[28%] align-top py-1">
                                             <span className="font-bosBold text-sm uppercase block">Alamat</span>
-                                            <span className="font-bos italic text-[10px] text-gray-700 block -mt-1 leading-tight">Address</span>
+                                            <span className="font-bos italic text-[10px] text-black block -mt-1 leading-tight">Address</span>
                                         </td>
                                         <td className="w-[3%] align-top py-1 text-md font-bosBold">:</td>
                                         <td className="w-[69%] align-top py-1 text-md font-bosBold uppercase leading-tight">
@@ -176,14 +176,14 @@ const FormatSertifikatP2MKP = forwardRef(
 
                         {/* Validity Footer Text */}
                         <div className="text-center leading-none flex flex-col items-center space-y-2 -mt-20">
-                            <p className="text-sm font-bosNormal leading-none italic text-gray-700">Sebagai / <span className="italic">As</span></p>
-                            <h3 className="text-2xl font-bosBold leading-none text-[#003566]  uppercase">
+                            <p className="text-sm font-bosNormal leading-none italic text-black">Sebagai / <span className="italic">As</span></p>
+                            <h3 className="text-2xl font-bosBold leading-none text-black  uppercase">
                                 Pusat Pelatihan Mandiri Kelautan dan Perikanan (P2MKP)
                             </h3>
-                            <p className="text-sm font-bosNormal leading-none text-gray-700 max-w-[200mm]">
+                            <p className="text-sm font-bosNormal leading-none text-black max-w-[200mm]">
                                 Penetapan ini berlaku selama 2 (dua) tahun terhitung sejak ditetapkan.
                                 <br />
-                                <span className="text-xs opacity-70 text-gray-700 font-bosItalic">This assignment is valid for 2 (two) years from the date of establishment.</span>
+                                <span className="text-xs opacity-70 text-black font-bosItalic">This assignment is valid for 2 (two) years from the date of establishment.</span>
                             </p>
                         </div>
 
@@ -196,13 +196,13 @@ const FormatSertifikatP2MKP = forwardRef(
                             <div className="flex flex-col items-center text-center  max-w-[450px]">
                                 <p className="text-sm font-bosNormal">Jakarta, {penetapan?.tanggal_sertifikat}</p>
                                 <div className="space-y-1">
-                                    <p className="text-sm font-bosBold uppercase leading-none text-slate-900">
+                                    <p className="text-sm font-bosBold uppercase leading-none text-black">
                                         Kepala Badan Penyuluhan dan Pengembangan
                                     </p>
-                                    <p className="text-sm font-bosBold uppercase leading-none text-slate-900">
+                                    <p className="text-sm font-bosBold uppercase leading-none text-black">
                                         Sumber Daya Manusia Kelautan dan Perikanan,
                                     </p>
-                                    <p className="text-xs font-bosItalic text-gray-700 italic mt-1 leading-none px-4">
+                                    <p className="text-xs font-bosItalic text-black italic mt-1 leading-none px-4">
                                         Director General of The Agency for Marine and Fisheries Extension <br />
                                         and Human Resources Development
                                     </p>

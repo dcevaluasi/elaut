@@ -28,7 +28,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import Toast from "@/commons/Toast";
 import { elautBaseUrl } from "@/constants/urls";
-import { Editor } from "@tinymce/tinymce-react";
+import { Textarea } from "@/components/ui/textarea";
 import { PelatihanMasyarakat } from "@/types/product";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion, AnimatePresence } from "framer-motion";
@@ -52,13 +52,24 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
     onSuccess,
 }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [tanggalMulai, setTanggalMulai] = useState(tanggalPendaftaran![0] || "");
-    const [tanggalAkhir, setTanggalAkhir] = useState(tanggalPendaftaran![1] || "");
+    const [tanggalMulai, setTanggalMulai] = useState(tanggalPendaftaran?.[0] || "");
+    const [tanggalAkhir, setTanggalAkhir] = useState(tanggalPendaftaran?.[1] || "");
     const [detailPelatihan, setDetailPelatihan] = useState(currentDetail || "");
     const [fotoPelatihan, setFotoPelatihan] = useState<File | null>(null);
     const [kuotaPelatihan, setKuotaPelatihan] = useState(currentData?.KoutaPelatihan || "")
     const [asalPelatihan, setAsalPelatihan] = useState(currentData?.AsalPelatihan || "No Mandiri")
     const [loading, setLoading] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+    React.useEffect(() => {
+        if (!fotoPelatihan) {
+            setPreviewUrl(null);
+            return;
+        }
+        const url = URL.createObjectURL(fotoPelatihan);
+        setPreviewUrl(url);
+        return () => URL.revokeObjectURL(url);
+    }, [fotoPelatihan]);
 
     const handleSubmit = async () => {
         if (!detailPelatihan && !fotoPelatihan) {
@@ -131,7 +142,7 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
                 </Button>
             </DialogTrigger>
 
-            <DialogContent className="max-w-4xl w-[95vw] h-[95vh] p-0 overflow-hidden bg-white/95 dark:bg-slate-950/95 backdrop-blur-3xl border-slate-200 dark:border-slate-800 rounded-[2.5rem] shadow-2xl z-[99999] flex flex-col">
+            <DialogContent className="max-w-4xl w-[95vw] h-[95vh] p-0 overflow-hidden bg-white/95 dark:bg-slate-950/95 backdrop-blur-3xl border-slate-200 dark:border-slate-800 rounded-[2.5rem] shadow-2xl flex flex-col">
                 <div className="relative flex-1 flex flex-col min-h-0 overflow-hidden">
                     <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-indigo-500/10 rounded-full -mr-20 -mt-20 blur-3xl pointer-events-none" />
                     <div className="absolute bottom-0 left-0 w-[200px] h-[200px] bg-blue-500/10 rounded-full -ml-20 -mb-20 blur-2xl pointer-events-none" />
@@ -166,7 +177,7 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
                                         <FormLabel icon={Calendar} label="Mulai Pendaftaran" />
                                         <input
                                             type="date"
-                                            className="w-full h-10 md:h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs md:text-sm font-bold focus:ring-2 focus:ring-indigo-500 transition-all outline-none"
+                                            className="w-full h-10 md:h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs md:text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 transition-all outline-none"
                                             value={tanggalMulai}
                                             onChange={(e) => setTanggalMulai(e.target.value)}
                                         />
@@ -175,7 +186,7 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
                                         <FormLabel icon={Clock} label="Akhir Pendaftaran" />
                                         <input
                                             type="date"
-                                            className="w-full h-10 md:h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs md:text-sm font-bold focus:ring-2 focus:ring-indigo-500 transition-all outline-none"
+                                            className="w-full h-10 md:h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs md:text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 transition-all outline-none"
                                             value={tanggalAkhir}
                                             onChange={(e) => setTanggalAkhir(e.target.value)}
                                         />
@@ -185,7 +196,7 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
                                         <input
                                             type="text"
                                             placeholder="Contoh: 30 Orang"
-                                            className="w-full h-10 md:h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs md:text-sm font-bold focus:ring-2 focus:ring-indigo-500 transition-all outline-none"
+                                            className="w-full h-10 md:h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs md:text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 transition-all outline-none"
                                             value={kuotaPelatihan}
                                             onChange={(e) => setKuotaPelatihan(e.target.value)}
                                         />
@@ -199,21 +210,18 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
                                     <Badge className="bg-blue-50 dark:bg-blue-500/10 text-blue-600 border-blue-100 dark:border-blue-500/20 uppercase font-black text-[8px] md:text-[9px] px-3 py-1">Deskripsi & Narasi</Badge>
                                     <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800" />
                                 </div>
-                                <div className="rounded-[1.25rem] md:rounded-[1.5rem] overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm transition-all focus-within:shadow-md">
-                                    <Editor
-                                        apiKey={process.env.NEXT_PUBLIC_TINY_MCE_KEY}
+                                <div className="relative group">
+                                    <Textarea
                                         value={detailPelatihan}
-                                        onEditorChange={(content: string) => setDetailPelatihan(content)}
-                                        init={{
-                                            height: 250,
-                                            menubar: false,
-                                            plugins: "advlist autolink lists link charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table wordcount",
-                                            toolbar: "undo redo | blocks | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat",
-                                            content_style: "body { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #334155; }",
-                                            skin: "oxide",
-                                            content_css: "default"
-                                        }}
+                                        onChange={(e) => setDetailPelatihan(e.target.value)}
+                                        placeholder="Tuliskan deskripsi lengkap pelatihan di sini... (Contoh: Materi yang akan dipelajari, target peserta, dan output pelatihan)"
+                                        className="min-h-[200px] w-full p-6 rounded-[1.5rem] border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 text-sm font-medium leading-relaxed focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all resize-none shadow-inner"
                                     />
+                                    <div className="absolute bottom-4 right-4 flex items-center gap-2 opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none">
+                                        <Badge variant="outline" className="bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm text-[8px] font-black uppercase tracking-widest text-slate-400 border-slate-200 dark:border-slate-800">
+                                            {detailPelatihan.length} Karakter
+                                        </Badge>
+                                    </div>
                                 </div>
                             </div>
 
@@ -225,7 +233,10 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                                     <div>
-                                        <label htmlFor="flyerUpload" className="group/upload relative block w-full h-[150px] md:h-[180px] rounded-[1.5rem] md:rounded-[2rem] border-2 border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-900 hover:border-indigo-500 transition-all cursor-pointer overflow-hidden shadow-inner">
+                                        <label htmlFor="flyerUpload" className="group/upload relative block w-full h-[200px] md:h-[240px] rounded-[2.5rem] border-[3px] border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 hover:bg-white dark:hover:bg-slate-900 hover:border-indigo-400 transition-all cursor-pointer overflow-hidden shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)] group">
+                                            {/* Background Pattern */}
+                                            <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#4f46e5 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+                                            
                                             <input
                                                 id="flyerUpload"
                                                 type="file"
@@ -233,15 +244,88 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
                                                 accept="image/*"
                                                 onChange={(e) => setFotoPelatihan(e.target.files ? e.target.files[0] : null)}
                                             />
-                                            <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
-                                                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 mb-2 md:mb-3 flex items-center justify-center transition-transform group-hover/upload:scale-110 group-hover/upload:rotate-6">
-                                                    <UploadCloud className="w-5 h-5 md:w-6 md:h-6" />
-                                                </div>
-                                                <p className="text-[9px] md:text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest leading-none mb-1 md:mb-2">
-                                                    {fotoPelatihan ? fotoPelatihan.name : "Unggah Flyer Baru"}
-                                                </p>
-                                                <p className="text-[8px] md:text-xs font-medium text-slate-400 dark:text-slate-500 italic">Maksimal 5MB (JPG, PNG)</p>
-                                            </div>
+                                            
+                                            <AnimatePresence mode="wait">
+                                                {previewUrl ? (
+                                                    <motion.div 
+                                                        key="preview"
+                                                        initial={{ opacity: 0, scale: 1.1 }}
+                                                        animate={{ opacity: 1, scale: 1 }}
+                                                        exit={{ opacity: 0, scale: 0.9 }}
+                                                        className="absolute inset-0 w-full h-full"
+                                                    >
+                                                        <img 
+                                                            src={previewUrl} 
+                                                            alt="Preview" 
+                                                            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                                                        />
+                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-end pb-8">
+                                                            <div className="flex gap-3 scale-90 group-hover:scale-100 transition-transform duration-500">
+                                                                <div className="bg-white/10 backdrop-blur-xl px-6 py-2.5 rounded-2xl border border-white/20 text-white text-[10px] font-black uppercase tracking-widest shadow-2xl flex items-center gap-2">
+                                                                    <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></div>
+                                                                    Ganti Gambar
+                                                                </div>
+                                                                <button 
+                                                                    type="button"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        e.stopPropagation();
+                                                                        setFotoPelatihan(null);
+                                                                    }}
+                                                                    className="bg-rose-500/20 backdrop-blur-xl p-2.5 rounded-2xl border border-rose-500/30 text-rose-100 hover:bg-rose-500 hover:text-white transition-all shadow-2xl group/btn"
+                                                                >
+                                                                    <X className="w-5 h-5 transition-transform group-hover/btn:rotate-90" />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </motion.div>
+                                                ) : (
+                                                    <motion.div 
+                                                        key="empty"
+                                                        initial={{ opacity: 0, y: 10 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        exit={{ opacity: 0, y: -10 }}
+                                                        className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center"
+                                                    >
+                                                        <div className="relative mb-6">
+                                                            {/* Decorative Glow */}
+                                                            <div className="absolute inset-0 bg-indigo-500/20 blur-2xl rounded-full scale-150 animate-pulse" />
+                                                            
+                                                            <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-[2.5rem] bg-gradient-to-tr from-indigo-600 to-blue-500 text-white flex items-center justify-center shadow-2xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-indigo-500/40">
+                                                                <UploadCloud className="w-8 h-8 md:w-10 md:h-10 text-indigo-100" />
+                                                                
+                                                                {/* Floating Badge */}
+                                                                <div className="absolute -top-1 -right-1 w-7 h-7 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg border border-slate-100 dark:border-slate-800 animate-bounce">
+                                                                    <div className="w-4 h-4 bg-emerald-500 rounded-lg flex items-center justify-center">
+                                                                        <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div className="space-y-2">
+                                                            <p className="text-xs md:text-sm font-black text-slate-900 dark:text-white uppercase tracking-[0.4em] leading-none">
+                                                                Unggah Flyer
+                                                            </p>
+                                                            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 italic max-w-[200px] mx-auto leading-relaxed">
+                                                                Drag & drop atau klik untuk memilih file visual pelatihan
+                                                            </p>
+                                                        </div>
+                                                        
+                                                        <div className="mt-8 px-8 py-2.5 rounded-2xl bg-indigo-600 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-500/30 hover:bg-indigo-700 transition-all transform active:scale-95">
+                                                            Pilih File
+                                                        </div>
+                                                        
+                                                        <div className="mt-4 flex items-center gap-4 text-[9px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest">
+                                                            <span>PNG</span>
+                                                            <div className="w-1 h-1 bg-slate-200 dark:bg-slate-800 rounded-full"></div>
+                                                            <span>JPG</span>
+                                                            <div className="w-1 h-1 bg-slate-200 dark:bg-slate-800 rounded-full"></div>
+                                                            <span>MAX 5MB</span>
+                                                        </div>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
                                         </label>
                                     </div>
                                     <div className="flex flex-col justify-center gap-3 md:gap-4 bg-slate-50 dark:bg-slate-900/50 p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-inner">
@@ -317,7 +401,7 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
                                             animate={{ rotate: 360 }}
                                             transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
                                             className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
-                                        />
+                                        ></motion.div>
                                         <span>Menyimpan...</span>
                                     </>
                                 ) : (

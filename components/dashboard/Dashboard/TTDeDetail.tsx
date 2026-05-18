@@ -230,7 +230,8 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
             await axios.put(
                 `${elautBaseUrl}/lemdik/updatePelatihan?id=${data?.IdPelatihan}`,
                 {
-                    StatusPenerbitan: status
+                    StatusPenerbitan: status,
+                    StatusApproval: passphrase
                 },
                 {
                     headers: {

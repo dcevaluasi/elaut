@@ -179,7 +179,7 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
                         <input
                             id="namaKegiatan"
                             type="text"
-                            className="form-input w-full text-black border-gray-300 rounded-md"
+                            className="form-input w-full text-slate-700 border-gray-300 rounded-md"
                             placeholder="Masukkan nama kegiatan"
                             required
                             value={namaPelatihan}
@@ -194,7 +194,7 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
                         <label className="text-sm font-medium text-gray-700">Lokasi Pelatihan</label>
                         <input
                             type="text"
-                            className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
+                            className="w-full rounded-md border border-gray-300 p-2 text-sm text-slate-700 focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
                             value={lokasiPelatihan}
                             onChange={(e) => setLokasiPelatihan(e.target.value)}
                         />
@@ -381,7 +381,7 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
                         <label className="text-sm font-medium text-gray-700">Tanggal Mulai</label>
                         <input
                             type="date"
-                            className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
+                            className="w-full rounded-md border border-gray-300 p-2 text-sm text-slate-700 focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
                             value={tanggalMulaiPelatihan}
                             onChange={(e) => setTanggalMulaiPelatihan(e.target.value)}
                         />
@@ -392,7 +392,7 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
                         <label className="text-sm font-medium text-gray-700">Tanggal Berakhir</label>
                         <input
                             type="date"
-                            className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
+                            className="w-full rounded-md border border-gray-300 p-2 text-sm text-slate-700 focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
                             value={tanggalBerakhirPelatihan}
                             onChange={(e) => setTanggalBerakhirPelatihan(e.target.value)}
                         />
@@ -406,7 +406,7 @@ const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
                         <input
                             type="number"
                             min={0}
-                            className="w-full rounded-md border border-gray-300 p-2 text-sm focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
+                            className="w-full rounded-md border border-gray-300 p-2 text-sm text-slate-700 focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500"
                             value={hargaPelatihan}
                             onChange={(e) => setHargaPelatihan(parseInt(e.target.value))}
                         />

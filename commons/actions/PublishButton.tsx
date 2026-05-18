@@ -79,10 +79,10 @@ const PublishButton: React.FC<PublishButtonProps> = ({
       >
         <AlertDialogContent className="rounded-2xl shadow-lg border border-gray-200">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-lg font-semibold text-gray-800">
+            <AlertDialogTitle className="text-lg font-black text-slate-900 tracking-tight">
               Publikasi ke Web E-LAUT
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-sm text-gray-600 mt-1">
+            <AlertDialogDescription className="text-sm text-slate-500 font-medium leading-relaxed">
               Agar pelatihan di balai/lemdiklat-mu dapat dilihat oleh masyarakat
               umum lakukan checklist agar tampil di website E-LAUT!
             </AlertDialogDescription>
@@ -99,10 +99,10 @@ const PublishButton: React.FC<PublishButtonProps> = ({
                       onCheckedChange={() => setSelectedStatus("Publish")}
                     />
                     <div className="space-y-1">
-                      <label className="font-medium text-gray-800">
+                      <label className="font-bold text-slate-800">
                         Publish Website E-LAUT
                       </label>
-                      <p className="text-xs text-gray-600 leading-snug">
+                      <p className="text-xs text-slate-500 font-medium leading-snug">
                         Dengan ini sebagai pihak lemdiklat saya mempublish informasi
                         pelatihan terbuka untuk masyarakat umum!
                       </p>
@@ -113,10 +113,10 @@ const PublishButton: React.FC<PublishButtonProps> = ({
                 <div className="flex flex-row items-center space-x-3 rounded-xl border border-gray-200 p-4 bg-green-50">
                   <RiVerifiedBadgeFill className="h-7 w-7 text-green-500" />
                   <div className="space-y-1">
-                    <label className="font-medium text-gray-800">
+                    <label className="font-bold text-slate-800">
                       Published Website E-LAUT
                     </label>
-                    <p className="text-xs text-gray-600 leading-snug">
+                    <p className="text-xs text-slate-500 font-medium leading-snug">
                       Informasi Kelas Pelatihanmu telah dipublikasikan melalui laman
                       Website E-LAUT balai mu!
                     </p>

@@ -211,7 +211,7 @@ const FormatSTTPL = React.forwardRef(
                     pelatihan?.TtdSertifikat?.includes('Kepala Badan') ?
                         <div
                             ref={ref}
-                            className={`w-full h-full scale-95 flex flex-col gap-4 items-center justify-center  px-10  rounded-md font-bos leading-[120%] pb-0`}
+                            className={`w-full h-full scale-95 flex flex-col gap-4 items-center justify-center  px-10  rounded-md font-bos leading-[120%] pb-0 text-black`}
                         >
 
                             <div ref={refPage} className={`pdf-page w-full flex flex-col  gap-4 relative  items-center justify-center h-[49.63rem]`}>
@@ -634,7 +634,7 @@ const FormatSTTPL = React.forwardRef(
                         </div> :
                         <div
                             ref={ref}
-                            className={`w-full h-full scale-95 flex flex-col gap-4 items-center justify-center  px-10  rounded-md font-bos leading-[120%] pb-0`}
+                            className={`w-full h-full scale-95 flex flex-col gap-4 items-center justify-center  px-10  rounded-md font-bos leading-[120%] pb-0 text-black`}
                         >
 
                             <div ref={refPage} className={`pdf-page w-full flex flex-col  gap-4 relative  items-center justify-center h-[49.63rem]`}>
