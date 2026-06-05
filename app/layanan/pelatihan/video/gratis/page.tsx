@@ -55,10 +55,10 @@ export default function VideoGratisPage() {
     const filteredVideos = videoLayanan.filter(v => {
         const query = searchQuery.toLowerCase();
         return (v.namaPelatihan?.toLowerCase() || "").includes(query) ||
-               (v.programPelatihan?.toLowerCase() || "").includes(query) ||
-               (v.jenisProgramPelatihan?.toLowerCase() || "").includes(query) ||
-               (v.penyelenggara?.toLowerCase() || "").includes(query) ||
-               (v.descriptionVideo?.toLowerCase() || "").includes(query);
+            (v.programPelatihan?.toLowerCase() || "").includes(query) ||
+            (v.jenisProgramPelatihan?.toLowerCase() || "").includes(query) ||
+            (v.penyelenggara?.toLowerCase() || "").includes(query) ||
+            (v.descriptionVideo?.toLowerCase() || "").includes(query);
     });
 
     const handleVideoClick = async (video: any) => {
@@ -194,7 +194,7 @@ export default function VideoGratisPage() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.25 }}
-                        className="fixed inset-0 z-[99999] flex items-center justify-center p-4"
+                        className="fixed inset-0 z-[999999999999] flex items-center justify-center p-4"
                         onClick={() => setActiveVideo(null)}
                     >
                         <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
