@@ -451,8 +451,8 @@ const FormatSTTPL = React.forwardRef(
                                                         <span className="italic font-bos leading-none">ALLOCATION TIME</span>
                                                     </div>
                                                     <div className="flex flex-row items-center justify-center -mt-1">
-                                                        <span className="text-lg leading-none !font-bosBold">@45 MENIT</span>/
-                                                        <span className="italic font-bos leading-none">@45 MINS</span>
+                                                        <span className="text-lg leading-none !font-bosBold">{(pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? '@60 MENIT' : '@45 MENIT'}</span>/
+                                                        <span className="italic font-bos leading-none">{(pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? '@60 MINS' : '@45 MENIT'}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -876,8 +876,8 @@ const FormatSTTPL = React.forwardRef(
                                                         <span className="italic font-bos leading-none">ALLOCATION TIME</span>
                                                     </div>
                                                     <div className="flex flex-row items-center justify-center -mt-1">
-                                                        <span className="text-lg leading-none !font-bosBold">@45 MENIT</span>/
-                                                        <span className="italic font-bos leading-none">@45 MINS</span>
+                                                        <span className="text-lg leading-none !font-bosBold">{(pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? '@60 MENIT' : '@45 MENIT'}</span>/
+                                                        <span className="italic font-bos leading-none">{(pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? '@60 MINS' : '@45 MINS'}</span>
                                                     </div>
                                                 </div>
                                             </div>
