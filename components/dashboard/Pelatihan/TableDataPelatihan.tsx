@@ -32,6 +32,36 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { PelatihanMasyarakat } from "@/types/product";
 
+// Urutan tampil di tabel berdasarkan label status (getStatusInfo).
+// Index lebih kecil = tampil lebih dulu (atas).
+const STATUS_ORDER: string[] = [
+  // === APPROVE ===
+  "Approved Kapus",
+  "Approved Kabalai",
+  "Approved Kabadan",
+  "Approved Pelaksanaan",
+  // === PENDING ===
+  "Pending Kapus",
+  "Pending Kabalai",
+  "Pending Kabadan",
+  "Pending STTPL Verifikator",
+  "Pending SPV",
+  "Pending Verifikator",
+  // === PERBAIKAN ===
+  "Perbaikan Kapus",
+  "Perbaikan Kabalai",
+  "Perbaikan Kabadan",
+  "Perbaikan SPV",
+  "Perbaikan Verifikator",
+  "Perbaikan STTPL Verifikator",
+  // === LAINNYA ===
+  "Draft",
+  "Publish",
+  "Closed",
+  "Signed",
+  "Tidak Diketahui",
+];
+
 const TableDataPelatihan: React.FC = () => {
   const {
     data,
@@ -80,19 +110,12 @@ const TableDataPelatihan: React.FC = () => {
     return isNaN(date.getTime()) ? "" : date.getFullYear().toString();
   };
 
-  // Status grouping rank (lower = front). Signed always pushed to the very back.
-  // "Signed" dideteksi dari label getStatusInfo (mencakup 7D, 11, 15) — sumber yang
-  // sama dengan badge yang tampil, agar tidak ada status signed yang terlewat.
+  // Rank kelompok status berdasarkan STATUS_ORDER (label dari getStatusInfo).
+  // Label di luar daftar didorong ke paling belakang.
   const getStatusRank = (p: PelatihanMasyarakat) => {
-    const s = String(p.StatusPenerbitan);
-    if (getStatusInfo(s).label === "Signed") return 99; // Signed -> paling belakang
-    if (isPendingSigning(s)) return 6;
-    if (s === "On Progress") return 5;   // Proses Pengajuan Sertifikat
-    if (isVerifyDiklat(s)) return 4;     // Verifikasi Pelaksanaan
-    if (s === "1.1" || s === "4") return 3; // Approved Pelaksanaan
-    if (s === "1") return 2;             // Pending SPV
-    if (p.Status === "Publish") return 1;
-    return 50;                           // status lain -> sebelum Signed
+    const label = getStatusInfo(String(p.StatusPenerbitan)).label;
+    const idx = STATUS_ORDER.indexOf(label);
+    return idx === -1 ? STATUS_ORDER.length : idx;
   };
 
   const getDateValue = (dateStr: string | undefined | null) => {
