@@ -10,7 +10,7 @@ import Image from "next/image";
 import Cookies from "js-cookie";
 
 import { Input } from "@/components/ui/input";
-import { generateTanggalPelatihan } from "@/utils/text";
+import { generateTanggalPelatihan, getStatusInfo } from "@/utils/text";
 import { Button } from "@/components/ui/button";
 import { MdSearch } from "react-icons/md";
 
@@ -80,8 +80,29 @@ const TableDataPelatihan: React.FC = () => {
     return isNaN(date.getTime()) ? "" : date.getFullYear().toString();
   };
 
+  // Status grouping rank (lower = front). Signed always pushed to the very back.
+  // "Signed" dideteksi dari label getStatusInfo (mencakup 7D, 11, 15) — sumber yang
+  // sama dengan badge yang tampil, agar tidak ada status signed yang terlewat.
+  const getStatusRank = (p: PelatihanMasyarakat) => {
+    const s = String(p.StatusPenerbitan);
+    if (getStatusInfo(s).label === "Signed") return 99; // Signed -> paling belakang
+    if (isPendingSigning(s)) return 6;
+    if (s === "On Progress") return 5;   // Proses Pengajuan Sertifikat
+    if (isVerifyDiklat(s)) return 4;     // Verifikasi Pelaksanaan
+    if (s === "1.1" || s === "4") return 3; // Approved Pelaksanaan
+    if (s === "1") return 2;             // Pending SPV
+    if (p.Status === "Publish") return 1;
+    return 50;                           // status lain -> sebelum Signed
+  };
+
+  const getDateValue = (dateStr: string | undefined | null) => {
+    if (!dateStr) return 0;
+    const t = new Date(dateStr).getTime();
+    return isNaN(t) ? 0 : t;
+  };
+
   const filteredData = useMemo(() => {
-    return data.filter(p => {
+    const filtered = data.filter(p => {
       const program = (p.Program || "").toLowerCase().trim();
       const namaPelatihan = (p.NamaPelatihan || "").toLowerCase().trim();
       const penyelenggara = (p.PenyelenggaraPelatihan || "").toLowerCase().trim();
@@ -102,6 +123,14 @@ const TableDataPelatihan: React.FC = () => {
           p.Status === selectedStatusFilter
         )
       );
+    });
+
+    // Kelompokkan berdasarkan status (Signed paling belakang),
+    // di dalam tiap kelompok urutkan tanggal terbaru lebih dulu.
+    return filtered.sort((a, b) => {
+      const rankDiff = getStatusRank(a) - getStatusRank(b);
+      if (rankDiff !== 0) return rankDiff;
+      return getDateValue(b.TanggalMulaiPelatihan) - getDateValue(a.TanggalMulaiPelatihan);
     });
   }, [data, filterCategory, filterCategoryPenyelenggara, filterCategorySasaran, searchQuery, selectedStatusFilter, filterYear]);
 
