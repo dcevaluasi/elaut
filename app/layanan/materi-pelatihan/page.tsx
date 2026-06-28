@@ -35,9 +35,9 @@ const Document = dynamic(() => import('react-pdf').then(mod => mod.Document), { 
 const Page = dynamic(() => import('react-pdf').then(mod => mod.Page), { ssr: false });
 import { pdfjs } from 'react-pdf';
 
-// pdfjs Worker from CDN
+// pdfjs Worker from CDN (version must match the pdfjs-dist bundled by react-pdf)
 if (typeof window !== 'undefined') {
-    pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js`;
+    pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 }
 
 import 'react-pdf/dist/Page/AnnotationLayer.css';
