@@ -270,6 +270,14 @@ const FormatSTTPL = React.forwardRef(
                                 className="pdf-page  flex flex-col gap-4 relative items-center justify-center mt-10"
                             >
 
+                                <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center">
+                                    <img
+                                        src="/logo-kkp-2.png"
+                                        alt=""
+                                        className="w-[32rem] max-w-[60%] opacity-[0.06] select-none"
+                                    />
+                                </div>
+
 
                                 <div className="flex flex-row  absolute top-0 right-0 mr-5">
                                     <p className="text-lg font-bosNormal">
@@ -374,7 +382,7 @@ const FormatSTTPL = React.forwardRef(
                                     </div>
 
                                     <>
-                                        <div className="flex w-full flex-col space-y-1 max-w-7xl mx-auto items-start text-sm -mt-2 text-center font-bos h-fit">
+                                        <div className="flex w-full flex-col space-y-1 max-w-7xl mx-auto items-start text-sm mt-5 text-center font-bos h-fit">
                                             <span className="text-lg leading-[115%] font-bosNormal max-w-7xl">
                                                 Pelatihan {[
                                                     "Penjamin Mutu",
@@ -403,6 +411,7 @@ const FormatSTTPL = React.forwardRef(
                                         <div className="flex gap-2 items-center justify-center pt-4">
                                             <div className="grid grid-cols-3 items-center">
                                                 {/* Kolom 1 - QR Code */}
+
                                                 <QRCodeImage value={userPelatihan?.NoRegistrasi} />
 
                                                 {/* Kolom 2 - Foto */}
@@ -459,11 +468,7 @@ const FormatSTTPL = React.forwardRef(
                                                     </span>
                                                 </div>
 
-                                                <img
-                                                    alt="Logo KNMP"
-                                                    className="h-30 mx-auto w-30"
-                                                    src="/logo-knmp.png"
-                                                />
+
 
 
                                             </div>
@@ -476,6 +481,13 @@ const FormatSTTPL = React.forwardRef(
                             <div
                                 className={`pdf-page w-full flex flex-col gap-2 h-[49.63rem] items-center justify-center px-5 ${materiIntiCount >= 10 ? "mt-56" : "mt-36"} break-before-auto relative  mb-0 pb-0`}
                             >
+                                <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center">
+                                    <img
+                                        src="/logo-kkp-2.png"
+                                        alt=""
+                                        className="w-[32rem] max-w-[60%] opacity-[0.06] select-none"
+                                    />
+                                </div>
                                 <div className="w-full mb-0 pb-0">
                                     {/* Title */}
                                     <div className={`flex flex-row justify-center items-center ${materiIntiCount >= 10 ? "-mb-20" : "mb-5"}`}>
