@@ -415,30 +415,7 @@ const FormatSTTPL = React.forwardRef(
                                                 <QRCodeImage value={userPelatihan?.NoRegistrasi} />
 
                                                 {/* Kolom 2 - Foto */}
-                                                {
-                                                    peserta?.Foto == 'https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/' ? <></> : <div
-                                                        className=""
-                                                        style={{
-                                                            width: "135px",
-                                                            height: "195px",
-                                                            border: "1px solid #9f9f9f",
-                                                            borderRadius: "15px",
-                                                            marginLeft: "8rem",
-                                                            overflow: "hidden",
-                                                            padding: "3px",
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={peserta?.Foto || ""}
-                                                            alt="Foto"
-                                                            style={{
-                                                                width: "100%",
-                                                                height: "100%",
-                                                                objectFit: "cover",
-                                                            }}
-                                                        />
-                                                    </div>
-                                                }
+
 
 
                                                 {/* Kolom 3 - Tanda Tangan & Pejabat */}
