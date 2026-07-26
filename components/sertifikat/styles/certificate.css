@@ -1,9 +1,34 @@
+@page {
+  size: A4 landscape;
+  margin: 0;
+}
+
 @media print {
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    width: 297mm;
+    height: 210mm;
+  }
+
   .pdf-page {
+    width: 297mm !important;
+    height: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
     page-break-after: always;
     break-after: page;
   }
+
   .pdf-page:last-child {
-    page-break-after: auto; /* ✅ prevent extra blank page */
+    page-break-after: auto;
+  }
+
+  img {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
   }
 }

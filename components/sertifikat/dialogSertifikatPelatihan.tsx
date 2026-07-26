@@ -20,6 +20,9 @@ import './styles/certificate.css'
 import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
 import { findDataUnitKerjaById } from "@/utils/unitkerja";
 import { ESELON1, ESELON_1 } from "@/constants/nomenclatures";
+import { Button } from "@/components/ui/button";
+import { FiDownload } from "react-icons/fi";
+import { Loader2 } from "lucide-react";
 
 
 function QRCodeImage({ value }: { value: string }) {
@@ -117,6 +120,50 @@ const FormatSTTPL = React.forwardRef(
 
         const db = getFirestore(firebaseApp);
 
+        function formatName(value: string): string {
+            if (!value) return "";
+
+            value = value.trim().replace(/\s+/g, " ");
+
+            // Match common Indonesian academic degrees at the end
+            const degreeRegex =
+                /\s+(A\.?MD\.?SN|A\.?MD|S\.?PI|S\.?PD|S\.?KOM|S\.?TP|S\.?T|S\.?SI|M\.?SI|M\.?PD|DR\.?|DRS\.?|IR\.?)$/i;
+
+            let name = value;
+            let degree = "";
+
+            if (value.includes(",")) {
+                const parts = value.split(",");
+                name = parts[0].trim();
+                degree = parts.slice(1).join(",").trim();
+            } else {
+                const match = value.match(degreeRegex);
+                if (match) {
+                    name = value.substring(0, match.index).trim();
+                    degree = (match[1] + (match[2] ?? "")).trim();
+                }
+            }
+
+            name = name.toUpperCase();
+
+            degree = degree
+                .replace(/A\.?MD\.?SN/gi, "A.Md.Sn")
+                .replace(/A\.?MD/gi, "A.Md.")
+                .replace(/S\.?PI/gi, "S.Pi.")
+                .replace(/S\.?PD/gi, "S.Pd.")
+                .replace(/S\.?KOM/gi, "S.Kom.")
+                .replace(/S\.?TP/gi, "S.TP.")
+                .replace(/S\.?T/gi, "S.T.")
+                .replace(/S\.?SI/gi, "S.Si.")
+                .replace(/M\.?SI/gi, "M.Si.")
+                .replace(/M\.?PD/gi, "M.Pd.")
+                .replace(/DRS\.?/gi, "Drs.")
+                .replace(/DR\.?/gi, "Dr.")
+                .replace(/IR\.?/gi, "Ir.");
+
+            return degree ? `${name}, ${degree}` : name;
+        }
+
         const [selectedDoc, setSelectedDoc] = React.useState<any | null>(null);
         const [loading, setLoading] = React.useState(false);
 
@@ -208,13 +255,21 @@ const FormatSTTPL = React.forwardRef(
         return (
             <>
                 {
-                    pelatihan?.TtdSertifikat?.includes('Kepala Badan') ?
+                    (pelatihan?.TtdSertifikat?.includes('Kepala Badan') || pelatihan?.TtdSertifikat?.includes('Kepala BPPSDM') || pelatihan?.TtdSertifikat === ESELON_1.fullName) && !pelatihan?.TtdSertifikat?.includes('a.n.') && !pelatihan?.TtdSertifikat?.includes('Kepala Pusat') ?
                         <div
                             ref={ref}
-                            className={`w-full h-full scale-95 flex flex-col gap-4 items-center justify-center  px-10  rounded-md font-bos leading-[120%] pb-0 text-black`}
+
+                            className={`flex flex-col  items-center justify-center   rounded-md font-bos leading-[120%] pb-0 text-black`}
                         >
 
-                            <div ref={refPage} className={`pdf-page w-full flex flex-col  gap-4 relative  items-center justify-center h-[49.63rem]`}>
+                            <div
+                                ref={refPage}
+
+                                className="pdf-page  flex flex-col gap-4 relative items-center justify-center mt-10"
+                            >
+
+
+
                                 <div className="flex flex-row  absolute top-0 right-0">
                                     <p className="text-lg font-bosNormal">
                                         NO. SERTIFIKAT : {userPelatihan?.NoRegistrasi}
@@ -222,12 +277,27 @@ const FormatSTTPL = React.forwardRef(
                                 </div>
 
                                 <div className="w-full flex flex-col space-y-0 px-10 mt-10 ">
-                                    {isPrint ? <div className="mx-auto w-30 h-64"></div> : <img
-                                        alt="Logo KKP"
-                                        className="mx-auto w-30"
-                                        src="/logo-kkp-2.png"
-                                    />}
+                                    {isPrint ? <div className="mx-auto w-30 h-64"></div> : <div className="w-full items-center justify-center flex mt-5">
+                                        <div className="w-fit flex flex-row gap-2 items-center justify-center">
+                                            <img
+                                                alt="Logo KKP"
+                                                className="mx-auto w-30"
+                                                src="/logo-kkp-2.png"
+                                            />
+                                            {
+                                                pelatihan?.Program?.includes("Kampung Nelayan Merah Putih (KNMP)") && <>
 
+                                                    <img
+                                                        alt="Logo KKP"
+                                                        className="mx-auto w-26 h-26"
+                                                        src="/logo-knmp.png"
+                                                    />
+                                                </>
+                                            }
+                                        </div>
+                                    </div>
+                                    }
+                                    {/* sd */}
                                     <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-3">
                                         <div className="flex flex-col h-fit items-center justify-center space-y-1">
                                             <h1 className="text-lg font-bosBold">
@@ -277,15 +347,9 @@ const FormatSTTPL = React.forwardRef(
                                                     <span className="font-bosBold text-lg uppercase">Nama</span>
                                                     <span className="font-bos italic text-[0.85rem] -mt-2">Name</span>
                                                 </td>
-                                                <td className=" w-2/3 text-xl font-bosBold uppercase">: {peserta?.Nama}</td>
+                                                <td className=" w-2/3 text-xl font-bosBold ">: {formatName(peserta?.Nama!)}</td>
                                             </tr>
-                                            <tr className="w-full">
-                                                <td className="font-bos w-full flex flex-col space-y-0">
-                                                    <span className="font-bosBold text-lg uppercase">NIK</span>
-                                                    <span className="font-bos italic text-[0.85rem] -mt-2">Identification Number</span>
-                                                </td>
-                                                <td className=" w-2/3 text-xl font-bosBold uppercase">: {peserta?.Nik}</td>
-                                            </tr>
+
                                             <tr className="w-full mt-3">
                                                 <td className="font-bos w-full flex flex-col space-y-0">
                                                     <span className="text-lg font-bosBold uppercase">Tempat Tanggal Lahir</span>
@@ -298,45 +362,51 @@ const FormatSTTPL = React.forwardRef(
                                                     : {peserta?.TempatLahir}, {peserta?.TanggalLahir}
                                                 </td>
                                             </tr>
-                                            <tr className="w-full">
-                                                <td className="font-bos w-full flex flex-col space-y-0">
-                                                    <span className="font-bosBold text-lg uppercase">Nama Instansi</span>
-                                                    <span className="font-bos italic text-[0.85rem] -mt-2">Institution Name</span>
-                                                </td>
-                                                <td className=" w-2/3 text-xl font-bosBold uppercase">: {peserta?.Status}</td>
-                                            </tr>
+
                                         </table>
                                     </div>
 
                                     <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-1 mb-4">
                                         <h1 className="font-bosBold text-2xl leading-none">
-                                            {
+                                            {/* {
                                                 userPelatihan?.IsActice == "" ? "-" : generatedStatusCertificate(userPelatihan?.IsActice).status_indo
-                                            }
+                                            } */}
+                                            TELAH MENGIKUTI
                                         </h1>
-                                        <h3 className="font-bosNormal text-xl italic">
-                                            {
+                                        <h3 className="font-bosNormal text-xl italic mb-3">
+                                            {/* {
                                                 userPelatihan?.IsActice == "" ? "-" : generatedStatusCertificate(userPelatihan?.IsActice).status_eng
-                                            }
+                                            } */}
+                                            HAS ATTENDANCE
                                         </h3>
                                     </div>
 
                                     <>
                                         <div className="flex w-full flex-col space-y-1 max-w-7xl mx-auto items-start text-sm -mt-2 text-center font-bos h-fit">
-
                                             <span className="text-lg leading-[115%] font-bosNormal max-w-7xl">
-                                                {generatedDescriptionCertificate(pelatihan?.DeskripsiSertifikat).desc_indo} pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
+                                                Pelatihan {[
+                                                    "Penjamin Mutu",
+                                                    "Administrasi Keuangan",
+                                                    "Kepala Produksi",
+                                                    "Manajer Operasional",
+                                                ].some((jabatan) => pelatihan?.Program?.includes(jabatan)) && (
+                                                        <span>Jabatan </span>
+                                                    )}
+                                                {[
+                                                    "Pengelola",
+                                                ].some((jabatan) => pelatihan?.Program?.includes(jabatan)) && (
+                                                        <span>SDM </span>
+                                                    )}
+                                                <span className={`${pelatihan?.Program.includes('HACCP') ? 'font-bosItalic' : 'font-bosNormal'}`}>{dataProgramPelatihan[0]?.name_indo}</span> pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))} di {pelatihan!.LokasiPelatihan} {" "}{generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_indo == "" ? `yang diselenggarakan oleh ${pelatihan?.PenyelenggaraPelatihan} dengan jam pelajaran ${totalHoursCertificateLvl.totalTheory + totalHoursCertificateLvl.totalPractice} JP secara ${pelatihan?.PelaksanaanPelatihan}. Pelatihan ini merupakan bagian dari upaya peningkatan kapasitas dan kompetensi sumber daya manusia di sektor kelautan dan perikanan, sesuai dengan standar mutu atau ketentuan yang berlaku, sehingga peserta memperoleh pengetahuan, keterampilan, dan pemahaman yang relevan sesuai program pelatihan.` : generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_indo}
                                             </span>
                                             {
                                                 generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng != "" && <span className="max-w-6xl mt-1 leading-none font-bosItalic text-[0.9rem] mx-auto">
-                                                    {generatedDescriptionCertificate(pelatihan?.DeskripsiSertifikat).desc_eng} on {formatDateRangeEnglish(
-                                                        generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan),
-                                                        generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan)
-                                                    )}
+                                                    {dataProgramPelatihan[0]?.name_english} training on {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}  at {pelatihan!.LokasiPelatihan} {""} {dataProgramPelatihan[0]?.description == "" ? "in support of the Quality Assurance System based on Regulation of the Minister of Marine Affairs and Fisheries of the Republic of Indonesia Number 8 of 2024 concerning Control of the Implementation of the Quality Assurance and Safety System for Marine and Fishery Product" : generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng}
                                                 </span>
                                             }
 
                                         </div>
+
 
                                         <div className="flex gap-2 items-center justify-center pt-4">
                                             <div className="grid grid-cols-3 items-center">
@@ -373,7 +443,7 @@ const FormatSTTPL = React.forwardRef(
                                                 {/* Kolom 3 - Tanda Tangan & Pejabat */}
                                                 <div className={`flex flex-col items-center justify-center text-center ${peserta?.Foto == "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/" ? "w-[120%]" : "w-[120%]"} mt-2 space-y-1 -ml-10`}>
                                                     <div className="flex flex-col items-center gap-0.5 font-bosNormal text-sm leading-tight">
-                                                        <span className='text-base'>Jakarta, {userPelatihan?.TanggalSertifikat}</span>
+                                                        <span className='text-base'>Jakarta, {generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan)}</span>
                                                         <span className="w-full font-bosBold text-base">
                                                             KEPALA BADAN PENYULUHAN DAN PENGEMBANGAN <br />
                                                             SUMBER DAYA MANUSIA KELAUTAN DAN PERIKANAN
@@ -405,26 +475,34 @@ const FormatSTTPL = React.forwardRef(
                             </div>
 
                             <div
-                                className={`pdf-page w-full flex flex-col gap-2 h-[53.74rem] items-center justify-center ${materiIntiCount >= 10 ? "mt-56" : "mt-36"} break-before-auto relative  mb-0 pb-0`}
+                                className={`pdf-page w-full flex flex-col gap-2 h-[49.63rem] items-center justify-center px-5 ${materiIntiCount >= 10 ? "mt-56" : "mt-36"} break-before-auto relative  mb-0 pb-0`}
                             >
+
                                 <div className="w-full mb-0 pb-0">
                                     {/* Title */}
                                     <div className={`flex flex-row justify-center items-center ${materiIntiCount >= 10 ? "-mb-20" : "mb-5"}`}>
                                         <div className="flex flex-col text-center space-y-0 h-fit items-center justify-center w-full gap-0">
                                             <p className={`font-bosBold ${materiIntiCount >= 10 ? "text-xl" : "text-2xl max-w-6xl"} w-full uppercase leading-none mb-0`}>
-                                                Materi {pelatihan?.NamaPelatihan}, pada tanggal{" "}
-                                                {formatDateRange(
-                                                    generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan),
-                                                    generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan)
-                                                )}
+                                                Materi Pelatihan {[
+                                                    "Penjamin Mutu",
+                                                    "Administrasi Keuangan",
+                                                    "Kepala Produksi",
+                                                    "Manajer Operasional",
+                                                ].some((jabatan) => pelatihan?.Program?.includes(jabatan)) && (
+                                                        <span>Jabatan </span>
+                                                    )}
+                                                {[
+                                                    "Pengelola",
+                                                ].some((jabatan) => pelatihan?.Program?.includes(jabatan)) && (
+                                                        <span>SDM </span>
+                                                    )}
+                                                {pelatihan?.Program}
+
                                             </p>
                                             {
                                                 generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng != "" && <span className={`font-bos ${materiIntiCount >= 10 ? "text-lg" : "text-xl"} leading-none w-full -mt-5 pt-0`}>
-                                                    Curriculum of {pelatihan?.NamaPelathanInggris}
-                                                    {" "}on {formatDateRangeEnglish(
-                                                        generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan),
-                                                        generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan)
-                                                    )}
+                                                    Curriculum of {dataProgramPelatihan[0]?.name_english} Training
+                                                    {" "}
                                                 </span>
                                             }
 
@@ -438,7 +516,7 @@ const FormatSTTPL = React.forwardRef(
                                             <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 leading-none relative">
                                                 <span className="absolute mt-10 right-0 left-0 !font-bosBold text-lg">NO</span>
                                             </div>
-                                            <div className="w-7/12 px-1 flex flex-col justify-center items-center border-r border-gray-400 relative">
+                                            <div className="w-8/12 px-1 flex flex-col justify-center items-center border-r border-gray-400 relative">
                                                 <div className="flex flex-row items-center justify-center absolute mt-10">
                                                     <span className="text-lg leading-none !font-bosBold">MATERI</span>/
                                                     <span className="italic font-bos leading-none">COURSE</span>
@@ -1058,6 +1136,8 @@ const DialogSertifikatPelatihan = forwardRef<DialogSertifikatHandle, Props>(
         const componentRef = useRef<HTMLDivElement>(null);
         const componentRefPage = useRef<HTMLDivElement>(null);
 
+        const [isDownloading, setIsDownloading] = React.useState(false);
+
         const uploadPdf = async () => {
             if (!userPelatihan) return;
 
@@ -1077,17 +1157,17 @@ const DialogSertifikatPelatihan = forwardRef<DialogSertifikatHandle, Props>(
 
                 // Hyper-optimized settings for absolute speed
                 const opt = {
-                    margin: [0, 5, 5, 5],
+
                     filename: `${userPelatihan.Nama}_${userPelatihan.NoRegistrasi}.pdf`,
                     image: { type: 'jpeg', quality: 1.3 }, // Quality 0.5 untuk speed maksimal
                     pagebreak: { mode: ["avoid-all"] },
                     html2canvas: {
-                        scale: 1.3, // Skala 0.85 (Fastest balance)
+                        scale: 3, // Skala 0.85 (Fastest balance)
                         useCORS: true,
                         logging: false,
-                        backgroundColor: "#fff",
+                        backgroundColor: null,
                         windowWidth: element.offsetWidth,
-                        windowHeight: element.scrollHeight,
+                        windowHeight: element.offsetHeight,
                         letterRendering: false,
                     },
                     jsPDF: {
@@ -1128,6 +1208,7 @@ const DialogSertifikatPelatihan = forwardRef<DialogSertifikatHandle, Props>(
         };
         const downloadPdf = async () => {
             if (!userPelatihan) return;
+            setIsDownloading(true);
             console.log("⬇️ Downloading PDF for:", userPelatihan.Nama);
 
             try {
@@ -1172,13 +1253,36 @@ const DialogSertifikatPelatihan = forwardRef<DialogSertifikatHandle, Props>(
                 console.log("✅ PDF downloaded locally:", userPelatihan.Nama);
             } catch (error) {
                 console.error("❌ Error downloading PDF:", error);
+            } finally {
+                setIsDownloading(false);
             }
         };
 
         useImperativeHandle(ref, () => ({ uploadPdf, downloadPdf }), []);
 
         return (
-            <div className="max-h-[1000px] pt-20 scale-95 bg-white flex flex-col gap-2 overflow-y-auto scroll-smooth">
+            <div className="max-h-[1000px] pt-4 scale-95 bg-white flex flex-col gap-4 overflow-y-auto scroll-smooth">
+                {!isPrint && (
+                    <div className="flex justify-end w-full max-w-[297mm] mx-auto px-6 sticky top-0 z-10 bg-white/80 backdrop-blur-sm py-2">
+                        <Button
+                            onClick={downloadPdf}
+                            disabled={isDownloading}
+                            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-50"
+                        >
+                            {isDownloading ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    <span>Mengunduh PDF...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <FiDownload className="w-4 h-4" />
+                                    <span>Download PDF</span>
+                                </>
+                            )}
+                        </Button>
+                    </div>
+                )}
                 <FormatSTTPL
                     ref={componentRef}
                     refPage={componentRefPage}

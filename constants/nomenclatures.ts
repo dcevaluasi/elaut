@@ -8,7 +8,7 @@ export type ESELON = {
   nip?: string
 }
 
-export const KA_BPPSDM = 'Dr. I Nyoman Radiarta, S.Pi, M.Sc'
+export const KA_BPPSDM = 'Dr. I NYOMAN RADIARTA, S.Pi, M.Sc'
 export const KA_PUSLAT_KP = 'Dr. Lilly Aprilya Pregiwati, S.Pi., M.Si'
 
 export const ESELONS = {
@@ -21,7 +21,7 @@ export const ESELONS = {
     abbrvEselon: 'BPPSDM KP',
     fullNameEselon:
       'Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan',
-    currentPerson: 'Dr. I Nyoman Radiarta, S.Pi, M.Sc',
+    currentPerson: 'Dr. I NYOMAN RADIARTA, S.Pi, M.Sc',
     nip: '19730501 200212 1 001',
   },
   'Kepala Pusat Pelatihan Kelautan dan Perikanan': {
@@ -54,7 +54,7 @@ export const ESELON_1: ESELON = {
   abbrvEselon: 'BPPSDM KP',
   fullNameEselon:
     'Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan',
-  currentPerson: 'Dr. I Nyoman Radiarta, S.Pi, M.Sc',
+  currentPerson: 'Dr. I NYOMAN RADIARTA, S.Pi, M.Sc',
   nip: '19720402 199803 1 005',
 }
 
