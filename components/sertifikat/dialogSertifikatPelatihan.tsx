@@ -289,7 +289,7 @@ const FormatSTTPL = React.forwardRef(
 
                                                     <img
                                                         alt="Logo KKP"
-                                                        className="mx-auto w-26 h-26"
+                                                        className="mx-auto w-[6.2rem] h-[6.2rem]"
                                                         src="/logo-knmp.png"
                                                     />
                                                 </>
