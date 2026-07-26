@@ -100,6 +100,7 @@ const FormatSTTPL = React.forwardRef(
 
         const [peserta, setPeserta] = React.useState<User | null>(null);
 
+        const isAKP = pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan');
         const handleFetchDetailPeserta = async () => {
             try {
                 const response = await axios.get(
@@ -148,15 +149,15 @@ const FormatSTTPL = React.forwardRef(
 
             degree = degree
                 .replace(/A\.?MD\.?SN/gi, "A.Md.Sn")
-                .replace(/A\.?MD/gi, "A.Md.")
-                .replace(/S\.?PI/gi, "S.Pi.")
-                .replace(/S\.?PD/gi, "S.Pd.")
-                .replace(/S\.?KOM/gi, "S.Kom.")
-                .replace(/S\.?TP/gi, "S.TP.")
-                .replace(/S\.?T/gi, "S.T.")
-                .replace(/S\.?SI/gi, "S.Si.")
-                .replace(/M\.?SI/gi, "M.Si.")
-                .replace(/M\.?PD/gi, "M.Pd.")
+                .replace(/A\.?MD/gi, "A.Md")
+                .replace(/S\.?PI/gi, "S.Pi")
+                .replace(/S\.?PD/gi, "S.Pd")
+                .replace(/S\.?KOM/gi, "S.Kom")
+                .replace(/S\.?TP/gi, "S.TP")
+                .replace(/S\.?T/gi, "S.T")
+                .replace(/S\.?SI/gi, "S.Si")
+                .replace(/M\.?SI/gi, "M.Si")
+                .replace(/M\.?PD/gi, "M.Pd")
                 .replace(/DRS\.?/gi, "Drs.")
                 .replace(/DR\.?/gi, "Dr.")
                 .replace(/IR\.?/gi, "Ir.");
@@ -231,6 +232,7 @@ const FormatSTTPL = React.forwardRef(
         };
 
 
+
         const totalHoursCertificateLvl = calculateTotalHoursFromFirestore(
             selectedDoc?.categories || {}
         );
@@ -269,8 +271,7 @@ const FormatSTTPL = React.forwardRef(
                             >
 
 
-
-                                <div className="flex flex-row  absolute top-0 right-0">
+                                <div className="flex flex-row  absolute top-0 right-0 mr-5">
                                     <p className="text-lg font-bosNormal">
                                         NO. SERTIFIKAT : {userPelatihan?.NoRegistrasi}
                                     </p>
@@ -284,16 +285,7 @@ const FormatSTTPL = React.forwardRef(
                                                 className="mx-auto w-30"
                                                 src="/logo-kkp-2.png"
                                             />
-                                            {
-                                                pelatihan?.Program?.includes("Kampung Nelayan Merah Putih (KNMP)") && <>
 
-                                                    <img
-                                                        alt="Logo KKP"
-                                                        className="mx-auto w-[6.2rem] h-[6.2rem]"
-                                                        src="/logo-knmp.png"
-                                                    />
-                                                </>
-                                            }
                                         </div>
                                     </div>
                                     }
@@ -467,6 +459,13 @@ const FormatSTTPL = React.forwardRef(
                                                     </span>
                                                 </div>
 
+                                                <img
+                                                    alt="Logo KNMP"
+                                                    className="h-30 mx-auto w-30"
+                                                    src="/logo-knmp.png"
+                                                />
+
+
                                             </div>
 
                                         </div>
@@ -477,12 +476,11 @@ const FormatSTTPL = React.forwardRef(
                             <div
                                 className={`pdf-page w-full flex flex-col gap-2 h-[49.63rem] items-center justify-center px-5 ${materiIntiCount >= 10 ? "mt-56" : "mt-36"} break-before-auto relative  mb-0 pb-0`}
                             >
-
                                 <div className="w-full mb-0 pb-0">
                                     {/* Title */}
                                     <div className={`flex flex-row justify-center items-center ${materiIntiCount >= 10 ? "-mb-20" : "mb-5"}`}>
                                         <div className="flex flex-col text-center space-y-0 h-fit items-center justify-center w-full gap-0">
-                                            <p className={`font-bosBold ${materiIntiCount >= 10 ? "text-xl" : "text-2xl max-w-6xl"} w-full uppercase leading-none mb-0`}>
+                                            <p className={`font-bosBold ${materiIntiCount >= 10 ? "text-xl" : "text-2xl max-w-7xl"} w-full uppercase leading-none mb-0`}>
                                                 Materi Pelatihan {[
                                                     "Penjamin Mutu",
                                                     "Administrasi Keuangan",
@@ -511,45 +509,39 @@ const FormatSTTPL = React.forwardRef(
 
                                     {/* Table */}
                                     <div className={`${scaleClass} ${(pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? '-mb-24' : 'mb-0'} pb-0 w-full border border-gray-400 rounded-md overflow-hidden `}>
-                                        {/* Header Baris 1 */}
-                                        <div className="flex text-center font-bosNormal bg-gray-100 ">
-                                            <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 leading-none relative">
-                                                <span className="absolute mt-10 right-0 left-0 !font-bosBold text-lg">NO</span>
+                                        <div className="flex items-stretch text-center font-bosNormal bg-gray-100 border-b border-gray-400">
+                                            {/* NO — setinggi penuh */}
+                                            <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 !font-bosBold text-lg">
+                                                NO
                                             </div>
-                                            <div className="w-8/12 px-1 flex flex-col justify-center items-center border-r border-gray-400 relative">
-                                                <div className="flex flex-row items-center justify-center absolute mt-10">
-                                                    <span className="text-lg leading-none !font-bosBold">MATERI</span>/
-                                                    <span className="italic font-bos leading-none">COURSE</span>
-                                                </div>
-                                            </div>
-                                            <div className="w-4/12 px-1 flex items-center justify-center border-b border-gray-400">
-                                                <div className="flex flex-col mb-3">
-                                                    <div className="flex flex-row items-center justify-center">
-                                                        <span className="text-lg leading-none !font-bosBold">ALOKASI WAKTU </span>/
-                                                        <span className="italic font-bos leading-none">ALLOCATION TIME</span>
-                                                    </div>
-                                                    <div className="flex flex-row items-center justify-center -mt-1">
-                                                        <span className="text-lg leading-none !font-bosBold">{(pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? '@60 MENIT' : '@45 MENIT'}</span>/
-                                                        <span className="italic font-bos leading-none">{(pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? '@60 MINS' : '@45 MENIT'}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
 
-                                        {/* Header Baris 2 */}
-                                        <div className="flex text-center font-bosNormal bg-gray-100 border-b border-gray-400">
-                                            <div className="w-1/12 px-1 border-r border-gray-400"></div>
-                                            <div className="w-7/12 px-1 border-r border-gray-400"></div>
-                                            <div className="w-2/12 px-1 py-1 border-r border-gray-400">
-                                                <div className="flex flex-row items-center justify-center mb-4">
-                                                    <span className="text-lg leading-none !font-bosBold">TEORI</span>/
-                                                    <span className="italic font-bos leading-none ">THEORY</span>
-                                                </div>
+                                            {/* MATERI — setinggi penuh */}
+                                            <div className="w-7/12 px-1 flex items-center justify-center border-r border-gray-400">
+                                                <span className="text-lg !font-bosBold">MATERI</span>/
+                                                <span className="italic font-bos">Course</span>
                                             </div>
-                                            <div className="w-2/12 px-1 py-1">
-                                                <div className="flex flex-row items-center justify-center mb-4">
-                                                    <span className="text-lg leading-none !font-bosBold">PRAKTEK</span>/
-                                                    <span className="italic font-bos leading-none ">PRACTICE</span>
+
+                                            {/* ALOKASI WAKTU — atas header, bawah dibagi 2 */}
+                                            <div className="w-4/12 flex flex-col">
+                                                <div className="px-1 py-1 border-b pb-5 border-gray-400 leading-tight">
+                                                    <div className="flex items-center justify-center">
+                                                        <span className="text-lg !font-bosBold">ALOKASI WAKTU </span>/
+                                                        <span className="italic font-bos">Allocation Time</span>
+                                                    </div>
+                                                    <div className="flex items-center justify-center">
+                                                        <span className="text-lg !font-bosBold">{isAKP ? '@60 MENIT' : '@45 MENIT'}</span>/
+                                                        <span className="italic font-bos">{isAKP ? '@60 MINS' : '@45 MINS'}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-1">
+                                                    <div className="w-1/2 px-1 py-1 flex pb-5 items-center justify-center border-r border-gray-400">
+                                                        <span className="text-lg !font-bosBold">TEORI</span>/
+                                                        <span className="italic font-bos">Theory</span>
+                                                    </div>
+                                                    <div className="w-1/2 px-1 py-1 flex pb-5 items-center justify-center">
+                                                        <span className="text-lg !font-bosBold">PRAKTEK</span>/
+                                                        <span className="italic font-bos">Practice</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
