@@ -732,7 +732,7 @@ function IndonesiaMapSection({ p2mkpList, loading }: { p2mkpList: P2MKP[], loadi
 
     // Build all pins from items that have valid coordinates in bidang_pelatihan
     const allPins: P2MKPPin[] = p2mkpList.flatMap(item => {
-        const coords = parseCoords(item.bidang_pelatihan || '');
+        const coords = parseCoords(item.bidang_pelatihan || '') || parseCoords(item.alamat || '');
         if (!coords) return [];
         return [{
             id: item.IdPpmkp,
@@ -741,12 +741,12 @@ function IndonesiaMapSection({ p2mkpList, loading }: { p2mkpList: P2MKP[], loadi
             nama: item.nama_Ppmkp || item.nama_ppmkp || 'P2MKP',
             kota: item.kota || '',
             provinsi: item.provinsi || '',
+            status: item.status || 'Approved',
             pj: item.nama_penanggung_jawab || '',
-            status: item.status || '',
             alamat: item.alamat || '',
-            noTelp: item.no_telp_penanggung_jawab || item.no_telp || '',
+            noTelp: item.no_telp || item.no_telp_penanggung_jawab || '',
             jenisPelatihan: item.jenis_pelatihan || item.jenis_bidang_pelatihan || '',
-            klasifikasi: item.klasiikasi || 'Tidak Terklasifikasi',
+            klasifikasi: (item as any).klasifikasi || item.klasiikasi || 'Tidak Terklasifikasi',
             tahunPenetapan: item.tahun_penetapan || '-',
         }];
     });
@@ -1125,7 +1125,7 @@ function VideoGallerySection() {
             {/* Popup Player */}
             {activeVideo ? (
                 <div
-                    className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+                    className="fixed inset-0 z-[999999] flex items-center justify-center p-4"
                     onClick={() => setActiveVideo(null)}
                 >
                     {/* Backdrop */}
@@ -1133,7 +1133,7 @@ function VideoGallerySection() {
 
                     {/* Modal */}
                     <div
-                        className="relative w-full max-w-4xl z-10 rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/20 border border-white/10 bg-[#050d1a]"
+                        className="relative w-full max-w-4xl z-999999 rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/20 border border-white/10 bg-[#050d1a]"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Close button */}

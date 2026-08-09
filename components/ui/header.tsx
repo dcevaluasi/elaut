@@ -111,7 +111,7 @@ export default function Header() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`fixed left-0 right-0 z-[999999] transition-all duration-500 ${top ? "py-4 md:py-6" : "py-2 md:py-3"
+      className={`fixed left-0 right-0 z-99999 transition-all duration-500 ${top ? "py-4 md:py-6" : "py-2 md:py-3"
         }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -1,8 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -18,11 +17,12 @@ import {
     FiChevronRight,
     FiGlobe,
     FiCheckCircle,
-    FiInfo
+    FiInfo,
+    FiEye,
+    FiEyeOff
 } from 'react-icons/fi';
 import Link from 'next/link';
 
-import { Button } from '@/components/ui/button';
 import {
     Form,
     FormControl,
@@ -57,8 +57,6 @@ import { elautBaseUrl } from '@/constants/urls';
 import Swal from 'sweetalert2';
 import { useRouter } from 'next/navigation';
 import { HashLoader } from 'react-spinners';
-import Toast from '@/commons/Toast';
-import Image from 'next/image';
 
 const formSchema = z.object({
     nama_Ppmkp: z.string().min(1, 'Nama Lembaga atau Usaha wajib diisi'),
@@ -88,17 +86,19 @@ const formSchema = z.object({
     ),
     jenis_bidang_pelatihan: z.string().min(1, 'Jenis bidang pelatihan wajib dipilih'),
 }).refine((data) => data.password === data.confirm_password, {
-    message: "Password tidak cocok",
+    message: "Konfirmasi kata sandi tidak cocok",
     path: ["confirm_password"],
 });
 
 export default function RegistrasiP2MKPPage() {
     const { data: rumpunPelatihan, loading: loadingRumpun } = useFetchDataRumpunPelatihan();
     const router = useRouter();
-    const [isSubmitting, setIsSubmitting] = React.useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     // Alert State
-    const [alertConfig, setAlertConfig] = React.useState<{
+    const [alertConfig, setAlertConfig] = useState<{
         isOpen: boolean;
         title: string;
         description: string;
@@ -164,10 +164,18 @@ export default function RegistrasiP2MKPPage() {
             });
 
             if (response.status === 200 || response.status === 201) {
-                Toast.fire({
+                await Swal.fire({
                     icon: 'success',
-                    title: 'Registrasi Berhasil',
-                    text: 'Akun P2MKP Anda telah didaftarkan. Silakan login.'
+                    title: 'Registrasi Berhasil!',
+                    text: 'Akun P2MKP Anda telah berhasil terdaftar. Silakan login untuk melanjutkan ke portal P2MKP.',
+                    confirmButtonText: 'Ke Halaman Login',
+                    confirmButtonColor: '#2563eb',
+                    background: '#0f172a',
+                    color: '#ffffff',
+                    customClass: {
+                        popup: 'rounded-3xl border border-white/10 shadow-2xl z-[999999]',
+                        confirmButton: 'rounded-xl font-bold tracking-wider text-xs px-6 py-3',
+                    }
                 });
                 router.push('/p2mkp/login');
             }
@@ -190,18 +198,17 @@ export default function RegistrasiP2MKPPage() {
         if (isEmpty) {
             showAlert(
                 'Data Masih Kosong',
-                'Silakan isi formulir registrasi terlebih dahulu.',
+                'Silakan isi seluruh formulir registrasi terlebih dahulu.',
                 'warning'
             );
         } else {
-            // Get the first error message to show in the alert
             const errorKeys = Object.keys(errors);
             if (errorKeys.length > 0) {
                 const firstKey = errorKeys[0];
                 const firstError = errors[firstKey];
                 showAlert(
                     'Data Belum Sesuai',
-                    firstError?.message || 'Mohon periksa kembali inputan Anda.',
+                    firstError?.message || 'Mohon periksa kembali data yang Anda masukkan.',
                     'error'
                 );
             }
@@ -220,7 +227,7 @@ export default function RegistrasiP2MKPPage() {
 
             <Header />
 
-            <main className="relative z-10 pt-30 pb-12 px-4 md:px-8 max-w-3xl mx-auto min-h-screen flex flex-col justify-center">
+            <main className="relative z-10 pt-28 pb-16 px-4 md:px-8 max-w-3xl mx-auto min-h-screen flex flex-col justify-center">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -228,219 +235,247 @@ export default function RegistrasiP2MKPPage() {
                     className="w-full"
                 >
                     {/* Header Section */}
-                    <div className="text-center mb-6 space-y-3">
+                    <div className="text-center mb-8 space-y-3">
                         <motion.div
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             transition={{ delay: 0.2 }}
-                            className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[9px] font-bold uppercase tracking-widest"
+                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-widest"
                         >
-                            <span className="w-1 h-1 rounded-full bg-blue-500 animate-pulse" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
                             Daftarkan Lembaga atau Usaha Anda
                         </motion.div>
                         <h1 className="text-2xl md:text-4xl font-calsans leading-none tracking-tight">
                             MARI BERGABUNG
-                            <span className="text-transparent bg-clip-text bg-gradient-to-br from-blue-400 via-indigo-400 to-cyan-400"> MENJADI P2MKP.</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-br from-blue-400 via-indigo-400 to-cyan-400"> MENJADI P2MKP</span>
                         </h1>
-                        <p className="text-gray-400 text-[10px] md:text-xs max-w-lg mx-auto leading-relaxed">
-                            Mulai langkah Anda untuk menjadi bagian dari pusat pelatihan mandiri kelautan dan perikanan dalam membangun usaha dan peningkatan SDM di Sektor Kelautan dan Perikanan.
+                        <p className="text-gray-400 text-xs max-w-lg mx-auto leading-relaxed font-light">
+                            Isi formulir pendaftaran di bawah ini untuk mendaftarkan lembaga atau usaha Anda sebagai Pusat Pelatihan Mandiri Kelautan dan Perikanan.
                         </p>
                     </div>
 
                     {/* Form Container */}
                     <div className="relative group">
-                        <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-[2rem] blur-xl opacity-30 group-hover:opacity-60 transition duration-1000" />
+                        <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-[2.5rem] blur-xl opacity-40 group-hover:opacity-70 transition duration-1000" />
 
-                        <div className="relative bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[2rem] p-6 md:p-8 shadow-2xl">
+                        <div className="relative bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-6 md:p-10 shadow-2xl">
                             <Form {...form}>
-                                <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-5">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                        {/* Nama Lembaga */}
                                         <FormField
                                             control={form.control}
                                             name="nama_Ppmkp"
                                             render={({ field }) => (
                                                 <FormItem className="md:col-span-2">
-                                                    <FormLabel className="text-[9px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-1">
-                                                        <FiBriefcase className="text-blue-500" /> Nama Lembaga/Usaha
+                                                    <FormLabel className="text-[10px] font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-2 mb-1">
+                                                        <FiBriefcase className="text-blue-400 w-3.5 h-3.5" /> Nama Lembaga / Usaha P2MKP
                                                     </FormLabel>
                                                     <FormControl>
                                                         <Input
                                                             {...field}
-                                                            placeholder="Contoh: Sinar Mandiri"
-                                                            className="h-10 bg-white/5 border-white/10 text-white text-xs rounded-lg focus:ring-blue-500/20 focus:border-blue-500/50 transition-all"
+                                                            placeholder="Contoh: P2MKP Sinar Mandiri Bahari"
+                                                            className="h-11 bg-white/5 border-white/10 text-white text-xs rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/60 transition-all font-medium placeholder:text-gray-500"
                                                         />
                                                     </FormControl>
-                                                    <FormMessage className="text-rose-500 text-[9px] font-bold" />
+                                                    <FormMessage className="text-rose-400 text-[10px] font-bold" />
                                                 </FormItem>
                                             )}
                                         />
 
+                                        {/* Email */}
                                         <FormField
                                             control={form.control}
                                             name="email"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel className="text-[9px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-1">
-                                                        <FiMail className="text-blue-500" /> Email Akun
+                                                    <FormLabel className="text-[10px] font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-2 mb-1">
+                                                        <FiMail className="text-blue-400 w-3.5 h-3.5" /> Email Resmi / Pengelola
                                                     </FormLabel>
                                                     <FormControl>
                                                         <Input
                                                             {...field}
                                                             type="email"
-                                                            placeholder="lembaga@example.com"
-                                                            className="h-10 bg-white/5 border-white/10 text-white text-xs rounded-lg focus:ring-blue-500/20 focus:border-blue-500/50 transition-all"
+                                                            placeholder="lembaga@domain.com"
+                                                            className="h-11 bg-white/5 border-white/10 text-white text-xs rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/60 transition-all font-medium placeholder:text-gray-500"
                                                         />
                                                     </FormControl>
-                                                    <p className="text-[10px] italic text-gray-500">*Email aktif pengelola atau perusahaan/lembaga</p>
-                                                    <FormMessage className="text-rose-500 text-[9px] font-bold" />
+                                                    <p className="text-[9px] text-gray-500 italic">*Digunakan sebagai kredensial login portal</p>
+                                                    <FormMessage className="text-rose-400 text-[10px] font-bold" />
                                                 </FormItem>
                                             )}
                                         />
 
+                                        {/* Phone */}
                                         <FormField
                                             control={form.control}
                                             name="no_telp"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel className="text-[9px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-1">
-                                                        <FiPhone className="text-blue-500" /> WhatsApp / Telp
+                                                    <FormLabel className="text-[10px] font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-2 mb-1">
+                                                        <FiPhone className="text-blue-400 w-3.5 h-3.5" /> Nomor WhatsApp / Telp
                                                     </FormLabel>
                                                     <FormControl>
                                                         <Input
                                                             {...field}
                                                             placeholder="0812XXXXXXXX"
-                                                            className="h-10 bg-white/5 border-white/10 text-white text-xs rounded-lg focus:ring-blue-500/20 focus:border-blue-500/50 transition-all"
+                                                            className="h-11 bg-white/5 border-white/10 text-white text-xs rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/60 transition-all font-medium placeholder:text-gray-500"
                                                         />
                                                     </FormControl>
-                                                    <p className="text-[10px] italic text-gray-500">*No Telepon aktif pengelola atau perusahaan/lembaga</p>
-
-                                                    <FormMessage className="text-rose-500 text-[9px] font-bold" />
+                                                    <p className="text-[9px] text-gray-500 italic">*Nomor aktif kontak penanggung jawab</p>
+                                                    <FormMessage className="text-rose-400 text-[10px] font-bold" />
                                                 </FormItem>
                                             )}
                                         />
 
-                                        <FormField
-                                            control={form.control}
-                                            name="password"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="text-[9px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-1">
-                                                        <FiLock className="text-blue-500" /> Kata Sandi
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <Input
-                                                            {...field}
-                                                            type="password"
-                                                            placeholder="••••••••"
-                                                            className="h-10 bg-white/5 border-white/10 text-white text-xs rounded-lg focus:ring-blue-500/20 focus:border-blue-500/50 transition-all"
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage className="text-rose-500 text-[9px] font-bold" />
-                                                </FormItem>
-                                            )}
-                                        />
-
-                                        <FormField
-                                            control={form.control}
-                                            name="confirm_password"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="text-[9px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-1">
-                                                        <FiCheckCircle className="text-blue-500" /> Konfirmasi Sandi
-                                                    </FormLabel>
-                                                    <FormControl>
-                                                        <Input
-                                                            {...field}
-                                                            type="password"
-                                                            placeholder="••••••••"
-                                                            className="h-10 bg-white/5 border-white/10 text-white text-xs rounded-lg focus:ring-blue-500/20 focus:border-blue-500/50 transition-all"
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage className="text-rose-500 text-[9px] font-bold" />
-                                                </FormItem>
-                                            )}
-                                        />
-
+                                        {/* Status Kepemilikan */}
                                         <FormField
                                             control={form.control}
                                             name="status_kepemilikan"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel className="text-[9px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-1">
-                                                        <FiGlobe className="text-blue-500" /> Status Kepemilikan Usaha
+                                                    <FormLabel className="text-[10px] font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-2 mb-1">
+                                                        <FiGlobe className="text-blue-400 w-3.5 h-3.5" /> Status Kepemilikan Usaha
                                                     </FormLabel>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                         <FormControl>
-                                                            <SelectTrigger className="h-10 bg-white/5 border-white/10 text-white text-xs rounded-lg focus:ring-blue-500/20 transition-all">
+                                                            <SelectTrigger className="h-11 bg-white/5 border-white/10 text-white text-xs rounded-xl focus:ring-2 focus:ring-blue-500/30 transition-all font-medium">
                                                                 <SelectValue placeholder="Pilih Status..." />
                                                             </SelectTrigger>
                                                         </FormControl>
-                                                        <SelectContent className="bg-[#0f172a] border-white/10 text-white">
+                                                        <SelectContent className="bg-[#0f172a] border-white/10 text-white rounded-xl">
                                                             {['Koperasi', 'BUMN', 'Persero', 'Perusahaan Umum', 'Badan Usaha Milik Swasta', 'Perserorangan'].map((status) => (
-                                                                <SelectItem key={status} value={status} className="hover:bg-blue-600 focus:bg-blue-600 transition-colors cursor-pointer text-xs">
+                                                                <SelectItem key={status} value={status} className="hover:bg-blue-600 focus:bg-blue-600 transition-colors cursor-pointer text-xs font-semibold">
                                                                     {status}
                                                                 </SelectItem>
                                                             ))}
                                                         </SelectContent>
                                                     </Select>
-                                                    <FormMessage className="text-rose-500 text-[9px] font-bold" />
+                                                    <FormMessage className="text-rose-400 text-[10px] font-bold" />
                                                 </FormItem>
                                             )}
                                         />
 
+                                        {/* Jenis Bidang Pelatihan */}
                                         <FormField
                                             control={form.control}
                                             name="jenis_bidang_pelatihan"
                                             render={({ field }) => (
                                                 <FormItem>
-                                                    <FormLabel className="text-[9px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-1">
-                                                        <FiAward className="text-blue-500" /> Bidang Usaha atau Pelatihan
+                                                    <FormLabel className="text-[10px] font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-2 mb-1">
+                                                        <FiAward className="text-blue-400 w-3.5 h-3.5" /> Bidang Usaha / Pelatihan
                                                     </FormLabel>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loadingRumpun}>
                                                         <FormControl>
-                                                            <SelectTrigger className="h-10 bg-white/5 border-white/10 text-white text-xs rounded-lg focus:ring-blue-500/20 transition-all">
-                                                                <SelectValue placeholder={loadingRumpun ? "Memuat..." : "Pilih Bidang Usaha atau Pelatihan..."} />
+                                                            <SelectTrigger className="h-11 bg-white/5 border-white/10 text-white text-xs rounded-xl focus:ring-2 focus:ring-blue-500/30 transition-all font-medium">
+                                                                <SelectValue placeholder={loadingRumpun ? "Memuat..." : "Pilih Bidang..."} />
                                                             </SelectTrigger>
                                                         </FormControl>
-                                                        <SelectContent className="bg-[#0f172a] border-white/10 text-white max-h-[200px]">
+                                                        <SelectContent className="bg-[#0f172a] border-white/10 text-white max-h-[220px] rounded-xl">
                                                             {rumpunPelatihan?.map((item: any) => (
-                                                                <SelectItem key={item.id_rumpun_pelatihan} value={item.id_rumpun_pelatihan.toString()} className="hover:bg-blue-600 focus:bg-blue-600 transition-colors cursor-pointer text-xs">
+                                                                <SelectItem key={item.id_rumpun_pelatihan} value={item.id_rumpun_pelatihan.toString()} className="hover:bg-blue-600 focus:bg-blue-600 transition-colors cursor-pointer text-xs font-semibold">
                                                                     {item.name}
                                                                 </SelectItem>
                                                             ))}
                                                         </SelectContent>
                                                     </Select>
-                                                    <p className="text-[10px] italic text-gray-500">*Pilih bidang yang paling menonjol pada usaha atau pelatihan</p>
+                                                    <FormMessage className="text-rose-400 text-[10px] font-bold" />
+                                                </FormItem>
+                                            )}
+                                        />
 
-                                                    <FormMessage className="text-rose-500 text-[9px] font-bold" />
+                                        {/* Password with Eye Toggle */}
+                                        <FormField
+                                            control={form.control}
+                                            name="password"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-[10px] font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-2 mb-1">
+                                                        <FiLock className="text-blue-400 w-3.5 h-3.5" /> Kata Sandi
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        <div className="relative">
+                                                            <Input
+                                                                {...field}
+                                                                type={showPassword ? "text" : "password"}
+                                                                placeholder="••••••••"
+                                                                className="h-11 bg-white/5 border-white/10 text-white text-xs rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/60 transition-all font-medium pr-10 placeholder:text-gray-500"
+                                                            />
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setShowPassword(!showPassword)}
+                                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors p-1"
+                                                            >
+                                                                {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+                                                            </button>
+                                                        </div>
+                                                    </FormControl>
+                                                    <p className="text-[9px] text-gray-500 italic">*Min. 8 karakter, huruf besar/kecil, angka & simbol</p>
+                                                    <FormMessage className="text-rose-400 text-[10px] font-bold" />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        {/* Confirm Password with Eye Toggle */}
+                                        <FormField
+                                            control={form.control}
+                                            name="confirm_password"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-[10px] font-extrabold text-slate-300 uppercase tracking-wider flex items-center gap-2 mb-1">
+                                                        <FiCheckCircle className="text-blue-400 w-3.5 h-3.5" /> Konfirmasi Kata Sandi
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        <div className="relative">
+                                                            <Input
+                                                                {...field}
+                                                                type={showConfirmPassword ? "text" : "password"}
+                                                                placeholder="••••••••"
+                                                                className="h-11 bg-white/5 border-white/10 text-white text-xs rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500/60 transition-all font-medium pr-10 placeholder:text-gray-500"
+                                                            />
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors p-1"
+                                                            >
+                                                                {showConfirmPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+                                                            </button>
+                                                        </div>
+                                                    </FormControl>
+                                                    <FormMessage className="text-rose-400 text-[10px] font-bold" />
                                                 </FormItem>
                                             )}
                                         />
                                     </div>
 
-                                    <div className="pt-2">
+                                    {/* Submit Button */}
+                                    <div className="pt-3">
                                         <button
                                             type="submit"
                                             disabled={isSubmitting}
-                                            className="w-full h-12 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold tracking-widest text-xs transition-all shadow-xl shadow-blue-600/20 flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-50"
+                                            className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl font-black tracking-widest text-xs transition-all shadow-xl shadow-blue-600/30 flex items-center justify-center gap-2.5 active:scale-[0.98] disabled:opacity-50 uppercase"
                                         >
                                             {isSubmitting ? (
-                                                <HashLoader color="#fff" size={16} />
+                                                <HashLoader color="#fff" size={18} />
                                             ) : (
                                                 <>
                                                     <FiSave className="text-base" />
-                                                    BUAT AKUN
+                                                    DAFTARKAN AKUN P2MKP
                                                 </>
                                             )}
                                         </button>
                                     </div>
 
-                                    <div className="pt-4 border-t border-white/5 flex flex-col items-center gap-3">
-                                        <p className="text-[10px] text-gray-500 font-medium">
-                                            Sudah memiliki akun? <Link href="/p2mkp/login" className="text-blue-400 hover:underline font-bold">Masuk Portal</Link>
+                                    {/* Bottom Links */}
+                                    <div className="pt-4 border-t border-white/10 flex flex-col items-center gap-2.5">
+                                        <p className="text-xs text-gray-400 font-medium">
+                                            Sudah memiliki akun?{' '}
+                                            <Link href="/p2mkp/login" className="text-blue-400 hover:text-blue-300 font-black underline underline-offset-4">
+                                                Masuk Portal P2MKP
+                                            </Link>
                                         </p>
-                                        <Link href="/p2mkp" className="inline-flex items-center gap-2 text-[8px] text-gray-500 hover:text-white transition-colors uppercase tracking-[0.2em] font-bold">
-                                            <FiArrowLeft /> Kembali ke Beranda
+                                        <Link href="/p2mkp" className="inline-flex items-center gap-2 text-[9px] text-gray-500 hover:text-gray-300 transition-colors uppercase tracking-[0.2em] font-bold">
+                                            <FiArrowLeft /> Kembali ke Landing Page
                                         </Link>
                                     </div>
                                 </form>
@@ -453,10 +488,10 @@ export default function RegistrasiP2MKPPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 1 }}
-                        className="mt-6 flex items-center justify-center gap-2 opacity-50"
+                        className="mt-6 flex items-center justify-center gap-2 opacity-60"
                     >
-                        <FiShield className="text-emerald-500" size={12} />
-                        <p className="text-[8px] text-gray-500 font-bold uppercase tracking-widest leading-none">Sistem Keamanan Terintegrasi BPPSDM KP</p>
+                        <FiShield className="text-emerald-400" size={13} />
+                        <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest leading-none">Sistem Keamanan Terintegrasi BPPSDM KP</p>
                     </motion.div>
                 </motion.div>
             </main>
@@ -464,20 +499,20 @@ export default function RegistrasiP2MKPPage() {
             <Footer />
 
             <AlertDialog open={alertConfig.isOpen} onOpenChange={(open) => setAlertConfig(prev => ({ ...prev, isOpen: open }))}>
-                <AlertDialogContent className="bg-[#0f172a] border-white/10 text-white font-jakarta">
+                <AlertDialogContent className="bg-[#0f172a] border-white/10 text-white font-jakarta rounded-3xl">
                     <AlertDialogHeader>
-                        <AlertDialogTitle className="flex items-center gap-2">
+                        <AlertDialogTitle className="flex items-center gap-2 text-base font-bold">
                             {alertConfig.type === 'error' && <FiShield className="text-rose-500" />}
                             {alertConfig.type === 'warning' && <FiInfo className="text-amber-500" />}
                             {alertConfig.type === 'success' && <FiCheckCircle className="text-emerald-500" />}
                             {alertConfig.title}
                         </AlertDialogTitle>
-                        <AlertDialogDescription className="text-gray-400">
+                        <AlertDialogDescription className="text-gray-400 text-xs">
                             {alertConfig.description}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="border-t border-white/5 pt-4">
-                        <AlertDialogAction className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 border-none">
+                        <AlertDialogAction className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-2 text-xs rounded-xl border-none">
                             MENGERTI
                         </AlertDialogAction>
                     </AlertDialogFooter>

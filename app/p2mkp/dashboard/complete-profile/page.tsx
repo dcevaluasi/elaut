@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { motion } from 'framer-motion';
@@ -25,6 +26,7 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import DashboardLayout from '../DashboardLayout';
+import { PROVINCES, KABUPATENS } from '@/constants/regions';
 
 import {
     Form,
@@ -100,6 +102,7 @@ export default function CompleteProfilePage() {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = React.useState(false);
     const [loading, setLoading] = useState(true);
+    const [selectedProvinceId, setSelectedProvinceId] = useState<string>('');
 
     const [alertConfig, setAlertConfig] = React.useState<{
         isOpen: boolean;
@@ -191,6 +194,14 @@ export default function CompleteProfilePage() {
                 if (response.status === 200) {
                     const data = response.data.data || response.data;
                     setProfileId(data.IdPpmkp || data.id_p2mkp || data.id);
+
+                    // Resolve province ID from name for cascading select
+                    const provinsiName = data.Provinsi || data.provinsi || '';
+                    const matchedProvince = PROVINCES.find(
+                        p => p.provinsi.toLowerCase() === provinsiName.toLowerCase()
+                    );
+                    if (matchedProvince) setSelectedProvinceId(matchedProvince.id);
+
                     form.reset({
                         NamaPpmkp: data.nama_ppmkp,
                         StatusKepemilikan: data.StatusKepemilikan || data.status_kepemilikan || "Perserorangan",
@@ -259,18 +270,13 @@ export default function CompleteProfilePage() {
             }
 
             if (!profileId) {
-                showAlert(
-                    'System Error',
-                    'ID Profil tidak ditemukan. Silakan refresh halaman.',
-                    'error'
-                );
+                showAlert('System Error', 'ID Profil tidak ditemukan. Silakan refresh halaman.', 'error');
                 return;
             }
 
             const formData = new FormData();
             Object.entries(values).forEach(([key, value]) => {
                 if (value === undefined || value === null || value === "") return;
-
                 formData.append(key, String(value));
             });
 
@@ -282,20 +288,26 @@ export default function CompleteProfilePage() {
             });
 
             if (response.status === 200) {
-                showAlert(
-                    'Profil Terupdate',
-                    'Seluruh perubahan data profil Anda telah disimpan ke server pusat.',
-                    'success'
-                );
-                setTimeout(() => {
-                    router.push('/p2mkp/dashboard');
-                }, 1500);
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Profil Berhasil Disimpan!',
+                    html: '<p style="color:#94a3b8;font-size:13px;line-height:1.6;">Data profil P2MKP Anda telah berhasil diperbarui dan disinkronisasi ke server pusat. Anda akan diarahkan kembali ke dashboard.</p>',
+                    confirmButtonText: 'Ke Dashboard',
+                    confirmButtonColor: '#2563eb',
+                    background: '#0f172a',
+                    color: '#ffffff',
+                    customClass: {
+                        popup: 'rounded-3xl border border-white/10 shadow-2xl z-[999999]',
+                        confirmButton: 'rounded-xl font-bold tracking-wider text-xs px-6 py-3',
+                    }
+                });
+                router.push('/p2mkp/dashboard');
             }
         } catch (error: any) {
             console.error('Submission error:', error);
             showAlert(
-                'Operation Failed',
-                error.response?.data?.message || 'Gagal sinkronisasi data profil.',
+                'Gagal Menyimpan',
+                error.response?.data?.message || 'Terjadi kesalahan saat menyimpan data profil. Silakan coba lagi.',
                 'error'
             );
         } finally {
@@ -327,6 +339,20 @@ export default function CompleteProfilePage() {
         }
     };
 
+    // --- Compute progress from required fields ---
+    const requiredFields = [
+        'NamaPpmkp', 'StatusKepemilikan', 'Nib', 'Alamat', 'Provinsi', 'Kota',
+        'Kecamatan', 'Kelurahan', 'KodePos', 'NoTelp', 'Email',
+        'JenisBidangPelatihan', 'JenisPelatihan',
+        'NamaPenanggungJawab', 'NoTelpPenanggungJawab', 'TempatTanggalLahir',
+        'JenisKelamin', 'PendidikanTerakhir', 'IsLpk',
+    ] as const;
+
+    const allValues = form.watch();
+    const filledCount = requiredFields.filter((f) => !!allValues[f as keyof typeof allValues]).length;
+    const progressPct = Math.round((filledCount / requiredFields.length) * 100);
+    const progressColor = progressPct < 40 ? '#ef4444' : progressPct < 75 ? '#f59e0b' : '#10b981';
+
     return (
         <DashboardLayout>
             <div className="relative overflow-hidden bg-slate-50 min-h-screen">
@@ -337,19 +363,47 @@ export default function CompleteProfilePage() {
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="max-w-5xl mx-auto space-y-12 pb-32 relative z-10"
+                    className="max-w-5xl mx-auto space-y-10 pb-32 relative z-10"
                 >
+                    {/* Header */}
                     <div className="space-y-4 pt-6">
-                        <div className="flex items-center gap-4">
-                            <span className="h-[2px] w-12 bg-blue-500 rounded-full" />
-                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-600">Gerbang Registrasi</span>
-                        </div>
                         <h1 className="text-4xl md:text-5xl font-black italic uppercase tracking-tighter leading-none text-slate-900">
                             Lengkapi <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Profil</span>
                         </h1>
-                        <p className="text-slate-500 text-base max-w-3xl font-medium leading-relaxed italic mt-4">
-                            Mohon lengkapi parameter kredensial lembaga dan otorisasi penanggung jawab untuk finalisasi sertifikasi standarisasi P2MKP.
+                        <p className="text-slate-500 text-sm max-w-3xl font-medium leading-relaxed mt-2">
+                            Mohon lengkapi seluruh data berikut untuk melengkapi profil lembaga P2MKP Anda sebelum mengajukan penetapan.
                         </p>
+                    </div>
+
+                    {/* Progress Bar Card */}
+                    <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm space-y-3">
+                        <div className="flex items-center justify-between">
+                            <div className="space-y-0.5">
+                                <p className="text-sm font-black text-slate-700">Kelengkapan Profil</p>
+                                <p className="text-[10px] text-slate-400 font-medium uppercase tracking-widest">{filledCount} dari {requiredFields.length} field wajib terisi</p>
+                            </div>
+                            <div className="text-right">
+                                <span className="text-3xl font-black" style={{ color: progressColor }}>{progressPct}%</span>
+                            </div>
+                        </div>
+                        <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                            <motion.div
+                                className="h-full rounded-full"
+                                initial={{ width: 0 }}
+                                animate={{ width: `${progressPct}%` }}
+                                transition={{ duration: 0.6, ease: 'easeOut' }}
+                                style={{ backgroundColor: progressColor }}
+                            />
+                        </div>
+                        {progressPct === 100 ? (
+                            <p className="text-[10px] font-bold text-emerald-600 flex items-center gap-1.5">
+                                <FiCheckCircle size={12} /> Semua data wajib telah terisi. Klik Simpan untuk menyimpan profil Anda.
+                            </p>
+                        ) : (
+                            <p className="text-[10px] font-medium text-slate-400">
+                                Lengkapi {requiredFields.length - filledCount} field lagi untuk mencapai profil 100%.
+                            </p>
+                        )}
                     </div>
 
                     <Form {...form}>
@@ -426,8 +480,87 @@ export default function CompleteProfilePage() {
                                 <div className="space-y-8">
                                     <FormFieldItem label="Alamat Spesifik" name="Alamat" control={form.control} placeholder="Jalan, No, RT/RW..." icon={<FiMapPin />} />
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                        <FormFieldItem label="Provinsi" name="Provinsi" control={form.control} placeholder="Nama Provinsi..." />
-                                        <FormFieldItem label="Kota/Kabupaten" name="Kota" control={form.control} placeholder="Nama Kota..." />
+
+                                        {/* Provinsi Select */}
+                                        <FormField
+                                            control={form.control}
+                                            name="Provinsi"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-2">
+                                                    <FormLabel className="text-[10px] font-bold text-slate-500 uppercase tracking-widest pl-1">Provinsi</FormLabel>
+                                                    <Select
+                                                        onValueChange={(val) => {
+                                                            // val = "ID|provinsiName"
+                                                            const [id, name] = val.split('|');
+                                                            field.onChange(name);
+                                                            setSelectedProvinceId(id);
+                                                            form.setValue('Kota', '', { shouldValidate: false });
+                                                        }}
+                                                        value={selectedProvinceId
+                                                            ? `${selectedProvinceId}|${field.value}`
+                                                            : ''}
+                                                    >
+                                                        <FormControl>
+                                                            <SelectTrigger className="w-full h-14 bg-white border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all text-slate-700 hover:border-slate-300 shadow-sm">
+                                                                <SelectValue placeholder="Pilih Provinsi..." />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent className="bg-white border-slate-200 text-slate-800 rounded-2xl shadow-xl max-h-60 overflow-y-auto">
+                                                            {PROVINCES.map((prov) => (
+                                                                <SelectItem
+                                                                    key={prov.id}
+                                                                    value={`${prov.id}|${prov.provinsi}`}
+                                                                    className="hover:bg-slate-50 rounded-lg py-2.5 cursor-pointer focus:bg-indigo-50 focus:text-indigo-700 text-sm capitalize"
+                                                                >
+                                                                    {prov.provinsi.charAt(0) + prov.provinsi.slice(1).toLowerCase()}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage className="text-[10px] font-bold text-rose-500 tracking-wide pl-1" />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        {/* Kota/Kabupaten Select (cascading) */}
+                                        <FormField
+                                            control={form.control}
+                                            name="Kota"
+                                            render={({ field }) => {
+                                                const filteredKab = selectedProvinceId
+                                                    ? KABUPATENS.filter(k => k.id_provinsi === selectedProvinceId)
+                                                    : [];
+                                                return (
+                                                    <FormItem className="space-y-2">
+                                                        <FormLabel className="text-[10px] font-bold text-slate-500 uppercase tracking-widest pl-1">Kota / Kabupaten</FormLabel>
+                                                        <Select
+                                                            onValueChange={field.onChange}
+                                                            value={field.value}
+                                                            disabled={!selectedProvinceId}
+                                                        >
+                                                            <FormControl>
+                                                                <SelectTrigger className="w-full h-14 bg-white border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all text-slate-700 hover:border-slate-300 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                                                    <SelectValue placeholder={selectedProvinceId ? 'Pilih Kota/Kabupaten...' : 'Pilih Provinsi dulu...'} />
+                                                                </SelectTrigger>
+                                                            </FormControl>
+                                                            <SelectContent className="bg-white border-slate-200 text-slate-800 rounded-2xl shadow-xl max-h-60 overflow-y-auto">
+                                                                {filteredKab.map((kab) => (
+                                                                    <SelectItem
+                                                                        key={kab.id}
+                                                                        value={kab.kabupaten}
+                                                                        className="hover:bg-slate-50 rounded-lg py-2.5 cursor-pointer focus:bg-indigo-50 focus:text-indigo-700 text-sm capitalize"
+                                                                    >
+                                                                        {kab.kabupaten.charAt(0) + kab.kabupaten.slice(1).toLowerCase()}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <FormMessage className="text-[10px] font-bold text-rose-500 tracking-wide pl-1" />
+                                                    </FormItem>
+                                                );
+                                            }}
+                                        />
+
                                         <FormFieldItem label="Kecamatan" name="Kecamatan" control={form.control} placeholder="Kecamatan..." />
                                         <FormFieldItem label="Kelurahan" name="Kelurahan" control={form.control} placeholder="Kelurahan..." />
                                         <FormFieldItem label="Kode Pos" name="KodePos" control={form.control} placeholder="5 Digit..." maxlength={5} />
