@@ -84,7 +84,7 @@ export default function P2MKPSection() {
 
             <div className="pt-6">
               <Link
-                href="https://elaut-bppsdm.kkp.go.id/p2mkp"
+                href="/p2mkp"
                 target="_blank"
                 className="group/btn inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-teal-600 to-emerald-500 hover:from-teal-500 hover:to-emerald-400 text-white font-bold transition-all duration-300 shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_40px_rgba(16,185,129,0.6)] hover:-translate-y-1 overflow-hidden relative"
               >

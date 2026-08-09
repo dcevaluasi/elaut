@@ -86,7 +86,7 @@ const FormatSertifikatP2MKP = forwardRef(
                 <div
                     ref={refPage}
                     style={{ width: '297mm', height: '210mm', minWidth: '297mm', minHeight: '210mm' }}
-                    className="pdf-page bg-white  flex flex-col relative items-center justify-center mx-auto overflow-hidden p-[15mm]"
+                    className="pdf-page bg-white text-black flex flex-col relative items-center justify-center mx-auto overflow-hidden p-[15mm]"
                 >
                     {/* Top Right Reference Number */}
                     <div className="absolute top-[5mm] right-[15mm] text-right">
@@ -156,7 +156,7 @@ const FormatSertifikatP2MKP = forwardRef(
                                             <span className="font-bos italic text-[10px] text-black block -mt-1 leading-tight">Training Category</span>
                                         </td>
                                         <td className="w-[3%] align-top py-1 text-md font-bosBold">:</td>
-                                        <td className="w-[69%] align-top py-1 text-md font-bosBold uppercase leading-tight">
+                                        <td className="w-[69%] align-top py-1 text-md text-black font-bosBold uppercase leading-tight">
                                             {p2mkp?.jenis_pelatihan}
                                         </td>
                                     </tr>
@@ -166,7 +166,7 @@ const FormatSertifikatP2MKP = forwardRef(
                                             <span className="font-bos italic text-[10px] text-black block -mt-1 leading-tight">Address</span>
                                         </td>
                                         <td className="w-[3%] align-top py-1 text-md font-bosBold">:</td>
-                                        <td className="w-[69%] align-top py-1 text-md font-bosBold uppercase leading-tight">
+                                        <td className="w-[69%] align-top py-1 text-md font-bosBold uppercase leading-tight text-black">
                                             {alamatFull || "-"}
                                         </td>
                                     </tr>
@@ -209,10 +209,10 @@ const FormatSertifikatP2MKP = forwardRef(
                                 </div>
 
                                 <div className="flex flex-col items-center mt-16">
-                                    <p className="text-sm font-bosBold px-8 mb-2  tracking-tight">
+                                    <p className="text-sm font-bosBold px-8 mb-2  tracking-tight text-black">
                                         Dr. I NYOMAN RADIARTA, S.Pi., M.Sc.
                                     </p>
-                                    <p className="text-sm font-bosNormal -mt-3">NIP. {ESELON_1.nip}</p>
+                                    <p className="text-sm font-bosNormal -mt-3 text-black">NIP. {ESELON_1.nip}</p>
                                 </div>
                             </div>
                         </div>

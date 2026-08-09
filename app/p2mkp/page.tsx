@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Footer from '@/components/ui/footer';
-import Header from '@/components/ui/header';
 import dynamic from 'next/dynamic';
-import { FiBriefcase, FiUsers, FiAnchor, FiTarget, FiAward, FiFileText, FiCheckCircle, FiMapPin, FiArrowRight, FiUserCheck, FiActivity, FiShield, FiLayers, FiTrendingUp, FiCpu, FiPlus, FiMinus, FiChevronDown, FiPlay, FiX, FiYoutube } from 'react-icons/fi';
+import { FiBriefcase, FiUsers, FiTarget, FiAward, FiFileText, FiCheckCircle, FiMapPin, FiArrowRight, FiUserCheck, FiActivity, FiShield, FiLayers, FiTrendingUp, FiCpu, FiPlus, FiMinus, FiChevronDown, FiPlay, FiX, FiYoutube } from 'react-icons/fi';
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import axios from 'axios';
@@ -14,35 +13,6 @@ import { P2MKP } from '@/types/p2mkp';
 import type { P2MKPPin } from '@/components/ui/P2MKPLeafletMap';
 
 const REGULATION = "Peraturan Menteri Kelautan dan Perikanan Republik Indonesia No. 18 Tahun 2024"
-
-// --- Video Gallery Data ---
-const VIDEO_GALLERY = [
-    {
-        id: 'vWf0UgE980A',
-        title: 'P2MKP Kirno Bersaudara',
-        description: 'Pengenalan Pusat Pelatihan Mandiri Kelautan dan Perikanan sebagai lembaga pelatihan berbasis masyarakat.'
-    },
-    {
-        id: 'vOw6zO_8aM0',
-        title: 'P2MKP Tambakan Sukses Budi Daya Gurame Nila, Mas, dan Lele',
-        description: 'Panduan lengkap tahapan pengajuan dan penetapan resmi lembaga P2MKP oleh BPPP.'
-    },
-    {
-        id: 'RpcS1lG0rfw',
-        title: 'Cerita Sukses Bisnis Ikan Lele',
-        description: 'Memahami tingkatan klasifikasi P2MKP: Pemula, Muda, Madya, dan Utama.'
-    },
-    {
-        id: 'P9TQ10UTyIA',
-        title: 'Kisah Sukses Budi Daya Ikan Nila, P2MKP Mina Tarna Bakti Sleman',
-        description: 'Keuntungan dan manfaat menjadi bagian dari jaringan P2MKP nasional di bidang kelautan dan perikanan.'
-    },
-    {
-        id: 'msBCLWDD4E0',
-        title: 'P2MKP Citra Handycraft - Pembuatan Hiasan Kerang',
-        description: 'Kisah sukses dan pengalaman nyata dari para pengelola dan peserta P2MKP di seluruh Indonesia.'
-    },
-];
 
 const ISLAND_GROUPS = [
     { name: 'Sumatera', icon: '🌴', color: 'from-emerald-500 to-teal-600', provinces: ['Aceh', 'Sumatera Utara', 'Sumatera Barat', 'Riau', 'Kepulauan Riau', 'Jambi', 'Sumatera Selatan', 'Kepulauan Bangka Belitung', 'Bengkulu', 'Lampung'] },
@@ -452,6 +422,7 @@ function FAQTabs() {
 // --- Main Page ---
 
 import MarqueeLogos from '@/components/marquee-logos';
+import { VIDEO_GALLERY_P2MKP } from '@/constants/p2mkp';
 
 export default function P2MKPPage() {
     const [p2mkpList, setP2mkpList] = useState<P2MKP[]>([]);
@@ -1125,15 +1096,15 @@ function VideoGallerySection() {
                         className="lg:row-span-2"
                     >
                         <VideoCard
-                            video={VIDEO_GALLERY[0]}
+                            video={VIDEO_GALLERY_P2MKP[0]}
                             featured
-                            onClick={() => setActiveVideo(VIDEO_GALLERY[0].id)}
+                            onClick={() => setActiveVideo(VIDEO_GALLERY_P2MKP[0].id)}
                         />
                     </motion.div>
 
                     {/* Side grid */}
                     <div className="grid grid-cols-2 gap-5">
-                        {VIDEO_GALLERY.slice(1).map((video, i) => (
+                        {VIDEO_GALLERY_P2MKP.slice(1).map((video, i) => (
                             <motion.div
                                 key={video.id}
                                 initial={{ opacity: 0, y: 20 }}
@@ -1186,7 +1157,7 @@ function VideoGallerySection() {
 
                         {/* Video info strip */}
                         {(() => {
-                            const vid = VIDEO_GALLERY.find(v => v.id === activeVideo);
+                            const vid = VIDEO_GALLERY_P2MKP.find(v => v.id === activeVideo);
                             return vid ? (
                                 <div key="video-info-strip" className="px-6 py-4 flex items-start gap-3 border-t border-white/5">
                                     <div className="w-8 h-8 shrink-0 rounded-lg bg-red-600/20 border border-red-500/30 flex items-center justify-center">
@@ -1203,7 +1174,7 @@ function VideoGallerySection() {
 }
 
 function VideoCard({ video, featured = false, onClick }: {
-    video: typeof VIDEO_GALLERY[0];
+    video: typeof VIDEO_GALLERY_P2MKP[0];
     featured?: boolean;
     onClick: () => void;
 }) {

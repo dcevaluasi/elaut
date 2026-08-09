@@ -273,7 +273,7 @@ export default function LayoutAdminElaut({
 
           {/* Pusat Pelatihan Mandiri KP */}
           {
-            (Cookies.get('Access')?.includes('superAdmin')) && <li className="list-none">
+            ((Cookies.get('Access')?.includes('superAdmin') || Cookies.get('Access')?.includes('viewP2MKP'))) && <li className="list-none">
               <button
                 onClick={() => { setSubMenuP2MKPOpen(!subMenuP2MKPOpen) }}
                 className={`flex items-center justify-between w-full px-3 py-2.5 rounded-lg transition-all duration-200 group ${pathname.includes("p2mkp")
@@ -307,41 +307,44 @@ export default function LayoutAdminElaut({
             </li>
           }
 
-          {/* Penyelenggaraan Pelatihan */}
-          <li className="list-none">
-            <button
-              onClick={() => { setSubMenuPelatihanOpen(!subMenuPelatihanOpen) }}
-              className={`flex items-center justify-between w-full px-3 py-2.5 rounded-lg transition-all duration-200 group ${pathname.includes("pelatihan")
-                ? "bg-blue-600 text-white shadow-lg shadow-blue-900/40"
-                : "hover:bg-slate-800 hover:text-white"
-                }`}
-            >
-              <div className="flex items-center gap-3">
-                <TbSchool className={`w-6 h-6 flex-shrink-0 ${pathname.includes("pelatihan") ? "text-white" : "text-slate-400 group-hover:text-white"}`} />
-                {sidebarOpen && (
-                  <span className="text-sm font-medium text-left">Penyelenggaraan Pelatihan</span>
-                )}
-              </div>
-              {sidebarOpen && (subMenuPelatihanOpen ? <FiChevronDown className="opacity-70" /> : <FiChevronRight className="opacity-70" />)}
-            </button>
-            {subMenuPelatihanOpen && sidebarOpen && (
-              <ul className="ml-4 mt-1 pl-3 border-l border-slate-700 space-y-1">
-                <NavItem
-                  href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/pelatihan`}
-                  icon={<TbSchool className="flex-shrink-0 w-5 -ml-0.5 h-6" />}
-                  label="Kelas Pelatihan"
-                />
-                {
-                  Cookies.get('Access')?.includes('superAdmin') &&
+          {
+            (Cookies.get('Access')?.includes('superAdmin') || Cookies.get('Access')?.includes('viewPelatihan')) &&
+
+            <li className="list-none">
+              <button
+                onClick={() => { setSubMenuPelatihanOpen(!subMenuPelatihanOpen) }}
+                className={`flex items-center justify-between w-full px-3 py-2.5 rounded-lg transition-all duration-200 group ${pathname.includes("pelatihan")
+                  ? "bg-blue-600 text-white shadow-lg shadow-blue-900/40"
+                  : "hover:bg-slate-800 hover:text-white"
+                  }`}
+              >
+                <div className="flex items-center gap-3">
+                  <TbSchool className={`w-6 h-6 flex-shrink-0 ${pathname.includes("pelatihan") ? "text-white" : "text-slate-400 group-hover:text-white"}`} />
+                  {sidebarOpen && (
+                    <span className="text-sm font-medium text-left">Penyelenggaraan Pelatihan</span>
+                  )}
+                </div>
+                {sidebarOpen && (subMenuPelatihanOpen ? <FiChevronDown className="opacity-70" /> : <FiChevronRight className="opacity-70" />)}
+              </button>
+              {subMenuPelatihanOpen && sidebarOpen && (
+                <ul className="ml-4 mt-1 pl-3 border-l border-slate-700 space-y-1">
                   <NavItem
-                    href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/pelatihan/video`}
-                    icon={<FiYoutube className="flex-shrink-0 w-5 -ml-0.5 h-6" />}
-                    label="Video Pelatihan"
+                    href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/pelatihan`}
+                    icon={<TbSchool className="flex-shrink-0 w-5 -ml-0.5 h-6" />}
+                    label="Kelas Pelatihan"
                   />
-                }
-              </ul>
-            )}
-          </li>
+                  {
+                    Cookies.get('Access')?.includes('superAdmin') &&
+                    <NavItem
+                      href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/pelatihan/video`}
+                      icon={<FiYoutube className="flex-shrink-0 w-5 -ml-0.5 h-6" />}
+                      label="Video Pelatihan"
+                    />
+                  }
+                </ul>
+              )}
+            </li>
+          }
 
           {/* Layanan Publik */}
           {
@@ -371,7 +374,7 @@ export default function LayoutAdminElaut({
             {sidebarOpen && <span className="font-medium">Logout</span>}
           </button>
         </div>
-      </aside>
+      </aside >
 
       <div className="flex-grow flex flex-col overflow-y-auto">
         <header className="flex justify-end items-center bg-white/80 backdrop-blur-md sticky top-0 z-40 h-20 px-8 border-b border-slate-200/60 shadow-sm">
@@ -379,7 +382,7 @@ export default function LayoutAdminElaut({
         </header>
         <main className="flex-grow p-6 bg-slate-50">{children}</main>
       </div>
-    </div>
+    </div >
   );
 }
 

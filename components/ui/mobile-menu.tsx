@@ -10,15 +10,12 @@ import {
   HiHome,
   HiIdentification,
   HiNewspaper,
-  HiOutlineClipboardDocumentCheck,
-  HiOutlineDocumentText,
-  HiOutlineChatBubbleLeftRight,
-  HiOutlineChartBar,
-  HiOutlineChatBubbleBottomCenterText,
   HiOutlineUsers,
   HiOutlineBuildingOffice2,
   HiOutlineShieldCheck,
+  HiOutlineDocumentText,
 } from "react-icons/hi2";
+import { LAYANAN_LANDING_MENU_ITEMS } from "@/utils/links";
 
 export default function MobileMenu({ isTop }: { isTop: boolean }) {
   const [mobileNavOpen, setMobileNavOpen] = useState<boolean>(false);
@@ -56,8 +53,8 @@ export default function MobileMenu({ isTop }: { isTop: boolean }) {
   }, [mobileNavOpen]);
 
   return (
-    <div className={`${pathname.includes('instruktur/form') ? 'hidden' : 'flex lg:hidden'} items-center`}>
-      {/* Hamburger button */}
+    <div className={`flex lg:hidden items-center`}>
+      {/* Button Menu */}
       <button
         ref={trigger}
         className="relative z-[9999999] p-2 text-white transition-colors"
@@ -79,14 +76,14 @@ export default function MobileMenu({ isTop }: { isTop: boolean }) {
         </div>
       </button>
 
-      {/* Mobile navigation */}
+      {/* Mobile Navigation */}
       <AnimatePresence>
         {mobileNavOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[9999998] bg-[#020617]/95 backdrop-blur-2xl"
+            className="fixed inset-0 z-[9999999999] bg-[#020617]/95 backdrop-blur-2xl"
           >
             <motion.nav
               initial={{ x: "100%" }}
@@ -140,6 +137,7 @@ export default function MobileMenu({ isTop }: { isTop: boolean }) {
                       />
                     </button>
 
+                    {/* Non P2MKP Portal Menus */}
                     <AnimatePresence>
                       {openLayanan && (
                         <motion.ul
@@ -148,69 +146,15 @@ export default function MobileMenu({ isTop }: { isTop: boolean }) {
                           exit={{ height: 0, opacity: 0 }}
                           className="mt-2 ml-4 border-l border-white/10 space-y-1 overflow-hidden"
                         >
-                          <MobileDropdownSubItem
-                            href="/layanan/regulasi"
-                            label="Regulasi Pelatihan"
-                            icon={<HiOutlineDocumentText />}
-                            onClick={() => setMobileNavOpen(false)}
-                          />
-                          <MobileDropdownSubItem
-                            href="/layanan/publik/maklumat-pelayanan"
-                            label="Maklumat Pelayanan"
-                            icon={<HiOutlineClipboardDocumentCheck />}
-                            onClick={() => setMobileNavOpen(false)}
-                          />
-                          <MobileDropdownSubItem
-                            href="/layanan/standar-pelayanan"
-                            label="Standar Pelayanan"
-                            icon={<HiOutlineDocumentText />}
-                            onClick={() => setMobileNavOpen(false)}
-                          />
-                          <MobileDropdownSubItem
-                            href="https://span.lapor.go.id"
-                            label="SPAN Lapor"
-                            icon={<HiOutlineChatBubbleLeftRight />}
-                            onClick={() => setMobileNavOpen(false)}
-                          />
-                          <MobileDropdownSubItem
-                            href="/layanan/survey-kepuasan"
-                            label="Susan KKP"
-                            icon={<HiOutlineChartBar />}
-                            onClick={() => setMobileNavOpen(false)}
-                          />
-                          <MobileDropdownSubItem
-                            href="/layanan/hasil-survey"
-                            label="Hasil Survei"
-                            icon={<HiOutlineChartBar />}
-                            onClick={() => setMobileNavOpen(false)}
-                          />
-                          <MobileDropdownSubItem
-                            href="/layanan/publik/masukan-saran"
-                            label="Masukan & Saran"
-                            icon={<HiOutlineChatBubbleBottomCenterText />}
-                            onClick={() => setMobileNavOpen(false)}
-                          />
-                          <MobileDropdownSubItem
-                            href="ttps://www.lapor.go.id"
-                            label="e-Lapor"
-                            icon={<HiOutlineChatBubbleBottomCenterText />}
-                            onClick={() => setMobileNavOpen(false)}
-                          />
-                          <MobileDropdownSubItem
-                            href="https://gol.kpk.go.id/login"
-                            label="GOL KPK"
-                            icon={<HiOutlineChatBubbleBottomCenterText />}
-                            onClick={() => setMobileNavOpen(false)}
-                          />
-                          <MobileDropdownSubItem
-                            href="https://wbs.kkp.go.id/register"
-                            label="WBS"
-                            icon={<HiOutlineChatBubbleBottomCenterText />}
-                            onClick={() => setMobileNavOpen(false)}
-                          />
-
-
-                          {/* asda */}
+                          {LAYANAN_LANDING_MENU_ITEMS.map(({ href, label, icon: Icon }) => (
+                            <MobileDropdownSubItem
+                              key={href}
+                              href={href}
+                              label={label}
+                              icon={<Icon />}
+                              onClick={() => setMobileNavOpen(false)}
+                            />
+                          ))}
                         </motion.ul>
                       )}
                     </AnimatePresence>

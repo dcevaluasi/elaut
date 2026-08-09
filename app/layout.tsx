@@ -5,7 +5,6 @@ import { Delius_Unicase, Inter, Plus_Jakarta_Sans } from "next/font/google";
 import localFont from "next/font/local";
 
 import Header from "@/components/ui/header";
-import BottomNavigation from "@/components/ui/bottom-nav";
 
 const myFont = localFont({
   src: "./font/calsans.ttf",
@@ -206,7 +205,6 @@ export default function RootLayout({
           <div className="flex flex-col overflow-hidden supports-[overflow:clip]:overflow-clip relative">
             <Header />
             {children}
-            <BottomNavigation />
             <FloatingContact />
           </div>
         </LanguageProvider>

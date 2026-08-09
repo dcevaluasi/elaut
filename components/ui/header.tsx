@@ -124,27 +124,26 @@ export default function Header() {
           {/* Logo */}
           <div className="flex shrink-0 items-center">
             <AnimatePresence mode="wait">
-              {pathname !== "/" && (
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Link href="/" className="flex items-center gap-2 group">
-                    <div className="relative">
-                      <div className="absolute -inset-2 bg-blue-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <Image
-                        className="w-12 sm:w-14 md:w-16 lg:w-20 relative z-10 transition-transform duration-300 group-hover:scale-105"
-                        width={200}
-                        height={200}
-                        src={LOGO_PATH}
-                        alt="Logo KKP"
-                      />
-                    </div>
-                  </Link>
-                </motion.div>
-              )}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Link href="/" className="flex items-center gap-2 group">
+                  <div className="relative">
+                    <div className="absolute -inset-2 bg-blue-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <Image
+                      className="w-12 sm:w-14 md:w-16 lg:w-16 relative z-10 transition-transform duration-300 group-hover:scale-105"
+                      width={150}
+                      height={150}
+                      src={LOGO_PATH}
+                      alt="Logo KKP"
+                    />
+                  </div>
+                </Link>
+              </motion.div>
+
             </AnimatePresence>
           </div>
 
@@ -406,9 +405,9 @@ export default function Header() {
           </nav>
 
           {/* Mobile Menu Button */}
-          <div className="lg:hidden">
+          <nav className="lg:hidden">
             <MobileMenu isTop={top} />
-          </div>
+          </nav>
         </div>
       </div>
     </motion.header >

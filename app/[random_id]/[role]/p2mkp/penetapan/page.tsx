@@ -1,7 +1,7 @@
 "use client";
 
 import LayoutAdminElaut, { HeaderPageLayoutAdminElaut } from "@/components/dashboard/Layouts/LayoutAdminElaut";
-import TablePenetapanP2MKP from "@/components/dashboard/P2MKP/Table/TablePenetapanP2MKP";
+import TableDataPenetapanP2MKP from "@/components/dashboard/P2MKP/Table/TableDataPenetapanP2MKP";
 import { TbGavel } from "react-icons/tb";
 
 export default function Page() {
@@ -14,7 +14,7 @@ export default function Page() {
                     icon={<TbGavel className="text-3xl" />}
                 />
                 <article className="w-full h-full">
-                    <TablePenetapanP2MKP />
+                    <TableDataPenetapanP2MKP />
                 </article>
             </section>
         </LayoutAdminElaut>
