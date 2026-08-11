@@ -117,7 +117,7 @@ const CekSertifikatByNIKPage = () => {
                 });
 
                 const filteredData = res.data.data?.filter(
-                    (item: PelatihanByNik) => item.file_sertifikat?.includes('sertifikat')
+                    (item: PelatihanByNik) => item.file_sertifikat?.includes('sertifikat-ttde')
                 ) || [];
 
                 if (filteredData.length > 0) {
