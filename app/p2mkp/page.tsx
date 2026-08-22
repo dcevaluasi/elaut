@@ -4,15 +4,14 @@ import React, { useState, useEffect } from 'react';
 import Footer from '@/components/ui/footer';
 import dynamic from 'next/dynamic';
 import { FiBriefcase, FiUsers, FiTarget, FiAward, FiFileText, FiCheckCircle, FiMapPin, FiArrowRight, FiUserCheck, FiActivity, FiShield, FiLayers, FiTrendingUp, FiCpu, FiPlus, FiMinus, FiChevronDown, FiPlay, FiX, FiYoutube } from 'react-icons/fi';
-import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import axios from 'axios';
-import { useCountUp } from 'react-countup';
 import { elautBaseUrl } from '@/constants/urls';
 import { P2MKP } from '@/types/p2mkp';
 import type { P2MKPPin } from '@/components/ui/P2MKPLeafletMap';
-
-const REGULATION = "Peraturan Menteri Kelautan dan Perikanan Republik Indonesia No. 18 Tahun 2024"
+import MarqueeLogos from '@/components/marquee-logos';
+import { VIDEO_GALLERY_P2MKP } from '@/constants/p2mkp';
 
 const ISLAND_GROUPS = [
     { name: 'Sumatera', icon: '🌴', color: 'from-emerald-500 to-teal-600', provinces: ['Aceh', 'Sumatera Utara', 'Sumatera Barat', 'Riau', 'Kepulauan Riau', 'Jambi', 'Sumatera Selatan', 'Kepulauan Bangka Belitung', 'Bengkulu', 'Lampung'] },
@@ -43,7 +42,6 @@ const P2MKPLeafletMap = dynamic(() => import('@/components/ui/P2MKPLeafletMap'),
     ),
 });
 
-// --- Helper Components ---
 
 const AnimatedCounter = ({ value, duration = 2 }: { value: number; duration?: number }) => {
     return <span>{value.toLocaleString()}</span>;
@@ -362,7 +360,6 @@ const FAQ_TABS = [
     }
 ];
 
-// --- FAQ Tabs Component ---
 
 function FAQTabs() {
     const [activeTab, setActiveTab] = React.useState('p2mkp');
@@ -418,11 +415,6 @@ function FAQTabs() {
         </div>
     );
 }
-
-// --- Main Page ---
-
-import MarqueeLogos from '@/components/marquee-logos';
-import { VIDEO_GALLERY_P2MKP } from '@/constants/p2mkp';
 
 export default function P2MKPPage() {
     const [p2mkpList, setP2mkpList] = useState<P2MKP[]>([]);

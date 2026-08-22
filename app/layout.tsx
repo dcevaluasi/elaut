@@ -1,4 +1,5 @@
 import "./css/style.css";
+import "leaflet/dist/leaflet.css";
 
 import { Delius_Unicase, Inter, Plus_Jakarta_Sans } from "next/font/google";
 

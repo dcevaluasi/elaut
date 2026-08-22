@@ -37,10 +37,10 @@ const useFetchDataDukung = (isIncludePusat: boolean = false) => {
         )
       }
 
-      filteredData = filteredData.filter(
-        (item) =>
-          item.FileSertifikat?.toLowerCase().includes('signed'),
-      )
+      // filteredData = filteredData.filter(
+      //   (item) =>
+      //     item.FileSertifikat?.toLowerCase().includes('signed'),
+      // )
 
       setData(filteredData)
       setIsFetching(false)

@@ -1,7 +1,6 @@
 
 import CertificateCheckFeature from "@/components/elaut/CertificateCheckFeature";
 import Footer from "@/components/ui/footer";
-import TourGuide from "@/components/tour-guide";
 
 export const metadata = {
   title: "Cek Sertifikat E-LAUT - Elektronik Layanan Pelatihan Utama Terpadu",

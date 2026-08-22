@@ -1,7 +1,4 @@
 import Hero from "@/components/hero";
-import BalaiPelatihanSection from "@/components/balai-pelatihan-section";
-import AboutElautSection from "@/components/about-elaut-section";
-import TourGuide from "@/components/tour-guide";
 import Footer from "@/components/ui/footer";
 import MarqueeLogos from "@/components/marquee-logos";
 
