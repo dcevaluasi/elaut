@@ -113,10 +113,7 @@ export const PENDIDIKAN_TERAKHIR = [
 export const JENIS_PELATIH = [
   'Widyaiswara',
   'Instruktur',
-  'Dosen',
-  'Guru',
-  'Praktisi',
-  'Penyuluh',
+
 ]
 
 export const JENJANG_JABATAN = [

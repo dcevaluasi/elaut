@@ -1,7 +1,7 @@
 # Portal Instruktur — Masuk dengan NIP & Lengkapi Profil
 
 **Tanggal:** 12 Agustus 2026
-**Status:** Disetujui — tahap UI (data dummy)
+**Status:** Terintegrasi dengan backend api-elaut (24 Agustus 2026)
 
 ## Masalah
 
@@ -14,7 +14,9 @@ pengisian profil miliknya.
 
 ## Ruang lingkup
 
-Tahap ini **UI saja, dengan data dummy**. Integrasi API menyusul setelah UI disetujui.
+Tahap awal UI saja dengan data dummy. Sejak 24 Agustus 2026 portal sudah memakai data
+sungguhan dari `api-elaut`; `constants/instruktur-dummy.ts` dihapus dan daftar pilihannya
+pindah ke `constants/instruktur.ts` yang kini dipakai bersama form admin.
 
 ## Alur
 
@@ -41,11 +43,11 @@ Keputusan yang sudah diambil:
 
 ## Pembagian field
 
-20 field dari `types/instruktur.ts` dibagi ke empat langkah:
+Field dari `types/instruktur.ts` dibagi ke empat langkah:
 
-1. **Data Diri** — `nama`, `nip` (readonly, terkunci dari login), `email`, `no_telpon`, `pendidikkan_terakhir`
-2. **Unit Kerja** — `eselon_1`, `eselon_2` (opsi bergantung pada eselon 1, sumber `UK_ESELON_2`), `id_lemdik`, `status`
-3. **Kepakaran** — `jenis_pelatih`, `jenjang_jabatan`, `bidang_keahlian`
+1. **Data Diri** — `nama`, `nip` (readonly, terkunci dari login), `email`, `no_telpon`, `pendidikkan_terakhir`, `Golongan`
+2. **Unit Kerja** — `eselon_1`, `eselon_2` (opsi bergantung pada eselon 1, sumber `UK_ESELON_2`); `id_lemdik` dan `status` ditampilkan terkunci
+3. **Kepakaran** — `jenis_pelatih`, `jenjang_jabatan`, `bidang_keahlian`, `jenis_sisjamu` (opsional), `label`, `jenis_label`
 4. **Sertifikasi** — `metodologi_pelatihan`, `pelatihan_pelatih`, `kompetensi_teknis`, `management_of_training`, `training_officer_course`, `link_data_dukung_sertifikat`
 
 Langkah kelima adalah ringkasan: semua isian ditampilkan per bagian dengan tombol "Ubah" yang
@@ -64,12 +66,14 @@ components/instruktur/
   StepIndicator.tsx      stepper + progress kelengkapan
   StepDataDiri.tsx
   StepUnitKerja.tsx
-  StepKepakaran.tsx
+  Step.tsx
   StepSertifikasi.tsx
   ReviewSummary.tsx
   FieldText.tsx          input teks berlabel + ikon
   FieldSelect.tsx        select berlabel + ikon
-constants/instruktur-dummy.ts
+  FieldTerkunci.tsx      tampilan data yang ditetapkan admin
+constants/instruktur.ts             daftar pilihan bersama portal & admin
+hooks/elaut/instruktur/usePortalInstruktur.ts
 ```
 
 ## Keputusan teknis
@@ -97,22 +101,34 @@ langkah lalu digabung.
 dari react-hook-form dan bersifat presentational — tidak menyimpan state sendiri, tidak memanggil
 API. Ini menjaga tiap berkas tetap kecil dan bisa diuji sendiri.
 
-**Persentase kelengkapan** dihitung dari jumlah field terisi dibagi 20, ditampilkan di progress bar
+**Daftar pilihan dipakai bersama.** `constants/instruktur.ts` menjadi satu-satunya sumber untuk
+pendidikan, golongan, jenjang jabatan, bidang keahlian, label, jenis label, dan program SISJAMU —
+dipakai wizard portal maupun form admin, supaya keduanya tidak pernah menyimpan ejaan yang berbeda
+untuk hal yang sama.
+
+**Persentase kelengkapan** dihitung dari 22 field pada `TRACKED_FIELDS` — naik dari 18 setelah
+`Golongan`, `jenis_sisjamu`, `label`, dan `jenis_label` ikut diisi — ditampilkan di progress bar
 header wizard dan diperbarui saat pengguna mengetik.
 
-**Data dummy** ada di `constants/instruktur-dummy.ts`: tiga profil dengan tingkat kelengkapan
-berbeda (lengkap, separuh, hampir kosong) supaya progress bar dan penanda "belum lengkap" bisa
-diuji. Daftar lemdik juga dihardcode di sana, karena `useFetchDataUnitKerja` menuntut token admin
-yang tidak dimiliki instruktur.
+## Integrasi backend
 
-**Menyimpan masih dummy.** Tombol "Simpan profil" menampilkan dialog sukses tanpa memanggil API.
+Dua endpoint publik ditambahkan di `api-elaut` (`app/controllers/instrukturPortal.go`), keduanya
+di luar `JwtProtect` dan dibatasi 10 permintaan per IP per menit lewat `limiterPortalInstruktur()`
+di `app/routes/routes.go`:
 
-## Dependensi yang belum ada
+| Endpoint | Guna |
+|---|---|
+| `GET /instruktur/nip/:nip` | Pencarian profil saat masuk. Respons dipangkas — `IdInstruktur` dan `create_at` tidak dibuka, dan nama unit kerja ikut dikirim sebagai `unit_kerja` supaya portal tidak perlu memanggil endpoint unit kerja yang menuntut token admin. |
+| `PUT /instruktur/self/:nip` | Instruktur menyimpan profilnya sendiri. Hanya kolom pada `permintaanProfilInstruktur` yang bisa berubah. |
 
-Backend belum punya endpoint pencarian NIP tanpa autentikasi. `GET /getInstrukturs` menuntut token
-admin dan mengembalikan seluruh instruktur — tidak layak dipanggil dari halaman publik. Integrasi
-nanti membutuhkan endpoint baru, misalnya `GET /instruktur/by-nip/{nip}`, yang publik namun
-dibatasi laju permintaannya agar NIP tidak bisa disapu satu per satu.
+**`nip`, `id_lemdik`, dan `status` tidak bisa diubah instruktur.** Ketiganya ditetapkan admin
+lemdik. Di wizard, satuan pendidikan dan status keaktifan ditampilkan terkunci lewat
+`FieldTerkunci` — ditampilkan, bukan disembunyikan, supaya instruktur bisa memverifikasi
+penempatannya dan tahu harus menghubungi admin bila keliru.
+
+Akses dari frontend lewat `hooks/elaut/instruktur/usePortalInstruktur.ts`, yang memetakan 404 dan
+429 ke keadaan tersendiri agar halaman bisa membedakan "NIP belum terdaftar" dari "terlalu banyak
+percobaan".
 
 ## Batasan yang disadari
 
@@ -120,3 +136,8 @@ Masuk hanya dengan NIP berarti siapa pun yang mengetahui NIP seseorang bisa memb
 profil orang itu. NIP bukan rahasia — formatnya bisa ditebak dan sering tercantum di dokumen publik.
 Ini keputusan sadar demi kemudahan pada tahap ini; kalau nanti data yang disimpan bertambah sensitif,
 faktor kedua (OTP ke email terdaftar) perlu ditambahkan.
+
+Yang sudah dipasang untuk menekan risikonya: pembatas 10 permintaan per IP per menit di kedua
+endpoint publik, respons 404 bernada generik supaya tidak bisa dipakai membedakan NIP yang salah
+format dari NIP yang belum terdaftar, dan daftar kolom yang diizinkan pada `UpdateInstrukturSelf`
+sehingga penempatan serta status kepegawaian tetap hanya bisa diubah admin.

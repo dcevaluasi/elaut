@@ -2,13 +2,13 @@
 
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
-import { TbUser, TbId, TbMail, TbPhone, TbSchool } from "react-icons/tb";
+import { TbUser, TbId, TbMail, TbPhone, TbSchool, TbAward } from "react-icons/tb";
 import FieldText from "./FieldText";
 import FieldSelect from "./FieldSelect";
 import StepShell from "./StepShell";
 import { ACCENTS } from "./accents";
 import { STEPS, InstrukturFormValues } from "./steps";
-import { PENDIDIKAN_TERAKHIR } from "@/constants/instruktur-dummy";
+import { GOLONGAN, PENDIDIKAN_TERAKHIR } from "@/constants/instruktur";
 
 const step = STEPS[0];
 const accent = ACCENTS[step.accent];
@@ -62,20 +62,31 @@ export default function StepDataDiri({
                 hint="Dipakai panitia untuk konfirmasi jadwal mengajar."
             />
 
-            <div className="md:col-span-2">
-                <FieldSelect
-                    form={form}
-                    name="pendidikkan_terakhir"
-                    label="Pendidikan terakhir"
-                    placeholder="Pilih jenjang pendidikan"
-                    icon={TbSchool}
-                    accent={accent}
-                    options={PENDIDIKAN_TERAKHIR.map((level) => ({
-                        value: level,
-                        label: level,
-                    }))}
-                />
-            </div>
+            <FieldSelect
+                form={form}
+                name="pendidikkan_terakhir"
+                label="Pendidikan terakhir"
+                placeholder="Pilih jenjang pendidikan"
+                icon={TbSchool}
+                accent={accent}
+                options={PENDIDIKAN_TERAKHIR.map((level) => ({
+                    value: level,
+                    label: level,
+                }))}
+            />
+
+            <FieldSelect
+                form={form}
+                name="Golongan"
+                label="Pangkat / golongan"
+                placeholder="Pilih pangkat/golongan"
+                icon={TbAward}
+                accent={accent}
+                options={GOLONGAN.map((golongan) => ({
+                    value: golongan,
+                    label: golongan,
+                }))}
+            />
         </StepShell>
     );
 }

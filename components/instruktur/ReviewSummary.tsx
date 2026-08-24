@@ -4,7 +4,7 @@ import React from "react";
 import { TbPencil, TbExternalLink } from "react-icons/tb";
 import { ACCENTS } from "./accents";
 import { STEPS, InstrukturFormValues } from "./steps";
-import { DUMMY_LEMDIK, STATUS_KEAKTIFAN } from "@/constants/instruktur-dummy";
+import { labelStatusKeaktifan } from "@/constants/instruktur";
 
 const LABEL: Record<keyof InstrukturFormValues, string> = {
     nama: "Nama lengkap",
@@ -12,19 +12,33 @@ const LABEL: Record<keyof InstrukturFormValues, string> = {
     email: "Email",
     no_telpon: "Nomor WhatsApp",
     pendidikkan_terakhir: "Pendidikan terakhir",
+    Golongan: "Pangkat / golongan",
     eselon_1: "Unit kerja eselon I",
     eselon_2: "Unit kerja eselon II",
     id_lemdik: "Satuan pendidikan",
+    unit_kerja: "Satuan pendidikan",
     status: "Status keaktifan",
     jenis_pelatih: "Jenis pelatih",
     jenjang_jabatan: "Jenjang jabatan",
     bidang_keahlian: "Bidang keahlian",
+    jenis_sisjamu: "Program SISJAMU yang diampu",
+    label: "Label",
+    jenis_label: "Jenis label",
     metodologi_pelatihan: "Metodologi pelatihan",
     pelatihan_pelatih: "Training of Trainer (ToT)",
     kompetensi_teknis: "Kompetensi teknis",
     management_of_training: "Management of Training (MoT)",
     training_officer_course: "Training Officer Course (ToC)",
     link_data_dukung_sertifikat: "Data dukung lainnya",
+};
+
+/**
+ * Field yang ditampilkan di ringkasan tapi tidak ada di `STEPS[n].fields`
+ * karena ditetapkan admin dan tidak bisa diubah instruktur. Tetap ditampilkan
+ * supaya instruktur bisa memverifikasi penempatannya sebelum menyimpan.
+ */
+const FIELD_TERKUNCI_PER_LANGKAH: Record<number, (keyof InstrukturFormValues)[]> = {
+    1: ["unit_kerja", "status"],
 };
 
 const FIELD_TAUTAN: (keyof InstrukturFormValues)[] = [
@@ -41,16 +55,7 @@ function tampilkanNilai(
     nilai: string,
 ): string {
     if (!nilai) return "";
-    if (field === "id_lemdik") {
-        return (
-            DUMMY_LEMDIK.find((lemdik) => String(lemdik.id) === nilai)?.nama ?? nilai
-        );
-    }
-    if (field === "status") {
-        return (
-            STATUS_KEAKTIFAN.find((status) => status.value === nilai)?.label ?? nilai
-        );
-    }
+    if (field === "status") return labelStatusKeaktifan(nilai);
     return nilai;
 }
 
@@ -109,7 +114,10 @@ export default function ReviewSummary({
                             </header>
 
                             <dl className="divide-y divide-gray-50 dark:divide-white/5">
-                                {bagian.fields.map((field) => {
+                                {[
+                                    ...bagian.fields,
+                                    ...(FIELD_TERKUNCI_PER_LANGKAH[bagian.id] ?? []),
+                                ].map((field) => {
                                     const nilai = tampilkanNilai(
                                         field,
                                         String(values[field] ?? ""),

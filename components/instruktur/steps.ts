@@ -20,17 +20,27 @@ export const instrukturSchema = z.object({
         .min(10, "Nomor telepon minimal 10 digit")
         .regex(/^08\d+$/, "Nomor harus diawali 08 dan hanya berisi angka"),
     pendidikkan_terakhir: z.string().min(1, "Pendidikan terakhir wajib dipilih"),
+    // Nama field berhuruf besar mengikuti tag JSON backend (`json:"Golongan"`).
+    Golongan: z.string().min(1, "Pangkat/golongan wajib dipilih"),
 
     // Langkah 2 — Unit Kerja
     eselon_1: z.string().min(1, "Eselon I wajib dipilih"),
     eselon_2: z.string().min(1, "Eselon II wajib dipilih"),
-    id_lemdik: z.string().min(1, "Satuan pendidikan wajib dipilih"),
-    status: z.string().min(1, "Status keaktifan wajib dipilih"),
+    // id_lemdik, unit_kerja, dan status ditetapkan admin lemdik. Ketiganya hanya
+    // ditampilkan di wizard dan tidak ikut dikirim saat menyimpan, jadi tidak
+    // divalidasi di sini.
+    id_lemdik: z.string(),
+    unit_kerja: z.string(),
+    status: z.string(),
 
     // Langkah 3 — Kepakaran
     jenis_pelatih: z.string().min(1, "Jenis pelatih wajib dipilih"),
     jenjang_jabatan: z.string().min(1, "Jenjang jabatan wajib dipilih"),
     bidang_keahlian: z.string().min(1, "Bidang keahlian wajib dipilih"),
+    // Tidak semua instruktur mengampu program SISJAMU, jadi opsional.
+    jenis_sisjamu: z.string(),
+    label: z.string().min(1, "Label wajib dipilih"),
+    jenis_label: z.string().min(1, "Jenis label wajib dipilih"),
 
     // Langkah 4 — Sertifikasi (semua opsional)
     metodologi_pelatihan: linkOpsional,
@@ -61,7 +71,7 @@ export const STEPS: StepDefinition[] = [
         judul: "Data diri",
         deskripsi: "Identitas dan kontak yang dipakai panitia untuk menghubungi Anda.",
         accent: "biru",
-        fields: ["nama", "nip", "email", "no_telpon", "pendidikkan_terakhir"],
+        fields: ["nama", "nip", "email", "no_telpon", "pendidikkan_terakhir", "Golongan"],
     },
     {
         id: 1,
@@ -70,7 +80,7 @@ export const STEPS: StepDefinition[] = [
         judul: "Unit kerja",
         deskripsi: "Penempatan Anda saat ini di lingkungan Kementerian.",
         accent: "emerald",
-        fields: ["eselon_1", "eselon_2", "id_lemdik", "status"],
+        fields: ["eselon_1", "eselon_2"],
     },
     {
         id: 2,
@@ -79,7 +89,14 @@ export const STEPS: StepDefinition[] = [
         judul: "Kepakaran",
         deskripsi: "Bidang yang Anda ampu. Ini yang dipakai sistem saat mencari pengajar.",
         accent: "violet",
-        fields: ["jenis_pelatih", "jenjang_jabatan", "bidang_keahlian"],
+        fields: [
+            "jenis_pelatih",
+            "jenjang_jabatan",
+            "bidang_keahlian",
+            "jenis_sisjamu",
+            "label",
+            "jenis_label",
+        ],
     },
     {
         id: 3,

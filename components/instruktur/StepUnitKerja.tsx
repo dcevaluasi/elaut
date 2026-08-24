@@ -9,11 +9,12 @@ import {
     TbUserCheck,
 } from "react-icons/tb";
 import FieldSelect from "./FieldSelect";
+import FieldTerkunci from "./FieldTerkunci";
 import StepShell from "./StepShell";
 import { ACCENTS } from "./accents";
 import { STEPS, InstrukturFormValues } from "./steps";
 import { UK_ESELON_1, UK_ESELON_2 } from "@/constants/unitkerja";
-import { DUMMY_LEMDIK, STATUS_KEAKTIFAN } from "@/constants/instruktur-dummy";
+import { labelStatusKeaktifan } from "@/constants/instruktur";
 
 const step = STEPS[1];
 const accent = ACCENTS[step.accent];
@@ -70,28 +71,18 @@ export default function StepUnitKerja({
                 />
             </div>
 
-            <FieldSelect
-                form={form}
-                name="id_lemdik"
+            <FieldTerkunci
                 label="Satuan pendidikan"
-                placeholder="Pilih satuan pendidikan"
+                nilai={form.watch("unit_kerja")}
                 icon={TbSchool}
-                accent={accent}
-                options={DUMMY_LEMDIK.map((lemdik) => ({
-                    value: String(lemdik.id),
-                    label: lemdik.nama,
-                }))}
-                hint="Tempat Anda ditugaskan mengajar."
+                alasan="Penempatan ditetapkan admin lemdik. Hubungi admin bila keliru."
             />
 
-            <FieldSelect
-                form={form}
-                name="status"
+            <FieldTerkunci
                 label="Status keaktifan"
-                placeholder="Pilih status"
+                nilai={labelStatusKeaktifan(form.watch("status"))}
                 icon={TbUserCheck}
-                accent={accent}
-                options={STATUS_KEAKTIFAN}
+                alasan="Status kepegawaian hanya bisa diubah admin lemdik."
             />
         </StepShell>
     );

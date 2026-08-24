@@ -17,18 +17,15 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-    DUMMY_INSTRUKTUR,
-    findInstrukturByNip,
-} from "@/constants/instruktur-dummy";
-import { SESSION_KEY } from "@/components/instruktur/session";
+import { usePortalInstruktur } from "@/hooks/elaut/instruktur/usePortalInstruktur";
+import { simpanSesiInstruktur } from "@/components/instruktur/session";
 
 const PANJANG_NIP = 18;
 
 export default function LoginInstrukturPage() {
     const router = useRouter();
+    const { cariBerdasarkanNip, sedangMemuat } = usePortalInstruktur();
     const [nip, setNip] = useState("");
-    const [sedangMengecek, setSedangMengecek] = useState(false);
     const [galat, setGalat] = useState<string | null>(null);
     const [dialogTerbuka, setDialogTerbuka] = useState(false);
 
@@ -43,20 +40,28 @@ export default function LoginInstrukturPage() {
             return;
         }
 
-        setSedangMengecek(true);
+        const hasil = await cariBerdasarkanNip(nip);
 
-        // Jeda singkat meniru waktu tempuh permintaan ke server.
-        await new Promise((resolve) => setTimeout(resolve, 600));
-
-        const instruktur = findInstrukturByNip(nip);
-        setSedangMengecek(false);
-
-        if (!instruktur) {
+        if (hasil.status === "tidak-ditemukan") {
             setDialogTerbuka(true);
             return;
         }
 
-        sessionStorage.setItem(SESSION_KEY, JSON.stringify(instruktur));
+        if (hasil.status === "terlalu-sering") {
+            // Endpoint pencarian NIP dibatasi laju permintaannya di backend
+            // supaya NIP tidak bisa disapu satu per satu.
+            setGalat(
+                "Terlalu banyak percobaan. Tunggu sekitar satu menit sebelum mencoba lagi.",
+            );
+            return;
+        }
+
+        if (hasil.status === "galat") {
+            setGalat(hasil.pesan);
+            return;
+        }
+
+        simpanSesiInstruktur(hasil.data);
         router.push("/instruktur/edit-profile");
     }
 
@@ -143,10 +148,10 @@ export default function LoginInstrukturPage() {
 
                         <button
                             type="submit"
-                            disabled={sedangMengecek}
+                            disabled={sedangMemuat}
                             className="w-full h-14 rounded-2xl bg-primary text-white font-bold tracking-wide flex items-center justify-center gap-2 transition-all hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/30"
                         >
-                            {sedangMengecek ? (
+                            {sedangMemuat ? (
                                 <>
                                     <HashLoader color="#ffffff" size={18} />
                                     Mencari data Anda
@@ -167,31 +172,6 @@ export default function LoginInstrukturPage() {
                         </p>
                     </div>
 
-                    {/* Dihapus setelah API pencarian NIP tersedia. */}
-                    <div className="mt-4 rounded-2xl border border-dashed border-slate-200 dark:border-white/10 px-5 py-4">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">
-                            NIP untuk uji coba
-                        </p>
-                        <ul className="space-y-1">
-                            {DUMMY_INSTRUKTUR.map((instruktur) => (
-                                <li key={instruktur.nip}>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setNip(instruktur.nip);
-                                            setGalat(null);
-                                        }}
-                                        className="text-left text-[11px] font-bold text-slate-500 hover:text-primary transition-colors tabular-nums focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 rounded"
-                                    >
-                                        {instruktur.nip}
-                                        <span className="ml-2 font-semibold text-slate-400">
-                                            {instruktur.nama}
-                                        </span>
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
                 </motion.div>
             </div>
 

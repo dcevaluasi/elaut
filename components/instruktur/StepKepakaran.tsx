@@ -2,16 +2,26 @@
 
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
-import { TbBriefcase, TbChalkboard, TbCertificate } from "react-icons/tb";
+import {
+    TbBriefcase,
+    TbChalkboard,
+    TbCertificate,
+    TbClipboardList,
+    TbTag,
+    TbTags,
+} from "react-icons/tb";
 import FieldSelect from "./FieldSelect";
 import StepShell from "./StepShell";
 import { ACCENTS } from "./accents";
 import { STEPS, InstrukturFormValues } from "./steps";
 import {
     BIDANG_KEAHLIAN,
+    JENIS_LABEL_INSTRUKTUR,
     JENIS_PELATIH,
+    JENIS_SISJAMU,
     JENJANG_JABATAN,
-} from "@/constants/instruktur-dummy";
+    LABEL_INSTRUKTUR,
+} from "@/constants/instruktur";
 
 const step = STEPS[2];
 const accent = ACCENTS[step.accent];
@@ -62,6 +72,49 @@ export default function StepKepakaran({
                         label: bidang,
                     }))}
                     hint="Sistem memakai bidang ini untuk mencocokkan Anda dengan pelatihan yang dibuka."
+                />
+            </div>
+
+            <FieldSelect
+                form={form}
+                name="label"
+                label="Label"
+                placeholder="Pilih label"
+                icon={TbTag}
+                accent={accent}
+                options={LABEL_INSTRUKTUR.map((label) => ({
+                    value: label,
+                    label,
+                }))}
+            />
+
+            <FieldSelect
+                form={form}
+                name="jenis_label"
+                label="Jenis label"
+                placeholder="Pilih jenis label"
+                icon={TbTags}
+                accent={accent}
+                options={JENIS_LABEL_INSTRUKTUR.map((jenis) => ({
+                    value: jenis,
+                    label: jenis,
+                }))}
+                hint="Menandai apakah Anda bertugas di UPT atau di Pusat."
+            />
+
+            <div className="md:col-span-2">
+                <FieldSelect
+                    form={form}
+                    name="jenis_sisjamu"
+                    label="Program SISJAMU yang diampu"
+                    placeholder="Pilih program SISJAMU"
+                    icon={TbClipboardList}
+                    accent={accent}
+                    options={JENIS_SISJAMU.map((program) => ({
+                        value: program,
+                        label: program,
+                    }))}
+                    hint="Opsional. Kosongkan bila Anda tidak mengampu program sertifikasi SISJAMU."
                 />
             </div>
         </StepShell>

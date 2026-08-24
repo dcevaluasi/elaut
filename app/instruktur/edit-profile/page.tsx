@@ -12,6 +12,7 @@ import {
     TbCircleCheck,
     TbDeviceFloppy,
     TbLogout,
+    TbAlertTriangle,
 } from "react-icons/tb";
 import { HashLoader } from "react-spinners";
 
@@ -41,8 +42,13 @@ import {
 import {
     bacaSesiInstruktur,
     hapusSesiInstruktur,
+    simpanSesiInstruktur,
 } from "@/components/instruktur/session";
-import { hitungKelengkapan } from "@/constants/instruktur-dummy";
+import { hitungKelengkapan } from "@/constants/instruktur";
+import {
+    usePortalInstruktur,
+    PayloadProfilInstruktur,
+} from "@/hooks/elaut/instruktur/usePortalInstruktur";
 
 const NILAI_KOSONG: InstrukturFormValues = {
     nama: "",
@@ -50,13 +56,18 @@ const NILAI_KOSONG: InstrukturFormValues = {
     email: "",
     no_telpon: "",
     pendidikkan_terakhir: "",
+    Golongan: "",
     eselon_1: "",
     eselon_2: "",
     id_lemdik: "",
+    unit_kerja: "",
     status: "",
     jenis_pelatih: "",
     jenjang_jabatan: "",
     bidang_keahlian: "",
+    jenis_sisjamu: "",
+    label: "",
+    jenis_label: "",
     metodologi_pelatihan: "",
     pelatihan_pelatih: "",
     kompetensi_teknis: "",
@@ -65,12 +76,42 @@ const NILAI_KOSONG: InstrukturFormValues = {
     link_data_dukung_sertifikat: "",
 };
 
+/**
+ * Hanya field pada whitelist backend (`UpdateInstrukturSelf`) yang dikirim.
+ * `nip`, `id_lemdik`, `unit_kerja`, dan `status` sengaja ditinggalkan — itu
+ * ditetapkan admin lemdik dan akan ditolak backend bila dikirim.
+ */
+function keMuatanSimpan(nilai: InstrukturFormValues): PayloadProfilInstruktur {
+    return {
+        nama: nilai.nama,
+        email: nilai.email,
+        no_telpon: nilai.no_telpon,
+        pendidikkan_terakhir: nilai.pendidikkan_terakhir,
+        Golongan: nilai.Golongan,
+        eselon_1: nilai.eselon_1,
+        eselon_2: nilai.eselon_2,
+        jenis_pelatih: nilai.jenis_pelatih,
+        jenjang_jabatan: nilai.jenjang_jabatan,
+        bidang_keahlian: nilai.bidang_keahlian,
+        jenis_sisjamu: nilai.jenis_sisjamu,
+        label: nilai.label,
+        jenis_label: nilai.jenis_label,
+        metodologi_pelatihan: nilai.metodologi_pelatihan,
+        pelatihan_pelatih: nilai.pelatihan_pelatih,
+        kompetensi_teknis: nilai.kompetensi_teknis,
+        management_of_training: nilai.management_of_training,
+        training_officer_course: nilai.training_officer_course,
+        link_data_dukung_sertifikat: nilai.link_data_dukung_sertifikat,
+    };
+}
+
 export default function EditProfileInstrukturPage() {
     const router = useRouter();
+    const { simpanProfil: kirimProfilKeServer, sedangMemuat } = usePortalInstruktur();
     const [siapDitampilkan, setSiapDitampilkan] = useState(false);
     const [langkah, setLangkah] = useState(0);
-    const [sedangMenyimpan, setSedangMenyimpan] = useState(false);
     const [dialogSukses, setDialogSukses] = useState(false);
+    const [galatSimpan, setGalatSimpan] = useState<string | null>(null);
 
     const form = useForm<InstrukturFormValues>({
         resolver: zodResolver(instrukturSchema),
@@ -93,13 +134,18 @@ export default function EditProfileInstrukturPage() {
             email: sesi.email ?? "",
             no_telpon: sesi.no_telpon ?? "",
             pendidikkan_terakhir: sesi.pendidikkan_terakhir ?? "",
+            Golongan: sesi.Golongan ?? "",
             eselon_1: sesi.eselon_1 ?? "",
             eselon_2: sesi.eselon_2 ?? "",
             id_lemdik: sesi.id_lemdik ? String(sesi.id_lemdik) : "",
+            unit_kerja: sesi.unit_kerja ?? "",
             status: sesi.status ?? "",
             jenis_pelatih: sesi.jenis_pelatih ?? "",
             jenjang_jabatan: sesi.jenjang_jabatan ?? "",
             bidang_keahlian: sesi.bidang_keahlian ?? "",
+            jenis_sisjamu: sesi.jenis_sisjamu ?? "",
+            label: sesi.label ?? "",
+            jenis_label: sesi.jenis_label ?? "",
             metodologi_pelatihan: sesi.metodologi_pelatihan ?? "",
             pelatihan_pelatih: sesi.pelatihan_pelatih ?? "",
             kompetensi_teknis: sesi.kompetensi_teknis ?? "",
@@ -154,10 +200,35 @@ export default function EditProfileInstrukturPage() {
             return;
         }
 
-        setSedangMenyimpan(true);
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        setSedangMenyimpan(false);
-        setDialogSukses(true);
+        setGalatSimpan(null);
+        const hasil = await kirimProfilKeServer(
+            form.getValues("nip"),
+            keMuatanSimpan(form.getValues()),
+        );
+
+        if (hasil.status === "sukses") {
+            // Sesi disegarkan dengan hasil dari server supaya nilai yang
+            // ditampilkan sama persis dengan yang tersimpan.
+            simpanSesiInstruktur(hasil.data);
+            setDialogSukses(true);
+            return;
+        }
+
+        if (hasil.status === "tidak-ditemukan") {
+            setGalatSimpan(
+                "Data Anda tidak lagi ditemukan di server. Coba masuk ulang dengan NIP Anda.",
+            );
+            return;
+        }
+
+        if (hasil.status === "terlalu-sering") {
+            setGalatSimpan(
+                "Terlalu banyak permintaan. Tunggu sekitar satu menit, lalu simpan lagi.",
+            );
+            return;
+        }
+
+        setGalatSimpan(hasil.pesan);
     }
 
     function keluar() {
@@ -244,6 +315,22 @@ export default function EditProfileInstrukturPage() {
                                 </AnimatePresence>
                             </div>
 
+                            {galatSimpan && (
+                                <div
+                                    role="alert"
+                                    className="mx-6 md:mx-10 mb-5 flex items-start gap-3 rounded-2xl bg-rose-50 dark:bg-rose-500/10 px-4 py-3.5"
+                                >
+                                    <TbAlertTriangle
+                                        aria-hidden
+                                        size={18}
+                                        className="text-rose-500 shrink-0 mt-0.5"
+                                    />
+                                    <p className="text-[13px] font-semibold leading-relaxed text-rose-600 dark:text-rose-400">
+                                        {galatSimpan}
+                                    </p>
+                                </div>
+                            )}
+
                             {/* Navigasi */}
                             <div className="flex items-center justify-between gap-3 px-6 md:px-10 py-5 border-t border-gray-100 dark:border-white/5 bg-gray-50/60 dark:bg-white/[0.02]">
                                 <button
@@ -260,10 +347,10 @@ export default function EditProfileInstrukturPage() {
                                     <button
                                         type="button"
                                         onClick={simpanProfil}
-                                        disabled={sedangMenyimpan}
+                                        disabled={sedangMemuat}
                                         className="flex items-center gap-2 h-12 px-7 rounded-2xl bg-primary text-white text-sm font-bold transition-all hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/30"
                                     >
-                                        {sedangMenyimpan ? (
+                                        {sedangMemuat ? (
                                             <>
                                                 <HashLoader color="#ffffff" size={16} />
                                                 Menyimpan
