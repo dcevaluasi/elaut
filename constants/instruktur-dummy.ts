@@ -106,3 +106,6 @@ export function hitungKelengkapan(
 
   return Math.round((terisi / TRACKED_FIELDS.length) * 100)
 }
+
+
+//
