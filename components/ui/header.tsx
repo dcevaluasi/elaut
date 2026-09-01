@@ -321,7 +321,7 @@ export default function Header() {
                           <div className="space-y-1">
                             <p className="text-[9px] font-black uppercase tracking-[0.2em] text-blue-400/40 px-3 mb-2">Informasi & Transparansi</p>
                             <DropdownItem href="/layanan/regulasi" label="Regulasi Pelatihan" subLabel="Dasar hukum & aturan" icon={<HiOutlineDocumentText />} />
-                            <DropdownItem href="/layanan/standar-pelayanan" label="Standar Pelayanan" subLabel="Prosedur pelayanan" icon={<HiOutlineClipboardDocumentCheck />} />
+                            <DropdownItem href="/files/Standar Pelayanan P2MKP.pdf" label="Standar Pelayanan" subLabel="Prosedur pelayanan" icon={<HiOutlineClipboardDocumentCheck />} />
                             <DropdownItem href="/layanan/publik/maklumat-pelayanan" label="Maklumat Pelayanan" subLabel="Komitmen kami" icon={<HiOutlineShieldCheck />} />
 
                             <p className="text-[9px] font-black uppercase tracking-[0.2em] text-blue-400/40 px-3 mb-2 pt-4">Data Kepuasan</p>
@@ -331,6 +331,8 @@ export default function Header() {
 
                           <div className="space-y-1">
                             <p className="text-[9px] font-black uppercase tracking-[0.2em] text-blue-400/40 px-3 mb-2">Pusat Bantuan & Aduan</p>
+                            <DropdownItem href="https://rumah-aspirasi-digital-smoky.vercel.app/" label="Pengaduan & Aspirasi" subLabel="Kirim feedback" icon={<HiOutlineChatBubbleBottomCenterText />} />
+
                             <DropdownItem href="/layanan/publik/masukan-saran" label="Masukan & Saran" subLabel="Kirim feedback" icon={<HiOutlineChatBubbleBottomCenterText />} />
                             <DropdownItem href="https://span.lapor.go.id" label="SPAN Lapor" subLabel="Lapor ke pusat" icon={<HiOutlineChatBubbleLeftRight />} />
                             <DropdownItem href="https://www.lapor.go.id/" label="e-LAPOR" subLabel="Laporan online" icon={<HiOutlineChatBubbleLeftRight />} />

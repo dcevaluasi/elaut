@@ -1,6 +1,7 @@
 import Hero from "@/components/hero";
 import Footer from "@/components/ui/footer";
 import MarqueeLogos from "@/components/marquee-logos";
+import AnnouncementPopup from "@/components/announcement-popup";
 
 export const metadata = {
   title:
@@ -76,6 +77,7 @@ export const metadata = {
 export default function Home() {
   return (
     <>
+      <AnnouncementPopup />
       <Hero />
       <MarqueeLogos />
       <Footer />

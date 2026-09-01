@@ -14,7 +14,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
-import { IoLogoWhatsapp } from "react-icons/io";
+import { IoLogoWhatsapp, IoMegaphone } from "react-icons/io5";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { DIALOG_TEXTS } from "@/constants/texts";
@@ -71,18 +71,27 @@ function CallCenter() {
           <div className="flex flex-col space-y-3">
             <div className="flex flex-col space-y-2">
               <h4 className="text-sm font-semibold text-white">Layanan Pengaduan dan Informasi Pusat Pelatihan KP</h4>
-              <div className="">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <AlertDialogAction className="bg-white/10 hover:bg-gradient-to-r hover:from-blue-500 hover:to-blue-600 text-white border border-white/20 shadow-lg transition-all flex gap-2 items-center group duration-700">
                   <Link
-                    href={
-                      `https://wa.me/`
-                    }
+                    href="https://wa.me/6281188088767"
                     target="_blank"
                     title={'Call Center Pusat Pelatihan KP'}
                     className="bg-transparent flex gap-2 items-center group-hover:bg-transparent"
                   >
                     <IoLogoWhatsapp />
-                    Call Center Pusat Pelatihan KP
+                    Call Center (081188088767)
+                  </Link>
+                </AlertDialogAction>
+                <AlertDialogAction className="bg-white/10 hover:bg-gradient-to-r hover:from-amber-500 hover:to-orange-600 text-white border border-white/20 shadow-lg transition-all flex gap-2 items-center group duration-700">
+                  <Link
+                    href="https://rumah-aspirasi-digital-smoky.vercel.app/"
+                    target="_blank"
+                    title={'Pengaduan & Aspirasi Puslat KP'}
+                    className="bg-transparent flex gap-2 items-center group-hover:bg-transparent"
+                  >
+                    <IoMegaphone />
+                    Pengaduan & Aspirasi Puslat KP
                   </Link>
                 </AlertDialogAction>
               </div>

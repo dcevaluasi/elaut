@@ -15,12 +15,17 @@ export const LAYANAN_LANDING_MENU_ITEMS: LayananItem[] = [
         icon: HiOutlineDocumentText,
     },
     {
+        href: "https://rumah-aspirasi-digital-smoky.vercel.app/",
+        label: "Pengaduan dan Aspirasi",
+        icon: HiOutlineDocumentText,
+    },
+    {
         href: "/layanan/publik/maklumat-pelayanan",
         label: "Maklumat Pelayanan",
         icon: HiOutlineClipboardDocumentCheck,
     },
     {
-        href: "/layanan/standar-pelayanan",
+        href: "/files/Standar Pelayanan P2MKP.pdf",
         label: "Standar Pelayanan",
         icon: HiOutlineDocumentText,
     },
