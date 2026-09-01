@@ -40,6 +40,15 @@ import {
     TbChecks
 } from "react-icons/tb";
 import { UK_ESELON_1, UK_ESELON_2 } from "@/constants/unitkerja";
+import {
+    GOLONGAN,
+    JENIS_LABEL_INSTRUKTUR,
+    JENIS_PELATIH,
+    JENIS_SISJAMU,
+    JENJANG_JABATAN,
+    LABEL_INSTRUKTUR,
+    PENDIDIKAN_TERAKHIR,
+} from "@/constants/instruktur";
 import { useFetchDataRumpunPelatihan } from "@/hooks/elaut/master/useFetchDataRumpunPelatihan";
 import { RumpunPelatihan } from "@/types/program";
 import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
@@ -66,7 +75,11 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
     const [jenjangJabatan, setJenjangJabatan] = useState("");
     const [bidangKeahlian, setBidangKeahlian] = useState("");
     const [metodologiPelatihan, setMetodologiPelatihan] = useState("");
-    const [pelatihanPelatih, setPelatihanPelatih] = useState(""); // This seems to be used for Pangkat/Golongan based on previous code
+    const [pelatihanPelatih, setPelatihanPelatih] = useState("");
+    const [golongan, setGolongan] = useState("");
+    const [jenisSisjamu, setJenisSisjamu] = useState("");
+    const [labelInstruktur, setLabelInstruktur] = useState("");
+    const [jenisLabel, setJenisLabel] = useState("");
     const [kompetensiTeknis, setKompetensiTeknis] = useState("");
     const [managementOfTraining, setManagementOfTraining] = useState("");
     const [trainingOfficerCourse, setTrainingOfficerCourse] = useState("");
@@ -87,6 +100,10 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
         setBidangKeahlian("");
         setMetodologiPelatihan("");
         setPelatihanPelatih("");
+        setGolongan("");
+        setJenisSisjamu("");
+        setLabelInstruktur("");
+        setJenisLabel("");
         setKompetensiTeknis("");
         setManagementOfTraining("");
         setTrainingOfficerCourse("");
@@ -115,9 +132,16 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
             training_officer_course: trainingOfficerCourse,
             link_data_dukung_sertifikat: linkSertifikat,
             status,
-            eselon1,
-            eselon2,
+            // Backend membaca tag JSON `eselon_1`/`eselon_2`; ejaan `eselon1`
+            // membuat kedua nilai ini hilang diam-diam saat disimpan.
+            eselon_1: eselon1,
+            eselon_2: eselon2,
             pendidikkan_terakhir: pendidikanTerakhir,
+            // Tag JSON backend memang berhuruf besar (`json:"Golongan"`).
+            Golongan: golongan,
+            jenis_sisjamu: jenisSisjamu,
+            label: labelInstruktur,
+            jenis_label: jenisLabel,
         };
 
         try {
@@ -284,30 +308,36 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
 
                             <div className=" space-y-2">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Jenjang Jabatan</label>
-                                <div className="relative group">
-                                    <TbBriefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors" size={20} />
-                                    <input
-                                        type="text"
-                                        className="w-full h-14 pl-12 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-emerald-500/10 transition-all placeholder:text-slate-300"
-                                        placeholder="Contoh: Widyaiswara Ahli Madya"
-                                        value={jenjangJabatan}
-                                        onChange={(e) => setJenjangJabatan(e.target.value)}
-                                    />
-                                </div>
+                                <Select value={jenjangJabatan || undefined} onValueChange={setJenjangJabatan}>
+                                    <SelectTrigger className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-emerald-500/10">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <TbBriefcase className="text-slate-400 shrink-0" size={20} />
+                                            <SelectValue placeholder="Pilih Jenjang Jabatan" />
+                                        </div>
+                                    </SelectTrigger>
+                                    <SelectContent className="max-h-80 z-[9999999]">
+                                        {JENJANG_JABATAN.map((jenjang) => (
+                                            <SelectItem key={jenjang} value={jenjang} className="font-semibold text-xs py-3">{jenjang}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
 
                             <div className=" space-y-2">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Pangkat / Golongan</label>
-                                <div className="relative group">
-                                    <TbActivity className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors" size={20} />
-                                    <input
-                                        type="text"
-                                        className="w-full h-14 pl-12 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-emerald-500/10 transition-all placeholder:text-slate-300"
-                                        placeholder="Contoh: Pembina (IV/a)"
-                                        value={pelatihanPelatih}
-                                        onChange={(e) => setPelatihanPelatih(e.target.value)}
-                                    />
-                                </div>
+                                <Select value={golongan || undefined} onValueChange={setGolongan}>
+                                    <SelectTrigger className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-emerald-500/10">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <TbActivity className="text-slate-400 shrink-0" size={20} />
+                                            <SelectValue placeholder="Pilih Pangkat/Golongan" />
+                                        </div>
+                                    </SelectTrigger>
+                                    <SelectContent className="max-h-80 z-[9999999]">
+                                        {GOLONGAN.map((item) => (
+                                            <SelectItem key={item} value={item} className="font-semibold text-xs py-3">{item}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
 
                             <div className=" space-y-2">
@@ -320,8 +350,46 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
                                         </div>
                                     </SelectTrigger>
                                     <SelectContent className="z-[9999999]">
-                                        {["SMA/SMK", "D3", "S1", "S2", "S3"].map((level) => (
+                                        {PENDIDIKAN_TERAKHIR.map((level) => (
                                             <SelectItem key={level} value={level} className="font-semibold text-xs py-3">{level}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className=" space-y-2">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Unit Kerja Eselon I</label>
+                                <Select value={eselon1 || undefined} onValueChange={setEselon1}>
+                                    <SelectTrigger className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-emerald-500/10">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <TbBuildingSkyscraper className="text-slate-400 shrink-0" size={20} />
+                                            <SelectValue placeholder="Pilih Eselon I" />
+                                        </div>
+                                    </SelectTrigger>
+                                    <SelectContent className="max-h-80 z-[9999999]">
+                                        {UK_ESELON_1.map((unit) => (
+                                            <SelectItem key={unit.name} value={unit.name} className="font-semibold text-xs py-3">{unit.name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className=" space-y-2">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Unit Kerja Eselon II</label>
+                                <Select
+                                    value={eselon2 || undefined}
+                                    onValueChange={setEselon2}
+                                    disabled={!eselon1}
+                                >
+                                    <SelectTrigger className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-emerald-500/10 disabled:opacity-60">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <TbBuildingSkyscraper className="text-slate-400 shrink-0" size={20} />
+                                            <SelectValue placeholder={eselon1 ? "Pilih Eselon II" : "Pilih Eselon I dahulu"} />
+                                        </div>
+                                    </SelectTrigger>
+                                    <SelectContent className="max-h-80 z-[9999999]">
+                                        {((eselon1 && UK_ESELON_2[eselon1]) || []).map((nama) => (
+                                            <SelectItem key={nama} value={nama} className="font-semibold text-xs py-3">{nama}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
@@ -338,6 +406,74 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
                         </div>
 
                         <div className="w-full grid grid-cols-2 gap-3">
+                            <div className=" space-y-2">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Jenis Pelatih</label>
+                                <Select value={jenisPelatih || undefined} onValueChange={setJenisPelatih}>
+                                    <SelectTrigger className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-violet-500/10">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <TbUser className="text-slate-400 shrink-0" size={20} />
+                                            <SelectValue placeholder="Pilih Jenis Pelatih" />
+                                        </div>
+                                    </SelectTrigger>
+                                    <SelectContent className="max-h-80 z-[9999999]">
+                                        {JENIS_PELATIH.map((jenis) => (
+                                            <SelectItem key={jenis} value={jenis} className="font-semibold text-xs py-3">{jenis}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className=" space-y-2">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Label</label>
+                                <Select value={labelInstruktur || undefined} onValueChange={setLabelInstruktur}>
+                                    <SelectTrigger className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-violet-500/10">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <TbCertificate className="text-slate-400 shrink-0" size={20} />
+                                            <SelectValue placeholder="Pilih Label" />
+                                        </div>
+                                    </SelectTrigger>
+                                    <SelectContent className="max-h-80 z-[9999999]">
+                                        {LABEL_INSTRUKTUR.map((item) => (
+                                            <SelectItem key={item} value={item} className="font-semibold text-xs py-3">{item}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className=" space-y-2">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Jenis Label</label>
+                                <Select value={jenisLabel || undefined} onValueChange={setJenisLabel}>
+                                    <SelectTrigger className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-violet-500/10">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <TbCertificate className="text-slate-400 shrink-0" size={20} />
+                                            <SelectValue placeholder="Pilih Jenis Label" />
+                                        </div>
+                                    </SelectTrigger>
+                                    <SelectContent className="max-h-80 z-[9999999]">
+                                        {JENIS_LABEL_INSTRUKTUR.map((item) => (
+                                            <SelectItem key={item} value={item} className="font-semibold text-xs py-3">{item}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className=" space-y-2">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Program SISJAMU</label>
+                                <Select value={jenisSisjamu || undefined} onValueChange={setJenisSisjamu}>
+                                    <SelectTrigger className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-violet-500/10">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <TbActivity className="text-slate-400 shrink-0" size={20} />
+                                            <SelectValue placeholder="Pilih Program SISJAMU" />
+                                        </div>
+                                    </SelectTrigger>
+                                    <SelectContent className="max-h-80 z-[9999999]">
+                                        {JENIS_SISJAMU.map((program) => (
+                                            <SelectItem key={program} value={program} className="font-semibold text-xs py-3">{program}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
                             <div className="md:col-span-12 space-y-2">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Bidang Keahlian</label>
                                 <Select value={bidangKeahlian} onValueChange={setBidangKeahlian}>
@@ -370,15 +506,57 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
                             </div>
 
                             <div className="md:col-span-4 space-y-2">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Link ToT</label>
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Link ToT (Pelatihan Pelatih)</label>
                                 <div className="relative group">
                                     <TbLink className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-violet-500 transition-colors" size={20} />
                                     <input
                                         type="text"
                                         className="w-full h-14 pl-12 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-violet-500/10 transition-all placeholder:text-slate-300"
                                         placeholder="URL Sertifikat ToT"
+                                        value={pelatihanPelatih}
+                                        onChange={(e) => setPelatihanPelatih(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="md:col-span-4 space-y-2">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Link ToC (Training Officer Course)</label>
+                                <div className="relative group">
+                                    <TbLink className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-violet-500 transition-colors" size={20} />
+                                    <input
+                                        type="text"
+                                        className="w-full h-14 pl-12 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-violet-500/10 transition-all placeholder:text-slate-300"
+                                        placeholder="URL Sertifikat ToC"
                                         value={trainingOfficerCourse}
                                         onChange={(e) => setTrainingOfficerCourse(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="md:col-span-4 space-y-2">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Link Metodologi Pelatihan</label>
+                                <div className="relative group">
+                                    <TbLink className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-violet-500 transition-colors" size={20} />
+                                    <input
+                                        type="text"
+                                        className="w-full h-14 pl-12 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-violet-500/10 transition-all placeholder:text-slate-300"
+                                        placeholder="URL Sertifikat Metodologi"
+                                        value={metodologiPelatihan}
+                                        onChange={(e) => setMetodologiPelatihan(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="md:col-span-4 space-y-2">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Link Kompetensi Teknis</label>
+                                <div className="relative group">
+                                    <TbLink className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-violet-500 transition-colors" size={20} />
+                                    <input
+                                        type="text"
+                                        className="w-full h-14 pl-12 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-violet-500/10 transition-all placeholder:text-slate-300"
+                                        placeholder="URL Sertifikat Kompetensi Teknis"
+                                        value={kompetensiTeknis}
+                                        onChange={(e) => setKompetensiTeknis(e.target.value)}
                                     />
                                 </div>
                             </div>

@@ -18,7 +18,8 @@ import {
     TbMail,
     TbPhone,
     TbId,
-    TbUser
+    TbUser,
+    TbFileSpreadsheet
 } from "react-icons/tb";
 import {
     DropdownMenu,
@@ -55,6 +56,7 @@ import UpdateInstrukturAction from "@/commons/actions/instruktur/UpdateInstruktu
 import DeleteInstrukturAction from "@/commons/actions/instruktur/DeleteInstrukturAction";
 import { motion, AnimatePresence } from "framer-motion";
 import StatsInstruktur from "../StatsInstruktur";
+import { exportInstrukturToExcel } from "@/lib/exportToExcel";
 
 const COLORS_ROLE = ["#F59E0B", "#EF4444", "#3B82F6"];
 const COLORS_STATUS = ["#10B981", "#6B7280", "#F59E0B", "#EF4444"];
@@ -156,6 +158,15 @@ function InstrukturTable({ data, fetchData }: Props) {
         setCurrentPage(1);
     };
 
+    const handleDownloadExcel = () => {
+        // Ikut filter & pencarian yang sedang aktif, diurutkan sama seperti tabel.
+        const rows = [...filteredData].sort((a, b) => a.nama.localeCompare(b.nama));
+        exportInstrukturToExcel(
+            rows,
+            (idLemdik) => findNameUnitKerjaById(unitKerjas, idLemdik?.toString()).name || ""
+        );
+    };
+
     return (
         <div className="space-y-6">
             {/* Premium Header & Search Bar */}
@@ -203,6 +214,16 @@ function InstrukturTable({ data, fetchData }: Props) {
                             clearFilters={clearFilters}
                             hasActiveFilters={!!(filterKeahlian || filterJabatan || filterPendidikan || filterStatus || filterUnitKerja)}
                         />
+                        <button
+                            type="button"
+                            onClick={handleDownloadExcel}
+                            disabled={filteredData.length === 0}
+                            title={filteredData.length === 0 ? "Tidak ada data untuk diunduh" : `Unduh ${filteredData.length} data instruktur`}
+                            className="h-12 px-6 rounded-2xl font-bold text-xs uppercase tracking-widest flex items-center gap-3 transition-all bg-white text-emerald-600 border border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:text-slate-400 disabled:border-slate-200 disabled:hover:bg-white"
+                        >
+                            <TbFileSpreadsheet className="text-lg" />
+                            Download Excel
+                        </button>
                         <AddInstrukturAction onSuccess={fetchData} />
                     </div>
                 </div>
