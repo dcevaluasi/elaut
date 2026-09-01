@@ -6,6 +6,8 @@ export interface UptKkpPoint {
   lng: number;
   region: 'Sumatera' | 'Jawa & Banten' | 'Bali & Nusa Tenggara' | 'Kalimantan' | 'Sulawesi & Gorontalo' | 'Maluku & Papua';
   type: string;
+  eselon1?: string;
+  alamat?: string;
   direction?: 'top' | 'bottom' | 'left' | 'right';
   offset?: [number, number];
 }
@@ -50,6 +52,102 @@ export const UPT_KKP_38: UptKkpPoint[] = [
   { id: 138, no: 38, name: "Loka Riset Perikanan Tuna Benoa", lat: -8.705274, lng: 115.233410, region: "Bali & Nusa Tenggara", type: "Loka Riset", direction: 'bottom', offset: [0, 8] },
 ];
 
+/** Titik UPT / Instansi KKP Khusus Wilayah Papua (6 UPT) */
+export const UPT_PAPUA_6: UptKkpPoint[] = [
+  {
+    id: 901,
+    no: 1,
+    name: "Balai PPMHKP Jayapura",
+    eselon1: "BPPMHKP",
+    lat: -2.568256,
+    lng: 140.520237,
+    alamat: "Jl. Pasir No. 6, Sentani Kota, Kab. Jayapura, Papua",
+    region: "Maluku & Papua",
+    type: "Balai PPMHKP",
+    direction: 'top',
+    offset: [0, -12]
+  },
+  {
+    id: 902,
+    no: 2,
+    name: "Stasiun PPMHKP Merauke (Badan Mutu KKP Papua Selatan)",
+    eselon1: "BPPMHKP",
+    lat: -8.524991,
+    lng: 140.416334,
+    alamat: "Jl. Garuda Spadem, Rimba Jaya, Kec. Merauke, Papua Selatan",
+    region: "Maluku & Papua",
+    type: "Stasiun PPMHKP",
+    direction: 'bottom',
+    offset: [0, 12]
+  },
+  {
+    id: 903,
+    no: 3,
+    name: "Badan Mutu KKP Sorong",
+    eselon1: "BPPMHKP",
+    lat: -0.880431,
+    lng: 131.254246,
+    alamat: "Pelabuhan Perikanan Sorong, Jl. Ahmad Yani, Kampung Baru, Kota Sorong",
+    region: "Maluku & Papua",
+    type: "Badan Mutu KKP",
+    direction: 'top',
+    offset: [-35, -16]
+  },
+  {
+    id: 904,
+    no: 4,
+    name: "Stasiun PSDKP Biak",
+    eselon1: "PSDKP",
+    lat: -1.160344,
+    lng: 136.103432,
+    alamat: "Sumberker, Kec. Samofa, Kab. Biak Numfor, Papua",
+    region: "Maluku & Papua",
+    type: "Stasiun PSDKP",
+    direction: 'top',
+    offset: [0, -12]
+  },
+  {
+    id: 905,
+    no: 5,
+    name: "LPSPL Sorong",
+    eselon1: "DJPKRL",
+    lat: -0.890973,
+    lng: 131.321053,
+    alamat: "Jl. KPR PDAM Km. 10, Klawuyuk, Distrik Sorong Timur, Kota Sorong",
+    region: "Maluku & Papua",
+    type: "LPSPL",
+    direction: 'right',
+    offset: [24, 8]
+  },
+  {
+    id: 906,
+    no: 6,
+    name: "SUPM Negeri Sorong",
+    eselon1: "BPPSDMKP",
+    lat: -0.878224,
+    lng: 131.262116,
+    alamat: "Jl. Ahmad Yani No. 32, Klakublik, Distrik Sorong, Kota Sorong",
+    region: "Maluku & Papua",
+    type: "SUPMN",
+    direction: 'bottom',
+    offset: [-40, 16]
+  },
+  {
+    id: 907,
+    no: 7,
+    name: "Politeknik KP Sorong",
+    eselon1: "BPPSDMKP",
+    lat: -0.828993,
+    lng: 131.235254,
+    alamat: "Jl. Tanjung Kasuari, Saoka, Distrik Sorong Barat, Kota Sorong, Papua Barat Daya",
+    region: "Maluku & Papua",
+    type: "Politeknik KP",
+    direction: 'top',
+    offset: [20, -18]
+  }
+];
+
+export const UPT_PAPUA_7 = UPT_PAPUA_6;
 
 // UPT Pendidikan & Pelatihan KP:
 // Mencakup BPPP, Balai Diklat, Politeknik KP, Politeknik AUP, Akademi KP, SUPMN
@@ -65,4 +163,5 @@ export const BALAI_PELATIHAN_UPT = BALAI_PENDIDIKAN_UPT;
 export const BPPP_ONLY_UPT: UptKkpPoint[] = UPT_KKP_38.filter((u) =>
   u.type === 'BPPP' || u.type === 'Balai Diklat'
 );
+
 

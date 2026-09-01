@@ -2,8 +2,8 @@
 
 import React, { useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { COORDINATES_100, COORDINATES_1100, CoordinatePoint } from './data/coordinates';
-import { UPT_KKP_38, BALAI_PENDIDIKAN_UPT, BPPP_ONLY_UPT, UptKkpPoint } from './data/upt_kkp';
+import { COORDINATES_100, COORDINATES_1100, CoordinatePoint, isPapuaPoint } from './data/coordinates';
+import { UPT_KKP_38, BALAI_PENDIDIKAN_UPT, BPPP_ONLY_UPT, UPT_PAPUA_6, UptKkpPoint } from './data/upt_kkp';
 import {
   getNearestUpt,
   ClusteredCoordinatePoint,
@@ -67,7 +67,7 @@ const REGIONS = [
 
 export default function KNMPTESTMAP() {
   const [knmpCountMode, setKnmpCountMode] = useState<'100' | '1100'>('100');
-  const [targetClusterType, setTargetClusterType] = useState<'all' | 'bppp' | 'bppp_only'>('all');
+  const [targetClusterType, setTargetClusterType] = useState<'all' | 'bppp' | 'bppp_only' | 'papua_6'>('all');
   const [selectedRegion, setSelectedRegion] = useState<string>('Semua');
   const [activeDataset, setActiveDataset] = useState<'all' | 'knmp' | 'upt'>('all');
   const [showUptLabels, setShowUptLabels] = useState<boolean>(true);
@@ -79,21 +79,31 @@ export default function KNMPTESTMAP() {
 
   // Active KNMP Points based on selected mode (100 or 1,100 points)
   const activeKnmpList = useMemo(() => {
-    return knmpCountMode === '100' ? COORDINATES_100 : COORDINATES_1100;
-  }, [knmpCountMode]);
+    const rawList = knmpCountMode === '100' ? COORDINATES_100 : COORDINATES_1100;
+    if (targetClusterType === 'papua_6') {
+      return rawList.filter(isPapuaPoint);
+    }
+    return rawList;
+  }, [knmpCountMode, targetClusterType]);
 
   // Active target UPT list for clustering
   const activeClusterUpts = useMemo(() => {
+    if (targetClusterType === 'papua_6') return UPT_PAPUA_6;
     if (targetClusterType === 'bppp') return BALAI_PENDIDIKAN_UPT;
     if (targetClusterType === 'bppp_only') return BPPP_ONLY_UPT;
     return UPT_KKP_38;
   }, [targetClusterType]);
 
-  // Compute clustered points — semua mode pakai capacity-aware clustering
-  // Kriteria: min 100 peserta per UPT (= 13 titik KNMP), berlaku untuk semua filter
+  // Compute clustered points — capacity-aware untuk nasional, nearest-neighbor untuk Papua 6 UPT
   const clusteredKnmpList = useMemo(() => {
+    if (targetClusterType === 'papua_6') {
+      return activeKnmpList.map((p) => {
+        const { nearestUpt, distanceKm } = getNearestUpt(p, UPT_PAPUA_6);
+        return { ...p, nearestUpt, distanceKm } as ClusteredCoordinatePoint;
+      });
+    }
     return getCapacityAwareClustering(activeKnmpList, activeClusterUpts);
-  }, [activeKnmpList, activeClusterUpts]);
+  }, [activeKnmpList, activeClusterUpts, targetClusterType]);
 
   // Compute UPT Cluster Summaries for displayed UPTs
   const uptClusterSummaries = useMemo(() => {
@@ -166,16 +176,17 @@ export default function KNMPTESTMAP() {
     return counts;
   }, [combinedPoints]);
 
-  // ─── SHARED: Draw Indonesia map onto a canvas context ──────────────────────
+  // ─── SHARED: Draw Indonesia / Papua map onto a canvas context ──────────────────────
   const drawMapToCanvas = (
     ctx: CanvasRenderingContext2D,
     width: number,
     height: number
   ) => {
-    const minLng = 94.0;
-    const maxLng = 142.5;
-    const minLat = -11.5;
-    const maxLat = 6.5;
+    const isPapua = targetClusterType === 'papua_6';
+    const minLng = isPapua ? 129.5 : 94.0;
+    const maxLng = isPapua ? 141.5 : 142.5;
+    const minLat = isPapua ? -9.5 : -11.5;
+    const maxLat = isPapua ? 1.0 : 6.5;
     const padding = 120;
 
     const project = (lng: number, lat: number) => {
@@ -415,19 +426,23 @@ export default function KNMPTESTMAP() {
     });
 
     // Title strip at top
-    ctx.fillStyle = '#1e3a5f';
+    const titleText = targetClusterType === 'papua_6'
+      ? `PETA CLUSTERING TITIK KNMP & 6 INSTANSI / UPT KKP WILAYAH PAPUA (${activeKnmpList.length} TITIK)`
+      : `PETA SEBARAN KNMP – ${targetClusterType === 'bppp' ? 'CLUSTERING BALAI PELATIHAN BPPP' : 'CLUSTERING 38 UPT KKP'} (${activeKnmpList.length} TITIK)`;
+
+    const downloadFilename = targetClusterType === 'papua_6'
+      ? `peta_clustering_papua_6_upt_${knmpCountMode}_knmp.png`
+      : `peta_knmp_${knmpCountMode}_${targetClusterType}.png`;
+
     ctx.fillRect(0, 0, width, 64);
     ctx.font = "bold 22px 'Arial', sans-serif";
     ctx.fillStyle = '#ffffff';
-    ctx.fillText(
-      `PETA SEBARAN KNMP – ${targetClusterType === 'bppp' ? 'CLUSTERING BALAI PELATIHAN BPPP' : 'CLUSTERING 38 UPT KKP'} (${activeKnmpList.length} TITIK)`,
-      40, 42
-    );
+    ctx.fillText(titleText, 40, 42);
 
     const url = canvas.toDataURL('image/png');
     const a = document.createElement('a');
     a.href = url;
-    a.download = `peta_knmp_${knmpCountMode}_${targetClusterType}.png`;
+    a.download = downloadFilename;
     a.click();
   };
 
@@ -456,8 +471,8 @@ export default function KNMPTESTMAP() {
       targetClusterType === 'bppp'
         ? 'BALAI PENDIDIKAN KP (BPPP + POLTEK + SUPMN)'
         : targetClusterType === 'bppp_only'
-        ? 'BPPP SAJA'
-        : '38 UPT KKP';
+          ? 'BPPP SAJA'
+          : '38 UPT KKP';
 
     ctx.fillStyle = '#1e3a5f';
     ctx.fillRect(0, 0, width, headerH);
@@ -485,15 +500,15 @@ export default function KNMPTESTMAP() {
     // NO | NAMA | JENIS | WILAYAH | TITIK | PESERTA | STATUS | JARAK AVG | MIN–MAX
     const PAD = 40;
     const colX = {
-      no:     PAD,
-      nama:   PAD + 60,
-      jenis:  PAD + 680,
-      wilayah:PAD + 870,
-      titik:  PAD + 1060,
-      peserta:PAD + 1200,
+      no: PAD,
+      nama: PAD + 60,
+      jenis: PAD + 680,
+      wilayah: PAD + 870,
+      titik: PAD + 1060,
+      peserta: PAD + 1200,
       status: PAD + 1370,
-      avg:    PAD + 1520,
-      range:  PAD + 1680,
+      avg: PAD + 1520,
+      range: PAD + 1680,
     };
     const tableW = width - 2 * PAD;
     const tableStartY = headerH;
@@ -843,28 +858,26 @@ export default function KNMPTESTMAP() {
               <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
                 <button
                   onClick={() => setKnmpCountMode('100')}
-                  className={`px-4 py-2 rounded-lg font-extrabold transition-all flex items-center gap-2 ${
-                    knmpCountMode === '100'
+                  className={`px-4 py-2 rounded-lg font-extrabold transition-all flex items-center gap-2 ${knmpCountMode === '100'
                       ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
                       : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                  }`}
+                    }`}
                 >
                   <span>🔴 100 Titik KNMP</span>
                 </button>
 
                 <button
                   onClick={() => setKnmpCountMode('1100')}
-                  className={`px-4 py-2 rounded-lg font-extrabold transition-all flex items-center gap-2 ${
-                    knmpCountMode === '1100'
+                  className={`px-4 py-2 rounded-lg font-extrabold transition-all flex items-center gap-2 ${knmpCountMode === '1100'
                       ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
                       : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                  }`}
+                    }`}
                 >
                   <span>🔴 1.100 Titik KNMP</span>
                 </button>
               </div>
 
-              {/* TARGET CLUSTERING SWITCHER (BALAI PELATIHAN VS ALL UPTS) */}
+              {/* TARGET CLUSTERING SWITCHER (BALAI PELATIHAN VS ALL UPTS VS PAPUA 6 UPTS) */}
               <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5 ml-2">
                 <GraduationCap className="w-4 h-4 text-amber-400" />
                 Target Clustering:
@@ -872,22 +885,20 @@ export default function KNMPTESTMAP() {
               <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
                 <button
                   onClick={() => setTargetClusterType('all')}
-                  className={`px-3.5 py-2 rounded-lg font-extrabold transition-all flex items-center gap-2 ${
-                    targetClusterType === 'all'
+                  className={`px-3.5 py-2 rounded-lg font-extrabold transition-all flex items-center gap-2 ${targetClusterType === 'all'
                       ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
                       : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                  }`}
+                    }`}
                 >
                   <span>🏢 Semua 38 UPT</span>
                 </button>
 
                 <button
                   onClick={() => setTargetClusterType('bppp')}
-                  className={`px-3.5 py-2 rounded-lg font-extrabold transition-all flex items-center gap-2 ${
-                    targetClusterType === 'bppp'
+                  className={`px-3.5 py-2 rounded-lg font-extrabold transition-all flex items-center gap-2 ${targetClusterType === 'bppp'
                       ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/30'
                       : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                  }`}
+                    }`}
                   title="Clustering berdasarkan Balai Pendidikan & Pelatihan KP (BPPP, Politeknik KP, Politeknik AUP, Akademi KP, SUPMN, Balai Diklat) — dengan constraint minimum 100 peserta per UPT"
                 >
                   <span>🎓 Balai Pendidikan KP (BPPP+Poltek+SUPMN)</span>
@@ -895,14 +906,27 @@ export default function KNMPTESTMAP() {
 
                 <button
                   onClick={() => setTargetClusterType('bppp_only')}
-                  className={`px-3.5 py-2 rounded-lg font-extrabold transition-all flex items-center gap-2 ${
-                    targetClusterType === 'bppp_only'
+                  className={`px-3.5 py-2 rounded-lg font-extrabold transition-all flex items-center gap-2 ${targetClusterType === 'bppp_only'
                       ? 'bg-rose-700 text-white shadow-lg shadow-rose-700/30'
                       : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                  }`}
+                    }`}
                   title="Clustering khusus BPPP dan Balai Diklat saja — dengan constraint minimum 100 peserta per UPT"
                 >
                   <span>🏫 BPPP Saja</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setTargetClusterType('papua_6');
+                    setSelectedRegion('Maluku & Papua');
+                  }}
+                  className={`px-3.5 py-2 rounded-lg font-extrabold transition-all flex items-center gap-2 ${targetClusterType === 'papua_6'
+                      ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30 ring-2 ring-emerald-400'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                    }`}
+                  title="Clustering titik KNMP Papua dengan 6 Titik Koordinat Instansi/UPT KKP di Wilayah Papua"
+                >
+                  <span>🏝️ Khusus 6 UPT Papua</span>
                 </button>
               </div>
             </div>
@@ -911,11 +935,10 @@ export default function KNMPTESTMAP() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowClustering(!showClustering)}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-2 ${
-                  showClustering
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-2 ${showClustering
                     ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400/50 shadow-md shadow-cyan-500/20'
                     : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
-                }`}
+                  }`}
                 title="Tampilkan Garis Penghubung Clustering Terdekat"
               >
                 <Network className="w-4 h-4 text-cyan-400" />
@@ -924,11 +947,10 @@ export default function KNMPTESTMAP() {
 
               <button
                 onClick={() => setShowUptLabels(!showUptLabels)}
-                className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 ${
-                  showUptLabels
+                className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 ${showUptLabels
                     ? 'bg-blue-600/20 text-blue-300 border-blue-500/40'
                     : 'bg-slate-950 text-slate-400 border-slate-800'
-                }`}
+                  }`}
               >
                 <Tag className="w-3.5 h-3.5" />
                 <span>Label ({showUptLabels ? 'ON' : 'OFF'})</span>
@@ -943,39 +965,36 @@ export default function KNMPTESTMAP() {
               <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
                 <button
                   onClick={() => setActiveDataset('all')}
-                  className={`px-3.5 py-1.5 rounded-lg font-bold transition-all flex items-center gap-2 ${
-                    activeDataset === 'all'
+                  className={`px-3.5 py-1.5 rounded-lg font-bold transition-all flex items-center gap-2 ${activeDataset === 'all'
                       ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
                       : 'text-slate-400 hover:text-white'
-                  }`}
+                    }`}
                 >
                   <span>Semua ({combinedPoints.length})</span>
                 </button>
 
                 <button
                   onClick={() => setActiveDataset('knmp')}
-                  className={`px-3.5 py-1.5 rounded-lg font-bold transition-all flex items-center gap-2 ${
-                    activeDataset === 'knmp'
+                  className={`px-3.5 py-1.5 rounded-lg font-bold transition-all flex items-center gap-2 ${activeDataset === 'knmp'
                       ? 'bg-red-600 text-white shadow-md'
                       : 'text-slate-400 hover:text-white'
-                  }`}
+                    }`}
                 >
                   <span>KNMP ({activeKnmpList.length})</span>
                 </button>
 
                 <button
                   onClick={() => setActiveDataset('upt')}
-                  className={`px-3.5 py-1.5 rounded-lg font-bold transition-all flex items-center gap-2 ${
-                    activeDataset === 'upt'
+                  className={`px-3.5 py-1.5 rounded-lg font-bold transition-all flex items-center gap-2 ${activeDataset === 'upt'
                       ? 'bg-blue-600 text-white shadow-md'
                       : 'text-slate-400 hover:text-white'
-                  }`}
+                    }`}
                 >
                   <Building2 className="w-3.5 h-3.5" />
                   <span>{
                     targetClusterType === 'bppp' ? `Balai Pendidikan KP (${activeClusterUpts.length})` :
-                    targetClusterType === 'bppp_only' ? `BPPP (${activeClusterUpts.length})` :
-                    `UPT KKP (${activeClusterUpts.length})`
+                      targetClusterType === 'bppp_only' ? `BPPP (${activeClusterUpts.length})` :
+                        `UPT KKP (${activeClusterUpts.length})`
                   }</span>
                 </button>
               </div>
@@ -986,6 +1005,56 @@ export default function KNMPTESTMAP() {
             </div>
           </div>
         </div>
+
+        {/* PAPUA 6 UPT CLUSTERING BANNER & QUICK STATS */}
+        {targetClusterType === 'papua_6' && (
+          <div className="bg-emerald-950/40 border border-emerald-500/40 rounded-2xl p-5 shadow-2xl space-y-3">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="p-3 bg-emerald-500/20 rounded-2xl border border-emerald-500/30 text-emerald-400">
+                  <Globe className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+                    <span>Hasil Clustering Titik KNMP Papua dengan 6 UPT KKP Papua</span>
+                    <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      Khusus Wilayah Papua
+                    </span>
+                  </h3>
+                  <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                    Menghubungkan sebaran titik Kampung Nelayan Merah Putih (KNMP) di Papua ke 6 instansi/UPT KKP terdekat:
+                    <strong className="text-emerald-300 ml-1">Balai PPMHKP Jayapura, Stasiun PPMHKP Merauke, Badan Mutu KKP Sorong, Stasiun PSDKP Biak, LPSPL Sorong, dan SUPM Negeri Sorong</strong>.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={handleDownloadMapOnlyPNG}
+                className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold px-5 py-3 rounded-xl text-xs flex items-center justify-center gap-2.5 shadow-lg shadow-emerald-600/30 transition-all active:scale-95 shrink-0"
+              >
+                <Download className="w-4 h-4 text-emerald-200" />
+                <span>Unduh Gambar Peta Papua (PNG)</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-2">
+              {UPT_PAPUA_6.map((upt) => {
+                const summary = uptClusterSummaries.find((s) => s.upt.id === upt.id);
+                const count = summary ? summary.assignedPointsCount : 0;
+                return (
+                  <div key={upt.id} className="bg-slate-950/70 border border-emerald-500/20 rounded-xl p-3 text-xs space-y-1">
+                    <div className="text-[11px] font-bold text-white truncate" title={upt.name}>{upt.name}</div>
+                    <div className="text-[10px] text-emerald-400 font-semibold">{upt.eselon1}</div>
+                    <div className="flex items-center justify-between text-[11px] pt-1 border-t border-slate-800/80">
+                      <span className="text-slate-400">Titik KNMP:</span>
+                      <span className="font-black text-emerald-300">{count} Titik</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Capacity Info Banner — berlaku di semua mode (capacity-aware clustering aktif) */}
         {redistributionStats && (
@@ -1068,11 +1137,10 @@ export default function KNMPTESTMAP() {
               <button
                 key={region}
                 onClick={() => setSelectedRegion(region)}
-                className={`whitespace-nowrap text-xs font-medium px-3 py-2 rounded-xl transition-all ${
-                  selectedRegion === region
+                className={`whitespace-nowrap text-xs font-medium px-3 py-2 rounded-xl transition-all ${selectedRegion === region
                     ? 'bg-blue-600 text-white font-bold shadow-md shadow-blue-600/20'
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/70'
-                }`}
+                  }`}
               >
                 {region} ({regionCounts[region] || 0})
               </button>
@@ -1095,22 +1163,20 @@ export default function KNMPTESTMAP() {
             <div className="flex bg-slate-950 p-1 border border-slate-800 rounded-xl text-xs">
               <button
                 onClick={() => setViewMode('map')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
-                  viewMode === 'map'
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${viewMode === 'map'
                     ? 'bg-slate-800 text-blue-400 font-bold shadow'
                     : 'text-slate-400 hover:text-slate-200'
-                }`}
+                  }`}
               >
                 <Globe className="w-3.5 h-3.5" />
                 <span>Peta</span>
               </button>
               <button
                 onClick={() => setViewMode('table')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
-                  viewMode === 'table'
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${viewMode === 'table'
                     ? 'bg-slate-800 text-blue-400 font-bold shadow'
                     : 'text-slate-400 hover:text-slate-200'
-                }`}
+                  }`}
               >
                 <TableIcon className="w-3.5 h-3.5" />
                 <span>Tabel Data</span>
@@ -1157,24 +1223,22 @@ export default function KNMPTESTMAP() {
                       <div
                         key={`${point.pointType}-${point.id}`}
                         onClick={() => setSelectedPoint(point)}
-                        className={`p-3 rounded-xl border cursor-pointer transition-all ${
-                          isSelected
+                        className={`p-3 rounded-xl border cursor-pointer transition-all ${isSelected
                             ? isUpt
                               ? 'bg-blue-950/40 border-blue-500/60 shadow-lg shadow-blue-500/10'
                               : 'bg-red-950/40 border-red-500/60 shadow-lg shadow-red-500/10'
                             : 'bg-slate-950/40 border-slate-800/80 hover:bg-slate-800/60 hover:border-slate-700'
-                        }`}
+                          }`}
                       >
                         <div className="flex items-center justify-between mb-1">
                           <span className={`text-xs font-bold flex items-center gap-1.5 ${isUpt ? 'text-blue-400' : 'text-red-400'}`}>
                             <MapPin className={`w-3.5 h-3.5 ${isUpt ? 'text-blue-400 fill-blue-400' : 'text-red-500 fill-red-500'}`} />
                             {point.name} (#{point.no})
                           </span>
-                          <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
-                            isUpt
+                          <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${isUpt
                               ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
                               : 'bg-red-500/20 text-red-300 border border-red-500/30'
-                          }`}>
+                            }`}>
                             {isUpt ? 'UPT KKP' : 'KNMP'}
                           </span>
                         </div>
@@ -1269,11 +1333,10 @@ export default function KNMPTESTMAP() {
                           #{point.no}
                         </td>
                         <td className="py-3 px-4">
-                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-                            isUpt
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${isUpt
                               ? 'bg-blue-500/20 text-blue-300 border-blue-500/40'
                               : 'bg-red-500/20 text-red-300 border-red-500/40'
-                          }`}>
+                            }`}>
                             {isUpt ? '🔵 UPT KKP' : '🔴 KNMP'}
                           </span>
                         </td>
@@ -1393,13 +1456,12 @@ export default function KNMPTESTMAP() {
                   return (
                     <tr
                       key={summary.upt.id}
-                      className={`transition-colors ${
-                        !hasPoints && targetClusterType === 'bppp'
+                      className={`transition-colors ${!hasPoints && targetClusterType === 'bppp'
                           ? 'opacity-40'
                           : isSelected
-                          ? 'bg-cyan-950/40 border-l-4 border-l-cyan-400'
-                          : 'hover:bg-slate-800/40'
-                      }`}
+                            ? 'bg-cyan-950/40 border-l-4 border-l-cyan-400'
+                            : 'hover:bg-slate-800/40'
+                        }`}
                     >
                       <td className="py-3 px-4 text-center font-bold text-slate-500">
                         #{summary.upt.no}
@@ -1422,23 +1484,21 @@ export default function KNMPTESTMAP() {
                       </td>
                       <td className="py-3 px-4 text-slate-300">{summary.upt.region}</td>
                       <td className="py-3 px-4 text-center bg-cyan-950/20 border-x border-cyan-900/30">
-                        <span className={`px-3 py-1 rounded-xl font-black text-xs inline-block min-w-[70px] ${
-                          hasPoints
+                        <span className={`px-3 py-1 rounded-xl font-black text-xs inline-block min-w-[70px] ${hasPoints
                             ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/40'
                             : 'bg-slate-800/60 text-slate-500 border border-slate-700'
-                        }`}>
+                          }`}>
                           {summary.assignedPointsCount} Titik
                         </span>
                       </td>
                       {targetClusterType === 'bppp' && (
                         <td className="py-3 px-4 text-center bg-amber-950/10 border-r border-amber-900/20">
-                          <span className={`px-3 py-1 rounded-xl font-black text-xs inline-block min-w-[70px] ${
-                            meetsMin
+                          <span className={`px-3 py-1 rounded-xl font-black text-xs inline-block min-w-[70px] ${meetsMin
                               ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
                               : hasPoints
-                              ? 'bg-red-500/20 text-red-300 border border-red-400/40'
-                              : 'bg-slate-800/60 text-slate-500 border border-slate-700'
-                          }`}>
+                                ? 'bg-red-500/20 text-red-300 border border-red-400/40'
+                                : 'bg-slate-800/60 text-slate-500 border border-slate-700'
+                            }`}>
                             {summary.totalPersons ?? summary.assignedPointsCount * PERSONS_PER_KNMP} orang
                           </span>
                         </td>

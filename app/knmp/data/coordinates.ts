@@ -8,6 +8,15 @@ export interface CoordinatePoint {
   location: string;
 }
 
+/** Filtering titik KNMP yang khusus berada di daratan / wilayah Provinsi Papua */
+export function isPapuaPoint(p: { lat: number; lng: number }): boolean {
+  if (p.lng < 130.5 || p.lng > 141.5) return false;
+  if (p.lat < -9.5 || p.lat > 2.0) return false;
+  // Exclude Kepulauan Maluku (Kei & Aru Islands)
+  if (p.lat <= -5.0 && p.lat >= -7.5 && p.lng >= 131.5 && p.lng <= 135.2) return false;
+  return true;
+}
+
 export const COORDINATES_100: CoordinatePoint[] = [
   {
     "id": 1,

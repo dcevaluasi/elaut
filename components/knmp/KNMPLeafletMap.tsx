@@ -19,7 +19,7 @@ interface KNMPLeafletMapProps {
   onToggleUptLabels?: () => void;
   showClustering?: boolean;
   onToggleClustering?: () => void;
-  targetClusterType?: 'all' | 'bppp' | 'bppp_only';
+  targetClusterType?: 'all' | 'bppp' | 'bppp_only' | 'papua_6';
   onToggleClusterType?: () => void;
 }
 
@@ -52,7 +52,9 @@ export default function KNMPLeafletMap({
 
   // Active target UPTs for clustering
   const activeClusterUpts = useMemo(() => {
-    return targetClusterType === 'bppp' ? BALAI_PELATIHAN_UPT : uptPoints;
+    if (targetClusterType === 'papua_6') return uptPoints;
+    if (targetClusterType === 'bppp') return BALAI_PELATIHAN_UPT;
+    return uptPoints;
   }, [targetClusterType, uptPoints]);
 
   // Compute clustered points based on active target UPTs
@@ -87,8 +89,8 @@ export default function KNMPLeafletMap({
     if (!mapContainerRef.current || mapInstanceRef.current) return;
 
     const map = L.map(mapContainerRef.current, {
-      center: [-2.5, 118.0],
-      zoom: 5,
+      center: targetClusterType === 'papua_6' ? [-4.0, 136.5] : [-2.5, 118.0],
+      zoom: targetClusterType === 'papua_6' ? 6 : 5,
       minZoom: 4,
       maxZoom: 18,
       zoomControl: false,
@@ -106,6 +108,16 @@ export default function KNMPLeafletMap({
       mapInstanceRef.current = null;
     };
   }, []);
+
+  // Camera framing when target cluster type changes
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+    if (targetClusterType === 'papua_6') {
+      mapInstanceRef.current.flyToBounds([[-9.2, 130.0], [0.8, 141.5]], { duration: 1.2 });
+    } else {
+      mapInstanceRef.current.flyTo([-2.5, 118.0], 5, { duration: 1.2 });
+    }
+  }, [targetClusterType]);
 
   // Update Base Map Style
   useEffect(() => {
@@ -278,8 +290,27 @@ export default function KNMPLeafletMap({
         });
 
         if (showUptLabels) {
-          const dir = upt.direction || 'top';
-          const baseOffset: [number, number] = upt.offset || [0, -12];
+          let dir = upt.direction || 'top';
+          let baseOffset: [number, number] = upt.offset || [0, -12];
+
+          // Group UPTs in close proximity to prevent label stacking in same city/area
+          const sameGroup = activeClusterUpts
+            .filter((other) => Math.abs(other.lat - upt.lat) < 0.18 && Math.abs(other.lng - upt.lng) < 0.18)
+            .sort((a, b) => a.id - b.id);
+
+          if (sameGroup.length > 1) {
+            const idx = sameGroup.findIndex((u) => u.id === upt.id);
+            const spreadConfigs: Array<{ dir: 'top' | 'bottom' | 'left' | 'right'; offset: [number, number] }> = [
+              { dir: 'top', offset: [-35, -16] },
+              { dir: 'right', offset: [24, 8] },
+              { dir: 'bottom', offset: [-40, 16] },
+              { dir: 'left', offset: [-25, -10] },
+            ];
+            const cfg = spreadConfigs[idx % spreadConfigs.length];
+            dir = cfg.dir;
+            baseOffset = cfg.offset;
+          }
+
           const spacedOffset: [number, number] = [
             baseOffset[0],
             dir === 'top' ? baseOffset[1] - 4 : dir === 'bottom' ? baseOffset[1] + 4 : baseOffset[1],
@@ -337,23 +368,16 @@ export default function KNMPLeafletMap({
     }
   }, [knmpPoints, uptPoints, activeDataset, showUptLabels, showClustering, targetClusterType, selectedPoint, selectedUptId, onSelectPoint, clusteredKnmpPoints, clusterSummaries, activeClusterUpts]);
 
-  // Fly to Selected Point
-  useEffect(() => {
-    if (!selectedPoint || !mapInstanceRef.current) return;
-    mapInstanceRef.current.flyTo([selectedPoint.lat, selectedPoint.lng], 9, {
-      duration: 1.2,
-    });
-  }, [selectedPoint]);
-
   // Download High Resolution Styled Map WITH EMBEDDED GRAPHIC TABLE
   const downloadStyledMapPNG = (exportMode: 'all' | 'upt' | 'knmp') => {
     setIsExportingPNG(true);
 
     setTimeout(() => {
+      const isPapuaMode = targetClusterType === 'papua_6';
       const canvas = document.createElement('canvas');
       const width = 2500;
       const mapHeight = 1250;
-      const tableHeight = 1050;
+      const tableHeight = isPapuaMode ? 550 : 1050;
       const totalHeight = mapHeight + tableHeight;
 
       canvas.width = width;
@@ -369,10 +393,11 @@ export default function KNMPLeafletMap({
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, width, totalHeight);
 
-      const minLng = 94.0;
-      const maxLng = 142.5;
-      const minLat = -11.5;
-      const maxLat = 6.5;
+      // Coordinate Bounding Box
+      const minLng = isPapuaMode ? 129.5 : 94.0;
+      const maxLng = isPapuaMode ? 141.5 : 142.5;
+      const minLat = isPapuaMode ? -9.5 : -11.5;
+      const maxLat = isPapuaMode ? 1.0 : 6.5;
       const padding = 120;
 
       const project = (lng: number, lat: number) => {
@@ -418,7 +443,6 @@ export default function KNMPLeafletMap({
           const end = project(point.nearestUpt.lng, point.nearestUpt.lat);
 
           ctx.save();
-          // Glow pass
           ctx.beginPath();
           ctx.setLineDash([10, 5]);
           ctx.moveTo(start.x, start.y);
@@ -426,7 +450,6 @@ export default function KNMPLeafletMap({
           ctx.strokeStyle = 'rgba(14, 165, 233, 0.22)';
           ctx.lineWidth = 8;
           ctx.stroke();
-          // Core pass
           ctx.beginPath();
           ctx.setLineDash([10, 5]);
           ctx.moveTo(start.x, start.y);
@@ -466,7 +489,7 @@ export default function KNMPLeafletMap({
         });
       }
 
-      // 4. Draw UPT KKP Blue Pins & Name Labels (big font + collision-free placement)
+      // 4. Draw UPT KKP Blue Pins & Name Labels (collision-free layout)
       if (exportMode === 'all' || exportMode === 'upt') {
         const LPAD = 10;
         const LFONT = 15;
@@ -486,37 +509,35 @@ export default function KNMPLeafletMap({
         const calcPos = (px: number, py: number, tw: number, dir: string, dist: number) => {
           const bw = tw + LPAD * 2;
           switch (dir) {
-            case 'bottom': return { bx: px - bw / 2, by: py + dist, lx: px - tw / 2, ly: py + dist + LBOX_H - 5 };
-            case 'left':   return { bx: px - bw - dist, by: py - LBOX_H / 2, lx: px - bw - dist + LPAD, ly: py + 6 };
-            case 'right':  return { bx: px + dist, by: py - LBOX_H / 2, lx: px + dist + LPAD, ly: py + 6 };
-            default:       return { bx: px - bw / 2, by: py - dist - LBOX_H, lx: px - tw / 2, ly: py - dist - 5 };
+            case 'bottom':       return { bx: px - bw / 2, by: py + dist, lx: px - tw / 2, ly: py + dist + LBOX_H - 5 };
+            case 'left':         return { bx: px - bw - dist, by: py - LBOX_H / 2, lx: px - bw - dist + LPAD, ly: py + 6 };
+            case 'right':        return { bx: px + dist, by: py - LBOX_H / 2, lx: px + dist + LPAD, ly: py + 6 };
+            case 'top-left':     return { bx: px - bw - dist, by: py - dist - LBOX_H, lx: px - bw - dist + LPAD, ly: py - dist - 5 };
+            case 'top-right':    return { bx: px + dist, by: py - dist - LBOX_H, lx: px + dist + LPAD, ly: py - dist - 5 };
+            case 'bottom-left':  return { bx: px - bw - dist, by: py + dist, lx: px - bw - dist + LPAD, ly: py + dist + LBOX_H - 5 };
+            case 'bottom-right': return { bx: px + dist, by: py + dist, lx: px + dist + LPAD, ly: py + dist + LBOX_H - 5 };
+            default:             return { bx: px - bw / 2, by: py - dist - LBOX_H, lx: px - tw / 2, ly: py - dist - 5 };
           }
         };
 
-        // Sort by assigned count desc so the most important UPTs get preferred slots
-        const sortedUpts = [...uptPoints].sort((a, b) => {
+        const sortedUpts = [...activeClusterUpts].sort((a, b) => {
           const sa = clusterSummaries.find((s) => s.upt.id === a.id)?.assignedPointsCount ?? 0;
           const sb = clusterSummaries.find((s) => s.upt.id === b.id)?.assignedPointsCount ?? 0;
           return sb - sa;
         });
 
-        // Pass 1 – draw all pins first
         sortedUpts.forEach((upt) => {
           const { x, y } = project(upt.lng, upt.lat);
-
           ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
           ctx.shadowBlur = 8;
           ctx.shadowOffsetY = 4;
-
           ctx.beginPath();
           ctx.arc(x, y, 10, 0, Math.PI * 2);
           ctx.fillStyle = '#2563eb';
           ctx.fill();
-
           ctx.lineWidth = 2.5;
           ctx.strokeStyle = '#ffffff';
           ctx.stroke();
-
           ctx.shadowColor = 'transparent';
           ctx.beginPath();
           ctx.arc(x, y, 3.5, 0, Math.PI * 2);
@@ -524,7 +545,6 @@ export default function KNMPLeafletMap({
           ctx.fill();
         });
 
-        // Pass 2 – smart label placement
         sortedUpts.forEach((upt) => {
           const { x, y } = project(upt.lng, upt.lat);
           const summary = clusterSummaries.find((s) => s.upt.id === upt.id);
@@ -535,8 +555,18 @@ export default function KNMPLeafletMap({
           const tw = ctx.measureText(labelText).width;
           const bw = tw + LPAD * 2;
 
-          const dirs = [upt.direction || 'top', 'top', 'bottom', 'right', 'left'];
-          const offsets = [14, 22, 32, 44, 58];
+          const dirs = [
+            upt.direction || 'top',
+            'top',
+            'bottom',
+            'right',
+            'left',
+            'top-left',
+            'bottom-left',
+            'top-right',
+            'bottom-right',
+          ];
+          const offsets = [14, 26, 42, 60, 85, 115];
           let finalPos: { bx: number; by: number; lx: number; ly: number } | null = null;
 
           outer: for (const off of offsets) {
@@ -550,7 +580,6 @@ export default function KNMPLeafletMap({
           }
           if (!finalPos) finalPos = calcPos(x, y, tw, upt.direction || 'top', 14);
 
-          // Thin connector from pin to label box
           const boxCx = finalPos.bx + bw / 2;
           const boxCy = finalPos.by + LBOX_H / 2;
           const dx = boxCx - x;
@@ -567,8 +596,6 @@ export default function KNMPLeafletMap({
           ctx.lineWidth = 1.2;
           ctx.stroke();
           ctx.setLineDash([]);
-
-          // Label box
           ctx.shadowColor = 'rgba(0, 119, 255, 0.12)';
           ctx.shadowBlur = 5;
           ctx.fillStyle = 'rgba(255, 255, 255, 0.97)';
@@ -579,12 +606,8 @@ export default function KNMPLeafletMap({
           ctx.lineWidth = 1.5;
           ctx.strokeStyle = '#0ea5e9';
           ctx.stroke();
-
-          // Label text
           ctx.fillStyle = '#0c4a6e';
-          ctx.font = `bold ${LFONT}px 'Poppins', system-ui, sans-serif`;
           ctx.fillText(labelText, finalPos.lx, finalPos.ly);
-
           placed.push({ x: finalPos.bx, y: finalPos.by, w: bw, h: LBOX_H });
         });
       }
@@ -603,99 +626,159 @@ export default function KNMPLeafletMap({
       ctx.strokeStyle = '#38bdf8';
       ctx.stroke();
 
+      const headerTitle = isPapuaMode
+        ? `PETA CLUSTERING TITIK KNMP & 6 INSTANSI / UPT KKP PAPUA (${knmpPoints.length} TITIK KNMP)`
+        : `TABEL KETERANGAN CLUSTERING PEMBINAAN (${targetClusterType === 'bppp' ? 'KHUSUS BALAI PELATIHAN BPPP' : '38 UPT KKP'}) - ${knmpPoints.length} TITIK KNMP`;
+
       ctx.font = "bold 20px 'Poppins', system-ui, sans-serif";
       ctx.fillStyle = '#ffffff';
-      ctx.fillText(
-        `TABEL KETERANGAN CLUSTERING PEMBINAAN (${targetClusterType === 'bppp' ? 'KHUSUS BALAI PELATIHAN BPPP' : '38 UPT KKP'}) - ${knmpPoints.length} TITIK KNMP`,
-        70,
-        tableStartY + 42
-      );
+      ctx.fillText(headerTitle, 70, tableStartY + 42);
 
       ctx.font = "bold 13px 'Poppins', system-ui, sans-serif";
       ctx.fillStyle = '#7dd3fc';
-      ctx.fillText(`TARGET: ${targetClusterType === 'bppp' ? 'BALAI PELATIHAN (BPPP)' : 'SEMUA 38 UPT'}  |  MODE: ${knmpPoints.length} TITIK KNMP`, width - 680, tableStartY + 42);
+      ctx.fillText(
+        isPapuaMode ? `WILAYAH: PAPUA  |  6 UPT KKP PAPUA  |  ${knmpPoints.length} TITIK KNMP` : `TARGET: ${targetClusterType === 'bppp' ? 'BALAI PELATIHAN (BPPP)' : 'SEMUA 38 UPT'}  |  MODE: ${knmpPoints.length} TITIK KNMP`,
+        width - 720,
+        tableStartY + 42
+      );
 
-      const colWidth = (width - 110) / 2;
-      const rowHeight = 44;
       const subTableStartY = tableStartY + 90;
 
-      const drawSubTable = (startIndex: number, endIndex: number, startX: number) => {
-        // Column header row
+      if (isPapuaMode) {
+        const tableW = width - 80;
+        const startX = 40;
         ctx.fillStyle = '#1e3a5f';
         ctx.beginPath();
-        ctx.roundRect(startX, subTableStartY, colWidth, 38, 10);
+        ctx.roundRect(startX, subTableStartY, tableW, 42, 10);
         ctx.fill();
-
         ctx.lineWidth = 1.5;
         ctx.strokeStyle = '#38bdf8';
         ctx.stroke();
 
         ctx.font = "bold 12px 'Poppins', sans-serif";
         ctx.fillStyle = '#7dd3fc';
-        ctx.fillText('NO', startX + 15, subTableStartY + 24);
-        ctx.fillText('NAMA UPT KKP', startX + 60, subTableStartY + 24);
-        ctx.fillText('JENIS UPT', startX + colWidth - 360, subTableStartY + 24);
-        ctx.fillText('WILAYAH', startX + colWidth - 230, subTableStartY + 24);
-        ctx.fillText('KNMP', startX + colWidth - 115, subTableStartY + 24);
+        ctx.fillText('NO', startX + 15, subTableStartY + 26);
+        ctx.fillText('INSTANSI / UPT KKP', startX + 60, subTableStartY + 26);
+        ctx.fillText('ESELON I', startX + 380, subTableStartY + 26);
+        ctx.fillText('ALAMAT', startX + 520, subTableStartY + 26);
+        ctx.fillText('JUMLAH KNMP', startX + tableW - 480, subTableStartY + 26);
+        ctx.fillText('EST. PESERTA', startX + tableW - 330, subTableStartY + 26);
+        ctx.fillText('JARAK AVG', startX + tableW - 180, subTableStartY + 26);
+        ctx.fillText('RANGE (KM)', startX + tableW - 80, subTableStartY + 26);
 
-        clusterSummaries.slice(startIndex, endIndex).forEach((s, idx) => {
-          const rowY = subTableStartY + 48 + idx * rowHeight;
+        const rowHeight = 48;
+        clusterSummaries.forEach((s, idx) => {
+          const rowY = subTableStartY + 52 + idx * rowHeight;
           const hasPoints = s.assignedPointsCount > 0;
-
-          // Row background — white-based for readability
           ctx.fillStyle = idx % 2 === 0 ? '#f8fafc' : '#eef5ff';
           ctx.beginPath();
-          ctx.roundRect(startX, rowY, colWidth, 38, 8);
+          ctx.roundRect(startX, rowY, tableW, 42, 8);
           ctx.fill();
-
-          // Row separator
-          ctx.strokeStyle = '#e2e8f0';
+          ctx.strokeStyle = '#cbd5e1';
           ctx.lineWidth = 0.8;
           ctx.beginPath();
-          ctx.moveTo(startX, rowY + 38);
-          ctx.lineTo(startX + colWidth, rowY + 38);
+          ctx.moveTo(startX, rowY + 42);
+          ctx.lineTo(startX + tableW, rowY + 42);
           ctx.stroke();
-
-          ctx.font = "bold 12px 'Poppins', sans-serif";
-          ctx.fillStyle = '#94a3b8';
-          ctx.fillText(`#${s.upt.no}`, startX + 15, rowY + 24);
-
+          ctx.font = "bold 13px 'Poppins', sans-serif";
+          ctx.fillStyle = '#64748b';
+          ctx.fillText(`#${s.upt.no}`, startX + 15, rowY + 26);
           ctx.fillStyle = '#0f172a';
-          ctx.fillText(s.upt.name.length > 32 ? s.upt.name.substring(0, 30) + '...' : s.upt.name, startX + 60, rowY + 24);
-
-          ctx.fillStyle = '#2563eb';
+          ctx.fillText(s.upt.name, startX + 60, rowY + 26);
+          ctx.font = "bold 12px 'Poppins', sans-serif";
+          ctx.fillStyle = '#0284c7';
+          ctx.fillText(s.upt.eselon1 || s.upt.type, startX + 380, rowY + 26);
           ctx.font = "11px 'Poppins', sans-serif";
-          ctx.fillText(s.upt.type, startX + colWidth - 360, rowY + 24);
-
           ctx.fillStyle = '#475569';
-          ctx.fillText(s.upt.region.length > 15 ? s.upt.region.substring(0, 13) + '..' : s.upt.region, startX + colWidth - 230, rowY + 24);
-
-          // KNMP count badge
-          ctx.fillStyle = hasPoints ? '#0369a1' : '#94a3b8';
+          const shortAlamat = s.upt.alamat ? (s.upt.alamat.length > 48 ? s.upt.alamat.substring(0, 46) + '…' : s.upt.alamat) : '-';
+          ctx.fillText(shortAlamat, startX + 520, rowY + 26);
+          ctx.fillStyle = hasPoints ? '#0284c7' : '#94a3b8';
           ctx.beginPath();
-          ctx.roundRect(startX + colWidth - 120, rowY + 6, 105, 26, 8);
+          ctx.roundRect(startX + tableW - 485, rowY + 8, 110, 26, 6);
           ctx.fill();
-
           ctx.font = "bold 12px 'Poppins', sans-serif";
           ctx.fillStyle = '#ffffff';
-          ctx.fillText(`${s.assignedPointsCount} Titik`, startX + colWidth - 105, rowY + 24);
+          ctx.fillText(`${s.assignedPointsCount} Titik`, startX + tableW - 470, rowY + 25);
+          ctx.fillStyle = hasPoints ? '#059669' : '#94a3b8';
+          ctx.beginPath();
+          ctx.roundRect(startX + tableW - 340, rowY + 8, 120, 26, 6);
+          ctx.fill();
+          ctx.font = "bold 12px 'Poppins', sans-serif";
+          ctx.fillStyle = '#ffffff';
+          ctx.fillText(`${s.assignedPointsCount * 8} Orang`, startX + tableW - 325, rowY + 25);
+          ctx.font = "bold 12px 'Poppins', sans-serif";
+          ctx.fillStyle = '#0f172a';
+          ctx.fillText(hasPoints ? `${s.avgDistanceKm} km` : '-', startX + tableW - 180, rowY + 26);
+          ctx.font = "11px 'Poppins', sans-serif";
+          ctx.fillStyle = '#64748b';
+          ctx.fillText(hasPoints ? `${s.minDistanceKm} – ${s.maxDistanceKm} km` : '-', startX + tableW - 80, rowY + 26);
         });
-      };
-
-      drawSubTable(0, 19, 40);
-      drawSubTable(19, 38, 40 + colWidth + 30);
+      } else {
+        const colWidth = (width - 110) / 2;
+        const rowHeight = 44;
+        const drawSubTable = (startIndex: number, endIndex: number, startX: number) => {
+          ctx.fillStyle = '#1e3a5f';
+          ctx.beginPath();
+          ctx.roundRect(startX, subTableStartY, colWidth, 38, 10);
+          ctx.fill();
+          ctx.lineWidth = 1.5;
+          ctx.strokeStyle = '#38bdf8';
+          ctx.stroke();
+          ctx.font = "bold 12px 'Poppins', sans-serif";
+          ctx.fillStyle = '#7dd3fc';
+          ctx.fillText('NO', startX + 15, subTableStartY + 24);
+          ctx.fillText('NAMA UPT KKP', startX + 60, subTableStartY + 24);
+          ctx.fillText('JENIS UPT', startX + colWidth - 360, subTableStartY + 24);
+          ctx.fillText('WILAYAH', startX + colWidth - 230, subTableStartY + 24);
+          ctx.fillText('KNMP', startX + colWidth - 115, subTableStartY + 24);
+          clusterSummaries.slice(startIndex, endIndex).forEach((s, idx) => {
+            const rowY = subTableStartY + 48 + idx * rowHeight;
+            const hasPoints = s.assignedPointsCount > 0;
+            ctx.fillStyle = idx % 2 === 0 ? '#f8fafc' : '#eef5ff';
+            ctx.beginPath();
+            ctx.roundRect(startX, rowY, colWidth, 38, 8);
+            ctx.fill();
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.moveTo(startX, rowY + 38);
+            ctx.lineTo(startX + colWidth, rowY + 38);
+            ctx.stroke();
+            ctx.font = "bold 12px 'Poppins', sans-serif";
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillText(`#${s.upt.no}`, startX + 15, rowY + 24);
+            ctx.fillStyle = '#0f172a';
+            ctx.fillText(s.upt.name.length > 32 ? s.upt.name.substring(0, 30) + '...' : s.upt.name, startX + 60, rowY + 24);
+            ctx.fillStyle = '#2563eb';
+            ctx.font = "11px 'Poppins', sans-serif";
+            ctx.fillText(s.upt.type, startX + colWidth - 360, rowY + 24);
+            ctx.fillStyle = '#475569';
+            ctx.fillText(s.upt.region.length > 15 ? s.upt.region.substring(0, 13) + '..' : s.upt.region, startX + colWidth - 230, rowY + 24);
+            ctx.fillStyle = hasPoints ? '#0369a1' : '#94a3b8';
+            ctx.beginPath();
+            ctx.roundRect(startX + colWidth - 120, rowY + 6, 105, 26, 8);
+            ctx.fill();
+            ctx.font = "bold 12px 'Poppins', sans-serif";
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(`${s.assignedPointsCount} Titik`, startX + colWidth - 105, rowY + 24);
+          });
+        };
+        drawSubTable(0, 19, 40);
+        drawSubTable(19, 38, 40 + colWidth + 30);
+      }
 
       const clusterSuffix = showClustering ? `_clustering_${targetClusterType}` : '';
-      const filename = `peta_dan_tabel_lengkap_${knmpPoints.length}_knmp_${targetClusterType}${clusterSuffix}.png`;
+      const filename = isPapuaMode
+        ? `peta_clustering_papua_6_upt_${knmpPoints.length}_knmp.png`
+        : `peta_dan_tabel_lengkap_${knmpPoints.length}_knmp_${targetClusterType}${clusterSuffix}.png`;
 
       const url = canvas.toDataURL('image/png');
       const a = document.createElement('a');
       a.href = url;
       a.download = filename;
       a.click();
-
       setIsExportingPNG(false);
-    }, 100);
+    }, 200);
   };
 
   const toggleFullscreen = () => {
