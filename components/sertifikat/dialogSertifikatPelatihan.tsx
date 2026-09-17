@@ -405,7 +405,7 @@ const FormatSTTPL = React.forwardRef(
                                                 </span>
                                                 {
                                                     generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng != "" && <span className="max-w-6xl mt-1 leading-none font-bosItalic text-[0.9rem] mx-auto">
-                                                        {""} {dataProgramPelatihan[0]?.description == "" ? "in support of the Quality Assurance System based on Regulation of the Minister of Marine Affairs and Fisheries of the Republic of Indonesia Number 8 of 2024 concerning Control of the Implementation of the Quality Assurance and Safety System for Marine and Fishery Product" : generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng} {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
+                                                        {""} {dataProgramPelatihan[0]?.description == "" ? "in support of the Quality Assurance System based on Regulation of the Minister of Marine Affairs and Fisheries of the Republic of Indonesia Number 8 of 2024 concerning Control of the Implementation of the Quality Assurance and Safety System for Marine and Fishery Product" : generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng} {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))}
                                                     </span>
                                                 }
 
@@ -446,7 +446,30 @@ const FormatSTTPL = React.forwardRef(
                                                 <QRCodeImage value={userPelatihan?.NoRegistrasi} />
 
                                                 {/* Kolom 2 - Foto */}
-
+                                                {
+                                                    peserta?.Foto == 'https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/profile/fotoProfile/' ? <></> : <div
+                                                        className=""
+                                                        style={{
+                                                            width: "135px",
+                                                            height: "195px",
+                                                            border: "1px solid #9f9f9f",
+                                                            borderRadius: "15px",
+                                                            marginLeft: "8rem",
+                                                            overflow: "hidden",
+                                                            padding: "3px",
+                                                        }}
+                                                    >
+                                                        <img
+                                                            src={peserta?.Foto || ""}
+                                                            alt="Foto"
+                                                            style={{
+                                                                width: "100%",
+                                                                height: "100%",
+                                                                objectFit: "cover",
+                                                            }}
+                                                        />
+                                                    </div>
+                                                }
 
 
                                                 {/* Kolom 3 - Tanda Tangan & Pejabat */}
