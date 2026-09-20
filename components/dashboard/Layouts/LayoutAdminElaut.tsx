@@ -10,7 +10,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import React, { ReactNode, useEffect, useState } from "react";
 import DropdownUser from "../Header/DropdownUser";
-import { LucideLayoutDashboard } from "lucide-react";
+import { BadgeCheck, LucideLayoutDashboard } from "lucide-react";
 import { IoAlbumsOutline, IoBookOutline, IoDocumentOutline, IoFolderOpenOutline, IoPieChartOutline, IoSchoolOutline } from "react-icons/io5";
 import { FiMenu, FiLogOut, FiChevronDown, FiChevronRight, FiYoutube } from "react-icons/fi";
 import { HiOutlineInbox, HiOutlineUserGroup } from "react-icons/hi2";
@@ -358,6 +358,21 @@ export default function LayoutAdminElaut({
               >
                 <IoAlbumsOutline className={`flex-shrink-0 w-6 h-6 ${pathname.includes("layanan") ? "text-white" : "text-slate-400 group-hover:text-white"}`} />
                 {sidebarOpen && <span className="text-sm font-medium">Layanan dan Pengaduan</span>}
+              </a>
+            </li>
+          }
+
+          {
+            Cookies.get('Access')?.includes('superAdmin') && <li className="list-none">
+              <a
+                href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/layanan/perbaikan-sertifikat`}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${pathname.includes(`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/layanan/perbaikan-sertifikat`)
+                  ? "bg-blue-600 text-white shadow-lg shadow-blue-900/40"
+                  : "hover:bg-slate-800 hover:text-white"
+                  }`}
+              >
+                <BadgeCheck className={`flex-shrink-0 w-6 h-6 ${pathname.includes("layanan/perbaikan-sertifikat") ? "text-white" : "text-slate-400 group-hover:text-white"}`} />
+                {sidebarOpen && <span className="text-sm font-medium">Perbaikan Sertifikat</span>}
               </a>
             </li>
           }

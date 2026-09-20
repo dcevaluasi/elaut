@@ -5,7 +5,7 @@ import axios, { isAxiosError } from 'axios';
 import { UserPelatihan } from '@/types/user';
 import { addFiveYears } from '@/utils/pelatihan';
 import { generateTanggalPelatihan } from '@/utils/text';
-import { RiQuillPenAiLine, RiVerifiedBadgeFill, RiShieldCheckFill, RiFilePdfLine } from 'react-icons/ri';
+import { RiQuillPenAiLine, RiVerifiedBadgeFill, RiShieldCheckFill, RiFilePdfLine, RiShieldFlashLine } from 'react-icons/ri';
 import {
     FiUser,
     FiBookOpen,
@@ -30,6 +30,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
 import { verifyPDFBSrEUrl } from '@/constants/urls';
+import { DialogPerbaikanSertifikat } from '@/components/sertifikat/DialogPerbaikanSertifikat';
+import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
+import firebaseApp from '@/firebase/config';
+import { PerbaikanSertifikatItem } from '@/app/[random_id]/[role]/layanan/perbaikan-sertifikat/page';
+import { FiClock } from 'react-icons/fi';
 
 const containerVariants = {
     hidden: { opacity: 0 },
@@ -55,9 +60,41 @@ const CertificateResultPage = () => {
     const [error, setError] = useState<string | null>(null);
     const [imgError, setImgError] = useState(false);
     const [copiedText, setCopiedText] = useState<string | null>(null);
+    const [isPerbaikanModalOpen, setIsPerbaikanModalOpen] = useState(false);
+    const [existingPerbaikan, setExistingPerbaikan] = useState<PerbaikanSertifikatItem | null>(null);
 
     useEffect(() => {
         if (!no_sertifikat || typeof no_sertifikat !== 'string') return;
+
+        const checkExistingPerbaikan = async (sertifikatObj: UserPelatihan) => {
+            try {
+                const db = getFirestore(firebaseApp);
+                const colRef = collection(db, "perbaikan-sertifikat");
+
+                if (sertifikatObj?.IdUserPelatihan) {
+                    const q1 = query(colRef, where("IdUserPelatihan", "==", sertifikatObj.IdUserPelatihan));
+                    const snap1 = await getDocs(q1);
+                    if (!snap1.empty) {
+                        setExistingPerbaikan(snap1.docs[0].data() as PerbaikanSertifikatItem);
+                        return;
+                    }
+                }
+
+                const targetNo = sertifikatObj?.NoRegistrasi || sertifikatObj?.NoSertifikat;
+                if (targetNo) {
+                    const q2 = query(colRef, where("NoSertifikat", "==", targetNo));
+                    const snap2 = await getDocs(q2);
+                    if (!snap2.empty) {
+                        setExistingPerbaikan(snap2.docs[0].data() as PerbaikanSertifikatItem);
+                        return;
+                    }
+                }
+
+                setExistingPerbaikan(null);
+            } catch (err) {
+                console.error("Error checking existing perbaikan:", err);
+            }
+        };
 
         const fetchData = async () => {
             setLoading(true);
@@ -75,6 +112,10 @@ const CertificateResultPage = () => {
                 setData(sertifikatData);
                 setDataPelatihan(res.data.pelatihan);
                 setError(null);
+
+                if (sertifikatData) {
+                    await checkExistingPerbaikan(sertifikatData);
+                }
             } catch (err) {
                 if (isAxiosError(err)) {
                     setError(err.response?.data?.Pesan || 'Sertifikat tidak ditemukan dalam pangkalan data kami.');
@@ -82,6 +123,7 @@ const CertificateResultPage = () => {
                     setError('Terjadi masalah saat menghubungi server. Silakan coba lagi nanti.');
                 }
                 setData(null);
+                setExistingPerbaikan(null);
             } finally {
                 setLoading(false);
             }
@@ -490,6 +532,121 @@ const CertificateResultPage = () => {
                                     ))}
                                 </motion.div>
 
+                                {existingPerbaikan ? (
+                                    /* ===== STATUS PERBAIKAN CARD (JIKA SUDAH PERNAH PENGAJUAN) ===== */
+                                    <motion.div
+                                        variants={itemVariants}
+                                        className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0b1120] via-slate-900 to-[#0b1120] border border-amber-500/30 p-5 sm:p-6 space-y-4 shadow-2xl backdrop-blur-xl"
+                                    >
+                                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-white/[0.08]">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 flex-shrink-0">
+                                                    <RiShieldFlashLine className="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <h4 className="text-sm sm:text-base font-bold text-white font-calsans">
+                                                            Status Pengajuan Perbaikan Sertifikat
+                                                        </h4>
+                                                        <span className="font-mono text-xs font-bold text-cyan-300">
+                                                            #{existingPerbaikan.TiketPerbaikan || 'PENDING'}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-[11px] text-gray-400">
+                                                        Pengajuan berhasil dicatat pada pangkalan data E-LAUT
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {/* Status Badge */}
+                                            <div className="flex items-center gap-2 self-end sm:self-auto">
+                                                <span
+                                                    className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border text-xs font-bold uppercase tracking-wider ${
+                                                        existingPerbaikan.Status === 'Pending'
+                                                            ? 'bg-amber-500/15 border-amber-500/40 text-amber-400'
+                                                            : existingPerbaikan.Status === 'Diproses'
+                                                            ? 'bg-blue-500/15 border-blue-500/40 text-blue-400'
+                                                            : existingPerbaikan.Status === 'Selesai'
+                                                            ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
+                                                            : existingPerbaikan.Status === 'Ditolak'
+                                                            ? 'bg-rose-500/15 border-rose-500/40 text-rose-400'
+                                                            : 'bg-gray-500/15 border-gray-500/40 text-gray-300'
+                                                    }`}
+                                                >
+                                                    <FiClock className="w-3.5 h-3.5" />
+                                                    <span>Status: {existingPerbaikan.Status || 'Pending'}</span>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        {/* Content details */}
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                                            <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+                                                <span className="text-gray-500 text-[10px] uppercase font-bold block mb-1">
+                                                    Jenis Perbaikan:
+                                                </span>
+                                                <span className="font-bold text-amber-300">{existingPerbaikan.JenisPerbaikan}</span>
+                                                {existingPerbaikan.PerbaikanSudahTerbit && existingPerbaikan.PerbaikanSudahTerbit.length > 0 && (
+                                                    <div className="flex flex-wrap gap-1 mt-1.5">
+                                                        {existingPerbaikan.PerbaikanSudahTerbit.map((t: string, idx: number) => (
+                                                            <span key={idx} className="px-2 py-0.5 rounded-md bg-rose-500/15 border border-rose-500/30 text-rose-300 text-[10px]">
+                                                                {t}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+                                                <span className="text-gray-500 text-[10px] uppercase font-bold block mb-1">
+                                                    Detail Perbaikan Seharusnya:
+                                                </span>
+                                                <p className="text-gray-200 italic line-clamp-2">
+                                                    &ldquo;{existingPerbaikan.PerbaikanSeharusnya}&rdquo;
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Catatan Admin if available */}
+                                        {existingPerbaikan.CatatanAdmin && (
+                                            <div className="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-200 space-y-1">
+                                                <span className="font-bold text-blue-400 block uppercase tracking-wider text-[10px]">
+                                                    Catatan dari Admin E-LAUT:
+                                                </span>
+                                                <p className="text-gray-200 font-medium">{existingPerbaikan.CatatanAdmin}</p>
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                ) : (
+                                    /* ===== PERBAIKAN SERTIFIKAT CTA BANNER ===== */
+                                    <motion.div
+                                        variants={itemVariants}
+                                        className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-500/10 via-orange-500/5 to-rose-500/10 border border-amber-500/25 p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl backdrop-blur-xl"
+                                    >
+                                        <div className="flex items-center gap-3.5 text-center sm:text-left">
+                                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 flex-shrink-0 shadow-inner">
+                                                <RiShieldFlashLine className="w-6 h-6" />
+                                            </div>
+                                            <div className="space-y-0.5">
+                                                <h4 className="text-sm sm:text-base font-bold text-white font-calsans">
+                                                    Ada Kesalahan pada Sertifikat?
+                                                </h4>
+                                                <p className="text-xs text-gray-400">
+                                                    Ajukan perbaikan data nama, tanggal lahir, institusi, atau penerbitan sertifikat secara langsung.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            onClick={() => setIsPerbaikanModalOpen(true)}
+                                            className="whitespace-nowrap inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-slate-950 text-xs font-bold hover:brightness-110 transition-all shadow-lg shadow-amber-500/20 flex-shrink-0"
+                                        >
+                                            <FiEdit3 className="w-4 h-4 stroke-[2.5]" />
+                                            <span>Ajukan Perbaikan</span>
+                                        </button>
+                                    </motion.div>
+                                )}
+
                                 {/* ===== BSRE FOOTER TRUST BOX ===== */}
                                 <motion.div
                                     initial={{ opacity: 0 }}
@@ -546,6 +703,15 @@ const CertificateResultPage = () => {
                             </motion.div>
                         ) : null}
                     </AnimatePresence>
+
+                    {/* Certificate Revision Modal */}
+                    <DialogPerbaikanSertifikat
+                        isOpen={isPerbaikanModalOpen}
+                        onClose={() => setIsPerbaikanModalOpen(false)}
+                        data={data}
+                        dataPelatihan={dataPelatihan}
+                        onSuccess={(newPayload) => setExistingPerbaikan(newPayload as any)}
+                    />
 
                 </div>
             </main>
