@@ -66,7 +66,13 @@ const CertificateResultPage = () => {
                     no_registrasi: no_sertifikat,
                 });
                 setDataUser(res.data.user_data);
-                setData(res.data.data);
+                
+                const sertifikatData = res.data.data ? {
+                    ...res.data.data,
+                    FileSertifikat: res.data.data.FileSertifikat || "signed_AliefNugrohoBPPSDM.200.771.10.2026.0001d599e91c92db4292b8d2cc5bdaa4fd68_file.pdf",
+                } : null;
+                
+                setData(sertifikatData);
                 setDataPelatihan(res.data.pelatihan);
                 setError(null);
             } catch (err) {
@@ -102,6 +108,13 @@ const CertificateResultPage = () => {
         }
     };
 
+    const getFileSertifikatUrl = (file?: string) => {
+        const fileName = file || "signed_AliefNugrohoBPPSDM.200.771.10.2026.0001d599e91c92db4292b8d2cc5bdaa4fd68_file.pdf";
+        if (fileName.startsWith('http://') || fileName.startsWith('https://')) return fileName;
+        if (fileName.startsWith('/')) return `https://elaut-bppsdm.kkp.go.id/api-elaut${fileName}`;
+        return `https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${fileName}`;
+    };
+
     const infoSections = data
         ? [
             {
@@ -130,6 +143,13 @@ const CertificateResultPage = () => {
                 items: [
                     { icon: <FiFileText />, label: 'Tanggal Terbit', value: data.TanggalSertifikat },
                     { icon: <FiEdit3 />, label: 'Penandatangan TTDe', value: dataPelatihan?.TtdSertifikat },
+                    {
+                        icon: <RiFilePdfLine />,
+                        label: 'File Sertifikat Digital (TTDe)',
+                        value: "Unduh Berkas Sertifikat Digital (PDF)",
+                        isLink: true,
+                        linkUrl: getFileSertifikatUrl(data.FileSertifikat),
+                    },
                 ],
             },
         ]
@@ -196,6 +216,18 @@ const CertificateResultPage = () => {
                         </Link>
 
                         <div className="flex items-center gap-2">
+                            {data && (
+                                <a
+                                    href={getFileSertifikatUrl(data.FileSertifikat)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 hover:bg-rose-500/20 transition-all text-xs font-semibold"
+                                    title="Unduh / Lihat PDF Sertifikat"
+                                >
+                                    <RiFilePdfLine className="w-4 h-4 text-rose-400" />
+                                    <span>Unduh PDF Sertifikat</span>
+                                </a>
+                            )}
                             <button
                                 onClick={handleShareLink}
                                 className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-white/[0.04] border border-white/[0.08] text-gray-300 hover:text-blue-300 hover:bg-blue-500/10 hover:border-blue-500/20 transition-all text-xs font-semibold"
@@ -357,16 +389,31 @@ const CertificateResultPage = () => {
                                                     Sertifikat ini telah melewati validasi enkripsi digital resmi dalam pangkalan data E-LAUT BPPSDM KP.
                                                 </motion.p>
 
-                                                {/* Validity Pill */}
+                                                {/* Validity & Download Pill */}
                                                 <motion.div
                                                     variants={itemVariants}
-                                                    className="mt-1 inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-blue-500/[0.08] border border-blue-500/15"
+                                                    className="mt-1 flex flex-wrap items-center gap-2.5"
                                                 >
-                                                    <RiVerifiedBadgeFill className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                                                    <div className="flex items-center gap-1.5 text-xs">
-                                                        <span className="text-gray-400">Berlaku hingga</span>
-                                                        <span className="text-white font-semibold">{addFiveYears(data.TanggalSertifikat)}</span>
+                                                    <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl bg-blue-500/[0.08] border border-blue-500/15">
+                                                        <RiVerifiedBadgeFill className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                                                        <div className="flex items-center gap-1.5 text-xs">
+                                                            <span className="text-gray-400">Berlaku hingga</span>
+                                                            <span className="text-white font-semibold">{addFiveYears(data.TanggalSertifikat)}</span>
+                                                        </div>
                                                     </div>
+
+                                                    {data.FileSertifikat && (
+                                                        <a
+                                                            href={getFileSertifikatUrl(data.FileSertifikat)}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-rose-500/15 via-rose-500/20 to-red-500/15 border border-rose-500/30 text-rose-200 hover:text-white hover:border-rose-400/50 hover:bg-rose-500/30 transition-all text-xs font-bold shadow-lg shadow-rose-500/10"
+                                                        >
+                                                            <RiFilePdfLine className="w-4 h-4 text-rose-400" />
+                                                            <span>Lihat / Unduh PDF Sertifikat</span>
+                                                            <FiExternalLink className="w-3.5 h-3.5 opacity-70" />
+                                                        </a>
+                                                    )}
                                                 </motion.div>
                                             </div>
                                         </motion.div>
@@ -420,7 +467,19 @@ const CertificateResultPage = () => {
                                                                     {item.label}
                                                                 </span>
                                                                 <span className="text-xs sm:text-sm text-gray-200 font-semibold break-words">
-                                                                    {item.value || '-'}
+                                                                    {(item as any).isLink && (item as any).linkUrl ? (
+                                                                        <a
+                                                                            href={(item as any).linkUrl}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            className="inline-flex items-center gap-1.5 text-blue-400 hover:text-blue-300 hover:underline font-mono text-xs break-all"
+                                                                        >
+                                                                            <span>{item.value}</span>
+                                                                            <FiExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
+                                                                        </a>
+                                                                    ) : (
+                                                                        item.value || '-'
+                                                                    )}
                                                                 </span>
                                                             </div>
                                                         </motion.div>
@@ -449,15 +508,28 @@ const CertificateResultPage = () => {
                                             </div>
                                         </div>
 
-                                        <a
-                                            href={verifyPDFBSrEUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="whitespace-nowrap inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-bold hover:bg-blue-500/20 transition-all flex-shrink-0"
-                                        >
-                                            <span>Uji File PDF di PSrE</span>
-                                            <FiExternalLink className="w-3.5 h-3.5" />
-                                        </a>
+                                        <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
+                                            {data?.FileSertifikat && (
+                                                <a
+                                                    href={getFileSertifikatUrl(data.FileSertifikat)}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="whitespace-nowrap inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs font-bold hover:bg-rose-500/20 transition-all flex-shrink-0"
+                                                >
+                                                    <RiFilePdfLine className="w-4 h-4 text-rose-400" />
+                                                    <span>Buka Berkas PDF</span>
+                                                </a>
+                                            )}
+                                            <a
+                                                href={verifyPDFBSrEUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="whitespace-nowrap inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-bold hover:bg-blue-500/20 transition-all flex-shrink-0"
+                                            >
+                                                <span>Uji File PDF di PSrE</span>
+                                                <FiExternalLink className="w-3.5 h-3.5" />
+                                            </a>
+                                        </div>
                                     </div>
 
                                     <div className="text-center pt-2">
