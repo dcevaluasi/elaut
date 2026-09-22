@@ -89,8 +89,30 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
             )
         } catch (error: any) {
             console.error(error)
+            throw error
         }
     }
+
+    const handleDeleteCertificate = async (user: UserPelatihan) => {
+        const confirmDelete = window.confirm(`Apakah Anda yakin ingin menghapus sertifikat untuk ${user.Nama}?`);
+        if (!confirmDelete) return;
+
+        try {
+            await handleDeleteCertificateById(user.IdUserPelatihan);
+            Toast.fire({
+                icon: "success",
+                title: "Berhasil!",
+                text: "Sertifikat berhasil dihapus.",
+            });
+            onSuccess();
+        } catch (error) {
+            Toast.fire({
+                icon: "error",
+                title: "Gagal!",
+                text: "Gagal menghapus sertifikat.",
+            });
+        }
+    };
 
     const handleUploadNilaiPeserta = async (
         id: number,
@@ -449,14 +471,27 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                                         Tgl Revisi
                                     </Button> : <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest italic shrink-0 animate-pulse">Processing...</span> :
                                     row.original.FileSertifikat != "" && (
-                                        <Link
-                                            target="_blank"
-                                            href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${row.original.FileSertifikat}`}
-                                            className="group/link flex items-center gap-2 h-9 px-4 rounded-xl border border-blue-100 bg-blue-50/50 text-blue-600 text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-sm shadow-blue-500/5"
-                                        >
-                                            <RiVerifiedBadgeFill className="h-4 w-4" />
-                                            <span>Lihat e-STTPL</span>
-                                        </Link>
+                                        <div className="flex items-center gap-2">
+                                            <Link
+                                                target="_blank"
+                                                href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${row.original.FileSertifikat}`}
+                                                className="group/link flex items-center gap-2 h-9 px-4 rounded-xl border border-blue-100 bg-blue-50/50 text-blue-600 text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-sm shadow-blue-500/5"
+                                            >
+                                                <RiVerifiedBadgeFill className="h-4 w-4" />
+                                                <span>Lihat e-STTPL</span>
+                                            </Link>
+                                            {Cookies.get('Access')?.includes('superAdmin') && (
+                                                <Button
+                                                    variant="outline"
+                                                    size="icon"
+                                                    title="Hapus Sertifikat"
+                                                    onClick={() => handleDeleteCertificate(row.original)}
+                                                    className="w-9 h-9 rounded-xl border-rose-100 text-rose-500 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all shadow-sm shrink-0"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            )}
+                                        </div>
                                     )
                             }
                         </div>
@@ -553,42 +588,19 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                                 idPeserta={row.original.IdUsers.toString()}
                             />
 
-                            {(parseInt(pelatihan?.StatusPenerbitan) <= 5) && (
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={async () => {
-                                        const confirmDelete = window.confirm(`⚠️ Apakah Anda yakin ingin menghapus ${row.original.Nama}?`);
-                                        if (!confirmDelete) return;
-
-                                        try {
-                                            const res = await fetch(
-                                                `${elautBaseUrl}/deleteUserPelatihanById?id=${row.original.IdUserPelatihan}`,
-                                                {
-                                                    method: "DELETE",
-                                                    headers: {
-                                                        "Authorization": `Bearer ${Cookies.get('XSRF091')}`,
-                                                        "Content-Type": "application/json",
-                                                    },
-                                                }
-                                            );
-                                            if (!res.ok) throw new Error("Gagal menghapus data peserta");
-
-                                            setUsers((prevData) =>
-                                                prevData.filter((item) => item.IdUserPelatihan !== row.original.IdUserPelatihan)
-                                            );
-
-                                        } catch (error) {
-                                            console.error(error);
-                                            Toast.fire({ icon: 'error', title: 'Gagal menghapus peserta' });
-                                        }
-                                    }}
-                                    className="w-9 h-9 rounded-xl border-rose-100 text-rose-500 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all shadow-sm"
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
-                            )}
                         </div>
+                    )}
+
+                    {Cookies.get('Access')?.includes('superAdmin') && (row.original.FileSertifikat !== "" || row.original.StatusPenandatangan === "Done") && (
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            title="Hapus Sertifikat"
+                            onClick={() => handleDeleteCertificate(row.original)}
+                            className="w-9 h-9 rounded-xl border-rose-100 text-rose-500 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all shadow-sm shrink-0"
+                        >
+                            <TbCertificate className="h-4 w-4 text-rose-500" />
+                        </Button>
                     )}
                 </div>
             ),

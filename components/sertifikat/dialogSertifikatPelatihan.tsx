@@ -750,7 +750,17 @@ const FormatSTTPL = React.forwardRef(
                             className={`w-full h-full scale-95 flex flex-col gap-4 items-center justify-center  px-10  rounded-md font-bos leading-[120%] pb-0 text-black`}
                         >
 
+
+
                             <div ref={refPage} className={`pdf-page w-full flex flex-col  gap-4 relative  items-center justify-center h-[49.63rem]`}>
+                                <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center">
+                                    <img
+                                        src="/logo-kkp-2.png"
+                                        alt=""
+                                        className="w-[32rem] max-w-[60%] opacity-[0.06] select-none"
+                                    />
+                                </div>
+
                                 <div className="flex flex-row  absolute top-0 right-0">
                                     <p className="text-lg font-bosNormal">
                                         NO. SERTIFIKAT : {userPelatihan?.NoRegistrasi}
@@ -944,7 +954,13 @@ const FormatSTTPL = React.forwardRef(
 
                             <div
                                 className={`pdf-page w-full flex flex-col gap-2 h-[53.74rem] items-center justify-center ${materiIntiCount >= 10 ? "mt-56" : "mt-36"} break-before-auto relative  mb-0 pb-0`}
-                            >
+                            > <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center">
+                                    <img
+                                        src="/logo-kkp-2.png"
+                                        alt=""
+                                        className="w-[32rem] max-w-[60%] opacity-[0.06] select-none"
+                                    />
+                                </div>
                                 <div className="w-full mb-0 pb-0">
                                     {/* Title */}
                                     <div className={`flex flex-row justify-center items-center ${materiIntiCount >= 10 ? "-mb-20" : "mb-5"}`}>

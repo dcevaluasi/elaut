@@ -18,8 +18,9 @@ import { TbBuildingEstate, TbBuildingSkyscraper, TbChartPie, TbDatabaseEdit, TbG
 import Link from "next/link";
 import { breakdownStatus, setSecureCookie, removeSecureCookie } from "@/lib/utils";
 import { generatedSignedCertificate } from "@/utils/certificates";
-import { RiQuillPenAiLine } from "react-icons/ri";
+import { RiQuillPenAiLine, RiUserSearchLine } from "react-icons/ri";
 import { BiBadgeCheck } from "react-icons/bi";
+import { HiOutlineUser } from "react-icons/hi";
 
 export default function LayoutAdminElaut({
   children,
@@ -260,12 +261,12 @@ export default function LayoutAdminElaut({
                       />
                     </>
                   }
-                  <NavItem
-                    href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/program-pelatihan`}
-                    icon={<RiQuillPenAiLine className="flex-shrink-0 w-5 h-5" />}
-                    label="Program Pelatihan"
-                  />
 
+                  <NavItem
+                    href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/peserta`}
+                    icon={<HiOutlineUser className="flex-shrink-0 w-5 h-5" />}
+                    label="Peserta Pelatihan"
+                  />
                 </ul>
               )}
             </li>

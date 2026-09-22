@@ -31,7 +31,7 @@ import { Edit3, User as UserIcon, X, Check, Save, Info, Plus } from "lucide-reac
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface EditPesertaActionProps {
-    idPelatihan: string;
+    idPelatihan?: string;
     idPeserta: string;
     onSuccess?: () => void;
 }

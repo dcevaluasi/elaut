@@ -116,3 +116,50 @@ export const exportInstrukturToExcel = (
   const stamp = new Date().toISOString().slice(0, 10)
   saveAs(blob, `Data Instruktur - ${stamp}.xlsx`)
 }
+
+export const exportUsersToExcel = (data: any[]) => {
+  const columns = [
+    'No',
+    'Nama Lengkap',
+    'NIK',
+    'Email',
+    'No Telepon',
+    'Jenis Kelamin',
+    'Tempat Lahir',
+    'Tanggal Lahir',
+    'Pendidikan Terakhir',
+    'Instansi/Status',
+    'Provinsi',
+    'Kota/Kabupaten',
+    'Alamat'
+  ]
+
+  const rows = data.map((row, index) => [
+    index + 1,
+    row.Nama || '-',
+    row.Nik || '-',
+    row.Email || '-',
+    row.NoTelpon || '-',
+    row.JenisKelamin === 'L' ? 'Laki-Laki' : row.JenisKelamin === 'P' ? 'Perempuan' : row.JenisKelamin || '-',
+    row.TempatLahir || '-',
+    row.TanggalLahir || '-',
+    row.PendidikanTerakhir || '-',
+    row.Status || row.Instansi || '-',
+    row.Provinsi || '-',
+    row.Kota || '-',
+    row.Alamat || '-'
+  ])
+
+  const worksheet = XLSX.utils.aoa_to_sheet([columns, ...rows])
+  const workbook = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Data Peserta')
+
+  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
+  const blob = new Blob([excelBuffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  })
+
+  const stamp = new Date().toISOString().slice(0, 10)
+  saveAs(blob, `Data Peserta - ${stamp}.xlsx`)
+}
+
