@@ -103,6 +103,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
             throw error
         }
     }
+    // 
 
     const handleDeleteCertificate = async (user: UserPelatihan) => {
         const confirmDelete = window.confirm(`Apakah Anda yakin ingin menghapus sertifikat untuk ${user.Nama}?`);
