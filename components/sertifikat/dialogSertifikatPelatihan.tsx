@@ -384,16 +384,14 @@ const FormatSTTPL = React.forwardRef(
 
                                     <div className="flex flex-col space-y-0 w-full h-fit items-center justify-center -mt-1 mb-4">
                                         <h1 className="font-bosBold text-2xl leading-none">
-                                            {/* {
+                                            {
                                                 userPelatihan?.IsActice == "" ? "-" : generatedStatusCertificate(userPelatihan?.IsActice).status_indo
-                                            } */}
-                                            TELAH MENGIKUTI
+                                            }
                                         </h1>
-                                        <h3 className="font-bosNormal text-xl italic mb-3">
-                                            {/* {
+                                        <h3 className="font-bosNormal text-xl italic">
+                                            {
                                                 userPelatihan?.IsActice == "" ? "-" : generatedStatusCertificate(userPelatihan?.IsActice).status_eng
-                                            } */}
-                                            HAS ATTENDANCE
+                                            }
                                         </h3>
                                     </div>
 
@@ -510,7 +508,7 @@ const FormatSTTPL = React.forwardRef(
                             </div>
 
                             <div
-                                className={`pdf-page w-full flex flex-col gap-2 h-[49.63rem] items-center justify-center px-5 ${materiIntiCount >= 10 ? "mt-56" : "mt-36"} break-before-auto relative  mb-0 pb-0`}
+                                className={`pdf-page w-full flex flex-col gap-2 h-[53.74rem] items-center justify-center ${materiIntiCount >= 10 ? "mt-56" : "mt-40"} break-before-auto relative  mb-0 pb-0`}
                             >
                                 <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center">
                                     <img
