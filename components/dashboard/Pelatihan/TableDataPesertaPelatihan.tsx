@@ -134,36 +134,6 @@ const TableDataPesertaPelatihan = () => {
     }
   };
 
-  const [openFormDeleteFileSertifikat, setOpenFormDeleteFileSertifikat] = React.useState<boolean>(false)
-  const [isDeletingFileSertifikat, setIsDeletingFileSertifikat] = React.useState<boolean>(false)
-  const handleDeleteFileSertifikat = async () => {
-    setIsDeletingFileSertifikat(true)
-    try {
-      const response: AxiosResponse = await axios.get(
-        `${baseUrl}/deleteSertifikatFiles?id_pelatihan?id=${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get("XSRF091")}`,
-          },
-        }
-      );
-      setOpenFormDeleteFileSertifikat(false)
-      setIsDeletingFileSertifikat(false)
-      Toast.fire({
-        icon: "success",
-        title: `Berhasil menghapuskan draft file sertifikat!`,
-      });
-    } catch (error) {
-      console.error("Error posting participants training data:", error);
-      Toast.fire({
-        icon: "error",
-        title: `Gagal menghapuskan draft file sertifikat!`,
-      });
-      setOpenFormDeleteFileSertifikat(false)
-      setIsDeletingFileSertifikat(false)
-      throw error;
-    }
-  };
 
   React.useEffect(() => {
     handleFetchingPublicTrainingDataById();
@@ -623,46 +593,7 @@ const TableDataPesertaPelatihan = () => {
               </div>
               <table className="w-full">
                 <tr className="flex w-fit items-center justify-start p-2 gap-2">
-                  {/* Update Certificates */}
-                  {(Cookies.get('Access')?.includes('updateCertificates') && countUserWithCertificate(data) == data.length && dataPelatihan?.IsRevisi != "1") && (
-                    <div className="w-full flex justify-end gap-2">
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <button
-                            type="button"
-                            className="flex items-center justify-center gap-2 h-10 px-5 text-sm font-medium rounded-lg border bg-gray-500 text-white 
-              hover:bg-gray-600 transition-colors shadow-sm w-fit flex-shrink-0"
-                          >
-                            <IoReload />
-                            Revisi Sertifikat
-                          </button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Ada sertifikat yang perlu direvisi?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Langkah melakukan revisi,
-                              <div className="flex flex-col">
-                                <span>1. Identifikasi Sertifikat Yang Dianggap Perlu Direvisi/Ditambahkan;</span>
-                                <span>2. Lakukan Penambahan/Pengupdatean Data Sesuai Kebutuhan dan Pastikan Tersampaikan Secara Formal;</span>
-                                <span>3. Hapus Terlebih Dahulu Sertifikat Yang Telah Terbit Sebelumnya</span>
-                                <span>4. Ajukan Sertifikat Kembali;</span>
-                              </div>
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Batal</AlertDialogCancel>
-                            <AlertDialogAction
-                              className="bg-gray-500 text-white hover:bg-gray-600"
-                              onClick={() => handleReviseCertificate(parseInt(id))}
-                            >
-                              Lakukan Revisi
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  )}
+
                 </tr>
               </table>
             </div>

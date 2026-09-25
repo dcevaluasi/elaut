@@ -35,7 +35,7 @@ import {
     DialogFooter,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { ArrowUpDown, Check, Info, Trash2, Edit3, User as UserIcon, Calendar, Hash, Award, ShieldCheck, RefreshCw, MoreVertical, Search, Download, Trash, Edit, X, CreditCard, MapPin, Phone, Mail, GraduationCap, Building, ChevronRight } from "lucide-react";
+import { ArrowUpDown, Check, Info, Trash2, Edit3, User as UserIcon, Calendar, Hash, Award, ShieldCheck, RefreshCw, MoreVertical, Search, Download, Trash, Edit, X, CreditCard, MapPin, Phone, Mail, GraduationCap, Building, ChevronRight, Loader2 } from "lucide-react";
 import { PelatihanMasyarakat, UserPelatihan } from "@/types/product";
 import { AiOutlineFieldNumber } from "react-icons/ai";
 
@@ -76,6 +76,17 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
     const [tanggalSertifikatRevisi, setTanggalSertifikatRevisi] = React.useState('')
     const [loadingTanggalSertifikatRevisi, setLoadingTanggalSertifikatRevisi] = React.useState(false)
 
+    const [openDialogDeleteAllCertificates, setOpenDialogDeleteAllCertificates] = React.useState(false);
+    const [loadingDeleteAllCertificates, setLoadingDeleteAllCertificates] = React.useState(false);
+
+    React.useEffect(() => {
+        setUsers(data);
+    }, [data]);
+
+    const usersWithCertificate = React.useMemo(() => {
+        return users.filter((u) => u.FileSertifikat && u.FileSertifikat !== "");
+    }, [users]);
+
     const handleDeleteCertificateById = async (id: number) => {
         try {
             const token = Cookies.get("XSRF091")
@@ -111,6 +122,44 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                 title: "Gagal!",
                 text: "Gagal menghapus sertifikat.",
             });
+        }
+    };
+
+    const handleDeleteAllCertificates = async () => {
+        if (usersWithCertificate.length === 0) return;
+        setLoadingDeleteAllCertificates(true);
+
+        try {
+            const token = Cookies.get("XSRF091");
+            await Promise.all(
+                usersWithCertificate.map((u) =>
+                    axios.delete(
+                        `${elautBaseUrl}/deleteSertifikatTTde?id=${u.IdUserPelatihan}`,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    )
+                )
+            );
+
+            Toast.fire({
+                icon: "success",
+                title: "Berhasil!",
+                text: `Semua sertifikat (${usersWithCertificate.length} file) berhasil dihapus.`,
+            });
+            onSuccess();
+        } catch (error: any) {
+            console.error("Gagal menghapus semua sertifikat:", error);
+            Toast.fire({
+                icon: "error",
+                title: "Gagal!",
+                text: "Terjadi kesalahan saat menghapus semua sertifikat.",
+            });
+        } finally {
+            setLoadingDeleteAllCertificates(false);
+            setOpenDialogDeleteAllCertificates(false);
         }
     };
 
@@ -591,17 +640,7 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                         </div>
                     )}
 
-                    {Cookies.get('Access')?.includes('superAdmin') && (row.original.FileSertifikat !== "" || row.original.StatusPenandatangan === "Done") && (
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            title="Hapus Sertifikat"
-                            onClick={() => handleDeleteCertificate(row.original)}
-                            className="w-9 h-9 rounded-xl border-rose-100 text-rose-500 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all shadow-sm shrink-0"
-                        >
-                            <TbCertificate className="h-4 w-4 text-rose-500" />
-                        </Button>
-                    )}
+
                 </div>
             ),
         },
@@ -615,7 +654,32 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
     });
 
     return (
-        <div className="w-full">
+        <div className="w-full space-y-4">
+            {Cookies.get('Access')?.includes('superAdmin') && usersWithCertificate.length > 0 && (
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-[2rem] bg-white/60 border border-slate-100 backdrop-blur-xl shadow-sm">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold shrink-0">
+                            <TbCertificate className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <p className="text-xs font-black text-slate-800 uppercase tracking-tight">Berkas Sertifikat e-STTPL</p>
+                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
+                                Terdeteksi <span className="text-rose-600 font-black">{usersWithCertificate.length}</span> dari {users.length} peserta memiliki file sertifikat.
+                            </p>
+                        </div>
+                    </div>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setOpenDialogDeleteAllCertificates(true)}
+                        className="h-10 px-4 rounded-xl border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-all shadow-sm text-xs font-black uppercase tracking-widest flex items-center gap-2 shrink-0"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                        Hapus Semua Sertifikat ({usersWithCertificate.length})
+                    </Button>
+                </div>
+            )}
+
             <div className="overflow-hidden bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-slate-100 shadow-xl overflow-x-auto">
                 <Table>
                     <TableHeader>
@@ -679,6 +743,42 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
             </div>
 
             {/* Dialogs */}
+            <AlertDialog open={openDialogDeleteAllCertificates} onOpenChange={setOpenDialogDeleteAllCertificates}>
+                <AlertDialogContent className="bg-white/80 backdrop-blur-2xl border-white rounded-[3rem] p-10 max-w-md shadow-2xl">
+                    <AlertDialogHeader className="space-y-4">
+                        <div className="w-16 h-16 rounded-[1.5rem] bg-rose-50 text-rose-600 flex items-center justify-center text-3xl shadow-xl shadow-rose-500/5">
+                            <Trash2 className="w-8 h-8" />
+                        </div>
+                        <AlertDialogTitle className="font-black text-2xl text-slate-900 tracking-tight">Hapus Semua Sertifikat?</AlertDialogTitle>
+                        <AlertDialogDescription className="text-sm text-slate-500 font-medium leading-relaxed">
+                            Apakah Anda yakin ingin menghapus <span className="text-rose-600 font-black underline underline-offset-4">{usersWithCertificate.length} file sertifikat</span> e-STTPL untuk semua peserta pada pelatihan ini? Tindakan ini tidak dapat dibatalkan.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="mt-8 gap-3 sm:gap-0">
+                        <AlertDialogCancel
+                            disabled={loadingDeleteAllCertificates}
+                            className="h-12 flex-1 rounded-2xl border-slate-100 text-slate-500 font-black uppercase tracking-widest text-[10px] hover:bg-slate-50"
+                        >
+                            Batalkan
+                        </AlertDialogCancel>
+                        <Button
+                            disabled={loadingDeleteAllCertificates}
+                            onClick={handleDeleteAllCertificates}
+                            className="h-12 flex-1 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-black uppercase tracking-widest text-[10px] shadow-lg shadow-rose-500/20 flex items-center justify-center gap-2"
+                        >
+                            {loadingDeleteAllCertificates ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    <span>Menghapus...</span>
+                                </>
+                            ) : (
+                                "Hapus Semua"
+                            )}
+                        </Button>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
             <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
                 <AlertDialogContent className="bg-white/80 backdrop-blur-2xl border-white rounded-[3rem] p-10 max-w-md shadow-2xl">
                     <AlertDialogHeader className="space-y-4">
