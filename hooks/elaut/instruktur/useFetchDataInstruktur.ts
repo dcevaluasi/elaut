@@ -14,6 +14,23 @@ export type CountStats = {
   pendidikanTerakhir: Record<string, number>
   status: Record<string, number>
   tot: number
+  /** Jumlah per kategori pelatih; `lainnya` = Pelatih non Instruktur / belum diisi. */
+  kategori: { instruktur: number; widyaiswara: number; lainnya: number }
+}
+
+/**
+ * `label` adalah kolom baru; data lama mungkin baru punya `jenis_pelatih`
+ * atau `jenjang_jabatan`, jadi keduanya dipakai sebagai cadangan.
+ */
+export function kategoriPelatih(
+  i: Instruktur,
+): keyof CountStats['kategori'] {
+  const sumber = (i.label || i.jenis_pelatih || i.jenjang_jabatan || '')
+    .trim()
+    .toLowerCase()
+  if (sumber.startsWith('widyaiswara')) return 'widyaiswara'
+  if (sumber.startsWith('instruktur')) return 'instruktur'
+  return 'lainnya'
 }
 
 export function useFetchDataInstrukturChoose() {
@@ -121,8 +138,10 @@ export function useFetchDataInstruktur({
       'Tugas Belajar': 0,
     }
     let tot = 0
+    const kategori = { instruktur: 0, widyaiswara: 0, lainnya: 0 }
 
     instrukturs.forEach((i) => {
+      kategori[kategoriPelatih(i)] += 1
       if (i.bidang_keahlian) {
         bidangKeahlian[i.bidang_keahlian] =
           (bidangKeahlian[i.bidang_keahlian] || 0) + 1
@@ -143,7 +162,14 @@ export function useFetchDataInstruktur({
       }
     })
 
-    return { bidangKeahlian, jenjangJabatan, pendidikanTerakhir, status, tot }
+    return {
+      bidangKeahlian,
+      jenjangJabatan,
+      pendidikanTerakhir,
+      status,
+      tot,
+      kategori,
+    }
   }, [instrukturs])
 
   return { instrukturs, loading, error, fetchInstrukturData, stats }

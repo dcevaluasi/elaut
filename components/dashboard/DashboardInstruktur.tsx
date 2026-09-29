@@ -54,10 +54,21 @@ export default function DashboardInstruktur() {
                                 <h4 className="text-3xl font-black tracking-tighter">{instrukturs.length}</h4>
                             </div>
                         </div>
-                        <div className="flex items-center gap-2 text-xs font-bold text-blue-100/60 uppercase tracking-tighter">
-                            <TrendingUp className="w-3.5 h-3.5" />
-                            <span>SDM internal & eksternal</span>
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="rounded-xl bg-white/10 border border-white/15 px-3 py-2">
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-blue-100/80">Instruktur</p>
+                                <p className="text-xl font-black tracking-tighter">{stats.kategori.instruktur}</p>
+                            </div>
+                            <div className="rounded-xl bg-white/10 border border-white/15 px-3 py-2">
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-blue-100/80">Widyaiswara</p>
+                                <p className="text-xl font-black tracking-tighter">{stats.kategori.widyaiswara}</p>
+                            </div>
                         </div>
+                        {stats.kategori.lainnya > 0 && (
+                            <p className="mt-2 text-[11px] font-semibold text-blue-100/70">
+                                + {stats.kategori.lainnya} pelatih non instruktur / belum dikategorikan
+                            </p>
+                        )}
                     </div>
                 </div>
 
