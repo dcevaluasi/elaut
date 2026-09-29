@@ -11,6 +11,9 @@ const LABEL: Record<keyof InstrukturFormValues, string> = {
     nip: "NIP",
     email: "Email",
     no_telpon: "Nomor WhatsApp",
+    jenis_kelamin: "Jenis kelamin",
+    jenis_asn: "Jenis ASN",
+    tahun_pensiun: "Tahun pensiun",
     pendidikkan_terakhir: "Pendidikan terakhir",
     Golongan: "Pangkat / golongan",
     eselon_1: "Unit kerja eselon I",
@@ -38,6 +41,7 @@ const LABEL: Record<keyof InstrukturFormValues, string> = {
  * supaya instruktur bisa memverifikasi penempatannya sebelum menyimpan.
  */
 const FIELD_TERKUNCI_PER_LANGKAH: Record<number, (keyof InstrukturFormValues)[]> = {
+    0: ["tahun_pensiun"],
     1: ["unit_kerja", "status"],
 };
 

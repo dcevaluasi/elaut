@@ -19,6 +19,8 @@ export type PayloadProfilInstruktur = {
   nama: string
   email: string
   no_telpon: string
+  jenis_kelamin: string
+  jenis_asn: string
   pendidikkan_terakhir: string
   Golongan: string
   eselon_1: string

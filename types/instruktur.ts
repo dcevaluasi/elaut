@@ -19,6 +19,11 @@ export type Instruktur = {
   no_telpon: string
   email: string
   nip: string
+  jenis_kelamin: string
+  /** Status kepegawaian: PNS atau PPPK. */
+  jenis_asn: string
+  /** Tahun batas usia pensiun, mis. `'2044'`. Diisi admin, bukan instruktur. */
+  tahun_pensiun: string
   eselon_1: string
   eselon_2: string
   /** Pangkat/golongan. Nama field mengikuti tag JSON backend yang berhuruf besar. */

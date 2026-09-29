@@ -39,6 +39,11 @@ export const GOLONGAN = [
   'IV/e - Pembina Utama',
 ]
 
+export const JENIS_KELAMIN = ['Laki-laki', 'Perempuan']
+
+/** Status kepegawaian ASN. Mengisi kolom `jenis_asn` di backend. */
+export const JENIS_ASN = ['PNS', 'PPPK']
+
 export const JENIS_PELATIH = ['Widyaiswara', 'Instruktur']
 
 export const JENJANG_JABATAN = [
@@ -97,12 +102,18 @@ export function labelStatusKeaktifan(status: string): string {
   return STATUS_KEAKTIFAN.find((item) => item.value === status)?.label || status
 }
 
-/** Field yang dihitung untuk persentase kelengkapan profil. */
+/**
+ * Field yang dihitung untuk persentase kelengkapan profil.
+ * `tahun_pensiun` sengaja tidak ikut: instruktur tidak bisa mengisinya sendiri,
+ * jadi memasukkannya akan menahan kelengkapan di bawah 100% tanpa jalan keluar.
+ */
 export const TRACKED_FIELDS: (keyof Instruktur)[] = [
   'nama',
   'nip',
   'email',
   'no_telpon',
+  'jenis_kelamin',
+  'jenis_asn',
   'pendidikkan_terakhir',
   'Golongan',
   'eselon_1',

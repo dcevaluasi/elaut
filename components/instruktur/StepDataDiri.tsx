@@ -2,13 +2,29 @@
 
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
-import { TbUser, TbId, TbMail, TbPhone, TbSchool, TbAward } from "react-icons/tb";
+import {
+    TbUser,
+    TbId,
+    TbMail,
+    TbPhone,
+    TbSchool,
+    TbAward,
+    TbGenderBigender,
+    TbIdBadge2,
+    TbCalendarTime,
+} from "react-icons/tb";
 import FieldText from "./FieldText";
 import FieldSelect from "./FieldSelect";
+import FieldTerkunci from "./FieldTerkunci";
 import StepShell from "./StepShell";
 import { ACCENTS } from "./accents";
 import { STEPS, InstrukturFormValues } from "./steps";
-import { GOLONGAN, PENDIDIKAN_TERAKHIR } from "@/constants/instruktur";
+import {
+    GOLONGAN,
+    JENIS_ASN,
+    JENIS_KELAMIN,
+    PENDIDIKAN_TERAKHIR,
+} from "@/constants/instruktur";
 
 const step = STEPS[0];
 const accent = ACCENTS[step.accent];
@@ -60,6 +76,39 @@ export default function StepDataDiri({
                 icon={TbPhone}
                 accent={accent}
                 hint="Dipakai panitia untuk konfirmasi jadwal mengajar."
+            />
+
+            <FieldSelect
+                form={form}
+                name="jenis_kelamin"
+                label="Jenis kelamin"
+                placeholder="Pilih jenis kelamin"
+                icon={TbGenderBigender}
+                accent={accent}
+                options={JENIS_KELAMIN.map((jenis) => ({
+                    value: jenis,
+                    label: jenis,
+                }))}
+            />
+
+            <FieldSelect
+                form={form}
+                name="jenis_asn"
+                label="Jenis ASN"
+                placeholder="Pilih status kepegawaian"
+                icon={TbIdBadge2}
+                accent={accent}
+                options={JENIS_ASN.map((jenis) => ({
+                    value: jenis,
+                    label: jenis,
+                }))}
+            />
+
+            <FieldTerkunci
+                label="Tahun pensiun"
+                nilai={form.watch("tahun_pensiun")}
+                icon={TbCalendarTime}
+                alasan="Dihitung dari data kepegawaian. Hubungi admin bila keliru."
             />
 
             <FieldSelect

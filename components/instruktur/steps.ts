@@ -19,6 +19,11 @@ export const instrukturSchema = z.object({
         .trim()
         .min(10, "Nomor telepon minimal 10 digit")
         .regex(/^08\d+$/, "Nomor harus diawali 08 dan hanya berisi angka"),
+    jenis_kelamin: z.string().min(1, "Jenis kelamin wajib dipilih"),
+    jenis_asn: z.string().min(1, "Jenis ASN wajib dipilih"),
+    // Turunan dari data kepegawaian, bukan isian instruktur. Ikut ditampilkan
+    // di wizard seperti id_lemdik dan status, tapi tidak dikirim saat menyimpan.
+    tahun_pensiun: z.string(),
     pendidikkan_terakhir: z.string().min(1, "Pendidikan terakhir wajib dipilih"),
     // Nama field berhuruf besar mengikuti tag JSON backend (`json:"Golongan"`).
     Golongan: z.string().min(1, "Pangkat/golongan wajib dipilih"),
@@ -71,7 +76,16 @@ export const STEPS: StepDefinition[] = [
         judul: "Data diri",
         deskripsi: "Identitas dan kontak yang dipakai panitia untuk menghubungi Anda.",
         accent: "biru",
-        fields: ["nama", "nip", "email", "no_telpon", "pendidikkan_terakhir", "Golongan"],
+        fields: [
+            "nama",
+            "nip",
+            "email",
+            "no_telpon",
+            "jenis_kelamin",
+            "jenis_asn",
+            "pendidikkan_terakhir",
+            "Golongan",
+        ],
     },
     {
         id: 1,

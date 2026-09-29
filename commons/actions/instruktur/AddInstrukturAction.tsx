@@ -37,11 +37,16 @@ import {
     TbLink,
     TbActivity,
     TbX,
-    TbChecks
+    TbChecks,
+    TbGenderBigender,
+    TbIdBadge2,
+    TbCalendarTime
 } from "react-icons/tb";
 import { UK_ESELON_1, UK_ESELON_2 } from "@/constants/unitkerja";
 import {
     GOLONGAN,
+    JENIS_ASN,
+    JENIS_KELAMIN,
     JENIS_LABEL_INSTRUKTUR,
     JENIS_PELATIH,
     JENIS_SISJAMU,
@@ -89,6 +94,9 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
     const [eselon2, setEselon2] = useState("");
     const [idLemdik, setIdLemdik] = useState<number | undefined>(undefined);
     const [pendidikanTerakhir, setPendidikanTerakhir] = useState("");
+    const [jenisKelamin, setJenisKelamin] = useState("");
+    const [jenisAsn, setJenisAsn] = useState("");
+    const [tahunPensiun, setTahunPensiun] = useState("");
 
     const clearForm = () => {
         setNama("");
@@ -113,6 +121,9 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
         setIdLemdik(undefined);
         setEselon2("");
         setPendidikanTerakhir("");
+        setJenisKelamin("");
+        setJenisAsn("");
+        setTahunPensiun("");
     };
 
     const handleSubmit = async () => {
@@ -137,6 +148,9 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
             eselon_1: eselon1,
             eselon_2: eselon2,
             pendidikkan_terakhir: pendidikanTerakhir,
+            jenis_kelamin: jenisKelamin,
+            jenis_asn: jenisAsn,
+            tahun_pensiun: tahunPensiun,
             // Tag JSON backend memang berhuruf besar (`json:"Golongan"`).
             Golongan: golongan,
             jenis_sisjamu: jenisSisjamu,
@@ -338,6 +352,56 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
                                         ))}
                                     </SelectContent>
                                 </Select>
+                            </div>
+
+                            <div className=" space-y-2">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Jenis Kelamin</label>
+                                <Select value={jenisKelamin || undefined} onValueChange={setJenisKelamin}>
+                                    <SelectTrigger className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-emerald-500/10">
+                                        <div className="flex items-center gap-3">
+                                            <TbGenderBigender className="text-slate-400" size={20} />
+                                            <SelectValue placeholder="Pilih Jenis Kelamin" />
+                                        </div>
+                                    </SelectTrigger>
+                                    <SelectContent className="z-[9999999]">
+                                        {JENIS_KELAMIN.map((item) => (
+                                            <SelectItem key={item} value={item} className="font-semibold text-xs py-3">{item}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className=" space-y-2">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Jenis ASN</label>
+                                <Select value={jenisAsn || undefined} onValueChange={setJenisAsn}>
+                                    <SelectTrigger className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-emerald-500/10">
+                                        <div className="flex items-center gap-3">
+                                            <TbIdBadge2 className="text-slate-400" size={20} />
+                                            <SelectValue placeholder="Pilih Jenis ASN" />
+                                        </div>
+                                    </SelectTrigger>
+                                    <SelectContent className="z-[9999999]">
+                                        {JENIS_ASN.map((item) => (
+                                            <SelectItem key={item} value={item} className="font-semibold text-xs py-3">{item}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className=" space-y-2">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Tahun Pensiun</label>
+                                <div className="relative">
+                                    <TbCalendarTime className="text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" size={20} />
+                                    <input
+                                        type="text"
+                                        inputMode="numeric"
+                                        maxLength={4}
+                                        value={tahunPensiun}
+                                        onChange={(e) => setTahunPensiun(e.target.value.replace(/\D/g, ""))}
+                                        placeholder="Contoh: 2044"
+                                        className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent pl-12 pr-4 font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-emerald-500/10"
+                                    />
+                                </div>
                             </div>
 
                             <div className=" space-y-2">
