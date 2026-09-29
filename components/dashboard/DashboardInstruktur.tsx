@@ -54,19 +54,21 @@ export default function DashboardInstruktur() {
                                 <h4 className="text-3xl font-black tracking-tighter">{instrukturs.length}</h4>
                             </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-3">
-                            <div className="rounded-xl bg-white/10 border border-white/15 px-3 py-2">
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-blue-100/80">Instruktur</p>
-                                <p className="text-xl font-black tracking-tighter">{stats.kategori.instruktur}</p>
-                            </div>
-                            <div className="rounded-xl bg-white/10 border border-white/15 px-3 py-2">
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-blue-100/80">Widyaiswara</p>
-                                <p className="text-xl font-black tracking-tighter">{stats.kategori.widyaiswara}</p>
-                            </div>
+                        <div className="grid grid-cols-3 gap-2">
+                            {[
+                                { label: "Instruktur", value: stats.kategori.instruktur },
+                                { label: "Widyaiswara", value: stats.kategori.widyaiswara },
+                                { label: "Pelatih non Instruktur", value: stats.kategori.nonInstruktur },
+                            ].map((item) => (
+                                <div key={item.label} className="rounded-xl bg-white/10 border border-white/15 px-3 py-2">
+                                    <p className="text-[10px] font-bold uppercase tracking-wider leading-tight text-blue-100/80">{item.label}</p>
+                                    <p className="text-xl font-black tracking-tighter">{item.value}</p>
+                                </div>
+                            ))}
                         </div>
-                        {stats.kategori.lainnya > 0 && (
+                        {stats.kategori.belumDiisi > 0 && (
                             <p className="mt-2 text-[11px] font-semibold text-blue-100/70">
-                                + {stats.kategori.lainnya} pelatih non instruktur / belum dikategorikan
+                                + {stats.kategori.belumDiisi} pelatih belum dikategorikan
                             </p>
                         )}
                     </div>

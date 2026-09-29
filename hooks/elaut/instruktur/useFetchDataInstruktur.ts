@@ -14,8 +14,13 @@ export type CountStats = {
   pendidikanTerakhir: Record<string, number>
   status: Record<string, number>
   tot: number
-  /** Jumlah per kategori pelatih; `lainnya` = Pelatih non Instruktur / belum diisi. */
-  kategori: { instruktur: number; widyaiswara: number; lainnya: number }
+  /** Jumlah per `label` pelatih; `belumDiisi` = belum punya kategori. */
+  kategori: {
+    instruktur: number
+    widyaiswara: number
+    nonInstruktur: number
+    belumDiisi: number
+  }
 }
 
 /**
@@ -30,7 +35,8 @@ export function kategoriPelatih(
     .toLowerCase()
   if (sumber.startsWith('widyaiswara')) return 'widyaiswara'
   if (sumber.startsWith('instruktur')) return 'instruktur'
-  return 'lainnya'
+  if (sumber.startsWith('pelatih non')) return 'nonInstruktur'
+  return 'belumDiisi'
 }
 
 export function useFetchDataInstrukturChoose() {
@@ -138,7 +144,12 @@ export function useFetchDataInstruktur({
       'Tugas Belajar': 0,
     }
     let tot = 0
-    const kategori = { instruktur: 0, widyaiswara: 0, lainnya: 0 }
+    const kategori = {
+      instruktur: 0,
+      widyaiswara: 0,
+      nonInstruktur: 0,
+      belumDiisi: 0,
+    }
 
     instrukturs.forEach((i) => {
       kategori[kategoriPelatih(i)] += 1
