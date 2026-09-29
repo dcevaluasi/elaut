@@ -5,6 +5,8 @@ import axios from 'axios'
 import Cookies from 'js-cookie'
 import { elautBaseUrl } from '@/constants/urls'
 import { Instruktur } from '@/types/instruktur'
+import { UnitKerja } from '@/types/master'
+import { isBalaiPelatihanPuslat } from '@/utils/unitkerja'
 
 export type CountStats = {
   bidangKeahlian: Record<string, number>
@@ -47,7 +49,13 @@ export function useFetchDataInstrukturChoose() {
   return { instrukturs, loading, error, fetchInstrukturData }
 }
 
-export function useFetchDataInstruktur() {
+/**
+ * `balaiOnly`: untuk akun pusat (IDUnitKerja 0) dan Puslat KP (8), batasi ke
+ * instruktur BPPP dan BDA Sukamandi saja. Akun UPT tetap melihat unitnya sendiri.
+ */
+export function useFetchDataInstruktur({
+  balaiOnly = false,
+}: { balaiOnly?: boolean } = {}) {
   const [instrukturs, setInstrukturs] = useState<Instruktur[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<unknown>(null)
@@ -65,18 +73,34 @@ export function useFetchDataInstruktur() {
     setError(null)
 
     try {
-      const response = await axios.get<Instruktur[]>(
-        `${elautBaseUrl}/getInstrukturs`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      )
+      const isAkunPusat =
+        !cookieIdUnitKerja ||
+        cookieIdUnitKerja.toString() === '0' ||
+        cookieIdUnitKerja.toString() === '8'
+      const headers = { Authorization: `Bearer ${token}` }
+
+      const [response, unitKerjaResponse] = await Promise.all([
+        axios.get<Instruktur[]>(`${elautBaseUrl}/getInstrukturs`, { headers }),
+        balaiOnly && isAkunPusat
+          ? axios.get<{ data: UnitKerja[] }>(
+              `${elautBaseUrl}/unit-kerja/getAllUnitKerja`,
+              { headers },
+            )
+          : null,
+      ])
+
+      const balaiIds = unitKerjaResponse
+        ? new Set(
+            (unitKerjaResponse.data.data || [])
+              .filter((uk) => isBalaiPelatihanPuslat(uk.nama))
+              .map((uk) => String(uk.id_unit_kerja)),
+          )
+        : null
+
       const filtered = (response.data || []).filter((row) => {
-        return cookieIdUnitKerja &&
-          cookieIdUnitKerja.toString() !== '0' &&
-          cookieIdUnitKerja.toString() !== '8'
-          ? String(row.id_lemdik ?? '') === cookieIdUnitKerja
-          : true
+        const idLemdik = String(row.id_lemdik ?? '')
+        if (!isAkunPusat) return idLemdik === cookieIdUnitKerja
+        return balaiIds ? balaiIds.has(idLemdik) : true
       })
 
       setInstrukturs(filtered)
@@ -85,7 +109,7 @@ export function useFetchDataInstruktur() {
     } finally {
       setLoading(false)
     }
-  }, [token])
+  }, [token, cookieIdUnitKerja, balaiOnly])
 
   const stats: CountStats = useMemo(() => {
     const bidangKeahlian: Record<string, number> = {}

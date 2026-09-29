@@ -8,7 +8,7 @@ import { Users, UserPlus, Award, TrendingUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function DashboardInstruktur() {
-    const { instrukturs, loading, fetchInstrukturData, stats } = useFetchDataInstruktur();
+    const { instrukturs, loading, fetchInstrukturData, stats } = useFetchDataInstruktur({ balaiOnly: true });
 
     useEffect(() => {
         fetchInstrukturData();

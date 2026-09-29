@@ -57,3 +57,10 @@ export function findDataUnitKerjaById(
     return null
   }
 }
+
+/** Balai pelatihan milik Puslat KP: seluruh BPPP dan BDA Sukamandi. */
+export function isBalaiPelatihanPuslat(nama: string | undefined): boolean {
+  return /BPPP|Balai Pelatihan dan Penyuluhan Perikanan|Sukamandi/i.test(
+    nama ?? '',
+  )
+}
