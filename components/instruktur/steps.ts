@@ -1,5 +1,6 @@
 import * as z from "zod";
 import { AccentName } from "./accents";
+import { BIDANG_KEAHLIAN, LABEL_INSTRUKTUR, aturanKepakaran } from "@/constants/instruktur";
 
 /** URL opsional: boleh kosong, tapi kalau diisi harus URL yang sah. */
 const linkOpsional = z
@@ -38,14 +39,20 @@ export const instrukturSchema = z.object({
     unit_kerja: z.string(),
     status: z.string(),
 
-    // Langkah 3 — Kepakaran
-    jenis_pelatih: z.string().min(1, "Jenis pelatih wajib dipilih"),
-    jenjang_jabatan: z.string().min(1, "Jenjang jabatan wajib dipilih"),
-    bidang_keahlian: z.string().min(1, "Bidang keahlian wajib dipilih"),
+    // Langkah 3 — Kepakaran. Hanya nilai dari daftar baku yang diterima, agar
+    // isian lama yang diketik bebas harus dipilih ulang. Kaitan label dengan
+    // jenis pelatih/jenjang/jenis label diperiksa di superRefine di bawah.
+    jenis_pelatih: z.string(),
+    jenjang_jabatan: z.string(),
+    bidang_keahlian: z.string().refine((v) => BIDANG_KEAHLIAN.includes(v), {
+        message: "Bidang keahlian wajib dipilih dari daftar",
+    }),
     // Tidak semua instruktur mengampu program SISJAMU, jadi opsional.
     jenis_sisjamu: z.string(),
-    label: z.string().min(1, "Label wajib dipilih"),
-    jenis_label: z.string().min(1, "Jenis label wajib dipilih"),
+    label: z.string().refine((v) => LABEL_INSTRUKTUR.includes(v), {
+        message: "Label wajib dipilih",
+    }),
+    jenis_label: z.string(),
 
     // Langkah 4 — Sertifikasi (semua opsional)
     metodologi_pelatihan: linkOpsional,
@@ -54,6 +61,18 @@ export const instrukturSchema = z.object({
     management_of_training: linkOpsional,
     training_officer_course: linkOpsional,
     link_data_dukung_sertifikat: linkOpsional,
+}).superRefine((nilai, ctx) => {
+    const aturan = aturanKepakaran(nilai.label);
+    if (!aturan.jenisPelatih) return;
+    if (nilai.jenis_pelatih !== aturan.jenisPelatih) {
+        ctx.addIssue({ code: "custom", path: ["jenis_pelatih"], message: "Jenis pelatih harus sesuai label" });
+    }
+    if (!aturan.jenjang.includes(nilai.jenjang_jabatan)) {
+        ctx.addIssue({ code: "custom", path: ["jenjang_jabatan"], message: "Jenjang jabatan wajib dipilih" });
+    }
+    if (!aturan.jenisLabel.includes(nilai.jenis_label)) {
+        ctx.addIssue({ code: "custom", path: ["jenis_label"], message: "Jenis label wajib dipilih" });
+    }
 });
 
 export type InstrukturFormValues = z.infer<typeof instrukturSchema>;

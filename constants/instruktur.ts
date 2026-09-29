@@ -59,15 +59,23 @@ export const JENJANG_JABATAN = [
   'Instruktur Penyelia',
 ]
 
+/**
+ * Mengikuti kategori laporan Puslat KP ("Jumlah Widyaiswara dan Instruktur
+ * Menurut Bidang Keahlian"), supaya rekap dashboard sama dengan laporan.
+ */
 export const BIDANG_KEAHLIAN = [
-  'Perikanan Tangkap',
-  'Perikanan Budidaya',
+  'Diklat Fungsional',
+  'Diklat Struktural',
+  'Diklat Teknis',
+  'Manajerial',
+  'Garam',
+  'Pembudidayaan Ikan',
+  'Pengelolaan One Data',
+  'Pengelolaan Sumberdaya KP',
   'Pengolahan Hasil Perikanan',
+  'Perikanan Tangkap',
   'Permesinan Perikanan',
-  'Nautika Perikanan',
-  'Konservasi dan Kelautan',
-  'Mutu dan Keamanan Hasil Perikanan',
-  'Kewirausahaan Kelautan dan Perikanan',
+  'Konservasi',
 ]
 
 /**
@@ -90,6 +98,42 @@ export const JENIS_LABEL_INSTRUKTUR = [
   'Instruktur Pusat',
   'Widyaiswara Pusat',
 ]
+
+/**
+ * `label` menentukan isian kepakaran lain supaya tidak saling bertentangan:
+ * jenis pelatih mengikuti label, dan pilihan jenjang serta jenis label hanya
+ * yang diawali nama label itu. Pelatih non Instruktur (guru, dosen, tim teknis)
+ * tidak punya jenjang JF Instruktur/Widyaiswara: jenis pelatih dan jenis label
+ * dikosongkan, sedangkan jenjangnya (jabatan asalnya) dibiarkan apa adanya.
+ */
+export function aturanKepakaran(label: string) {
+  const jf = JENIS_PELATIH.includes(label) ? label : ''
+  return {
+    jenisPelatih: jf,
+    jenjang: jf ? JENJANG_JABATAN.filter((j) => j.startsWith(jf)) : [],
+    jenisLabel: jf ? JENIS_LABEL_INSTRUKTUR.filter((j) => j.startsWith(jf)) : [],
+  }
+}
+
+/** Pesan kesalahan pertama pada isian kepakaran, atau `null` bila sudah konsisten. */
+export function cekKepakaran(
+  nilai: Pick<
+    Instruktur,
+    'label' | 'jenis_pelatih' | 'jenjang_jabatan' | 'jenis_label' | 'bidang_keahlian'
+  >,
+): string | null {
+  if (!LABEL_INSTRUKTUR.includes(nilai.label)) return 'Label wajib dipilih.'
+  const aturan = aturanKepakaran(nilai.label)
+  if (nilai.jenis_pelatih !== aturan.jenisPelatih)
+    return 'Jenis pelatih harus sesuai label.'
+  if (aturan.jenisPelatih && !aturan.jenjang.includes(nilai.jenjang_jabatan))
+    return 'Jenjang jabatan wajib dipilih sesuai label.'
+  if (aturan.jenisPelatih && !aturan.jenisLabel.includes(nilai.jenis_label))
+    return 'Jenis label wajib dipilih sesuai label.'
+  if (!BIDANG_KEAHLIAN.includes(nilai.bidang_keahlian))
+    return 'Bidang keahlian wajib dipilih dari daftar.'
+  return null
+}
 
 export const STATUS_KEAKTIFAN = [
   { value: 'Active', label: 'Aktif' },

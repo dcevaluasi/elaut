@@ -2,13 +2,14 @@
 
 import React, { useEffect } from "react";
 import StatsInstruktur from "./Pelatihan/StatsInstruktur";
+import TableSebaranPelatih from "./Pelatihan/TableSebaranPelatih";
 import { useFetchDataInstruktur } from "@/hooks/elaut/instruktur/useFetchDataInstruktur";
 import { HashLoader } from "react-spinners";
 import { Users, UserPlus, Award, TrendingUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function DashboardInstruktur() {
-    const { instrukturs, loading, fetchInstrukturData, stats } = useFetchDataInstruktur({ balaiOnly: true });
+    const { instrukturs, unitKerjas, loading, fetchInstrukturData, stats } = useFetchDataInstruktur({ balaiOnly: true });
 
     useEffect(() => {
         fetchInstrukturData();
@@ -112,6 +113,8 @@ export default function DashboardInstruktur() {
                     </div>
                 </div>
             </div>
+
+            <TableSebaranPelatih data={instrukturs} unitKerjas={unitKerjas} />
 
             <StatsInstruktur data={instrukturs} stats={stats} />
         </div>

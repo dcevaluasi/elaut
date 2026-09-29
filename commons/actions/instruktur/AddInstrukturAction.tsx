@@ -47,21 +47,18 @@ import {
     GOLONGAN,
     JENIS_ASN,
     JENIS_KELAMIN,
-    JENIS_LABEL_INSTRUKTUR,
-    JENIS_PELATIH,
+    BIDANG_KEAHLIAN,
     JENIS_SISJAMU,
-    JENJANG_JABATAN,
     LABEL_INSTRUKTUR,
+    aturanKepakaran,
+    cekKepakaran,
     PENDIDIKAN_TERAKHIR,
 } from "@/constants/instruktur";
-import { useFetchDataRumpunPelatihan } from "@/hooks/elaut/master/useFetchDataRumpunPelatihan";
-import { RumpunPelatihan } from "@/types/program";
 import { useFetchDataUnitKerja } from "@/hooks/elaut/unit-kerja/useFetchDataUnitKerja";
 
 const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
     onSuccess,
 }) => {
-    const { data: dataRumpunPelatihan, loading: loadingRumpunPelatihan } = useFetchDataRumpunPelatihan();
     const { unitKerjas, fetchUnitKerjaData } = useFetchDataUnitKerja();
 
     React.useEffect(() => {
@@ -76,7 +73,6 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
     const [noTelpon, setNoTelpon] = useState("");
     const [email, setEmail] = useState("");
     const [nip, setNip] = useState("");
-    const [jenisPelatih, setJenisPelatih] = useState("");
     const [jenjangJabatan, setJenjangJabatan] = useState("");
     const [bidangKeahlian, setBidangKeahlian] = useState("");
     const [metodologiPelatihan, setMetodologiPelatihan] = useState("");
@@ -103,7 +99,6 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
         setNoTelpon("");
         setEmail("");
         setNip("");
-        setJenisPelatih("");
         setJenjangJabatan("");
         setBidangKeahlian("");
         setMetodologiPelatihan("");
@@ -126,14 +121,36 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
         setTahunPensiun("");
     };
 
+    // Label memimpin: jenis pelatih mengikuti label, dan jenjang/jenis label
+    // yang tidak cocok dengan label dikosongkan agar dipilih ulang.
+    const aturan = aturanKepakaran(labelInstruktur);
+    const pilihLabel = (label: string) => {
+        const baru = aturanKepakaran(label);
+        setLabelInstruktur(label);
+        if (baru.jenisPelatih && !baru.jenjang.includes(jenjangJabatan)) setJenjangJabatan("");
+        if (!baru.jenisLabel.includes(jenisLabel)) setJenisLabel("");
+    };
+
     const handleSubmit = async () => {
+        const salah = cekKepakaran({
+            label: labelInstruktur,
+            jenis_pelatih: aturan.jenisPelatih,
+            jenjang_jabatan: jenjangJabatan,
+            jenis_label: jenisLabel,
+            bidang_keahlian: bidangKeahlian,
+        });
+        if (salah) {
+            Toast.fire({ icon: "error", title: "Data kepakaran belum sesuai", text: salah });
+            return;
+        }
+
         const form = {
             nama,
             id_lemdik: idLemdik || 0,
             no_telpon: noTelpon,
             email: email,
             nip: nip,
-            jenis_pelatih: jenisPelatih,
+            jenis_pelatih: aturan.jenisPelatih,
             jenjang_jabatan: jenjangJabatan,
             bidang_keahlian: bidangKeahlian,
             metodologi_pelatihan: metodologiPelatihan,
@@ -322,15 +339,15 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
 
                             <div className=" space-y-2">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Jenjang Jabatan</label>
-                                <Select value={jenjangJabatan || undefined} onValueChange={setJenjangJabatan}>
+                                <Select value={jenjangJabatan || undefined} onValueChange={setJenjangJabatan} disabled={aturan.jenjang.length === 0}>
                                     <SelectTrigger className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-emerald-500/10">
                                         <div className="flex items-center gap-3 min-w-0">
                                             <TbBriefcase className="text-slate-400 shrink-0" size={20} />
-                                            <SelectValue placeholder="Pilih Jenjang Jabatan" />
+                                            <SelectValue placeholder={labelInstruktur ? (aturan.jenjang.length ? "Pilih Jenjang Jabatan" : "Tidak berlaku untuk label ini") : "Pilih Label dulu"} />
                                         </div>
                                     </SelectTrigger>
                                     <SelectContent className="max-h-80 z-[9999999]">
-                                        {JENJANG_JABATAN.map((jenjang) => (
+                                        {aturan.jenjang.map((jenjang) => (
                                             <SelectItem key={jenjang} value={jenjang} className="font-semibold text-xs py-3">{jenjang}</SelectItem>
                                         ))}
                                     </SelectContent>
@@ -472,15 +489,15 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
                         <div className="w-full grid grid-cols-2 gap-3">
                             <div className=" space-y-2">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Jenis Pelatih</label>
-                                <Select value={jenisPelatih || undefined} onValueChange={setJenisPelatih}>
+                                <Select value={aturan.jenisPelatih || undefined} disabled>
                                     <SelectTrigger className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-violet-500/10">
                                         <div className="flex items-center gap-3 min-w-0">
                                             <TbUser className="text-slate-400 shrink-0" size={20} />
-                                            <SelectValue placeholder="Pilih Jenis Pelatih" />
+                                            <SelectValue placeholder={labelInstruktur ? "Tidak berlaku untuk label ini" : "Mengikuti Label"} />
                                         </div>
                                     </SelectTrigger>
                                     <SelectContent className="max-h-80 z-[9999999]">
-                                        {JENIS_PELATIH.map((jenis) => (
+                                        {(aturan.jenisPelatih ? [aturan.jenisPelatih] : []).map((jenis) => (
                                             <SelectItem key={jenis} value={jenis} className="font-semibold text-xs py-3">{jenis}</SelectItem>
                                         ))}
                                     </SelectContent>
@@ -489,7 +506,7 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
 
                             <div className=" space-y-2">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Label</label>
-                                <Select value={labelInstruktur || undefined} onValueChange={setLabelInstruktur}>
+                                <Select value={labelInstruktur || undefined} onValueChange={pilihLabel}>
                                     <SelectTrigger className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-violet-500/10">
                                         <div className="flex items-center gap-3 min-w-0">
                                             <TbCertificate className="text-slate-400 shrink-0" size={20} />
@@ -506,15 +523,15 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
 
                             <div className=" space-y-2">
                                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Jenis Label</label>
-                                <Select value={jenisLabel || undefined} onValueChange={setJenisLabel}>
+                                <Select value={jenisLabel || undefined} onValueChange={setJenisLabel} disabled={aturan.jenisLabel.length === 0}>
                                     <SelectTrigger className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border-transparent font-bold text-slate-700 dark:text-white focus:ring-4 focus:ring-violet-500/10">
                                         <div className="flex items-center gap-3 min-w-0">
                                             <TbCertificate className="text-slate-400 shrink-0" size={20} />
-                                            <SelectValue placeholder="Pilih Jenis Label" />
+                                            <SelectValue placeholder={labelInstruktur ? (aturan.jenisLabel.length ? "Pilih Jenis Label" : "Tidak berlaku untuk label ini") : "Pilih Label dulu"} />
                                         </div>
                                     </SelectTrigger>
                                     <SelectContent className="max-h-80 z-[9999999]">
-                                        {JENIS_LABEL_INSTRUKTUR.map((item) => (
+                                        {aturan.jenisLabel.map((item) => (
                                             <SelectItem key={item} value={item} className="font-semibold text-xs py-3">{item}</SelectItem>
                                         ))}
                                     </SelectContent>
@@ -548,8 +565,8 @@ const AddInstrukturAction: React.FC<{ onSuccess?: () => void }> = ({
                                         </div>
                                     </SelectTrigger>
                                     <SelectContent className="max-h-80 z-[9999999]">
-                                        {dataRumpunPelatihan?.map((rumpun: RumpunPelatihan) => (
-                                            <SelectItem key={rumpun.id_rumpun_pelatihan} value={rumpun.name} className="font-semibold text-xs py-3">{rumpun.name}</SelectItem>
+                                        {BIDANG_KEAHLIAN.map((bidang) => (
+                                            <SelectItem key={bidang} value={bidang} className="font-semibold text-xs py-3">{bidang}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>

@@ -72,14 +72,19 @@ export function useFetchDataInstrukturChoose() {
   return { instrukturs, loading, error, fetchInstrukturData }
 }
 
+/** IDUnitKerja milik Puslat KP. */
+const ID_PUSLAT_KP = '8'
+
 /**
  * `balaiOnly`: untuk akun pusat (IDUnitKerja 0) dan Puslat KP (8), batasi ke
- * instruktur BPPP dan BDA Sukamandi saja. Akun UPT tetap melihat unitnya sendiri.
+ * instruktur Puslat KP, BPPP, dan BDA Sukamandi saja. Akun UPT tetap melihat
+ * unitnya sendiri. Daftar unit kerja ikut dikembalikan untuk menamai unit.
  */
 export function useFetchDataInstruktur({
   balaiOnly = false,
 }: { balaiOnly?: boolean } = {}) {
   const [instrukturs, setInstrukturs] = useState<Instruktur[]>([])
+  const [unitKerjas, setUnitKerjas] = useState<UnitKerja[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<unknown>(null)
 
@@ -104,21 +109,31 @@ export function useFetchDataInstruktur({
 
       const [response, unitKerjaResponse] = await Promise.all([
         axios.get<Instruktur[]>(`${elautBaseUrl}/getInstrukturs`, { headers }),
-        balaiOnly && isAkunPusat
-          ? axios.get<{ data: UnitKerja[] }>(
-              `${elautBaseUrl}/unit-kerja/getAllUnitKerja`,
-              { headers },
-            )
+        balaiOnly
+          ? axios
+              .get<{ data: UnitKerja[] }>(
+                `${elautBaseUrl}/unit-kerja/getAllUnitKerja`,
+                { headers },
+              )
+              // Akun pusat butuh daftar ini untuk menyaring; akun UPT hanya
+              // memakainya untuk nama unit, jadi kegagalan tidak fatal.
+              .catch((err) => {
+                if (isAkunPusat) throw err
+                return null
+              })
           : null,
       ])
 
-      const balaiIds = unitKerjaResponse
-        ? new Set(
-            (unitKerjaResponse.data.data || [])
-              .filter((uk) => isBalaiPelatihanPuslat(uk.nama))
-              .map((uk) => String(uk.id_unit_kerja)),
-          )
-        : null
+      const semuaUnitKerja = unitKerjaResponse?.data.data || []
+      const balaiIds =
+        balaiOnly && isAkunPusat
+          ? new Set([
+              ID_PUSLAT_KP,
+              ...semuaUnitKerja
+                .filter((uk) => isBalaiPelatihanPuslat(uk.nama))
+                .map((uk) => String(uk.id_unit_kerja)),
+            ])
+          : null
 
       const filtered = (response.data || []).filter((row) => {
         const idLemdik = String(row.id_lemdik ?? '')
@@ -127,6 +142,7 @@ export function useFetchDataInstruktur({
       })
 
       setInstrukturs(filtered)
+      setUnitKerjas(semuaUnitKerja)
     } catch (err) {
       setError(err)
     } finally {
@@ -183,7 +199,7 @@ export function useFetchDataInstruktur({
     }
   }, [instrukturs])
 
-  return { instrukturs, loading, error, fetchInstrukturData, stats }
+  return { instrukturs, unitKerjas, loading, error, fetchInstrukturData, stats }
 }
 
 export function useFetchDataInstrukturSelected(ids: number[]) {
