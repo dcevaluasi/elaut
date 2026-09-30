@@ -21,6 +21,11 @@ const logos = [
     image: "/layanan/logo_gol_kpk.png",
     link: "https://gol.kpk.go.id/login",
   },
+  {
+    name: "SIPPN PUSLAT KP",
+    image: "/layanan/logo_sippn.svg",
+    link: "https://sippn.menpan.go.id/pelayanan-publik/penetapan-dan-klasifikasi-pusat-pelatihan-mandiri-kelautan-dan-perikanan-p2mkp-8346341",
+  },
 ];
 
 const MarqueeLogos = () => {

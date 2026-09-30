@@ -13,7 +13,7 @@ import DropdownUser from "../Header/DropdownUser";
 import { BadgeCheck, LucideLayoutDashboard } from "lucide-react";
 import { IoAlbumsOutline, IoBookOutline, IoDocumentOutline, IoFolderOpenOutline, IoPieChartOutline, IoSchoolOutline } from "react-icons/io5";
 import { FiMenu, FiLogOut, FiChevronDown, FiChevronRight, FiYoutube } from "react-icons/fi";
-import { HiOutlineInbox, HiOutlineUserGroup } from "react-icons/hi2";
+import { HiBookmark, HiOutlineInbox, HiOutlineUserGroup } from "react-icons/hi2";
 import { TbBuildingEstate, TbBuildingSkyscraper, TbChartPie, TbDatabaseEdit, TbGavel, TbSchool } from "react-icons/tb";
 import Link from "next/link";
 import { breakdownStatus, setSecureCookie, removeSecureCookie } from "@/lib/utils";
@@ -261,6 +261,12 @@ export default function LayoutAdminElaut({
                       />
                     </>
                   }
+
+                  <NavItem
+                    href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/proram-pelatihan`}
+                    icon={<HiBookmark className="flex-shrink-0 w-5 h-5" />}
+                    label="Program Pelatihan"
+                  />
 
                   <NavItem
                     href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/peserta`}

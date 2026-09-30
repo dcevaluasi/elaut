@@ -26,6 +26,7 @@ import {
     AlertDialogDescription,
     AlertDialogFooter,
     AlertDialogCancel,
+    AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import {
     Dialog,
@@ -86,6 +87,33 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
     const usersWithCertificate = React.useMemo(() => {
         return users.filter((u) => u.FileSertifikat && u.FileSertifikat !== "");
     }, [users]);
+
+    const handleDeleteUserPelatihanById = async (id: number) => {
+        try {
+            const token = Cookies.get("XSRF091");
+            await axios.delete(
+                `${elautBaseUrl}/deleteUserPelatihanById?id=${id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            Toast.fire({
+                icon: "success",
+                title: "Berhasil!",
+                text: "Peserta pelatihan berhasil dihapus.",
+            });
+            onSuccess();
+        } catch (error: any) {
+            console.error("Gagal menghapus peserta pelatihan:", error);
+            Toast.fire({
+                icon: "error",
+                title: "Gagal!",
+                text: "Gagal menghapus peserta pelatihan.",
+            });
+        }
+    };
 
     const handleDeleteCertificateById = async (id: number) => {
         try {
@@ -637,7 +665,40 @@ const UserPelatihanTable: React.FC<UserPelatihanTableProps> = ({
                                 onSuccess={onSuccess}
                                 idPeserta={row.original.IdUsers.toString()}
                             />
-
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        title="Hapus Peserta"
+                                        className="w-9 h-9 rounded-xl border-rose-100 text-rose-500 hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all shadow-sm"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent className="bg-white/90 backdrop-blur-2xl border-white rounded-[2.5rem] p-8 max-w-md shadow-2xl">
+                                    <AlertDialogHeader className="space-y-3">
+                                        <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl shadow-lg shadow-rose-500/10">
+                                            <Trash2 className="w-6 h-6" />
+                                        </div>
+                                        <AlertDialogTitle className="font-black text-xl text-slate-900 tracking-tight">Hapus Peserta Pelatihan</AlertDialogTitle>
+                                        <AlertDialogDescription className="text-xs font-medium text-slate-500">
+                                            Apakah Anda yakin ingin menghapus <span className="font-black text-slate-900">{row.original.Nama}</span> dari pelatihan ini? Tindakan ini tidak dapat dibatalkan.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter className="mt-6 gap-2">
+                                        <AlertDialogCancel className="h-11 rounded-xl border-slate-200 text-slate-600 text-xs font-bold uppercase tracking-wider">
+                                            Batal
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction
+                                            onClick={() => handleDeleteUserPelatihanById(row.original.IdUserPelatihan)}
+                                            className="h-11 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black uppercase tracking-wider shadow-lg shadow-rose-500/20"
+                                        >
+                                            Hapus
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
                         </div>
                     )}
 

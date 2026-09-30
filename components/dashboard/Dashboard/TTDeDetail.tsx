@@ -409,7 +409,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-100">
                     <div className="flex items-center gap-3 w-fit">
                         <UserIcon className="w-4 h-4 text-blue-600" />
-                        <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-[0.3em]">DAFTAR VERIFIKASI SERTIFIKAT</h4>
+                        <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-[0.3em]">DAFTAR  SERTIFIKAT</h4>
                     </div>
 
                     <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
