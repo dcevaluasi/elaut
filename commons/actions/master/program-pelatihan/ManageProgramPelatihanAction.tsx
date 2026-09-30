@@ -168,7 +168,7 @@ const ManageProgramPelatihanAction: React.FC<{
                             <label className="text-[11px] font-black uppercase text-slate-400 tracking-widest">Klaster Pelatihan</label>
                         </div>
                         <select
-                            className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 px-5 font-bold text-sm focus:ring-4 focus:ring-blue-500/10 outline-none transition-all appearance-none cursor-pointer"
+                            className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 px-5 font-bold text-sm focus:ring-4 focus:ring-blue-500/10 outline-none transition-all appearance-none cursor-pointer text-black"
                             value={idRumpunPelatihan}
                             onChange={(e) => setIdRumpunPelatihan(e.target.value)}
                             disabled={rumpunLoading}
@@ -192,7 +192,7 @@ const ManageProgramPelatihanAction: React.FC<{
                             <input
                                 type="text"
                                 placeholder="..."
-                                className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 px-5 font-bold text-sm focus:ring-4 focus:ring-blue-500/10 outline-none transition-all uppercase"
+                                className="text-black w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 px-5 font-bold text-sm focus:ring-4 focus:ring-blue-500/10 outline-none transition-all uppercase"
                                 value={nama}
                                 onChange={(e) => setNama(e.target.value)}
                             />

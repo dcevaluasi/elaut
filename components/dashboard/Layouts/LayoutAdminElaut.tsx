@@ -263,7 +263,7 @@ export default function LayoutAdminElaut({
                   }
 
                   <NavItem
-                    href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/proram-pelatihan`}
+                    href={`/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/master/program-pelatihan`}
                     icon={<HiBookmark className="flex-shrink-0 w-5 h-5" />}
                     label="Program Pelatihan"
                   />
