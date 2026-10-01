@@ -29,7 +29,8 @@ import {
     Users,
     Layers,
     X,
-    CheckCircle2
+    CheckCircle2,
+    UserCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +39,8 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import { elautBaseUrl } from "@/constants/urls";
 import Toast from "@/commons/Toast";
+import HistoryButton from "@/commons/actions/HistoryButton";
+import { useFetchDataPusatById } from "@/hooks/elaut/pusat/useFetchDataPusatById";
 import {
     Dialog,
     DialogContent,
@@ -97,6 +100,7 @@ const ManagePelatihan = () => {
     const paths = usePathname().split("/");
     const idPelatihan = decryptValue(paths[paths.length - 1]);
     const { data: dataPelatihan, loading: loadingDataPelatihan, error, refetch: refetchDetailPelatihan } = useFetchDataPelatihanMasyarakatDetail(idPelatihan);
+    const { adminPusatData } = useFetchDataPusatById(dataPelatihan?.VerifikatorPelatihan ?? "");
     const [activeTab, setActiveTab] = useState('1');
 
     const [isSuperAdmin, setIsSuperAdmin] = useState(false);
@@ -237,14 +241,39 @@ const ManagePelatihan = () => {
                     </button>
 
                     {/* Status Pill & Super Admin Switch */}
-                    <div className="flex items-center gap-3 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-1.5 px-3 rounded-2xl shadow-sm flex-wrap justify-between sm:justify-end">
+                    <div className="flex items-center gap-2.5 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-1.5 px-3 rounded-2xl shadow-sm flex-wrap justify-between sm:justify-end">
                         <div className="flex items-center gap-2">
                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider hidden md:inline">Status:</span>
-                            <div className={`flex items-center gap-2 px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider ${color} text-white shadow-sm`}>
+                            <Button type="button" className={`flex items-center gap-2 px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider ${color} text-white shadow-sm`}>
                                 {React.cloneElement(icon as React.ReactElement, { className: "w-3.5 h-3.5" })}
                                 <span> {label}</span>
-                            </div>
+                            </Button>
                         </div>
+
+                        {/* Verificator Name Pill */}
+                        {(adminPusatData?.Nama || dataPelatihan?.VerifikatorPelatihan) && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                type="button"
+                                className="h-9 px-3.5 rounded-xl border-blue-200 dark:border-blue-900 text-blue-600 dark:text-blue-400 font-bold text-xs hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-all gap-2 shadow-sm"
+                            >
+                                <UserCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                                <span>Verifikator: {adminPusatData?.Nama || dataPelatihan?.VerifikatorPelatihan}</span>
+                            </Button>
+
+                        )}
+
+                        {/* History Action Button */}
+                        <HistoryButton
+                            pelatihan={dataPelatihan}
+                            statusPelatihan={dataPelatihan?.Status ?? ""}
+                            idPelatihan={dataPelatihan?.IdPelatihan?.toString()}
+                            handleFetchingData={refetchDetailPelatihan}
+                            statusLabel={label}
+                            statusStage={dataPelatihan?.StatusPenerbitan}
+                            isFloating={false}
+                        />
 
                         {/* Super Admin Status Change Button */}
                         {isSuperAdmin && (
@@ -568,7 +597,7 @@ const ManagePelatihan = () => {
                     </AnimatePresence>
                 </div>
             </Tabs>
-        </section>
+        </section >
     );
 }
 

@@ -155,13 +155,15 @@ const ChooseModulAction: React.FC<ChooseModulActionProps> = ({
             <AlertDialogTrigger asChild>
                 {
                     (Cookies.get("Access")?.includes("createPelatihan") &&
-                        (currentData?.StatusPenerbitan === "0" || currentData?.StatusPenerbitan === "3" || currentData?.StatusPenerbitan === "1.2")) && <Button
-                            variant="outline"
-                            className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500"
-                        >
-                        <TbBook className="h-5 w-5" />
-                        <span>{currentData?.ModuleMateri != "" ? "Update" : "Pilih"} Perangkat Pelatihan</span>
-                    </Button>
+                        (currentData?.StatusPenerbitan === "0" || currentData?.StatusPenerbitan === "3" || currentData?.StatusPenerbitan === "1.2")) && (
+                            <Button
+                                variant="outline"
+                                className="h-11 px-5 rounded-2xl border border-indigo-400/40 bg-indigo-500/5 hover:bg-indigo-600 text-indigo-600 hover:text-white dark:text-indigo-400 font-black text-xs uppercase tracking-wider flex items-center gap-2.5 transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-indigo-500/20 active:scale-95"
+                            >
+                                <TbBook className="h-5 w-5 shrink-0" />
+                                <span>{currentData?.ModuleMateri != "" ? "Update" : "Pilih"} Perangkat Pelatihan</span>
+                            </Button>
+                        )
                 }
             </AlertDialogTrigger>
 

@@ -191,203 +191,6 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
 
     return (
         <div className="w-full space-y-4 py-1">
-            {/* Compact Administrative Control Banner */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-slate-100 dark:border-slate-800">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 shrink-0">
-                            <LayoutGrid className="w-5 h-5" />
-                        </div>
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <h3 className="font-black text-sm md:text-base text-slate-900 dark:text-white leading-none">Pusat Kontrol Pelaksanaan</h3>
-                                <Badge className={`text-[9px] font-black uppercase ${color} text-white border-none px-2 py-0.5`}>
-                                    Stage {data.StatusPenerbitan}
-                                </Badge>
-                            </div>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">Status: <span className="font-bold text-slate-700 dark:text-slate-300">{label}</span></p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <HistoryButton
-                            pelatihan={data!}
-                            statusPelatihan={data?.Status ?? ""}
-                            idPelatihan={data!.IdPelatihan.toString()}
-                            handleFetchingData={fetchData}
-                        />
-                    </div>
-                </div>
-
-                {/* Action Buttons & Summary Bar */}
-                <div className="pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 flex-wrap">
-                    <div className="flex flex-wrap items-center gap-2">
-                        {Cookies.get('Access')?.includes('createPelatihan') && (
-                            <>
-                                <UploadSuratButton
-                                    idPelatihan={String(data.IdPelatihan)}
-                                    pelatihan={data}
-                                    handleFetchingData={fetchData}
-                                />
-
-                                {data.SuratPemberitahuan !== "" && (data.StatusPenerbitan === "0" || data.StatusPenerbitan === "1.2") ? (
-                                    data?.UserPelatihan?.length !== 0 ? (
-                                        <SendNoteAction
-                                            idPelatihan={data.IdPelatihan.toString()}
-                                            title="Kirim ke SPV"
-                                            description="Apakah Anda yakin ingin mengirim pelaksanaan ini ke SPV untuk verifikasi?"
-                                            buttonLabel="Kirim ke SPV"
-                                            icon={Send}
-                                            buttonColor="blue"
-                                            onSuccess={fetchData}
-                                            status={"1"}
-                                            pelatihan={data}
-                                        />
-                                    ) : (
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            className="h-9 px-4 rounded-xl border-blue-200 text-blue-600 font-bold text-xs hover:bg-blue-50"
-                                            onClick={() => {
-                                                Toast.fire({
-                                                    icon: "warning",
-                                                    title: "Lengkapi Data Pelatihan",
-                                                    html: `
-                                                        <div class="text-left mt-2 space-y-1 text-xs text-slate-600">
-                                                            ${data?.ModuleMateri === "" ? "• Modul/Materi belum diisi" : ""}
-                                                            ${!data?.UserPelatihan || data?.UserPelatihan.length === 0 ? "• Peserta pelatihan belum ditambahkan" : ""}
-                                                            ${data?.SuratPemberitahuan === "" ? "• Surat Pemberitahuan belum diupload" : ""}
-                                                        </div>
-                                                    `,
-                                                });
-                                            }}
-                                        >
-                                            <Send className="h-3.5 w-3.5 mr-1" />
-                                            Kirim ke SPV
-                                        </Button>
-                                    )
-                                ) : null}
-
-                                {data.SuratPemberitahuan !== "" && data.StatusPenerbitan === "3" && (
-                                    <SendNoteAction
-                                        idPelatihan={data.IdPelatihan.toString()}
-                                        title="Kirim ke Verifikator"
-                                        description="Perbaiki permohonan pelaksanaan sesuai catatan Verifikator"
-                                        buttonLabel="Kirim ke Verifikator"
-                                        icon={Send}
-                                        buttonColor="teal"
-                                        onSuccess={fetchData}
-                                        status={"2"}
-                                        pelatihan={data}
-                                    />
-                                )}
-
-                                {(data.StatusPenerbitan === "4" || data.StatusPenerbitan === "1.1") && isMoreThanToday(data.TanggalBerakhirPelatihan) && (
-                                    <SendNoteAction
-                                        idPelatihan={data.IdPelatihan.toString()}
-                                        title="Tutup Pelatihan"
-                                        description="Dengan menutup pelatihan ini, proses selanjutnya adalah penerbitan STTPL."
-                                        buttonLabel="Tutup Pelatihan"
-                                        icon={Clock}
-                                        buttonColor="neutral"
-                                        onSuccess={fetchData}
-                                        status={"5"}
-                                        pelatihan={data}
-                                    />
-                                )}
-
-                                {data.StatusPenerbitan === "5" && (
-                                    <SendNoteAction
-                                        idPelatihan={data.IdPelatihan.toString()}
-                                        title="Ajukan Penerbitan STTPL"
-                                        description="Segera ajukan penerbitan STTPL untuk pelatihan ini."
-                                        buttonLabel="Ajukan Penerbitan STTPL"
-                                        icon={CheckCircle2}
-                                        buttonColor="blue"
-                                        onSuccess={fetchData}
-                                        status={"6"}
-                                        pelatihan={data}
-                                    />
-                                )}
-                            </>
-                        )}
-
-                        {Cookies.get('Access')?.includes('supervisePelaksanaan') && data.StatusPenerbitan === "1" && (
-                            <>
-                                <SendNoteAction
-                                    idPelatihan={data.IdPelatihan.toString()}
-                                    title="Perbaikan Pelaksanaan"
-                                    description="Berikan catatan perbaikan kepada operator."
-                                    buttonLabel="Minta Perbaikan"
-                                    icon={AlertCircle}
-                                    buttonColor="rose"
-                                    onSuccess={fetchData}
-                                    status={"1.2"}
-                                    pelatihan={data}
-                                />
-                                <SendNoteAction
-                                    idPelatihan={data.IdPelatihan.toString()}
-                                    title="Pilih Verifikator"
-                                    description="Menunjuk verifikator verifikasi pelaksanaan"
-                                    buttonLabel="Pilih Verifikator"
-                                    icon={TbSettings}
-                                    buttonColor="teal"
-                                    onSuccess={fetchData}
-                                    status={"2"}
-                                    pelatihan={data}
-                                />
-                            </>
-                        )}
-
-                        {Cookies.get('Access')?.includes('verifyPelaksanaan') && data.StatusPenerbitan === "2" && (
-                            <>
-                                <SendNoteAction
-                                    idPelatihan={data.IdPelatihan.toString()}
-                                    title="Perbaikan Pelaksanaan"
-                                    description="Minta perbaikan kelengkapan administrasi"
-                                    buttonLabel="Minta Perbaikan"
-                                    icon={Trash2}
-                                    buttonColor="rose"
-                                    onSuccess={fetchData}
-                                    status={"3"}
-                                    pelatihan={data}
-                                />
-                                <SendNoteAction
-                                    idPelatihan={data.IdPelatihan.toString()}
-                                    title="Setujui Pelaksanaan"
-                                    description="Setujui pelaksanaan pelatihan ini."
-                                    buttonLabel="Setujui Pelaksanaan"
-                                    icon={ShieldCheck}
-                                    buttonColor="teal"
-                                    onSuccess={fetchData}
-                                    status={"4"}
-                                    pelatihan={data}
-                                />
-                            </>
-                        )}
-                    </div>
-
-                    <div className="flex items-center gap-3 text-xs font-semibold text-slate-600 dark:text-slate-400">
-                        {data.SuratPemberitahuan ? (
-                            <Link target="_blank" href={`${urlFileSuratPemberitahuan}/${data?.SuratPemberitahuan}`} className="flex items-center gap-1.5 text-blue-600 dark:text-blue-400 hover:underline">
-                                <FileText className="w-3.5 h-3.5" />
-                                <span>Surat Pemberitahuan ({truncateText(data?.SuratPemberitahuan, 15, '...')})</span>
-                            </Link>
-                        ) : (
-                            <span className="text-amber-600 dark:text-amber-400 flex items-center gap-1 text-[11px]">
-                                <Lock className="w-3 h-3" /> Surat Pemberitahuan Belum Diunggah
-                            </span>
-                        )}
-
-                        {adminPusatData && (
-                            <>
-                                <span className="text-slate-300">|</span>
-                                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Verifikator: {adminPusatData.Nama}</span>
-                            </>
-                        )}
-                    </div>
-                </div>
-            </div>
 
             {/* Accordions */}
             <Accordion
@@ -395,14 +198,14 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                 className="w-full space-y-3"
                 defaultValue={["pins", "publish", "peserta", "perangkat", "instruktur"]}
             >
-                {/* General Info - Complete & Colorful Data Grid */}
+                {/* General Info - Grouped Data Specification Grid */}
                 <AccordionSection
                     value="pins"
                     title="Informasi Umum Pelatihan"
                     icon={<TbSchool className="text-blue-600" />}
-                    description="Rincian lengkap data pelatihan, pembiayaan, lokasi, dan jadwal pelaksanaan."
+                    description="Rincian lengkap data pelatihan, pembiayaan, lokasi, jadwal, dan dokumen legalitas."
                 >
-                    <div className="space-y-4">
+                    <div className="space-y-5">
                         <div className="flex items-center gap-2">
                             <EditPelatihanAction
                                 idPelatihan={data.IdPelatihan.toString()}
@@ -414,35 +217,267 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 pelatihan={data}
                                 handleFetchingData={fetchData}
                             />
+
+                            {/* Action Buttons & Summary Bar */}
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 flex-wrap">
+                                <div className="flex flex-wrap items-center gap-2">
+                                    {Cookies.get('Access')?.includes('createPelatihan') && (
+                                        <>
+                                            <UploadSuratButton
+                                                idPelatihan={String(data.IdPelatihan)}
+                                                pelatihan={data}
+                                                handleFetchingData={fetchData}
+                                            />
+
+                                            {data.SuratPemberitahuan !== "" && (data.StatusPenerbitan === "0" || data.StatusPenerbitan === "1.2") ? (
+                                                data?.UserPelatihan?.length !== 0 ? (
+                                                    <SendNoteAction
+                                                        idPelatihan={data.IdPelatihan.toString()}
+                                                        title="Kirim ke SPV"
+                                                        description="Apakah Anda yakin ingin mengirim pelaksanaan ini ke SPV untuk verifikasi?"
+                                                        buttonLabel="Kirim ke SPV"
+                                                        icon={Send}
+                                                        buttonColor="blue"
+                                                        onSuccess={fetchData}
+                                                        status={"1"}
+                                                        pelatihan={data}
+                                                    />
+                                                ) : (
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-9 px-4 rounded-xl border-blue-200 text-blue-600 font-bold text-xs hover:bg-blue-50"
+                                                        onClick={() => {
+                                                            Toast.fire({
+                                                                icon: "warning",
+                                                                title: "Lengkapi Data Pelatihan",
+                                                                html: `
+                                                        <div class="text-left mt-2 space-y-1 text-xs text-slate-600">
+                                                            ${data?.ModuleMateri === "" ? "• Modul/Materi belum diisi" : ""}
+                                                            ${!data?.UserPelatihan || data?.UserPelatihan.length === 0 ? "• Peserta pelatihan belum ditambahkan" : ""}
+                                                            ${data?.SuratPemberitahuan === "" ? "• Surat Pemberitahuan belum diupload" : ""}
+                                                        </div>
+                                                    `,
+                                                            });
+                                                        }}
+                                                    >
+                                                        <Send className="h-3.5 w-3.5 mr-1" />
+                                                        Kirim ke SPV
+                                                    </Button>
+                                                )
+                                            ) : null}
+
+                                            {data.SuratPemberitahuan !== "" && data.StatusPenerbitan === "3" && (
+                                                <SendNoteAction
+                                                    idPelatihan={data.IdPelatihan.toString()}
+                                                    title="Kirim ke Verifikator"
+                                                    description="Perbaiki permohonan pelaksanaan sesuai catatan Verifikator"
+                                                    buttonLabel="Kirim ke Verifikator"
+                                                    icon={Send}
+                                                    buttonColor="teal"
+                                                    onSuccess={fetchData}
+                                                    status={"2"}
+                                                    pelatihan={data}
+                                                />
+                                            )}
+
+                                            {(data.StatusPenerbitan === "4" || data.StatusPenerbitan === "1.1") && isMoreThanToday(data.TanggalBerakhirPelatihan) && (
+                                                <SendNoteAction
+                                                    idPelatihan={data.IdPelatihan.toString()}
+                                                    title="Tutup Pelatihan"
+                                                    description="Dengan menutup pelatihan ini, proses selanjutnya adalah penerbitan STTPL."
+                                                    buttonLabel="Tutup Pelatihan"
+                                                    icon={Clock}
+                                                    buttonColor="neutral"
+                                                    onSuccess={fetchData}
+                                                    status={"5"}
+                                                    pelatihan={data}
+                                                />
+                                            )}
+
+                                            {data.StatusPenerbitan === "5" && (
+                                                <SendNoteAction
+                                                    idPelatihan={data.IdPelatihan.toString()}
+                                                    title="Ajukan Penerbitan STTPL"
+                                                    description="Segera ajukan penerbitan STTPL untuk pelatihan ini."
+                                                    buttonLabel="Ajukan Penerbitan STTPL"
+                                                    icon={CheckCircle2}
+                                                    buttonColor="blue"
+                                                    onSuccess={fetchData}
+                                                    status={"6"}
+                                                    pelatihan={data}
+                                                />
+                                            )}
+                                        </>
+                                    )}
+
+                                    {Cookies.get('Access')?.includes('supervisePelaksanaan') && data.StatusPenerbitan === "1" && (
+                                        <>
+                                            <SendNoteAction
+                                                idPelatihan={data.IdPelatihan.toString()}
+                                                title="Perbaikan Pelaksanaan"
+                                                description="Berikan catatan perbaikan kepada operator."
+                                                buttonLabel="Minta Perbaikan"
+                                                icon={AlertCircle}
+                                                buttonColor="rose"
+                                                onSuccess={fetchData}
+                                                status={"1.2"}
+                                                pelatihan={data}
+                                            />
+                                            <SendNoteAction
+                                                idPelatihan={data.IdPelatihan.toString()}
+                                                title="Pilih Verifikator"
+                                                description="Menunjuk verifikator verifikasi pelaksanaan"
+                                                buttonLabel="Pilih Verifikator"
+                                                icon={TbSettings}
+                                                buttonColor="teal"
+                                                onSuccess={fetchData}
+                                                status={"2"}
+                                                pelatihan={data}
+                                            />
+                                        </>
+                                    )}
+
+                                    {Cookies.get('Access')?.includes('verifyPelaksanaan') && data.StatusPenerbitan === "2" && (
+                                        <>
+                                            <SendNoteAction
+                                                idPelatihan={data.IdPelatihan.toString()}
+                                                title="Perbaikan Pelaksanaan"
+                                                description="Minta perbaikan kelengkapan administrasi"
+                                                buttonLabel="Minta Perbaikan"
+                                                icon={Trash2}
+                                                buttonColor="rose"
+                                                onSuccess={fetchData}
+                                                status={"3"}
+                                                pelatihan={data}
+                                            />
+                                            <SendNoteAction
+                                                idPelatihan={data.IdPelatihan.toString()}
+                                                title="Setujui Pelaksanaan"
+                                                description="Setujui pelaksanaan pelatihan ini."
+                                                buttonLabel="Setujui Pelaksanaan"
+                                                icon={ShieldCheck}
+                                                buttonColor="teal"
+                                                onSuccess={fetchData}
+                                                status={"4"}
+                                                pelatihan={data}
+                                            />
+                                        </>
+                                    )}
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Complete & Colorful Data Specification Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                            <ColorfulInfoItem label="Kode Pelatihan / Kelas" value={data.KodePelatihan} icon={TbTag} colorScheme="blue" />
-                            <ColorfulInfoItem label="Nama Pelatihan (ID)" value={data.NamaPelatihan} icon={TbSchool} colorScheme="indigo" />
-                            <ColorfulInfoItem label="Nama Pelatihan (EN)" value={data.NamaPelathanInggris} icon={Globe} colorScheme="violet" />
-                            <ColorfulInfoItem label="Sektor / Jenis Program" value={data.JenisProgram} icon={TbHierarchy} colorScheme="indigo" />
-                            <ColorfulInfoItem label="Klaster / Bidang" value={data?.BidangPelatihan} icon={TbCategory} colorScheme="amber" />
-                            <ColorfulInfoItem label="Program Utama" value={data.Program} icon={TbRocket} colorScheme="emerald" />
-                            <ColorfulInfoItem label="Sumber Pembiayaan" value={data.JenisPelatihan} icon={TbCash} colorScheme="rose" />
-                            <ColorfulInfoItem label="Lembaga Penyelenggara" value={data.PenyelenggaraPelatihan} icon={TbBuildingSkyscraper} colorScheme="cyan" />
-                            <ColorfulInfoItem label="Program Terobosan KKP" value={data.DukunganProgramTerobosan} icon={TbStar} colorScheme="amber" />
-                            <ColorfulInfoItem label="Tanggal Mulai Diklat" value={generateTanggalPelatihan(data.TanggalMulaiPelatihan)} icon={TbCalendar} colorScheme="blue" />
-                            <ColorfulInfoItem label="Tanggal Selesai Diklat" value={generateTanggalPelatihan(data.TanggalBerakhirPelatihan)} icon={TbClock} colorScheme="blue" />
-                            <ColorfulInfoItem label="Mulai Pendaftaran" value={data.TanggalMulaiPendaftaran ? generateTanggalPelatihan(data.TanggalMulaiPendaftaran) : "-"} icon={TbCalendar} colorScheme="teal" />
-                            <ColorfulInfoItem label="Tutup Pendaftaran" value={data.TanggalAkhirPendaftaran || data.TanggalBerakhirPendaftaran ? generateTanggalPelatihan(data.TanggalAkhirPendaftaran || data.TanggalBerakhirPendaftaran!) : "-"} icon={TbClock} colorScheme="rose" />
-                            <ColorfulInfoItem label="Lokasi Pelaksanaan" value={data.LokasiPelatihan} icon={TbMapPin} colorScheme="emerald" />
-                            <ColorfulInfoItem label="Metode Pelaksanaan" value={data.PelaksanaanPelatihan} icon={TbSchool} colorScheme="indigo" />
-                            <ColorfulInfoItem label="Kuota Peserta" value={data.KoutaPelatihan ? `${data.KoutaPelatihan} Orang` : "-"} icon={Users} colorScheme="violet" />
-                            {data?.JenisPelatihan === JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN[1] && (
-                                <ColorfulInfoItem label="Biaya Pelatihan" value={`Rp ${data.HargaPelatihan.toLocaleString()}`} icon={TbCash} colorScheme="rose" />
-                            )}
-                            <ColorfulInfoItem label="Penandatangan Sertifikat" value={data.TtdSertifikat} icon={TbSignature} colorScheme="slate" />
-                            <ColorfulInfoItem label="Jenis Sertifikat" value={data.JenisSertifikat} icon={TbCertificate} colorScheme="teal" />
-                            <ColorfulInfoItem label="Uji Kompetensi" value={data.UjiKompotensi} icon={ShieldCheck} colorScheme="amber" />
-                            <ColorfulInfoItem label="Judul/Deskripsi Sertifikat" value={data.DeskripsiSertifikat} icon={FileText} colorScheme="blue" />
-                            <ColorfulInfoItem label="Asal Pelatihan" value={data.AsalPelatihan} icon={Building} colorScheme="cyan" />
-                            <ColorfulInfoItem label="Dibuat Pada" value={data.CreateAt ? generateTanggalPelatihan(data.CreateAt) : "-"} icon={Calendar} colorScheme="slate" />
+                        {/* Group 1: Identitas & Program Pelatihan */}
+                        <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 space-y-3">
+                            <div className="flex items-center gap-2 pb-2 border-b border-slate-200/60 dark:border-slate-800">
+                                <TbTag className="w-4 h-4 text-blue-600" />
+                                <h4 className="text-xs font-black uppercase text-slate-800 dark:text-slate-200 tracking-wider">
+                                    Identitas & Program Pelatihan
+                                </h4>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                <ColorfulInfoItem label="Kode Pelatihan / Kelas" value={data.KodePelatihan} icon={TbTag} colorScheme="blue" />
+                                <ColorfulInfoItem label="Nama Pelatihan (ID)" value={data.NamaPelatihan} icon={TbSchool} colorScheme="indigo" />
+                                <ColorfulInfoItem label="Nama Pelatihan (EN)" value={data.NamaPelathanInggris} icon={Globe} colorScheme="violet" />
+                                <ColorfulInfoItem label="Sektor / Jenis Program" value={data.JenisProgram} icon={TbHierarchy} colorScheme="indigo" />
+                                <ColorfulInfoItem label="Klaster / Bidang" value={data?.BidangPelatihan} icon={TbCategory} colorScheme="amber" />
+                                <ColorfulInfoItem label="Program Utama" value={data.Program} icon={TbRocket} colorScheme="emerald" />
+                                <ColorfulInfoItem label="Program Terobosan KKP" value={data.DukunganProgramTerobosan} icon={TbStar} colorScheme="amber" />
+                            </div>
+                        </div>
+
+                        {/* Group 2: Waktu & Jadwal Pelaksanaan */}
+                        <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 space-y-3">
+                            <div className="flex items-center gap-2 pb-2 border-b border-slate-200/60 dark:border-slate-800">
+                                <TbCalendar className="w-4 h-4 text-emerald-600" />
+                                <h4 className="text-xs font-black uppercase text-slate-800 dark:text-slate-200 tracking-wider">
+                                    Waktu & Jadwal Pelaksanaan
+                                </h4>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                                <ColorfulInfoItem label="Tanggal Mulai Diklat" value={generateTanggalPelatihan(data.TanggalMulaiPelatihan)} icon={TbCalendar} colorScheme="blue" />
+                                <ColorfulInfoItem label="Tanggal Selesai Diklat" value={generateTanggalPelatihan(data.TanggalBerakhirPelatihan)} icon={TbClock} colorScheme="blue" />
+                                <ColorfulInfoItem label="Mulai Pendaftaran" value={data.TanggalMulaiPendaftaran ? generateTanggalPelatihan(data.TanggalMulaiPendaftaran) : "-"} icon={TbCalendar} colorScheme="teal" />
+                                <ColorfulInfoItem label="Tutup Pendaftaran" value={data.TanggalAkhirPendaftaran || data.TanggalBerakhirPendaftaran ? generateTanggalPelatihan(data.TanggalAkhirPendaftaran || data.TanggalBerakhirPendaftaran!) : "-"} icon={TbClock} colorScheme="rose" />
+                            </div>
+                        </div>
+
+                        {/* Group 3: Penyelenggara & Pembiayaan */}
+                        <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 space-y-3">
+                            <div className="flex items-center gap-2 pb-2 border-b border-slate-200/60 dark:border-slate-800">
+                                <TbBuildingSkyscraper className="w-4 h-4 text-violet-600" />
+                                <h4 className="text-xs font-black uppercase text-slate-800 dark:text-slate-200 tracking-wider">
+                                    Penyelenggara, Pembiayaan & Akses
+                                </h4>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                <ColorfulInfoItem label="Lembaga Penyelenggara" value={data.PenyelenggaraPelatihan} icon={TbBuildingSkyscraper} colorScheme="cyan" />
+                                <ColorfulInfoItem label="Sumber Pembiayaan" value={data.JenisPelatihan} icon={TbCash} colorScheme="rose" />
+                                {data?.JenisPelatihan === JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN[1] && (
+                                    <ColorfulInfoItem label="Biaya Pelatihan" value={`Rp ${data.HargaPelatihan.toLocaleString()}`} icon={TbCash} colorScheme="rose" />
+                                )}
+                                <ColorfulInfoItem label="Kuota Peserta" value={data.KoutaPelatihan ? `${data.KoutaPelatihan} Orang` : "-"} icon={Users} colorScheme="violet" />
+                                <ColorfulInfoItem label="Lokasi Pelaksanaan" value={data.LokasiPelatihan} icon={TbMapPin} colorScheme="emerald" />
+                                <ColorfulInfoItem label="Metode Pelaksanaan" value={data.PelaksanaanPelatihan} icon={TbSchool} colorScheme="indigo" />
+                                <ColorfulInfoItem label="Asal Pelatihan" value={data.AsalPelatihan} icon={Building} colorScheme="cyan" />
+                            </div>
+                        </div>
+
+                        {/* Group 4: Legalitas, Sertifikasi & Surat Pemberitahuan */}
+                        <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 space-y-3">
+                            <div className="flex items-center justify-between pb-2 border-b border-slate-200/60 dark:border-slate-800">
+                                <div className="flex items-center gap-2">
+                                    <TbCertificate className="w-4 h-4 text-amber-600" />
+                                    <h4 className="text-xs font-black uppercase text-slate-800 dark:text-slate-200 tracking-wider">
+                                        Legalitas, Sertifikasi & Dokumen Pelatihan
+                                    </h4>
+                                </div>
+                            </div>
+
+                            {/* Surat Pemberitahuan Card inside Informasi Umum */}
+                            <div className="p-3.5 rounded-xl border border-indigo-200/70 dark:border-indigo-900/50 bg-indigo-50/40 dark:bg-indigo-950/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-indigo-600/20">
+                                        <FileText className="w-5 h-5" />
+                                    </div>
+                                    <div>
+                                        <span className="text-[9px] font-black uppercase text-indigo-500 dark:text-indigo-400 tracking-widest block leading-none mb-0.5">
+                                            Surat Pemberitahuan Pelatihan
+                                        </span>
+                                        {data?.SuratPemberitahuan ? (
+                                            <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate block max-w-xs">
+                                                {data?.SuratPemberitahuan}
+                                            </span>
+                                        ) : (
+                                            <span className="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                                                <Lock className="w-3.5 h-3.5" /> Surat Pemberitahuan belum diunggah
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    {data?.SuratPemberitahuan && (
+                                        <Link
+                                            target="_blank"
+                                            href={`${urlFileSuratPemberitahuan}/${data?.SuratPemberitahuan}`}
+                                            className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm"
+                                        >
+                                            <FileText className="w-3.5 h-3.5" />
+                                            <span>Lihat Surat Pemberitahuan</span>
+                                        </Link>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 pt-1">
+                                <ColorfulInfoItem label="Penandatangan Sertifikat" value={data.TtdSertifikat} icon={TbSignature} colorScheme="slate" />
+                                <ColorfulInfoItem label="Jenis Sertifikat" value={data.JenisSertifikat} icon={TbCertificate} colorScheme="teal" />
+                                <ColorfulInfoItem label="Uji Kompetensi" value={data.UjiKompotensi} icon={ShieldCheck} colorScheme="amber" />
+                                <ColorfulInfoItem label="Judul/Deskripsi Sertifikat" value={data.DeskripsiSertifikat} icon={FileText} colorScheme="blue" />
+                                <ColorfulInfoItem label="Dibuat Pada" value={data.CreateAt ? generateTanggalPelatihan(data.CreateAt) : "-"} icon={Calendar} colorScheme="slate" />
+                            </div>
                         </div>
                     </div>
                 </AccordionSection>

@@ -521,24 +521,21 @@ const DropdownUser = ({
                       <AiFillBank className="text-lg text-blue-500" />
                       <span className="font-semibold text-sm tracking-tighter">
                         {" "}
-                        {lemdiklatLoggedInInfo != null &&
-                          lemdiklatLoggedInInfo!.data!.NamaLemdik}
+                        {lemdiklatLoggedInInfo?.data?.NamaLemdik}
                       </span>
                     </div>
                     <div className="flex w-fit gap-1 items-center">
                       <MdAlternateEmail className="text-lg text-blue-500" />
                       <span className="font-semibold text-sm tracking-tighter">
                         {" "}
-                        {lemdiklatLoggedInInfo != null &&
-                          lemdiklatLoggedInInfo!.data!.Email}
+                        {lemdiklatLoggedInInfo?.data?.Email}
                       </span>
                     </div>
                     <div className="flex w-fit gap-1 items-center">
                       <BiSolidPhone className="text-lg text-blue-500" />
                       <span className="font-semibold text-sm tracking-tighter">
                         {" "}
-                        {lemdiklatLoggedInInfo != null &&
-                          lemdiklatLoggedInInfo!.data!.NoTelpon}
+                        {lemdiklatLoggedInInfo?.data?.NoTelpon}
                       </span>
                     </div>
                   </div>
@@ -547,9 +544,7 @@ const DropdownUser = ({
                     <RiVerifiedBadgeFill className="text-lg text-blue-500" />
                     <span className="font-semibold text-sm tracking-tighter">
                       {" "}
-                      {/* {lemdiklatLoggedInInfo != null && lemdiklatLoggedInInfo!.data!.Email} */}
-                      {lemdiklatLoggedInInfo != null &&
-                        lemdiklatLoggedInInfo!.data!.LastNosertif}{" "}
+                      {lemdiklatLoggedInInfo?.data?.LastNosertif}{" "}
                     </span>
                   </div>
                   <div className="flex w-fit gap-1 items-center">
@@ -557,15 +552,13 @@ const DropdownUser = ({
                     <span className="font-semibold text-sm tracking-tighter">
                       {" "}
                       {pathname.includes("lemdik") &&
-                        lemdiklatLoggedInInfo != null &&
-                        lemdiklatLoggedInInfo!.data!.Pelatihan.length}
+                        (lemdiklatLoggedInInfo?.data?.Pelatihan?.length ?? 0)}{" "}
                       Pelatihan
                     </span>
                   </div>
                 </div>
                 <AlertDialogDescription className="-mt-2 text-justify text-gray-600">
-                  {lemdiklatLoggedInInfo != null &&
-                    lemdiklatLoggedInInfo!.data!.Deskripsi}
+                  {lemdiklatLoggedInInfo?.data?.Deskripsi}
                 </AlertDialogDescription>
                 <AlertDialogFooter>
                   <AlertDialogCancel

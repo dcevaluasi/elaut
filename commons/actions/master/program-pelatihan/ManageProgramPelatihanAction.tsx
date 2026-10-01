@@ -5,14 +5,7 @@ import {
     AlertDialog,
     AlertDialogTrigger,
     AlertDialogContent,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogCancel,
-    AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 import axios from "axios";
 import Toast from "@/commons/Toast";
 import { elautBaseUrl } from "@/constants/urls";
@@ -206,7 +199,7 @@ const ManageProgramPelatihanAction: React.FC<{
                             <input
                                 type="text"
                                 placeholder="..."
-                                className="w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 px-5 font-bold text-sm italic focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+                                className="text-black w-full h-14 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 px-5 font-bold text-sm italic focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
                                 value={namaEng}
                                 onChange={(e) => setNamaEng(e.target.value)}
                             />

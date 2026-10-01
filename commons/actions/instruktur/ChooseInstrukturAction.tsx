@@ -147,13 +147,20 @@ const ChooseInstrukturAction: React.FC<ChooseInstrukturActionProps> = ({
             <AlertDialogTrigger asChild>
                 {
                     (Cookies.get("Access")?.includes("createPelatihan") &&
-                        (currentData?.StatusPenerbitan === "0" || currentData?.StatusPenerbitan === "3" || currentData?.StatusPenerbitan === "1.2")) && <Button
-                            variant="outline"
-                            className="flex items-center gap-2 w-fit rounded-lg px-4 py-2 shadow-sm transition-all bg-transparent border-teal-500 text-teal-500 hover:text-white hover:bg-teal-500"
-                        >
-                        <TbUser className="h-5 w-5" />
-                        <span>{currentData?.Instruktur != "" ? "Update" : "Pilih"} Instruktur/Pelatih</span>
-                    </Button>
+                        (currentData?.StatusPenerbitan === "0" || currentData?.StatusPenerbitan === "3" || currentData?.StatusPenerbitan === "1.2")) && (
+                            <Button
+                                variant="outline"
+                                className="h-11 px-5 rounded-2xl border border-teal-400/40 bg-teal-500/5 hover:bg-teal-600 text-teal-600 hover:text-white dark:text-teal-400 font-black text-xs uppercase tracking-wider flex items-center gap-2.5 transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-teal-500/20 active:scale-95"
+                            >
+                                <TbUser className="h-5 w-5 shrink-0" />
+                                <span>{currentData?.Instruktur != "" ? "Update" : "Pilih"} Instruktur/Pelatih</span>
+                                {selectedIdInstruktur.length > 0 && (
+                                    <span className="ml-1 px-2 py-0.5 rounded-full bg-teal-500 text-white text-[10px] font-black">
+                                        {selectedIdInstruktur.length}
+                                    </span>
+                                )}
+                            </Button>
+                        )
                 }
             </AlertDialogTrigger>
 

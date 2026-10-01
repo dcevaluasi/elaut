@@ -93,13 +93,41 @@ const TableDataPelatihan: React.FC = () => {
   // SEARCHING
   const [searchQuery, setSearchQuery] = React.useState<string>("");
 
+  const isPendingSigningForUser = (p: PelatihanMasyarakat) => {
+    const status = String(p.StatusPenerbitan);
+    if (!isPendingSigning(status)) return false;
+
+    const role = Cookies.get('Role') || '';
+    const access = Cookies.get('Access') || '';
+
+    if (access.includes('approveKapus') && status === '10') return true;
+    if (access.includes('approveKabadan') && status === '14') return true;
+    if (access.includes('approveKabalai') && status === '1.4') return true;
+
+    return (!!role.includes(p.TtdSertifikat) || role === p.TtdSertifikat);
+  };
+
+  const isSignedForUser = (p: PelatihanMasyarakat) => {
+    const status = String(p.StatusPenerbitan);
+    if (!isSigned(status)) return false;
+
+    const role = Cookies.get('Role') || '';
+    const access = Cookies.get('Access') || '';
+
+    if (access.includes('approveKapus') && status === '11') return true;
+    if (access.includes('approveKabadan') && status === '15') return true;
+    if (access.includes('approveKabalai') && status === '1.6') return true;
+
+    return (!!role.includes(p.TtdSertifikat) || role === p.TtdSertifikat);
+  };
+
   const statusMapping: Record<string, (p: PelatihanMasyarakat) => boolean> = {
     "Proses Pengajuan Sertifikat": p => String(p.StatusPenerbitan) === "On Progress",
     "Pending SPV": p => String(p.StatusPenerbitan) === "1",
     "Verifikasi Pelaksanaan": p => isVerifyDiklat(String(p.StatusPenerbitan)),
-    "Pending Signing": p => isPendingSigning(String(p.StatusPenerbitan)) && (!!Cookies.get('Role')?.includes(p.TtdSertifikat) || Cookies.get('Role') === p.TtdSertifikat),
-    "Done": p => isSigned(String(p.StatusPenerbitan)),
-    "Signed": p => isSigned(String(p.StatusPenerbitan)) && (!!Cookies.get('Role')?.includes(p.TtdSertifikat) || Cookies.get('Role') === p.TtdSertifikat),
+    "Pending Signing": p => isPendingSigningForUser(p),
+    "Done": p => isSignedForUser(p),
+    "Signed": p => isSignedForUser(p),
     "Published": p => p.Status === "Publish",
     "Approved": p => String(p.StatusPenerbitan) === "1.1",
   };
@@ -253,16 +281,10 @@ const TableDataPelatihan: React.FC = () => {
       all: baseFiltered.length,
       published: baseFiltered.filter(p => p.Status === "Publish").length,
       verifying: baseFiltered.filter(p => isVerifyDiklat(String(p.StatusPenerbitan))).length,
-      done: baseFiltered.filter(p => isSigned(String(p.StatusPenerbitan))).length,
+      done: baseFiltered.filter(p => isSignedForUser(p)).length,
       diklatSPV: baseFiltered.filter(p => String(p.StatusPenerbitan) === "1").length,
-      pendingSigning: baseFiltered.filter(p =>
-        isPendingSigning(String(p.StatusPenerbitan)) &&
-        (!!Cookies.get('Role')?.includes(p.TtdSertifikat) || Cookies.get('Role') === p.TtdSertifikat)
-      ).length,
-      signed: baseFiltered.filter(p =>
-        isSigned(String(p.StatusPenerbitan)) &&
-        (!!Cookies.get('Role')?.includes(p.TtdSertifikat) || Cookies.get('Role') === p.TtdSertifikat)
-      ).length,
+      pendingSigning: baseFiltered.filter(p => isPendingSigningForUser(p)).length,
+      signed: baseFiltered.filter(p => isSignedForUser(p)).length,
       approved: baseFiltered.filter(p => String(p.StatusPenerbitan) === "1.1").length,
     };
   }, [data, filterCategory, filterCategoryPenyelenggara, filterCategorySasaran, searchQuery, filterYear]);

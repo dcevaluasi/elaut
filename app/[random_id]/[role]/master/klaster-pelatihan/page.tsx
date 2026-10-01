@@ -8,7 +8,6 @@ export default function Page() {
     return (
         <LayoutAdminElaut>
             <section className="flex-1 flex flex-col">
-                <HeaderPageLayoutAdminElaut title="Klaster Pelatihan" description="Monitoring pengelolaan data klaster pelatihan!" icon={<HiOutlineInbox className="text-3xl" />} />
                 <article className="w-full h-full">
                     <TableRumpunPelatihan />
                 </article>

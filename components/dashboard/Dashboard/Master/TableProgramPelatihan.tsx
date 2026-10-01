@@ -25,18 +25,13 @@ import {
     TbBook,
     TbActivity,
     TbSearch,
-    TbChevronDown,
-    TbExternalLink,
-    TbFileText,
-    TbFolder,
-    TbSparkles,
     TbFilter
 } from "react-icons/tb";
 import { ProgramPelatihan } from "@/types/program";
 import { generatedDescriptionCertificateFull } from "@/utils/certificates";
 import { canManageProgram, canManageProgramUPT } from "@/utils/permissions";
 import { HashLoader } from "react-spinners";
-import { Search, BookOpen, ChevronDown, Sparkles, X, FileText, Layers, RefreshCw } from "lucide-react";
+import { Search, BookOpen, ChevronDown, Sparkles, X, FileText, RefreshCw } from "lucide-react";
 
 const rumpunIcons: Record<string, JSX.Element> = {
     "Sistem Jaminan Mutu": <TbShieldCheck size={22} className="text-blue-600 dark:text-blue-400" />,
@@ -63,7 +58,6 @@ export default function TableProgramPelatihan() {
     const [selectedClusterFilter, setSelectedClusterFilter] = useState<string>("ALL");
     const [openRowId, setOpenRowId] = useState<number | null>(null);
 
-    // Filter & Group programs by Cluster
     const { groupedData, totalCount } = useMemo(() => {
         if (!Array.isArray(data)) return { groupedData: {}, totalCount: 0 };
 
@@ -100,7 +94,6 @@ export default function TableProgramPelatihan() {
         return { groupedData: grouped, totalCount: filtered.length };
     }, [data, dataRumpunPelatihan, searchQuery, selectedClusterFilter]);
 
-    // Available cluster list for quick filter pills
     const allClusterNames = useMemo(() => {
         if (!Array.isArray(dataRumpunPelatihan)) return [];
         return dataRumpunPelatihan.map((r: any) => r.name);
@@ -137,7 +130,6 @@ export default function TableProgramPelatihan() {
 
     return (
         <div className="space-y-6 pb-16 w-full max-w-7xl mx-auto">
-            {/* Header & Search Control Bar */}
             <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-sm relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/5 rounded-full -mr-32 -mt-32 blur-[80px] pointer-events-none" />
 
@@ -185,7 +177,6 @@ export default function TableProgramPelatihan() {
                     </div>
                 </div>
 
-                {/* Cluster Quick Filter Pills */}
                 {allClusterNames.length > 0 && (
                     <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
                         <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 shrink-0 mr-1">
@@ -195,11 +186,10 @@ export default function TableProgramPelatihan() {
                         <button
                             type="button"
                             onClick={() => setSelectedClusterFilter("ALL")}
-                            className={`px-3 py-1.5 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all ${
-                                selectedClusterFilter === "ALL"
+                            className={`px-3 py-1.5 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all ${selectedClusterFilter === "ALL"
                                     ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm"
                                     : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
-                            }`}
+                                }`}
                         >
                             Semua Rumpun
                         </button>
@@ -208,11 +198,10 @@ export default function TableProgramPelatihan() {
                                 key={name}
                                 type="button"
                                 onClick={() => setSelectedClusterFilter(name)}
-                                className={`px-3 py-1.5 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all ${
-                                    selectedClusterFilter === name
+                                className={`px-3 py-1.5 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all ${selectedClusterFilter === name
                                         ? "bg-blue-600 text-white shadow-sm"
                                         : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
-                                }`}
+                                    }`}
                             >
                                 {name}
                             </button>
@@ -221,7 +210,6 @@ export default function TableProgramPelatihan() {
                 )}
             </div>
 
-            {/* List of Program Clusters */}
             <div className="space-y-4">
                 {Object.entries(groupedData).map(([rumpunName, programs], idx) => {
                     const isOpen = openRumpun === rumpunName || searchQuery.trim() !== "" || selectedClusterFilter !== "ALL";
@@ -234,14 +222,12 @@ export default function TableProgramPelatihan() {
                             transition={{ delay: idx * 0.04 }}
                             className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden transition-all"
                         >
-                            {/* Accordion Header */}
                             <button
                                 type="button"
-                                className={`w-full flex items-center justify-between p-5 md:p-6 text-left transition-all ${
-                                    isOpen
+                                className={`w-full flex items-center justify-between p-5 md:p-6 text-left transition-all ${isOpen
                                         ? "bg-blue-50/40 dark:bg-blue-950/20 border-b border-slate-100 dark:border-slate-800"
                                         : "hover:bg-slate-50/60 dark:hover:bg-slate-800/40"
-                                }`}
+                                    }`}
                                 onClick={() => setOpenRumpun(openRumpun === rumpunName ? null : rumpunName)}
                             >
                                 <div className="flex items-center gap-3.5 min-w-0">
@@ -260,7 +246,7 @@ export default function TableProgramPelatihan() {
 
                                 <div className="flex items-center gap-3 shrink-0 ml-2">
                                     <Badge variant="outline" className="text-[10px] font-bold text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-900 hidden sm:inline-flex">
-                                        {programs.length} Modul
+                                        {programs.length} Program
                                     </Badge>
                                     <div className={`p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}>
                                         <ChevronDown className="w-4 h-4" />
@@ -268,7 +254,6 @@ export default function TableProgramPelatihan() {
                                 </div>
                             </button>
 
-                            {/* Program Expansion Area */}
                             <AnimatePresence initial={false}>
                                 {isOpen && (
                                     <motion.div
@@ -282,7 +267,6 @@ export default function TableProgramPelatihan() {
                                             {programs.map((row: ProgramPelatihan) => (
                                                 <div key={row.id_program_pelatihan} className="space-y-2">
                                                     <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:border-blue-300 dark:hover:border-blue-800 hover:shadow-md">
-                                                        {/* Program Titles & Abbrv */}
                                                         <div className="space-y-1 min-w-0 flex-1">
                                                             <div className="flex items-center gap-2">
                                                                 <Badge className="bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-300 border-none font-mono text-[10px] px-2 py-0.5 uppercase font-bold">
@@ -301,7 +285,6 @@ export default function TableProgramPelatihan() {
                                                             )}
                                                         </div>
 
-                                                        {/* Action Buttons */}
                                                         <div className="flex flex-wrap items-center gap-2 shrink-0">
                                                             <Link
                                                                 href={`/admin/lemdiklat/master/program-pelatihan/materi/${encodeURIComponent(row.name_indo)}`}
@@ -315,11 +298,10 @@ export default function TableProgramPelatihan() {
                                                             <button
                                                                 type="button"
                                                                 onClick={() => setOpenRowId(openRowId === row.id_program_pelatihan ? null : row.id_program_pelatihan)}
-                                                                className={`h-9 px-3.5 rounded-xl border text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all ${
-                                                                    openRowId === row.id_program_pelatihan
+                                                                className={`h-9 px-3.5 rounded-xl border text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all ${openRowId === row.id_program_pelatihan
                                                                         ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-slate-900"
                                                                         : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300"
-                                                                }`}
+                                                                    }`}
                                                             >
                                                                 <FileText className="w-3.5 h-3.5" />
                                                                 <span>Deskripsi</span>
@@ -341,7 +323,6 @@ export default function TableProgramPelatihan() {
                                                         </div>
                                                     </div>
 
-                                                    {/* Certificate Description Drawer */}
                                                     <AnimatePresence>
                                                         {openRowId === row.id_program_pelatihan && (
                                                             <motion.div
@@ -401,7 +382,6 @@ export default function TableProgramPelatihan() {
                 })}
             </div>
 
-            {/* Empty State */}
             {Object.keys(groupedData).length === 0 && (
                 <div className="py-16 text-center space-y-3 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
                     <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto">

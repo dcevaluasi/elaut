@@ -20,6 +20,7 @@ import { Wallet, Users, BookOpen, TrendingUp } from "lucide-react";
 import { formatToRupiah, formatToShorthandRupiah } from "@/lib/utils";
 import MetricsSummaryPelatihan from "./MetricsSummaryPelatihan";
 import { StatsMetricStatus } from "./Summary/StatsMetricStatus";
+import CalendarSelesaiPelatihan from "./Summary/CalendarSelesaiPelatihan";
 import {
   Tooltip,
   TooltipContent,
@@ -385,6 +386,9 @@ const SummaryPelatihan: React.FC = () => {
               <StatsMetricStatus data={filteredDataPelatihan} tahun={tahun.toString()} />
             </div>
           </div>
+
+          {/* Kalender & Export Pelatihan Selesai (Status 11 & 15) */}
+          <CalendarSelesaiPelatihan data={data} tahunGlobal={tahun} />
 
           <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-white to-slate-50/50">

@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Progress } from "@/components/ui/progress";
 import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
+import HistoryButton from "@/commons/actions/HistoryButton";
 import Link from "next/link";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { MdLock, MdOutlineHistoryEdu } from "react-icons/md";
@@ -308,19 +309,30 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
 
     return (
         <div className="space-y-10">
-            {/* Action Toolbar */}
-            <div className="flex flex-wrap items-center justify-between gap-6 p-8 rounded-[2.5rem] bg-white/40 backdrop-blur-2xl border border-slate-100 shadow-xl">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl shadow-inner">
-                        <MdOutlineHistoryEdu />
-                    </div>
-                    <div>
-                        <h4 className="text-sm font-black text-slate-800 uppercase tracking-tight">KONTROL PENANDATANGAN</h4>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none mt-1">Kelola Validasi & Tanda Tangan Digital</p>
-                    </div>
-                </div>
+
+
+            {/* Metrics Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <MetricCard icon={Hash} label="Target Penandatanganan" value={`${data?.UserPelatihan.length} Peserta`} />
+                <MetricCard
+                    icon={FileCheck}
+                    label="Draft Sertifikat Siap"
+                    value={`${drafCount}/${data?.UserPelatihan.length}`}
+                    current={drafCount}
+                    total={data?.UserPelatihan.length}
+                    color="amber"
+                />
+                <MetricCard
+                    icon={ShieldCheck}
+                    label="Tuntas Di-TTDe"
+                    value={`${certifiedCount}/${data?.UserPelatihan.length}`}
+                    current={certifiedCount}
+                    total={data?.UserPelatihan.length}
+                    color="emerald"
+                />
 
                 <div className="flex items-center gap-3">
+
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
                             {tanggalCount === 0 && (
@@ -381,27 +393,6 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                         </Button>
                     )}
                 </div>
-            </div>
-
-            {/* Metrics Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <MetricCard icon={Hash} label="Target Penandatanganan" value={`${data?.UserPelatihan.length} Peserta`} />
-                <MetricCard
-                    icon={FileCheck}
-                    label="Draft Sertifikat Siap"
-                    value={`${drafCount}/${data?.UserPelatihan.length}`}
-                    current={drafCount}
-                    total={data?.UserPelatihan.length}
-                    color="amber"
-                />
-                <MetricCard
-                    icon={ShieldCheck}
-                    label="Tuntas Di-TTDe"
-                    value={`${certifiedCount}/${data?.UserPelatihan.length}`}
-                    current={certifiedCount}
-                    total={data?.UserPelatihan.length}
-                    color="emerald"
-                />
             </div>
 
             {/* Participant List */}

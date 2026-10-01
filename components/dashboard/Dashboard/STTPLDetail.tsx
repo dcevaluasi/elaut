@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useRef } from "react";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 import { Accordion } from "@/components/ui/accordion";
 import AccordionSection from "@/components/reusables/AccordionSection";
 import { PelatihanMasyarakat } from "@/types/product";
-import { generateTanggalPelatihan, getStatusInfo } from "@/utils/text";
+import { generateTanggalPelatihan, getStatusInfo, splitCityAndDate } from "@/utils/text";
 import Cookies from "js-cookie";
 import Link from "next/link";
 import { urlFileBeritaAcara, urlFileLapwas } from "@/constants/urls";
@@ -54,6 +56,7 @@ import {
     Users,
     FileCheck
 } from "lucide-react";
+import { TbFileSpreadsheet } from "react-icons/tb";
 import { Badge } from "@/components/ui/badge";
 
 interface Props {
@@ -152,33 +155,145 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
         }
     };
 
+    const handleDownloadExcel = () => {
+        const rows = data.UserPelatihan.map((item, idx) => {
+            let tempatLahir = (item as any).TempatLahir ?? "-";
+            let tanggalLahir = (item as any).TanggalLahir ?? "-";
+
+            if (item.TempatTanggalLahir) {
+                try {
+                    const result = splitCityAndDate(item.TempatTanggalLahir);
+                    if (result.city && result.city !== "-") tempatLahir = result.city;
+                    if (result.date && result.date !== "-") tanggalLahir = result.date;
+                } catch {
+                    const input = item.TempatTanggalLahir;
+                    const commaMatch = input.match(/^([^,]+),?\s*(.*)$/);
+                    if (commaMatch && commaMatch[2]) {
+                        tempatLahir = commaMatch[1].trim();
+                        tanggalLahir = commaMatch[2].trim();
+                    } else {
+                        tempatLahir = input;
+                    }
+                }
+            }
+
+            const fileUrl = item.FileSertifikat
+                ? `https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${item.FileSertifikat}`
+                : "-";
+
+            return {
+                No: idx + 1,
+                Nama: item.Nama ?? (item as any).User?.Nama ?? "-",
+                NIK: (item as any).Nik ?? (item as any).User?.Nik ?? "-",
+                "No Telpon": (item as any).NoTelpon ?? (item as any).User?.NoTelpon ?? "-",
+                "Kabupaten / Kota": (item as any).Kota ?? (item as any).Kabupaten ?? (item as any).User?.Kota ?? "-",
+                Provinsi: item.Provinsi ?? (item as any).User?.Provinsi ?? "-",
+                Alamat: (item as any).Alamat ?? (item as any).User?.Alamat ?? "-",
+                "Tempat Lahir": tempatLahir,
+                "Tanggal Lahir": tanggalLahir,
+                "Jenis Kelamin": item.JenisKelamin ?? (item as any).User?.JenisKelamin ?? "-",
+                "Pendidikan Terakhir": item.PendidikanTerakhir ?? (item as any).User?.PendidikanTerakhir ?? "-",
+                "No STTPL": item.NoRegistrasi ?? (item as any).NoSertifikat ?? "-",
+                "Link File STTPL": fileUrl,
+            };
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(rows);
+
+        // Set column widths
+        worksheet["!cols"] = [
+            { wch: 6 },   // No
+            { wch: 35 },  // Nama
+            { wch: 20 },  // NIK
+            { wch: 18 },  // No Telpon
+            { wch: 22 },  // Kabupaten / Kota
+            { wch: 22 },  // Provinsi
+            { wch: 40 },  // Alamat
+            { wch: 22 },  // Tempat Lahir
+            { wch: 18 },  // Tanggal Lahir
+            { wch: 16 },  // Jenis Kelamin
+            { wch: 22 },  // Pendidikan Terakhir
+            { wch: 30 },  // No STTPL
+            { wch: 65 },  // Link File STTPL
+        ];
+
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Peserta STTPL");
+
+        const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+        const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+        const fileName = `Daftar_Peserta_STTPL_${data.NamaPelatihan ?? data.Program ?? "Pelatihan"}.xlsx`;
+        saveAs(blob, fileName);
+
+        Toast.fire({ icon: "success", title: "Berhasil!", text: "File Excel berhasil diunduh." });
+    };
+
     return (
         <div className="w-full space-y-4 py-1">
-            {/* Top Workflow Control Bar */}
-            <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 shrink-0">
-                            <Award className="w-5 h-5" />
-                        </div>
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <h3 className="font-black text-sm md:text-base text-slate-900 dark:text-white leading-none">Penerbitan STTPL Digital</h3>
-                                <Badge className={`text-[9px] font-black uppercase ${color} text-white border-none px-2 py-0.5`}>
-                                    Stage {data.StatusPenerbitan}
-                                </Badge>
-                            </div>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">Status Alur: <span className="font-bold text-slate-700 dark:text-slate-300">{label}</span></p>
-                        </div>
-                    </div>
 
-                    <HistoryButton
-                        pelatihan={data!}
-                        statusPelatihan={data?.Status ?? ""}
-                        idPelatihan={data!.IdPelatihan.toString()}
-                        handleFetchingData={fetchData}
-                    />
-                </div>
+
+            {/* Accordions */}
+            <Accordion
+                type="multiple"
+                className="w-full space-y-3"
+                defaultValue={["meta", "peserta"]}
+            >
+                {/* Metadata & Status Grid */}
+                <AccordionSection
+                    value="meta"
+                    title="Metadata & Persetujuan Dokumen STTPL"
+                    icon={<TbSettings className="text-blue-600" />}
+                    description="Status penandatanganan, berita acara, dan dokumen pengawasan."
+                >
+                    <div className="space-y-3">
+                        {data.SuratPemberitahuan === "" ? (
+                            <div className="py-6 text-center text-xs text-slate-400 font-semibold italic bg-slate-50 dark:bg-slate-950 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+                                Harap mengunggah Surat Pemberitahuan Pelatihan terlebih dahulu untuk mengaktifkan alur sertifikasi.
+                            </div>
+                        ) : (
+                            <div className="bg-slate-50/80 dark:bg-slate-950/80 rounded-xl border border-slate-200/80 dark:border-slate-800 p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                                <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between">
+                                    <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider block mb-1">Pejabat Penandatangan</span>
+                                    <span className="text-xs font-black text-slate-900 dark:text-white">{data?.TtdSertifikat || "-"}</span>
+                                </div>
+
+                                {data?.BeritaAcara && (
+                                    <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between">
+                                        <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider block mb-1">Berita Acara Pelaksanaan</span>
+                                        <Link target="_blank" href={`${urlFileBeritaAcara}/${data?.BeritaAcara}`} className="text-xs font-black text-blue-600 dark:text-blue-400 flex items-center gap-1 hover:underline">
+                                            <FileText className="w-3.5 h-3.5 shrink-0" />
+                                            <span className="truncate">{truncateText(data?.BeritaAcara, 15, '...')}</span>
+                                        </Link>
+                                    </div>
+                                )}
+
+                                {data?.MemoPusat && (
+                                    <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between">
+                                        <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider block mb-1">Memo Lapwas</span>
+                                        <Link target="_blank" href={`${urlFileLapwas}/${data?.MemoPusat}`} className="text-xs font-black text-amber-600 dark:text-amber-400 flex items-center gap-1 hover:underline">
+                                            <TbShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                                            <span>Dokumen Lapwas</span>
+                                        </Link>
+                                    </div>
+                                )}
+
+                                {adminPusatData && (
+                                    <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between">
+                                        <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider block mb-1">Verifikator</span>
+                                        <span className="text-xs font-black text-slate-900 dark:text-white truncate">{adminPusatData.Nama}</span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </AccordionSection>
+
+                {/* Signing Hub (If active signer) */}
+                {Cookies.get('Role')?.includes(data?.TtdSertifikat) && Cookies.get('Access')?.includes('isSigning') && (parseInt(data.StatusPenerbitan) >= 7 && parseInt(data.StatusPenerbitan) <= 15) && (
+                    <div className="relative group">
+                        <TTDeDetail data={data} fetchData={fetchData} />
+                    </div>
+                )}
 
                 {/* Workflow Action Buttons Bar */}
                 <div className="pt-3 flex flex-wrap items-center gap-2">
@@ -310,70 +425,6 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                         />
                     )}
                 </div>
-            </div>
-
-            {/* Accordions */}
-            <Accordion
-                type="multiple"
-                className="w-full space-y-3"
-                defaultValue={["meta", "peserta"]}
-            >
-                {/* Metadata & Status Grid */}
-                <AccordionSection
-                    value="meta"
-                    title="Metadata & Persetujuan Dokumen STTPL"
-                    icon={<TbSettings className="text-blue-600" />}
-                    description="Status penandatanganan, berita acara, dan dokumen pengawasan."
-                >
-                    <div className="space-y-3">
-                        {data.SuratPemberitahuan === "" ? (
-                            <div className="py-6 text-center text-xs text-slate-400 font-semibold italic bg-slate-50 dark:bg-slate-950 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
-                                Harap mengunggah Surat Pemberitahuan Pelatihan terlebih dahulu untuk mengaktifkan alur sertifikasi.
-                            </div>
-                        ) : (
-                            <div className="bg-slate-50/80 dark:bg-slate-950/80 rounded-xl border border-slate-200/80 dark:border-slate-800 p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                                <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between">
-                                    <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider block mb-1">Pejabat Penandatangan</span>
-                                    <span className="text-xs font-black text-slate-900 dark:text-white">{data?.TtdSertifikat || "-"}</span>
-                                </div>
-
-                                {data?.BeritaAcara && (
-                                    <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between">
-                                        <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider block mb-1">Berita Acara Pelaksanaan</span>
-                                        <Link target="_blank" href={`${urlFileBeritaAcara}/${data?.BeritaAcara}`} className="text-xs font-black text-blue-600 dark:text-blue-400 flex items-center gap-1 hover:underline">
-                                            <FileText className="w-3.5 h-3.5 shrink-0" />
-                                            <span className="truncate">{truncateText(data?.BeritaAcara, 15, '...')}</span>
-                                        </Link>
-                                    </div>
-                                )}
-
-                                {data?.MemoPusat && (
-                                    <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between">
-                                        <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider block mb-1">Memo Lapwas</span>
-                                        <Link target="_blank" href={`${urlFileLapwas}/${data?.MemoPusat}`} className="text-xs font-black text-amber-600 dark:text-amber-400 flex items-center gap-1 hover:underline">
-                                            <TbShieldCheck className="w-3.5 h-3.5 shrink-0" />
-                                            <span>Dokumen Lapwas</span>
-                                        </Link>
-                                    </div>
-                                )}
-
-                                {adminPusatData && (
-                                    <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex flex-col justify-between">
-                                        <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider block mb-1">Verifikator</span>
-                                        <span className="text-xs font-black text-slate-900 dark:text-white truncate">{adminPusatData.Nama}</span>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                </AccordionSection>
-
-                {/* Signing Hub (If active signer) */}
-                {Cookies.get('Role')?.includes(data?.TtdSertifikat) && Cookies.get('Access')?.includes('isSigning') && (parseInt(data.StatusPenerbitan) >= 7 && parseInt(data.StatusPenerbitan) <= 15) && (
-                    <div className="relative group">
-                        <TTDeDetail data={data} fetchData={fetchData} />
-                    </div>
-                )}
 
                 {/* Participant Selection & STTPL Table */}
                 {!Cookies.get('Access')?.includes('isSigning') && (
@@ -401,6 +452,18 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         >
                                             <Download className="h-3.5 w-3.5 mr-1" />
                                             <span>{isZipping ? 'Membentuk ZIP...' : 'Download ZIP e-STTPL'}</span>
+                                        </Button>
+                                    )}
+
+                                    {(["11", "15"].includes(data.StatusPenerbitan)) && data.UserPelatihan.length > 0 && (
+                                        <Button
+                                            onClick={handleDownloadExcel}
+                                            variant="outline"
+                                            size="sm"
+                                            className="h-9 px-4 rounded-xl border-emerald-200 text-emerald-700 font-bold text-xs hover:bg-emerald-50 hover:border-emerald-400 transition-all gap-1.5"
+                                        >
+                                            <TbFileSpreadsheet className="h-4 w-4" />
+                                            <span>Download Excel Peserta</span>
                                         </Button>
                                     )}
                                 </div>
