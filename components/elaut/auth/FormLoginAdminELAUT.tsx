@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { HiOutlineEyeOff } from "react-icons/hi";
 import { HashLoader } from "react-spinners";
 
-export const LoginAdminELAUT = () => {
+export const FormLoginAdminELAUT = () => {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const router = useRouter();
 
@@ -214,7 +214,7 @@ export const LoginAdminELAUT = () => {
                     <form className="space-y-4 md:space-y-5" onSubmit={handleLogin}>
                       {/* Email Input */}
                       <div className="space-y-1.5">
-                        <label className="text-xs md:text-sm font-medium text-gray-300 flex items-center gap-2">
+                        <label className="text-xs md:text-sm font-medium text-gray-300 flex items-center gap-2" htmlFor="email">
                           <HiOutlineEnvelope className="text-blue-400" /> Email Address
                         </label>
                         <input
@@ -224,12 +224,14 @@ export const LoginAdminELAUT = () => {
                           className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm md:text-base placeholder:text-gray-500 outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all font-inter"
                           placeholder="admin@elaut.id"
                           autoComplete="off"
+                          id="email"
+                          name="Email"
                         />
                       </div>
 
                       {/* Password Input */}
                       <div className="space-y-1.5">
-                        <label className="text-xs md:text-sm font-medium text-gray-300 flex items-center gap-2">
+                        <label className="text-xs md:text-sm font-medium text-gray-300 flex items-center gap-2" htmlFor="password">
                           <HiOutlineLockClosed className="text-blue-400" /> Password
                         </label>
                         <div className="relative">
@@ -240,6 +242,8 @@ export const LoginAdminELAUT = () => {
                             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm md:text-base placeholder:text-gray-500 outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all font-inter"
                             placeholder="••••••••"
                             autoComplete="off"
+                            id="password"
+                            name="Password"
                           />
                           <button
                             type="button"
@@ -253,13 +257,15 @@ export const LoginAdminELAUT = () => {
 
                       {/* Role Selection */}
                       <div className="space-y-1.5">
-                        <label className="text-xs md:text-sm font-medium text-gray-300 flex items-center gap-2">
+                        <label className="text-xs md:text-sm font-medium text-gray-300 flex items-center gap-2" htmlFor="role">
                           <HiOutlineUserGroup className="text-blue-400" /> Akses Sebagai
                         </label>
                         <select
                           value={role}
                           onChange={(e) => setRole(e.target.value)}
                           className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm md:text-base outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer placeholder:text-gray-500 font-inter"
+                          id="role"
+                          name="Role"
                         >
                           <option value="" disabled className="bg-slate-900">Pilih akses</option>
                           <option value="upt" className="bg-slate-900">Pengelola UPT</option>
@@ -278,9 +284,9 @@ export const LoginAdminELAUT = () => {
                             className="overflow-hidden"
                           >
                             <div className="pt-2">
-                              <label className="text-[10px] md:text-xs font-medium text-gray-400 mb-2 block">
+                              <span className="text-[10px] md:text-xs font-medium text-gray-400 mb-2 block">
                                 Verification <span className="text-red-500">*</span>
-                              </label>
+                              </span>
                               <div className="bg-white/5 rounded-xl p-1.5 flex justify-center border border-white/5 scale-[0.85] md:scale-100 origin-top">
                                 <ReCAPTCHA
                                   theme="dark"

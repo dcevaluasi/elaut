@@ -823,7 +823,7 @@ const FormatSTTPL = React.forwardRef(
                                                     <span className="font-bosBold text-lg uppercase">Nama</span>
                                                     <span className="font-bos italic text-[0.85rem] -mt-2">Name</span>
                                                 </td>
-                                                <td className=" w-2/3 text-xl font-bosBold uppercase">: {peserta?.Nama}</td>
+                                                <td className=" w-2/3 text-xl font-bosBold uppercase">: {formatName(peserta?.Nama!)}</td>
                                             </tr>
                                             <tr className="w-full mt-3">
                                                 <td className="font-bos w-full flex flex-col space-y-0">

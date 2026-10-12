@@ -105,7 +105,6 @@ export const metadata: Metadata = {
     shortcut: "/logo-kkp.png",
     apple: "/logo-kkp.png",
   },
-  manifest: "/site.webmanifest",
   openGraph: {
     type: "website",
     locale: "id_ID",

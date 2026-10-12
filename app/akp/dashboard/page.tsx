@@ -87,7 +87,6 @@ export const metadata = {
       "en-US": "https://elaut-bppsdm.kkp.go.id/akp/dashboard/en",
     },
   },
-  manifest: "/site.webmanifest",
   themeColor: "#2563EB",
   icons: {
     icon: "/favicon.ico",

@@ -7,7 +7,6 @@ import Loader from "@/components/dashboard/common/Loader";
 import { Delius_Unicase, Inter, Plus_Jakarta_Sans } from "next/font/google";
 
 import localFont from "next/font/local";
-import { useRouter } from "next/navigation";
 import { UnitKerjaProvider } from "@/context/UnitKerjaContext";
 
 const myFont = localFont({

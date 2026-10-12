@@ -61,6 +61,7 @@
     "next": "^16.2.9",
     "nextjs-google-analytics": "^2.3.7",
     "pdfmake": "^0.2.11",
+    "pptxgenjs": "^4.0.1",
     "qrcode": "^1.5.4",
     "react": "18.2.0",
     "react-apexcharts": "^1.7.0",

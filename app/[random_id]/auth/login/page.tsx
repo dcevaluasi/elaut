@@ -1,4 +1,4 @@
-import { LoginAdminELAUT } from "@/components/elaut/auth/LoginAdminELAUT";
+import { FormLoginAdminELAUT } from "@/components/elaut/auth/FormLoginAdminELAUT";
 
 export const metadata = {
   title: "Login Admin E-LAUT - Elektronik Layanan Pelatihan Utama Terpadu",
@@ -57,7 +57,7 @@ export const metadata = {
 export default function page() {
   return (
     <>
-      <LoginAdminELAUT />
+      <FormLoginAdminELAUT />
     </>
   );
 }
