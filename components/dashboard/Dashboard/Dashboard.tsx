@@ -1,19 +1,12 @@
 "use client";
 import React from "react";
 import { HiCheckBadge } from "react-icons/hi2";
-import { GiBattery75, GiPapers } from "react-icons/gi";
+import { GiPapers } from "react-icons/gi";
 import { MdSchool } from "react-icons/md";
 import Cookies from "js-cookie";
 import axios, { AxiosResponse } from "axios";
 import { LemdiklatDetailInfo } from "@/types/lemdiklat";
-import {
-  RiLogoutCircleRFill,
-  RiShipFill,
-  RiVerifiedBadgeFill,
-} from "react-icons/ri";
 import { Blanko, BlankoKeluar } from "@/types/blanko";
-import TableDataPublicBlanko from "../Pelatihan/TableDataPublicBlanko";
-// import MapOne from "../Maps/MapOne";
 
 
 import {
@@ -22,7 +15,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { formatDateTime } from "@/utils";
-import TableDataBlankoKeluarPublic from "../Pelatihan/TableDataBlankoKeluarPublic";
 
 import CardDataStats from "@/commons/cards/CardDataStats";
 import ChartPopoverPelatihan from "@/commons/charts/ChartPopoverPelatihan";

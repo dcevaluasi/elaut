@@ -1,8 +1,7 @@
 "use client";
 
 import TableProgramPelatihan from "@/components/dashboard/Dashboard/Master/TableProgramPelatihan";
-import LayoutAdminElaut, { HeaderPageLayoutAdminElaut } from "@/components/dashboard/Layouts/LayoutAdminElaut";
-import { RiQuillPenAiLine } from "react-icons/ri";
+import LayoutAdminElaut from "@/components/dashboard/Layouts/LayoutAdminElaut";
 
 export default function Page() {
     return (
