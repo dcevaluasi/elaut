@@ -122,15 +122,13 @@ export default function DashboardMainView() {
             />
           )}
 
-          {(isSuperAdmin || (!hasViewP2MKP && !hasViewModul)) && (
-            <DashboardTabTrigger
-              value="instruktur"
-              icon={<Users className="w-4 h-4" />}
-              label="SDM Pelatih"
-              sublabel="Instruktur & WI"
-              theme="violet"
-            />
-          )}
+          <DashboardTabTrigger
+            value="instruktur"
+            icon={<Users className="w-4 h-4" />}
+            label="SDM Pelatih"
+            sublabel="Instruktur & WI"
+            theme="violet"
+          />
 
           {(isSuperAdmin || hasViewModul) && (
             <DashboardTabTrigger
