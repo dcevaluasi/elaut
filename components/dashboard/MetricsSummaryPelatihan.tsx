@@ -1,9 +1,8 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Users, CalendarDays, BookOpen, Clock } from "lucide-react"
+import { Users, CalendarDays, BookOpen, Clock, CheckCircle2, ArrowUpRight } from "lucide-react"
 import { PelatihanMasyarakat } from "@/types/product"
 import React from "react"
 import { parseIndonesianDate } from "@/utils/time"
@@ -17,35 +16,27 @@ interface MetricsSummaryPelatihanProps {
 }
 
 const MetricsSummaryPelatihan: React.FC<MetricsSummaryPelatihanProps> = ({ data, tahun }) => {
+    const pathname = usePathname()
+    const adminBase = pathname.includes('pusat') ? 'pusat' : 'lemdiklat'
+
     // ================== Filter ==================
     const filteredData = React.useMemo(() => {
         return data.filter((item: PelatihanMasyarakat) => {
             if (!item.TanggalMulaiPelatihan) return false;
-
             let d = new Date(item.TanggalMulaiPelatihan);
             if (isNaN(d.getTime())) {
                 d = parseIndonesianDate(item.TanggalMulaiPelatihan) as Date;
             }
             if (!d || isNaN(d.getTime())) return false;
-
             const itemTahun = String(d.getFullYear());
             if (tahun && itemTahun !== tahun) return false;
-
             return true;
         });
     }, [data, tahun]);
 
     // ================== Metrics ==================
-    const totalTrainings = filteredData.length;
-
-    const totalParticipants = filteredData.reduce(
-        (sum, item) => sum + (item.JumlahPeserta ?? 0),
-        0
-    );
-
     const now = new Date();
 
-    // Sedang berlangsung
     const ongoingData = filteredData.filter((item) => {
         if (!item.TanggalMulaiPelatihan || !item.TanggalBerakhirPelatihan) return false;
         const start = new Date(item.TanggalMulaiPelatihan);
@@ -53,147 +44,189 @@ const MetricsSummaryPelatihan: React.FC<MetricsSummaryPelatihanProps> = ({ data,
         return start <= now && end >= now && item?.StatusPenerbitan == "4";
     });
 
-    // Akan berlangsung (belum mulai)
     const upcomingData = filteredData.filter((item) => {
         if (!item.TanggalMulaiPelatihan) return false;
         const start = new Date(item.TanggalMulaiPelatihan);
         return start > now && item?.StatusPenerbitan == "4";
     });
 
-    // Telah selesai
     const completedData = filteredData.filter((item) => {
         if (!item.TanggalBerakhirPelatihan) return false;
         const end = new Date(item.TanggalBerakhirPelatihan);
-        const isClosed = parseInt(item?.StatusPenerbitan) >= 5
-
+        const isClosed = parseInt(item?.StatusPenerbitan) >= 5;
         return end < now && isClosed;
     });
 
-    // Pending STTPL
     const pendingData = filteredData.filter((item) => {
-        const isPending = ["7A", "7B", "8", "10", "12", "14"].includes(item?.StatusPenerbitan);
-
-        return isPending;
+        return ["7A", "7B", "8", "10", "12", "14"].includes(item?.StatusPenerbitan);
     });
 
+    // ================== Ongoing list with progress ==================
+    const ongoingTrainings = React.useMemo(() => {
+        return ongoingData.map((item) => {
+            let startStr = item.TanggalMulaiPelatihan || "";
+            let endStr = item.TanggalBerakhirPelatihan || "";
 
-    const metrics = [
-        { title: "Akan Berlangsung", value: upcomingData.length, icon: CalendarDays, color: 'teal' },
-        { title: "Sedang Berlangsung", value: ongoingData.length, icon: BookOpen, color: 'blue' },
-        { title: "Telah Selesai", value: completedData.length, icon: Users, color: 'indigo' },
-        { title: "Pending STTPL", value: pendingData.length, icon: Clock, color: 'amber' },
-    ];
+            if (startStr.includes(" - ")) {
+                const parts = startStr.split(" - ").map((s: string) => s.trim());
+                startStr = parts[0];
+                endStr = parts[1];
+            }
 
+            const normalizeDate = (d: Date) => {
+                const nd = new Date(d);
+                nd.setHours(0, 0, 0, 0);
+                return nd;
+            };
 
-    const ongoingTrainings = ongoingData.map((item, idx) => {
-        // Handle combined date string like "2025-07-23 - 2025-07-30"
-        let startStr = item.TanggalMulaiPelatihan || "";
-        let endStr = item.TanggalBerakhirPelatihan || "";
+            const startDate = normalizeDate(new Date(startStr));
+            const endDate = normalizeDate(new Date(endStr));
+            const today = normalizeDate(new Date());
+            let progress = 0;
 
-        // If TanggalMulaiPelatihan actually contains both dates (e.g. "2025-07-23 - 2025-07-30")
-        if (startStr.includes(" - ")) {
-            const parts = startStr.split(" - ").map((s: string) => s.trim());
-            startStr = parts[0];
-            endStr = parts[1];
-        }
+            if (!isNaN(startDate.getTime()) && !isNaN(endDate.getTime())) {
+                const totalDays = Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
+                const daysPassed = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+                if (today < startDate) progress = 0;
+                else if (today > endDate) progress = 100;
+                else progress = Math.round((daysPassed / totalDays) * 100);
+            }
 
-        // Validate
-        const isValidDate = (d: Date) => !isNaN(d.getTime());
-        let progress = 0;
-
-        const normalizeDate = (d: Date) => {
-            const nd = new Date(d);
-            nd.setHours(0, 0, 0, 0);
-            return nd;
-        };
-
-        const startDate = normalizeDate(new Date(startStr));
-        const endDate = normalizeDate(new Date(endStr));
-        const today = normalizeDate(new Date());
-
-        if (isValidDate(startDate) && isValidDate(endDate)) {
-            const totalDays = Math.max(
-                1,
-                Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
-            );
-
-            const daysPassed = Math.floor(
-                (today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-            );
-
-            if (today < startDate) progress = 0;
-            else if (today > endDate) progress = 100;
-            else progress = Math.round((daysPassed / totalDays) * 100);
-        }
-
-        return {
-            id: item.IdPelatihan,
-            code: item.KodePelatihan,
-            title: item.NamaPelatihan,
-            batch: item.LokasiPelatihan ?? "-",
-            penyelenggara: item.PenyelenggaraPelatihan ?? "-",
-            participants: item.UserPelatihan?.length ?? 0,
-            progress,
-            status: "Berlangsung",
-        };
-    }).sort((a, b) => b.participants - a.participants);
-
-
-
-
+            return {
+                id: item.IdPelatihan,
+                code: item.KodePelatihan,
+                title: item.NamaPelatihan,
+                lokasi: item.LokasiPelatihan ?? "-",
+                penyelenggara: item.PenyelenggaraPelatihan ?? "-",
+                participants: item.UserPelatihan?.length ?? 0,
+                progress,
+            };
+        }).sort((a, b) => b.participants - a.participants);
+    }, [ongoingData]);
 
     return (
         <div className="flex flex-col gap-4 w-full h-full">
-            {metrics.map((item) => (
-                <Card key={item.title} className={`shadow-none border border-slate-200 bg-white rounded-2xl overflow-hidden hover:border-${item.color}-200 transition-colors group`}>
-                    <CardContent className="p-5 flex items-center justify-between">
-                        <div className="space-y-1">
-                            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{item.title}</p>
-                            <div className="text-2xl font-black text-slate-800 flex items-baseline gap-1">
-                                {item.value}
-                                <span className="text-xs font-medium text-slate-400">Total</span>
-                            </div>
-                        </div>
-                        <div className={`p-3 rounded-xl bg-${item.color}-50}-900/20 text-${item.color}-600}-400 group-hover:scale-110 transition-transform`}>
-                            <item.icon className="h-6 w-6" />
-                        </div>
-                    </CardContent>
-                </Card>
-            ))}
 
-            {/* Ongoing Training Snippet */}
-            <Card className="shadow-none border border-slate-200 bg-white rounded-2xl flex-1 flex flex-col">
-                <CardHeader className="p-5 pb-2 border-b border-slate-50">
-                    <CardTitle className="text-sm font-bold text-slate-800">Pelatihan Berlangsung</CardTitle>
-                </CardHeader>
-                <CardContent className="p-0 flex-1 overflow-auto max-h-[300px] custom-scrollbar">
+            {/* ── Metric cards ───────────────────────────────────────────── */}
+            <div className="grid grid-cols-2 gap-3">
+                {/* Akan Berlangsung */}
+                <div className="bg-white rounded-2xl border border-slate-100 p-4 flex items-center gap-3.5 hover:border-teal-200 transition-colors group">
+                    <div className="p-2.5 rounded-xl bg-teal-50 text-teal-600 group-hover:scale-105 transition-transform flex-shrink-0">
+                        <CalendarDays className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Akan Datang</p>
+                        <p className="text-2xl font-black text-slate-800 tracking-tight leading-none mt-0.5">{upcomingData.length}</p>
+                    </div>
+                </div>
+
+                {/* Sedang Berlangsung */}
+                <div className="bg-white rounded-2xl border border-slate-100 p-4 flex items-center gap-3.5 hover:border-blue-200 transition-colors group">
+                    <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600 group-hover:scale-105 transition-transform flex-shrink-0">
+                        <BookOpen className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Berlangsung</p>
+                        <p className="text-2xl font-black text-slate-800 tracking-tight leading-none mt-0.5">{ongoingData.length}</p>
+                    </div>
+                </div>
+
+                {/* Telah Selesai */}
+                <div className="bg-white rounded-2xl border border-slate-100 p-4 flex items-center gap-3.5 hover:border-emerald-200 transition-colors group">
+                    <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 group-hover:scale-105 transition-transform flex-shrink-0">
+                        <CheckCircle2 className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Selesai</p>
+                        <p className="text-2xl font-black text-slate-800 tracking-tight leading-none mt-0.5">{completedData.length}</p>
+                    </div>
+                </div>
+
+                {/* Pending STTPL */}
+                <div className="bg-white rounded-2xl border border-slate-100 p-4 flex items-center gap-3.5 hover:border-amber-200 transition-colors group">
+                    <div className="p-2.5 rounded-xl bg-amber-50 text-amber-600 group-hover:scale-105 transition-transform flex-shrink-0">
+                        <Clock className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Pending STTPL</p>
+                        <p className="text-2xl font-black text-slate-800 tracking-tight leading-none mt-0.5">{pendingData.length}</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* ── Ongoing trainings list ──────────────────────────────────── */}
+            <div className="bg-white rounded-2xl border border-slate-100 flex-1 flex flex-col overflow-hidden">
+                <div className="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                        <div className="w-1 h-5 bg-blue-500 rounded-full" />
+                        <h4 className="text-sm font-black text-slate-800 tracking-tight">Pelatihan Berlangsung</h4>
+                    </div>
+                    {ongoingTrainings.length > 0 && (
+                        <span className="text-[10px] font-bold bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full border border-blue-100">
+                            {ongoingTrainings.length} aktif
+                        </span>
+                    )}
+                </div>
+
+                <div className="flex-1 overflow-auto max-h-[340px] custom-scrollbar">
                     {ongoingTrainings.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center p-8 text-center h-full">
-                            <CalendarDays className="h-10 w-10 text-slate-300 mb-3" />
-                            <p className="text-sm font-medium text-slate-500">
-                                Tidak ada pelatihan aktif saat ini
-                            </p>
+                        <div className="flex flex-col items-center justify-center p-10 text-center h-full">
+                            <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center mb-3">
+                                <CalendarDays className="h-6 w-6 text-slate-300" />
+                            </div>
+                            <p className="text-sm font-bold text-slate-400">Tidak ada pelatihan aktif</p>
+                            <p className="text-xs text-slate-400 mt-1">Pelatihan yang sedang berjalan akan muncul di sini</p>
                         </div>
                     ) : (
-                        <div className="divide-y divide-slate-100">
+                        <div className="divide-y divide-slate-50">
                             {ongoingTrainings.map((training) => (
-                                <div key={training.id} className="p-4 hover:bg-slate-50 transition-colors">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <Link href={`/admin/${usePathname().includes('pusat') ? 'pusat' : 'lemdiklat'}/pelatihan/detail/${training.code}/${encryptValue(training.id.toString())}`} className="font-bold text-sm text-slate-800 line-clamp-1 hover:text-blue-600 transition-colors">
+                                <div key={training.id} className="px-5 py-3.5 hover:bg-slate-50/60 transition-colors">
+                                    {/* Title + link */}
+                                    <div className="flex items-start justify-between gap-2 mb-2">
+                                        <Link
+                                            href={`/admin/${adminBase}/pelatihan/detail/${training.code}/${encryptValue(training.id.toString())}`}
+                                            className="text-sm font-bold text-slate-800 line-clamp-1 hover:text-blue-600 transition-colors flex-1"
+                                        >
                                             {training.title}
                                         </Link>
+                                        <Link
+                                            href={`/admin/${adminBase}/pelatihan/detail/${training.code}/${encryptValue(training.id.toString())}`}
+                                            className="text-slate-400 hover:text-blue-600 transition-colors flex-shrink-0 mt-0.5"
+                                        >
+                                            <ArrowUpRight className="w-3.5 h-3.5" />
+                                        </Link>
                                     </div>
-                                    <div className="flex justify-between items-center text-xs text-slate-500 mb-2">
-                                        <span>{training.batch}</span>
-                                        <span className="font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">{training.progress}%</span>
+
+                                    {/* Meta row */}
+                                    <div className="flex items-center gap-3 text-xs text-slate-500 mb-2.5">
+                                        <span className="truncate">{training.lokasi}</span>
+                                        <span className="text-slate-300">·</span>
+                                        <span className="flex items-center gap-1 flex-shrink-0">
+                                            <Users className="w-3 h-3" />
+                                            {training.participants}
+                                        </span>
                                     </div>
-                                    <Progress value={training.progress} className="h-1.5" />
+
+                                    {/* Progress */}
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex-1">
+                                            <Progress value={training.progress} className="h-1.5" />
+                                        </div>
+                                        <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${training.progress >= 80
+                                                ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                                                : training.progress >= 40
+                                                    ? "bg-blue-50 text-blue-700 border border-blue-100"
+                                                    : "bg-slate-50 text-slate-600 border border-slate-200"
+                                            }`}>
+                                            {training.progress}%
+                                        </span>
+                                    </div>
                                 </div>
                             ))}
                         </div>
                     )}
-                </CardContent>
-            </Card>
+                </div>
+            </div>
         </div>
     );
 };

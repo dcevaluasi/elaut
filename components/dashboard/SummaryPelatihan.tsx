@@ -3,7 +3,7 @@ import React from "react";
 import { HashLoader } from "react-spinners";
 import Image from "next/image";
 import ChartMasyarakatDilatihMonthly from "@/commons/charts/ChartMasyarakatDilatihMonthly";
-import ChartDetailMasyarakatDilatih from "@/commons/charts/ChartDetailMasyarakatDilatih";
+import ChartDetailMasyarakatDilatih, { ChartSektorPembiayaanCard } from "@/commons/charts/ChartDetailMasyarakatDilatih";
 import useFetchDataDukung from "@/hooks/elaut/useFetchDataDukung";
 import { useFetchAllDataPelatihanMasyarakat } from "@/hooks/elaut/pelatihan/useFetchDataPelatihanMasyarakat";
 import dayjs from "dayjs";
@@ -224,208 +224,226 @@ const SummaryPelatihan: React.FC = () => {
     };
   }, [filteredDataPelatihan, filteredDataDukung]);
 
+  const genderRatio = analytics
+    ? Math.round((analytics.maleCount / Math.max(analytics.totalPeserta, 1)) * 100)
+    : 50;
+
   return (
-    <div className="w-full min-h-screen bg-slate-50/50">
+    <div className="w-full min-h-screen bg-slate-50">
       {isFetching || isFetchingDataDukung ? (
         <div className="w-full h-[60vh] flex items-center justify-center">
           <div className="flex flex-col items-center gap-4">
             <HashLoader color="#3b82f6" size={50} />
-            <p className="text-sm font-medium text-slate-500 animate-pulse tracking-wide">Memuat data dashboard...</p>
+            <p className="text-sm font-medium text-slate-500 animate-pulse tracking-wide">Memuat data pelatihan…</p>
           </div>
         </div>
       ) : data != null ? (
-        <div className="flex flex-col gap-8 max-w-[1920px] mx-auto">
-          {/* Dashboard Header with Global Year Filter */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/60 backdrop-blur-xl p-6 rounded-[2rem] border border-slate-200/50 shadow-sm">
-            <div>
-              <h2 className="text-2xl font-black text-slate-800 tracking-tight">Ringkasan Capaian</h2>
-              <p className="text-sm font-medium text-slate-500">Periode Pelaksanaan {tahun}</p>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-2 bg-slate-100 px-4 py-2 rounded-2xl border border-slate-200">
-                <FiFilter className="text-blue-600" />
-                <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Tahun Anggaran</span>
+        <div className="flex flex-col gap-8 max-w-[1920px] mx-auto pb-12">
+
+          {/* ─── HERO ─────────────────────────────────────────────────────── */}
+          <div className="relative bg-gradient-to-br from-blue-700 via-indigo-700 to-violet-800 rounded-[2rem] p-8 md:p-10 text-white overflow-hidden shadow-2xl shadow-indigo-200/50">
+            <div className="absolute -top-20 -right-20 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            {/* Top row: title + filter */}
+            <div className="relative z-10 flex flex-col md:flex-row md:items-start justify-between gap-5 mb-8">
+              <div>
+                <p className="text-blue-300 text-[10px] font-bold uppercase tracking-[0.25em] mb-1.5">Realisasi Pelatihan Masyarakat</p>
+                <h2 className="text-3xl md:text-4xl font-black tracking-tight leading-tight">Capaian {triwulan} · {tahun}</h2>
+                <p className="text-blue-200/60 text-sm mt-1.5 font-medium">Data bersertifikat · diperbarui sesuai filter aktif</p>
               </div>
-              <Select value={tahun.toString()} onValueChange={(val) => setTahun(parseInt(val))}>
-                <SelectTrigger className="w-[120px] h-12 rounded-2xl border-slate-200 bg-white shadow-sm text-sm font-bold hover:bg-slate-50 transition-all focus:ring-2 focus:ring-blue-100 text-slate-700">
-                  <SelectValue placeholder="Pilih Tahun" />
-                </SelectTrigger>
-                <SelectContent className="rounded-2xl border-none shadow-2xl">
-                  {tahunList.sort((a, b) => b - a).map((t) => (
-                    <SelectItem key={t} value={t.toString()} className="font-bold cursor-pointer text-slate-700 text-xs py-3">{t}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={triwulan} onValueChange={setTriwulan}>
-                <SelectTrigger className="w-[120px] h-12 rounded-2xl border-slate-200 bg-white shadow-sm text-sm font-bold hover:bg-slate-50 transition-all focus:ring-2 focus:ring-blue-100">
-                  <SelectValue placeholder="Triwulan" />
-                </SelectTrigger>
-                <SelectContent className="rounded-2xl border-none shadow-2xl">
-                  <SelectItem value="TW I" className="font-bold cursor-pointer text-xs py-3">TW I</SelectItem>
-                  <SelectItem value="TW II" className="font-bold cursor-pointer text-xs py-3">TW II</SelectItem>
-                  <SelectItem value="TW III" className="font-bold cursor-pointer text-xs py-3">TW III</SelectItem>
-                  <SelectItem value="TW IV" className="font-bold cursor-pointer text-xs py-3">TW IV</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Quick Metrics Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-blue-200 group transition-all duration-500 hover:scale-[1.02]">
-              <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
-              <div className="relative z-10">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="p-3.5 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
-                    <BookOpen className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-blue-100 text-xs font-bold uppercase tracking-widest opacity-80">Total Pelatihan</p>
-                    <h4 className="text-3xl font-black tracking-tighter">{analytics?.totalPelatihan}</h4>
-                  </div>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <div className="flex items-center gap-1.5 bg-white/10 px-3 py-2 rounded-xl border border-white/15">
+                  <FiFilter className="w-3.5 h-3.5 text-blue-300" />
+                  <span className="text-[11px] font-bold text-blue-200 uppercase tracking-widest">Filter</span>
                 </div>
-                <div className="flex items-center gap-2 text-xs font-bold text-blue-100/60 uppercase tracking-tighter">
-                  <TrendingUp className="w-3.5 h-3.5" />
-                  <span>Capaian kumulatif pelatihan</span>
-                </div>
+                <Select value={tahun.toString()} onValueChange={(val) => setTahun(parseInt(val))}>
+                  <SelectTrigger className="w-[110px] h-10 rounded-xl border-white/20 bg-white/10 text-sm font-bold text-white hover:bg-white/20 transition-all focus:ring-0">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl shadow-2xl border-0">
+                    {tahunList.sort((a, b) => b - a).map((t) => (
+                      <SelectItem key={t} value={t.toString()} className="font-bold text-xs py-2.5">{t}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={triwulan} onValueChange={setTriwulan}>
+                  <SelectTrigger className="w-[100px] h-10 rounded-xl border-white/20 bg-white/10 text-sm font-bold text-white hover:bg-white/20 transition-all focus:ring-0">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl shadow-2xl border-0">
+                    {["TW I", "TW II", "TW III", "TW IV"].map((tw) => (
+                      <SelectItem key={tw} value={tw} className="font-bold text-xs py-2.5">{tw}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-violet-600 to-purple-700 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-violet-200 group transition-all duration-500 hover:scale-[1.02]">
-              <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
-              <div className="relative z-10">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="p-3.5 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
-                    <Users className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-purple-100 text-xs font-bold uppercase tracking-widest opacity-80">Total Peserta</p>
-                    <h4 className="text-3xl font-black tracking-tighter">{analytics?.totalPeserta}</h4>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 text-xs font-bold text-purple-100/60 uppercase tracking-tighter">
-                  <TrendingUp className="w-3.5 h-3.5" />
-                  <span>Masyarakat telah dilatih</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-emerald-200 group transition-all duration-500 hover:scale-[1.02]">
-              <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
-              <div className="relative z-10">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="p-3.5 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
-                    <Wallet className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-emerald-100 text-xs font-bold uppercase tracking-widest opacity-80">Total PNPB</p>
+            {/* KPI strip */}
+            <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[
+                { label: "Total Pelatihan", value: analytics?.totalPelatihan?.toLocaleString() ?? "—", sub: "program" },
+                { label: "Masyarakat Dilatih", value: analytics?.totalPeserta?.toLocaleString() ?? "—", sub: "peserta bersertifikat" },
+                {
+                  label: "Realisasi PNBP",
+                  value: formatToShorthandRupiah(analytics?.totalPNPB || 0),
+                  fullValue: formatToRupiah(analytics?.totalPNPB || 0),
+                  sub: "penerimaan negara",
+                  tooltip: true,
+                },
+                { label: "Tingkat Penyelesaian", value: `${analytics?.completionRate ?? 0}%`, sub: "program selesai" },
+              ].map((k) => (
+                <div key={k.label} className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl px-5 py-4 hover:bg-white/15 transition-colors duration-200">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-blue-200/70 mb-2">{k.label}</p>
+                  {k.tooltip ? (
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <h4 className="text-2xl md:text-3xl font-black tracking-tighter cursor-help">
-                            {formatToShorthandRupiah(analytics?.totalPNPB || 0)}
-                          </h4>
+                          <p className="text-2xl font-black tracking-tight cursor-help">{k.value}</p>
                         </TooltipTrigger>
-                        <TooltipContent className="bg-white/90 backdrop-blur-md border-emerald-100 text-emerald-900 px-4 py-2 rounded-xl font-bold shadow-xl">
-                          {formatToRupiah(analytics?.totalPNPB || 0)}
+                        <TooltipContent className="bg-white text-slate-800 px-4 py-2 rounded-xl font-bold shadow-xl text-sm">
+                          {k.fullValue}
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
-                  </div>
+                  ) : (
+                    <p className="text-2xl font-black tracking-tight">{k.value}</p>
+                  )}
+                  <p className="text-[11px] text-blue-200/50 mt-0.5 font-medium">{k.sub}</p>
                 </div>
-                <div className="flex items-center gap-2 text-xs font-bold text-emerald-100/60 uppercase tracking-tighter">
-                  <TrendingUp className="w-3.5 h-3.5" />
-                  <span>Realisasi Penerimaan Negara</span>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 
-          {/* Main Content Grid - Power BI Layout */}
-          {/* Top Section: Monthly Trend & Status Metrics */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 w-full">
-            {/* Left Panel - Monthly Trend (Takes 2/3 width on large screens) */}
-            <div className="xl:col-span-2 bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-              <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-white to-slate-50/50">
-                <div className="flex items-center gap-4">
-                  <div className="p-2.5 bg-blue-50 rounded-xl ring-1 ring-blue-100">
-                    <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+          {/* ─── SEKSI 1: PROFIL PESERTA ─────────────────────────────────── */}
+          <SectionLabel color="blue" label="Profil Peserta" description="Komposisi demografis peserta pelatihan bersertifikat pada periode ini." />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {/* Gender breakdown */}
+            <div className="bg-white rounded-[1.5rem] border border-slate-100 shadow-sm p-6">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4">Distribusi Gender</p>
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block" />
+                    <span className="text-sm font-semibold text-slate-700">Laki-laki</span>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-800 tracking-tight">Trend Pelatihan</h3>
-                    <p className="text-sm text-slate-500 font-medium">Statistik bulanan masyarakat dilatih</p>
-                  </div>
+                  <span className="text-sm font-black text-slate-800">{analytics?.maleCount?.toLocaleString() ?? 0} <span className="text-xs font-medium text-slate-400">({analytics?.malePercentage ?? 0}%)</span></span>
                 </div>
-              </div>
-              <div className="p-6 flex-1">
-                <ChartMasyarakatDilatihMonthly data={filteredDataPelatihan} dataUser={filteredDataDukung} tahun={tahun.toString()} triwulan={triwulan} />
+                <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-700" style={{ width: `${genderRatio}%` }} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block" />
+                    <span className="text-sm font-semibold text-slate-700">Perempuan</span>
+                  </div>
+                  <span className="text-sm font-black text-slate-800">{analytics?.femaleCount?.toLocaleString() ?? 0} <span className="text-xs font-medium text-slate-400">({analytics?.femalePercentage ?? 0}%)</span></span>
+                </div>
               </div>
             </div>
 
-            {/* Right Panel - Metrics Summary (Takes 1/3 width) */}
-            <div className="xl:col-span-1 flex flex-col gap-6">
+            {/* Avg per training */}
+            <div className="bg-white rounded-[1.5rem] border border-slate-100 shadow-sm p-6 flex flex-col justify-between">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4">Rata-rata Peserta per Pelatihan</p>
+              <div>
+                <p className="text-5xl font-black text-slate-800 tracking-tight">{analytics?.avgPeserta?.toLocaleString() ?? 0}</p>
+                <p className="text-xs font-medium text-slate-400 mt-1.5">orang / kegiatan</p>
+              </div>
+              <div className="mt-4 h-px bg-slate-100" />
+              <p className="text-xs text-slate-500 mt-3 leading-relaxed">Dari {analytics?.totalPelatihan} pelatihan dengan total {analytics?.totalPeserta?.toLocaleString()} peserta.</p>
+            </div>
+
+            {/* Avg per day */}
+            <div className="bg-white rounded-[1.5rem] border border-slate-100 shadow-sm p-6 flex flex-col justify-between">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4">Rata-rata Peserta per Hari</p>
+              <div>
+                <p className="text-5xl font-black text-slate-800 tracking-tight">{analytics?.avgParticipantsPerDay?.toLocaleString() ?? 0}</p>
+                <p className="text-xs font-medium text-slate-400 mt-1.5">orang / hari pelatihan</p>
+              </div>
+              <div className="mt-4 h-px bg-slate-100" />
+              <p className="text-xs text-slate-500 mt-3 leading-relaxed">Dihitung dari akumulasi {analytics?.totalDays?.toLocaleString() ?? 0} hari durasi kegiatan.</p>
+            </div>
+          </div>
+
+          {/* ─── SEKSI 2: TREN REALISASI ─────────────────────────────────── */}
+          <SectionLabel color="indigo" label="Tren Realisasi" description="Grafik bulanan peserta dilatih dan akumulasi PNBP sepanjang tahun anggaran." />
+
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+            <div className="xl:col-span-2 bg-white rounded-[1.5rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-white to-slate-50/60">
+                <div className="flex items-center gap-3">
+                  <div className="w-1 h-6 bg-indigo-500 rounded-full" />
+                  <div>
+                    <h3 className="text-sm font-black text-slate-800">Trend Bulanan</h3>
+                    <p className="text-xs text-slate-500 font-medium">Peserta &amp; PNBP per bulan</p>
+                  </div>
+                </div>
+                {analytics && (
+                  <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border ${analytics.isPositiveGrowth ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-red-50 text-red-600 border-red-100"}`}>
+                    <TrendingUp className={`w-3.5 h-3.5 ${analytics.isPositiveGrowth ? "" : "rotate-180"}`} />
+                    {analytics.growthRate > 0 ? "+" : ""}{analytics.growthRate}% bulan ini
+                  </span>
+                )}
+              </div>
+              <div className="p-5 flex-1 max-h-[340px]">
+                <ChartMasyarakatDilatihMonthly data={filteredDataPelatihan} dataUser={filteredDataDukung} tahun={tahun.toString()} triwulan={triwulan} />
+              </div>
+            </div>
+            <div className="xl:col-span-1 overflow-hidden">
+              <ChartSektorPembiayaanCard data={filteredDataPelatihan} dataUser={filteredDataDukung} />
+            </div>
+          </div>
+
+          {/* ─── SEKSI 3: STATUS PENYELENGGARAAN ─────────────────────────── */}
+          <SectionLabel color="emerald" label="Status Penyelenggaraan" description="Pipeline tahap administrasi pelatihan — dari pengajuan hingga penerbitan sertifikat." />
+
+          <div className="flex gap-3">
+            <div className="bg-white rounded-[1.5rem] border border-slate-100 shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-3 bg-gradient-to-r from-white to-emerald-50/40">
+                <div className="w-1 h-6 bg-emerald-500 rounded-full" />
+                <div>
+                  <h3 className="text-sm font-black text-slate-800">Pipeline Administrasi</h3>
+                  <p className="text-xs text-slate-500 font-medium">Distribusi status {filteredDataPelatihan.length} pelatihan aktif periode ini</p>
+                </div>
+              </div>
+              <div className="p-6">
+                <StatsMetricStatus data={filteredDataPelatihan} tahun={tahun.toString()} />
+              </div>
+            </div>
+            <div className="xl:col-span-1">
               <MetricsSummaryPelatihan data={filteredDataPelatihan} tahun={tahun.toString()} />
             </div>
           </div>
 
-          {/* Stats Section - Full Width */}
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-            <div className="px-6 py-5 border-b border-slate-100 bg-gradient-to-r from-white to-slate-50/50">
-              <div className="flex items-center gap-4">
-                <div className="p-2.5 bg-emerald-50 rounded-xl ring-1 ring-emerald-100">
-                  <div className="w-1.5 h-6 bg-emerald-600 rounded-full"></div>
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-slate-800 tracking-tight">Statistik Status</h3>
-                  <p className="text-sm text-slate-500 font-medium">Distribusi status penyelenggaraan pelatihan</p>
-                </div>
-              </div>
-            </div>
-            <div className="p-6">
-              <StatsMetricStatus data={filteredDataPelatihan} tahun={tahun.toString()} />
-            </div>
-          </div>
 
-          {/* Kalender & Export Pelatihan Selesai (Status 11 & 15) */}
-          <CalendarSelesaiPelatihan data={data} tahunGlobal={tahun} />
+          {/* ─── SEKSI 4: ANALISIS DISTRIBUSI ───────────────────────────── */}
+          <SectionLabel color="violet" label="Analisis Distribusi" description="Breakdown multidimensi: sektor, sumber pembiayaan, klaster, gender, dan penyelenggara." />
 
-          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-            <div className="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-gradient-to-r from-white to-slate-50/50">
-              <div className="flex items-center gap-4">
-                <div className="p-2.5 bg-indigo-50 rounded-xl ring-1 ring-indigo-100">
-                  <div className="w-1.5 h-6 bg-indigo-600 rounded-full"></div>
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-slate-800 tracking-tight">Detail Realisasi</h3>
-                  <p className="text-sm text-slate-500 font-medium">Rincian data pelatihan per triwulan</p>
-                </div>
+          <div className="bg-white rounded-[1.5rem] border border-slate-100 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-3 bg-gradient-to-r from-white to-violet-50/40">
+              <div className="w-1 h-6 bg-violet-500 rounded-full" />
+              <div>
+                <h3 className="text-sm font-black text-slate-800">Detail Realisasi</h3>
+                <p className="text-xs text-slate-500 font-medium">Distribusi masyarakat dilatih per dimensi analitik</p>
               </div>
             </div>
             <div className="p-0">
               <ChartDetailMasyarakatDilatih data={filteredDataPelatihan} dataUser={filteredDataDukung} tahun={tahun.toString()} triwulan={triwulan} />
             </div>
           </div>
+
         </div>
       ) : (
         <div className="relative max-w-7xl w-full mx-auto mt-20 p-6">
-          <div className="pt-7 md:pt-0 flex flex-col items-center bg-white rounded-3xl shadow-xl border border-slate-200 p-12">
-            <Image
-              src={"/illustrations/not-found.png"}
-              alt="Not Found"
-              width={0}
-              height={0}
-              className="w-[350px] md:w-[400px]"
-            />
-            <div className="max-w-3xl mx-auto text-center pb-5 md:pb-8 -mt-2">
-              <h1 className="text-2xl md:text-3xl font-bold leading-[110%] bg-gradient-to-r from-slate-700 to-slate-900 bg-clip-text text-transparent">
-                Belum Ada Pelatihan
-              </h1>
-              <div className="text-slate-600 text-center leading-[125%] max-w-md mt-3">
-                Capaian ataupun summary dari pelaksanaan pelatihan belum dapat
-                dilihat, karena Balai Pelatihan belum memiliki penyelenggaraan
-                pelatihan!
-              </div>
+          <div className="flex flex-col items-center bg-white rounded-[2rem] shadow-xl border border-slate-100 p-12">
+            <Image src="/illustrations/not-found.png" alt="Belum ada data" width={0} height={0} className="w-[320px] md:w-[380px]" />
+            <div className="text-center mt-4">
+              <h1 className="text-2xl font-black text-slate-800 tracking-tight">Belum Ada Data Pelatihan</h1>
+              <p className="text-sm text-slate-500 font-medium mt-2 max-w-sm mx-auto leading-relaxed">
+                Data capaian pelatihan belum tersedia. Pastikan penyelenggaraan pelatihan telah tercatat di sistem.
+              </p>
             </div>
           </div>
         </div>
@@ -434,4 +452,34 @@ const SummaryPelatihan: React.FC = () => {
   );
 };
 
+// ─── Section label ───────────────────────────────────────────────────────────
+const LABEL_COLORS = {
+  blue: { bar: "bg-blue-500", dot: "bg-blue-100", text: "text-blue-600" },
+  indigo: { bar: "bg-indigo-500", dot: "bg-indigo-100", text: "text-indigo-600" },
+  emerald: { bar: "bg-emerald-500", dot: "bg-emerald-100", text: "text-emerald-600" },
+  violet: { bar: "bg-violet-500", dot: "bg-violet-100", text: "text-violet-600" },
+} as const;
+
+function SectionLabel({
+  label,
+  description,
+  color = "blue",
+}: {
+  label: string;
+  description: string;
+  color?: keyof typeof LABEL_COLORS;
+}) {
+  const c = LABEL_COLORS[color];
+  return (
+    <div className="flex items-center gap-4">
+      <div className={`w-1 h-10 ${c.bar} rounded-full flex-shrink-0`} />
+      <div className="flex-1 min-w-0">
+        <h3 className="text-lg font-black text-slate-800 tracking-tight leading-none">{label}</h3>
+        <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">{description}</p>
+      </div>
+    </div>
+  );
+}
+
 export default SummaryPelatihan;
+

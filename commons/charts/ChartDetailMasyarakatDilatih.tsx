@@ -21,15 +21,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
-import { formatDateTime } from "@/utils";
+import { ChartContainer } from "@/components/ui/chart";
 import {
   getFilteredDataByBalai,
-  getFilteredDataPelatihanByBalai,
 } from "@/lib/training";
 import { isSigned, isUnsigned } from "@/lib/sign";
 import { PelatihanMasyarakat, UserPelatihan } from "@/types/product";
-import { getQuarterForFiltering, parseIndonesianDate } from "@/utils/time";
 
 // ========================================================
 // Color Palette
@@ -163,32 +160,45 @@ const TrainingChartCard: React.FC<ChartCardProps> = ({
           )}
         </div>
 
-        {/* Modern Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 dark:from-slate-800/40 dark:to-slate-800/10 rounded-2xl p-4 border border-slate-100 dark:border-slate-700/50 relative overflow-hidden group/stat">
-            <div className="absolute -right-4 -top-4 w-16 h-16 bg-blue-500/5 rounded-full blur-xl group-hover/stat:bg-blue-500/10 transition-colors" />
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1.5">Total Keseluruhan</p>
-            <p className="text-3xl font-black text-slate-800 dark:text-white tracking-tighter">{totalVisitors.toLocaleString()}</p>
+        {/* Quick Stats */}
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50">
+            <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: barColors[0] }}>Total Peserta</p>
+            <p className="text-3xl font-black text-slate-800 tracking-tighter">{totalVisitors.toLocaleString()}</p>
+            <p className="text-[11px] text-slate-400 font-medium mt-0.5">keseluruhan</p>
           </div>
-          <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 dark:from-slate-800/40 dark:to-slate-800/10 rounded-2xl p-4 border border-slate-100 dark:border-slate-700/50 relative overflow-hidden group/stat">
-            <div className="absolute -right-4 -top-4 w-16 h-16 bg-emerald-500/5 rounded-full blur-xl group-hover/stat:bg-emerald-500/10 transition-colors" />
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-1.5">Kategori / Segmen</p>
-            <p className="text-3xl font-black text-slate-800 dark:text-white tracking-tighter">{chartData.length}</p>
+          <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50">
+            <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: barColors[4] }}>Segmen</p>
+            <p className="text-3xl font-black text-slate-800 tracking-tighter">{chartData.length}</p>
+            <p className="text-[11px] text-slate-400 font-medium mt-0.5">kategori unik</p>
           </div>
-          <div className="bg-gradient-to-br from-indigo-50 to-blue-50/50 dark:from-indigo-900/20 dark:to-blue-900/10 rounded-2xl p-4 border border-indigo-100 dark:border-indigo-800/50 relative overflow-hidden group/stat">
-            <div className="absolute -right-4 -top-4 w-16 h-16 bg-indigo-500/10 rounded-full blur-xl group-hover/stat:bg-indigo-500/20 transition-colors" />
-            <p className="text-[10px] text-indigo-600/80 dark:text-indigo-400 font-bold uppercase tracking-widest mb-1.5">Capaian Tertinggi</p>
-            <p className="text-3xl font-black text-indigo-700 dark:text-indigo-300 tracking-tighter">{highestValue.toLocaleString()}</p>
+          <div className="rounded-2xl p-4 border-2 bg-white" style={{ borderColor: barColors[2] + '40', backgroundColor: barColors[2] + '08' }}>
+            <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: barColors[2] }}>Tertinggi</p>
+            <p className="text-3xl font-black tracking-tighter" style={{ color: barColors[2] }}>{highestValue.toLocaleString()}</p>
+            <p className="text-[11px] font-medium mt-0.5" style={{ color: barColors[2] + 'aa' }}>
+              {totalVisitors > 0 ? Math.round((highestValue / totalVisitors) * 100) : 0}% dari total
+            </p>
           </div>
         </div>
 
         {topItem && (
-          <div className="flex items-center gap-3 bg-white dark:bg-slate-800 rounded-2xl p-3.5 border border-slate-100 dark:border-slate-700 shadow-sm mt-2">
-            <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-500/20 flex items-center justify-center">
-              <span className="text-orange-600 dark:text-orange-400 text-lg">🏆</span>
+          <div className="flex items-center gap-3 bg-white rounded-2xl p-3.5 border-2 shadow-sm mt-2"
+            style={{ borderColor: barColors[0] + '30', backgroundColor: barColors[0] + '06' }}>
+            <div className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ backgroundColor: barColors[0] + '20' }}>
+              <span className="text-base">🏆</span>
             </div>
-            <p className="text-sm font-semibold text-slate-600 dark:text-slate-300 leading-tight">
-              Kategori terbanyak adalah <span className="font-bold text-slate-800 dark:text-white">{topItem.name}</span> dengan total <span className="text-blue-600 dark:text-blue-400 font-bold">{topItem.visitors.toLocaleString()}</span> peserta.
+            <p className="text-sm font-medium text-slate-600 leading-tight">
+              Terbanyak: <span className="font-black text-slate-800">{topItem.name}</span>
+              {" — "}
+              <span className="font-black" style={{ color: barColors[0] }}>{topItem.visitors.toLocaleString()}</span>
+              <span className="text-slate-400 font-medium"> peserta</span>
+              {totalVisitors > 0 && (
+                <span className="ml-1.5 text-xs font-bold px-2 py-0.5 rounded-full"
+                  style={{ backgroundColor: barColors[0] + '18', color: barColors[0] }}>
+                  {Math.round((topItem.visitors / totalVisitors) * 100)}%
+                </span>
+              )}
             </p>
           </div>
         )}
@@ -303,21 +313,24 @@ const TrainingChartCard: React.FC<ChartCardProps> = ({
         </ChartContainer>
       </CardContent>
 
-      <CardFooter className="flex flex-col gap-5 px-8 pb-8 pt-5 bg-white/50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800">
+      <CardFooter className="flex flex-col gap-5 px-8 pb-8 pt-5 bg-white/50 border-t border-slate-100">
         <div className="w-full flex flex-col gap-3">
-          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-            Legend
-          </p>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Distribusi per Kategori</p>
           <div className="flex gap-2 flex-wrap">
             {enhancedData.map((entry) => (
-              <div key={entry.name} className="flex items-center gap-2.5 bg-white dark:bg-slate-800 px-3.5 py-1.5 rounded-full border border-slate-200/60 dark:border-slate-700 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 cursor-default">
-                <div
-                  className="w-2.5 h-2.5 rounded-full shadow-sm"
-                  style={{ backgroundColor: entry.colorHex }}
-                />
-                <span className="text-[13px] text-slate-700 dark:text-slate-200 font-semibold">
-                  {entry.name} <span className="text-slate-400 font-medium ml-1">({entry.visitors})</span>
+              <div key={entry.name}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm cursor-default"
+                style={{ borderColor: entry.colorHex + '40', backgroundColor: entry.colorHex + '0d' }}>
+                <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: entry.colorHex }} />
+                <span className="text-[12px] font-bold" style={{ color: entry.colorHex }}>
+                  {entry.visitors.toLocaleString()}
                 </span>
+                <span className="text-[11px] text-slate-600 font-medium">{entry.name}</span>
+                {totalVisitors > 0 && (
+                  <span className="text-[10px] font-bold text-slate-400">
+                    {Math.round((entry.visitors / totalVisitors) * 100)}%
+                  </span>
+                )}
               </div>
             ))}
           </div>
@@ -377,8 +390,224 @@ const TrainingChartCard: React.FC<ChartCardProps> = ({
 
 
 // ========================================================
+// Synchronized Cross-Tab Chart Card
+// Y-axis: Sektor Pelatihan | Bars: Sumber Pembiayaan
+// ========================================================
+interface CrossTabRow {
+  sektor: string;
+  [jenis: string]: string | number;
+}
+
+interface SyncChartCardProps {
+  title: string;
+  crossTabData: CrossTabRow[];
+  jenisKeys: string[];   // unique Sumber Pembiayaan names → one bar each
+}
+
+const SYNC_PALETTE = [
+  "#6366f1", // Indigo
+  "#8b5cf6", // Violet
+  "#ec4899", // Pink
+  "#f59e0b", // Amber
+  "#10b981", // Emerald
+  "#3b82f6", // Blue
+  "#14b8a6", // Teal
+  "#f97316", // Orange
+  "#06b6d4", // Cyan
+  "#84cc16", // Lime
+  "#a855f7", // Purple
+  "#ef4444", // Red
+];
+
+const SynchronizedChartCard: React.FC<SyncChartCardProps> = ({
+  title,
+  crossTabData,
+  jenisKeys,
+}) => {
+  const truncateLabel = (value: string, maxLength = 22) =>
+    value?.length > maxLength ? value.substring(0, maxLength) + "\u2026" : value;
+
+  const grandTotal = crossTabData.reduce(
+    (sum, row) => sum + jenisKeys.reduce((s, k) => s + ((row[k] as number) || 0), 0),
+    0
+  );
+
+  const SyncTooltip = ({ active, payload, label }: any) => {
+    if (!active || !payload?.length) return null;
+    return (
+      <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl p-4 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.12)] border border-slate-100 dark:border-slate-800 min-w-[200px]">
+        <p className="text-[13px] font-bold text-slate-800 dark:text-slate-200 mb-2 border-b border-slate-100 dark:border-slate-800 pb-2">
+          {label}
+        </p>
+        {payload
+          .filter((p: any) => (p.value as number) > 0)
+          .map((p: any) => (
+            <div key={p.name} className="flex items-center gap-2.5 mt-1.5">
+              <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: p.fill }} />
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium flex-1 leading-tight">{p.name}:</span>
+              <span className="text-sm font-black text-slate-800 dark:text-white">
+                {(p.value as number).toLocaleString()}
+                <span className="text-xs font-medium text-slate-400 ml-1">org</span>
+              </span>
+            </div>
+          ))}
+      </div>
+    );
+  };
+
+
+
+  return (
+    <Card className="flex flex-col w-full shadow-[0_2px_20px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.06)] transition-all duration-500 border border-slate-100/80 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl rounded-[2rem] overflow-hidden">
+      <CardHeader className="pb-2 pt-8 px-8 border-none">
+        <div className="flex items-center gap-3">
+          <div className="w-1 h-6 bg-indigo-500 rounded-full" />
+          <div>
+            <h3 className="text-sm font-black text-slate-800">{title}</h3>
+            <p className="text-xs text-slate-500 font-medium">Distribusi peserta per sektor pelatihan, dikelompokkan berdasarkan sumber pembiayaan</p>
+          </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="rounded-2xl p-4 border-2 bg-white"
+            style={{ borderColor: SYNC_PALETTE[0] + '35', backgroundColor: SYNC_PALETTE[0] + '08' }}>
+            <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: SYNC_PALETTE[0] }}>Total Peserta</p>
+            <p className="text-2xl font-black text-slate-800">{grandTotal.toLocaleString()}</p>
+            <p className="text-[11px] mt-0.5 font-medium" style={{ color: SYNC_PALETTE[0] + '90' }}>bersertifikat</p>
+          </div>
+          <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Sektor</p>
+            <p className="text-2xl font-black text-slate-800">{crossTabData.length}</p>
+            <p className="text-[11px] text-slate-400 mt-0.5 font-medium">jenis sektor</p>
+          </div>
+          <div className="rounded-2xl p-4 border border-slate-100 bg-slate-50">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Pembiayaan</p>
+            <p className="text-2xl font-black text-slate-800">{jenisKeys.length}</p>
+            <p className="text-[11px] text-slate-400 mt-0.5 font-medium">sumber</p>
+          </div>
+        </div>
+        {/* Insight note */}
+        {crossTabData.length > 0 && (() => {
+          const topRow = crossTabData[0];
+          const topRowTotal = jenisKeys.reduce((s, k) => s + ((topRow[k] as number) || 0), 0);
+          return (
+            <div className="flex items-center gap-3 rounded-2xl p-3.5 border-2 bg-white mb-1"
+              style={{ borderColor: SYNC_PALETTE[0] + '30', backgroundColor: SYNC_PALETTE[0] + '06' }}>
+              <div className="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: SYNC_PALETTE[0] + '20' }}>
+                <span className="text-base">📊</span>
+              </div>
+              <p className="text-sm font-medium text-slate-600 leading-tight">
+                Sektor terbesar: <span className="font-black text-slate-800">{topRow.sektor}</span>
+                {" — "}
+                <span className="font-black" style={{ color: SYNC_PALETTE[0] }}>{topRowTotal.toLocaleString()}</span>
+                <span className="text-slate-400 font-medium"> peserta</span>
+                {grandTotal > 0 && (
+                  <span className="ml-1.5 text-xs font-bold px-2 py-0.5 rounded-full"
+                    style={{ backgroundColor: SYNC_PALETTE[0] + '18', color: SYNC_PALETTE[0] }}>
+                    {Math.round((topRowTotal / grandTotal) * 100)}%
+                  </span>
+                )}
+              </p>
+            </div>
+          );
+        })()}
+      </CardHeader>
+
+      <CardContent className="flex-1 pb-4 pt-4 px-6">
+        <ResponsiveContainer width="100%" height={Math.max(320, crossTabData.length * jenisKeys.length * 28 + 100)}>
+          <BarChart
+            data={crossTabData}
+            margin={{ top: 20, right: 20, left: 10, bottom: crossTabData.length > 4 ? 80 : 50 }}
+            barCategoryGap="22%"
+            barGap={2}
+          >
+            <defs>
+              {jenisKeys.map((_, idx) => (
+                <linearGradient key={idx} id={`sg-${idx}`} x1="0" y1="1" x2="0" y2="0">
+                  <stop offset="0%" stopColor={SYNC_PALETTE[idx % SYNC_PALETTE.length]} stopOpacity={0.6} />
+                  <stop offset="100%" stopColor={SYNC_PALETTE[idx % SYNC_PALETTE.length]} stopOpacity={1} />
+                </linearGradient>
+              ))}
+            </defs>
+            <CartesianGrid strokeDasharray="4 4" opacity={0.22} stroke="#cbd5e1" vertical={false} horizontal />
+            <XAxis
+              type="category"
+              dataKey="sektor"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 11, fill: '#475569', fontWeight: 600 }}
+              tickFormatter={(val) => truncateLabel(val, 18)}
+              angle={crossTabData.length > 4 ? -40 : 0}
+              textAnchor={crossTabData.length > 4 ? "end" : "middle"}
+              height={crossTabData.length > 4 ? 80 : 50}
+              interval={0}
+            />
+            <YAxis
+              type="number"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 11, fill: '#64748b', fontWeight: 600 }}
+              width={40}
+            />
+            <Tooltip content={<SyncTooltip />} cursor={{ fill: 'rgba(241,245,249,0.45)', radius: 8 }} />
+            {jenisKeys.map((key, idx) => (
+              <Bar
+                key={key}
+                dataKey={key}
+                name={key}
+                fill={`url(#sg-${idx})`}
+                radius={[6, 6, 0, 0]}
+                barSize={Math.max(12, Math.min(32, Math.floor(180 / (crossTabData.length * jenisKeys.length + 1))))}
+                label={{
+                  position: 'top',
+                  fill: '#334155',
+                  fontSize: 10,
+                  fontWeight: 800,
+                  formatter: (v: number) => v > 0 ? v : '',
+                }}
+                animationDuration={1100 + idx * 150}
+                animationEasing="ease-out"
+              />
+            ))}
+          </BarChart>
+        </ResponsiveContainer>
+      </CardContent>
+
+
+      <CardFooter className="flex flex-col gap-4 px-8 pb-8 pt-5 bg-white/50 border-t border-slate-100">
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sumber Pembiayaan</p>
+        <div className="flex gap-2 flex-wrap">
+          {jenisKeys.map((key, idx) => {
+            const color = SYNC_PALETTE[idx % SYNC_PALETTE.length];
+            const total = crossTabData.reduce((s, row) => s + ((row[key] as number) || 0), 0);
+            return (
+              <div key={key}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-200 hover:-translate-y-0.5 cursor-default"
+                style={{ borderColor: color + '40', backgroundColor: color + '0d' }}>
+                <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+                <span className="text-[12px] font-bold" style={{ color }}>{total.toLocaleString()}</span>
+                <span className="text-[11px] text-slate-600 font-medium">{key}</span>
+                {grandTotal > 0 && (
+                  <span className="text-[10px] font-bold text-slate-400">
+                    {Math.round((total / grandTotal) * 100)}%
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </CardFooter>
+    </Card>
+  );
+};
+
+
+// ========================================================
 // Main Component
 // ========================================================
+
 interface ChartDetailMasyarakatDilatihProps {
   data: PelatihanMasyarakat[];
   dataUser: UserPelatihan[];
@@ -501,6 +730,31 @@ const ChartDetailMasyarakatDilatih: React.FC<
       },
     ];
 
+    // Cross-tab: Y=Sektor Pelatihan, bars=Sumber Pembiayaan (JenisPelatihan)
+    const uniqueSektorForCrossTab = [
+      ...new Set(filteredByStatus.map((i) => i.JenisProgram?.trim()).filter(Boolean)),
+    ] as string[];
+    const uniqueJenisForCrossTab = [
+      ...new Set(filteredByStatus.map((i) => i.JenisPelatihan?.trim()).filter(Boolean)),
+    ] as string[];
+
+    const bySektorXJenis: CrossTabRow[] = uniqueSektorForCrossTab
+      .map((sektor) => {
+        const row: CrossTabRow = { sektor };
+        let rowTotal = 0;
+        uniqueJenisForCrossTab.forEach((jenis) => {
+          const count = filteredByStatus
+            .filter((p) => p.JenisProgram?.trim() === sektor && p.JenisPelatihan?.trim() === jenis)
+            .reduce((sum, p) => sum + (p.UserPelatihan?.filter((u) => u.FileSertifikat?.includes("signed")).length || 0), 0);
+          row[jenis] = count;
+          rowTotal += count;
+        });
+        return { ...row, _total: rowTotal };
+      })
+      .filter((row) => (row._total as number) > 0)
+      .sort((a, b) => (b._total as number) - (a._total as number))
+      .map(({ _total, ...rest }) => rest as CrossTabRow);
+
     return {
       byGender,
       byJenisPelatihan,
@@ -509,7 +763,9 @@ const ChartDetailMasyarakatDilatih: React.FC<
       byProgramPrioritas,
       byProgramPelatihan,
       bySertifikat,
-      byPenyelenggaraPelatihan
+      byPenyelenggaraPelatihan,
+      bySektorXJenis,
+      jenisKeysForSync: uniqueJenisForCrossTab,
     };
   }, [filteredDataByBalai, filteredPelatihanByBalai]);
 
@@ -517,27 +773,6 @@ const ChartDetailMasyarakatDilatih: React.FC<
     <div className="p-6">
 
       <div className="flex h-full gap-6 flex-col">
-        {/* First Row - Mixed Layout */}
-        <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-          <TrainingChartCard
-            title="Sektor Pelatihan"
-            chartConfig={chartConfigs.programPelatihan}
-            chartData={chartData.bySektorPelatihan}
-            chartType={chartData.bySektorPelatihan.length > 5 ? "horizontal" : "pie"}
-            itemsPerPage={6}
-          />
-          <TrainingChartCard
-            title="Sumber Pembiayaan atau Pemenuhan IKU"
-            chartConfig={chartConfigs.jenisPelatihan}
-            chartData={chartData.byJenisPelatihan}
-            chartType={chartData.byJenisPelatihan.length > 5 ? "horizontal" : "pie"}
-            itemsPerPage={6}
-          />
-
-        </div>
-
-
-        {/* Second Row - Full Width Charts */}
         <div className="w-full grid grid-cols-2 gap-6">
           <TrainingChartCard
             title="Dukungan Program Prioritas"
@@ -556,7 +791,6 @@ const ChartDetailMasyarakatDilatih: React.FC<
           />
         </div>
 
-        {/* Third Row - Side by Side */}
         <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
           <TrainingChartCard
             title="Penyelenggara Pelatihan"
@@ -581,3 +815,172 @@ const ChartDetailMasyarakatDilatih: React.FC<
 };
 
 export default ChartDetailMasyarakatDilatih;
+
+// ============================================================
+// Standalone export: Sektor × Sumber Pembiayaan card
+// Styled to match ChartMasyarakatDilatihMonthly
+// ============================================================
+interface ChartSektorPembiayaanCardProps {
+  data: PelatihanMasyarakat[];      // filteredDataPelatihan
+  dataUser: UserPelatihan[];        // kept for API parity
+}
+
+export const ChartSektorPembiayaanCard: React.FC<ChartSektorPembiayaanCardProps> = ({ data }) => {
+  const isAdminBalaiPelatihan = Cookies.get("Role") === "Pengelola UPT";
+  const nameBalaiPelatihan = Cookies.get("Satker");
+
+  const { crossTabData, jenisKeys, grandTotal } = useMemo(() => {
+    let filtered = [...data];
+    if (isAdminBalaiPelatihan) {
+      filtered = filtered.filter((p) => p.PenyelenggaraPelatihan === nameBalaiPelatihan);
+    }
+
+    const filteredByStatus = filtered.filter((item) =>
+      ["7D", "11", "15"].includes(String(item?.StatusPenerbitan).trim().toUpperCase())
+    );
+
+    const uniqueSektor = [
+      ...new Set(filteredByStatus.map((i) => i.JenisProgram?.trim()).filter(Boolean)),
+    ] as string[];
+    const uniqueJenis = [
+      ...new Set(filteredByStatus.map((i) => i.JenisPelatihan?.trim()).filter(Boolean)),
+    ] as string[];
+
+    const crossTab: CrossTabRow[] = uniqueSektor
+      .map((sektor) => {
+        const row: CrossTabRow = { sektor };
+        let total = 0;
+        uniqueJenis.forEach((jenis) => {
+          const count = filteredByStatus
+            .filter((p) => p.JenisProgram?.trim() === sektor && p.JenisPelatihan?.trim() === jenis)
+            .reduce((sum, p) => sum + (p.UserPelatihan?.filter((u) => u.FileSertifikat?.includes("signed")).length || 0), 0);
+          row[jenis] = count;
+          total += count;
+        });
+        return { ...row, _total: total };
+      })
+      .filter((row) => (row._total as number) > 0)
+      .sort((a, b) => (b._total as number) - (a._total as number))
+      .map(({ _total, ...rest }) => rest as CrossTabRow);
+
+    const total = crossTab.reduce(
+      (s, row) => s + uniqueJenis.reduce((ss, k) => ss + ((row[k] as number) || 0), 0), 0
+    );
+
+    return { crossTabData: crossTab, jenisKeys: uniqueJenis, grandTotal: total };
+  }, [data, isAdminBalaiPelatihan, nameBalaiPelatihan]);
+
+  const truncate = (v: string, n = 16) => v?.length > n ? v.slice(0, n) + "…" : v;
+
+  const SyncTooltip = ({ active, payload, label }: any) => {
+    if (!active || !payload?.length) return null;
+    return (
+      <div className="bg-white/95 backdrop-blur-xl p-3 rounded-2xl shadow-lg border border-slate-100 min-w-[180px]">
+        <p className="text-[12px] font-bold text-slate-800 mb-1.5 border-b border-slate-100 pb-1.5">{label}</p>
+        {payload.filter((p: any) => (p.value as number) > 0).map((p: any) => (
+          <div key={p.name} className="flex items-center gap-2 mt-1">
+            <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: p.fill }} />
+            <span className="text-[11px] text-slate-500 flex-1">{p.name}:</span>
+            <span className="text-[12px] font-black text-slate-800">{(p.value as number).toLocaleString()}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const chartHeight = Math.max(280, crossTabData.length * 40 + 80);
+
+  return (
+    <div className="w-full h-full flex flex-col gap-4">
+      {/* Stats — same style as ChartMasyarakatDilatihMonthly */}
+      <div className="flex flex-wrap gap-5 px-5 pt-2">
+        {/* Sektor */}
+        <div className="flex items-center gap-3">
+          <span className="flex h-3 w-3 items-center justify-center rounded-full bg-emerald-500 ring-4 ring-emerald-500/20 flex-shrink-0" />
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Sektor Pelatihan</p>
+            <p className="text-lg font-bold text-slate-800 leading-none">{crossTabData.length} Sektor</p>
+          </div>
+        </div>
+        {/* Sumber */}
+        <div className="flex items-center gap-3">
+          <span className="flex h-3 w-3 items-center justify-center rounded-full bg-pink-500 ring-4 ring-pink-500/20 flex-shrink-0" />
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-0.5">Sumber Pembiayaan</p>
+            <p className="text-lg font-bold text-slate-800 leading-none">{jenisKeys.length} Sumber</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Chart */}
+      <div className="-ml-3 flex-1" style={{ minHeight: `${chartHeight}px` }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={crossTabData}
+            margin={{ top: 16, right: 16, left: 0, bottom: crossTabData.length > 4 ? 70 : 40 }}
+            barCategoryGap="22%"
+            barGap={2}
+          >
+            <defs>
+              {jenisKeys.map((_, idx) => (
+                <linearGradient key={idx} id={`spg-${idx}`} x1="0" y1="1" x2="0" y2="0">
+                  <stop offset="0%" stopColor={SYNC_PALETTE[idx % SYNC_PALETTE.length]} stopOpacity={0.6} />
+                  <stop offset="100%" stopColor={SYNC_PALETTE[idx % SYNC_PALETTE.length]} stopOpacity={1} />
+                </linearGradient>
+              ))}
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.6} vertical={false} />
+            <XAxis
+              dataKey="sektor"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 10, fill: '#64748b', fontWeight: 600 }}
+              tickFormatter={(v) => truncate(v, 14)}
+              angle={crossTabData.length > 3 ? -35 : 0}
+              textAnchor={crossTabData.length > 3 ? "end" : "middle"}
+              height={crossTabData.length > 3 ? 70 : 40}
+              interval={0}
+            />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 600 }}
+              width={32}
+            />
+            <Tooltip content={<SyncTooltip />} cursor={{ fill: 'rgba(241,245,249,0.5)', radius: 8 }} />
+            {jenisKeys.map((key, idx) => (
+              <Bar
+                key={key}
+                dataKey={key}
+                name={key}
+                fill={`url(#spg-${idx})`}
+                radius={[5, 5, 0, 0]}
+                barSize={Math.max(10, Math.min(28, Math.floor(140 / (crossTabData.length * jenisKeys.length + 1))))}
+                animationDuration={900 + idx * 120}
+                animationEasing="ease-out"
+              />
+            ))}
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Legend — subtle pills like stat items */}
+      {jenisKeys.length > 0 && (
+        <div className="flex flex-wrap gap-2 px-5 pb-1">
+          {jenisKeys.map((key, idx) => {
+            const color = SYNC_PALETTE[idx % SYNC_PALETTE.length];
+            const total = crossTabData.reduce((s, row) => s + ((row[key] as number) || 0), 0);
+            return (
+              <div key={key} className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border"
+                style={{ borderColor: color + '40', backgroundColor: color + '10' }}>
+                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
+                <span className="text-[10px] font-bold" style={{ color }}>{total.toLocaleString()}</span>
+                <span className="text-[10px] text-slate-500 font-medium">{key}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};

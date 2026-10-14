@@ -3,118 +3,257 @@ import { getStatusInfo } from "@/utils/text"
 import { parseIndonesianDate } from "@/utils/time"
 
 type Props = {
-    data: PelatihanMasyarakat[]
-    tahun: string
+  data: PelatihanMasyarakat[]
+  tahun: string
 }
 
+// ─── Status grouping for the data layer ──────────────────────────────────────
 const ALL_STATUS_CODES = [
-    "0", "1", "1.2",
-    "2", "3", "4", "5", "6", "7",
-    "8", "9", "11", "12", "13", "15",
+  "0", "1", "1.2",
+  "2", "3", "4", "5", "6", "7",
+  "8", "9", "11", "12", "13", "15",
 ]
 
 export function groupPelatihanByStatus(
-    data: PelatihanMasyarakat[],
-    tahun?: string
+  data: PelatihanMasyarakat[],
+  tahun?: string
 ) {
-    const filtered = data.filter((item) => {
-        if (!item.TanggalMulaiPelatihan) return false
+  const filtered = data.filter((item) => {
+    if (!item.TanggalMulaiPelatihan) return false
+    let d = new Date(item.TanggalMulaiPelatihan)
+    if (isNaN(d.getTime())) {
+      d = parseIndonesianDate(item.TanggalMulaiPelatihan) as Date
+    }
+    if (!d || isNaN(d.getTime())) return false
+    const itemTahun = String(d.getFullYear())
+    if (tahun && itemTahun !== tahun) return false
+    return true
+  })
 
-        let d = new Date(item.TanggalMulaiPelatihan)
-        if (isNaN(d.getTime())) {
-            d = parseIndonesianDate(item.TanggalMulaiPelatihan) as Date
-        }
-        if (!d || isNaN(d.getTime())) return false
+  const counts = filtered.reduce<Record<string, number>>((acc, item) => {
+    const status = item.StatusPenerbitan ?? ""
+    acc[status] = (acc[status] || 0) + 1
+    return acc
+  }, {})
 
-        const itemTahun = String(d.getFullYear())
-        if (tahun && itemTahun !== tahun) return false
-
-        return true
-    })
-
-    const counts = filtered.reduce<Record<string, number>>((acc, item) => {
-        const status = item.StatusPenerbitan ?? ""
-        acc[status] = (acc[status] || 0) + 1
-        return acc
-    }, {})
-
-    return ALL_STATUS_CODES.map((status) => ({
-        status,
-        count: counts[status] || 0,
-        ...getStatusInfo(status),
-    }))
+  return ALL_STATUS_CODES.map((status) => ({
+    status,
+    count: counts[status] || 0,
+    ...getStatusInfo(status),
+  }))
 }
-const STATUS_THEMES: Record<string, { bg: string; text: string; border: string; iconBg: string; shadow: string; gradientFrom: string; bottomAccent: string }> = {
-    "default": { bg: "bg-slate-50", text: "text-slate-600", border: "border-slate-200", iconBg: "bg-slate-200", shadow: "shadow-slate-100", gradientFrom: "from-slate-50", bottomAccent: "bg-slate-500" },
-    "0": { bg: "bg-gray-50", text: "text-gray-600", border: "border-gray-200", iconBg: "bg-gray-100", shadow: "shadow-gray-100", gradientFrom: "from-gray-50", bottomAccent: "bg-gray-500" }, // Draft
-    "0.1": { bg: "bg-indigo-50", text: "text-indigo-600", border: "border-indigo-200", iconBg: "bg-indigo-100", shadow: "shadow-indigo-100", gradientFrom: "from-indigo-50", bottomAccent: "bg-indigo-500" }, // Publish
-    "1": { bg: "bg-amber-50", text: "text-amber-600", border: "border-amber-200", iconBg: "bg-amber-100", shadow: "shadow-amber-100", gradientFrom: "from-amber-50", bottomAccent: "bg-amber-500" }, // Pending SPV
-    "1.1": { bg: "bg-emerald-50", text: "text-emerald-600", border: "border-emerald-200", iconBg: "bg-emerald-100", shadow: "shadow-emerald-100", gradientFrom: "from-emerald-50", bottomAccent: "bg-emerald-500" }, // Approved Pelaksanaan
-    "1.2": { bg: "bg-rose-50", text: "text-rose-600", border: "border-rose-200", iconBg: "bg-rose-100", shadow: "shadow-rose-100", gradientFrom: "from-rose-50", bottomAccent: "bg-rose-500" }, // Perbaikan SPV
-    "2": { bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-200", iconBg: "bg-orange-100", shadow: "shadow-orange-100", gradientFrom: "from-orange-50", bottomAccent: "bg-orange-500" }, // Pending Verifikator
-    "3": { bg: "bg-red-50", text: "text-red-600", border: "border-red-200", iconBg: "bg-red-100", shadow: "shadow-red-100", gradientFrom: "from-red-50", bottomAccent: "bg-red-500" }, // Perbaikan Verifikator
-    "4": { bg: "bg-teal-50", text: "text-teal-600", border: "border-teal-200", iconBg: "bg-teal-100", shadow: "shadow-teal-100", gradientFrom: "from-teal-50", bottomAccent: "bg-teal-500" }, // Approved Pelaksanaan
-    "5": { bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-200", iconBg: "bg-blue-100", shadow: "shadow-blue-100", gradientFrom: "from-blue-50", bottomAccent: "bg-blue-500" }, // Closed
-    "7A": { bg: "bg-cyan-50", text: "text-cyan-600", border: "border-cyan-200", iconBg: "bg-cyan-100", shadow: "shadow-cyan-100", gradientFrom: "from-cyan-50", bottomAccent: "bg-cyan-500" }, // Pending Kabalai
-    "7B": { bg: "bg-emerald-50", text: "text-emerald-600", border: "border-emerald-200", iconBg: "bg-emerald-100", shadow: "shadow-emerald-100", gradientFrom: "from-emerald-50", bottomAccent: "bg-emerald-500" }, // Approved Kabalai
-    "7C": { bg: "bg-rose-50", text: "text-rose-600", border: "border-rose-200", iconBg: "bg-rose-100", shadow: "shadow-rose-100", gradientFrom: "from-rose-50", bottomAccent: "bg-rose-500" }, // Perbaikan Kabalai
-    "7D": { bg: "bg-green-50", text: "text-green-600", border: "border-green-200", iconBg: "bg-green-100", shadow: "shadow-green-100", gradientFrom: "from-green-50", bottomAccent: "bg-green-500" }, // Signed
-    "8": { bg: "bg-violet-50", text: "text-violet-600", border: "border-violet-200", iconBg: "bg-violet-100", shadow: "shadow-violet-100", gradientFrom: "from-violet-50", bottomAccent: "bg-violet-500" }, // Pending Kapus
-    "9": { bg: "bg-pink-50", text: "text-pink-600", border: "border-pink-200", iconBg: "bg-pink-100", shadow: "shadow-pink-100", gradientFrom: "from-pink-50", bottomAccent: "bg-pink-500" }, // Perbaikan Kapus
-    "10": { bg: "bg-yellow-50", text: "text-yellow-600", border: "border-yellow-200", iconBg: "bg-yellow-100", shadow: "shadow-yellow-100", gradientFrom: "from-yellow-50", bottomAccent: "bg-yellow-500" }, // Approved Kapus
-    "11": { bg: "bg-green-50", text: "text-green-600", border: "border-green-200", iconBg: "bg-green-100", shadow: "shadow-green-100", gradientFrom: "from-green-50", bottomAccent: "bg-green-500" }, // Signed
-    "12": { bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-200", iconBg: "bg-orange-100", shadow: "shadow-orange-100", gradientFrom: "from-orange-50", bottomAccent: "bg-orange-500" }, // Pending Kabadan
-    "13": { bg: "bg-red-50", text: "text-red-600", border: "border-red-200", iconBg: "bg-red-100", shadow: "shadow-red-100", gradientFrom: "from-red-50", bottomAccent: "bg-red-500" }, // Perbaikan Kabadan
-    "14": { bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-200", iconBg: "bg-blue-100", shadow: "shadow-blue-100", gradientFrom: "from-blue-50", bottomAccent: "bg-blue-500" }, // Approved Kabadan
-    "15": { bg: "bg-green-50", text: "text-green-600", border: "border-green-200", iconBg: "bg-green-100", shadow: "shadow-green-100", gradientFrom: "from-green-50", bottomAccent: "bg-green-500" }, // Signed
-};
 
+// ─── Pipeline stage definitions ───────────────────────────────────────────────
+// Each stage maps to one or more status codes with a readable name + color
+const PIPELINE_STAGES = [
+  {
+    id: "persiapan",
+    label: "Persiapan",
+    sublabel: "Draft & pengajuan awal",
+    codes: ["0"],
+    color: "bg-pink-500",
+    lightBg: "bg-pink-50",
+    border: "border-pink-200",
+    text: "text-pink-700",
+    dot: "bg-pink-400",
+  },
+  {
+    id: "pending_spv",
+    label: "Review SPV",
+    sublabel: "Menunggu / perbaikan supervisor",
+    codes: ["1", "1.2"],
+    color: "bg-amber-500",
+    lightBg: "bg-amber-50",
+    border: "border-amber-200",
+    text: "text-amber-700",
+    dot: "bg-amber-400",
+  },
+  {
+    id: "pending_verifikator",
+    label: "Review Verifikator",
+    sublabel: "Menunggu / perbaikan verifikator",
+    codes: ["2", "3", "4"],
+    color: "bg-blue-500",
+    lightBg: "bg-blue-50",
+    border: "border-blue-200",
+    text: "text-blue-700",
+    dot: "bg-blue-400",
+  },
+  {
+    id: "pelaksanaan",
+    label: "Pelaksanaan",
+    sublabel: "Pelatihan berjalan (Closed)",
+    codes: ["5", "6"],
+    color: "bg-teal-500",
+    lightBg: "bg-teal-50",
+    border: "border-teal-200",
+    text: "text-teal-700",
+    dot: "bg-teal-400",
+  },
+  {
+    id: "pending_sttpl",
+    label: "Review STTPL",
+    sublabel: "Menunggu / perbaikan sertifikat",
+    codes: ["7", "8", "9"],
+    color: "bg-pink-500",
+    lightBg: "bg-pink-50",
+    border: "border-pink-200",
+    text: "text-pink-700",
+    dot: "bg-pink-400",
+  },
+  {
+    id: "pending_kabadan",
+    label: "Review Kabadan",
+    sublabel: "Menunggu / perbaikan kepala badan",
+    codes: ["12", "13"],
+    color: "bg-amber-500",
+    lightBg: "bg-amber-50",
+    border: "border-amber-200",
+    text: "text-amber-700",
+    dot: "bg-amber-400",
+  },
+  {
+    id: "selesai",
+    label: "Selesai & Bersertifikat",
+    sublabel: "Sertifikat telah diterbitkan",
+    codes: ["11", "15"],
+    color: "bg-emerald-500",
+    lightBg: "bg-emerald-50",
+    border: "border-emerald-200",
+    text: "text-emerald-700",
+    dot: "bg-emerald-400",
+  },
+
+] as const
+
+// ─── Component ────────────────────────────────────────────────────────────────
 export function StatsMetricStatus({ data, tahun }: Props) {
-    const metrics = groupPelatihanByStatus(data, tahun)
+  const rawMetrics = groupPelatihanByStatus(data, tahun)
+  const countByCode = Object.fromEntries(rawMetrics.map((m) => [m.status, m.count]))
+  const grandTotal = rawMetrics.reduce((s, m) => s + m.count, 0)
 
-    return (
-        <div className="w-full overflow-x-auto pb-4 pt-2 -mx-1 px-1 custom-scrollbar">
-            <div className="flex gap-5 min-w-max px-2">
-                {metrics.map(({ status, icon, label, count }) => {
-                    const theme = STATUS_THEMES[status] || STATUS_THEMES["default"];
+  // Compute aggregated count per stage
+  const stages = PIPELINE_STAGES.map((stage) => ({
+    ...stage,
+    total: stage.codes.reduce((s, code) => s + (countByCode[code] ?? 0), 0),
+    breakdown: stage.codes
+      .map((code) => ({ code, count: countByCode[code] ?? 0, label: rawMetrics.find((m) => m.status === code)?.label ?? code }))
+      .filter((b) => b.count > 0),
+  }))
 
-                    return (
-                        <div
-                            key={status}
-                            className={`
-                                relative flex flex-col items-start justify-between
-                                min-w-[200px] h-[110px] p-5
-                                bg-white 
-                                rounded-3xl border border-slate-100
-                                shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)]
-                                transition-all duration-300 ease-out
-                                group cursor-default overflow-hidden
-                            `}
-                        >
-                            <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${theme.gradientFrom} to-transparent opacity-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110`} />
+  const activeStages = stages.filter((s) => s.total > 0)
+  const completed = stages.find((s) => s.id === "selesai")?.total ?? 0
+  const completionPct = grandTotal > 0 ? Math.round((completed / grandTotal) * 100) : 0
 
-                            <div className="flex justify-between items-start w-full relative z-10">
-                                <span className={`text-[11px] font-bold uppercase tracking-wider ${theme.text} bg-white/80 backdrop-blur-sm px-2 py-1 rounded-lg border ${theme.border}`}>
-                                    {label}
-                                </span>
-                                <div className={`p-2.5 rounded-xl ${theme.iconBg} ${theme.text} bg-opacity-30`}>
-                                    <div className="w-5 h-5 flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
-                                        {icon}
-                                    </div>
-                                </div>
-                            </div>
+  return (
+    <div className="flex flex-col gap-5">
 
-                            <div className="relative z-10 mt-auto">
-                                <span className="text-3xl font-black text-slate-800 tracking-tight leading-none group-hover:scale-105 origin-left transition-transform duration-300 block">
-                                    {count}
-                                </span>
-                            </div>
+      {/* ── Summary header ──────────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[
+          { label: "Total Pelatihan", value: grandTotal, color: "text-slate-800", sub: "dalam periode ini" },
+          { label: "Belum Selesai", value: grandTotal - completed, color: "text-amber-600", sub: "masih dalam proses" },
+          { label: "Sudah Selesai", value: completed, color: "text-emerald-600", sub: "sertifikat diterbitkan" },
+          { label: "Tingkat Selesai", value: `${completionPct}%`, color: "text-indigo-600", sub: "dari total pelatihan" },
+        ].map((s) => (
+          <div key={s.label} className="bg-slate-50 rounded-2xl px-5 py-4 border border-slate-100">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">{s.label}</p>
+            <p className={`text-2xl font-black tracking-tight ${s.color}`}>{typeof s.value === 'number' ? s.value.toLocaleString() : s.value}</p>
+            <p className="text-[11px] text-slate-400 font-medium mt-0.5">{s.sub}</p>
+          </div>
+        ))}
+      </div>
 
-                            <div className={`absolute bottom-0 left-0 w-full h-1 ${theme.bottomAccent} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-                        </div>
-                    );
-                })}
-            </div>
+      {/* ── Progress bar (full pipeline) ────────────────────────────────── */}
+      <div className="bg-slate-50 rounded-2xl px-5 py-4 border border-slate-100">
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Distribusi Pipeline</p>
+          <p className="text-[11px] font-semibold text-slate-500">{grandTotal} pelatihan</p>
         </div>
-    )
+        <div className="flex w-full h-3 rounded-full overflow-hidden gap-px bg-slate-200">
+          {activeStages.map((stage) => (
+            <div
+              key={stage.id}
+              title={`${stage.label}: ${stage.total}`}
+              className={`${stage.color} transition-all duration-700 first:rounded-l-full last:rounded-r-full`}
+              style={{ width: `${(stage.total / grandTotal) * 100}%` }}
+            />
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-3">
+          {activeStages.map((stage) => (
+            <div key={stage.id} className="flex items-center gap-1.5">
+              <span className={`w-2 h-2 rounded-full ${stage.color} flex-shrink-0`} />
+              <span className="text-[11px] font-medium text-slate-600">{stage.label}</span>
+              <span className="text-[11px] font-black text-slate-800">{stage.total}</span>
+              <span className="text-[10px] text-slate-400">({Math.round((stage.total / grandTotal) * 100)}%)</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Stage cards ─────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
+        {stages.map((stage) => {
+          const pct = grandTotal > 0 ? Math.round((stage.total / grandTotal) * 100) : 0
+          const isEmpty = stage.total === 0
+          return (
+            <div
+              key={stage.id}
+              className={`relative rounded-2xl border p-4 transition-all duration-300 overflow-hidden
+                ${isEmpty
+                  ? "bg-slate-50 border-slate-100 opacity-50"
+                  : `${stage.lightBg} ${stage.border} hover:shadow-md hover:-translate-y-0.5`
+                }`}
+            >
+              {/* Accent bar top */}
+              <div className={`absolute top-0 left-0 h-1 w-full ${isEmpty ? "bg-slate-200" : stage.color} rounded-t-2xl`} />
+
+              <div className="mt-1 flex flex-col gap-2">
+                {/* Stage name + pct */}
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className={`text-xs font-black tracking-tight leading-tight ${isEmpty ? "text-slate-400" : stage.text}`}>
+                      {stage.label}
+                    </p>
+                    <p className="text-[10px] text-slate-400 font-medium mt-0.5 leading-tight">{stage.sublabel}</p>
+                  </div>
+                  {!isEmpty && (
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${stage.lightBg} ${stage.text} border ${stage.border} flex-shrink-0`}>
+                      {pct}%
+                    </span>
+                  )}
+                </div>
+
+                {/* Count */}
+                <p className={`text-3xl font-black tracking-tight ${isEmpty ? "text-slate-300" : "text-slate-800"}`}>
+                  {stage.total}
+                </p>
+
+                {/* Mini progress */}
+                <div className="w-full h-1.5 bg-white/60 rounded-full overflow-hidden border border-slate-100">
+                  <div
+                    className={`h-full ${isEmpty ? "bg-slate-200" : stage.color} rounded-full transition-all duration-700`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+
+                {/* Breakdown of sub-statuses */}
+                {stage.breakdown.length > 0 && (
+                  <div className="flex flex-col gap-0.5 mt-0.5">
+                    {stage.breakdown.map((b) => (
+                      <div key={b.code} className="flex items-center justify-between">
+                        <span className="text-[10px] text-slate-500 font-medium truncate">{b.label}</span>
+                        <span className="text-[10px] font-black text-slate-700 ml-2">{b.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
 }

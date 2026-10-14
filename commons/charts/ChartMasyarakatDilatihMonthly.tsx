@@ -191,7 +191,7 @@ export default function ChartMasyarakatDilatihMonthly({ data, dataUser, tahun, t
 
   // ================== Render ==================
   return (
-    <div className="w-full h-full flex flex-col gap-4">
+    <div className="w-full h-full flex flex-col gap-4 mb-5">
       {/* Stats */}
       <div className="flex flex-wrap gap-5 px-5 pt-2">
         <StatItem color="primary" label="Total Masyarakat Dilatih" value={`${totalMasyarakat} Orang`} />
