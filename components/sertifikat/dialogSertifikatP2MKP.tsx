@@ -130,10 +130,10 @@ const FormatSertifikatP2MKP = forwardRef(
                         {/* Statement Paragraph */}
                         <div className="flex w-full py-0 flex-col mt-10 space-y-1 max-w-[240mm] h-[20mm]  mx-auto items-center text-center font-bos">
                             <span className="text-sm -mt-5 leading-none font-bosNormal">
-                                Berdasarkan Peraturan Menteri Kelautan dan Perikanan Nomor 18 Tahun 2024 tentang Pusat Pelatihan Mandiri Kelautan dan Perikanan dan Keputusan Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan Nomor 393 Tahun 2025 tentang Penetapan Pusat Pelatihan Mandiri Kelautan dan Perikanan, menyatakan bahwa:
+                                Berdasarkan Peraturan Menteri Kelautan dan Perikanan Nomor 18 Tahun 2024 tentang Pusat Pelatihan Mandiri Kelautan dan Perikanan dan Keputusan Kepala Badan Penyuluhan dan Pengembangan Sumber Daya Manusia Kelautan dan Perikanan Nomor 381 Tahun 2026 tentang Penetapan Pusat Pelatihan Mandiri Kelautan dan Perikanan, menyatakan bahwa:
                             </span>
                             <span className="text-xs text-black font-bosItalic leading-none">
-                                Based on Regulation of the Minister of Marine Affairs and Fisheries Number 18 of 2024 concerning Independent Marine and Fisheries Training Centers and Decree of the Head of the Agency for Extension and Human Resource Development in Marine Affairs and Fisheries Number 393 of 2025 concerning the Establishment of Independent Marine and Fisheries Training Centers, it is stated that:                            </span>
+                                Based on Regulation of the Minister of Marine Affairs and Fisheries Number 18 of 2024 concerning Independent Marine and Fisheries Training Centers and Decree of the Head of the Agency for Extension and Human Resource Development in Marine Affairs and Fisheries Number 381 of 2026 concerning the Establishment of Independent Marine and Fisheries Training Centers, it is stated that:                            </span>
                         </div>
 
                         {/* Institutional Details Table */}
