@@ -201,7 +201,7 @@ const CertificateCard = ({ cert, index, variants }: { cert: any, index: number, 
           <FiDownload /> Unduh Sertifikat
         </a>
         <a
-          href={`/certificate/verify/${cert.NoSertifikat}`}
+          href={`/layanan/cek-sertifikat/${cert.NoSertifikat}`}
           className="p-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-gray-400 hover:text-white transition-all shadow-inner"
           title="Lihat Detail Verifikasi"
         >

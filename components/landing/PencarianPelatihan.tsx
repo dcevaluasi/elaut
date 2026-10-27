@@ -93,7 +93,7 @@ function PencarianPelatihan() {
     setLoading(true);
     try {
       const response: AxiosResponse = await axios.get(
-        `${elautBaseUrl}/lemdik/getPelatihan?program=${encodeURIComponent(jenisProgram)}`
+        `${elautBaseUrl}/lemdik/getPelatihan`
       );
       setLoading(false);
       setShowResult(true);

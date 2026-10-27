@@ -131,8 +131,8 @@ export default function DashboardUser() {
 
                                         <h1 className="text-4xl md:text-6xl lg:text-7xl font-calsans leading-[1.1] text-white">
                                             Dashboard <br />
-                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-300 to-teal-300">
-                                                {isManningAgent === "true" ? manningAgentDetail?.NamaManingAgent : userDetail?.Nama.toLowerCase()}
+                                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-300 to-teal-300 uppercase">
+                                                {isManningAgent === "true" ? manningAgentDetail?.NamaManingAgent : userDetail?.Nama.toUpperCase()}
                                             </span>
                                         </h1>
 

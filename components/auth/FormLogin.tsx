@@ -2,866 +2,698 @@
 
 import Image from "next/image";
 import Link from "next/link";
-
-import React, { FormEvent } from "react";
-import { useLanguage } from "@/context/LanguageContext";
-import { useRouter } from "next/navigation";
+import React, { FormEvent, useState, useEffect, useCallback } from "react";
 import axios, { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
-
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  SelectLabel,
-} from "@/components/ui/select";
-
-// RECAPTCHA
-import ReCAPTCHA from "react-google-recaptcha";
-import { HiMiniUserGroup, HiOutlineEye, HiOutlineUserGroup } from "react-icons/hi2";
-import { HiOutlineEyeOff } from "react-icons/hi";
-
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { elautBaseUrl, manningAgentDevUrl } from "@/constants/urls";
-import {
-  sanitizedDangerousChars,
-  validateIsDangerousChars,
-} from "@/utils/input";
-import { setSecureCookie } from "@/lib/utils";
-import { handlePasswordCriteria } from "@/utils/security";
-import Toast from "@/commons/Toast";
 import { motion, AnimatePresence } from "framer-motion";
-import { HiOutlineDeviceMobile, HiOutlineIdentification, HiOutlineLockClosed, HiOutlineMail } from "react-icons/hi";
-import { FiShield } from "react-icons/fi";
+import { elautBaseUrl } from "@/constants/urls";
+import { setSecureCookie, removeSecureCookie, encryptValue } from "@/lib/utils";
+import { validateIsDangerousChars, sanitizedDangerousChars } from "@/utils/input";
+import Toast from "@/commons/Toast";
+import { User, UserPelatihan } from "@/types/user";
+import {
+  HiOutlineIdentification,
+  HiOutlineMail,
+  HiOutlineLocationMarker,
+  HiOutlineLogout,
+  HiOutlineChevronRight,
+  HiOutlineCalendar,
+  HiOutlineAcademicCap,
+  HiOutlineOfficeBuilding,
+  HiOutlinePhone,
+} from "react-icons/hi";
+import {
+  FiShield, FiLoader, FiUser, FiAward, FiEdit3, FiCheck, FiX, FiAlertCircle,
+  FiRefreshCw, FiBookOpen, FiMapPin,
+} from "react-icons/fi";
+import { RiFingerprint2Line, RiVerifiedBadgeFill } from "react-icons/ri";
+import { MdOutlineSchool } from "react-icons/md";
 
-function FormLogin() {
-  const { t, language } = useLanguage();
-  const [formData, setFormData] = React.useState<{ [key: string]: string }>({
-    no_number: "",
-    password: "",
-  });
+// ─── Constants ────────────────────────────────────────────────────────────────
+const TOKEN_COOKIE = "XSRF081";
+const NIK_COOKIE = "XSRF_NK";
 
-  const [errors, setErrors] = React.useState<{ [key: string]: string | null }>({
-    no_number: null,
-    password: null,
-  });
+type ProfileField = { key: keyof User; label: string; type?: string; readonly?: boolean };
+const PROFILE_FIELDS: ProfileField[] = [
+  { key: "Nama",               label: "Nama Lengkap" },
+  { key: "Email",              label: "Email",               type: "email" },
+  { key: "NoTelpon",           label: "No. Telepon",         type: "tel" },
+  { key: "Kota",               label: "Kota" },
+  { key: "Provinsi",           label: "Provinsi" },
+  { key: "Alamat",             label: "Alamat" },
+  { key: "Pekerjaan",          label: "Pekerjaan" },
+  { key: "PendidikanTerakhir", label: "Pendidikan Terakhir" },
+  { key: "Agama",              label: "Agama" },
+  { key: "StatusMenikah",      label: "Status Menikah" },
+  { key: "JenisKelamin",       label: "Jenis Kelamin",       readonly: true },
+  { key: "GolonganDarah",      label: "Golongan Darah" },
+  { key: "Kewarganegaraan",    label: "Kewarganegaraan" },
+  { key: "IbuKandung",         label: "Nama Ibu Kandung" },
+  { key: "NegaraTujuanBekerja",label: "Negara Tujuan Bekerja" },
+  { key: "TempatLahir",        label: "Tempat Lahir",        readonly: true },
+  { key: "TanggalLahir",       label: "Tanggal Lahir",       type: "date", readonly: true },
+];
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const { name, value } = e.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
-    }));
-    if (validateIsDangerousChars(value)) {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        [name]: "You are using dangerous characters!",
-      }));
-    } else {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        [name]: null,
-      }));
-    }
-  };
+function getBadgeStyle(status: string) {
+  const s = (status || "").toLowerCase();
+  if (["lulus", "selesai", "approved"].includes(s))
+    return { cls: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30", dot: "bg-emerald-400" };
+  if (["gagal", "belum lulus", "ditolak"].includes(s))
+    return { cls: "bg-rose-500/15 text-rose-300 border-rose-500/30", dot: "bg-rose-400" };
+  if (s === "menunggu" || s === "proses")
+    return { cls: "bg-amber-500/15 text-amber-300 border-amber-500/30", dot: "bg-amber-400 animate-pulse" };
+  return { cls: "bg-blue-500/15 text-blue-300 border-blue-500/30", dot: "bg-blue-400 animate-pulse" };
+}
 
+function Skeleton({ className = "" }: { className?: string }) {
+  return <div className={`animate-pulse rounded-xl bg-white/[0.06] ${className}`} />;
+}
 
-  const [countWrongPassword, setCountPassword] = React.useState<number>(0);
+// ═══════════════════════════════════════════════════════════════════════════════
+// MAIN COMPONENT
+// ═══════════════════════════════════════════════════════════════════════════════
+export default function FormLogin() {
+  const [view, setView] = useState<"login" | "dashboard">("login");
+  const [nik, setNik] = useState("");
+  const [nikError, setNikError] = useState<string | null>(null);
+  const [loadingLogin, setLoadingLogin] = useState(false);
 
-  const [captcha, setCaptcha] = React.useState<string | null>();
+  const [user, setUser] = useState<User | null>(null);
+  const [loadingUser, setLoadingUser] = useState(false);
+  const [pelatihan, setPelatihan] = useState<UserPelatihan[] | null>(null);
+  const [loadingPelatihan, setLoadingPelatihan] = useState(false);
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  const router = useRouter();
+  const [activeTab, setActiveTab] = useState<"profile" | "pelatihan">("profile");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState<Partial<User>>({});
+  const [loadingSave, setLoadingSave] = useState(false);
 
+  // ── Fetch helpers ──────────────────────────────────────────────────────────
 
-  const handleLoginAkun = async (e: FormEvent) => {
-    e.preventDefault();
-    if (countWrongPassword <= 3) {
-      if (formData!.no_number == "" || formData!.password == "") {
-        Toast.fire({
-          icon: "error",
-          title: "Gagal mencoba login.",
-          text: `Tolong lengkapi data login untuk login kedalam ELAUT`,
-        });
-      } else {
-        if (
-          validateIsDangerousChars(formData!.no_number) ||
-          validateIsDangerousChars(formData!.password)
-        ) {
-          Toast.fire({
-            icon: "error",
-            title: "Oopsss!",
-            text: `Kamu memasukkan karakter berbahaya pada no telpon atau password, login tidak dapat diproses!`,
-          });
-        } else {
-          // if (captcha) {
-          try {
-            const response: AxiosResponse = await axios.post(
-              selectedMethodLogin == 'NIK' ? `${baseUrl}/users/login` : `${baseUrl}/users/loginNotelpon`,
-              selectedMethodLogin == 'NIK' ?
-                JSON.stringify({
-                  nik: sanitizedDangerousChars(formData!.no_number),
-                  password: sanitizedDangerousChars(formData!.password),
-                }) : JSON.stringify({
-                  no_number: sanitizedDangerousChars(formData!.no_number),
-                  password: sanitizedDangerousChars(formData!.password),
-                }),
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              }
-            );
-            // console.log({ response });
-
-            // setting user's token
-            setSecureCookie("XSRF081", response.data.t);
-
-            // user is first timer and has registered
-            if (Cookies.get('XSRF087')) {
-              Toast.fire({
-                icon: "success",
-                title: "Berhasil login.",
-                text: `Silahkan melengkapi dahulu biodata mu sebelum menjelajah lebih jauh di E-LAUT!`,
-              });
-              router.replace('/dashboard/edit-profile')
-            } else {
-              // user before selected one of training's detail before
-              if (Cookies.get("XSRF088")) {
-                Toast.fire({
-                  icon: "success",
-                  title: "Berhasil login.",
-                  text: `Berhasil melakukan login, ayo segera daftarkan dirimu dalam pelatihan!`,
-                });
-                router.replace(Cookies.get("XSRF088")!);
-              } else {
-                // instead will redirect to the main page
-                router.replace('/')
-              }
-            }
-
-
-          } catch (error: any) {
-            console.error({ error });
-            if (
-              error.response &&
-              error.response.data &&
-              error.response.data.pesan
-            ) {
-              const errorMsg = error.response.data.pesan;
-              if (errorMsg == "Incorrect password!") {
-                setCountPassword(countWrongPassword + 1);
-              }
-              Toast.fire({
-                icon: "error",
-                title: "Gagal mencoba login.",
-                text: `Gagal melakukan login, ${errorMsg}!`,
-              });
-            } else {
-              const errorMsg = error.response.data.pesan;
-              Toast.fire({
-                icon: "error",
-                title: "Gagal mencoba login.",
-                text: `Gagal melakukan login. ${errorMsg}!`,
-              });
-            }
-          }
-          // }
-        }
-      }
-    } else {
-      Toast.fire({
-        icon: "error",
-        title: "Gagal mencoba login.",
-        text: `Ups, terlihat kamu sudah mencoba berulang kali dengan password gagal, coba lagi nanti!`,
+  const fetchUser = useCallback(async (token: string): Promise<User | null> => {
+    setLoadingUser(true);
+    try {
+      const res: AxiosResponse<User> = await axios.get(`${elautBaseUrl}/users/getUsersById`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
+      setUser(res.data);
+      setEditData(res.data);
+      return res.data;
+    } catch (err) {
+      console.error("fetchUser error:", err);
+      return null;
+    } finally {
+      setLoadingUser(false);
     }
-  };
-
-  const [email, setEmail] = React.useState<string>("");
-  const [passwordManningAgent, setPasswordManningAgent] =
-    React.useState<string>("");
-
-  const handleLoginAkunManningAgent = async (e: FormEvent) => {
-    e.preventDefault();
-    if (countWrongPassword <= 3) {
-      if (email == "" || passwordManningAgent == "") {
-        Toast.fire({
-          icon: "error",
-          title: "Gagal mencoba login.",
-          text: `Tolong lengkapi data login untuk login kedalam ELAUT`,
-        });
-      } else {
-        if (
-          validateIsDangerousChars(email) ||
-          validateIsDangerousChars(passwordManningAgent)
-        ) {
-          Toast.fire({
-            icon: "error",
-            title: "Oopsss!",
-            text: `Kamu memasukkan karakter berbahaya pada no telpon atau password, login tidak dapat diproses!`,
-          });
-        } else {
-          if (captcha) {
-            try {
-              const response: AxiosResponse = await axios.post(
-                `${elautBaseUrl}/manningAgent/loginManningAgent`,
-                JSON.stringify({
-                  email: sanitizedDangerousChars(email),
-                  password: sanitizedDangerousChars(passwordManningAgent),
-                }),
-                {
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                }
-              );
-              console.log({ response });
-
-              Cookies.set("XSRF081", response.data.t, { expires: 1 });
-
-              Cookies.set("isManningAgent", "true", { expires: 1 });
-
-              if (Cookies.get("XSRF085")) {
-                Toast.fire({
-                  icon: "success",
-                  title: "Berhasil login.",
-                  text: `Berhasil melakukan login, ayo segera daftarkan dirimu!`,
-                });
-                router.replace("/dashboard");
-              } else {
-                Toast.fire({
-                  icon: "success",
-                  title: "Berhasil login.",
-                  text: `Berhasil melakukan login kedalam ELAUT!`,
-                });
-                if (Cookies.get("XSRF083")) {
-                  // router.replace("/dashboard/complete-profile");
-                  if (Cookies.get("LastPath")) {
-                    const path = Cookies.get("LastPath");
-                    router.replace(path!);
-                  }
-                } else {
-                  if (Cookies.get("LastPath")) {
-                    const path = Cookies.get("LastPath");
-                    router.replace(path!);
-                  } else {
-                    router.replace("/dashboard");
-                  }
-                }
-              }
-            } catch (error: any) {
-              console.error({ error });
-              if (
-                error.response &&
-                error.response.data &&
-                error.response.data.pesan
-              ) {
-                const errorMsg = error.response.data.pesan;
-                if (errorMsg == "Incorrect password!") {
-                  setCountPassword(countWrongPassword + 1);
-                }
-                Toast.fire({
-                  icon: "error",
-                  title: "Gagal mencoba login.",
-                  text: `Gagal melakukan login, ${errorMsg}!`,
-                });
-              } else {
-                const errorMsg = error.response.data.pesan;
-                Toast.fire({
-                  icon: "error",
-                  title: "Gagal mencoba login.",
-                  text: `Gagal melakukan login. ${errorMsg}!`,
-                });
-              }
-            }
-          }
-        }
-      }
-    } else {
-      Toast.fire({
-        icon: "error",
-        title: "Gagal mencoba login.",
-        text: `Ups, terlihat kamu sudah mencoba berulang kali dengan password gagal, coba lagi nanti!`,
-      });
-    }
-  };
-
-  const [role, setRole] = React.useState<string>("Perseorangan");
-
-  const [imageIndex, setImageIndex] = React.useState(0);
-  const images = ["/images/hero-img3.jpg", "/images/hero-img6.jpg"];
-  const imagesMob = ["/diklat/bstf-1.jpg"];
-
-  // Showing password state management
-  const [isShowPassword, setIsShowPassword] = React.useState<boolean>(false);
-
-  // Forget password state management
-  const [isForgetPassword, setIsForgetPassword] =
-    React.useState<boolean>(false);
-  const [isForgetPhoneNumber, setIsForgetPhoneNumber] =
-    React.useState<boolean>(false);
-  const [nik, setNik] = React.useState<string>("");
-  const [passwordReset, setPasswordReset] = React.useState<string>("");
-  const [tokenResetPassword, setTokenResetPassword] =
-    React.useState<string>("");
-  const [phoneNumberInformation, setPhoneNumberInformation] =
-    React.useState<string>("");
-  const handleGetTokenResetPassword = async (e: any) => {
-    if (validateIsDangerousChars(nik)) {
-      Toast.fire({
-        icon: "error",
-        title: "Oopsss!",
-        text: `Kamu memasukkan karakter berbahaya pada input NIK-mu, cek akun tidak dapat diproses!`,
-      });
-    } else {
-      try {
-        const response = await axios.post(
-          `${elautBaseUrl}/users/getTokenPassword`,
-          {
-            nik: sanitizedDangerousChars(nik),
-          }
-        );
-
-        console.log({ response });
-
-        if (isForgetPhoneNumber) {
-          Toast.fire({
-            icon: "success",
-            title: "Yeayyy!",
-            text: `No telpon berhasil ditemukan, silahkan mendapatkan nomormu yang terdaftar, silahkan login!`,
-          });
-          setIsForgetPassword(false);
-          setPhoneNumberInformation(response.data.no_telpon);
-          setFormData({ no_number: response.data.no_telpon, password: "" });
-          setIsForgetPhoneNumber(false);
-          setNik("");
-        } else {
-          Toast.fire({
-            icon: "success",
-            title: "Yeayyy!",
-            text: `Akun berhasil ditemukan, silahkan reset ulang password mu!`,
-          });
-          setTokenResetPassword(response.data.token);
-          setFormData({
-            no_number: "",
-            password: "",
-          });
-        }
-      } catch (error: any) {
-        console.log({ error });
-        const errorMsg = error.response.data.Pesan;
-        Toast.fire({
-          icon: "error",
-          title: "Akun tidak ditemukan.",
-          text: `Gagal. ${errorMsg}!`,
-        });
-        setFormData({
-          no_number: "",
-          password: "",
-        });
-      }
-    }
-  };
-  const handleResetPassword = async (e: any) => {
-    if (validateIsDangerousChars(passwordReset)) {
-      Toast.fire({
-        icon: "error",
-        title: "Oopsss!",
-        text: `Kamu memasukkan karakter berbahaya pada input password baru-mu, reset password tidak dapat diproses!`,
-      });
-    } else {
-      if (handlePasswordCriteria(passwordReset)) {
-        try {
-          const response = await axios.post(
-            `${elautBaseUrl}/users/resetPassword`,
-            { password: sanitizedDangerousChars(passwordReset) },
-            {
-              headers: {
-                Authorization: `Bearer ${tokenResetPassword}`,
-              },
-            }
-          );
-          Toast.fire({
-            icon: "success",
-            title: "Berhasil mereset.",
-            text: `Silahkan menggunakan password yang sudah direset, jangan sampai lupa lagi!`,
-          });
-          setNik("");
-          setPasswordReset("");
-          setFormData({
-            no_number: "",
-            password: "",
-          });
-          setIsForgetPassword(false);
-          setTokenResetPassword("");
-          setRole("Perseorangan");
-          console.log({ response });
-        } catch (error: any) {
-          console.log({ error });
-          setNik("");
-          setPasswordReset("");
-          setIsForgetPassword(false);
-          setTokenResetPassword("");
-          setFormData({
-            no_number: "",
-            password: "",
-          });
-          Toast.fire({
-            icon: "error",
-            title: "Gagal mereset.",
-            text: `Password mu gagal untuk direset, nampaknya terdapat gangguan`,
-          });
-        }
-      }
-    }
-  };
-
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 10000);
-
-    return () => clearInterval(interval);
   }, []);
 
-  const [isInputErrorNoTelpon, setIsInputErrorNoTelpon] =
-    React.useState<boolean>(false);
-  const [isInputErrorNIK, setIsInputErrorNIK] = React.useState<boolean>(true);
-  const [isInputErrorPassword, setIsInputErrorPassword] =
-    React.useState<boolean>(true);
+  const fetchPelatihan = useCallback(async (nikValue: string) => {
+    if (!nikValue) return;
+    setLoadingPelatihan(true);
+    try {
+      const res = await axios.post(
+        `${elautBaseUrl}/getPelatihanByNik`,
+        { nik: String(nikValue) },
+        { headers: { "Content-Type": "application/json" } }
+      );
+      // API returns { Pesan: "...", data: [...] } or null
+      const raw = res.data?.data;
+      if (Array.isArray(raw)) {
+        setPelatihan(raw);
+      } else if (Array.isArray(res.data)) {
+        setPelatihan(res.data);
+      } else {
+        setPelatihan([]);
+      }
+    } catch (err) {
+      console.error("fetchPelatihan error:", err);
+      setPelatihan([]);
+    } finally {
+      setLoadingPelatihan(false);
+    }
+  }, []);
 
-  const [selectedMethodLogin, setSelectedMethodLogin] = React.useState<string>('Whatsapp/No Telpon')
+  // ── Session restore on mount ───────────────────────────────────────────────
+  useEffect(() => {
+    const token = Cookies.get(TOKEN_COOKIE);
+    const storedNik = Cookies.get(NIK_COOKIE); // encrypted, we use user.Nik after fetch
+    if (token) {
+      setView("dashboard");
+      fetchUser(token).then((userData) => {
+        // Use Nik from user data (from JWT/API) as the source of truth
+        if (userData?.Nik) {
+          fetchPelatihan(String(userData.Nik));
+        }
+      });
+    }
+  }, []);
 
+  // ── Login ─────────────────────────────────────────────────────────────────
+  const handleLogin = async (e: FormEvent) => {
+    e.preventDefault();
+    const trimmedNik = nik.trim();
+    if (!trimmedNik || trimmedNik.length !== 16) { setNikError("NIK harus tepat 16 digit."); return; }
+    if (validateIsDangerousChars(trimmedNik)) { setNikError("NIK mengandung karakter tidak valid."); return; }
+
+    setLoadingLogin(true);
+    setNikError(null);
+    try {
+      const res: AxiosResponse<{ data: string; message: string }> = await axios.post(
+        `${elautBaseUrl}/users/loginByNik`,
+        { nik: sanitizedDangerousChars(trimmedNik) },
+        { headers: { "Content-Type": "application/json" } }
+      );
+      const token = res.data.data;
+      setSecureCookie(TOKEN_COOKIE, token, 1);
+      setSecureCookie(NIK_COOKIE, encryptValue(trimmedNik), 1);
+
+      // Fetch user, then use returned NIK (canonical) for pelatihan
+      const userData = await fetchUser(token);
+      const canonicalNik = userData?.Nik ? String(userData.Nik) : trimmedNik;
+      fetchPelatihan(canonicalNik);
+
+      setView("dashboard");
+      Toast.fire({ icon: "success", title: "Login berhasil!", text: `Selamat datang, ${userData?.Nama || ""}!` });
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.response?.data?.pesan || "NIK tidak ditemukan atau terjadi kesalahan.";
+      setNikError(msg);
+      Toast.fire({ icon: "error", title: "Login Gagal", text: msg });
+    } finally {
+      setLoadingLogin(false);
+    }
+  };
+
+  // ── Logout ────────────────────────────────────────────────────────────────
+  const handleLogout = () => {
+    removeSecureCookie(TOKEN_COOKIE);
+    removeSecureCookie(NIK_COOKIE);
+    Cookies.remove(TOKEN_COOKIE);
+    Cookies.remove(NIK_COOKIE);
+    setUser(null); setPelatihan(null); setView("login"); setNik(""); setIsEditing(false);
+    Toast.fire({ icon: "success", title: "Logout berhasil." });
+  };
+
+  // ── Save profile ──────────────────────────────────────────────────────────
+  const handleSaveProfile = async () => {
+    const token = Cookies.get(TOKEN_COOKIE);
+    if (!token) return;
+    setLoadingSave(true);
+    try {
+      const fd = new FormData();
+      Object.entries(editData).forEach(([k, v]) => {
+        if (v !== undefined && v !== null && typeof v === "string") fd.append(k, v);
+      });
+      await axios.put(`${elautBaseUrl}/users/updateUsersByToken`, fd, {
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
+      });
+      await fetchUser(token);
+      setIsEditing(false);
+      Toast.fire({ icon: "success", title: "Profil diperbarui!", text: "Data berhasil disimpan." });
+    } catch (err: any) {
+      Toast.fire({ icon: "error", title: "Gagal menyimpan", text: err?.response?.data?.message || "Terjadi kesalahan." });
+    } finally {
+      setLoadingSave(false);
+    }
+  };
+
+  // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="fixed inset-0 z-[999999] font-jakarta overflow-hidden scrollbar-hide">
-      <main className="h-full w-full relative bg-slate-950 text-white flex items-center justify-center p-4 scrollbar-hide">
-        {/* Animated Background Image */}
-        <motion.div
-          initial={{ scale: 1.1, opacity: 0 }}
-          animate={{ scale: 1, opacity: 0.25 }}
-          transition={{ duration: 2, ease: "easeOut" }}
-          className="absolute inset-0 z-0"
-        >
-          <Image
-            src={"/images/hero-img6.jpg"}
-            className="w-full h-full object-cover"
-            alt="Background"
-            fill={true}
-            priority
-          />
+    <div className="fixed inset-0 z-[999999] font-jakarta overflow-hidden">
+      <main className="h-full w-full relative bg-[#020617] text-white flex items-center justify-center overflow-y-auto scrollbar-hide">
+        {/* Ambient background */}
+        <motion.div initial={{ scale: 1.1, opacity: 0 }} animate={{ scale: 1, opacity: 0.18 }} transition={{ duration: 3 }} className="fixed inset-0 z-0 pointer-events-none">
+          <Image src="/images/hero-img6.jpg" fill priority className="object-cover" alt="" />
         </motion.div>
+        <motion.div animate={{ x: [0, 50, 0], y: [0, -40, 0] }} transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }} className="pointer-events-none fixed -top-40 -left-40 h-[600px] w-[600px] rounded-full bg-blue-600/20 blur-[130px] z-0" />
+        <motion.div animate={{ x: [0, -50, 0], y: [0, 50, 0] }} transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }} className="pointer-events-none fixed -bottom-40 -right-40 h-[600px] w-[600px] rounded-full bg-cyan-500/15 blur-[140px] z-0" />
+        <motion.div animate={{ x: [0, 30, 0], y: [0, 30, 0] }} transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }} className="pointer-events-none fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[400px] w-[400px] rounded-full bg-indigo-600/10 blur-[100px] z-0" />
 
-        {/* Gradient Blobs with Animation */}
-        <motion.div
-          animate={{
-            x: [0, 30, 0],
-            y: [0, -30, 0],
-          }}
-          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-          className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-blue-600/30 blur-[100px] z-1"
-        />
-        <motion.div
-          animate={{
-            x: [0, -40, 0],
-            y: [0, 40, 0],
-          }}
-          transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-          className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-cyan-500/20 blur-[120px] z-1"
-        />
-
-        <Dialog open={isForgetPassword} onOpenChange={setIsForgetPassword}>
-          <DialogContent
-            className="sm:max-w-[425px] bg-slate-900/90 backdrop-blur-2xl border border-white/10 shadow-2xl rounded-3xl text-white"
-          >
-            <DialogHeader>
-              <DialogTitle className="text-xl font-bold text-white font-calsans tracking-tight">
-                {isForgetPhoneNumber ? "Cek No Telpon/WA" : "Reset Password"}
-              </DialogTitle>
-              <DialogDescription className="text-gray-400 text-sm">
-                {isForgetPhoneNumber
-                  ? "Harap masukkan NIK kamu sebelum melihat no telpon/WA mu yang terdaftar pada ELAUT"
-                  : "Harap masukkan NIK kamu sebelum melakukan reset, untuk mengetahui NIK tersebut terdaftar atau tidak"}
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="grid gap-4 py-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="nik" className="text-xs font-medium text-gray-300">
-                  NIK
-                </Label>
-                <div className="flex flex-col gap-1 w-full">
-                  <input
-                    id="nik"
-                    value={nik}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setNik(value);
-                      setIsInputErrorNIK(value.length > 0 && value.length < 16);
-                    }}
-                    maxLength={16}
-                    placeholder="Masukkan 16 digit NIK"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all"
-                    readOnly={tokenResetPassword != ""}
-                    autoComplete="off"
-                  />
-                  {isInputErrorNIK && nik != "" && (
-                    <span className="text-rose-400 font-medium text-[10px]">
-                      *NIK harus 16 digit!
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {tokenResetPassword != "" && (
-                <div className="space-y-1.5">
-                  <Label htmlFor="passwordReset" className="text-xs font-medium text-gray-300">
-                    Password Baru
-                  </Label>
-                  <input
-                    id="passwordReset"
-                    value={passwordReset}
-                    type="password"
-                    onChange={(e) => setPasswordReset(e.target.value)}
-                    placeholder="Masukkan password baru"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all font-inter"
-                    autoComplete="off"
-                  />
-                  <p className="text-gray-500 text-[10px] leading-relaxed mt-2 italic">
-                    *Password minimal 8 karakter, harus terdiri dari satu angka, huruf kapital dan kecil, serta karakter khusus.
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <DialogFooter className="sm:justify-start gap-2">
-              <div className="flex w-full gap-2">
-                {tokenResetPassword == "" ? (
-                  <Button
-                    type="button"
-                    onClick={(e) => handleGetTokenResetPassword(e)}
-                    disabled={isInputErrorNIK}
-                    className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl"
-                  >
-                    Cek Akunmu
-                  </Button>
-                ) : (
-                  <Button
-                    type="button"
-                    onClick={(e) => handleResetPassword(e)}
-                    className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl"
-                  >
-                    Reset Password
-                  </Button>
-                )}
-                <Button
-                  type="button"
-                  onClick={() => {
-                    setNik("");
-                    setPasswordReset("");
-                    setIsForgetPassword(false);
-                    setTokenResetPassword("");
-                    setIsInputErrorNIK(true);
-                  }}
-                  className="flex-1 bg-white/5 hover:bg-white/10 text-white border border-white/10 rounded-xl"
-                >
-                  Tutup
-                </Button>
-              </div>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        <section className="relative z-10 w-full max-w-lg flex flex-col items-center max-h-full overflow-y-auto scrollbar-hide py-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="w-full flex flex-col items-center"
-          >
-            {/* Header Section */}
-            <div className="text-center mb-6">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] md:text-xs font-semibold uppercase tracking-wider mb-3"
-              >
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                {t("common.welcome").includes("E-LAUT") ? "Portal Masyarakat" : "Society Portal"}
-              </motion.div>
-              <h1 className="text-3xl md:text-4xl leading-none font-bold tracking-tight text-white font-calsans mb-2">
-                {language === "id" ? "Selamat Datang di " : "Welcome to "}<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">E-LAUT</span>
-              </h1>
-              <p className="text-gray-400 mx-auto text-xs md:text-sm leading-relaxed max-w-sm">
-                {language === "id" ? "Akses portal pelatihan dan sertifikasi kelautan terpadu. Pilih peran anda untuk melanjutkan." : "Access the integrated marine training and certification portal. Choose your role to continue."}
-              </p>
-            </div>
-
-            {/* Role Switcher Tab */}
-            <div className="w-full max-w-[340px] mb-6 p-1 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 flex">
-              <button
-                onClick={() => setRole("Perseorangan")}
-                className={`flex-1 py-2 px-4 rounded-xl text-xs font-bold tracking-wide transition-all duration-300 ${role === "Perseorangan" ? "bg-blue-600 text-white shadow-lg" : "text-gray-400 hover:text-white"
-                  }`}
-              >
-                {language === "id" ? "PERSEORANGAN" : "INDIVIDUAL"}
-              </button>
-              <button
-                onClick={() => setRole("Corporate")}
-                className={`flex-1 py-2 px-4 rounded-xl text-xs font-bold tracking-wide transition-all duration-300 ${role === "Corporate" ? "bg-blue-600 text-white shadow-lg" : "text-gray-400 hover:text-white"
-                  }`}
-              >
-                {language === "id" ? "CORPORATE" : "CORPORATE"}
-              </button>
-            </div>
-
-            {/* Glassmorphism Form Card */}
-            <div className="w-full relative group px-2 md:px-0">
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-3xl blur opacity-15 group-hover:opacity-25 transition duration-1000" />
-              <div className="relative bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-6 md:p-10 shadow-2xl">
-                {role == "Perseorangan" ? (
-                  <form onSubmit={(e) => handleLoginAkun(e)} autoComplete="off" className="space-y-5">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-medium text-gray-300 flex items-center gap-2">
-                        Login Menggunakan
-                      </label>
-                      <Select
-                        value={selectedMethodLogin}
-                        onValueChange={(value: string) => setSelectedMethodLogin(value)}
-                      >
-                        <SelectTrigger className="w-full h-11 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 transition-all appearance-none cursor-pointer placeholder:text-gray-500 font-inter">
-                          <div className="flex items-center gap-3">
-                            <HiMiniUserGroup className="text-blue-400 text-xl" />
-                            <span className="text-sm font-medium">
-                              {selectedMethodLogin || "Pilih Metode Login"}
-                            </span>
-                          </div>
-                        </SelectTrigger>
-                        <SelectContent className="bg-slate-900/95 backdrop-blur-xl border-white/10 rounded-2xl p-2" >
-                          <SelectGroup>
-                            <SelectLabel className="text-blue-300/60 text-[10px] uppercase font-bold px-3 py-2">Metode Login</SelectLabel>
-                            <SelectItem className="rounded-xl focus:bg-blue-500/20 focus:text-blue-100 cursor-pointer py-3 transition-colors text-slate-300" value="Whatsapp/No Telpon">
-                              <div className="flex items-center gap-2">
-                                <HiOutlineDeviceMobile className="text-lg" />
-                                <span>Whatsapp / No Telpon</span>
-                              </div>
-                            </SelectItem>
-                            <SelectItem className="rounded-xl focus:bg-blue-500/20 focus:text-blue-100 cursor-pointer py-3 transition-colors text-slate-300" value="NIK">
-                              <div className="flex items-center gap-2">
-                                <HiOutlineIdentification className="text-lg" />
-                                <span>NIK</span>
-                              </div>
-                            </SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-medium text-gray-300 flex items-center gap-2" htmlFor="no_number">
-                        {selectedMethodLogin == 'NIK' ? <HiOutlineIdentification className="text-blue-400" /> : <HiOutlineDeviceMobile className="text-blue-400" />}
-                        {selectedMethodLogin == 'NIK' ? 'Nomor Induk Kependudukan (NIK)' : 'No Telepon / WhatsApp'}
-                      </label>
-                      <input
-                        id="no_number"
-                        type="text"
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm md:text-base placeholder:text-gray-600 outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all font-inter"
-                        placeholder={selectedMethodLogin == 'NIK' ? '32xxxxxxxxxxxxxx' : '62xxxxxxxxxxx'}
-                        value={formData.no_number}
-                        name="no_number"
-                        minLength={selectedMethodLogin == 'NIK' ? 16 : 12}
-                        maxLength={selectedMethodLogin == 'NIK' ? 24 : 13}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          handleInputChange(e);
-                          setIsInputErrorNoTelpon(
-                            value.length > 0 && value.length < 12
-                          );
-                        }}
-                        required
-                      />
-                      <div className="flex justify-between items-center px-1">
-                        {isInputErrorNoTelpon && formData.no_number != "" ? (
-                          <span className="text-rose-400 font-medium text-[10px]">
-                            * Minimal {selectedMethodLogin === 'NIK' ? '16' : '12'} digit!
-                          </span>
-                        ) : (
-                          <span className="text-white/30 text-[9px] font-medium uppercase tracking-tight">Lupa data anda? klik <button type="button" onClick={() => { setIsForgetPhoneNumber(true); setIsForgetPassword(true); }} className="text-blue-400 font-bold hover:underline">disini</button></span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-medium text-gray-300 flex items-center gap-2" htmlFor="password">
-                        <HiOutlineLockClosed className="text-blue-400" /> Security Password
-                      </label>
-                      <div className="relative">
-                        <input
-                          id="password"
-                          type={isShowPassword ? "text" : "password"}
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm md:text-base placeholder:text-gray-600 outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all font-inter"
-                          placeholder="••••••••"
-                          required
-                          name="password"
-                          value={formData.password}
-                          onChange={(e) => handleInputChange(e)}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setIsShowPassword(!isShowPassword)}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors"
-                        >
-                          {isShowPassword ? <HiOutlineEyeOff size={18} /> : <HiOutlineEye size={18} />}
-                        </button>
-                      </div>
-                      <div className="flex justify-end pr-1">
-                        <button
-                          type="button"
-                          onClick={() => setIsForgetPassword(true)}
-                          className="text-blue-400 hover:text-blue-300 text-[10px] font-bold transition-colors"
-                        >
-                          Lupa password?
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="pt-2">
-                      <motion.button
-                        whileHover={{ scale: 1.01 }}
-                        whileTap={{ scale: 0.99 }}
-                        type="submit"
-                        className="w-full h-12 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 group"
-                      >
-                        {language === "id" ? `SIGN IN ${role.toUpperCase()}` : `SIGN IN ${role.toUpperCase()}`}
-                        <HiOutlineMail className="group-hover:translate-x-1 transition-transform" />
-                      </motion.button>
-                    </div>
-                  </form>
-                ) : (
-                  <form
-                    onSubmit={(e) => handleLoginAkunManningAgent(e)}
-                    autoComplete="off"
-                    className="space-y-5"
-                  >
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-medium text-gray-300 flex items-center gap-2" htmlFor="email_agent">
-                        <HiOutlineMail className="text-blue-400" /> Corporate Email
-                      </label>
-                      <input
-                        id="email_agent"
-                        type="email"
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm md:text-base placeholder:text-gray-600 outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all font-inter"
-                        placeholder="corporate@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-medium text-gray-300 flex items-center gap-2" htmlFor="password_corporate">
-                        <HiOutlineLockClosed className="text-blue-400" /> Office Password
-                      </label>
-                      <div className="relative">
-                        <input
-                          id="password_corporate"
-                          type={isShowPassword ? "text" : "password"}
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm md:text-base placeholder:text-gray-600 outline-none focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10 transition-all font-inter"
-                          placeholder="••••••••"
-                          required
-                          value={passwordManningAgent}
-                          onChange={(e) => setPasswordManningAgent(e.target.value)}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setIsShowPassword(!isShowPassword)}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors"
-                        >
-                          {isShowPassword ? <HiOutlineEyeOff size={18} /> : <HiOutlineEye size={18} />}
-                        </button>
-                      </div>
-                    </div>
-
-                    {passwordManningAgent != "" && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        className="bg-white/5 rounded-xl border border-white/5 p-3 overflow-hidden"
-                      >
-                        <p className="text-[10px] text-gray-400 mb-2 font-bold uppercase tracking-wider text-center">Safety Check</p>
-                        <div className="flex justify-center scale-90 sm:scale-100">
-                          <ReCAPTCHA
-                            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
-                            theme="dark"
-                            onChange={setCaptcha}
-                          />
-                        </div>
-                      </motion.div>
-                    )}
-
-                    <div className="pt-2">
-                      <motion.button
-                        disabled={!captcha && passwordManningAgent != ""}
-                        whileHover={captcha || passwordManningAgent == "" ? { scale: 1.01 } : {}}
-                        whileTap={captcha || passwordManningAgent == "" ? { scale: 0.99 } : {}}
-                        type="submit"
-                        className={`w-full h-12 rounded-xl font-bold transition-all shadow-lg flex items-center justify-center gap-2 group ${captcha || passwordManningAgent == ""
-                          ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-blue-500/20"
-                          : "bg-white/10 text-white/30 cursor-not-allowed"
-                          }`}
-                      >
-                        SIGN IN CORPORATE
-                        <HiOutlineUserGroup className="group-hover:translate-x-1 transition-transform" />
-                      </motion.button>
-                    </div>
-                  </form>
-                )}
-
-                <div className="mt-8 pt-6 border-t border-white/10">
-                  <p className="text-gray-400 text-center text-sm">
-                    Belum memiliki akun?{" "}
-                    <Link
-                      href="/registrasi"
-                      onClick={() => Cookies.set("XSRF087", "1")}
-                      className="text-blue-400 font-bold hover:text-blue-300 transition-colors underline-offset-4 hover:underline"
-                    >
-                      Daftar Sekarang
-                    </Link>
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Security Footer */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1 }}
-              className="mt-8 flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-xl"
-            >
-              <FiShield className="text-emerald-500 shrink-0" size={16} />
-              <p className="text-[10px] text-gray-500 leading-tight">KKP Protected: Secure data encryption active. Authorized access only.</p>
-            </motion.div>
-          </motion.div>
-        </section>
+        <AnimatePresence mode="wait">
+          {view === "login" ? (
+            <LoginView key="login" nik={nik} setNik={setNik} nikError={nikError} setNikError={setNikError} loadingLogin={loadingLogin} handleLogin={handleLogin} />
+          ) : (
+            <DashboardView
+              key="dashboard"
+              user={user} loadingUser={loadingUser}
+              pelatihan={pelatihan} loadingPelatihan={loadingPelatihan}
+              activeTab={activeTab} setActiveTab={setActiveTab}
+              isEditing={isEditing} setIsEditing={setIsEditing}
+              editData={editData} setEditData={setEditData}
+              loadingSave={loadingSave}
+              handleSaveProfile={handleSaveProfile}
+              handleLogout={handleLogout}
+              onRefreshPelatihan={() => user?.Nik && fetchPelatihan(String(user.Nik))}
+            />
+          )}
+        </AnimatePresence>
       </main>
     </div>
   );
-};
+}
 
-export default FormLogin;
+// ═══════════════════════════════════════════════════════════════════════════════
+// LOGIN VIEW
+// ═══════════════════════════════════════════════════════════════════════════════
+function LoginView({ nik, setNik, nikError, setNikError, loadingLogin, handleLogin }: {
+  nik: string; setNik: (v: string) => void; nikError: string | null;
+  setNikError: (v: string | null) => void; loadingLogin: boolean; handleLogin: (e: FormEvent) => void;
+}) {
+  const progress = (nik.length / 16) * 100;
+  return (
+    <motion.section initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.6 }}
+      className="relative z-10 w-full max-w-md px-4 py-10 flex flex-col items-center">
+
+      {/* Logo */}
+      <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.1 }} className="mb-7 flex flex-col items-center gap-3">
+        <div className="relative w-20 h-20">
+          <div className="absolute inset-0 bg-blue-500/40 blur-3xl rounded-full" />
+          <Image src="/logo-kkp-white.png" alt="E-LAUT" fill className="object-contain relative z-10 drop-shadow-2xl" />
+        </div>
+        <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-[0.2em]">
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" /> Portal Masyarakat E-LAUT
+        </span>
+        <h1 className="text-3xl md:text-4xl font-bold font-calsans text-white leading-none text-center">
+          Masuk ke <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-300 to-teal-300">E-LAUT</span>
+        </h1>
+        <p className="text-gray-400 text-xs text-center max-w-xs leading-relaxed">
+          Gunakan NIK pada KTP Anda untuk mengakses portal pelatihan &amp; sertifikasi kelautan.
+        </p>
+      </motion.div>
+
+      {/* Card */}
+      <div className="w-full relative">
+        <div className="absolute -inset-[2px] bg-gradient-to-br from-blue-600/60 via-cyan-600/40 to-indigo-600/60 rounded-[28px] blur-sm opacity-30" />
+        <div className="relative bg-[#0a1628]/90 backdrop-blur-3xl border border-white/[0.08] rounded-3xl p-8 shadow-2xl">
+          {/* Fingerprint Icon */}
+          <div className="flex justify-center mb-7">
+            <motion.div whileHover={{ scale: 1.05 }} className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-500/10 border border-blue-500/20 flex items-center justify-center shadow-lg shadow-blue-500/10">
+              <div className="absolute inset-0 bg-blue-400/10 rounded-2xl blur-md" />
+              <RiFingerprint2Line className="text-blue-400 text-3xl relative z-10" />
+            </motion.div>
+          </div>
+
+          <form onSubmit={handleLogin} autoComplete="off" className="space-y-6">
+            <div className="space-y-2">
+              <label htmlFor="nik_input" className="text-xs font-semibold text-gray-300 flex items-center gap-2">
+                <HiOutlineIdentification className="text-blue-400 text-base" />
+                Nomor Induk Kependudukan (NIK)
+              </label>
+              <div className="relative">
+                <input
+                  id="nik_input" type="text" inputMode="numeric" pattern="[0-9]*" maxLength={16}
+                  value={nik}
+                  onChange={(e) => { const v = e.target.value.replace(/\D/g, ""); setNik(v); if (nikError) setNikError(null); }}
+                  placeholder="3 2 x x  x x x x  x x x x  x x x x"
+                  className={`w-full h-13 bg-white/[0.04] border-2 ${nikError ? "border-rose-500/50 focus:border-rose-500" : nik.length === 16 ? "border-emerald-500/40 focus:border-emerald-400" : "border-white/[0.08] focus:border-blue-500/60"} rounded-2xl px-4 pr-14 text-white text-base placeholder:text-gray-700 outline-none focus:ring-4 focus:ring-blue-500/10 transition-all font-mono tracking-[0.15em] py-3`}
+                  required
+                />
+                <div className={`absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-black tabular-nums ${nik.length === 16 ? "text-emerald-400" : "text-gray-600"}`}>
+                  {nik.length}/16
+                </div>
+              </div>
+
+              {/* Progress bar */}
+              <div className="h-1 w-full bg-white/[0.04] rounded-full overflow-hidden">
+                <motion.div
+                  className={`h-full rounded-full ${nik.length === 16 ? "bg-gradient-to-r from-emerald-400 to-teal-400" : "bg-gradient-to-r from-blue-500 to-cyan-400"}`}
+                  animate={{ width: `${progress}%` }}
+                  transition={{ type: "spring", stiffness: 120, damping: 20 }}
+                />
+              </div>
+
+              <AnimatePresence>
+                {nikError && (
+                  <motion.div initial={{ opacity: 0, y: -6, height: 0 }} animate={{ opacity: 1, y: 0, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+                    className="flex items-start gap-2 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
+                    <FiAlertCircle className="text-rose-400 shrink-0 mt-0.5 text-sm" />
+                    <p className="text-rose-400 text-[11px] font-medium">{nikError}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <motion.button
+              whileHover={nik.length === 16 && !loadingLogin ? { scale: 1.01, y: -1 } : {}}
+              whileTap={nik.length === 16 && !loadingLogin ? { scale: 0.99 } : {}}
+              type="submit" disabled={loadingLogin || nik.length !== 16}
+              className={`w-full h-12 rounded-2xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-2 ${nik.length === 16 && !loadingLogin
+                ? "bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 text-white shadow-xl shadow-blue-600/30 hover:shadow-blue-500/40"
+                : "bg-white/[0.04] text-white/20 cursor-not-allowed border border-white/[0.05]"}`}
+            >
+              {loadingLogin
+                ? <><FiLoader className="animate-spin text-lg" /> Memverifikasi NIK...</>
+                : <><RiFingerprint2Line className="text-lg" /> Masuk dengan NIK</>}
+            </motion.button>
+          </form>
+
+          <div className="mt-6 pt-5 border-t border-white/[0.06] text-center">
+            <p className="text-gray-500 text-sm">
+              Belum terdaftar?{" "}
+              <Link href="/registrasi" className="text-blue-400 font-bold hover:text-blue-300 transition-colors underline-offset-4 hover:underline">
+                Daftar Sekarang
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Security badge */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="mt-5 flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-white/[0.03] border border-white/[0.05]">
+        <FiShield className="text-emerald-400 shrink-0" size={14} />
+        <p className="text-[10px] text-gray-600">NIK dienkripsi AES-256. Data tidak disimpan di pihak ketiga.</p>
+      </motion.div>
+    </motion.section>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// DASHBOARD VIEW
+// ═══════════════════════════════════════════════════════════════════════════════
+function DashboardView({ user, loadingUser, pelatihan, loadingPelatihan, activeTab, setActiveTab, isEditing, setIsEditing, editData, setEditData, loadingSave, handleSaveProfile, handleLogout, onRefreshPelatihan }: {
+  user: User | null; loadingUser: boolean; pelatihan: UserPelatihan[] | null; loadingPelatihan: boolean;
+  activeTab: "profile" | "pelatihan"; setActiveTab: (t: "profile" | "pelatihan") => void;
+  isEditing: boolean; setIsEditing: (v: boolean) => void; editData: Partial<User>; setEditData: (v: Partial<User>) => void;
+  loadingSave: boolean; handleSaveProfile: () => void; handleLogout: () => void; onRefreshPelatihan: () => void;
+}) {
+  const pelatihanCount = pelatihan?.length ?? 0;
+
+  return (
+    <motion.section initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.6 }}
+      className="relative z-10 w-full max-w-3xl px-4 py-8 flex flex-col gap-5">
+
+      {/* ── Hero Profile Card ───────────────────────────────────────────── */}
+      <div className="relative">
+        <div className="absolute -inset-[1px] bg-gradient-to-br from-blue-500/30 via-cyan-500/20 to-indigo-500/20 rounded-[28px] blur-[2px]" />
+        <div className="relative bg-[#0a1628]/95 backdrop-blur-3xl border border-white/[0.07] rounded-3xl overflow-hidden shadow-2xl">
+          {/* Decorative top banner */}
+          <div className="h-2 w-full bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-400" />
+
+          <div className="p-6">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+              {/* Avatar */}
+              <div className="relative shrink-0">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-blue-500/30 to-cyan-500/20 border border-white/10 overflow-hidden flex items-center justify-center">
+                  {loadingUser ? (
+                    <Skeleton className="w-full h-full" />
+                  ) : (
+                    <img
+                      src={user?.Foto || "/dummies/profile.png"}
+                      alt={user?.Nama || "Foto Profil"}
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/dummies/profile.png"; }}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-400 border-2 border-[#0a1628] flex items-center justify-center shadow-lg">
+                  <FiCheck className="text-[#0a1628] text-[10px] font-black" />
+                </div>
+              </div>
+
+              {/* Info */}
+              <div className="flex-1 min-w-0 text-center sm:text-left">
+                {loadingUser ? (
+                  <div className="space-y-2.5">
+                    <Skeleton className="h-6 w-48 mx-auto sm:mx-0" />
+                    <Skeleton className="h-4 w-36 mx-auto sm:mx-0" />
+                    <Skeleton className="h-3 w-52 mx-auto sm:mx-0" />
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
+                      <h2 className="text-xl font-bold text-white font-calsans">{user?.Nama || "—"}</h2>
+                      <RiVerifiedBadgeFill className="text-blue-400 text-lg shrink-0" title="Terverifikasi" />
+                    </div>
+                    <p className="inline-flex items-center gap-1.5 text-[11px] text-blue-400/90 font-mono bg-blue-500/10 px-2 py-0.5 rounded-lg border border-blue-500/20 mb-2">
+                      <HiOutlineIdentification className="text-sm" />
+                      NIK: {user?.Nik || "—"}
+                    </p>
+                    <div className="flex flex-wrap justify-center sm:justify-start gap-x-4 gap-y-1 mt-1.5">
+                      {user?.Email && <span className="flex items-center gap-1 text-[11px] text-gray-400"><HiOutlineMail className="text-blue-400/70 text-sm" />{user.Email}</span>}
+                      {user?.NoTelpon && <span className="flex items-center gap-1 text-[11px] text-gray-400"><HiOutlinePhone className="text-blue-400/70 text-sm" />{user.NoTelpon}</span>}
+                      {user?.Kota && <span className="flex items-center gap-1 text-[11px] text-gray-400"><FiMapPin className="text-blue-400/70 text-sm" />{user.Kota}{user?.Provinsi ? `, ${user.Provinsi}` : ""}</span>}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Logout */}
+              <button onClick={handleLogout} className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 border border-white/[0.08] text-gray-400 text-xs font-semibold hover:bg-rose-500/10 hover:border-rose-500/20 hover:text-rose-400 transition-all duration-200">
+                <HiOutlineLogout className="text-base" /> Keluar
+              </button>
+            </div>
+
+            {/* Stats row */}
+            {!loadingUser && (
+              <div className="mt-5 pt-4 border-t border-white/[0.06] grid grid-cols-3 gap-3">
+                {[
+                  { label: "Pelatihan Diikuti", value: loadingPelatihan ? "..." : String(pelatihanCount), icon: <FiBookOpen className="text-blue-400" /> },
+                  { label: "Status Akun", value: user?.Status || "Aktif", icon: <RiVerifiedBadgeFill className="text-emerald-400" /> },
+                  { label: "Pekerjaan", value: user?.Pekerjaan || "—", icon: <MdOutlineSchool className="text-cyan-400" /> },
+                ].map((s, i) => (
+                  <div key={i} className="flex flex-col items-center text-center p-3 rounded-2xl bg-white/[0.03] border border-white/[0.05]">
+                    <div className="text-lg mb-1">{s.icon}</div>
+                    <p className="text-base font-extrabold text-white leading-none">{s.value}</p>
+                    <p className="text-[10px] text-gray-500 mt-1 leading-tight">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Tab Bar ────────────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 gap-2 p-1.5 bg-white/[0.03] border border-white/[0.07] rounded-2xl backdrop-blur-md">
+        {([
+          { id: "profile",   icon: <FiUser />,    label: "Profil Saya" },
+          { id: "pelatihan", icon: <FiAward />,   label: "Riwayat Pelatihan", badge: pelatihanCount },
+        ] as const).map((tab) => (
+          <button key={tab.id} onClick={() => setActiveTab(tab.id as any)}
+            className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold tracking-wide transition-all duration-300 ${activeTab === tab.id
+              ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-600/20"
+              : "text-gray-500 hover:text-gray-200 hover:bg-white/5"}`}
+          >
+            {tab.icon}
+            <span>{tab.label}</span>
+            {tab.id === "pelatihan" && pelatihanCount > 0 && (
+              <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-full ${activeTab === tab.id ? "bg-white/20 text-white" : "bg-blue-500/20 text-blue-400"}`}>
+                {pelatihanCount}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* ── Tab Content ────────────────────────────────────────────────────── */}
+      <AnimatePresence mode="wait">
+        {activeTab === "profile" ? (
+          <ProfileTab key="profile" user={user} loadingUser={loadingUser} isEditing={isEditing} setIsEditing={setIsEditing} editData={editData} setEditData={setEditData} loadingSave={loadingSave} handleSaveProfile={handleSaveProfile} />
+        ) : (
+          <PelatihanTab key="pelatihan" pelatihan={pelatihan} loadingPelatihan={loadingPelatihan} onRefresh={onRefreshPelatihan} />
+        )}
+      </AnimatePresence>
+    </motion.section>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PROFILE TAB
+// ═══════════════════════════════════════════════════════════════════════════════
+function ProfileTab({ user, loadingUser, isEditing, setIsEditing, editData, setEditData, loadingSave, handleSaveProfile }: {
+  user: User | null; loadingUser: boolean; isEditing: boolean; setIsEditing: (v: boolean) => void;
+  editData: Partial<User>; setEditData: (v: Partial<User>) => void; loadingSave: boolean; handleSaveProfile: () => void;
+}) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+      <div className="relative">
+        <div className="absolute -inset-[1px] bg-gradient-to-br from-blue-500/20 to-indigo-500/10 rounded-[28px] blur-[2px]" />
+        <div className="relative bg-[#0a1628]/90 backdrop-blur-3xl border border-white/[0.07] rounded-3xl p-6 shadow-xl">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-lg font-bold text-white font-calsans">Data Profil</h3>
+              <p className="text-gray-500 text-xs mt-0.5">Informasi pribadi yang terdaftar di E-LAUT</p>
+            </div>
+            {!isEditing ? (
+              <button onClick={() => { setEditData(user || {}); setIsEditing(true); }} disabled={loadingUser}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold hover:bg-blue-500/20 transition-all disabled:opacity-30">
+                <FiEdit3 className="text-sm" /> Edit Profil
+              </button>
+            ) : (
+              <div className="flex gap-2">
+                <button onClick={() => setIsEditing(false)} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-400 text-xs font-semibold hover:bg-white/10 transition-all">
+                  <FiX className="text-sm" /> Batal
+                </button>
+                <button onClick={handleSaveProfile} disabled={loadingSave} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold hover:bg-emerald-500/30 transition-all disabled:opacity-50">
+                  {loadingSave ? <FiLoader className="animate-spin text-sm" /> : <FiCheck className="text-sm" />}
+                  {loadingSave ? "Menyimpan..." : "Simpan"}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {loadingUser ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[...Array(10)].map((_, i) => (<div key={i} className="space-y-2"><Skeleton className="h-3 w-28" /><Skeleton className="h-10 w-full" /></div>))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {PROFILE_FIELDS.map(({ key, label, type, readonly }) => {
+                const isRO = readonly || !isEditing;
+                const value = isEditing ? ((editData[key] as string) ?? "") : ((user?.[key] as string) ?? "");
+                return (
+                  <div key={key} className="space-y-1.5">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-gray-500 flex items-center gap-1">
+                      {label}
+                      {readonly && isEditing && <span className="text-amber-500/60 normal-case text-[9px] font-medium">(tidak dapat diubah)</span>}
+                    </label>
+                    <input type={type || "text"} readOnly={isRO} value={value}
+                      onChange={(e) => setEditData({ ...editData, [key]: e.target.value })}
+                      className={`w-full h-10 px-3 rounded-xl text-sm border transition-all ${isRO
+                        ? "bg-white/[0.02] border-white/[0.04] text-gray-500 cursor-default select-none"
+                        : "bg-white/[0.05] border-white/[0.08] text-white focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/10 focus:bg-white/[0.07] outline-none"
+                      } ${readonly && isEditing ? "opacity-40" : ""}`}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PELATIHAN TAB
+// ═══════════════════════════════════════════════════════════════════════════════
+function PelatihanTab({ pelatihan, loadingPelatihan, onRefresh }: {
+  pelatihan: UserPelatihan[] | null; loadingPelatihan: boolean; onRefresh: () => void;
+}) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+      <div className="relative">
+        <div className="absolute -inset-[1px] bg-gradient-to-br from-cyan-500/20 to-blue-500/10 rounded-[28px] blur-[2px]" />
+        <div className="relative bg-[#0a1628]/90 backdrop-blur-3xl border border-white/[0.07] rounded-3xl p-6 shadow-xl">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-lg font-bold text-white font-calsans">Riwayat Pelatihan</h3>
+              <p className="text-gray-500 text-xs mt-0.5">Semua pelatihan yang pernah Anda ikuti</p>
+            </div>
+            <button onClick={onRefresh} disabled={loadingPelatihan} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 border border-white/[0.08] text-gray-400 text-xs font-semibold hover:bg-white/10 transition-all disabled:opacity-40">
+              <FiRefreshCw className={`text-sm ${loadingPelatihan ? "animate-spin" : ""}`} /> Muat Ulang
+            </button>
+          </div>
+
+          {loadingPelatihan ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((n) => (
+                <div key={n} className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05] space-y-3">
+                  <div className="flex gap-3"><Skeleton className="w-10 h-10 rounded-xl shrink-0" /><div className="flex-1 space-y-2"><Skeleton className="h-4 w-3/4" /><Skeleton className="h-3 w-1/2" /></div></div>
+                </div>
+              ))}
+            </div>
+          ) : !pelatihan || pelatihan.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="relative w-20 h-20 mb-5">
+                <div className="absolute inset-0 bg-blue-500/10 blur-2xl rounded-full" />
+                <div className="relative w-full h-full rounded-2xl bg-white/[0.03] border border-white/[0.07] flex items-center justify-center">
+                  <HiOutlineAcademicCap className="text-3xl text-gray-600" />
+                </div>
+              </div>
+              <h4 className="text-base font-bold text-white mb-2">Belum Ada Riwayat Pelatihan</h4>
+              <p className="text-gray-500 text-xs max-w-xs leading-relaxed mb-6">
+                Anda belum pernah mengikuti pelatihan di E-LAUT. Mulai eksplorasi dan tingkatkan kompetensi Anda!
+              </p>
+              <Link href="/layanan/pelatihan" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white text-xs font-bold hover:from-blue-500 hover:to-cyan-500 transition-all shadow-lg shadow-blue-600/20">
+                Jelajahi Pelatihan <HiOutlineChevronRight className="text-sm" />
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {pelatihan.map((item, idx) => {
+                const badge = getBadgeStyle(item.StatusAproval || "");
+                const hasNilai = item.NilaiTeory !== undefined || item.NilaiPraktek !== undefined;
+                return (
+                  <motion.div key={item.IdUserPelatihan || idx}
+                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}
+                    className="group relative bg-white/[0.02] hover:bg-white/[0.04] border border-white/[0.06] hover:border-blue-500/20 rounded-2xl p-4 transition-all duration-200 overflow-hidden">
+
+                    {/* Left accent bar */}
+                    <div className={`absolute left-0 top-0 bottom-0 w-0.5 ${badge.cls.includes("emerald") ? "bg-emerald-400" : badge.cls.includes("rose") ? "bg-rose-400" : badge.cls.includes("amber") ? "bg-amber-400" : "bg-blue-400"}`} />
+
+                    <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+                      {/* Icon */}
+                      <div className="shrink-0 w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/10 border border-blue-500/15 flex items-center justify-center">
+                        <HiOutlineAcademicCap className="text-blue-400 text-xl" />
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-3 flex-wrap">
+                          <h4 className="text-sm font-bold text-white leading-snug flex-1">{item.NamaPelatihan || "—"}</h4>
+                          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-wider border whitespace-nowrap ${badge.cls}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${badge.dot}`} />
+                            {item.StatusAproval || "Proses"}
+                          </span>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
+                          {item.PenyelenggaraPelatihan && (
+                            <span className="flex items-center gap-1 text-[11px] text-gray-400">
+                              <HiOutlineOfficeBuilding className="text-blue-400/70 shrink-0" />
+                              {item.PenyelenggaraPelatihan}
+                            </span>
+                          )}
+                          {item.TanggalMulai && (
+                            <span className="flex items-center gap-1 text-[11px] text-gray-400">
+                              <HiOutlineCalendar className="text-blue-400/70 shrink-0" />
+                              {item.TanggalMulai}{item.TanggalBerakhir ? ` – ${item.TanggalBerakhir}` : ""}
+                            </span>
+                          )}
+                          {item.JenisPelatihan && (
+                            <span className="text-[10px] text-gray-500 bg-white/[0.04] px-2 py-0.5 rounded-md border border-white/[0.06]">
+                              {item.JenisPelatihan}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Bottom row: Sertifikat + Nilai */}
+                        {(item.NoSertifikat || hasNilai) && (
+                          <div className="mt-3 pt-3 border-t border-white/[0.05] flex items-center justify-between flex-wrap gap-3">
+                            {item.NoSertifikat && (
+                              <div className="flex items-center gap-1.5 text-[11px]">
+                                <span className="text-gray-500">Sertifikat:</span>
+                                <span className="text-emerald-400 font-mono font-semibold">{item.NoSertifikat}</span>
+                              </div>
+                            )}
+                            {hasNilai && (
+                              <div className="flex items-center gap-4">
+                                {item.NilaiTeory !== undefined && item.NilaiTeory > 0 && (
+                                  <div className="text-center">
+                                    <p className="text-[9px] text-gray-500 uppercase font-bold tracking-wider">Teori</p>
+                                    <p className={`text-lg font-extrabold ${item.NilaiTeory >= 75 ? "text-emerald-400" : "text-rose-400"}`}>{item.NilaiTeory}</p>
+                                  </div>
+                                )}
+                                {item.NilaiPraktek !== undefined && item.NilaiPraktek > 0 && (
+                                  <div className="text-center">
+                                    <p className="text-[9px] text-gray-500 uppercase font-bold tracking-wider">Praktik</p>
+                                    <p className={`text-lg font-extrabold ${item.NilaiPraktek >= 75 ? "text-emerald-400" : "text-rose-400"}`}>{item.NilaiPraktek}</p>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
