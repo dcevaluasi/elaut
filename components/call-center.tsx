@@ -70,7 +70,7 @@ function CallCenter() {
           </AlertDialogHeader>
           <div className="flex flex-col space-y-3">
             <div className="flex flex-col space-y-2">
-              <h4 className="text-sm font-semibold text-white">Layanan Pengaduan dan Informasi Pusat Pelatihan KP</h4>
+              <h4 className="text-sm font-semibold text-white">Rumah Aspirasi Digital</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <AlertDialogAction className="bg-white/10 hover:bg-gradient-to-r hover:from-blue-500 hover:to-blue-600 text-white border border-white/20 shadow-lg transition-all flex gap-2 items-center group duration-700">
                   <Link

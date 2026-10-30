@@ -564,7 +564,7 @@ const ManagePelatihan = () => {
                             className="w-full"
                         >
                             <TabsContent value="1" className="mt-0 focus-visible:outline-none w-full">
-                                <PelatihanDetail data={dataPelatihan!} fetchData={refetchDetailPelatihan} />
+                                <PelatihanDetail data={dataPelatihan!} fetchData={refetchDetailPelatihan} onSwitchToSttpl={() => setActiveTab('2')} />
                             </TabsContent>
 
                             <TabsContent value="2" className="mt-0 focus-visible:outline-none w-full">

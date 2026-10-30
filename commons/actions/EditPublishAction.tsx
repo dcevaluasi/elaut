@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
     Dialog,
     DialogTrigger,
@@ -15,11 +15,9 @@ import {
     LayoutGrid,
     Calendar,
     Users,
-    FileImage,
     Rocket,
     Save,
     X,
-    UploadCloud,
     Megaphone,
     Clock,
     Target
@@ -31,7 +29,7 @@ import { elautBaseUrl } from "@/constants/urls";
 import { Textarea } from "@/components/ui/textarea";
 import { PelatihanMasyarakat } from "@/types/product";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 
 interface EditPublishActionProps {
@@ -59,17 +57,7 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
     const [kuotaPelatihan, setKuotaPelatihan] = useState(currentData?.KoutaPelatihan || "")
     const [asalPelatihan, setAsalPelatihan] = useState(currentData?.AsalPelatihan || "No Mandiri")
     const [loading, setLoading] = useState(false);
-    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
-    React.useEffect(() => {
-        if (!fotoPelatihan) {
-            setPreviewUrl(null);
-            return;
-        }
-        const url = URL.createObjectURL(fotoPelatihan);
-        setPreviewUrl(url);
-        return () => URL.revokeObjectURL(url);
-    }, [fotoPelatihan]);
+    const [uploadProgress, setUploadProgress] = useState(0);
 
     const handleSubmit = async () => {
         if (!detailPelatihan && !fotoPelatihan) {
@@ -91,12 +79,18 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
 
         try {
             setLoading(true);
-            const response = await axios.put(
+            setUploadProgress(0);
+            await axios.put(
                 `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${idPelatihan}`,
                 formData,
                 {
                     headers: {
                         Authorization: `Bearer ${Cookies.get("XSRF091")}`,
+                    },
+                    onUploadProgress: (event) => {
+                        if (event.total) {
+                            setUploadProgress(Math.round((event.loaded * 100) / event.total));
+                        }
                     },
                 }
             );
@@ -105,17 +99,19 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
                 title: "Berhasil!",
                 text: "Informasi pelatihan berhasil diperbarui.",
             });
+            setFotoPelatihan(null);
             setIsOpen(false);
-            setLoading(false);
             if (onSuccess) onSuccess();
         } catch (error) {
             console.error("ERROR UPDATE PELATIHAN: ", error);
-            setLoading(false);
             Toast.fire({
                 icon: "error",
                 title: "Gagal!",
                 text: "Terjadi kesalahan saat memperbarui pelatihan.",
             });
+        } finally {
+            setLoading(false);
+            setUploadProgress(0);
         }
     };
 
@@ -232,102 +228,13 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
                                     <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800" />
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                                    <div>
-                                        <label htmlFor="flyerUpload" className="group/upload relative block w-full h-[200px] md:h-[240px] rounded-[2.5rem] border-[3px] border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 hover:bg-white dark:hover:bg-slate-900 hover:border-indigo-400 transition-all cursor-pointer overflow-hidden shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)] group">
-                                            {/* Background Pattern */}
-                                            <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#4f46e5 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
-                                            
-                                            <input
-                                                id="flyerUpload"
-                                                type="file"
-                                                className="hidden"
-                                                accept="image/*"
-                                                onChange={(e) => setFotoPelatihan(e.target.files ? e.target.files[0] : null)}
-                                            />
-                                            
-                                            <AnimatePresence mode="wait">
-                                                {previewUrl ? (
-                                                    <motion.div 
-                                                        key="preview"
-                                                        initial={{ opacity: 0, scale: 1.1 }}
-                                                        animate={{ opacity: 1, scale: 1 }}
-                                                        exit={{ opacity: 0, scale: 0.9 }}
-                                                        className="absolute inset-0 w-full h-full"
-                                                    >
-                                                        <img 
-                                                            src={previewUrl} 
-                                                            alt="Preview" 
-                                                            className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-                                                        />
-                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col items-center justify-end pb-8">
-                                                            <div className="flex gap-3 scale-90 group-hover:scale-100 transition-transform duration-500">
-                                                                <div className="bg-white/10 backdrop-blur-xl px-6 py-2.5 rounded-2xl border border-white/20 text-white text-[10px] font-black uppercase tracking-widest shadow-2xl flex items-center gap-2">
-                                                                    <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></div>
-                                                                    Ganti Gambar
-                                                                </div>
-                                                                <button 
-                                                                    type="button"
-                                                                    onClick={(e) => {
-                                                                        e.preventDefault();
-                                                                        e.stopPropagation();
-                                                                        setFotoPelatihan(null);
-                                                                    }}
-                                                                    className="bg-rose-500/20 backdrop-blur-xl p-2.5 rounded-2xl border border-rose-500/30 text-rose-100 hover:bg-rose-500 hover:text-white transition-all shadow-2xl group/btn"
-                                                                >
-                                                                    <X className="w-5 h-5 transition-transform group-hover/btn:rotate-90" />
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </motion.div>
-                                                ) : (
-                                                    <motion.div 
-                                                        key="empty"
-                                                        initial={{ opacity: 0, y: 10 }}
-                                                        animate={{ opacity: 1, y: 0 }}
-                                                        exit={{ opacity: 0, y: -10 }}
-                                                        className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center"
-                                                    >
-                                                        <div className="relative mb-6">
-                                                            {/* Decorative Glow */}
-                                                            <div className="absolute inset-0 bg-indigo-500/20 blur-2xl rounded-full scale-150 animate-pulse" />
-                                                            
-                                                            <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-[2.5rem] bg-gradient-to-tr from-indigo-600 to-blue-500 text-white flex items-center justify-center shadow-2xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 group-hover:shadow-indigo-500/40">
-                                                                <UploadCloud className="w-8 h-8 md:w-10 md:h-10 text-indigo-100" />
-                                                                
-                                                                {/* Floating Badge */}
-                                                                <div className="absolute -top-1 -right-1 w-7 h-7 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg border border-slate-100 dark:border-slate-800 animate-bounce">
-                                                                    <div className="w-4 h-4 bg-emerald-500 rounded-lg flex items-center justify-center">
-                                                                        <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        
-                                                        <div className="space-y-2">
-                                                            <p className="text-xs md:text-sm font-black text-slate-900 dark:text-white uppercase tracking-[0.4em] leading-none">
-                                                                Unggah Flyer
-                                                            </p>
-                                                            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 italic max-w-[200px] mx-auto leading-relaxed">
-                                                                Drag & drop atau klik untuk memilih file visual pelatihan
-                                                            </p>
-                                                        </div>
-                                                        
-                                                        <div className="mt-8 px-8 py-2.5 rounded-2xl bg-indigo-600 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-500/30 hover:bg-indigo-700 transition-all transform active:scale-95">
-                                                            Pilih File
-                                                        </div>
-                                                        
-                                                        <div className="mt-4 flex items-center gap-4 text-[9px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest">
-                                                            <span>PNG</span>
-                                                            <div className="w-1 h-1 bg-slate-200 dark:bg-slate-800 rounded-full"></div>
-                                                            <span>JPG</span>
-                                                            <div className="w-1 h-1 bg-slate-200 dark:bg-slate-800 rounded-full"></div>
-                                                            <span>MAX 5MB</span>
-                                                        </div>
-                                                    </motion.div>
-                                                )}
-                                            </AnimatePresence>
-                                        </label>
-                                    </div>
+                                    <FlyerUploader
+                                        file={fotoPelatihan}
+                                        onChange={setFotoPelatihan}
+                                        currentUrl={currentFoto}
+                                        disabled={loading}
+                                        progress={uploadProgress}
+                                    />
                                     <div className="flex flex-col justify-center gap-3 md:gap-4 bg-slate-50 dark:bg-slate-900/50 p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-inner">
                                         <div className="flex items-center gap-3">
                                             <div className="p-1.5 md:p-2 rounded-lg md:rounded-xl bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600">
@@ -338,19 +245,6 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
                                                 <p className="text-[10px] md:text-xs font-bold text-slate-700 dark:text-slate-300 mt-1">{currentData?.Status || "Draft"}</p>
                                             </div>
                                         </div>
-                                        {currentFoto && (
-                                            <div className="flex items-center gap-3">
-                                                <div className="p-1.5 md:p-2 rounded-lg md:rounded-xl bg-blue-100 dark:bg-blue-500/20 text-blue-600">
-                                                    <FileImage className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-[9px] md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none text-left">Asset Visual</p>
-                                                    <a href={currentFoto} target="_blank" rel="noopener noreferrer" className="text-[10px] md:text-xs font-black text-indigo-600 dark:text-indigo-400 underline decoration-indigo-500/30 underline-offset-4 hover:text-indigo-700 transition-colors">
-                                                        Lihat Flyer Aktif
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -402,7 +296,11 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
                                             transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
                                             className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
                                         ></motion.div>
-                                        <span>Menyimpan...</span>
+                                        <span>
+                                            {fotoPelatihan && uploadProgress > 0
+                                                ? `Mengunggah ${uploadProgress}%`
+                                                : "Menyimpan..."}
+                                        </span>
                                     </>
                                 ) : (
                                     <>
@@ -420,3 +318,317 @@ const EditPublishAction: React.FC<EditPublishActionProps> = ({
 };
 
 export default EditPublishAction;
+
+import {
+    AlertCircle,
+    ExternalLink,
+    RefreshCw,
+    Trash2,
+    Undo2,
+    UploadCloud,
+} from "lucide-react";
+
+const ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/webp"];
+
+const formatSize = (bytes: number) =>
+    bytes < 1024 * 1024
+        ? `${Math.max(1, Math.round(bytes / 1024))} KB`
+        : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+
+interface FlyerUploaderProps {
+    /** Newly selected file (not saved yet) */
+    file: File | null;
+    onChange: (file: File | null) => void;
+    /** URL of the flyer that is currently published */
+    currentUrl?: string;
+    disabled?: boolean;
+    /** 0–100, shown over the preview while a new file is being uploaded */
+    progress?: number;
+    maxSizeMB?: number;
+}
+
+const FlyerUploader: React.FC<FlyerUploaderProps> = ({
+    file,
+    onChange,
+    currentUrl,
+    disabled = false,
+    progress = 0,
+    maxSizeMB = 5,
+}) => {
+    const inputRef = useRef<HTMLInputElement>(null);
+    const dragDepth = useRef(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [currentFailed, setCurrentFailed] = useState(false);
+
+    useEffect(() => {
+        if (!file) {
+            setPreviewUrl(null);
+            return;
+        }
+        const url = URL.createObjectURL(file);
+        setPreviewUrl(url);
+        return () => URL.revokeObjectURL(url);
+    }, [file]);
+
+    useEffect(() => {
+        setCurrentFailed(false);
+    }, [currentUrl]);
+
+    const openDialog = () => {
+        if (!disabled) inputRef.current?.click();
+    };
+
+    const validate = (f: File): string | null => {
+        if (!ACCEPTED_TYPES.includes(f.type)) {
+            return "Format file tidak didukung. Pilih gambar PNG, JPG, atau WEBP.";
+        }
+        if (f.size > maxSizeMB * 1024 * 1024) {
+            return `Ukuran file ${formatSize(f.size)} melebihi batas ${maxSizeMB} MB. Perkecil ukuran gambar lalu coba lagi.`;
+        }
+        return null;
+    };
+
+    const handlePick = (picked?: File) => {
+        if (!picked) return;
+        const message = validate(picked);
+        if (message) {
+            setError(message);
+            return;
+        }
+        setError(null);
+        onChange(picked);
+    };
+
+    const handleRemove = () => {
+        setError(null);
+        onChange(null);
+    };
+
+    const onDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        if (disabled) return;
+        dragDepth.current += 1;
+        setIsDragging(true);
+    };
+
+    const onDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault(); // required, otherwise the browser blocks dropping
+        e.dataTransfer.dropEffect = disabled ? "none" : "copy";
+    };
+
+    const onDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        if (disabled) return;
+        dragDepth.current = Math.max(0, dragDepth.current - 1);
+        if (dragDepth.current === 0) setIsDragging(false);
+    };
+
+    const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        dragDepth.current = 0;
+        setIsDragging(false);
+        if (disabled) return;
+        handlePick(e.dataTransfer.files?.[0]);
+    };
+
+    const displayUrl = previewUrl ?? (currentUrl && !currentFailed ? currentUrl : null);
+    const showProgress = !!file && disabled && progress > 0;
+
+    const frameClass = isDragging
+        ? "border-solid border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10"
+        : displayUrl
+            ? "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
+            : "border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 hover:border-indigo-400";
+
+    return (
+        <div className="space-y-2">
+            <input
+                ref={inputRef}
+                type="file"
+                accept={ACCEPTED_TYPES.join(",")}
+                className="sr-only"
+                tabIndex={-1}
+                disabled={disabled}
+                onChange={(e) => {
+                    const picked = e.target.files?.[0];
+                    e.target.value = ""; // lets the same file be chosen again after removing it
+                    handlePick(picked);
+                }}
+            />
+
+            <div
+                onDragEnter={onDragEnter}
+                onDragOver={onDragOver}
+                onDragLeave={onDragLeave}
+                onDrop={onDrop}
+                className={`relative overflow-hidden rounded-[2rem] border-2 transition-colors ${frameClass}`}
+            >
+                {displayUrl ? (
+                    <>
+                        <div className="relative aspect-[16/10] bg-slate-100 dark:bg-slate-800">
+                            <img
+                                src={displayUrl}
+                                alt={file ? "Pratinjau flyer baru" : "Flyer pelatihan saat ini"}
+                                className="h-full w-full object-contain"
+                                onError={() => {
+                                    if (!file) setCurrentFailed(true);
+                                }}
+                            />
+                            <Badge
+                                className={`absolute left-3 top-3 border-0 px-3 py-1 text-[11px] font-bold shadow-sm ${file
+                                    ? "bg-emerald-500 text-white hover:bg-emerald-500"
+                                    : "bg-white/90 text-slate-700 hover:bg-white/90"
+                                    }`}
+                            >
+                                {file ? "Flyer baru (belum disimpan)" : "Flyer saat ini"}
+                            </Badge>
+
+                            {showProgress && (
+                                <div
+                                    role="status"
+                                    className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-slate-900/70 px-8 text-white"
+                                >
+                                    <p className="text-sm font-bold">Mengunggah flyer… {progress}%</p>
+                                    <div
+                                        role="progressbar"
+                                        aria-valuemin={0}
+                                        aria-valuemax={100}
+                                        aria-valuenow={progress}
+                                        className="h-2 w-full max-w-[220px] overflow-hidden rounded-full bg-white/20"
+                                    >
+                                        <div
+                                            className="h-full rounded-full bg-emerald-400 transition-[width] duration-200"
+                                            style={{ width: `${progress}%` }}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            {isDragging && (
+                                <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-indigo-600/90 text-white">
+                                    <p className="text-sm font-bold">Lepaskan file untuk mengganti flyer</p>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="min-w-0">
+                                {file ? (
+                                    <>
+                                        <p
+                                            className="truncate text-sm font-bold text-slate-800 dark:text-slate-100"
+                                            title={file.name}
+                                        >
+                                            {file.name}
+                                        </p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                                            {formatSize(file.size)}. Klik “Simpan perubahan” untuk menerapkan.
+                                        </p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <p className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                                            Flyer yang tampil di portal
+                                        </p>
+                                        <a
+                                            href={currentUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400"
+                                        >
+                                            Buka ukuran penuh
+                                            <ExternalLink className="h-3 w-3" />
+                                        </a>
+                                    </>
+                                )}
+                            </div>
+
+                            <div className="flex shrink-0 gap-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={openDialog}
+                                    disabled={disabled}
+                                    className="gap-2 rounded-xl"
+                                >
+                                    <RefreshCw className="h-4 w-4" />
+                                    Ganti
+                                </Button>
+                                {file && (
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={handleRemove}
+                                        disabled={disabled}
+                                        className="gap-2 rounded-xl text-rose-600 hover:bg-rose-50 hover:text-rose-700 dark:hover:bg-rose-500/10"
+                                    >
+                                        {currentUrl && !currentFailed ? (
+                                            <Undo2 className="h-4 w-4" />
+                                        ) : (
+                                            <Trash2 className="h-4 w-4" />
+                                        )}
+                                        {currentUrl && !currentFailed ? "Batalkan" : "Hapus"}
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <div
+                        role="button"
+                        tabIndex={disabled ? -1 : 0}
+                        aria-disabled={disabled}
+                        aria-label="Pilih file flyer pelatihan"
+                        onClick={openDialog}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                openDialog();
+                            }
+                        }}
+                        className="flex min-h-[240px] cursor-pointer flex-col items-center justify-center gap-4 p-6 text-center outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 aria-disabled:cursor-not-allowed aria-disabled:opacity-60"
+                    >
+                        <div
+                            className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 transition-transform ${isDragging ? "scale-110" : ""
+                                }`}
+                        >
+                            <UploadCloud className="h-7 w-7" />
+                        </div>
+
+                        <div className="space-y-1">
+                            <p className="text-sm font-bold text-slate-900 dark:text-white">
+                                {isDragging ? "Lepaskan file di sini" : "Seret flyer ke sini"}
+                            </p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                                atau klik untuk memilih dari perangkat Anda
+                            </p>
+                        </div>
+
+                        <span className="rounded-full bg-indigo-600 px-5 py-2 text-xs font-bold text-white">
+                            Pilih file
+                        </span>
+
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                            PNG, JPG, atau WEBP. Maksimal {maxSizeMB} MB.
+                        </p>
+                    </div>
+                )}
+            </div>
+
+            {error && (
+                <p
+                    role="alert"
+                    className="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300"
+                >
+                    <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>{error}</span>
+                </p>
+            )}
+        </div>
+    );
+};
+

@@ -63,7 +63,7 @@ export default function Footer() {
           <div className="sm:col-span-6 md:col-span-3 lg:col-span-2">
             <h6 className="text-gray-300 font-bold mb-2">Layanan & Pengaduan</h6>
             <ul className="text-sm space-y-2">
-              <FooterLink href="https://rumah-aspirasi-digital-smoky.vercel.app/">Pengaduan dan Aspirasi Puslat KP</FooterLink>
+              <FooterLink href="https://rumah-aspirasi-digital-smoky.vercel.app/">Rumah Aspirasi Digital</FooterLink>
               <FooterLink href="/layanan/publik/maklumat-pelayanan">Maklumat Pelayanan</FooterLink>
               <FooterLink href="/files/Standar Pelayanan P2MKP.pdf">Standar Pelayanan</FooterLink>
               <FooterLink href="https://span.lapor.go.id">SPAN Lapor</FooterLink>

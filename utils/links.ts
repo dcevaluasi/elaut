@@ -16,7 +16,7 @@ export const LAYANAN_LANDING_MENU_ITEMS: LayananItem[] = [
     },
     {
         href: "https://rumah-aspirasi-digital-smoky.vercel.app/",
-        label: "Pengaduan dan Aspirasi",
+        label: "Rumah Aspirasi Digital",
         icon: HiOutlineDocumentText,
     },
     {

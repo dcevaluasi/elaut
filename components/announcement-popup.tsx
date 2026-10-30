@@ -94,7 +94,7 @@ export default function AnnouncementPopup() {
 
         {/* Scrollable Content Body (Frosted Glass Cards) */}
         <div className="p-4 sm:p-6 overflow-y-auto space-y-3.5 sm:space-y-4 flex-1 custom-scrollbar">
-          
+
           {/* Card 1: Standar Pelayanan */}
           <div className="group relative bg-white/5 hover:bg-white/10 backdrop-blur-xl border border-white/15 hover:border-cyan-400/50 rounded-2xl p-4 sm:p-4.5 transition-all duration-300 shadow-lg hover:shadow-cyan-500/10">
             <div className="flex items-start gap-3.5">
@@ -136,8 +136,7 @@ export default function AnnouncementPopup() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2 mb-1">
                   <h3 className="font-bold text-sm sm:text-base text-white leading-snug">
-                    Portal Pengaduan Pusat Pelatihan KP
-                  </h3>
+                    Rumah Aspirasi Digital                  </h3>
                   <span className="text-[10px] font-extrabold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-400/30 px-2.5 py-0.5 rounded-full flex-shrink-0">
                     Aspirasi
                   </span>

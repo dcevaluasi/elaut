@@ -1,379 +1,568 @@
 "use client";
 
-import Image from "next/image";
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "framer-motion";
+import { ArrowRight, ChevronDown, ExternalLink, Play, PlayCircle, Youtube, X } from "lucide-react";
+
 import Logo from "@/components/ui/logo";
-import { FiPlay, FiYoutube, FiX } from "react-icons/fi";
 import { getAllVideoPelatihans, incrementVideoClick } from "@/utils/videoPelatihan";
+import { cn } from "@/lib/utils";
 import ProgramKhususSection from "./ProgramKhususSection";
 import P2MKPSection from "./P2MKPSection";
 
-const extractYoutubeId = (url: string) => {
+/* ------------------------------------------------------------------ */
+/*  Content                                                             */
+/* ------------------------------------------------------------------ */
+type VideoPelatihan = {
+  id: string;
+  linkPelatihan: string;
+  namaPelatihan: string;
+  penyelenggara?: string;
+  programPelatihan?: string;
+  jenisProgramPelatihan?: string;
+};
+
+const HERO_IMAGES = [
+  "/images/hero-img4-preview.jpg",
+  "/images/hero-img.jpg",
+  "/images/hero-img3.jpg",
+  "/images/hero-img7.jpg",
+];
+const SLIDE_MS = 8000;
+const MAX_VIDEOS = 5;
+
+const PROGRAMS = [
+  {
+    name: "Perikanan",
+    icon: "/icons/icperikanan.png",
+    slug: "perikanan",
+    description:
+      "Pelatihan perikanan meliputi penangkapan ikan, budidaya, serta inovasi sumber daya laut berkelanjutan.",
+  },
+  {
+    name: "Awak Kapal Perikanan",
+    icon: "/icons/icawak.png",
+    slug: "akp",
+    description: "Membekali keterampilan penangkapan ikan, navigasi, dan keselamatan di laut.",
+  },
+  {
+    name: "Kelautan",
+    icon: "/icons/ickelautan.png",
+    slug: "kelautan",
+    description:
+      "Eksplorasi tak terbatas: pengelolaan sumber daya, konservasi, riset, dan teknologi kelautan.",
+  },
+];
+
+/** Returns the 11-character YouTube id from any common YouTube URL (or the input itself). */
+const extractYoutubeId = (url?: string) => {
   if (!url) return "";
-  try {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|live\/)([^#&?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : url;
-  } catch (e) {
-    return url;
-  }
+  const match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=|live\/)([^#&?]*).*/);
+  return match && match[2].length === 11 ? match[2] : url;
+};
+
+const videoMeta = (v: VideoPelatihan) =>
+  [v.penyelenggara, v.programPelatihan || v.jenisProgramPelatihan].filter(Boolean).join(" • ");
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
+};
+
+/* ------------------------------------------------------------------ */
+/*  Hooks                                                               */
+/* ------------------------------------------------------------------ */
+function useVideoPelatihan() {
+  const [videos, setVideos] = React.useState<VideoPelatihan[]>([]);
+  const [status, setStatus] = React.useState<"loading" | "ready" | "error">("loading");
+
+  const load = React.useCallback(async () => {
+    setStatus("loading");
+    try {
+      // The util is typed as `{ id: string }[]`, so assert the fuller shape here.
+      const data = (await getAllVideoPelatihans()) as VideoPelatihan[];
+      setVideos([...data].reverse().slice(0, MAX_VIDEOS)); // oldest first
+      setStatus("ready");
+    } catch (error) {
+      console.error(error);
+      setStatus("error");
+    }
+  }, []);
+
+  React.useEffect(() => {
+    load();
+  }, [load]);
+
+  return { videos, status, reload: load };
 }
 
-export default function Hero() {
-  const [videoPelatihan, setVideoPelatihan] = React.useState<any[]>([]);
-  const [isLoadingVideos, setIsLoadingVideos] = React.useState(true);
-
-  React.useEffect(() => {
-    const fetchVideos = async () => {
-      try {
-        setIsLoadingVideos(true);
-        const data = await getAllVideoPelatihans();
-        // Reverse array to show oldest first
-        const oldestFirst = [...data].reverse();
-        setVideoPelatihan(oldestFirst.slice(0, 5));
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoadingVideos(false);
-      }
-    };
-    fetchVideos();
-  }, []);
-
-  const handleVideoClick = async (video: any) => {
-    const ytId = extractYoutubeId(video.linkPelatihan);
-    setActiveVideo(ytId);
-    try {
-      await incrementVideoClick(video.id);
-    } catch (e) { }
+/* ------------------------------------------------------------------ */
+/*  Pieces                                                              */
+/* ------------------------------------------------------------------ */
+function ProgramCard({ program, index }: { program: (typeof PROGRAMS)[number]; index: number }) {
+  const handleMove = (e: React.PointerEvent<HTMLAnchorElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty("--x", `${e.clientX - rect.left}px`);
+    e.currentTarget.style.setProperty("--y", `${e.clientY - rect.top}px`);
   };
 
-  const programPelatihan = [
-    {
-      id: "001",
-      name: "Perikanan",
-      icon: "/icons/icperikanan.png",
-      slug: "perikanan",
-      description:
-        "Pelatihan perikanan meliputi penangkapan ikan, budidaya, serta inovasi sumber daya laut berkelanjutan.",
-    },
-    {
-      id: "002",
-      name: "Awak Kapal Perikanan",
-      icon: "/icons/icawak.png",
-      slug: "akp",
-      description:
-        "Membekali keterampilan penangkapan ikan, navigasi, dan keselamatan di laut.",
-    },
-    {
-      id: "003",
-      name: "Kelautan",
-      icon: "/icons/ickelautan.png",
-      slug: "kelautan",
-      description:
-        "Eksplorasi tak terbatas: pengelolaan sumber daya, konservasi, riset, dan teknologi kelautan.",
-    },
-  ];
+  return (
+    <motion.div variants={fadeUp} className="h-full">
+      <Link
+        href={`/layanan/pelatihan/program/${program.slug}`}
+        onPointerMove={handleMove}
+        className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-2xl transition-all duration-500 hover:-translate-y-1.5 hover:border-blue-400/40 hover:bg-white/[0.07] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 sm:p-7"
+      >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[radial-gradient(420px_circle_at_var(--x,50%)_var(--y,0%),rgba(96,165,250,0.18),transparent_60%)]"
+        />
+        <div className="relative flex items-start gap-4">
+          <div className="relative h-16 w-16 shrink-0 transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110">
+            <div className="absolute inset-0 rounded-full bg-blue-400/25 blur-xl" aria-hidden="true" />
+            <Image src={program.icon} alt="" fill sizes="64px" className="relative object-contain" />
+          </div>
+          <div className="min-w-0">
+            <p className="font-mono text-[11px] text-blue-300/60">0{index + 1}</p>
+            <h3 className="font-calsans text-xl text-white transition-colors group-hover:text-blue-200">
+              {program.name}
+            </h3>
+          </div>
+        </div>
+        <p className="relative mt-4 flex-1 text-sm font-light leading-relaxed text-gray-400">
+          {program.description}
+        </p>
+        <span className="relative mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-blue-300 transition-all group-hover:gap-2.5 group-hover:text-white">
+          Lihat program
+          <ArrowRight className="h-4 w-4" aria-hidden="true" />
+        </span>
+      </Link>
+    </motion.div>
+  );
+}
 
-  const [selectedProgram, setSelectedProgram] = React.useState<number | null>(null);
-  const [imageIndex, setImageIndex] = React.useState(0);
-  const [activeVideo, setActiveVideo] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setActiveVideo(null);
-    };
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, []);
-
-  const images = [
-    "/images/hero-img4-preview.jpg",
-    "/images/hero-img.jpg",
-    "/images/hero-img3.jpg",
-    "/images/hero-img7.jpg",
-  ];
-
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 8000);
-    return () => clearInterval(interval);
-  }, [images.length]);
+function VideoCard({
+  video,
+  featured = false,
+  onPlay,
+}: {
+  video: VideoPelatihan;
+  featured?: boolean;
+  onPlay: () => void;
+}) {
+  const ytId = extractYoutubeId(video.linkPelatihan);
 
   return (
-    <section>
-      <div className="relative pt-20 min-h-screen w-full overflow-hidden bg-[#020617] font-jakarta selection:bg-blue-500/30 -mb-20">
-        {/* Immersive Background System (Matching P2MKP style) */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-          <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-blue-600/15 rounded-full blur-[140px] animate-pulse" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-600/15 rounded-full blur-[140px]" />
-          <div className="absolute top-[30%] right-[0%] w-[40%] h-[40%] bg-cyan-600/10 rounded-full blur-[110px]" />
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-15 contrast-150 brightness-100" />
-        </div>
+    <button
+      type="button"
+      onClick={onPlay}
+      aria-label={`Putar video ${video.namaPelatihan}`}
+      className={cn(
+        "group relative block w-full overflow-hidden rounded-3xl border border-white/10 bg-white/5 text-left transition-all duration-300 hover:-translate-y-1 hover:border-blue-400/40 hover:shadow-2xl hover:shadow-blue-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
+        featured ? "h-full min-h-[300px]" : "h-[180px]"
+      )}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={`https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`}
+        alt=""
+        loading="lazy"
+        onError={(e) => {
+          const img = e.currentTarget;
+          const fallback = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+          if (img.src !== fallback) img.src = fallback;
+        }}
+        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/50 to-transparent opacity-80 transition-opacity duration-300 group-hover:opacity-95" />
 
-        <div className="absolute inset-0 z-0">
-          <AnimatePresence mode="wait">
+      <span className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
+        <span
+          className={cn(
+            "flex items-center justify-center rounded-full border border-blue-300/40 bg-blue-600/90 shadow-2xl shadow-blue-500/40 backdrop-blur-sm transition-transform duration-300 group-hover:scale-110",
+            featured ? "h-16 w-16" : "h-12 w-12"
+          )}
+        >
+          <Play className="ml-0.5 h-5 w-5 fill-white text-white" />
+        </span>
+      </span>
+
+      <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-black/60 px-2.5 py-1 backdrop-blur-sm">
+        <Youtube className="h-3 w-3 text-red-400" aria-hidden="true" />
+        <span className="text-[9px] font-bold uppercase tracking-wider text-gray-300">YouTube</span>
+      </span>
+
+      <span className="absolute inset-x-0 bottom-0 block p-4">
+        {featured && (
+          <span className="mb-2 inline-block rounded-full border border-blue-400/30 bg-blue-600/80 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-widest text-white">
+            Video Utama
+          </span>
+        )}
+        <span className={cn("line-clamp-2 block font-bold leading-snug text-white", featured ? "text-base md:text-lg" : "text-xs")}>
+          {video.namaPelatihan}
+        </span>
+        {videoMeta(video) && (
+          <span className="mt-1 line-clamp-1 block text-[10px] text-gray-300">{videoMeta(video)}</span>
+        )}
+      </span>
+    </button>
+  );
+}
+
+function VideoModal({ video, onClose }: { video: VideoPelatihan; onClose: () => void }) {
+  const ytId = extractYoutubeId(video.linkPelatihan);
+
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [onClose]);
+
+  return (
+    <motion.div
+      role="dialog"
+      aria-modal="true"
+      aria-label={video.namaPelatihan}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.25 }}
+      onClick={onClose}
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 font-jakarta"
+    >
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, y: 30 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 30 }}
+        transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
+        onClick={(e) => e.stopPropagation()}
+        className="relative z-10 w-full max-w-4xl overflow-hidden rounded-3xl border border-white/10 bg-[#050d1a] shadow-2xl shadow-blue-500/20"
+      >
+        <div className="aspect-video w-full bg-black">
+          <iframe
+            src={`https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`}
+            allow="accelerometer; autoplay; encrypted-media; picture-in-picture"
+            allowFullScreen
+            className="h-full w-full"
+            title={video.namaPelatihan}
+          />
+        </div>
+        <div className="flex items-center gap-3 border-t border-white/5 px-5 py-4">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-red-500/30 bg-red-600/20">
+            <Youtube className="h-4 w-4 text-red-400" aria-hidden="true" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <h4 className="truncate text-sm font-bold text-white">{video.namaPelatihan}</h4>
+            {videoMeta(video) && <p className="mt-0.5 truncate text-xs text-gray-400">{videoMeta(video)}</p>}
+          </div>
+          <a
+            href={`https://youtu.be/${ytId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs text-white transition-colors hover:bg-white/20 sm:inline-flex"
+          >
+            <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+            Buka di YouTube
+          </a>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Tutup video"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/10 text-white transition-all hover:bg-red-500/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function VideoSkeleton() {
+  const shimmer = (
+    <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+  );
+  return (
+    <>
+      <div className="relative min-h-[300px] overflow-hidden rounded-3xl border border-white/5 bg-[#1e293b]/40 lg:row-span-2">
+        {shimmer}
+      </div>
+      <div className="grid grid-cols-2 gap-5">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="relative h-[180px] overflow-hidden rounded-3xl border border-white/5 bg-[#1e293b]/40">
+            {shimmer}
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Hero                                                                */
+/* ------------------------------------------------------------------ */
+export default function Hero() {
+  const heroRef = React.useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
+
+  const [slide, setSlide] = React.useState(0);
+  const [activeVideo, setActiveVideo] = React.useState<VideoPelatihan | null>(null);
+  const { videos, status: videoStatus, reload: reloadVideos } = useVideoPelatihan();
+
+  /* Scroll parallax: background drifts slower, content fades & rises. */
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", reduceMotion ? "0%" : "25%"]);
+  const contentY = useTransform(scrollYProgress, [0, 1], [0, reduceMotion ? 0 : -80]);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.8], [1, reduceMotion ? 1 : 0]);
+
+  /* Pointer parallax on the glow blobs (smoothed with a spring). */
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const glowX = useSpring(useTransform(mx, (v) => v * 50), { stiffness: 60, damping: 20 });
+  const glowY = useSpring(useTransform(my, (v) => v * 50), { stiffness: 60, damping: 20 });
+  const handlePointer = (e: React.PointerEvent) => {
+    if (reduceMotion || e.pointerType !== "mouse") return;
+    mx.set(e.clientX / window.innerWidth - 0.5);
+    my.set(e.clientY / window.innerHeight - 0.5);
+  };
+
+  React.useEffect(() => {
+    if (reduceMotion) return;
+    const t = setTimeout(() => setSlide((s) => (s + 1) % HERO_IMAGES.length), SLIDE_MS);
+    return () => clearTimeout(t);
+  }, [slide, reduceMotion]);
+
+  const playVideo = (video: VideoPelatihan) => {
+    setActiveVideo(video);
+    incrementVideoClick(video.id).catch(() => { });
+  };
+  const closeVideo = React.useCallback(() => setActiveVideo(null), []);
+
+  const scrollTo = (id: string) =>
+    document.getElementById(id)?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+
+  const [featured, ...others] = videos;
+
+  return (
+    <section className="relative overflow-hidden bg-[#020617] font-jakarta selection:bg-blue-500/30">
+      {/* ============================== HERO ============================== */}
+      <div ref={heroRef} onPointerMove={handlePointer} className="relative isolate min-h-[100svh] overflow-hidden pt-20">
+        {/* Background slideshow with scroll parallax */}
+        <motion.div style={{ y: bgY }} className="absolute inset-0 -z-20" aria-hidden="true">
+          <AnimatePresence mode="sync">
             <motion.div
-              key={imageIndex}
+              key={slide}
               initial={{ opacity: 0, scale: 1.1 }}
-              animate={{ opacity: 0.15, scale: 1 }} // Reduced opacity for better blend with noise
-              exit={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 0.2, scale: 1 }}
+              exit={{ opacity: 0 }}
               transition={{ duration: 2, ease: "easeInOut" }}
               className="absolute inset-0"
             >
-              <Image
-                src={images[imageIndex]}
-                alt="Hero background"
-                fill
-                priority
-                className="object-cover"
-              />
+              <Image src={HERO_IMAGES[slide]} alt="" fill priority={slide === 0} sizes="100vw" className="object-cover" />
             </motion.div>
           </AnimatePresence>
-          {/* Dark Vignette Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#020617]/40 to-[#020617]" />
+        </motion.div>
+
+        {/* Tint, grid, noise, glow */}
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-[#020617]/40 to-[#020617]" aria-hidden="true" />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 opacity-[0.06] [background-image:linear-gradient(white_1px,transparent_1px),linear-gradient(90deg,white_1px,transparent_1px)] [background-size:56px_56px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]"
+        />
+        <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-15 contrast-150" />
+        <motion.div style={{ x: glowX, y: glowY }} className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+          <div className="absolute -left-24 -top-24 h-[40rem] w-[40rem] rounded-full bg-blue-600/15 blur-[120px]" />
+          <div className="absolute -bottom-48 -right-48 h-[45rem] w-[45rem] rounded-full bg-cyan-500/10 blur-[150px]" />
+          <div className="absolute right-0 top-1/3 h-[24rem] w-[24rem] rounded-full bg-indigo-600/15 blur-[110px]" />
+        </motion.div>
+
+        {/* Content */}
+        <motion.div
+          style={{ y: contentY, opacity: contentOpacity }}
+          initial="hidden"
+          animate="show"
+          variants={{ show: { transition: { staggerChildren: 0.12 } } }}
+          className="mx-auto flex min-h-[calc(100svh-5rem)] w-full max-w-7xl flex-col justify-center gap-10 px-6 py-16 md:px-12"
+        >
+          <div className="flex flex-col items-center text-center md:items-start md:text-left">
+            <motion.span
+              variants={fadeUp}
+              className="inline-flex items-center gap-2 rounded-full border border-blue-400/20 bg-blue-500/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-widest text-blue-300 backdrop-blur-md sm:text-xs"
+            >
+              <span className="relative flex h-2 w-2" aria-hidden="true">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-300 opacity-75 motion-reduce:animate-none" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-300" />
+              </span>
+              Next Generation Marine Training
+            </motion.span>
+
+            <motion.h1
+              variants={fadeUp}
+              className="mt-6 font-calsans text-3xl leading-[1.05] tracking-tight text-white drop-shadow-2xl sm:text-5xl lg:text-6xl"
+            >
+              Elektronik Layanan Pelatihan
+              <br />
+              <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-teal-300 bg-clip-text text-transparent">
+                Utama Terpadu
+              </span>
+            </motion.h1>
+
+            <motion.div variants={fadeUp} className="mt-3 flex flex-col items-center gap-2 md:flex-row md:items-end md:gap-4">
+              <span className="bg-gradient-to-b from-blue-400 to-indigo-600 bg-clip-text font-calsans text-6xl leading-none text-transparent drop-shadow-[0_0_30px_rgba(59,130,246,0.35)] sm:text-8xl lg:text-9xl">
+                E-LAUT
+              </span>
+              <div className="hero-logo scale-75 md:mb-4 md:scale-100">
+                <Logo />
+              </div>
+            </motion.div>
+
+            <motion.p variants={fadeUp} className="mt-6 max-w-2xl text-sm font-light leading-relaxed text-gray-400 md:text-lg">
+              Wujudkan kemandirian sumber daya manusia kelautan dan perikanan yang unggul dan inovatif
+              melalui platform pelatihan digital terstandarisasi.
+            </motion.p>
+
+            <motion.div variants={fadeUp} className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+              <button
+                type="button"
+                onClick={() => scrollTo("program-pelatihan")}
+                className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 px-7 py-3.5 font-semibold text-white shadow-xl shadow-blue-500/30 transition-all hover:-translate-y-0.5 hover:shadow-cyan-400/40 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/40"
+              >
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-y-0 -left-1/2 w-1/3 -skew-x-12 bg-white/30 blur-md transition-all duration-700 group-hover:left-[120%]"
+                />
+                Jelajahi Program
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollTo("video-pelatihan")}
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-7 py-3.5 font-semibold text-white backdrop-blur-md transition-all hover:-translate-y-0.5 hover:border-blue-300/40 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+              >
+                <PlayCircle className="h-5 w-5 text-cyan-300" aria-hidden="true" />
+                Tonton Video Gratis
+              </button>
+            </motion.div>
+          </div>
+
+          {/* Programs */}
+          <motion.div
+            id="program-pelatihan"
+            variants={{ show: { transition: { staggerChildren: 0.1, delayChildren: 0.3 } } }}
+            className="grid w-full scroll-mt-24 grid-cols-1 gap-5 md:grid-cols-3 md:gap-6"
+          >
+            {PROGRAMS.map((program, i) => (
+              <ProgramCard key={program.slug} program={program} index={i} />
+            ))}
+          </motion.div>
+        </motion.div>
+
+        {/* Slide indicators */}
+        <div className="absolute bottom-8 right-6 hidden items-center gap-2 md:flex">
+          {HERO_IMAGES.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setSlide(i)}
+              aria-label={`Tampilkan gambar ${i + 1}`}
+              aria-current={i === slide}
+              className={cn(
+                "h-1.5 rounded-full transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70",
+                i === slide ? "w-8 bg-white" : "w-1.5 bg-white/40 hover:bg-white/80"
+              )}
+            />
+          ))}
         </div>
 
-        {/* Modern Animated Gradient Blobs - Kept for extra depth */}
-        <motion.div
-          animate={{
-            x: [0, 50, 0],
-            y: [0, -30, 0],
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="pointer-events-none absolute -top-24 -left-24 h-[40rem] w-[40rem] rounded-full bg-blue-600/10 blur-[120px] z-1"
-        />
-        <motion.div
-          animate={{
-            x: [0, -60, 0],
-            y: [0, 40, 0],
-          }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="pointer-events-none absolute -bottom-48 -right-48 h-[45rem] w-[45rem] rounded-full bg-cyan-500/10 blur-[150px] z-1"
-        />
-
-        {/* Hero Content Area */}
-        <section className="relative md:scale-[0.8] z-10 flex min-h-screen items-center justify-center px-6 md:px-12 py-20 md:py-0">
-          <div className="w-full max-w-7xl mx-auto flex flex-col items-center md:items-start space-y-12">
-
-            {/* Header Animation Stack */}
-            <div className="flex flex-col items-center md:items-start text-center md:text-left">
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-                className="mb-8"
-              >
-                <div className="px-5 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs md:text-sm font-semibold tracking-widest uppercase mb-6 inline-flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                  Next Generation Marine Training
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 1, delay: 0.2 }}
-                className="space-y-4"
-              >
-                <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold font-calsans text-white tracking-tight leading-none drop-shadow-2xl">
-                  Elektronik Layanan Pelatihan <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-300 to-teal-300">
-                    Utama Terpadu
-                  </span>
-                </h1>
-                <div className="flex flex-col md:flex-row items-center md:items-end gap-2 md:gap-4">
-                  <h2 className="text-5xl md:text-8xl lg:text-9xl font-calsans bg-clip-text text-transparent bg-gradient-to-b from-blue-500 to-indigo-600 drop-shadow-[0_0_30px_rgba(59,130,246,0.3)] leading-none">
-                    E-LAUT
-                  </h2>
-                  <div className="hero-logo md:mb-4 scale-75 md:scale-100">
-                    <Logo />
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 1, delay: 0.5 }}
-                className="mt-6 text-gray-400 text-sm md:text-lg max-w-2xl leading-relaxed font-light"
-              >
-                Wujudkan kemandirian sumber daya manusia kelautan dan perikanan yang unggul dan inovatif melalui platform pelatihan digital terstandarisasi.
-              </motion.p>
-            </div>
-
-            {/* Card Showcase Area */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 w-full">
-              {programPelatihan.map((item, index) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
-                  whileHover={{ y: -5 }}
-                  className="relative group"
-                >
-                  {/* Glow Effect Backdrop */}
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl blur opacity-0 group-hover:opacity-20 transition duration-500" />
-
-                  <div
-                    onClick={() => setSelectedProgram(selectedProgram === index ? null : index)}
-                    className={`relative flex flex-col h-full items-center p-8 cursor-pointer rounded-3xl border border-white/10 bg-[#1e293b]/20 backdrop-blur-2xl transition-all duration-500 ${selectedProgram === index ? "ring-2 ring-blue-500/50 bg-[#1e293b]/40" : "hover:bg-[#1e293b]/30"
-                      }`}
-                  >
-                    <div className="relative w-24 h-24 mb-6 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3">
-                      <div className="absolute inset-0 bg-blue-400/20 blur-2xl rounded-full" />
-                      <Image
-                        src={item.icon}
-                        alt={item.name}
-                        fill
-                        className="object-contain relative z-10"
-                      />
-                    </div>
-
-                    <h3 className="text-white font-calsans text-xl text-center group-hover:text-blue-300 transition-colors">
-                      {item.name}
-                    </h3>
-
-                    <AnimatePresence>
-                      {selectedProgram === index && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="overflow-hidden w-full"
-                        >
-                          <div className="pt-6 flex flex-col items-center">
-                            <p className="text-gray-400 text-sm text-center leading-relaxed mb-6 font-light">
-                              {item.description}
-                            </p>
-                            <Link
-                              href={`/layanan/pelatihan/program/${item.slug}`}
-                              className="group/btn relative px-6 py-2.5 rounded-xl bg-blue-600 overflow-hidden transition-all duration-300"
-                            >
-                              <div className="absolute inset-0 w-3 bg-white/20 -skew-x-12 translate-x-[-100%] group-hover/btn:translate-x-[400%] transition-transform duration-700" />
-                              <span className="relative text-white font-semibold text-sm">Lihat Selengkapnya</span>
-                            </Link>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-
-        {/* Popup Player */}
-        <AnimatePresence>
-          {activeVideo && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="fixed inset-0 z-[9999] flex items-center justify-center p-4 font-jakarta"
-              onClick={() => setActiveVideo(null)}
-            >
-              <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
-              <motion.div
-                initial={{ opacity: 0, scale: 0.88, y: 30 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.88, y: 30 }}
-                transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
-                className="relative w-full max-w-4xl z-10 rounded-3xl overflow-hidden shadow-2xl shadow-blue-500/20 border border-white/10 bg-[#050d1a]"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button
-                  onClick={() => setActiveVideo(null)}
-                  className="absolute top-4 right-4 z-20 w-9 h-9 rounded-xl bg-white/10 hover:bg-red-500/80 border border-white/10 flex items-center justify-center text-white transition-all duration-200 hover:scale-110"
-                >
-                  <FiX size={16} />
-                </button>
-                <div className="aspect-video w-full">
-                  <iframe
-                    src={`https://www.youtube.com/embed/${activeVideo}?autoplay=1&rel=0&modestbranding=1`}
-                    allow="autoplay; encrypted-media"
-                    allowFullScreen
-                    className="w-full h-full"
-                    title="Video Pelatihan"
-                  />
-                </div>
-                {(() => {
-                  const vid = videoPelatihan.find((v) => extractYoutubeId(v.linkPelatihan) === activeVideo);
-                  return vid ? (
-                    <div className="px-6 py-4 flex items-center gap-3 border-t border-white/5">
-                      <div className="w-8 h-8 shrink-0 rounded-lg bg-red-600/20 border border-red-500/30 flex items-center justify-center">
-                        <FiYoutube size={14} className="text-red-400" />
-                      </div>
-                      <div>
-                        <h4 className="text-white text-sm font-bold">{vid.namaPelatihan}</h4>
-                        <p className="text-xs text-gray-400 mt-0.5">{vid.penyelenggara} • {vid.programPelatihan || vid.jenisProgramPelatihan}</p>
-                      </div>
-                    </div>
-                  ) : null;
-                })()}
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <button
+          type="button"
+          onClick={() => scrollTo("program-khusus")}
+          className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1 rounded-lg p-1 text-xs text-gray-400 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 md:flex"
+        >
+          Gulir
+          <ChevronDown className="h-4 w-4 animate-bounce motion-reduce:animate-none" aria-hidden="true" />
+        </button>
       </div>
 
-      <div className="relative md:scale-[0.8] z-10 flex flex-col min-h-screen items-center justify-center px-6 md:px-12 py-20 md:py-0">
-        {/* Program Khusus Section */}
-        <ProgramKhususSection />
+      {/* ========================= BELOW THE FOLD ========================= */}
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-center px-6 pb-20 md:px-12">
+        <div id="program-khusus" className="w-full scroll-mt-24">
+          <ProgramKhususSection />
+        </div>
 
-        {/* Video Pelatihan Gratis Section */}
-        <div className="w-full pt-12 border-t border-white/10 mt-12 relative z-10">
-          <div className="text-center md:text-left space-y-2 mb-8">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[9px] font-bold uppercase tracking-widest"
-            >
-              Galeri Video
+        {/* Free training videos */}
+        <div id="video-pelatihan" className="relative mt-12 w-full scroll-mt-24 border-t border-white/10 pt-12">
+          <motion.div
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.4 }}
+            variants={{ show: { transition: { staggerChildren: 0.1 } } }}
+            className="mb-8 flex flex-col items-center gap-4 text-center md:flex-row md:items-end md:justify-between md:text-left"
+          >
+            <div className="space-y-2">
+              <motion.span
+                variants={fadeUp}
+                className="inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-blue-400"
+              >
+                Galeri Video
+              </motion.span>
+              <motion.h2 variants={fadeUp} className="font-calsans text-2xl leading-tight text-white md:text-3xl lg:text-4xl">
+                Video Pelatihan Gratis
+              </motion.h2>
+              <motion.p variants={fadeUp} className="max-w-xl text-xs leading-relaxed text-gray-400 md:text-sm">
+                Tonton panduan, informasi, dan teknik mutakhir dari program pelatihan unggulan kami.
+              </motion.p>
+            </div>
+            <motion.div variants={fadeUp}>
+              <Link
+                href="/layanan/pelatihan/video/gratis"
+                className="group inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-white/5 px-5 py-2.5 text-sm font-semibold text-blue-300 transition-all hover:border-transparent hover:bg-blue-600 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+              >
+                Lihat semua video
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+              </Link>
             </motion.div>
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-2xl md:text-3xl lg:text-4xl font-calsans leading-tight text-white mb-2"
-            >
-              Video Pelatihan Gratis
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-gray-400 text-xs md:text-sm max-w-xl md:mx-0 mx-auto leading-relaxed"
-            >
-              Tonton panduan, informasi, dan teknik mutakhir dari program pelatihan unggulan kami.
-            </motion.p>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 z-10 relative">
-            {isLoadingVideos ? (
-              <>
-                <div className="lg:row-span-2">
-                  <div className="w-full h-full min-h-[300px] rounded-3xl bg-[#1e293b]/40 animate-pulse border border-white/5 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-5">
-                  {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="w-full h-[170px] rounded-3xl bg-[#1e293b]/40 animate-pulse border border-white/5 relative overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
-                    </div>
-                  ))}
-                </div>
-              </>
-            ) : videoPelatihan.length > 0 && (
+          <div className="relative grid grid-cols-1 gap-5 lg:grid-cols-2">
+            {videoStatus === "loading" && <VideoSkeleton />}
+
+            {videoStatus === "error" && (
+              <div className="col-span-full flex flex-col items-center gap-3 rounded-3xl border border-white/10 bg-white/5 p-10 text-center">
+                <p className="text-sm text-gray-300">Video pelatihan gagal dimuat.</p>
+                <button
+                  type="button"
+                  onClick={reloadVideos}
+                  className="rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
+                >
+                  Coba lagi
+                </button>
+              </div>
+            )}
+
+            {videoStatus === "ready" && !featured && (
+              <p className="col-span-full rounded-3xl border border-white/10 bg-white/5 p-10 text-center text-sm text-gray-400">
+                Belum ada video pelatihan. Nantikan konten terbaru dari kami!
+              </p>
+            )}
+
+            {videoStatus === "ready" && featured && (
               <>
                 <motion.div
                   initial={{ opacity: 0, x: -30 }}
@@ -382,110 +571,35 @@ export default function Hero() {
                   transition={{ duration: 0.5 }}
                   className="lg:row-span-2"
                 >
-                  <VideoCard
-                    video={videoPelatihan[0]}
-                    featured
-                    onClick={() => handleVideoClick(videoPelatihan[0])}
-                  />
+                  <VideoCard video={featured} featured onPlay={() => playVideo(featured)} />
                 </motion.div>
 
-                <div className="grid grid-cols-2 gap-5">
-                  {videoPelatihan.slice(1).map((video, i) => (
-                    <motion.div
-                      key={video.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.4, delay: i * 0.1 }}
-                    >
-                      <VideoCard
-                        video={video}
-                        onClick={() => handleVideoClick(video)}
-                      />
-                    </motion.div>
-                  ))}
-                </div>
+                {others.length > 0 && (
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                    {others.map((video, i) => (
+                      <motion.div
+                        key={video.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.4, delay: i * 0.1 }}
+                      >
+                        <VideoCard video={video} onPlay={() => playVideo(video)} />
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
               </>
             )}
           </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="mt-10 flex justify-center w-full relative z-10"
-          >
-            <Link
-              href="/layanan/pelatihan/video/gratis"
-              className="group/btn relative px-8 py-3.5 rounded-2xl bg-[#1e293b]/40 text-blue-400 border border-blue-500/30 overflow-hidden transition-all duration-300 flex justify-center hover:border-transparent hover:bg-blue-600 shadow-xl shadow-transparent hover:shadow-blue-500/20"
-            >
-              <div className="absolute inset-0 w-3 bg-white/20 -skew-x-12 translate-x-[-200%] group-hover/btn:translate-x-[600%] transition-transform duration-1000" />
-              <span className="relative font-bold tracking-wider text-sm group-hover/btn:text-white transition-colors">LIHAT SEMUA VIDEO E-LAUT</span>
-            </Link>
-          </motion.div>
         </div>
 
         <P2MKPSection />
       </div>
 
+      <AnimatePresence>
+        {activeVideo && <VideoModal video={activeVideo} onClose={closeVideo} />}
+      </AnimatePresence>
     </section>
-
-  );
-}
-
-function VideoCard({ video, featured = false, onClick }: {
-  video: any;
-  featured?: boolean;
-  onClick: () => void;
-}) {
-  const [hovered, setHovered] = React.useState(false);
-  const ytId = extractYoutubeId(video.linkPelatihan);
-  const thumbnailUrl = `https://img.youtube.com/vi/${ytId}/maxresdefault.jpg`;
-  const fallbackUrl = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
-
-  return (
-    <motion.div
-      whileHover={{ scale: 1.02 }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className={`relative group cursor-pointer rounded-3xl overflow-hidden border border-white/10 hover:border-blue-500/40 transition-colors duration-300 bg-white/5 ${featured ? "h-full min-h-[300px]" : "h-[170px]"}`}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onClick={onClick}
-    >
-      <img
-        src={thumbnailUrl}
-        alt={video.namaPelatihan}
-        onError={(e) => { (e.target as HTMLImageElement).src = fallbackUrl; }}
-        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300" />
-      <div className="absolute inset-0 flex items-center justify-center">
-        <motion.div
-          animate={{ scale: hovered ? 1.15 : 1 }}
-          transition={{ type: "spring", stiffness: 400, damping: 25 }}
-          className="w-14 h-14 rounded-full bg-blue-600/90 backdrop-blur-sm border border-blue-400/40 flex items-center justify-center shadow-2xl shadow-blue-500/40 group-hover:shadow-blue-500/60 transition-shadow duration-300"
-        >
-          <FiPlay size={20} className="text-white translate-x-0.5" fill="white" />
-        </motion.div>
-      </div>
-      <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-sm border border-white/10">
-        <FiYoutube size={11} className="text-red-400" />
-        <span className="text-[9px] text-gray-300 font-bold uppercase tracking-wider">YouTube</span>
-      </div>
-      <div className="absolute bottom-0 left-0 right-0 p-4">
-        {featured && (
-          <span className="inline-block mb-2 text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-blue-600/80 text-white border border-blue-400/30">
-            Video Utama
-          </span>
-        )}
-        <h4 className={`font-bold text-white leading-snug ${featured ? "text-base md:text-lg" : "text-xs"}`}>
-          {video.namaPelatihan}
-        </h4>
-        <p className="text-gray-300 text-[10px] mt-1 line-clamp-1">
-          {video.penyelenggara} • {video.programPelatihan || video.jenisProgramPelatihan}
-        </p>
-      </div>
-    </motion.div>
   );
 }

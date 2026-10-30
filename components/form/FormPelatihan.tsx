@@ -1,550 +1,633 @@
 "use client";
 
-import React, { ChangeEvent, useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import Cookies from "js-cookie";
 import { motion, AnimatePresence } from "framer-motion";
 import { HashLoader } from "react-spinners";
 import {
-  TbSchool,
-  TbClock,
-  TbFileText,
-  TbArrowRight,
-  TbArrowLeft,
-  TbCheck,
-  TbInfoCircle,
-  TbLayoutGrid,
-  TbUsers,
-  TbCurrencyDollar,
-  TbMapPin,
-  TbPlus,
+  TbSchool, TbClock, TbFileText, TbArrowRight, TbArrowLeft, TbCheck,
+  TbInfoCircle, TbLayoutGrid, TbCurrencyDollar, TbMapPin, TbPlus,
+  TbAlertCircle, TbCalendar, TbBuildingCommunity, TbAward, TbListCheck,
 } from "react-icons/tb";
 import { RiVerifiedBadgeLine } from "react-icons/ri";
+import { FiCheckCircle, FiCircle } from "react-icons/fi";
 
 import Toast from "@/commons/Toast";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectGroup, SelectItem,
+  SelectLabel, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { generateRandomString } from "@/utils";
 import { generateTimestamp } from "@/utils/time";
 import { UPT } from "@/constants/nomenclatures";
 import {
-  DUKUNGAN_PROGRAM_TEROBOSAN,
-  JENIS_PELAKSANAAN,
-  JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN,
-  JENIS_PENILAIAN_PELATIHAN,
-  PENANDATANGAN_SERTIFIKAT,
-  SEKTOR_PELATIHAN,
+  DUKUNGAN_PROGRAM_TEROBOSAN, JENIS_PELAKSANAAN,
+  JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN, JENIS_PENILAIAN_PELATIHAN,
+  PENANDATANGAN_SERTIFIKAT, SEKTOR_PELATIHAN,
 } from "@/constants/pelatihan";
 import { useFetchDataRumpunPelatihan } from "@/hooks/elaut/master/useFetchDataRumpunPelatihan";
-import { ProgramPelatihan, RumpunPelatihan } from "@/types/program";
-
+import { RumpunPelatihan } from "@/types/program";
 import addData from "@/firebase/firestore/addData";
 
+// ─── Step Config ──────────────────────────────────────────────────────────────
 const STEPS = [
-  { title: "Identitas", icon: <TbSchool size={20} />, description: "Nama & Lokasi" },
-  { title: "Klasifikasi", icon: <TbLayoutGrid size={20} />, description: "Sektor & Rumpun" },
-  { title: "Strategis", icon: <RiVerifiedBadgeLine size={20} />, description: "Biaya & Prioritas" },
-  { title: "Jadwal", icon: <TbClock size={20} />, description: "Waktu Pelaksanaan" },
+  { title: "Identitas", icon: TbSchool, desc: "Nama & lokasi kegiatan" },
+  { title: "Klasifikasi", icon: TbLayoutGrid, desc: "Sektor, klaster & program" },
+  { title: "Strategis", icon: RiVerifiedBadgeLine, desc: "Biaya, mode & penilaian" },
+  { title: "Jadwal", icon: TbCalendar, desc: "Waktu pelaksanaan" },
 ];
 
-function FormPelatihan({ edit = false, onSuccess }: { edit: boolean, onSuccess?: () => void }) {
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function formatRupiah(v: number) {
+  if (!v) return "";
+  return new Intl.NumberFormat("id-ID").format(v);
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
+function FormPelatihan({ edit = false, onSuccess }: { edit: boolean; onSuccess?: () => void }) {
   const router = useRouter();
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
   const token = Cookies.get("XSRF091");
-  const penyelenggara = Cookies.get('Satker');
+  const penyelenggara = Cookies.get("Satker");
 
   const [currentStep, setCurrentStep] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Form States
-  const [kodePelatihan, setKodePelatihan] = useState(generateRandomString());
+  // Form state
+  const [kodePelatihan] = useState(generateRandomString());
   const [namaPelatihan, setNamaPelatihan] = useState("");
   const [namaPelatihanInggris, setNamaPelatihanInggris] = useState("");
   const [penyelenggaraPelatihan, setPenyelenggaraPelatihan] = useState(penyelenggara || "");
   const [jenisPelatihan, setJenisPelatihan] = useState("");
   const [bidangPelatihan, setBidangPelatihan] = useState("");
   const [dukunganProgramTerobosan, setDukunganProgramTerobosan] = useState("");
-  const [tanggalMulaiPelatihan, setTanggalMulaiPelatihan] = useState("");
-  const [tanggalBerakhirPelatihan, setTanggalBerakhirPelatihan] = useState("");
+  const [tanggalMulai, setTanggalMulai] = useState("");
+  const [tanggalBerakhir, setTanggalBerakhir] = useState("");
   const [hargaPelatihan, setHargaPelatihan] = useState<number>(0);
   const [lokasiPelatihan, setLokasiPelatihan] = useState("");
   const [pelaksanaanPelatihan, setPelaksanaanPelatihan] = useState("");
   const [ujiKompetensi, setUjiKompetensi] = useState("");
-  const [asalPelatihan, setAsalPelatihan] = useState("Masyarakat");
-  const [jenisSertifikat, setJenisSertifikat] = useState("");
-  const [program, setProgram] = useState<string>("");
-  const [jenisProgram, setJenisProgram] = useState<string>("");
+  const [jenisSertifikat] = useState("");
+  const [program, setProgram] = useState("");
+  const [jenisProgram, setJenisProgram] = useState("");
 
-  const { data: dataRumpunPelatihan, fetchRumpunPelatihan } = useFetchDataRumpunPelatihan();
-  const [selectedRumpunPelatihan, setSelectedRumpunPelatihan] = useState<RumpunPelatihan | null>(null);
+  const { data: dataRumpunPelatihan } = useFetchDataRumpunPelatihan();
+  const [selectedRumpun, setSelectedRumpun] = useState<RumpunPelatihan | null>(null);
 
-  const isStep0Valid = !!(namaPelatihan && lokasiPelatihan && penyelenggaraPelatihan);
-  const isStep1Valid = !!(jenisProgram && bidangPelatihan && program);
-  const isStep2Valid = !!(jenisPelatihan && dukunganProgramTerobosan && (jenisPelatihan !== "PNBP/BLU - Berbayar" || hargaPelatihan > 0));
-  const isStep3Valid = !!(tanggalMulaiPelatihan && tanggalBerakhirPelatihan);
+  // ── Validation per step ────────────────────────────────────────────────────
+  const step0Valid = !!(namaPelatihan && lokasiPelatihan && penyelenggaraPelatihan);
+  const step1Valid = !!(jenisProgram && bidangPelatihan && program);
+  const step2Valid = !!(jenisPelatihan && dukunganProgramTerobosan && pelaksanaanPelatihan && ujiKompetensi && (jenisPelatihan !== "PNBP/BLU - Berbayar" || hargaPelatihan > 0));
+  const step3Valid = !!(tanggalMulai && tanggalBerakhir);
 
-  const canContinue = useMemo(() => {
-    if (currentStep === 0) return isStep0Valid;
-    if (currentStep === 1) return isStep1Valid;
-    if (currentStep === 2) return isStep2Valid;
-    if (currentStep === 3) return isStep3Valid;
-    return false;
-  }, [currentStep, isStep0Valid, isStep1Valid, isStep2Valid, isStep3Valid]);
+  const stepValid = [step0Valid, step1Valid, step2Valid, step3Valid];
+  const canContinue = stepValid[currentStep];
 
-  const handleAddHistoryPelatihan = async () => {
-    try {
-      await addData('historical-training-notes', kodePelatihan, {
-        historical: [
-          {
-            'created_at': generateTimestamp(),
-            id: kodePelatihan,
-            notes: `Telah membuka kelas pelatihan ${namaPelatihan}`,
-            role: Cookies.get('Role'),
-            upt: `${Cookies.get("Nama")} - ${Cookies.get("Satker")}`
-          }
-        ],
-        status: 'On Progress'
-      });
-    } catch (error) {
-      console.error("History log error:", error);
-    }
-  };
+  // Missing fields hints per step
+  const step0Missing = [
+    !namaPelatihan && "Nama Kegiatan",
+    !lokasiPelatihan && "Lokasi Pelatihan",
+    !penyelenggaraPelatihan && "Penyelenggara",
+  ].filter(Boolean) as string[];
 
-  const handlePostingPublicTrainingData = async (e: React.FormEvent) => {
+  const step1Missing = [
+    !jenisProgram && "Sektor Pelatihan",
+    !bidangPelatihan && "Klaster / Rumpun",
+    !program && "Program Pelatihan",
+  ].filter(Boolean) as string[];
+
+  const step2Missing = [
+    !jenisPelatihan && "Sumber Pembiayaan",
+    !dukunganProgramTerobosan && "Program Prioritas",
+    !pelaksanaanPelatihan && "Mode Pelaksanaan",
+    !ujiKompetensi && "Jenis Penilaian",
+    jenisPelatihan === "PNBP/BLU - Berbayar" && !hargaPelatihan && "Biaya Pelatihan",
+  ].filter(Boolean) as string[];
+
+  const step3Missing = [
+    !tanggalMulai && "Tanggal Mulai",
+    !tanggalBerakhir && "Tanggal Berakhir",
+  ].filter(Boolean) as string[];
+
+  const allMissing = [step0Missing, step1Missing, step2Missing, step3Missing];
+
+  // ── Submit ─────────────────────────────────────────────────────────────────
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isStep3Valid) return;
-
+    if (!step3Valid) return;
     setIsUploading(true);
-    const data = new FormData();
-    data.append("KodePelatihan", kodePelatihan);
-    data.append("NamaPelatihan", namaPelatihan);
-    data.append("NamaPelathanInggris", namaPelatihanInggris);
-    data.append("PenyelenggaraPelatihan", penyelenggaraPelatihan);
-    data.append("JenisPelatihan", jenisPelatihan);
-    data.append("BidangPelatihan", bidangPelatihan);
-    data.append("DukunganProgramTerobosan", dukunganProgramTerobosan);
-    data.append("TanggalMulaiPelatihan", tanggalMulaiPelatihan);
-    data.append("TanggalBerakhirPelatihan", tanggalBerakhirPelatihan);
-    data.append("HargaPelatihan", hargaPelatihan.toString());
-    data.append("Program", program);
-    data.append("JenisProgram", jenisProgram);
-    data.append("Status", "Proses Buka Kelas");
-    data.append("UjiKompetensi", ujiKompetensi);
-    data.append("LokasiPelatihan", lokasiPelatihan);
-    data.append("PelaksanaanPelatihan", pelaksanaanPelatihan);
-    data.append("StatusPenerbitan", '0');
-    data.append("PemberitahuanDiterima", 'Proses Buka Kelas');
-    data.append("AsalPelatihan", asalPelatihan);
-    data.append("JenisSertifikat", jenisSertifikat);
-    data.append("TtdSertifikat", PENANDATANGAN_SERTIFIKAT[1]);
-
+    const fd = new FormData();
+    fd.append("KodePelatihan", kodePelatihan);
+    fd.append("NamaPelatihan", namaPelatihan);
+    fd.append("NamaPelathanInggris", namaPelatihanInggris);
+    fd.append("PenyelenggaraPelatihan", penyelenggaraPelatihan);
+    fd.append("JenisPelatihan", jenisPelatihan);
+    fd.append("BidangPelatihan", bidangPelatihan);
+    fd.append("DukunganProgramTerobosan", dukunganProgramTerobosan);
+    fd.append("TanggalMulaiPelatihan", tanggalMulai);
+    fd.append("TanggalBerakhirPelatihan", tanggalBerakhir);
+    fd.append("HargaPelatihan", hargaPelatihan.toString());
+    fd.append("Program", program);
+    fd.append("JenisProgram", jenisProgram);
+    fd.append("Status", "Proses Buka Kelas");
+    fd.append("UjiKompetensi", ujiKompetensi);
+    fd.append("LokasiPelatihan", lokasiPelatihan);
+    fd.append("PelaksanaanPelatihan", pelaksanaanPelatihan);
+    fd.append("StatusPenerbitan", "0");
+    fd.append("PemberitahuanDiterima", "Proses Buka Kelas");
+    fd.append("AsalPelatihan", "Masyarakat");
+    fd.append("JenisSertifikat", jenisSertifikat);
+    fd.append("TtdSertifikat", PENANDATANGAN_SERTIFIKAT[1]);
     try {
-      await axios.post(`${baseUrl}/lemdik/createPelatihan`, data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
+      await axios.post(`${baseUrl}/lemdik/createPelatihan`, fd, {
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
       });
-      Toast.fire({ icon: "success", title: "Berhasil!", text: 'Pelatihan baru telah ditambahkan.' });
-      handleAddHistoryPelatihan();
-
-      if (onSuccess) {
-        onSuccess();
-      } else {
-        router.push("/admin/lemdiklat/pelatihan");
-      }
-    } catch (error) {
-      console.error("Submission error:", error);
-      Toast.fire({ icon: "error", title: "Gagal!", text: 'Terjadi kesalahan saat menyimpan data.' });
+      await addData("historical-training-notes", kodePelatihan, {
+        historical: [{ created_at: generateTimestamp(), id: kodePelatihan, notes: `Membuka kelas pelatihan ${namaPelatihan}`, role: Cookies.get("Role"), upt: `${Cookies.get("Nama")} - ${Cookies.get("Satker")}` }],
+        status: "On Progress",
+      });
+      Toast.fire({ icon: "success", title: "Kelas berhasil dibuka!", text: `Pelatihan "${namaPelatihan}" telah ditambahkan.` });
+      if (onSuccess) onSuccess(); else router.push("/admin/lemdiklat/pelatihan");
+    } catch {
+      Toast.fire({ icon: "error", title: "Gagal menyimpan", text: "Terjadi kesalahan. Coba lagi." });
     } finally {
       setIsUploading(false);
     }
   };
 
-  const nextStep = () => currentStep < STEPS.length - 1 && canContinue && setCurrentStep(prev => prev + 1);
-  const prevStep = () => currentStep > 0 && setCurrentStep(prev => prev - 1);
+  const nextStep = () => canContinue && currentStep < STEPS.length - 1 && setCurrentStep(p => p + 1);
+  const prevStep = () => currentStep > 0 && setCurrentStep(p => p - 1);
+
+  // ── Loading overlay ────────────────────────────────────────────────────────
+  if (isUploading) {
+    return (
+      <div className="h-[60vh] flex flex-col items-center justify-center gap-5">
+        <HashLoader color="#3b82f6" size={56} />
+        <div className="text-center space-y-1">
+          <p className="text-blue-500 font-bold text-sm">Membuka kelas pelatihan...</p>
+          <p className="text-slate-400 text-xs">Mohon tunggu, data sedang disimpan</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <section className="relative w-full py-4">
-      <div className="w-full mx-auto px-4">
-        {isUploading ? (
-          <div className="h-[60vh] flex flex-col items-center justify-center space-y-4">
-            <HashLoader color="#3b82f6" size={60} />
-            <p className="text-blue-500 font-bold animate-pulse tracking-widest uppercase text-xs">Processing Vault...</p>
-          </div>
-        ) : (
-          <div className="bg-white/70 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[40px] border border-gray-200/50 dark:border-white/5 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.08)] overflow-hidden">
+    <section className="relative w-full font-jakarta">
+      <div className="w-full mx-auto">
+        <div className="bg-white dark:bg-slate-900/90 backdrop-blur-2xl rounded-[32px] border border-gray-100 dark:border-white/[0.06] shadow-2xl overflow-hidden">
 
-            {/* Header & Progress */}
-            <div className="relative p-4 md:p-8 border-b border-gray-100 dark:border-white/5 bg-gradient-to-br from-blue-50/50 to-transparent dark:from-blue-500/5">
-              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-                <div className="space-y-2">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 rounded-full border border-blue-500/10">
-                    <ActivityIcon size={12} className="text-blue-500 animate-pulse" />
-                    <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">New Training Class</span>
-                  </div>
-                  <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight uppercase leading-none">
-                    Buka Kelas <span className="text-blue-600">Pelatihan</span>
-                  </h1>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Lengkapi parameter operasional untuk menginisialisasi program pelatihan baru.</p>
-                </div>
+          {/* ── Top Banner ────────────────────────────────────────────── */}
+          <div className="h-1 w-full bg-gradient-to-r from-blue-600 via-cyan-500 to-teal-400" />
 
-                <div className="flex items-center gap-4 bg-white/50 dark:bg-slate-800/50 p-2 rounded-2xl border border-gray-100 dark:border-white/5 shadow-sm">
-                  <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
-                    <span className="text-xl font-black">0{currentStep + 1}</span>
-                  </div>
-                  <div className="pr-4">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Status</p>
-                    <p className="text-sm font-black text-slate-800 dark:text-white leading-none mt-1 uppercase tracking-tight">{STEPS[currentStep].title}</p>
-                  </div>
+          {/* ── Header ───────────────────────────────────────────────── */}
+          <div className="p-6 md:p-8 border-b border-gray-100 dark:border-white/[0.05]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/10 rounded-full border border-blue-500/15">
+                  <ActivityIcon size={11} className="text-blue-500 animate-pulse" />
+                  <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.2em]">Buka Kelas Baru</span>
                 </div>
+                <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                  Buka Kelas <span className="text-blue-600 dark:text-blue-400">Pelatihan</span>
+                </h1>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Lengkapi 4 langkah berikut untuk menginisialisasi program pelatihan baru.
+                </p>
               </div>
-
-              {/* Stepper Visualization */}
-              <div className="grid grid-cols-4 gap-4 relative">
-                {STEPS.map((step, idx) => (
-                  <div key={idx} className="relative group/step">
-                    <div className={`h-1.5 rounded-full transition-all duration-700 ${idx <= currentStep ? "bg-blue-600" : "bg-gray-200 dark:bg-white/5"}`} />
-                    <div className="mt-4 hidden md:flex flex-col">
-                      <span className={`text-[10px] font-black uppercase tracking-widest ${idx <= currentStep ? "text-blue-600" : "text-gray-400"}`}>{step.title}</span>
-                      <span className="text-[9px] font-medium text-gray-400 mt-0.5">{step.description}</span>
-                    </div>
-                  </div>
-                ))}
+              {/* Step counter badge */}
+              <div className="flex items-center gap-3 shrink-0 bg-slate-50 dark:bg-white/5 px-4 py-3 rounded-2xl border border-slate-100 dark:border-white/[0.05]">
+                <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/25">
+                  <span className="text-base font-black">0{currentStep + 1}</span>
+                </div>
+                <div>
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Langkah</p>
+                  <p className="text-sm font-black text-slate-800 dark:text-white">{STEPS[currentStep].title}</p>
+                  <p className="text-[10px] text-slate-400">{STEPS[currentStep].desc}</p>
+                </div>
               </div>
             </div>
 
-            {/* Form Content */}
-            <div className="p-8 md:p-12 min-h-[400px]">
-              <form onSubmit={handlePostingPublicTrainingData}>
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={currentStep}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.4, ease: "circOut" }}
-                    className="space-y-8"
-                  >
-                    {/* Step 0: General Info */}
-                    {currentStep === 0 && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <FormField
-                          label="Nama Kegiatan"
-                          required
-                          icon={<TbSchool className="text-blue-500" />}
-                          description="Gunakan penamaan yang formal and deskriptif.">
-                          <input
-                            type="text"
-                            className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-2xl px-5 py-4 text-sm font-bold placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all uppercase"
-                            placeholder="Contoh: PELATIHAN TEKNIS BUDIDAYA LAUT"
-                            value={namaPelatihan}
-                            onChange={(e) => setNamaPelatihan(e.target.value)}
-                          />
-                        </FormField>
-
-                        <FormField
-                          label="Lokasi Pelatihan"
-                          required
-                          icon={<TbMapPin className="text-emerald-500" />}
-                          description="Tuliskan kota atau detail lokasi spesifik.">
-                          <input
-                            type="text"
-                            className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-2xl px-5 py-4 text-sm font-bold placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
-                            placeholder="Contoh: BPPP MEDAN / ONLINE"
-                            value={lokasiPelatihan}
-                            onChange={(e) => setLokasiPelatihan(e.target.value)}
-                          />
-                        </FormField>
-
-                        <FormField
-                          label="Penyelenggara"
-                          required
-                          className="md:col-span-2"
-                          icon={<TbLayoutGrid className="text-indigo-500" />}
-                          description="Unit kerja yang bertanggung jawab penuh atas pelaksanaan.">
-                          <Select value={penyelenggaraPelatihan} onValueChange={setPenyelenggaraPelatihan}>
-                            <SelectTrigger className="w-full bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/5 h-[58px] rounded-2xl px-5 font-bold">
-                              <SelectValue placeholder="Pilih penyelenggara" />
-                            </SelectTrigger>
-                            <SelectContent className="rounded-2xl border-white/10 shadow-2xl backdrop-blur-xl">
-                              {UPT.map((item, i) => <SelectItem key={i} value={item} className="uppercase font-bold text-xs py-3">{item}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                        </FormField>
+            {/* ── Step Progress Bar ─────────────────────────────────── */}
+            <div className="grid grid-cols-4 gap-3">
+              {STEPS.map((step, idx) => {
+                const Icon = step.icon;
+                const done = idx < currentStep;
+                const active = idx === currentStep;
+                return (
+                  <div key={idx} className="space-y-2">
+                    <div className="relative h-1.5 rounded-full bg-slate-100 dark:bg-white/[0.05] overflow-hidden">
+                      <motion.div
+                        className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500"
+                        animate={{ width: done ? "100%" : active ? "60%" : "0%" }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
+                      />
+                    </div>
+                    <div className="hidden sm:flex items-center gap-1.5">
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-colors ${done ? "bg-emerald-500" : active ? "bg-blue-600" : "bg-slate-200 dark:bg-white/10"}`}>
+                        {done ? <TbCheck size={11} className="text-white" /> : <Icon size={11} className={active ? "text-white" : "text-slate-400"} />}
                       </div>
-                    )}
+                      <div>
+                        <p className={`text-[10px] font-black uppercase tracking-wider leading-none ${done ? "text-emerald-500" : active ? "text-blue-600 dark:text-blue-400" : "text-slate-400"}`}>{step.title}</p>
+                        <p className="text-[9px] text-slate-400 mt-0.5 leading-none hidden md:block">{step.desc}</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
 
-                    {/* Step 1: Scopes */}
-                    {currentStep === 1 && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <FormField label="Sektor Pelatihan" required icon={<TbLayoutGrid className="text-blue-500" />} description="Grup utama klasifikasi industri.">
-                          <Select value={jenisProgram} onValueChange={setJenisProgram}>
-                            <SelectTrigger className="w-full bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/5 h-[58px] rounded-2xl px-5 font-bold uppercase tracking-tight">
-                              <SelectValue placeholder="Pilih Sektor" />
-                            </SelectTrigger>
-                            <SelectContent className="rounded-2xl">
-                              {SEKTOR_PELATIHAN.map((item, i) => <SelectItem key={i} value={item} className="font-bold py-3 uppercase text-xs">{item}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                        </FormField>
+          {/* ── Form Body ──────────────────────────────────────────────── */}
+          <div className="p-6 md:p-10">
+            <form onSubmit={handleSubmit}>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentStep}
+                  initial={{ opacity: 0, x: 24 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -24 }}
+                  transition={{ duration: 0.35, ease: "easeOut" }}
+                  className=" flex flex-col"
+                >
+                  {/* ── STEP 0: Identitas ─────────────────────────────── */}
+                  {currentStep === 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 flex-1">
+                      <Field label="Nama Kegiatan Pelatihan" required icon={<TbSchool className="text-blue-500" />}
+                        hint="Gunakan penamaan formal. Nama ini akan tercetak di sertifikat peserta.">
+                        <input
+                          type="text"
+                          placeholder="Contoh: Pelatihan Teknis Budidaya Laut"
+                          value={namaPelatihan}
+                          onChange={(e) => setNamaPelatihan(e.target.value.toUpperCase())}
+                          className={inputCls(!!namaPelatihan)}
+                        />
+                        <ValidationMsg show={!namaPelatihan} msg="Nama kegiatan wajib diisi" />
+                      </Field>
 
-                        <FormField label="Klaster Pelatihan" required icon={<TbLayoutGrid className="text-indigo-500" />} description="Kategori spesifik rumpun ilmu.">
-                          <Select
-                            value={String(selectedRumpunPelatihan?.id_rumpun_pelatihan || "")}
-                            onValueChange={(v) => {
-                              const found = dataRumpunPelatihan?.find(r => String(r.id_rumpun_pelatihan) === String(v));
-                              if (found) {
-                                setSelectedRumpunPelatihan(found);
-                                setBidangPelatihan(found.name || found.nama_rumpun_pelatihan || "");
-                                setProgram(""); // Reset program on cluster change
-                              }
-                            }}>
-                            <SelectTrigger className="w-full bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/5 h-[58px] rounded-2xl px-5 font-bold uppercase tracking-tight">
-                              <SelectValue placeholder="Pilih Klaster" />
+                      <Field label="Lokasi Pelaksanaan" required icon={<TbMapPin className="text-emerald-500" />}
+                        hint="Tulis kota atau nama unit pelaksana. Contoh: BPPP Medan, Online (Zoom).">
+                        <input
+                          type="text"
+                          placeholder="Contoh: BPPP Medan / Online"
+                          value={lokasiPelatihan}
+                          onChange={(e) => setLokasiPelatihan(e.target.value)}
+                          className={inputCls(!!lokasiPelatihan)}
+                        />
+                        <ValidationMsg show={!lokasiPelatihan} msg="Lokasi wajib diisi" />
+                      </Field>
+
+                      <Field label="Unit Penyelenggara" required className="md:col-span-2"
+                        icon={<TbBuildingCommunity className="text-indigo-500" />}
+                        hint="Pilih unit kerja yang bertanggung jawab atas pelaksanaan pelatihan ini.">
+                        <Select value={penyelenggaraPelatihan} onValueChange={setPenyelenggaraPelatihan}>
+                          <SelectTrigger className={selectCls(!!penyelenggaraPelatihan)}>
+                            <SelectValue placeholder="Pilih unit penyelenggara..." />
+                          </SelectTrigger>
+                          <SelectContent className="rounded-2xl border-slate-200 dark:border-white/10 shadow-2xl">
+                            <SelectGroup>
+                              <SelectLabel className="text-[10px] text-slate-400 uppercase tracking-widest px-3 py-2">Unit Pelaksana Teknis (UPT)</SelectLabel>
+                              {UPT.map((item, i) => <SelectItem key={i} value={item} className="text-xs font-semibold py-2.5">{item}</SelectItem>)}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                        <ValidationMsg show={!penyelenggaraPelatihan} msg="Pilih unit penyelenggara" />
+                      </Field>
+
+                    </div>
+                  )}
+
+                  {/* ── STEP 1: Klasifikasi ───────────────────────────── */}
+                  {currentStep === 1 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
+                      <Field label="Sektor / Jenis Program" required icon={<TbLayoutGrid className="text-blue-500" />}
+                        hint="Kelompok besar bidang pelatihan berdasarkan sektor KP.">
+                        <Select value={jenisProgram} onValueChange={setJenisProgram}>
+                          <SelectTrigger className={selectCls(!!jenisProgram)}>
+                            <SelectValue placeholder="Pilih sektor program..." />
+                          </SelectTrigger>
+                          <SelectContent className="rounded-2xl">
+                            {SEKTOR_PELATIHAN.map((item, i) => <SelectItem key={i} value={item} className="font-semibold text-xs py-2.5 uppercase">{item}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                        <ValidationMsg show={!jenisProgram} msg="Sektor wajib dipilih" />
+                      </Field>
+
+                      <Field label="Klaster / Rumpun Pelatihan" required icon={<TbLayoutGrid className="text-indigo-500" />}
+                        hint="Rumpun ilmu yang menjadi fokus teknis kegiatan pelatihan.">
+                        <Select
+                          value={String(selectedRumpun?.id_rumpun_pelatihan || "")}
+                          onValueChange={(v) => {
+                            const found = dataRumpunPelatihan?.find(r => String(r.id_rumpun_pelatihan) === String(v));
+                            if (found) { setSelectedRumpun(found); setBidangPelatihan(found.name || found.nama_rumpun_pelatihan || ""); setProgram(""); }
+                          }}>
+                          <SelectTrigger className={selectCls(!!bidangPelatihan)}>
+                            <SelectValue placeholder="Pilih klaster / rumpun..." />
+                          </SelectTrigger>
+                          <SelectContent className="rounded-2xl max-h-72">
+                            {dataRumpunPelatihan?.map(item => (
+                              <SelectItem key={item.id_rumpun_pelatihan} value={String(item.id_rumpun_pelatihan)} className="font-semibold text-xs py-2.5 uppercase">
+                                {item.nama_rumpun_pelatihan || item.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <ValidationMsg show={!bidangPelatihan} msg="Rumpun / klaster wajib dipilih" />
+                      </Field>
+
+                      <Field label="Program Pelatihan" required className="md:col-span-2"
+                        icon={<TbFileText className="text-emerald-500" />}
+                        hint="Nama program yang sesuai dengan rumpun dipilih. Akan tampil di sertifikat.">
+                        <div className="flex flex-col sm:flex-row gap-3">
+                          <Select value={program} onValueChange={(v) => v !== "__new__" && setProgram(v)}>
+                            <SelectTrigger className={`${selectCls(!!program)} flex-1`}>
+                              <SelectValue placeholder={bidangPelatihan ? `Pilih program ${bidangPelatihan}...` : "Pilih klaster terlebih dahulu"} />
                             </SelectTrigger>
-                            <SelectContent className="rounded-2xl max-h-[300px]">
-                              {dataRumpunPelatihan?.map((item) => (
-                                <SelectItem key={item.id_rumpun_pelatihan} value={String(item.id_rumpun_pelatihan)} className="font-bold py-3 uppercase text-xs">
-                                  {item.nama_rumpun_pelatihan || item.name}
+                            <SelectContent className="rounded-2xl max-h-72">
+                              {!selectedRumpun?.programs?.length && (
+                                <p className="text-[11px] text-slate-400 text-center py-4 px-3">Pilih klaster terlebih dahulu</p>
+                              )}
+                              {selectedRumpun?.programs?.map(p => (
+                                <SelectItem key={p.id_program_pelatihan} value={p.name_indo || String(p.id_program_pelatihan)} className="font-semibold text-xs py-2.5 uppercase">
+                                  {p.name_indo}
                                 </SelectItem>
                               ))}
-                            </SelectContent>
-                          </Select>
-                        </FormField>
-
-                        <FormField label="Program Pelatihan" required className="md:col-span-2" icon={<TbFileText className="text-emerald-500" />} description="Judul program yang akan muncul di sertifikat.">
-                          <div className="flex flex-col sm:flex-row gap-3">
-                            <Select value={program} onValueChange={(v) => {
-                              if (v === "__add_new__") {
-                                document.getElementById("trigger-add-program")?.click();
-                              } else {
-                                setProgram(v);
-                              }
-                            }}>
-                              <SelectTrigger className="flex-1 bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/5 h-[58px] rounded-2xl px-5 font-bold uppercase">
-                                <SelectValue placeholder={bidangPelatihan ? `Pilih Program ${bidangPelatihan}` : "Pilih Klaster Terlebih Dahulu"} />
-                              </SelectTrigger>
-                              <SelectContent className="rounded-2xl max-h-[300px]">
-                                {selectedRumpunPelatihan?.programs?.map((p) => (
-                                  <SelectItem key={p.id_program_pelatihan} value={p.name_indo || String(p.id_program_pelatihan)} className="font-bold py-3 uppercase text-xs">
-                                    {p.name_indo}
-                                  </SelectItem>
-                                ))}
-                                <div className="border-t border-gray-100 dark:border-white/5 my-2" />
-                                <SelectItem value="__add_new__" className="text-blue-500 font-extrabold py-3 text-xs">
-                                  + INTIASI PROGRAM BARU
+                              <div className="border-t border-slate-100 dark:border-white/5 mt-1 pt-1">
+                                <SelectItem value="__new__" className="text-blue-500 font-extrabold text-xs py-2.5">
+                                  + Inisiasi Program Baru
                                 </SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <button
-                              type="button"
-                              id="trigger-add-program"
-                              onClick={() => Toast.fire({ icon: "info", title: "Info", text: "Anda bisa menambahkan terlebih dahulu di menu program pelatihan" })}
-                              className="flex items-center gap-3 px-6 h-12 rounded-2xl bg-blue-600 dark:bg-blue-500 text-white font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-1 transition-all active:scale-95"
-                            >
-                              <TbPlus size={20} strokeWidth={3} />
-                              New Program
-                            </button>
-                          </div>
-                        </FormField>
-                      </div>
-                    )}
-
-                    {/* Step 2: Strategic */}
-                    {currentStep === 2 && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <FormField label="Sumber Pembiayaan" required icon={<TbCurrencyDollar className="text-blue-500" />} description="Model anggaran untuk operasional.">
-                          <Select value={jenisPelatihan} onValueChange={setJenisPelatihan}>
-                            <SelectTrigger className="w-full bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/5 h-[58px] rounded-2xl px-5 font-bold">
-                              <SelectValue placeholder="Pilih Sumber" />
-                            </SelectTrigger>
-                            <SelectContent className="rounded-2xl font-bold">
-                              {JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN.map((item, i) => <SelectItem key={i} value={item} className="text-xs uppercase font-extrabold py-3">{item}</SelectItem>)}
+                              </div>
                             </SelectContent>
                           </Select>
-                        </FormField>
+                          <button type="button"
+                            onClick={() => Toast.fire({ icon: "info", title: "Info", text: "Tambah program baru melalui menu Program Pelatihan terlebih dahulu." })}
+                            className="inline-flex shrink-0 items-center gap-2 px-5 py-3 rounded-2xl bg-blue-600 text-white font-bold text-xs uppercase tracking-wide shadow-lg shadow-blue-500/25 hover:bg-blue-500 hover:-translate-y-0.5 transition-all active:scale-95">
+                            <TbPlus size={16} strokeWidth={3} /> Program Baru
+                          </button>
+                        </div>
+                        <ValidationMsg show={!program} msg="Program pelatihan wajib dipilih" />
+                      </Field>
+                    </div>
+                  )}
 
-                        <FormField label="Program Prioritas" required icon={<RiVerifiedBadgeLine className="text-indigo-500" />} description="Integrasi dengan program strategis nasional.">
-                          <Select value={dukunganProgramTerobosan} onValueChange={setDukunganProgramTerobosan}>
-                            <SelectTrigger className="w-full bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/5 h-[58px] rounded-2xl px-5 font-bold">
-                              <SelectValue placeholder="Pilih Dukungan" />
-                            </SelectTrigger>
-                            <SelectContent className="rounded-2xl font-bold">
-                              {DUKUNGAN_PROGRAM_TEROBOSAN.map((item, i) => <SelectItem key={i} value={item} className="text-xs uppercase font-extrabold py-3">{item}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                        </FormField>
+                  {/* ── STEP 2: Strategis ─────────────────────────────── */}
+                  {currentStep === 2 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
+                      <Field label="Sumber Pembiayaan" required icon={<TbCurrencyDollar className="text-blue-500" />}
+                        hint="Mekanisme anggaran untuk operasional pelatihan ini.">
+                        <Select value={jenisPelatihan} onValueChange={setJenisPelatihan}>
+                          <SelectTrigger className={selectCls(!!jenisPelatihan)}>
+                            <SelectValue placeholder="Pilih sumber pembiayaan..." />
+                          </SelectTrigger>
+                          <SelectContent className="rounded-2xl">
+                            {JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN.map((item, i) => <SelectItem key={i} value={item} className="text-xs font-semibold py-2.5 uppercase">{item}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                        <ValidationMsg show={!jenisPelatihan} msg="Sumber pembiayaan wajib dipilih" />
+                      </Field>
 
+                      <Field label="Dukungan Program Prioritas" required icon={<RiVerifiedBadgeLine className="text-indigo-500" />}
+                        hint="Keterkaitan kegiatan dengan program strategis nasional KKP.">
+                        <Select value={dukunganProgramTerobosan} onValueChange={setDukunganProgramTerobosan}>
+                          <SelectTrigger className={selectCls(!!dukunganProgramTerobosan)}>
+                            <SelectValue placeholder="Pilih dukungan program..." />
+                          </SelectTrigger>
+                          <SelectContent className="rounded-2xl">
+                            {DUKUNGAN_PROGRAM_TEROBOSAN.map((item, i) => <SelectItem key={i} value={item} className="text-xs font-semibold py-2.5">{item}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                        <ValidationMsg show={!dukunganProgramTerobosan} msg="Dukungan program wajib dipilih" />
+                      </Field>
+
+                      <Field label="Mode Pelaksanaan" required icon={<TbLayoutGrid className="text-slate-500" />}
+                        hint="Metode penyampaian materi kepada peserta.">
+                        <Select value={pelaksanaanPelatihan} onValueChange={setPelaksanaanPelatihan}>
+                          <SelectTrigger className={selectCls(!!pelaksanaanPelatihan)}>
+                            <SelectValue placeholder="Pilih mode pelaksanaan..." />
+                          </SelectTrigger>
+                          <SelectContent className="rounded-2xl">
+                            {JENIS_PELAKSANAAN.map((item, i) => <SelectItem key={i} value={item} className="text-xs font-semibold py-2.5 uppercase">{item}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                        <ValidationMsg show={!pelaksanaanPelatihan} msg="Mode pelaksanaan wajib dipilih" />
+                      </Field>
+
+                      <Field label="Standar Penilaian" required icon={<TbAward className="text-emerald-500" />}
+                        hint="Metode evaluasi kompetensi peserta pelatihan.">
+                        <Select value={ujiKompetensi} onValueChange={setUjiKompetensi}>
+                          <SelectTrigger className={selectCls(!!ujiKompetensi)}>
+                            <SelectValue placeholder="Pilih standar penilaian..." />
+                          </SelectTrigger>
+                          <SelectContent className="rounded-2xl">
+                            {JENIS_PENILAIAN_PELATIHAN.map((item, i) => <SelectItem key={i} value={item} className="text-xs font-semibold py-2.5 uppercase">{item}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                        <ValidationMsg show={!ujiKompetensi} msg="Jenis penilaian wajib dipilih" />
+                      </Field>
+
+                      <AnimatePresence>
                         {jenisPelatihan === "PNBP/BLU - Berbayar" && (
-                          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} className="md:col-span-2">
-                            <FormField label="Biaya Pelatihan (IDR)" required icon={<TbCurrencyDollar className="text-emerald-500" />} description="Biaya per orang untuk komponen pelatihan saja.">
+                          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="md:col-span-2 overflow-hidden">
+                            <Field label="Biaya Pelatihan per Peserta" required icon={<TbCurrencyDollar className="text-emerald-500" />}
+                              hint="Tarif PNBP/BLU per peserta. Belum termasuk akomodasi.">
                               <div className="relative">
-                                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">Rp</span>
-                                <input
-                                  type="number"
-                                  className="w-full bg-blue-500/5 border border-blue-500/20 rounded-2xl pl-12 pr-5 py-4 text-sm font-black text-blue-600 outline-none focus:ring-4 focus:ring-blue-500/10 transition-all placeholder:text-blue-500/30"
-                                  placeholder="0"
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">Rp</span>
+                                <input type="number" placeholder="0"
                                   value={hargaPelatihan || ""}
                                   onChange={(e) => setHargaPelatihan(parseInt(e.target.value) || 0)}
-                                />
+                                  className="w-full bg-blue-500/5 border-2 border-blue-500/20 focus:border-blue-500 rounded-2xl pl-12 pr-5 py-3.5 text-sm font-black text-blue-600 outline-none focus:ring-4 focus:ring-blue-500/10 transition-all" />
+                                {hargaPelatihan > 0 && <p className="text-[10px] text-emerald-600 font-bold mt-1 px-1">= Rp {formatRupiah(hargaPelatihan)}</p>}
                               </div>
-                            </FormField>
+                              <ValidationMsg show={jenisPelatihan === "PNBP/BLU - Berbayar" && !hargaPelatihan} msg="Masukkan biaya pelatihan" />
+                            </Field>
                           </motion.div>
                         )}
+                      </AnimatePresence>
+                    </div>
+                  )}
 
-                        <FormField label="Mode Pelaksanaan" required icon={<TbLayoutGrid className="text-slate-400" />} description="Metode delivery materi pelatihan.">
-                          <Select value={pelaksanaanPelatihan} onValueChange={setPelaksanaanPelatihan}>
-                            <SelectTrigger className="w-full bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/5 h-[58px] rounded-2xl px-5 font-bold">
-                              <SelectValue placeholder="Pilih Mode" />
-                            </SelectTrigger>
-                            <SelectContent className="rounded-2xl font-bold uppercase">
-                              {JENIS_PELAKSANAAN.map((item, i) => <SelectItem key={i} value={item} className="text-xs font-black py-3">{item}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                        </FormField>
+                  {/* ── STEP 3: Jadwal + Ringkasan ────────────────────── */}
+                  {currentStep === 3 && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
+                      <Field label="Tanggal Mulai Pelatihan" required icon={<TbClock className="text-blue-500" />}
+                        hint="Tanggal resmi dimulainya kurikulum pelatihan.">
+                        <input type="date" value={tanggalMulai}
+                          onChange={(e) => { setTanggalMulai(e.target.value); if (tanggalBerakhir < e.target.value) setTanggalBerakhir(""); }}
+                          className={inputCls(!!tanggalMulai)} />
+                        <ValidationMsg show={!tanggalMulai} msg="Tanggal mulai wajib diisi" />
+                      </Field>
 
-                        <FormField label="Jenis Penilaian" required icon={<TbCheck className="text-emerald-500" />} description="Standar evaluasi kompetensi peserta.">
-                          <Select value={ujiKompetensi} onValueChange={setUjiKompetensi}>
-                            <SelectTrigger className="w-full bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/5 h-[58px] rounded-2xl px-5 font-bold">
-                              <SelectValue placeholder="Pilih Penilaian" />
-                            </SelectTrigger>
-                            <SelectContent className="rounded-2xl font-bold">
-                              {JENIS_PENILAIAN_PELATIHAN.map((item, i) => <SelectItem key={i} value={item} className="text-xs font-black py-3 uppercase">{item}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                        </FormField>
-                      </div>
-                    )}
+                      <Field label="Tanggal Berakhir Pelatihan" required icon={<TbClock className="text-rose-500" />}
+                        hint="Estimasi penyelesaian seluruh modul pelatihan.">
+                        <input type="date" min={tanggalMulai}
+                          value={tanggalBerakhir}
+                          onChange={(e) => setTanggalBerakhir(e.target.value)}
+                          disabled={!tanggalMulai}
+                          className={`${inputCls(!!tanggalBerakhir)} disabled:opacity-40 disabled:cursor-not-allowed`} />
+                        {!tanggalMulai && <p className="text-[10px] text-slate-400 mt-1 px-1">Isi tanggal mulai terlebih dahulu</p>}
+                        <ValidationMsg show={!!tanggalMulai && !tanggalBerakhir} msg="Tanggal berakhir wajib diisi" />
+                      </Field>
 
-                    {/* Step 3: Schedule */}
-                    {currentStep === 3 && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <FormField label="Mulai Pelatihan" required icon={<TbClock className="text-blue-500" />} description="Tanggal resmi dimulainya kurikulum.">
-                          <input
-                            type="date"
-                            className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all dark:color-scheme-dark"
-                            value={tanggalMulaiPelatihan}
-                            onChange={(e) => setTanggalMulaiPelatihan(e.target.value)}
-                          />
-                        </FormField>
-
-                        <FormField label="Berakhir Pelatihan" required icon={<TbClock className="text-rose-500" />} description="Estimasi penyelesaian seluruh modul.">
-                          <input
-                            type="date"
-                            min={tanggalMulaiPelatihan}
-                            className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-2xl px-5 py-4 text-sm font-bold outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all disabled:opacity-30 dark:color-scheme-dark"
-                            value={tanggalBerakhirPelatihan}
-                            onChange={(e) => setTanggalBerakhirPelatihan(e.target.value)}
-                            disabled={!tanggalMulaiPelatihan}
-                          />
-                        </FormField>
-
-                        <div className="md:col-span-2 p-6 bg-blue-500/5 border border-blue-500/10 rounded-3xl">
-                          <div className="flex gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center shrink-0">
-                              <TbCheck className="text-blue-500" size={24} />
+                      {/* Summary review card */}
+                      <div className="md:col-span-2">
+                        <div className="p-5 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.06] space-y-4">
+                          <div className="flex items-center gap-2 pb-3 border-b border-slate-200 dark:border-white/[0.05]">
+                            <TbListCheck className="text-blue-500" size={18} />
+                            <h4 className="text-sm font-black text-slate-700 dark:text-white uppercase tracking-tight">Ringkasan Data Pelatihan</h4>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-xs">
+                            {[
+                              { label: "Nama Kegiatan", val: namaPelatihan },
+                              { label: "Lokasi", val: lokasiPelatihan },
+                              { label: "Penyelenggara", val: penyelenggaraPelatihan },
+                              { label: "Sektor", val: jenisProgram },
+                              { label: "Klaster", val: bidangPelatihan },
+                              { label: "Program", val: program },
+                              { label: "Pembiayaan", val: jenisPelatihan },
+                              { label: "Program Prioritas", val: dukunganProgramTerobosan },
+                              { label: "Mode Pelaksanaan", val: pelaksanaanPelatihan },
+                              { label: "Standar Penilaian", val: ujiKompetensi },
+                              jenisPelatihan === "PNBP/BLU - Berbayar" ? { label: "Biaya/Peserta", val: `Rp ${formatRupiah(hargaPelatihan)}` } : null,
+                            ].filter(Boolean).map((row, i) => (
+                              <div key={i} className="flex items-start gap-2 py-1.5">
+                                <FiCheckCircle className="text-emerald-400 shrink-0 mt-0.5" size={12} />
+                                <div className="min-w-0">
+                                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-none">{row!.label}</p>
+                                  <p className="text-slate-700 dark:text-slate-200 font-semibold mt-0.5 truncate">{row!.val || "—"}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="flex items-start gap-3 pt-3 border-t border-slate-200 dark:border-white/[0.05] mt-1">
+                            <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center shrink-0">
+                              <TbAlertCircle className="text-amber-500" size={16} />
                             </div>
-                            <div>
-                              <h4 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-tight">Final Konfirmasi</h4>
-                              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-1">Data yang telah dibuat akan masuk ke alur Kerja (Workflow) Pusat. Pastikan seluruh informasi telah tervalidasi dengan benar.</p>
-                            </div>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                              Data yang dikirimkan akan masuk ke alur kerja Pusat untuk disetujui. Pastikan seluruh informasi di atas sudah benar sebelum menekan <strong className="text-slate-700 dark:text-white">Buka Kelas</strong>.
+                            </p>
                           </div>
                         </div>
                       </div>
-                    )}
-                  </motion.div>
-                </AnimatePresence>
-
-                {/* Footer Controllers */}
-                <div className="mt-16 pt-8 border-t border-gray-100 dark:border-white/5 flex flex-col sm:flex-row justify-between items-center gap-6">
-                  <button
-                    type="button"
-                    onClick={prevStep}
-                    disabled={currentStep === 0}
-                    className="flex items-center gap-2 px-8 py-4 text-sm font-black text-slate-400 uppercase tracking-widest hover:text-slate-900 dark:hover:text-white disabled:opacity-20 transition-all"
-                  >
-                    <TbArrowLeft size={18} />
-                    Back
-                  </button>
-
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1.5 mr-4 hidden md:flex">
-                      {[...Array(STEPS.length)].map((_, i) => (
-                        <div key={i} className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === currentStep ? "bg-blue-600 scale-150 shadow-[0_0_8px_rgba(37,99,235,0.4)]" : "bg-slate-200 dark:bg-white/10"}`} />
-                      ))}
                     </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
 
-                    {currentStep === STEPS.length - 1 ? (
-                      <button
-                        type="submit"
-                        onClick={handlePostingPublicTrainingData}
-                        className="group relative overflow-hidden px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl text-sm font-black uppercase tracking-widest shadow-xl shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-1 transition-all"
-                      >
-                        <span className="relative z-10 flex items-center gap-2">Buka Kelas <TbCheck size={18} /></span>
-                        <div className="absolute inset-x-0 bottom-0 h-1 bg-white/20 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-1000" />
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={nextStep}
-                        disabled={!canContinue}
-                        className={`
-                                                    group flex items-center gap-3 px-10 py-4 rounded-2xl text-sm font-black uppercase tracking-widest transition-all
-                                                    ${canContinue
-                            ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-xl hover:-translate-y-1"
-                            : "bg-slate-100 dark:bg-white/5 text-slate-300 dark:text-slate-700 cursor-not-allowed"}
-                                                `}
-                      >
-                        Continue
-                        <TbArrowRight size={18} className={`${canContinue ? "group-hover:translate-x-1" : ""} transition-transform`} />
-                      </button>
-                    )}
+              {/* ── Validation hint bar ────────────────────────────────── */}
+              <AnimatePresence>
+                {!canContinue && allMissing[currentStep].length > 0 && (
+                  <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                    className="mt-6 flex items-start gap-3 p-4 rounded-2xl bg-amber-500/8 border border-amber-500/20">
+                    <TbAlertCircle className="text-amber-500 shrink-0 mt-0.5" size={16} />
+                    <div>
+                      <p className="text-xs font-bold text-amber-600 dark:text-amber-400 mb-1">Lengkapi data berikut untuk melanjutkan:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {allMissing[currentStep].map((m, i) => (
+                          <span key={i} className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/25 text-amber-600 dark:text-amber-400">{m}</span>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* ── Footer Navigation ─────────────────────────────────── */}
+              <div className="mt-8 pt-6 border-t border-slate-100 dark:border-white/[0.05] flex items-center justify-between">
+                <button type="button" onClick={prevStep} disabled={currentStep === 0}
+                  className="flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-slate-400 hover:text-slate-700 dark:hover:text-white disabled:opacity-0 transition-all rounded-xl hover:bg-slate-100 dark:hover:bg-white/5">
+                  <TbArrowLeft size={17} /> Sebelumnya
+                </button>
+
+                <div className="flex items-center gap-3">
+                  {/* Dot indicators */}
+                  <div className="flex items-center gap-1.5 mr-2">
+                    {STEPS.map((_, i) => (
+                      <div key={i} className={`rounded-full transition-all duration-300 ${i === currentStep ? "w-5 h-1.5 bg-blue-600" : stepValid[i] ? "w-1.5 h-1.5 bg-emerald-400" : "w-1.5 h-1.5 bg-slate-200 dark:bg-white/10"}`} />
+                    ))}
                   </div>
+
+                  {currentStep < STEPS.length - 1 ? (
+                    <button type="button" onClick={nextStep} disabled={!canContinue}
+                      className={`flex items-center gap-2 px-6 py-3 rounded-2xl text-sm font-bold transition-all ${canContinue
+                        ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg hover:-translate-y-0.5 hover:shadow-xl"
+                        : "bg-slate-100 dark:bg-white/5 text-slate-300 dark:text-slate-600 cursor-not-allowed"}`}>
+                      Lanjutkan <TbArrowRight size={17} className={canContinue ? "group-hover:translate-x-1 transition-transform" : ""} />
+                    </button>
+                  ) : (
+                    <button type="submit" onClick={handleSubmit} disabled={!step3Valid}
+                      className={`flex items-center gap-2 px-8 py-3 rounded-2xl text-sm font-bold transition-all ${step3Valid
+                        ? "bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-xl shadow-blue-500/25 hover:-translate-y-0.5 hover:shadow-blue-500/40"
+                        : "bg-slate-100 dark:bg-white/5 text-slate-300 cursor-not-allowed"}`}>
+                      <TbCheck size={17} /> Buka Kelas
+                    </button>
+                  )}
                 </div>
-              </form>
-            </div>
+              </div>
+            </form>
           </div>
-        )}
+        </div>
       </div>
     </section>
   );
 }
 
-// Sub-component for form fields
-const FormField = ({ label, children, required, icon, className = "", description }: { label: string; children: React.ReactNode; required?: boolean; icon?: React.ReactNode; className?: string; description?: string }) => (
-  <div className={`space-y-2.5 ${className}`}>
-    <div className="flex items-center justify-between px-1">
-      <label className="text-[11px] font-black uppercase tracking-[0.1em] text-slate-400 dark:text-slate-500 flex items-center gap-2">
-        {icon}
-        {label}
-        {required && <span className="text-rose-500">*</span>}
-      </label>
-      {description && (
-        <div className="group/info relative">
-          <TbInfoCircle className="text-slate-300 hover:text-blue-500 transition-colors cursor-help" size={14} />
-          <div className="absolute bottom-full right-0 mb-2 w-48 p-3 bg-slate-900 text-[10px] text-white rounded-xl opacity-0 group-hover/info:opacity-100 transition-opacity pointer-events-none z-50 shadow-2xl font-medium leading-relaxed uppercase tracking-tighter shadow-blue-500/20">
-            {description}
-          </div>
-        </div>
-      )}
-    </div>
-    {children}
-  </div>
-);
+// ─── Sub-Components ───────────────────────────────────────────────────────────
+function inputCls(filled: boolean, optional = false) {
+  return `w-full bg-slate-50 dark:bg-white/[0.04] border-2 ${filled ? "border-emerald-400/40 dark:border-emerald-500/30" : optional ? "border-slate-200 dark:border-white/[0.06]" : "border-slate-200 dark:border-white/[0.06] focus:border-blue-500"
+    } rounded-2xl px-4 py-3.5 text-sm font-semibold placeholder:text-slate-400 placeholder:font-normal dark:text-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all`;
+}
 
-const ActivityIcon = ({ size, className }: { size: number; className?: string }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M22 12H18L15 21L9 3L6 12H2" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
+function selectCls(filled: boolean) {
+  return `w-full bg-slate-50 dark:bg-white/[0.04] border-2 ${filled ? "border-emerald-400/40 dark:border-emerald-500/30" : "border-slate-200 dark:border-white/[0.06]"
+    } h-[52px] rounded-2xl px-4 font-semibold focus:ring-4 focus:ring-blue-500/10 transition-all`;
+}
+
+function ValidationMsg({ show, msg }: { show: boolean; msg: string }) {
+  return (
+    <AnimatePresence>
+      {show && (
+        <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+          className="text-[10px] text-rose-500 font-bold flex items-center gap-1 mt-1 px-1 overflow-hidden">
+          <TbAlertCircle size={11} className="shrink-0" /> {msg}
+        </motion.p>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function Field({ label, children, required, icon, className = "", hint }: {
+  label: string; children: React.ReactNode; required?: boolean;
+  icon?: React.ReactNode; className?: string; hint?: string;
+}) {
+  return (
+    <div className={`space-y-2 ${className}`}>
+      <div className="flex items-center justify-between px-0.5">
+        <label className="text-[11px] font-black uppercase tracking-[0.1em] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+          {icon && <span className="text-base">{icon}</span>}
+          {label}
+          {required && <span className="text-rose-500 font-black">*</span>}
+        </label>
+        {hint && (
+          <div className="group/tip relative">
+            <TbInfoCircle className="text-slate-300 hover:text-blue-500 transition-colors cursor-help" size={14} />
+            <div className="absolute bottom-full right-0 mb-2 w-56 p-3 bg-slate-900 text-[10px] text-slate-200 rounded-xl opacity-0 group-hover/tip:opacity-100 transition-opacity pointer-events-none z-50 shadow-2xl leading-relaxed">
+              {hint}
+            </div>
+          </div>
+        )}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function ActivityIcon({ size, className }: { size: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+      <path d="M22 12H18L15 21L9 3L6 12H2" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 export default FormPelatihan;
