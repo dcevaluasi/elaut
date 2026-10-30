@@ -242,7 +242,7 @@ const FormatSTTPL = React.forwardRef(
             (selectedDoc?.categories?.["INTI"]?.length || 0);
 
         // ✅ Choose a scaling class
-        const scaleClass = materiIntiCount >= 10 ? "scale-[.8] w-[120%] text-lg -mt-16" : "scale-100";
+        const scaleClass = materiIntiCount >= 10 ? "scale-[.9] w-[120%] text-lg mt-14" : "scale-100";
 
 
         React.useEffect(() => {
@@ -270,7 +270,7 @@ const FormatSTTPL = React.forwardRef(
                                 className="pdf-page  flex flex-col gap-4 relative items-center justify-center mt-10"
                             >
 
-                                <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center">
+                                <div className="pointer-events-none absolute  inset-0 -z-10 flex items-center justify-center">
                                     <img
                                         src="/logo-kkp-2.png"
                                         alt=""
@@ -549,7 +549,7 @@ const FormatSTTPL = React.forwardRef(
                                     </div>
 
                                     {/* Table */}
-                                    <div className={`${scaleClass} ${(pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? '-mb-24' : 'mb-0'} pb-0 w-full border border-gray-400 rounded-md overflow-hidden `}>
+                                    <div className={`${scaleClass} ${(pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? '-mb-24 ' : 'mb-0'} pb-0 w-full border border-gray-400 rounded-md overflow-hidden `}>
                                         <div className="flex items-stretch text-center font-bosNormal bg-gray-100 border-b border-gray-400">
                                             {/* NO — setinggi penuh */}
                                             <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 !font-bosBold text-lg">
@@ -855,27 +855,28 @@ const FormatSTTPL = React.forwardRef(
 
                                     <>
                                         {
-                                            pelatihan?.JenisPelatihan != "Kerja Sama" ? <div className="flex w-full flex-col space-y-1 max-w-7xl mx-auto items-start text-sm -mt-2 text-center font-bos h-fit">
-                                                <span className="text-lg leading-[115%] font-bosNormal max-w-7xl">
-                                                    Pelatihan <span className={`${pelatihan?.Program.includes('HACCP') ? 'font-bosItalic' : 'font-bosNormal'}`}>{dataProgramPelatihan[0]?.name_indo}</span> pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))} {generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_indo == "" ? `yang diselenggarakan oleh ${pelatihan?.PenyelenggaraPelatihan} dengan jam pelajaran ${totalHoursCertificateLvl.totalTheory + totalHoursCertificateLvl.totalPractice} JP secara ${pelatihan?.PelaksanaanPelatihan}. Pelatihan ini merupakan bagian dari upaya peningkatan kapasitas dan kompetensi sumber daya manusia di sektor kelautan dan perikanan, sesuai dengan standar mutu atau ketentuan yang berlaku, sehingga peserta memperoleh pengetahuan, keterampilan, dan pemahaman yang relevan sesuai program pelatihan.` : generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_indo}
-                                                </span>
-                                                {
-                                                    generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng != "" && <span className="max-w-6xl mt-1 leading-none font-bosItalic text-[0.9rem] mx-auto">
-                                                        {dataProgramPelatihan[0]?.name_english} training on {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))} {dataProgramPelatihan[0]?.description == "" ? "in support of the Quality Assurance System based on Regulation of the Minister of Marine Affairs and Fisheries of the Republic of Indonesia Number 8 of 2024 concerning Control of the Implementation of the Quality Assurance and Safety System for Marine and Fishery Product" : generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng}
+                                            pelatihan?.JenisPelatihan != "Kerja Sama" ?
+                                                <div className="flex w-full flex-col space-y-1 max-w-7xl mx-auto items-start text-sm -mt-2 text-center font-bos h-fit">
+                                                    <span className="text-lg leading-[115%] font-bosNormal max-w-7xl">
+                                                        Pelatihan <span className={`${pelatihan?.Program.includes('HACCP') ? 'font-bosItalic' : 'font-bosNormal'}`}>{dataProgramPelatihan[0]?.name_indo}</span> pada tanggal {formatDateRange(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))} {generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_indo == "" ? `yang diselenggarakan oleh ${pelatihan?.PenyelenggaraPelatihan} dengan jam pelajaran ${totalHoursCertificateLvl.totalTheory + totalHoursCertificateLvl.totalPractice} JP secara ${pelatihan?.PelaksanaanPelatihan}. Pelatihan ini merupakan bagian dari upaya peningkatan kapasitas dan kompetensi sumber daya manusia di sektor kelautan dan perikanan, sesuai dengan standar mutu atau ketentuan yang berlaku, sehingga peserta memperoleh pengetahuan, keterampilan, dan pemahaman yang relevan sesuai program pelatihan.` : generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_indo}
                                                     </span>
-                                                }
+                                                    {
+                                                        generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng != "" && <span className="max-w-6xl mt-1 leading-none font-bosItalic text-[0.9rem] mx-auto">
+                                                            {dataProgramPelatihan[0]?.name_english} training on {formatDateRangeEnglish(generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan), generateTanggalPelatihan(pelatihan!.TanggalBerakhirPelatihan))} {dataProgramPelatihan[0]?.description == "" ? "in support of the Quality Assurance System based on Regulation of the Minister of Marine Affairs and Fisheries of the Republic of Indonesia Number 8 of 2024 concerning Control of the Implementation of the Quality Assurance and Safety System for Marine and Fishery Product" : generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng}
+                                                        </span>
+                                                    }
 
-                                            </div> : <div className="flex w-full flex-col space-y-1 max-w-7xl mx-auto items-start text-sm -mt-2 text-center font-bos h-fit">
-                                                <span className="text-lg leading-[115%] font-bosNormal max-w-7xl">
-                                                    {generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_indo}
-                                                </span>
-                                                {
-                                                    generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng != "" && <span className="max-w-6xl mt-1 leading-none font-bosItalic text-[0.9rem] mx-auto">
-                                                        {generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng}
+                                                </div> : <div className="flex w-full flex-col space-y-1 max-w-7xl mx-auto items-start text-sm -mt-2 text-center font-bos h-fit">
+                                                    <span className="text-lg leading-[115%] font-bosNormal max-w-7xl">
+                                                        {generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_indo}
                                                     </span>
-                                                }
+                                                    {
+                                                        generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng != "" && <span className="max-w-6xl mt-1 leading-none font-bosItalic text-[0.9rem] mx-auto">
+                                                            {generatedDescriptionCertificateFull(dataProgramPelatihan[0]?.description).body_eng}
+                                                        </span>
+                                                    }
 
-                                            </div>
+                                                </div>
                                         }
 
 
@@ -963,7 +964,7 @@ const FormatSTTPL = React.forwardRef(
                                     {/* Title */}
                                     <div className={`flex flex-row justify-center items-center ${materiIntiCount >= 10 ? "-mb-20" : "mb-5"}`}>
                                         <div className="flex flex-col text-center space-y-0 h-fit items-center justify-center w-full gap-0">
-                                            <p className={`font-bosBold ${materiIntiCount >= 10 ? "text-xl" : "text-xl max-w-6xl"} w-full uppercase leading-none mb-0`}>
+                                            <p className={`font-bosBold ${materiIntiCount >= 10 ? "text-xl" : "text-xl max-w-7xl"} w-full uppercase leading-none mb-0`}>
                                                 Materi Pelatihan {dataProgramPelatihan[0]?.name_indo}, Diselenggarakan oleh {pelatihan?.PenyelenggaraPelatihan} pada tanggal{" "}
                                                 {formatDateRange(
                                                     generateTanggalPelatihan(pelatihan!.TanggalMulaiPelatihan),
@@ -984,27 +985,27 @@ const FormatSTTPL = React.forwardRef(
                                     </div>
 
                                     {/* Table */}
-                                    <div className={`${scaleClass} ${(pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? '-mb-28' : 'mb-0'} pb-0 w-full border border-gray-400 rounded-md overflow-hidden `}>
+                                    <div className={`${scaleClass} ${(pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? '-mb-14 max-w-[150rem] mx-auto' : 'mb-0'} pb-0 w-full border border-gray-400 rounded-md overflow-hidden `}>
                                         {/* Header Baris 1 */}
                                         <div className="flex text-center font-bosNormal bg-gray-100 ">
                                             <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 leading-none relative">
                                                 <span className="absolute mt-10 right-0 left-0 !font-bosBold text-lg">NO</span>
                                             </div>
-                                            <div className="w-7/12 px-1 flex flex-col justify-center items-center border-r border-gray-400 relative">
+                                            <div className="w-10/12 px-1 flex flex-col justify-center items-center border-r border-gray-400 relative">
                                                 <div className="flex flex-row items-center justify-center absolute mt-10">
                                                     <span className="text-lg leading-none !font-bosBold">MATERI</span>/
                                                     <span className="italic font-bos leading-none">COURSE</span>
                                                 </div>
                                             </div>
-                                            <div className="w-4/12 px-1 flex items-center justify-center border-b border-gray-400">
+                                            <div className="w-2/12 px-1 flex items-center justify-center border-b border-gray-400">
                                                 <div className="flex flex-col mb-3">
                                                     <div className="flex flex-row items-center justify-center">
-                                                        <span className="text-lg leading-none !font-bosBold">ALOKASI WAKTU </span>/
-                                                        <span className="italic font-bos leading-none">ALLOCATION TIME</span>
+                                                        <span className="text-lg leading-none !font-bosBold">ALOKASI WAKTU </span>
+
                                                     </div>
                                                     <div className="flex flex-row items-center justify-center -mt-1">
-                                                        <span className="text-lg leading-none !font-bosBold">{(pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? '@60 MENIT' : '@45 MENIT'}</span>/
-                                                        <span className="italic font-bos leading-none">{(pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? '@60 MINS' : '@45 MINS'}</span>
+                                                        <span className="text-lg leading-none !font-bosBold">{(pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? '@60 MENIT' : '@45 MENIT'}</span>
+
                                                     </div>
                                                 </div>
                                             </div>
@@ -1013,17 +1014,15 @@ const FormatSTTPL = React.forwardRef(
                                         {/* Header Baris 2 */}
                                         <div className="flex text-center font-bosNormal bg-gray-100 border-b border-gray-400">
                                             <div className="w-1/12 px-1 border-r border-gray-400"></div>
-                                            <div className="w-7/12 px-1 border-r border-gray-400"></div>
-                                            <div className="w-2/12 px-1 py-1 border-r border-gray-400">
+                                            <div className="w-10/12 px-1 border-r border-gray-400"></div>
+                                            <div className="w-1/12 px-1 py-1 border-r border-gray-400">
                                                 <div className="flex flex-row items-center justify-center mb-4">
-                                                    <span className="text-lg leading-none !font-bosBold">TEORI</span>/
-                                                    <span className="italic font-bos leading-none ">THEORY</span>
+                                                    <span className="text-lg leading-none !font-bosBold">TEORI</span>
                                                 </div>
                                             </div>
-                                            <div className="w-2/12 px-1 py-1">
+                                            <div className="w-1/12 px-1 py-1">
                                                 <div className="flex flex-row items-center justify-center mb-4">
-                                                    <span className="text-lg leading-none !font-bosBold">PRAKTEK</span>/
-                                                    <span className="italic font-bos leading-none ">PRACTICE</span>
+                                                    <span className="text-lg leading-none !font-bosBold">PRAKTEK</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -1097,7 +1096,7 @@ const FormatSTTPL = React.forwardRef(
                                                                             <div className="w-1/12 px-1 text-center border-r border-gray-300 mb-3">
                                                                                 {idx + 1}.
                                                                             </div>
-                                                                            <div className="w-7/12 px-1 border-r border-gray-300">
+                                                                            <div className="w-9/12 px-1 border-r border-gray-300">
                                                                                 <div className="flex flex-col mb-3">
                                                                                     <span className={`${materiFontClass} font-normal`}>
                                                                                         {materi.name_ind}
@@ -1107,10 +1106,10 @@ const FormatSTTPL = React.forwardRef(
                                                                                     )}
                                                                                 </div>
                                                                             </div>
-                                                                            <div className="w-2/12 px-1 text-center border-r border-gray-300 mb-3">
+                                                                            <div className="w-1/12 px-1 text-center border-r border-gray-300 mb-3">
                                                                                 {materi.theory}
                                                                             </div>
-                                                                            <div className="w-2/12 px-1 text-center mb-3">{materi.practice}</div>
+                                                                            <div className="w-1/12 px-1 text-center mb-3">{materi.practice}</div>
                                                                         </div>
                                                                     ))}
                                                                 </React.Fragment>
@@ -1123,26 +1122,26 @@ const FormatSTTPL = React.forwardRef(
                                         {/* Jumlah Jam */}
                                         <div className="flex font-bosNormal border-b border-gray-300">
                                             <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-300"></div>
-                                            <div className="w-7/12 px-1 border-r border-gray-300">
+                                            <div className="w-9/12 px-1 border-r border-gray-300">
                                                 <div className="flex flex-row items-center mb-4">
                                                     <span className="text-lg leading-none !font-bosBold">JUMLAH JAM PELAJARAN</span>/
                                                     <span className="italic font-bos leading-none">Training Hours</span>
                                                 </div>
                                             </div>
-                                            <div className="w-2/12 text-lg px-1 mb-3 text-center">{totalHoursCertificateLvl.totalTheory}</div>
-                                            <div className="w-2/12 text-lg px-1 mb-3 text-center">{totalHoursCertificateLvl.totalPractice}</div>
+                                            <div className="w-1/12 text-lg px-1 mb-3 text-center">{totalHoursCertificateLvl.totalTheory}</div>
+                                            <div className="w-1/12 text-lg px-1 mb-3 text-center">{totalHoursCertificateLvl.totalPractice}</div>
                                         </div>
 
                                         {/* Total Jam */}
                                         <div className="flex font-bosNormal">
                                             <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-300"></div>
-                                            <div className="w-7/12 px-1 border-r border-gray-300">
+                                            <div className="w-9/12 px-1 border-r border-gray-300">
                                                 <div className="flex flex-row items-center mb-4">
                                                     <span className="text-lg leading-none !font-bosBold">TOTAL JAM PELAJARAN</span>/
                                                     <span className="italic font-bos leading-none">Total Hours</span>
                                                 </div>
                                             </div>
-                                            <div className="w-4/12 px-1 text-lg mb-3 text-center flex items-center justify-center">
+                                            <div className="w-2/12 px-1 text-lg mb-3 text-center flex items-center justify-center">
                                                 {totalHoursCertificateLvl.totalTheory + totalHoursCertificateLvl.totalPractice}
                                             </div>
                                         </div>
