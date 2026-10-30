@@ -242,7 +242,7 @@ const FormatSTTPL = React.forwardRef(
             (selectedDoc?.categories?.["INTI"]?.length || 0);
 
         // ✅ Choose a scaling class
-        const scaleClass = materiIntiCount >= 10 ? "scale-[.9] w-[120%] text-lg mt-14" : "scale-100";
+        const scaleClass = materiIntiCount >= 10 ? "scale-[.8] w-[120%] text-lg -mt-16" : "scale-100";
 
 
         React.useEffect(() => {
@@ -985,7 +985,7 @@ const FormatSTTPL = React.forwardRef(
                                     </div>
 
                                     {/* Table */}
-                                    <div className={`${scaleClass} ${(pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? '-mb-14 max-w-[150rem] mx-auto' : 'mb-0'} pb-0 w-full border border-gray-400 rounded-md overflow-hidden `}>
+                                    <div className={`${scaleClass} ${(pelatihan?.BidangPelatihan?.includes('Awak Kapal Perikanan')) ? '-mb-14' : 'mb-0'} pb-0 w-full border border-gray-400 rounded-md overflow-hidden `}>
                                         {/* Header Baris 1 */}
                                         <div className="flex text-center font-bosNormal bg-gray-100 ">
                                             <div className="w-1/12 px-1 flex items-center justify-center border-r border-gray-400 leading-none relative">
