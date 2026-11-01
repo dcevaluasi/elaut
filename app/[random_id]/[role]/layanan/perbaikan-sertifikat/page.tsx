@@ -1,18 +1,15 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
 import LayoutAdminElaut, { HeaderPageLayoutAdminElaut } from "@/components/dashboard/Layouts/LayoutAdminElaut";
-import {
-    getFirestore,
-    collection,
-    getDocs,
-    doc,
-    setDoc,
-    query,
-    orderBy
-} from "firebase/firestore";
+import { getFirestore, collection, getDocs, doc, setDoc } from "firebase/firestore";
 import firebaseApp from "@/firebase/config";
-import { motion, AnimatePresence } from "framer-motion";
+import Toast from "@/commons/Toast";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { encryptValue } from "@/lib/utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { RiShieldFlashLine } from "react-icons/ri";
 import {
     Search,
     RefreshCw,
@@ -21,43 +18,19 @@ import {
     AlertCircle,
     XCircle,
     FileText,
-    User,
-    BookOpen,
-    Edit3,
-    Eye,
-    Filter,
     Check,
     X,
     ExternalLink,
     Tag,
-    MessageSquare,
-    Send
+    Send,
+    Loader2,
+    ChevronLeft,
+    ChevronRight,
+    Loader,
+    LucideIcon,
 } from "lucide-react";
-import { RiShieldFlashLine, RiVerifiedBadgeFill, RiFilePdfLine } from "react-icons/ri";
-import { FiCheck, FiX, FiClock, FiAlertCircle } from "react-icons/fi";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
-import { encryptValue } from "@/lib/utils";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogDescription,
-    DialogFooter
-} from "@/components/ui/dialog";
-import { HashLoader } from "react-spinners";
+
+/* ============================ TYPES ============================ */
 
 export interface PerbaikanSertifikatItem {
     idDoc: string;
@@ -79,662 +52,595 @@ export interface PerbaikanSertifikatItem {
     UpdatedAt?: string;
 }
 
-const getStatusBadge = (status: string) => {
-    switch (status) {
-        case "Pending":
-            return {
-                bg: "bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400",
-                icon: <Clock className="w-3.5 h-3.5" />,
-                label: "Pending",
-            };
-        case "Diproses":
-            return {
-                bg: "bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400",
-                icon: <RefreshCw className="w-3.5 h-3.5 animate-spin" />,
-                label: "Diproses",
-            };
-        case "Selesai":
-            return {
-                bg: "bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400",
-                icon: <CheckCircle2 className="w-3.5 h-3.5" />,
-                label: "Selesai",
-            };
-        case "Ditolak":
-            return {
-                bg: "bg-rose-500/10 border-rose-500/30 text-rose-600 dark:text-rose-400",
-                icon: <XCircle className="w-3.5 h-3.5" />,
-                label: "Ditolak",
-            };
-        default:
-            return {
-                bg: "bg-slate-500/10 border-slate-500/30 text-slate-600 dark:text-slate-400",
-                icon: <AlertCircle className="w-3.5 h-3.5" />,
-                label: status || "Pending",
-            };
-    }
+type StatusKey = "Pending" | "Diproses" | "Selesai" | "Ditolak";
+
+/* ============================ KONSTANTA ============================ */
+
+const COLLECTION = "perbaikan-sertifikat";
+const PAGE_SIZE = 10;
+const STATUSES: StatusKey[] = ["Pending", "Diproses", "Selesai", "Ditolak"];
+
+const STATUS: Record<StatusKey, { icon: LucideIcon; accent: string; dot: string; text: string; soft: string }> = {
+    Pending: { icon: Clock, accent: "#F59E0B", dot: "bg-amber-500", text: "text-amber-600", soft: "bg-amber-50 ring-amber-200 text-amber-700" },
+    Diproses: { icon: Loader, accent: "#3B82F6", dot: "bg-blue-500", text: "text-blue-600", soft: "bg-blue-50 ring-blue-200 text-blue-700" },
+    Selesai: { icon: CheckCircle2, accent: "#10B981", dot: "bg-emerald-500", text: "text-emerald-600", soft: "bg-emerald-50 ring-emerald-200 text-emerald-700" },
+    Ditolak: { icon: XCircle, accent: "#F43F5E", dot: "bg-rose-500", text: "text-rose-600", soft: "bg-rose-50 ring-rose-200 text-rose-700" },
 };
+
+/** Normalisasi status (case-insensitive) → kunci baku; default Pending */
+const normStatus = (s?: string): StatusKey => STATUSES.find((k) => k.toLowerCase() === (s || "").trim().toLowerCase()) || "Pending";
+
+const fmt = (n: number) => n.toLocaleString("id-ID");
+const DATE_FMT = new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric" });
+const TIME_FMT = new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" });
+const parseDate = (s?: string) => {
+    if (!s) return null;
+    const d = new Date(s);
+    return isNaN(d.getTime()) ? null : d;
+};
+const fmtDate = (s?: string) => {
+    const d = parseDate(s);
+    return d ? DATE_FMT.format(d) : "-";
+};
+const fmtTime = (s?: string) => {
+    const d = parseDate(s);
+    return d ? TIME_FMT.format(d) : "";
+};
+const ticketOf = (i: PerbaikanSertifikatItem) => i.TiketPerbaikan || i.idDoc.slice(0, 8);
+
+/* ============================ PAGE ============================ */
 
 export default function PerbaikanSertifikatPage() {
     const pathname = usePathname();
+    const basePath = pathname?.includes("pusat") ? "pusat" : "lemdiklat";
+    const detailHref = useCallback(
+        (i: PerbaikanSertifikatItem) =>
+            i.KodePelatihan && i.IdPelatihan ? `/admin/${basePath}/pelatihan/detail/${i.KodePelatihan}/${encryptValue(String(i.IdPelatihan))}` : null,
+        [basePath]
+    );
+
+    /* ---------- Data ---------- */
     const [dataList, setDataList] = useState<PerbaikanSertifikatItem[]>([]);
     const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    // Filter & Search states
-    const [searchQuery, setSearchQuery] = useState("");
-    const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>("Semua");
-
-    // Modal state for detail & status update
-    const [selectedItem, setSelectedItem] = useState<PerbaikanSertifikatItem | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [updateStatus, setUpdateStatus] = useState<string>("Pending");
-    const [catatanAdmin, setCatatanAdmin] = useState<string>("");
-    const [updating, setUpdating] = useState(false);
-    const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
+        setLoading(true);
+        setError(null);
         try {
-            setLoading(true);
-            const db = getFirestore(firebaseApp);
-            const colRef = collection(db, "perbaikan-sertifikat");
-
-            // Attempt query with OrderBy, fallback if index is missing
-            let snapshot;
-            try {
-                const q = query(colRef, orderBy("CreatedAt", "desc"));
-                snapshot = await getDocs(q);
-            } catch (err) {
-                snapshot = await getDocs(colRef);
-            }
-
-            const list: PerbaikanSertifikatItem[] = [];
-            snapshot.forEach((docSnap) => {
-                const item = docSnap.data() as PerbaikanSertifikatItem;
-                list.push({
-                    ...item,
-                    idDoc: docSnap.id,
-                });
-            });
-
-            // Sort manually client side if fallback was used
-            list.sort((a, b) => {
-                const timeA = a.CreatedAt ? new Date(a.CreatedAt).getTime() : 0;
-                const timeB = b.CreatedAt ? new Date(b.CreatedAt).getTime() : 0;
-                return timeB - timeA;
-            });
-
+            // 1 request saja (tanpa orderBy → tidak butuh index & tidak ada request ganda), urut di client
+            const snap = await getDocs(collection(getFirestore(firebaseApp), COLLECTION));
+            const list = snap.docs.map((d) => ({ ...(d.data() as PerbaikanSertifikatItem), idDoc: d.id }));
+            list.sort((a, b) => (parseDate(b.CreatedAt)?.getTime() || 0) - (parseDate(a.CreatedAt)?.getTime() || 0));
             setDataList(list);
-        } catch (error) {
-            console.error("Error fetching perbaikan-sertifikat data:", error);
+        } catch (e: any) {
+            console.error("Error fetching perbaikan-sertifikat:", e);
+            setError(e?.message || "Gagal memuat data");
         } finally {
             setLoading(false);
-            setRefreshing(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchData();
+    }, [fetchData]);
+
+    /* ---------- Normalisasi sekali ---------- */
+    const rows = useMemo(
+        () =>
+            dataList.map((item) => ({
+                item,
+                status: normStatus(item.Status),
+                haystack: `${item.TiketPerbaikan ?? ""} ${item.idDoc} ${item.NoSertifikat ?? ""} ${item.Nama ?? ""} ${item.NamaPelatihan ?? ""} ${item.KodePelatihan ?? ""} ${item.JenisPerbaikan ?? ""}`.toLowerCase(),
+            })),
+        [dataList]
+    );
+
+    const counts = useMemo(() => {
+        const c: Record<StatusKey, number> = { Pending: 0, Diproses: 0, Selesai: 0, Ditolak: 0 };
+        rows.forEach((r) => c[r.status]++);
+        return c;
+    }, [rows]);
+
+    /* ---------- Filter ---------- */
+    const [search, setSearch] = useState("");
+    const q = useDeferredValue(search.trim().toLowerCase());
+    const [statusFilter, setStatusFilter] = useState<StatusKey | "">("");
+    const [page, setPage] = useState(1);
+
+    const filtered = useMemo(() => rows.filter((r) => (!statusFilter || r.status === statusFilter) && (!q || r.haystack.includes(q))), [rows, q, statusFilter]);
+    useEffect(() => setPage(1), [q, statusFilter]);
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    const safePage = Math.min(page, totalPages);
+    const pageRows = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+    const fromIdx = filtered.length ? (safePage - 1) * PAGE_SIZE + 1 : 0;
+    const hasFilter = !!(search || statusFilter);
+
+    // Shortcut "/" fokus ke pencarian
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => {
+            const t = e.target as HTMLElement;
+            if (e.key === "/" && !["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName)) {
+                e.preventDefault();
+                document.getElementById("search-perbaikan")?.focus();
+            }
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
     }, []);
 
-    const handleManualRefresh = () => {
-        setRefreshing(true);
-        fetchData();
+    /* ---------- Modal kelola ---------- */
+    const [selected, setSelected] = useState<PerbaikanSertifikatItem | null>(null);
+    const [newStatus, setNewStatus] = useState<StatusKey>("Pending");
+    const [catatan, setCatatan] = useState("");
+    const [saving, setSaving] = useState(false);
+
+    const openManage = (item: PerbaikanSertifikatItem) => {
+        setSelected(item);
+        setNewStatus(normStatus(item.Status));
+        setCatatan(item.CatatanAdmin || "");
     };
 
-    // Filter logic
-    const filteredData = useMemo(() => {
-        return dataList.filter((item) => {
-            const matchesSearch =
-                (item.TiketPerbaikan && item.TiketPerbaikan.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                (item.NoSertifikat && item.NoSertifikat.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                (item.Nama && item.Nama.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                (item.NamaPelatihan && item.NamaPelatihan.toLowerCase().includes(searchQuery.toLowerCase()));
+    const unchanged = !!selected && normStatus(selected.Status) === newStatus && (selected.CatatanAdmin || "") === catatan.trim();
+    const needNote = newStatus === "Ditolak" && !catatan.trim();
 
-            const matchesStatus =
-                selectedStatusFilter === "Semua" ||
-                item.Status?.toLowerCase() === selectedStatusFilter.toLowerCase();
-
-            return matchesSearch && matchesStatus;
-        });
-    }, [dataList, searchQuery, selectedStatusFilter]);
-
-    // Counts for stat bar
-    const counts = useMemo(() => {
-        const c = { total: dataList.length, pending: 0, diproses: 0, selesai: 0, ditolak: 0 };
-        dataList.forEach((item) => {
-            const st = item.Status?.toLowerCase();
-            if (st === "pending") c.pending++;
-            else if (st === "diproses") c.diproses++;
-            else if (st === "selesai") c.selesai++;
-            else if (st === "ditolak") c.ditolak++;
-        });
-        return c;
-    }, [dataList]);
-
-    const handleOpenUpdateModal = (item: PerbaikanSertifikatItem) => {
-        setSelectedItem(item);
-        setUpdateStatus(item.Status || "Pending");
-        setCatatanAdmin(item.CatatanAdmin || "");
-        setIsModalOpen(true);
-    };
-
-    const handleSaveStatus = async () => {
-        if (!selectedItem) return;
-
-        setUpdating(true);
-        try {
-            const db = getFirestore(firebaseApp);
-            const docRef = doc(db, "perbaikan-sertifikat", selectedItem.idDoc);
-
-            const updatedFields = {
-                Status: updateStatus,
-                CatatanAdmin: catatanAdmin.trim(),
-                UpdatedAt: new Date().toISOString(),
-            };
-
-            await setDoc(docRef, updatedFields, { merge: true });
-
-            // Local state update
-            setDataList((prev) =>
-                prev.map((i) =>
-                    i.idDoc === selectedItem.idDoc
-                        ? { ...i, ...updatedFields }
-                        : i
-                )
-            );
-
-            setIsModalOpen(false);
-            setSelectedItem(null);
-
-            // Toast feedback
-            setToastMessage(`Status tiket #${selectedItem.TiketPerbaikan || selectedItem.idDoc} berhasil diperbarui menjadi ${updateStatus}!`);
-            setTimeout(() => setToastMessage(null), 3500);
-        } catch (error) {
-            console.error("Error updating perbaikan sertifikat status:", error);
-            alert("Gagal memperbarui status. Silakan coba lagi.");
-        } finally {
-            setUpdating(false);
+    const save = async () => {
+        if (!selected || unchanged) return;
+        if (needNote) {
+            Toast.fire({ icon: "warning", title: "Isi alasan penolakan pada catatan admin" });
+            return;
         }
-    };
-
-    const formatDateStr = (dateStr?: string) => {
-        if (!dateStr) return "-";
+        setSaving(true);
         try {
-            const d = new Date(dateStr);
-            return d.toLocaleDateString("id-ID", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-            });
+            const fields = { Status: newStatus, CatatanAdmin: catatan.trim(), UpdatedAt: new Date().toISOString() };
+            await setDoc(doc(getFirestore(firebaseApp), COLLECTION, selected.idDoc), fields, { merge: true });
+            setDataList((prev) => prev.map((i) => (i.idDoc === selected.idDoc ? { ...i, ...fields } : i)));
+            Toast.fire({ icon: "success", title: `Tiket #${ticketOf(selected)} → ${newStatus}` });
+            setSelected(null);
         } catch (e) {
-            return dateStr;
+            console.error("Error updating status:", e);
+            Toast.fire({ icon: "error", title: "Gagal memperbarui status, coba lagi" });
+        } finally {
+            setSaving(false);
         }
     };
+
+    const initialLoading = loading && dataList.length === 0;
+    const selesaiPct = rows.length ? (counts.Selesai / rows.length) * 100 : 0;
 
     return (
         <LayoutAdminElaut>
-            <div className="flex flex-col w-full h-full gap-4">
-                {/* Page Header */}
+            <div className="flex flex-col w-full h-full gap-5">
                 <HeaderPageLayoutAdminElaut
                     title="Layanan Perbaikan Sertifikat"
                     description="Kelola dan proses pengajuan perbaikan data sertifikat elektronik peserta pelatihan E-LAUT."
-                    icon={<RiShieldFlashLine className="text-3xl text-amber-500" />}
+                    icon={<RiShieldFlashLine className="text-3xl" />}
                 />
 
-                {/* Toast Notification */}
-                <AnimatePresence>
-                    {toastMessage && (
-                        <motion.div
-                            initial={{ opacity: 0, y: -20, scale: 0.95 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                            className="fixed top-6 right-6 z-[99999] flex items-center gap-2.5 px-5 py-3 rounded-2xl bg-emerald-600 text-white font-bold text-xs shadow-2xl shadow-emerald-500/30 border border-emerald-400/40 backdrop-blur-md"
-                        >
-                            <FiCheck className="w-4 h-4 stroke-[3]" />
-                            <span>{toastMessage}</span>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                {/* Statistics Cards Bar */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 my-2">
-                    <div
-                        onClick={() => setSelectedStatusFilter("Semua")}
-                        className={`p-4 rounded-2xl border transition-all cursor-pointer ${selectedStatusFilter === "Semua"
-                            ? "bg-slate-900 text-white border-blue-500 ring-2 ring-blue-500/20 shadow-lg"
-                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
-                            }`}
-                    >
-                        <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">
-                            <span>Total Pengajuan</span>
-                            <FileText className="w-4 h-4 text-blue-500" />
-                        </div>
-                        <div className="text-2xl font-bold font-calsans tracking-tight">
-                            {counts.total}
-                        </div>
-                    </div>
-
-                    <div
-                        onClick={() => setSelectedStatusFilter("Pending")}
-                        className={`p-4 rounded-2xl border transition-all cursor-pointer ${selectedStatusFilter === "Pending"
-                            ? "bg-amber-500/10 border-amber-500 ring-2 ring-amber-500/20 shadow-lg"
-                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-amber-500/30"
-                            }`}
-                    >
-                        <div className="flex items-center justify-between text-xs font-semibold text-amber-600 dark:text-amber-400 mb-1">
-                            <span>Pending</span>
-                            <Clock className="w-4 h-4 text-amber-500" />
-                        </div>
-                        <div className="text-2xl font-bold font-calsans tracking-tight text-amber-600 dark:text-amber-400">
-                            {counts.pending}
-                        </div>
-                    </div>
-
-                    <div
-                        onClick={() => setSelectedStatusFilter("Diproses")}
-                        className={`p-4 rounded-2xl border transition-all cursor-pointer ${selectedStatusFilter === "Diproses"
-                            ? "bg-blue-500/10 border-blue-500 ring-2 ring-blue-500/20 shadow-lg"
-                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-blue-500/30"
-                            }`}
-                    >
-                        <div className="flex items-center justify-between text-xs font-semibold text-blue-600 dark:text-blue-400 mb-1">
-                            <span>Diproses</span>
-                            <RefreshCw className="w-4 h-4 text-blue-500" />
-                        </div>
-                        <div className="text-2xl font-bold font-calsans tracking-tight text-blue-600 dark:text-blue-400">
-                            {counts.diproses}
-                        </div>
-                    </div>
-
-                    <div
-                        onClick={() => setSelectedStatusFilter("Selesai")}
-                        className={`p-4 rounded-2xl border transition-all cursor-pointer ${selectedStatusFilter === "Selesai"
-                            ? "bg-emerald-500/10 border-emerald-500 ring-2 ring-emerald-500/20 shadow-lg"
-                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-emerald-500/30"
-                            }`}
-                    >
-                        <div className="flex items-center justify-between text-xs font-semibold text-emerald-600 dark:text-emerald-400 mb-1">
-                            <span>Selesai</span>
-                            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                        </div>
-                        <div className="text-2xl font-bold font-calsans tracking-tight text-emerald-600 dark:text-emerald-400">
-                            {counts.selesai}
-                        </div>
-                    </div>
-
-                    <div
-                        onClick={() => setSelectedStatusFilter("Ditolak")}
-                        className={`p-4 rounded-2xl border transition-all cursor-pointer ${selectedStatusFilter === "Ditolak"
-                            ? "bg-rose-500/10 border-rose-500 ring-2 ring-rose-500/20 shadow-lg"
-                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-rose-500/30"
-                            }`}
-                    >
-                        <div className="flex items-center justify-between text-xs font-semibold text-rose-600 dark:text-rose-400 mb-1">
-                            <span>Ditolak</span>
-                            <XCircle className="w-4 h-4 text-rose-500" />
-                        </div>
-                        <div className="text-2xl font-bold font-calsans tracking-tight text-rose-600 dark:text-rose-400">
-                            {counts.ditolak}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Filters & Search Controls */}
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-                    {/* Search Bar */}
-                    <div className="relative w-full sm:w-80">
-                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                        <Input
-                            type="text"
-                            placeholder="Cari Tiket, No STTPL, Nama, Pelatihan..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-10 pr-8 h-10 rounded-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-xs focus:ring-2 focus:ring-blue-500/20"
-                        />
-                        {searchQuery && (
-                            <button
-                                onClick={() => setSearchQuery("")}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                            >
-                                <X className="w-3.5 h-3.5" />
-                            </button>
-                        )}
-                    </div>
-
-                    {/* Filter Status Chips & Refresh */}
-                    <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end overflow-x-auto">
-                        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-1">
-                            {["Semua", "Pending", "Diproses", "Selesai", "Ditolak"].map((st) => {
-                                const active = selectedStatusFilter === st;
-                                return (
-                                    <button
-                                        key={st}
-                                        onClick={() => setSelectedStatusFilter(st)}
-                                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${active
-                                            ? "bg-blue-600 text-white shadow-md shadow-blue-600/20"
-                                            : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
-                                            }`}
-                                    >
-                                        {st}
-                                    </button>
-                                );
-                            })}
-                        </div>
-
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleManualRefresh}
-                            disabled={refreshing}
-                            className="h-10 px-3.5 rounded-xl border-slate-200 dark:border-slate-700 text-xs gap-1.5 flex-shrink-0"
-                        >
-                            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin text-blue-500" : ""}`} />
-                            <span className="hidden sm:inline">Muat Ulang</span>
-                        </Button>
-                    </div>
-                </div>
-
-                {/* Table Data View */}
-                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
-                    {loading ? (
-                        <div className="flex flex-col items-center justify-center py-20 gap-3">
-                            <HashLoader color="#2563eb" size={40} />
-                            <span className="text-xs font-semibold text-slate-500">Memuat data pengajuan perbaikan...</span>
-                        </div>
-                    ) : filteredData.length === 0 ? (
-                        <div className="text-center py-16 px-4 space-y-3">
-                            <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center mx-auto text-slate-400">
-                                <FileText className="w-8 h-8" />
-                            </div>
-                            <h3 className="text-base font-bold text-slate-800 dark:text-slate-100">
-                                Data Pengajuan Tidak Ditemukan
-                            </h3>
-                            <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                                Belum ada laporan perbaikan sertifikat yang sesuai dengan filter atau kata kunci pencarian Anda.
-                            </p>
-                        </div>
+                {/* ---------- Stats ---------- */}
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
+                    {initialLoading ? (
+                        [0, 1, 2, 3, 4].map((i) => <div key={i} className="h-[132px] rounded-3xl bg-slate-200/70 dark:bg-slate-800 animate-pulse" />)
                     ) : (
-                        <div className="overflow-x-auto">
-                            <Table>
-                                <TableHeader className="bg-slate-50 dark:bg-slate-800/60">
-                                    <TableRow>
-                                        <TableHead className="w-12 text-center text-xs font-bold">No</TableHead>
-                                        <TableHead className="text-xs font-bold">Tiket & Tanggal</TableHead>
-                                        <TableHead className="text-xs font-bold">Peserta & No. STTPL</TableHead>
-                                        <TableHead className="text-xs font-bold">Pelatihan</TableHead>
-                                        <TableHead className="text-xs font-bold">Jenis & Detail Perbaikan</TableHead>
-                                        <TableHead className="text-xs font-bold">Status</TableHead>
-                                        <TableHead className="text-center text-xs font-bold">Aksi</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {filteredData.map((item, index) => {
-                                        const badge = getStatusBadge(item.Status);
-                                        return (
-                                            <TableRow key={item.idDoc} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
-                                                <TableCell className="text-center text-xs font-mono text-slate-400">
-                                                    {index + 1}
-                                                </TableCell>
+                        <>
+                            <StatCard
+                                label="Total Pengajuan"
+                                value={fmt(rows.length)}
+                                unit="Tiket"
+                                sub={`${selesaiPct.toFixed(0)}% telah selesai`}
+                                icon={FileText}
+                                accent="#6366F1"
+                                progress={selesaiPct}
+                                active={!statusFilter}
+                                onClick={() => setStatusFilter("")}
+                                className="col-span-2 lg:col-span-1"
+                            />
+                            {STATUSES.map((s) => (
+                                <StatCard
+                                    key={s}
+                                    label={s}
+                                    value={fmt(counts[s])}
+                                    unit="Tiket"
+                                    sub={s === "Pending" ? (counts.Pending ? "perlu ditindaklanjuti" : "tidak ada antrean") : `${rows.length ? ((counts[s] / rows.length) * 100).toFixed(0) : 0}% dari total`}
+                                    icon={STATUS[s].icon}
+                                    accent={STATUS[s].accent}
+                                    active={statusFilter === s}
+                                    onClick={() => setStatusFilter(statusFilter === s ? "" : s)}
+                                />
+                            ))}
+                        </>
+                    )}
+                </div>
 
-                                                <TableCell>
-                                                    <div className="flex flex-col gap-0.5">
-                                                        <span className="font-mono font-bold text-xs text-blue-600 dark:text-blue-400">
-                                                            #{item.TiketPerbaikan || item.idDoc.slice(0, 8)}
-                                                        </span>
-                                                        <span className="text-[11px] text-slate-400">
-                                                            {formatDateStr(item.CreatedAt)}
-                                                        </span>
-                                                    </div>
-                                                </TableCell>
-
-                                                <TableCell>
-                                                    <div className="flex flex-col gap-0.5">
-                                                        <span className="font-bold text-xs text-slate-900 dark:text-slate-100">
-                                                            {item.Nama}
-                                                        </span>
-                                                        <span className="font-mono text-[11px] text-slate-500">
-                                                            STTPL: {item.NoSertifikat}
-                                                        </span>
-                                                    </div>
-                                                </TableCell>
-
-                                                <TableCell className="max-w-xs">
-                                                    <div className="flex flex-col gap-0.5">
-                                                        {item.KodePelatihan && item.IdPelatihan ? (
-                                                            <Link
-                                                                href={`/admin/${pathname.includes('pusat') ? 'pusat' : 'lemdiklat'}/pelatihan/detail/${item.KodePelatihan}/${encryptValue(item.IdPelatihan.toString())}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline line-clamp-2 flex items-center gap-1 group"
-                                                                title="Buka Detail Pelatihan"
-                                                            >
-                                                                <span>{item.NamaPelatihan}</span>
-                                                                <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 text-blue-500" />
-                                                            </Link>
-                                                        ) : (
-                                                            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 line-clamp-2">
-                                                                {item.NamaPelatihan}
-                                                            </span>
-                                                        )}
-                                                        {item.KodePelatihan && (
-                                                            <span className="font-mono text-[10px] text-slate-400 font-medium">
-                                                                Kode: {item.KodePelatihan}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                </TableCell>
-
-                                                <TableCell className="max-w-xs">
-                                                    <div className="flex flex-col gap-1">
-                                                        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-600 dark:text-amber-400">
-                                                            <Tag className="w-3 h-3" />
-                                                            {item.JenisPerbaikan}
-                                                        </span>
-
-                                                        {item.PerbaikanSudahTerbit && item.PerbaikanSudahTerbit.length > 0 && (
-                                                            <div className="flex flex-wrap gap-1">
-                                                                {item.PerbaikanSudahTerbit.map((tag, tIdx) => (
-                                                                    <span
-                                                                        key={tIdx}
-                                                                        className="px-2 py-0.5 rounded-md bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-600 dark:text-rose-400 text-[10px] font-medium"
-                                                                    >
-                                                                        {tag}
-                                                                    </span>
-                                                                ))}
-                                                            </div>
-                                                        )}
-
-                                                        {item.PerbaikanLainnya && (
-                                                            <span className="text-[11px] text-slate-500 italic line-clamp-1">
-                                                                &ldquo;{item.PerbaikanLainnya}&rdquo;
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                </TableCell>
-
-                                                <TableCell>
-                                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-bold ${badge.bg}`}>
-                                                        {badge.icon}
-                                                        <span>{badge.label}</span>
-                                                    </span>
-                                                </TableCell>
-
-                                                <TableCell className="text-center">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => handleOpenUpdateModal(item)}
-                                                        className="h-8 px-3 rounded-xl border-blue-200 dark:border-blue-900 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950 text-xs font-bold gap-1.5"
-                                                    >
-                                                        <Edit3 className="w-3.5 h-3.5" />
-                                                        <span>Kelola</span>
-                                                    </Button>
-                                                </TableCell>
-                                            </TableRow>
-                                        );
-                                    })}
-                                </TableBody>
-                            </Table>
+                {/* ---------- Toolbar ---------- */}
+                <div className="rounded-3xl bg-white dark:bg-slate-900 ring-1 ring-slate-200/80 dark:ring-slate-800 p-2.5 shadow-sm space-y-2.5">
+                    <div className="flex flex-col lg:flex-row gap-2.5 lg:items-center">
+                        <div className="relative flex-1 group">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-blue-500" />
+                            <input
+                                id="search-perbaikan"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                placeholder="Cari tiket, no. STTPL, nama, pelatihan..."
+                                className="pl-11 border-none pr-16 w-full h-11 bg-slate-50 dark:bg-slate-800 rounded-2xl text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500/20 placeholder:text-slate-400 placeholder:font-normal"
+                            />
+                            {search ? (
+                                <button type="button" onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-200" aria-label="Hapus pencarian">
+                                    <X className="w-4 h-4" />
+                                </button>
+                            ) : (
+                                <kbd className="hidden md:block absolute right-3 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded-md bg-white ring-1 ring-slate-200 text-[10px] font-bold text-slate-400">/</kbd>
+                            )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="flex items-center p-1 rounded-2xl bg-slate-50 dark:bg-slate-800 overflow-x-auto scrollbar-hide max-w-full">
+                                {(["", ...STATUSES] as (StatusKey | "")[]).map((s) => (
+                                    <button
+                                        key={s || "all"}
+                                        type="button"
+                                        onClick={() => setStatusFilter(s)}
+                                        className={`h-9 px-3 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${statusFilter === s ? "bg-[#0B1B3F] text-white shadow-md" : "text-slate-500 hover:text-slate-800"}`}
+                                    >
+                                        {s || "Semua"} <span className="opacity-60 tabular-nums">{s ? counts[s] : rows.length}</span>
+                                    </button>
+                                ))}
+                            </div>
+                            <button type="button" onClick={fetchData} disabled={loading} title="Muat ulang" className="h-11 w-11 shrink-0 rounded-2xl bg-slate-50 dark:bg-slate-800 text-slate-600 flex items-center justify-center hover:ring-1 hover:ring-slate-200 disabled:opacity-40">
+                                <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+                            </button>
+                        </div>
+                    </div>
+                    {hasFilter && (
+                        <div className="flex flex-wrap items-center gap-1.5 px-1 pb-0.5">
+                            {search && <Chip label={`"${search}"`} onClear={() => setSearch("")} />}
+                            {statusFilter && <Chip label={`Status: ${statusFilter}`} onClear={() => setStatusFilter("")} />}
+                            <button type="button" onClick={() => { setSearch(""); setStatusFilter(""); }} className="text-[11px] font-semibold text-slate-400 hover:text-rose-600 px-1">
+                                Reset semua
+                            </button>
+                            <span className="ml-auto text-[11px] text-slate-400"><b className="text-slate-700 tabular-nums">{fmt(filtered.length)}</b> hasil</span>
                         </div>
                     )}
                 </div>
 
-                {/* UPDATE STATUS & DETAIL DIALOG */}
-                <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                    <DialogContent className="sm:max-w-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl">
-                        <DialogHeader>
-                            <DialogTitle className="text-lg font-bold font-calsans flex items-center gap-2 text-slate-900 dark:text-slate-100">
-                                <RiShieldFlashLine className="w-5 h-5 text-amber-500" />
-                                <span>Kelola Status Perbaikan Sertifikat</span>
-                            </DialogTitle>
-                            <DialogDescription className="text-xs text-slate-500">
-                                Tiket #{selectedItem?.TiketPerbaikan || selectedItem?.idDoc} &bull; Dibuat pada {formatDateStr(selectedItem?.CreatedAt)}
-                            </DialogDescription>
-                        </DialogHeader>
+                {/* ---------- Tabel ---------- */}
+                <div className="bg-white dark:bg-slate-900 rounded-[1.75rem] ring-1 ring-slate-200/80 dark:ring-slate-800 shadow-sm overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+                                    <th className="w-12 pl-5 pr-2 py-3 text-center font-semibold">No</th>
+                                    <th className="px-3 py-3 font-semibold w-[140px]">Tiket</th>
+                                    <th className="px-3 py-3 font-semibold min-w-[200px]">Peserta</th>
+                                    <th className="px-3 py-3 font-semibold min-w-[240px]">Pelatihan</th>
+                                    <th className="px-3 py-3 font-semibold min-w-[220px]">Perbaikan</th>
+                                    <th className="px-3 py-3 font-semibold w-[120px]">Status</th>
+                                    <th className="w-[1%] px-5 py-3 text-right font-semibold">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                                {initialLoading ? (
+                                    Array.from({ length: 6 }).map((_, i) => (
+                                        <tr key={i}>
+                                            <td colSpan={7} className="px-5 py-3">
+                                                <div className="h-11 rounded-xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : error && dataList.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={7} className="py-16">
+                                            <div className="flex flex-col items-center gap-2 text-center">
+                                                <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center">
+                                                    <AlertCircle className="w-5 h-5" />
+                                                </div>
+                                                <p className="text-sm font-bold text-slate-700">Gagal memuat data</p>
+                                                <p className="text-xs text-slate-400 max-w-sm">{error}</p>
+                                                <button type="button" onClick={fetchData} className="mt-2 h-9 px-4 rounded-xl bg-[#0B1B3F] text-white text-xs font-bold">Coba lagi</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : pageRows.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={7} className="py-16">
+                                            <div className="flex flex-col items-center gap-2 text-center">
+                                                <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                                                    <FileText className="w-5 h-5 text-slate-400" />
+                                                </div>
+                                                <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{hasFilter ? "Pengajuan tidak ditemukan" : "Belum ada pengajuan perbaikan"}</p>
+                                                {hasFilter && (
+                                                    <button type="button" onClick={() => { setSearch(""); setStatusFilter(""); }} className="text-xs font-semibold text-blue-600 hover:underline">
+                                                        Reset filter
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    pageRows.map(({ item, status }, i) => {
+                                        const href = detailHref(item);
+                                        return (
+                                            <tr key={item.idDoc} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/30 transition-colors">
+                                                <td className="pl-5 pr-2 py-3.5 text-center text-xs text-slate-400 tabular-nums align-top">{fromIdx + i}</td>
+                                                <td className="px-3 py-3.5 align-top">
+                                                    <p className="font-mono text-xs font-bold text-blue-600">#{ticketOf(item)}</p>
+                                                    <p className="text-[11px] text-slate-400 tabular-nums">{fmtDate(item.CreatedAt)} {fmtTime(item.CreatedAt)}</p>
+                                                </td>
+                                                <td className="px-3 py-3.5 align-top">
+                                                    <p className="text-[13px] font-semibold text-slate-900 dark:text-white">{item.Nama || "-"}</p>
+                                                    <p className="font-mono text-[11px] text-slate-400">{item.NoSertifikat || "-"}</p>
+                                                </td>
+                                                <td className="px-3 py-3.5 align-top max-w-xs">
+                                                    {href ? (
+                                                        <Link href={href} target="_blank" rel="noopener noreferrer" className="group inline-flex items-start gap-1 text-xs font-semibold text-slate-800 dark:text-slate-200 hover:text-blue-600" title="Buka detail pelatihan">
+                                                            <span className="line-clamp-2">{item.NamaPelatihan}</span>
+                                                            <ExternalLink className="w-3 h-3 mt-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                        </Link>
+                                                    ) : (
+                                                        <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 line-clamp-2">{item.NamaPelatihan || "-"}</p>
+                                                    )}
+                                                    {item.KodePelatihan && <p className="font-mono text-[10px] text-slate-400">{item.KodePelatihan}</p>}
+                                                </td>
+                                                <td className="px-3 py-3.5 align-top max-w-xs">
+                                                    <p className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-700 dark:text-slate-200">
+                                                        <Tag className="w-3 h-3 text-slate-400" /> {item.JenisPerbaikan || "-"}
+                                                    </p>
+                                                    {!!item.PerbaikanSudahTerbit?.length && (
+                                                        <div className="mt-1 flex flex-wrap gap-1">
+                                                            {item.PerbaikanSudahTerbit.slice(0, 3).map((t) => (
+                                                                <span key={t} className="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-medium">{t}</span>
+                                                            ))}
+                                                            {item.PerbaikanSudahTerbit.length > 3 && <span className="text-[10px] text-slate-400">+{item.PerbaikanSudahTerbit.length - 3}</span>}
+                                                        </div>
+                                                    )}
+                                                    {item.PerbaikanLainnya && <p className="mt-1 text-[11px] text-slate-400 italic line-clamp-1">&ldquo;{item.PerbaikanLainnya}&rdquo;</p>}
+                                                </td>
+                                                <td className="px-3 py-3.5 align-top">
+                                                    <StatusPill s={status} />
+                                                    {item.UpdatedAt && <p className="mt-1 text-[10px] text-slate-400">diubah {fmtDate(item.UpdatedAt)}</p>}
+                                                </td>
+                                                <td className="px-5 py-3 align-top text-right">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => openManage(item)}
+                                                        className={`h-8 px-3 rounded-lg text-xs font-bold whitespace-nowrap transition-colors ${status === "Pending" ? "bg-[#0B1B3F] text-white hover:bg-blue-700" : "ring-1 ring-slate-200 dark:ring-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50"}`}
+                                                    >
+                                                        {status === "Pending" ? "Proses" : "Kelola"}
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-                        {selectedItem && (
-                            <div className="space-y-4 my-2 text-xs">
-                                {/* Detail Overview Box */}
-                                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 space-y-2.5">
-                                    <div className="grid grid-cols-2 gap-2 pb-2 border-b border-slate-200 dark:border-slate-700">
-                                        <div>
-                                            <span className="text-[10px] uppercase font-bold text-slate-400 block">No. STTPL / Registrasi</span>
-                                            <span className="font-mono font-bold text-blue-600 dark:text-blue-400 text-xs">{selectedItem.NoSertifikat}</span>
+                {/* ---------- Pagination ---------- */}
+                {filtered.length > PAGE_SIZE && (
+                    <div className="flex items-center justify-between px-1 text-xs text-slate-500">
+                        <span>
+                            <b className="text-slate-800 dark:text-white tabular-nums">{fromIdx}–{Math.min(safePage * PAGE_SIZE, filtered.length)}</b> dari <b className="tabular-nums">{fmt(filtered.length)}</b>
+                        </span>
+                        <div className="flex items-center gap-1">
+                            <button type="button" onClick={() => setPage(safePage - 1)} disabled={safePage <= 1} className="h-8 w-8 rounded-lg hover:bg-slate-100 disabled:opacity-30 flex items-center justify-center" aria-label="Sebelumnya">
+                                <ChevronLeft className="w-4 h-4" />
+                            </button>
+                            <span className="px-2 font-semibold tabular-nums">{safePage} / {totalPages}</span>
+                            <button type="button" onClick={() => setPage(safePage + 1)} disabled={safePage >= totalPages} className="h-8 w-8 rounded-lg hover:bg-slate-100 disabled:opacity-30 flex items-center justify-center" aria-label="Berikutnya">
+                                <ChevronRight className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* ---------- Dialog kelola ---------- */}
+                <Dialog open={!!selected} onOpenChange={(o) => !o && !saving && setSelected(null)}>
+                    <DialogContent className="sm:max-w-xl p-0 overflow-hidden rounded-3xl border-0 bg-white dark:bg-slate-900 shadow-2xl">
+                        {selected && (
+                            <>
+                                {/* Header hero */}
+                                <div className="relative isolate overflow-hidden bg-[#0B1B3F] text-white px-6 py-5">
+                                    <div className="absolute inset-0 -z-10 bg-[radial-gradient(70%_120%_at_0%_0%,#2563EB_0%,transparent_60%),radial-gradient(50%_120%_at_100%_100%,#0EA5E9_0%,transparent_60%)] opacity-90" />
+                                    <DialogHeader className="text-left space-y-1">
+                                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-sky-200/80">Kelola Perbaikan · #{ticketOf(selected)}</p>
+                                        <DialogTitle className="text-lg font-black text-white">{selected.Nama}</DialogTitle>
+                                        <DialogDescription className="text-xs text-blue-100/70">
+                                            <span className="font-mono">{selected.NoSertifikat}</span> · diajukan {fmtDate(selected.CreatedAt)} {fmtTime(selected.CreatedAt)}
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                </div>
+
+                                <div className="max-h-[60vh] overflow-y-auto px-6 py-5 space-y-5 text-xs">
+                                    {/* Detail */}
+                                    <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
+                                        <div className="sm:col-span-2">
+                                            <dt className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Pelatihan</dt>
+                                            <dd className="mt-0.5 font-semibold text-slate-800 dark:text-slate-200">
+                                                {detailHref(selected) ? (
+                                                    <Link href={detailHref(selected)!} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 hover:text-blue-600">
+                                                        {selected.NamaPelatihan} <ExternalLink className="w-3 h-3" />
+                                                    </Link>
+                                                ) : (
+                                                    selected.NamaPelatihan || "-"
+                                                )}
+                                                {selected.KodePelatihan && <span className="ml-2 font-mono text-[10px] text-slate-400">{selected.KodePelatihan}</span>}
+                                            </dd>
                                         </div>
                                         <div>
-                                            <span className="text-[10px] uppercase font-bold text-slate-400 block">Nama Peserta</span>
-                                            <span className="font-bold text-slate-800 dark:text-slate-200 text-xs">{selectedItem.Nama}</span>
+                                            <dt className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Jenis perbaikan</dt>
+                                            <dd className="mt-0.5 font-semibold text-slate-800 dark:text-slate-200">{selected.JenisPerbaikan || "-"}</dd>
                                         </div>
-                                    </div>
+                                        <div>
+                                            <dt className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Status saat ini</dt>
+                                            <dd className="mt-1"><StatusPill s={normStatus(selected.Status)} /></dd>
+                                        </div>
+                                        {!!selected.PerbaikanSudahTerbit?.length && (
+                                            <div className="sm:col-span-2">
+                                                <dt className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Bagian yang salah</dt>
+                                                <dd className="mt-1 flex flex-wrap gap-1">
+                                                    {selected.PerbaikanSudahTerbit.map((t) => (
+                                                        <span key={t} className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-medium">{t}</span>
+                                                    ))}
+                                                </dd>
+                                            </div>
+                                        )}
+                                        {selected.PerbaikanLainnya && (
+                                            <div className="sm:col-span-2">
+                                                <dt className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Lainnya</dt>
+                                                <dd className="mt-0.5 text-slate-700 dark:text-slate-300">{selected.PerbaikanLainnya}</dd>
+                                            </div>
+                                        )}
+                                    </dl>
 
                                     <div>
-                                        <span className="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Nama Pelatihan & Kode Kelas</span>
-                                        <div className="flex flex-wrap items-center gap-2">
-                                            {selectedItem.KodePelatihan && selectedItem.IdPelatihan ? (
-                                                <Link
-                                                    href={`/admin/${pathname.includes('pusat') ? 'pusat' : 'lemdiklat'}/pelatihan/detail/${selectedItem.KodePelatihan}/${encryptValue(selectedItem.IdPelatihan.toString())}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1.5"
-                                                    title="Buka Detail Pelatihan"
-                                                >
-                                                    <span>{selectedItem.NamaPelatihan}</span>
-                                                    <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
-                                                </Link>
-                                            ) : (
-                                                <span className="font-semibold text-slate-700 dark:text-slate-300">{selectedItem.NamaPelatihan}</span>
-                                            )}
-                                            {selectedItem.KodePelatihan && (
-                                                <span className="px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-[10px] font-mono font-bold">
-                                                    {selectedItem.KodePelatihan}
-                                                </span>
-                                            )}
+                                        <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-1.5">Perbaikan seharusnya (dari peserta)</p>
+                                        <blockquote className="rounded-2xl bg-slate-50 dark:bg-slate-800/50 p-4 text-[13px] leading-relaxed text-slate-700 dark:text-slate-200 border-l-4 border-blue-500 whitespace-pre-line">
+                                            {selected.PerbaikanSeharusnya || <span className="text-slate-400">-</span>}
+                                        </blockquote>
+                                    </div>
+
+                                    {/* Pilih status */}
+                                    <div>
+                                        <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-2">
+                                            Status baru <span className="text-rose-500">*</span>
+                                        </p>
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                            {STATUSES.map((s) => {
+                                                const active = newStatus === s;
+                                                const Icon = STATUS[s].icon;
+                                                return (
+                                                    <button
+                                                        key={s}
+                                                        type="button"
+                                                        onClick={() => setNewStatus(s)}
+                                                        className={`h-11 px-3 rounded-xl ring-1 text-xs font-bold flex items-center justify-between gap-2 transition-all ${active ? `${STATUS[s].soft} ring-2 shadow-sm` : "ring-slate-200 dark:ring-slate-700 text-slate-500 hover:bg-slate-50"}`}
+                                                    >
+                                                        <span className="flex items-center gap-1.5"><Icon className="w-3.5 h-3.5" /> {s}</span>
+                                                        {active && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                                                    </button>
+                                                );
+                                            })}
                                         </div>
                                     </div>
 
-                                    <div className="pt-2 border-t border-slate-200 dark:border-slate-700 space-y-1">
-                                        <span className="text-[10px] uppercase font-bold text-slate-400 block">Jenis & Opsi Kesalahan</span>
-                                        <div className="flex flex-wrap items-center gap-1.5">
-                                            <Badge variant="outline" className="bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border-amber-300 text-[10px] font-bold">
-                                                {selectedItem.JenisPerbaikan}
-                                            </Badge>
-                                            {selectedItem.PerbaikanSudahTerbit?.map((t, idx) => (
-                                                <Badge key={idx} variant="secondary" className="bg-rose-100 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 text-[10px]">
-                                                    {t}
-                                                </Badge>
-                                            ))}
+                                    {/* Catatan */}
+                                    <div>
+                                        <div className="flex items-baseline justify-between mb-1.5">
+                                            <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                                                Catatan admin {newStatus === "Ditolak" && <span className="text-rose-500">* wajib bila ditolak</span>}
+                                            </p>
+                                            <span className="text-[10px] text-slate-400 tabular-nums">{catatan.length}/500</span>
                                         </div>
-                                    </div>
-
-                                    {/* Perbaikan Seharusnya */}
-                                    <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
-                                        <span className="text-[10px] uppercase font-bold text-amber-600 dark:text-amber-400 block mb-1">
-                                            Perbaikan Seharusnya (Dari Peserta):
-                                        </span>
-                                        <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 font-medium text-slate-800 dark:text-slate-200 leading-relaxed italic">
-                                            &ldquo;{selectedItem.PerbaikanSeharusnya}&rdquo;
-                                        </div>
+                                        <textarea
+                                            rows={3}
+                                            maxLength={500}
+                                            value={catatan}
+                                            onChange={(e) => setCatatan(e.target.value)}
+                                            placeholder={newStatus === "Ditolak" ? "Tuliskan alasan penolakan..." : "Contoh: Sertifikat perbaikan telah terbit."}
+                                            className={`w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 ring-1 text-[13px] outline-none focus:ring-2 focus:ring-blue-500/30 resize-none placeholder:text-slate-400 ${needNote ? "ring-rose-300" : "ring-slate-200 dark:ring-slate-700"}`}
+                                        />
                                     </div>
                                 </div>
 
-                                {/* Status Selector Radio Options */}
-                                <div className="space-y-2">
-                                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                                        Pilih Status Baru <span className="text-rose-500">*</span>
-                                    </label>
-                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                        {[
-                                            { id: "Pending", label: "Pending", color: "border-amber-500 text-amber-600 bg-amber-500/10" },
-                                            { id: "Diproses", label: "Diproses", color: "border-blue-500 text-blue-600 bg-blue-500/10" },
-                                            { id: "Selesai", label: "Selesai", color: "border-emerald-500 text-emerald-600 bg-emerald-500/10" },
-                                            { id: "Ditolak", label: "Ditolak", color: "border-rose-500 text-rose-600 bg-rose-500/10" },
-                                        ].map((st) => {
-                                            const active = updateStatus === st.id;
-                                            return (
-                                                <button
-                                                    key={st.id}
-                                                    type="button"
-                                                    onClick={() => setUpdateStatus(st.id)}
-                                                    className={`p-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-between ${active
-                                                        ? `${st.color} ring-2 ring-blue-500/20 shadow-sm`
-                                                        : "border-slate-200 dark:border-slate-800 text-slate-500 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100"
-                                                        }`}
-                                                >
-                                                    <span>{st.label}</span>
-                                                    {active && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
+                                <div className="flex flex-col-reverse sm:flex-row gap-2 justify-end px-6 py-4 border-t border-slate-100 dark:border-slate-800">
+                                    <button type="button" onClick={() => setSelected(null)} disabled={saving} className="h-11 px-5 rounded-xl ring-1 ring-slate-200 dark:ring-slate-700 text-sm font-semibold text-slate-600 hover:bg-slate-50">
+                                        Batal
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={save}
+                                        disabled={saving || unchanged || needNote}
+                                        className="h-11 px-6 rounded-xl bg-[#0B1B3F] hover:bg-blue-700 text-white text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-40"
+                                    >
+                                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                                        {saving ? "Menyimpan…" : unchanged ? "Tidak ada perubahan" : "Simpan Status"}
+                                    </button>
                                 </div>
-
-                                {/* Admin Note Field */}
-                                <div className="space-y-1.5">
-                                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                                        Catatan / Keterangan Admin
-                                    </label>
-                                    <textarea
-                                        rows={3}
-                                        value={catatanAdmin}
-                                        onChange={(e) => setCatatanAdmin(e.target.value)}
-                                        placeholder="Tuliskan catatan tindak lanjut (misal: Sertifikat perbaikan telah terbit, atau Alasan penolakan)..."
-                                        className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 leading-relaxed resize-none"
-                                    />
-                                </div>
-                            </div>
+                            </>
                         )}
-
-                        <DialogFooter className="gap-2 sm:gap-0 pt-2">
-                            <Button
-                                variant="outline"
-                                onClick={() => setIsModalOpen(false)}
-                                className="h-10 rounded-xl text-xs font-semibold"
-                            >
-                                Batal
-                            </Button>
-                            <Button
-                                onClick={handleSaveStatus}
-                                disabled={updating}
-                                className="h-10 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs gap-1.5 shadow-md shadow-blue-600/20"
-                            >
-                                {updating ? (
-                                    <>
-                                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                                        <span>Menyimpan...</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Send className="w-3.5 h-3.5" />
-                                        <span>Simpan Perubahan Status</span>
-                                    </>
-                                )}
-                            </Button>
-                        </DialogFooter>
                     </DialogContent>
                 </Dialog>
             </div>
         </LayoutAdminElaut>
+    );
+}
+
+/* ============================ UI ============================ */
+
+function StatusPill({ s }: { s: StatusKey }) {
+    return (
+        <span className={`inline-flex items-center gap-1.5 text-xs font-semibold ${STATUS[s].text}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${STATUS[s].dot}`} /> {s}
+        </span>
+    );
+}
+
+function Chip({ label, onClear }: { label: string; onClear: () => void }) {
+    return (
+        <span className="inline-flex items-center gap-1 h-7 pl-2.5 pr-1 rounded-full bg-blue-50 text-blue-700 ring-1 ring-blue-100 text-[11px] font-semibold">
+            {label}
+            <button type="button" onClick={onClear} className="p-0.5 rounded-full hover:bg-blue-100" aria-label={`Hapus ${label}`}>
+                <X className="w-3 h-3" />
+            </button>
+        </span>
+    );
+}
+
+function StatCard({
+    label,
+    value,
+    unit,
+    sub,
+    icon: Icon,
+    accent,
+    progress,
+    active,
+    onClick,
+    className = "",
+}: {
+    label: string;
+    value: string;
+    unit: string;
+    sub?: string;
+    icon: LucideIcon;
+    accent: string;
+    progress?: number;
+    active?: boolean;
+    onClick?: () => void;
+    className?: string;
+}) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            className={`group relative isolate overflow-hidden rounded-3xl bg-[#0B1B3F] p-5 text-left text-white ring-1 transition-all duration-300 hover:-translate-y-0.5 ${active ? "ring-2 ring-white/50 shadow-xl" : "ring-white/10 shadow-lg"} ${className}`}
+            style={{ boxShadow: active ? `0 18px 40px -16px ${accent}` : undefined }}
+        >
+            <div className="absolute inset-0 -z-10 opacity-90" style={{ background: `radial-gradient(70% 90% at 100% 0%, ${accent}66 0%, transparent 60%), radial-gradient(60% 80% at 0% 100%, #2563EB55 0%, transparent 60%)` }} />
+            <div className="absolute inset-0 -z-10 opacity-[0.12] [background-image:radial-gradient(rgba(255,255,255,0.8)_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(to_left,black,transparent_70%)]" />
+            <div
+                className={`pointer-events-none absolute inset-0 -z-10 transition-opacity duration-500 ease-out ${active ? "opacity-70" : "opacity-0 group-hover:opacity-100"}`}
+                style={{ background: `linear-gradient(to left, ${accent}59 0%, ${accent}26 35%, transparent 75%)` }}
+            />
+            <Icon
+                aria-hidden
+                strokeWidth={1.5}
+                className={`pointer-events-none absolute -right-5 -bottom-7 -z-10 w-32 h-32 -rotate-12 transition-all duration-500 ease-out group-hover:-rotate-6 group-hover:scale-110 ${active ? "opacity-40" : "opacity-20 group-hover:opacity-40"}`}
+                style={{ color: accent, filter: `drop-shadow(0 0 24px ${accent}66)` }}
+            />
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-sky-100/75 pr-10">{label}</p>
+            <div className="mt-1 flex items-baseline gap-1.5">
+                <span className="text-3xl md:text-4xl font-black tracking-[-0.03em] tabular-nums">{value}</span>
+                <span className="text-[10px] font-bold uppercase text-sky-100/70">{unit}</span>
+            </div>
+            {progress !== undefined && (
+                <div className="mt-3 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${progress}%`, background: `linear-gradient(90deg, ${accent}, #fff)` }} />
+                </div>
+            )}
+            {sub && <p className="mt-2 text-[11px] font-medium text-blue-100/60 truncate">{sub}</p>}
+        </button>
     );
 }

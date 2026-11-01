@@ -9,7 +9,7 @@ export default function Page() {
         <LayoutAdminElaut>
             <section className="flex-1 flex flex-col">
                 <HeaderPageLayoutAdminElaut title="Instruktur/Pelatih" description="Monitoring dan kelola data Instruktur/Pelatih pada Lembaga Diklat, Internal Pusat, atau Lintas Eselon!" icon={<HiUserGroup className="text-3xl" />} />
-                <article className="w-full h-full">
+                <article className="w-full h-full mt-5">
                     <TableDataPelatih />
                 </article>
             </section>

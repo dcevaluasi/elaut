@@ -1,41 +1,51 @@
-import React, { useMemo } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+"use client";
 
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
-
+import React, { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Cookies from "js-cookie";
+import {
+  Briefcase,
+  Users,
+  Loader,
+  CheckCircle2,
+  Calendar,
+  SlidersHorizontal,
+  Search,
+  X,
+  RefreshCw,
+  ListChecks,
+  PlusCircle,
+  LucideIcon,
+} from "lucide-react";
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { generateTanggalPelatihan, getStatusInfo } from "@/utils/text";
 import { Button } from "@/components/ui/button";
-import { MdSearch } from "react-icons/md";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
+import { generateTanggalPelatihan, getStatusInfo } from "@/utils/text";
 import { encryptValue } from "@/lib/utils";
-import { HashLoader } from "react-spinners";
+import { isSigned } from "@/utils/status";
 import { UPT } from "@/constants/nomenclatures";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PelatihanMasyarakat } from "@/types/product";
 import { useFetchDataPelatihanMasyarakat } from "@/hooks/elaut/pelatihan/useFetchDataPelatihanMasyarakat";
 import { useFetchDataProgramPelatihan } from "@/hooks/elaut/master/useFetchDataProgramPelatihan";
-import TabStatusPelatihanMasyarakat from "./TabStatusPelatihanMasyarakat";
 import TableDataPelatihanMasyarakat from "./Table/TableDataPelatihanMasyrakat";
-import { isPendingSigning, isSigned, isVerifyDiklat } from "@/utils/status";
 import FormPelatihan from "@/components/form/FormPelatihan";
-import { Calendar, Users, Briefcase, GraduationCap, TrendingUp, SlidersHorizontal } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { PelatihanMasyarakat } from "@/types/product";
 
-// Urutan tampil di tabel berdasarkan label status (getStatusInfo).
-// Index lebih kecil = tampil lebih dulu (atas).
-// Ordered: Draft first (needs action) → Pending chain → Approved → Signed (done)
-const STATUS_ORDER: string[] = [
+/* ============================ KONSTANTA ============================ */
+
+// Urutan tampil di tabel (index kecil = paling atas)
+const STATUS_ORDER = [
   "Draft",
   "Pending SPV",
   "Perbaikan SPV",
@@ -58,541 +68,605 @@ const STATUS_ORDER: string[] = [
   "Closed",
   "Tidak Diketahui",
 ];
+const STATUS_RANK = new Map(STATUS_ORDER.map((s, i) => [s, i]));
 
-// Quick-filter status pills shown inline above the table
 const QUICK_STATUS_FILTERS = [
-  { key: "All", label: "Semua", color: "bg-slate-100 text-slate-600 border-slate-200" },
-  { key: "Draft", label: "Draft", color: "bg-slate-50 text-slate-700 border-slate-200" },
-  { key: "Pending SPV", label: "Pending SPV", color: "bg-orange-50 text-orange-700 border-orange-200" },
-  { key: "Pending Verifikator", label: "Pending Verifikator", color: "bg-amber-50 text-amber-700 border-amber-200" },
-  { key: "Pending Kapus", label: "Pending Kapus", color: "bg-purple-50 text-purple-700 border-purple-200" },
-  { key: "Approved Kapus", label: "Approved Kapus", color: "bg-blue-50 text-blue-700 border-blue-200" },
-  { key: "Signed", label: "Signed", color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
-];
+  { key: "All", label: "Semua", dot: "bg-slate-400", active: "bg-[#0B1B3F] text-white border-[#0B1B3F]" },
+  { key: "Draft", label: "Draft", dot: "bg-slate-400", active: "bg-slate-700 text-white border-slate-700" },
+  { key: "Pending SPV", label: "Pending SPV", dot: "bg-orange-500", active: "bg-orange-500 text-white border-orange-500" },
+  { key: "Pending Verifikator", label: "Pending Verifikator", dot: "bg-amber-500", active: "bg-amber-500 text-white border-amber-500" },
+  { key: "Pending Kapus", label: "Pending Kapus", dot: "bg-purple-500", active: "bg-purple-600 text-white border-purple-600" },
+  { key: "Approved Kapus", label: "Approved Kapus", dot: "bg-blue-500", active: "bg-blue-600 text-white border-blue-600" },
+  { key: "Signed", label: "Signed", dot: "bg-emerald-500", active: "bg-emerald-600 text-white border-emerald-600" },
+] as const;
+
+const UPT_OPTIONS: string[] = Array.from(new Set<string>(UPT || [])).filter(Boolean);
+
+const AKP_KEYWORDS = ["ANKAPIN", "ATKAPIN", "BSTF", "Rating", "SKN", "SKPI", "SOPI", "Fishing Master"];
+const KELAUTAN_KEYWORDS = ["BCL", "Sampah", "Ruang Laut", "Mitigasi", "Konservasi"];
+
+const CURRENT_YEAR = new Date().getFullYear().toString();
+
+/* ============================ HELPERS ============================ */
+
+const toTime = (s?: string | null) => {
+  if (!s) return NaN;
+  return new Date(s).getTime();
+};
+
+const fmt = (n: number) => n.toLocaleString("id-ID");
+const pct = (n: number, t: number) => (t > 0 ? Math.round((n / t) * 100) : 0);
+
+interface IndexedRow {
+  p: PelatihanMasyarakat;
+  nama: string;
+  program: string;
+  penyelenggara: string;
+  year: string;
+  pill: string; // label status (atau "Draft")
+  signed: boolean;
+  peserta: number;
+}
+
+/** Hitung field turunan SEKALI per data, sudah terurut → filter tidak perlu sort ulang */
+const buildIndex = (data: PelatihanMasyarakat[]): IndexedRow[] => {
+  const rows = data.map((p) => {
+    const status = String(p.StatusPenerbitan ?? "");
+    const label = getStatusInfo(status).label;
+    const isDraft = label === "Draft" || status === "0" || !p.StatusPenerbitan;
+    const t = toTime(p.TanggalMulaiPelatihan);
+    return {
+      row: {
+        p,
+        nama: (p.NamaPelatihan || "").toLowerCase(),
+        program: (p.Program || "").toLowerCase(),
+        penyelenggara: (p.PenyelenggaraPelatihan || "").toLowerCase(),
+        year: isNaN(t) ? "" : new Date(t).getFullYear().toString(),
+        pill: isDraft ? "Draft" : label,
+        signed: isSigned(status),
+        peserta: p.UserPelatihan?.length || 0,
+      } as IndexedRow,
+      rank: STATUS_RANK.get(label) ?? STATUS_ORDER.length,
+      time: isNaN(t) ? 0 : t,
+    };
+  });
+
+  rows.sort((a, b) => a.rank - b.rank || b.time - a.time);
+  return rows.map((r) => r.row);
+};
+
+/* ============================ STAT CARD (gaya hero) ============================ */
+
+interface StatCardProps {
+  label: string;
+  value: number;
+  unit: string;
+  sub?: string;
+  icon: LucideIcon;
+  accent: string; // warna hex aksen
+  progress?: number;
+  onClick?: () => void;
+  active?: boolean;
+}
+
+const StatCard: React.FC<StatCardProps> = ({ label, value, unit, sub, icon: Icon, accent, progress, onClick, active }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={!onClick}
+    className={`group relative isolate overflow-hidden rounded-3xl bg-[#0B1B3F] p-5 text-left text-white ring-1 transition-all duration-300 ${onClick ? "hover:-translate-y-0.5 cursor-pointer" : "cursor-default"} ${active ? "ring-2 ring-white/50 shadow-xl" : "ring-white/10 shadow-lg"}`}
+    style={{ boxShadow: active ? `0 18px 40px -16px ${accent}` : undefined }}
+  >
+    {/* Mesh aksen */}
+    <div
+      className="absolute inset-0 -z-10 opacity-90"
+      style={{ background: `radial-gradient(70% 90% at 100% 0%, ${accent}66 0%, transparent 60%), radial-gradient(60% 80% at 0% 100%, #2563EB55 0%, transparent 60%)` }}
+    />
+    <div className="absolute inset-0 -z-10 opacity-[0.12] [background-image:radial-gradient(rgba(255,255,255,0.8)_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(to_left,black,transparent_70%)]" />
+
+    {/* Cahaya lembut kanan → kiri saat hover / aktif */}
+    <div
+      className={`pointer-events-none absolute inset-0 -z-10 transition-opacity duration-500 ease-out ${active ? "opacity-70" : "opacity-0 group-hover:opacity-100"}`}
+      style={{ background: `linear-gradient(to left, ${accent}59 0%, ${accent}26 35%, transparent 75%)` }}
+    />
+
+    {/* Ikon besar sebagai background di kanan */}
+    <Icon
+      aria-hidden
+      strokeWidth={1.5}
+      className={`pointer-events-none absolute -right-5 -bottom-7 -z-10 w-32 h-32 -rotate-12 transition-all duration-500 ease-out group-hover:-rotate-6 group-hover:scale-110 ${active ? "opacity-40" : "opacity-20 group-hover:opacity-40"}`}
+      style={{ color: accent, filter: `drop-shadow(0 0 24px ${accent}66)` }}
+    />
+
+    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-sky-100/75 pr-10">{label}</p>
+    <div className="mt-1 flex items-baseline gap-1.5">
+      <span className="text-3xl md:text-4xl font-black tracking-[-0.03em] tabular-nums">{fmt(value)}</span>
+      <span className="text-[10px] font-bold uppercase text-sky-100/70">{unit}</span>
+    </div>
+
+    {progress !== undefined && (
+      <div className="mt-3 h-1.5 rounded-full bg-white/10 overflow-hidden">
+        <div className="h-full rounded-full transition-all duration-700" style={{ width: `${progress}%`, background: `linear-gradient(90deg, ${accent}, #fff)` }} />
+      </div>
+    )}
+    {sub && <p className="mt-2 text-[11px] font-medium text-blue-100/60 truncate">{sub}</p>}
+  </button>
+);
+
+const StatSkeleton = () => <div className="h-[132px] rounded-3xl bg-slate-200/70 dark:bg-slate-800 animate-pulse" />;
+
+/* ============================ KOMPONEN ============================ */
 
 const TableDataPelatihan: React.FC = () => {
-  const {
-    data,
-    isFetching,
-    setIsFetching,
-    countDone,
-    countDiklatSPV,
-    countPublished,
-    countVerifying,
-    countPendingSigning,
-    countSigned,
-    refetch,
-  } = useFetchDataPelatihanMasyarakat();
-
+  const { data, isFetching, refetch } = useFetchDataPelatihanMasyarakat();
   const { data: programs } = useFetchDataProgramPelatihan();
 
-  const [selectedStatusFilter, setSelectedStatusFilter] = React.useState<string>("All");
+  const [canCreate] = useState(() => (Cookies.get("Access") || "").includes("createPelatihan"));
+  const [tabValue, setTabValue] = useState<"list" | "create">("list");
 
-  // FILTERS
-  const [filterCategory, setFilterCategory] = React.useState<string>("all");
-  const [filterCategoryPenyelenggara, setFilterCategoryPenyelenggara] = React.useState<string>("all");
-  const [filterCategorySasaran, setFilterCategorySasaran] = React.useState<string>("all");
-  const [filterYear, setFilterYear] = React.useState<string>(new Date().getFullYear().toString());
+  // Filter
+  const [searchQuery, setSearchQuery] = useState("");
+  const deferredSearch = useDeferredValue(searchQuery.trim().toLowerCase());
+  const [statusFilter, setStatusFilter] = useState<string>("All");
+  const [filterProgram, setFilterProgram] = useState("all");
+  const [filterUPT, setFilterUPT] = useState("all");
+  const [filterYear, setFilterYear] = useState(CURRENT_YEAR);
 
-  // ROLE DETECTION
-  const access = Cookies.get('Access') || '';
-  const isSupervisor = access.includes('supervisePelaksanaan') && access.includes('superviseCertificate');
+  // Shortcut "/" untuk fokus ke pencarian
+  const searchRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (e.key === "/" && tag !== "INPUT" && tag !== "TEXTAREA") {
+        e.preventDefault();
+        searchRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
-  // SEARCHING
-  const [searchQuery, setSearchQuery] = React.useState<string>("");
+  /* ---------- Index (sekali per perubahan data) ---------- */
+  const indexed = useMemo(() => buildIndex(data), [data]);
 
-  const isPendingSigningForUser = (p: PelatihanMasyarakat) => {
-    const status = String(p.StatusPenerbitan);
-    if (!isPendingSigning(status)) return false;
-
-    const role = Cookies.get('Role') || '';
-    const access = Cookies.get('Access') || '';
-
-    if (access.includes('approveKapus') && status === '10') return true;
-    if (access.includes('approveKabadan') && status === '14') return true;
-    if (access.includes('approveKabalai') && status === '1.4') return true;
-
-    return (!!role.includes(p.TtdSertifikat) || role === p.TtdSertifikat);
-  };
-
-  const isSignedForUser = (p: PelatihanMasyarakat) => {
-    const status = String(p.StatusPenerbitan);
-    if (!isSigned(status)) return false;
-
-    const role = Cookies.get('Role') || '';
-    const access = Cookies.get('Access') || '';
-
-    if (access.includes('approveKapus') && status === '11') return true;
-    if (access.includes('approveKabadan') && status === '15') return true;
-    if (access.includes('approveKabalai') && status === '1.6') return true;
-
-    return (!!role.includes(p.TtdSertifikat) || role === p.TtdSertifikat);
-  };
-
-
-  const getYearFromDate = (dateStr: string | undefined | null) => {
-    if (!dateStr) return "";
-    const date = new Date(dateStr);
-    return isNaN(date.getTime()) ? "" : date.getFullYear().toString();
-  };
-
-  // Rank kelompok status berdasarkan STATUS_ORDER (label dari getStatusInfo).
-  // Label di luar daftar didorong ke paling belakang.
-  const getStatusRank = (p: PelatihanMasyarakat) => {
-    const label = getStatusInfo(String(p.StatusPenerbitan)).label;
-    const idx = STATUS_ORDER.indexOf(label);
-    return idx === -1 ? STATUS_ORDER.length : idx;
-  };
-
-  const getDateValue = (dateStr: string | undefined | null) => {
-    if (!dateStr) return 0;
-    const t = new Date(dateStr).getTime();
-    return isNaN(t) ? 0 : t;
-  };
-
-  // Helper: label-based status matcher for pill filters
-  const matchesStatusFilter = (p: PelatihanMasyarakat, filterKey: string): boolean => {
-    if (filterKey === "All") return true;
-    const label = getStatusInfo(String(p.StatusPenerbitan)).label;
-    // Special case: "Draft" maps to status label "Draft" OR raw StatusPenerbitan of "0"/empty
-    if (filterKey === "Draft") {
-      return label === "Draft" || String(p.StatusPenerbitan) === "0" || !p.StatusPenerbitan;
-    }
-    return label === filterKey;
-  };
-
-  const filteredData = useMemo(() => {
-    const filtered = data.filter(p => {
-      const program = (p.Program || "").toLowerCase().trim();
-      const namaPelatihan = (p.NamaPelatihan || "").toLowerCase().trim();
-      const penyelenggara = (p.PenyelenggaraPelatihan || "").toLowerCase().trim();
-      const sasaran = (p.AsalPelatihan || "").toLowerCase().trim();
-      const pYear = getYearFromDate(p.TanggalMulaiPelatihan);
-      const matchesYear = filterYear === "All" || pYear === filterYear;
-
-      return (
-        (filterCategory === "all" || program.includes(filterCategory.toLowerCase().trim())) &&
-        (filterCategoryPenyelenggara === "all" || penyelenggara.includes(filterCategoryPenyelenggara.toLowerCase().trim())) &&
-        (filterCategorySasaran === "all" || sasaran.includes(filterCategorySasaran.toLowerCase().trim())) &&
-        namaPelatihan.includes(searchQuery.toLowerCase().trim()) &&
-        matchesYear &&
-        matchesStatusFilter(p, selectedStatusFilter)
-      );
-    });
-
-    return filtered.sort((a, b) => {
-      const rankDiff = getStatusRank(a) - getStatusRank(b);
-      if (rankDiff !== 0) return rankDiff;
-      return getDateValue(b.TanggalMulaiPelatihan) - getDateValue(a.TanggalMulaiPelatihan);
-    });
-  }, [data, filterCategory, filterCategoryPenyelenggara, filterCategorySasaran, searchQuery, selectedStatusFilter, filterYear]);
+  const yearOptions = useMemo(() => {
+    const years = new Set<string>([CURRENT_YEAR]);
+    for (const r of indexed) if (r.year) years.add(r.year);
+    return Array.from(years).sort((a, b) => +b - +a);
+  }, [indexed]);
 
   const groupedPrograms = useMemo(() => {
-    const akp = programs.filter(p =>
-      p.name_indo.includes("ANKAPIN") ||
-      p.name_indo.includes("ATKAPIN") ||
-      p.name_indo.includes("BSTF") ||
-      p.name_indo.includes("Rating") ||
-      p.name_indo.includes("SKN") ||
-      p.name_indo.includes("SKPI") ||
-      p.name_indo.includes("SOPI") ||
-      p.name_indo.includes("Fishing Master") ||
-      p.abbrv_name?.includes("AKP")
-    );
-
-    const kelautan = programs.filter(p =>
-      p.name_indo.includes("BCL") ||
-      p.name_indo.includes("Sampah") ||
-      p.name_indo.includes("Ruang Laut") ||
-      p.name_indo.includes("Mitigasi") ||
-      p.name_indo.includes("Konservasi")
-    );
-
-    const perikanan = programs.filter(p =>
-      !akp.find(a => a.id_program_pelatihan === p.id_program_pelatihan) &&
-      !kelautan.find(k => k.id_program_pelatihan === p.id_program_pelatihan)
-    );
-
-    return { akp, perikanan, kelautan };
+    const valid = programs.filter((p) => p.name_indo?.trim());
+    const akp = valid.filter((p) => AKP_KEYWORDS.some((k) => p.name_indo.includes(k)) || p.abbrv_name?.includes("AKP"));
+    const akpIds = new Set(akp.map((p) => p.id_program_pelatihan));
+    const kelautan = valid.filter((p) => !akpIds.has(p.id_program_pelatihan) && KELAUTAN_KEYWORDS.some((k) => p.name_indo.includes(k)));
+    const kelautanIds = new Set(kelautan.map((p) => p.id_program_pelatihan));
+    const perikanan = valid.filter((p) => !akpIds.has(p.id_program_pelatihan) && !kelautanIds.has(p.id_program_pelatihan));
+    return [
+      { label: "AKP", items: akp },
+      { label: "Perikanan", items: perikanan },
+      { label: "Kelautan", items: kelautan },
+    ].filter((g) => g.items.length > 0);
   }, [programs]);
 
-  // Year Options
-  const yearOptions = useMemo(() => {
-    const years = new Set(data.map(p => getYearFromDate(p.TanggalMulaiPelatihan)).filter(y => y && y.trim() !== ""));
-    // Ensure current year is always available even if no data
-    years.add(new Date().getFullYear().toString());
-    return ["All", ...Array.from(years).sort((a, b) => parseInt(b) - parseInt(a))];
-  }, [data]);
+  /* ---------- Filter + statistik + hitungan pill dalam 1 loop ---------- */
+  const { rows, pillCounts, stats } = useMemo(() => {
+    const prog = filterProgram === "all" ? "" : filterProgram.toLowerCase().trim();
+    const upt = filterUPT === "all" ? "" : filterUPT.toLowerCase().trim();
 
-  // Stats Logic
-  const stats = useMemo(() => {
-    const total = filteredData.length;
-    const totalPeserta = filteredData.reduce((acc, curr) => acc + (curr.UserPelatihan?.length || 0), 0);
+    const counts: Record<string, number> = {};
+    QUICK_STATUS_FILTERS.forEach((f) => (counts[f.key] = 0));
 
-    // Distribution by Program
-    const programDist = [
-      { name: "Prodi AKP", value: filteredData.filter(p => p.Program?.includes("AKP")).length },
-      { name: "Prodi Perikanan", value: filteredData.filter(p => p.Program?.includes("Perikanan")).length },
-      { name: "Prodi Kelautan", value: filteredData.filter(p => p.Program?.includes("Kelautan")).length },
-    ].filter(d => d.value > 0);
+    const out: PelatihanMasyarakat[] = [];
+    let total = 0, peserta = 0, proses = 0, selesai = 0;
 
-    // Trend by Month (for the filtered data)
-    const monthCounts: Record<string, number> = {};
-    filteredData.forEach(p => {
-      if (p.TanggalMulaiPelatihan) {
-        const d = new Date(p.TanggalMulaiPelatihan);
-        if (!isNaN(d.getTime())) {
-          const month = d.toLocaleString('id-ID', { month: 'short' });
-          monthCounts[month] = (monthCounts[month] || 0) + 1;
-        }
-      }
-    });
+    for (const r of indexed) {
+      if (filterYear !== "All" && r.year !== filterYear) continue;
+      if (prog && !r.program.includes(prog)) continue;
+      if (upt && !r.penyelenggara.includes(upt)) continue;
+      if (deferredSearch && !r.nama.includes(deferredSearch) && !r.penyelenggara.includes(deferredSearch) && !String(r.p.IdPelatihan).includes(deferredSearch)) continue;
 
-    // Ensure chronological order if possible or just standard months
-    const standardMonths = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
-    const trendData = standardMonths.map(m => ({
-      name: m,
-      value: monthCounts[m] || 0
-    }));
+      // base (tanpa filter status) → untuk kartu statistik & hitungan pill
+      total++;
+      peserta += r.peserta;
+      if (r.signed) selesai++;
+      else if (r.pill !== "Draft") proses++;
+      counts.All++;
+      if (r.pill in counts) counts[r.pill]++;
 
-    return { total, totalPeserta, programDist, trendData };
-  }, [filteredData]);
+      if (statusFilter === "All" || r.pill === statusFilter) out.push(r.p);
+    }
 
-  // Quick-filter pill counts — must use `data` (NOT filteredData) with all
-  // non-status filters so sibling pill counts stay accurate while a pill is active.
-  const quickFilterCounts = useMemo(() => {
-    const base = data.filter(p => {
-      const prog = (p.Program || "").toLowerCase();
-      const nama = (p.NamaPelatihan || "").toLowerCase();
-      const peny = (p.PenyelenggaraPelatihan || "").toLowerCase();
-      const yr   = getYearFromDate(p.TanggalMulaiPelatihan);
-      return (
-        (filterCategory === "all" || prog.includes(filterCategory.toLowerCase())) &&
-        (filterCategoryPenyelenggara === "all" || peny.includes(filterCategoryPenyelenggara.toLowerCase())) &&
-        (filterCategorySasaran === "all" || (p.AsalPelatihan || "").toLowerCase().includes(filterCategorySasaran.toLowerCase())) &&
-        (filterYear === "All" || yr === filterYear) &&
-        nama.includes(searchQuery.toLowerCase())
-      );
-    });
-    const counts: Record<string, number> = { All: base.length };
-    QUICK_STATUS_FILTERS.slice(1).forEach(f => {
-      counts[f.key] = base.filter(p => matchesStatusFilter(p, f.key)).length;
-    });
-    return counts;
-  }, [data, filterCategory, filterCategoryPenyelenggara, filterCategorySasaran, filterYear, searchQuery]);
+    return { rows: out, pillCounts: counts, stats: { total, peserta, proses, selesai } };
+  }, [indexed, filterYear, filterProgram, filterUPT, deferredSearch, statusFilter]);
 
-  const [tabValue, setTabValue] = React.useState<string>("account");
+  /* ---------- Chip filter aktif ---------- */
+  const activeChips = [
+    searchQuery && { key: "search", label: `"${searchQuery}"`, clear: () => setSearchQuery("") },
+    statusFilter !== "All" && { key: "status", label: statusFilter, clear: () => setStatusFilter("All") },
+    filterYear !== CURRENT_YEAR && { key: "year", label: filterYear === "All" ? "Semua Tahun" : `Tahun ${filterYear}`, clear: () => setFilterYear(CURRENT_YEAR) },
+    filterProgram !== "all" && { key: "program", label: filterProgram, clear: () => setFilterProgram("all") },
+    filterUPT !== "all" && { key: "upt", label: filterUPT, clear: () => setFilterUPT("all") },
+  ].filter(Boolean) as { key: string; label: string; clear: () => void }[];
 
-  return (
-    <div className="space-y-2 pb-10 mt-10">
+  const advancedCount = (filterProgram !== "all" ? 1 : 0) + (filterUPT !== "all" ? 1 : 0);
 
-      {/* 2. Main Content (Filters + Table) */}
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="group relative overflow-hidden shadow-sm border border-slate-200 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl transition-all duration-500 hover:shadow-blue-500/10">
-            <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-700" />
-            <CardContent className="p-5 flex flex-col justify-between h-full relative z-10">
-              <div className="flex items-center justify-between mb-3">
-                <div className="p-3 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
-                  <Briefcase className="h-5 w-5 text-white" />
-                </div>
-                <div className="flex flex-col items-end">
-                  <span className="text-[9px] font-bold text-blue-100 uppercase tracking-widest opacity-80">Statistik</span>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-[8px] font-bold text-white uppercase tracking-wider">Aktif</span>
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-0.5">
-                <p className="text-[10px] font-bold text-blue-100 uppercase tracking-wider opacity-80">Total Pelatihan</p>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-3xl font-black text-white tracking-tighter">{stats.total}</span>
-                  <span className="text-[10px] font-bold text-blue-200 uppercase tracking-tighter">Kelas</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+  const resetAll = () => {
+    setSearchQuery("");
+    setStatusFilter("All");
+    setFilterProgram("all");
+    setFilterUPT("all");
+    setFilterYear(CURRENT_YEAR);
+  };
 
-          <Card className="group relative overflow-hidden shadow-sm border border-slate-200 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl transition-all duration-500 hover:shadow-emerald-500/10">
-            <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-700" />
-            <CardContent className="p-5 flex flex-col justify-between h-full relative z-10">
-              <div className="flex items-center justify-between mb-3">
-                <div className="p-3 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
-                  <Users className="h-5 w-5 text-white" />
-                </div>
-                <div className="flex flex-col items-end">
-                  <span className="text-[9px] font-bold text-emerald-100 uppercase tracking-widest opacity-80">Registrasi</span>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-                    <span className="text-[8px] font-bold text-white uppercase tracking-wider">Terverifikasi</span>
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-0.5">
-                <p className="text-[10px] font-bold text-emerald-100 uppercase tracking-wider opacity-80">Total Peserta</p>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-3xl font-black text-white tracking-tighter">{stats.totalPeserta}</span>
-                  <span className="text-[10px] font-bold text-emerald-200 uppercase tracking-tighter">Peserta</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+  const initialLoading = isFetching && data.length === 0;
+  const avgPeserta = stats.total > 0 ? Math.round(stats.peserta / stats.total) : 0;
 
-          {/* Additional info cards made smaller and more subtle */}
-          <Card className="group hidden lg:flex relative overflow-hidden shadow-sm border border-slate-100 bg-white rounded-2xl p-5 flex-col justify-center items-center text-center">
-            <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mb-3">
-              <TrendingUp className="h-6 w-6 text-slate-400 group-hover:text-blue-500 transition-colors" />
-            </div>
-            <div className="space-y-0.5">
-              <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tren Bulanan</h4>
-              <p className="text-[9px] font-bold text-blue-500 uppercase">+12% Bulan ini</p>
-            </div>
-          </Card>
+  /* ============================ RENDER ============================ */
 
-          <Card className="group hidden lg:flex relative overflow-hidden shadow-sm border border-slate-100 bg-white rounded-2xl p-5 flex-col justify-center items-center text-center">
-            <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mb-3">
-              <GraduationCap className="h-6 w-6 text-slate-400 group-hover:text-amber-500 transition-colors" />
-            </div>
-            <div className="space-y-0.5">
-              <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rasio Kelulusan</h4>
-              <p className="text-[9px] font-bold text-amber-500 uppercase">Rerata 89.4%</p>
-            </div>
-          </Card>
+  const listContent = (
+    <div className="flex flex-col gap-5">
+      {/* Statistik */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+        {initialLoading ? (
+          <>
+            <StatSkeleton />
+            <StatSkeleton />
+            <StatSkeleton />
+            <StatSkeleton />
+          </>
+        ) : (
+          <>
+            <StatCard
+              label="Total Pelatihan"
+              value={stats.total}
+              unit="Kelas"
+              sub={filterYear === "All" ? "semua tahun" : `tahun ${filterYear}`}
+              icon={Briefcase}
+              accent="#3B82F6"
+              onClick={() => setStatusFilter("All")}
+              active={statusFilter === "All"}
+            />
+            <StatCard
+              label="Total Peserta"
+              value={stats.peserta}
+              unit="Orang"
+              sub={`rata-rata ${fmt(avgPeserta)} / kelas`}
+              icon={Users}
+              accent="#06B6D4"
+            />
+            <StatCard
+              label="Dalam Proses"
+              value={stats.proses}
+              unit="Kelas"
+              sub={`${pct(stats.proses, stats.total)}% dari total`}
+              icon={Loader}
+              accent="#F59E0B"
+              progress={pct(stats.proses, stats.total)}
+            />
+            <StatCard
+              label="Selesai (Signed)"
+              value={stats.selesai}
+              unit="Kelas"
+              sub={`${pct(stats.selesai, stats.total)}% tersertifikasi`}
+              icon={CheckCircle2}
+              accent="#10B981"
+              progress={pct(stats.selesai, stats.total)}
+              onClick={() => setStatusFilter(statusFilter === "Signed" ? "All" : "Signed")}
+              active={statusFilter === "Signed"}
+            />
+          </>
+        )}
+      </div>
+
+      {/* Search + Filter */}
+      <div className="flex flex-col md:flex-row gap-2.5 items-stretch md:items-center bg-white dark:bg-slate-900 p-2.5 rounded-3xl ring-1 ring-slate-200/80 dark:ring-slate-800 shadow-sm">
+        <div className="relative flex-1 group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 transition-colors group-focus-within:text-blue-500" />
+          <Input
+            ref={searchRef}
+            type="text"
+            placeholder="Cari nama pelatihan, penyelenggara, atau ID..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-11 pr-16 h-11 w-full border-none bg-slate-50 dark:bg-slate-800 rounded-2xl focus-visible:ring-2 focus-visible:ring-blue-500/20 font-semibold text-sm placeholder:font-normal"
+          />
+          {searchQuery ? (
+            <button
+              type="button"
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700"
+              aria-label="Hapus pencarian"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          ) : (
+            <kbd className="hidden md:inline-flex absolute right-3 top-1/2 -translate-y-1/2 h-6 px-2 items-center rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-[10px] font-bold text-slate-400">
+              /
+            </kbd>
+          )}
         </div>
 
-        <section className="w-full">
-          <Tabs value={tabValue} onValueChange={setTabValue} className="w-full">
-            {
-              Cookies.get('Access')?.includes('createPelatihan') &&
-              <TabsList className="grid w-full grid-cols-2 bg-slate-100/50 p-1.5 h-fit rounded-2xl mb-8 border border-slate-200/50 backdrop-blur-sm">
-                <TabsTrigger
-                  value="account"
-                  onClick={() => refetch()}
-                  className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-[0_8px_20px_-4px_rgba(0,0,0,0.1)] rounded-xl py-3 text-xs font-black uppercase tracking-widest transition-all duration-300"
+        <div className="flex gap-2 items-center">
+          <Select value={filterYear} onValueChange={setFilterYear}>
+            <SelectTrigger className={`h-11 flex-1 md:w-[140px] border-none rounded-2xl font-bold text-xs ${filterYear !== CURRENT_YEAR ? "bg-[#0B1B3F] text-white" : "bg-slate-50 dark:bg-slate-800"}`}>
+              <div className="flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 opacity-60 shrink-0" />
+                <SelectValue />
+              </div>
+            </SelectTrigger>
+            <SelectContent className="rounded-2xl">
+              <SelectItem value="All">Semua Tahun</SelectItem>
+              {yearOptions.map((y) => (
+                <SelectItem key={y} value={y}>{y}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className={`h-11 flex-1 md:flex-none px-4 gap-2 border-none rounded-2xl font-bold text-xs ${advancedCount > 0 ? "bg-[#0B1B3F] text-white hover:bg-[#0B1B3F]/90 hover:text-white" : "bg-slate-50 dark:bg-slate-800 hover:bg-slate-100"}`}
+              >
+                <SlidersHorizontal className="w-3.5 h-3.5 opacity-70" />
+                Filter
+                {advancedCount > 0 && (
+                  <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-sky-400 text-[#0B1B3F] text-[10px] font-black flex items-center justify-center">
+                    {advancedCount}
+                  </span>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-80 p-4 space-y-4 rounded-2xl shadow-xl" align="end" onPointerDown={(e) => e.stopPropagation()}>
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Filter Lanjutan</p>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-500">Program Pelatihan</label>
+                <Select value={filterProgram} onValueChange={setFilterProgram}>
+                  <SelectTrigger className="h-9 text-xs w-full rounded-xl" onPointerDown={(e) => e.stopPropagation()}>
+                    <SelectValue placeholder="Semua Program" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl max-h-72">
+                    <SelectItem value="all">Semua Program</SelectItem>
+                    {groupedPrograms.map((g) => (
+                      <SelectGroup key={g.label}>
+                        <SelectLabel>{g.label}</SelectLabel>
+                        {g.items.map((i) => (
+                          <SelectItem key={i.id_program_pelatihan} value={i.name_indo}>{i.name_indo}</SelectItem>
+                        ))}
+                      </SelectGroup>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-500">Unit Penyelenggara</label>
+                <Select value={filterUPT} onValueChange={setFilterUPT}>
+                  <SelectTrigger className="h-9 text-xs w-full rounded-xl" onPointerDown={(e) => e.stopPropagation()}>
+                    <SelectValue placeholder="Semua UPT" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl max-h-72">
+                    <SelectItem value="all">Semua UPT</SelectItem>
+                    {UPT_OPTIONS.map((item) => (
+                      <SelectItem key={item} value={item}>{item}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {advancedCount > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full text-xs rounded-xl"
+                  onClick={() => {
+                    setFilterProgram("all");
+                    setFilterUPT("all");
+                  }}
                 >
-                  Daftar Pelatihan
-                </TabsTrigger>
-                <TabsTrigger
-                  value="password"
-                  className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-[0_8px_20px_-4px_rgba(0,0,0,0.1)] rounded-xl py-3 text-xs font-black uppercase tracking-widest transition-all duration-300"
-                >
-                  Buat Pelatihan Baru
-                </TabsTrigger>
-              </TabsList>
-            }
-
-            <TabsContent value="account">
-              {isFetching ? (
-                <div className="py-32 w-full flex flex-col items-center justify-center gap-4">
-                  <HashLoader color="#338CF5" size={50} />
-                  <p className="text-sm text-slate-400 font-medium animate-pulse">Memuat data pelatihan...</p>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-5">
-
-                  {/* ── Search + Filter Bar ─────────────────────────────── */}
-                  <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center bg-white p-3 rounded-3xl border border-slate-200 shadow-sm">
-                    <div className="relative flex-1 group">
-                      <MdSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 transition-colors group-focus-within:text-blue-500" />
-                      <Input
-                        type="text"
-                        placeholder="Cari nama pelatihan..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-11 h-11 w-full border-none bg-slate-50 rounded-2xl focus-visible:ring-2 focus-visible:ring-blue-500/20 transition-all font-semibold text-sm placeholder:font-normal"
-                      />
-                    </div>
-
-                    <div className="flex gap-2 items-center">
-                      <Select value={filterYear} onValueChange={setFilterYear}>
-                        <SelectTrigger className="h-11 w-[130px] bg-slate-50 border-none rounded-2xl font-bold text-xs focus:ring-2 focus:ring-blue-500/20 shrink-0">
-                          <div className="flex items-center gap-1.5">
-                            <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                            <SelectValue />
-                          </div>
-                        </SelectTrigger>
-                        <SelectContent className="rounded-2xl">
-                          {yearOptions.map(y => (
-                            <SelectItem key={y} value={y}>{y === "All" ? "Semua Tahun" : y}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="outline" className="h-11 px-5 gap-2 border-none bg-slate-50 rounded-2xl font-bold text-xs hover:bg-slate-100 transition-all shrink-0">
-                            <SlidersHorizontal className="w-3.5 h-3.5 text-slate-500" />
-                            Filter
-                            {(filterCategory !== "all" || filterCategoryPenyelenggara !== "all") && (
-                              <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-                            )}
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-72 p-4 space-y-4 rounded-2xl shadow-xl" align="end" onPointerDown={(e) => e.stopPropagation()}>
-                          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Filter Lanjutan</p>
-                          <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-500">Program Pelatihan</label>
-                            <Select value={filterCategory} onValueChange={setFilterCategory}>
-                              <SelectTrigger className="h-9 text-xs w-full rounded-xl" onPointerDown={(e) => e.stopPropagation()}>
-                                <SelectValue placeholder="Semua Program" />
-                              </SelectTrigger>
-                              <SelectContent className="rounded-xl">
-                                <SelectItem value="all">Semua Program</SelectItem>
-                                {groupedPrograms.akp.length > 0 && (
-                                  <SelectGroup>
-                                    <SelectLabel>AKP</SelectLabel>
-                                    {groupedPrograms.akp.filter(i => i.name_indo?.trim()).map(i => <SelectItem key={i.id_program_pelatihan} value={i.name_indo}>{i.name_indo}</SelectItem>)}
-                                  </SelectGroup>
-                                )}
-                                {groupedPrograms.perikanan.length > 0 && (
-                                  <SelectGroup>
-                                    <SelectLabel>Perikanan</SelectLabel>
-                                    {groupedPrograms.perikanan.filter(i => i.name_indo?.trim()).map(i => <SelectItem key={i.id_program_pelatihan} value={i.name_indo}>{i.name_indo}</SelectItem>)}
-                                  </SelectGroup>
-                                )}
-                                {groupedPrograms.kelautan.length > 0 && (
-                                  <SelectGroup>
-                                    <SelectLabel>Kelautan</SelectLabel>
-                                    {groupedPrograms.kelautan.filter(i => i.name_indo?.trim()).map(i => <SelectItem key={i.id_program_pelatihan} value={i.name_indo}>{i.name_indo}</SelectItem>)}
-                                  </SelectGroup>
-                                )}
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          <div className="space-y-1.5">
-                            <label className="text-xs font-bold text-slate-500">Unit Penyelenggara</label>
-                            <Select value={filterCategoryPenyelenggara} onValueChange={setFilterCategoryPenyelenggara}>
-                              <SelectTrigger className="h-9 text-xs w-full rounded-xl" onPointerDown={(e) => e.stopPropagation()}>
-                                <SelectValue placeholder="Semua UPT" />
-                              </SelectTrigger>
-                              <SelectContent className="rounded-xl">
-                                <SelectItem value="all">Semua UPT</SelectItem>
-                                {Array.from(new Set(UPT || [])).filter(Boolean).map((item: string, i) => (
-                                  <SelectItem key={i} value={item}>{item}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          {(filterCategory !== "all" || filterCategoryPenyelenggara !== "all") && (
-                            <Button variant="outline" size="sm" className="w-full text-xs rounded-xl"
-                              onClick={() => { setFilterCategory("all"); setFilterCategoryPenyelenggara("all"); setFilterCategorySasaran("all"); }}>
-                              Reset Semua Filter
-                            </Button>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
-
-                  {/* ── Quick Status Pills ───────────────────────────────── */}
-                  <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 shrink-0 pr-1">Status:</span>
-                    {QUICK_STATUS_FILTERS.map(f => {
-                      const count = quickFilterCounts[f.key] ?? 0;
-                      const isActive = selectedStatusFilter === f.key;
-                      return (
-                        <button
-                          key={f.key}
-                          onClick={() => setSelectedStatusFilter(f.key)}
-                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[11px] font-bold whitespace-nowrap transition-all duration-200 shrink-0 ${isActive
-                            ? `${f.color} ring-2 ring-offset-1 ring-current shadow-sm scale-105`
-                            : `${f.color} opacity-60 hover:opacity-100`
-                            }`}
-                        >
-                          {f.label}
-                          <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-full ${isActive ? "bg-current/10" : "bg-white/60"
-                            }`}>
-                            {count}
-                          </span>
-                        </button>
-                      );
-                    })}
-                    {selectedStatusFilter !== "All" && (
-                      <button
-                        onClick={() => setSelectedStatusFilter("All")}
-                        className="text-[10px] font-bold text-slate-400 hover:text-slate-600 underline underline-offset-2 shrink-0 transition-colors"
-                      >
-                        Hapus filter
-                      </button>
-                    )}
-                  </div>
-
-                  {/* ── Result Info ─────────────────────────────────────── */}
-                  <div className="flex items-center justify-between px-1">
-                    <p className="text-xs text-slate-500">
-                      Menampilkan <span className="font-bold text-slate-700">{filteredData.length}</span> dari <span className="font-bold">{filteredData.length}</span> pelatihan
-                      {selectedStatusFilter !== "All" && <span className="text-blue-500 font-semibold"> · {selectedStatusFilter}</span>}
-                    </p>
-                    {(searchQuery || selectedStatusFilter !== "All" || filterCategory !== "all" || filterCategoryPenyelenggara !== "all") && (
-                      <button
-                        onClick={() => { setSearchQuery(""); setSelectedStatusFilter("All"); setFilterCategory("all"); setFilterCategoryPenyelenggara("all"); }}
-                        className="text-[11px] font-bold text-rose-500 hover:text-rose-600 transition-colors"
-                      >
-                        Reset semua
-                      </button>
-                    )}
-                  </div>
-
-                  {/* ── Table / Empty State ─────────────────────────────── */}
-                  {filteredData.length === 0 ? (
-                    <div className="py-20 flex flex-col items-center gap-4 text-center">
-                      <Image src="/illustrations/not-found.png" alt="Tidak ada data" width={0} height={0} className="w-72 opacity-80" />
-                      <div>
-                        <h3 className="text-xl font-bold text-slate-700">Belum Ada Pelatihan</h3>
-                        <p className="text-sm text-slate-400 mt-1 max-w-xs">
-                          Buka kelas pelatihan baru untuk mulai melihat data di sini.
-                        </p>
-                      </div>
-                    </div>
-                  ) : filteredData.length === 0 ? (
-                    <div className="py-16 flex flex-col items-center gap-3 text-center">
-                      <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center">
-                        <MdSearch className="w-7 h-7 text-slate-400" />
-                      </div>
-                      <div>
-                        <h3 className="text-base font-bold text-slate-700">Tidak Ada Hasil</h3>
-                        <p className="text-sm text-slate-400 mt-1">
-                          Tidak ada pelatihan yang cocok dengan filter saat ini.
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => { setSearchQuery(""); setSelectedStatusFilter("All"); setFilterCategory("all"); setFilterCategoryPenyelenggara("all"); }}
-                        className="text-xs font-bold text-blue-500 hover:text-blue-600 underline underline-offset-2"
-                      >
-                        Hapus semua filter
-                      </button>
-                    </div>
-                  ) : (
-                    <TableDataPelatihanMasyarakat
-                      data={filteredData}
-                      generateTanggalPelatihan={generateTanggalPelatihan}
-                      encryptValue={encryptValue}
-                    />
-                  )}
-                </div>
+                  Reset Filter Lanjutan
+                </Button>
               )}
-            </TabsContent>
-            <TabsContent value="password">
-              <Card className="border-slate-200 shadow-sm rounded-xl">
-                <CardContent className="p-6">
-                  <FormPelatihan
-                    edit={false}
-                    onSuccess={() => {
-                      setTabValue("account");
-                      refetch();
-                    }}
-                  />
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </section>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            title="Muat ulang data"
+            className="h-11 w-11 shrink-0 border-none bg-slate-50 dark:bg-slate-800 rounded-2xl hover:bg-slate-100"
+          >
+            <RefreshCw className={`w-4 h-4 text-slate-500 ${isFetching ? "animate-spin" : ""}`} />
+          </Button>
+        </div>
       </div>
-    </div >
-  )
+
+      {/* Quick Status Pills */}
+      <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide -mx-1 px-1 pb-1">
+        {QUICK_STATUS_FILTERS.map((f) => {
+          const isActive = statusFilter === f.key;
+          const count = pillCounts[f.key] ?? 0;
+          return (
+            <button
+              key={f.key}
+              type="button"
+              onClick={() => setStatusFilter(isActive && f.key !== "All" ? "All" : f.key)}
+              className={`inline-flex items-center gap-2 pl-3 pr-1.5 py-1.5 rounded-full border text-[11px] font-bold whitespace-nowrap transition-all shrink-0 ${isActive
+                ? `${f.active} shadow-md`
+                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:border-slate-300 hover:bg-slate-50"
+                } ${count === 0 && !isActive ? "opacity-50" : ""}`}
+            >
+              {!isActive && <span className={`w-1.5 h-1.5 rounded-full ${f.dot}`} />}
+              {f.label}
+              <span className={`min-w-[22px] text-center text-[10px] font-black px-1.5 py-0.5 rounded-full tabular-nums ${isActive ? "bg-white/25" : "bg-slate-100 dark:bg-slate-800"}`}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Info hasil + chip filter aktif */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <p className="text-xs text-slate-500 mr-1">
+            Menampilkan <span className="font-black text-slate-800 dark:text-slate-200">{fmt(rows.length)}</span> dari{" "}
+            <span className="font-bold">{fmt(stats.total)}</span> pelatihan
+          </p>
+          {activeChips.map((c) => (
+            <span key={c.key} className="inline-flex items-center gap-1 pl-2.5 pr-1 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 text-[10px] font-bold max-w-[220px]">
+              <span className="truncate">{c.label}</span>
+              <button type="button" onClick={c.clear} className="p-0.5 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900" aria-label={`Hapus filter ${c.label}`}>
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+        {activeChips.length > 1 && (
+          <button type="button" onClick={resetAll} className="text-[11px] font-bold text-rose-500 hover:text-rose-600 self-start sm:self-auto">
+            Reset semua
+          </button>
+        )}
+      </div>
+
+      {/* Tabel / Loading / Empty */}
+      {initialLoading ? (
+        <div className="rounded-3xl ring-1 ring-slate-200 dark:ring-slate-800 bg-white dark:bg-slate-900 p-4 space-y-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-14 rounded-xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
+          ))}
+        </div>
+      ) : data.length === 0 ? (
+        <div className="py-16 flex flex-col items-center gap-4 text-center">
+          <Image src="/illustrations/not-found.png" alt="Tidak ada data" width={288} height={288} className="w-64 h-auto opacity-80" />
+          <div>
+            <h3 className="text-lg font-black text-slate-700 dark:text-slate-200">Belum Ada Pelatihan</h3>
+            <p className="text-sm text-slate-400 mt-1 max-w-xs">Buka kelas pelatihan baru untuk mulai melihat data di sini.</p>
+          </div>
+          {canCreate && (
+            <Button onClick={() => setTabValue("create")} className="rounded-xl bg-[#0B1B3F] hover:bg-blue-700 gap-2">
+              <PlusCircle className="w-4 h-4" /> Buat Pelatihan
+            </Button>
+          )}
+        </div>
+      ) : rows.length === 0 ? (
+        <div className="py-16 flex flex-col items-center gap-3 text-center rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
+          <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+            <Search className="w-6 h-6 text-slate-400" />
+          </div>
+          <div>
+            <h3 className="text-base font-black text-slate-700 dark:text-slate-200">Tidak Ada Hasil</h3>
+            <p className="text-sm text-slate-400 mt-1">Tidak ada pelatihan yang cocok dengan filter saat ini.</p>
+          </div>
+          <Button variant="outline" size="sm" onClick={resetAll} className="rounded-xl text-xs">
+            Hapus semua filter
+          </Button>
+        </div>
+      ) : (
+        <TableDataPelatihanMasyarakat
+          data={rows}
+          generateTanggalPelatihan={generateTanggalPelatihan}
+          encryptValue={encryptValue}
+        />
+      )}
+    </div>
+  );
+
+  if (!canCreate) {
+    return <div className="pb-10 mt-10">{listContent}</div>;
+  }
+  const TABS = [
+    { value: "list", label: "Daftar Pelatihan", sub: "Kelola & pantau kelas", icon: ListChecks, accent: "#3B82F6", count: stats.total },
+    { value: "create", label: "Buat Pelatihan Baru", sub: "Buka kelas pelatihan", icon: PlusCircle, accent: "#10B981" },
+  ] as const;
+
+  return (
+    <div className="pb-10 mt-10">
+      <Tabs value={tabValue} onValueChange={(v) => setTabValue(v as "list" | "create")} className="w-full">
+        {/* Tab bar navy — tab aktif kaca (glassmorphism) + ikon besar di latar, sama dengan DashboardMainView */}
+        <div className="relative isolate overflow-hidden mb-6 rounded-[1.75rem] bg-[#0B1B3F] ring-1 ring-white/10 shadow-[0_20px_50px_-20px_rgba(37,99,235,0.5)]">
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(50%_120%_at_0%_0%,#2563EB_0%,transparent_60%),radial-gradient(40%_120%_at_100%_100%,#0EA5E9_0%,transparent_60%)] opacity-70" />
+          <div className="absolute inset-0 -z-10 opacity-[0.12] [background-image:radial-gradient(rgba(255,255,255,0.8)_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(to_right,black,transparent_70%)]" />
+
+          <TabsList className="bg-transparent h-auto p-1.5 grid grid-cols-2 gap-1.5 w-full">
+            {TABS.map((t) => {
+              const Icon = t.icon;
+              return (
+                <TabsTrigger
+                  key={t.value}
+                  value={t.value}
+                  style={{ ["--accent" as string]: t.accent }}
+                  className="group relative isolate overflow-hidden justify-start rounded-[1.35rem] py-3 px-4 text-blue-100/70 font-bold ring-1 ring-transparent transition-all duration-300 outline-none
+                    hover:text-white hover:bg-white/[0.06]
+                    focus-visible:ring-2 focus-visible:ring-sky-300/60
+                    data-[state=active]:text-white data-[state=active]:bg-white/[0.12] data-[state=active]:backdrop-blur-xl data-[state=active]:ring-white/25
+                    data-[state=active]:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_12px_30px_-12px_var(--accent)]"
+                >
+                  {/* Glow aksen kanan → kiri */}
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 group-hover:opacity-50 group-data-[state=active]:opacity-100"
+                    style={{ background: `linear-gradient(to left, ${t.accent}59 0%, ${t.accent}1f 40%, transparent 80%)` }}
+                  />
+                  {/* Kilau kaca */}
+                  <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-1/2 bg-gradient-to-b from-white/[0.14] to-transparent opacity-0 transition-opacity duration-300 group-data-[state=active]:opacity-100" />
+                  {/* Ikon besar di latar */}
+                  <Icon
+                    aria-hidden
+                    strokeWidth={1.5}
+                    className="pointer-events-none absolute -right-3 -bottom-4 -z-10 w-16 h-16 -rotate-12 opacity-[0.08] transition-all duration-500 ease-out group-hover:opacity-20 group-hover:-rotate-6 group-data-[state=active]:opacity-35 group-data-[state=active]:scale-110 group-data-[state=active]:-rotate-6"
+                    style={{ color: t.accent, filter: `drop-shadow(0 0 16px ${t.accent}80)` }}
+                  />
+
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-1.5 rounded-xl bg-white/10 text-sky-100 ring-1 ring-white/10 transition-all duration-300 group-hover:bg-white/15 group-data-[state=active]:text-white group-data-[state=active]:ring-white/30 group-data-[state=active]:[background:var(--accent)] group-data-[state=active]:shadow-[0_6px_16px_-4px_var(--accent)]">
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <div className="flex flex-col items-start leading-none">
+                      <span className="text-sm tracking-tight whitespace-nowrap flex items-center gap-1.5">
+                        {t.label}
+                        {"count" in t && !initialLoading && (
+                          <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-white/10 group-data-[state=active]:bg-white/20 tabular-nums">{fmt(t.count)}</span>
+                        )}
+                      </span>
+                      <span className="hidden sm:block mt-1 text-[9px] font-semibold uppercase tracking-[0.16em] whitespace-nowrap text-blue-100/45 group-data-[state=active]:text-sky-100/80">
+                        {t.sub}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Garis aksen bawah */}
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute bottom-0 left-4 right-4 h-[2px] rounded-full opacity-0 scale-x-50 transition-all duration-300 group-data-[state=active]:opacity-100 group-data-[state=active]:scale-x-100"
+                    style={{ background: `linear-gradient(90deg, transparent, ${t.accent}, transparent)` }}
+                  />
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
+        </div>
+
+        <TabsContent value="list" className="mt-0">{listContent}</TabsContent>
+
+        {/* FormPelatihan sudah punya panel sendiri → tanpa Card pembungkus */}
+        <TabsContent value="create" className="mt-0 animate-in fade-in-50 duration-300">
+          <FormPelatihan
+            edit={false}
+            onSuccess={() => {
+              setTabValue("list");
+              refetch();
+            }}
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
 };
 
 export default TableDataPelatihan;

@@ -9,6 +9,8 @@ export default function Page() {
     return (
         <LayoutAdminElaut>
             <section className="flex-1 flex flex-col">
+                <HeaderPageLayoutAdminElaut title="Unit Kerja" description="Kelola data unit kerja" icon={<TbBuildingSkyscraper className="text-3xl" />} />
+
                 <main className="w-full h-full">
                     <TableDataUnitKerja />
                 </main>

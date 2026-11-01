@@ -1,485 +1,320 @@
 "use client";
-import React from "react";
-import { HashLoader } from "react-spinners";
+
+import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import ChartMasyarakatDilatihMonthly from "@/commons/charts/ChartMasyarakatDilatihMonthly";
-import ChartDetailMasyarakatDilatih, { ChartSektorPembiayaanCard } from "@/commons/charts/ChartDetailMasyarakatDilatih";
-import useFetchDataDukung from "@/hooks/elaut/useFetchDataDukung";
-import { useFetchAllDataPelatihanMasyarakat } from "@/hooks/elaut/pelatihan/useFetchDataPelatihanMasyarakat";
 import dayjs from "dayjs";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { FiFilter } from "react-icons/fi";
+  TrendingUp, TrendingDown, CalendarRange, RotateCcw, Wallet, School, Users, CheckCircle2, Gauge,
+  Map as MapIcon, LucideIcon,
+} from "lucide-react";
+
+import useFetchDataDukung from "@/hooks/elaut/useFetchDataDukung";
+import { useFetchAllDataPelatihanMasyarakat } from "@/hooks/elaut/pelatihan/useFetchDataPelatihanMasyarakat";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { parseIndonesianDate, tahunList } from "@/utils/time";
-import { Wallet, Users, BookOpen, TrendingUp } from "lucide-react";
 import { formatToRupiah, formatToShorthandRupiah } from "@/lib/utils";
-import MetricsSummaryPelatihan from "./MetricsSummaryPelatihan";
-import { StatsMetricStatus } from "./Summary/StatsMetricStatus";
-import CalendarSelesaiPelatihan from "./Summary/CalendarSelesaiPelatihan";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import PenyelenggaraMap from "./PenyelenggaraMap";
+
+/* ============================ HELPERS ============================ */
+
+const QUARTERS = ["TW I", "TW II", "TW III", "TW IV"] as const;
+type Quarter = (typeof QUARTERS)[number];
+
+const DAY_MS = 86_400_000;
+const PUSAT = "Pusat Pelatihan Kelautan dan Perikanan";
+const NOW = dayjs();
+const CURRENT_YEAR = NOW.year();
+const CURRENT_QUARTER_IDX = Math.floor(NOW.month() / 3);
+const BULAN = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+const quarterIdxOf = (month: number) => Math.min(3, Math.max(0, Math.ceil(month / 3) - 1));
+const defaultQuarterFor = (year: number): Quarter => QUARTERS[year === CURRENT_YEAR ? CURRENT_QUARTER_IDX : 3];
+
+/** Parse "YYYY-MM-DD", "DD-MM-YYYY", atau tanggal Indonesia → Date | null */
+const parseDate = (s?: string | null): Date | null => {
+  if (!s) return null;
+  if (s.includes("-")) {
+    const [a, b, c] = s.split("-");
+    const d = a.length === 4 ? new Date(+a, +b - 1, parseInt(c)) : new Date(+c, +b - 1, +a);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  const d = parseIndonesianDate(s);
+  return d && !isNaN(d.getTime()) ? d : null;
+};
+
+const fmt = (n: number) => n.toLocaleString("id-ID");
+const pct = (part: number, total: number) => (total > 0 ? Math.round((part / total) * 100) : 0);
+const isSigned = (f?: string) => !!f && f.includes("signed");
+
+/* ============================ KOMPONEN ============================ */
 
 const SummaryPelatihan: React.FC = () => {
-  const { data: dataDukung, isFetching: isFetchingDataDukung, refetch } = useFetchDataDukung()
-  const { data, isFetching, refetch: refechDataPelatihan } = useFetchAllDataPelatihanMasyarakat()
+  const { data: dataDukung, isFetching: isFetchingDukung } = useFetchDataDukung();
+  const { data, isFetching } = useFetchAllDataPelatihanMasyarakat();
 
-  const [tahun, setTahun] = React.useState(() => dayjs().year());
-  const [triwulan, setTriwulan] = React.useState("TW I");
+  const [tahun, setTahun] = useState(CURRENT_YEAR);
+  const [triwulan, setTriwulan] = useState<Quarter>(() => defaultQuarterFor(CURRENT_YEAR));
+  useEffect(() => setTriwulan(defaultQuarterFor(tahun)), [tahun]);
 
-  // Automatically set triwulan to latest when year changes
-  React.useEffect(() => {
-    const currentYear = dayjs().year();
-    if (tahun < currentYear) {
-      setTahun(tahun);
-      setTriwulan("TW IV");
-    } else {
-      const month = dayjs().month() + 1;
-      if (month <= 3) setTriwulan("TW I");
-      else if (month <= 6) setTriwulan("TW II");
-      else if (month <= 9) setTriwulan("TW III");
-      else setTriwulan("TW IV");
-    }
-  }, [tahun]);
+  const years = useMemo(() => [...tahunList].sort((a, b) => b - a), []);
+  const quarterIdx = QUARTERS.indexOf(triwulan);
+  const isDefaultPeriod = tahun === CURRENT_YEAR && triwulan === defaultQuarterFor(CURRENT_YEAR);
 
-  // ================== GLOBAL FILTERING ==================
-  const getQuarter = (month: number) => {
-    if (month <= 3) return "TW I";
-    if (month <= 6) return "TW II";
-    if (month <= 9) return "TW III";
-    return "TW IV";
-  };
+  /* ---------- Index tanggal (parse sekali) ---------- */
+  const pelatihanIndexed = useMemo(
+    () => (data || []).map((item) => ({ item, start: parseDate(item.TanggalMulaiPelatihan), end: parseDate(item.TanggalBerakhirPelatihan) })),
+    [data]
+  );
+  const dukungIndexed = useMemo(
+    () =>
+      (dataDukung || [])
+        .filter((u) => isSigned(u.FileSertifikat) && !u.PenyelenggaraPelatihan?.includes(PUSAT))
+        .map((item) => ({ item, start: parseDate(item.TanggalMulai) })),
+    [dataDukung]
+  );
 
-  const filteredDataPelatihan = React.useMemo(() => {
-    if (!data) return [];
-    return data.filter((item) => {
-      const dateStr = item.TanggalMulaiPelatihan;
-      if (!dateStr) return false;
+  /* ---------- Filter periode (s.d. triwulan) dalam 1 loop ---------- */
+  const period = useMemo(() => {
+    const inPeriod = (d: Date | null) => !!d && d.getFullYear() === tahun && quarterIdxOf(d.getMonth() + 1) <= quarterIdx;
 
-      let itemTahun;
-      let itemMonth;
-      if (dateStr.includes("-")) {
-        const parts = dateStr.split("-");
-        if (parts[0].length === 4) {
-          itemTahun = parseInt(parts[0]);
-          itemMonth = parseInt(parts[1]);
-        } else {
-          itemTahun = parseInt(parts[2]);
-          itemMonth = parseInt(parts[1]);
-        }
-      } else {
-        const d = parseIndonesianDate(dateStr);
-        itemTahun = d?.getFullYear();
-        itemMonth = (d?.getMonth() || 0) + 1;
+    const pel: (typeof pelatihanIndexed)[number]["item"][] = [];
+    let days = 0, done = 0, pnbp = 0;
+    for (const { item, start, end } of pelatihanIndexed) {
+      if (!inPeriod(start)) continue;
+      pel.push(item);
+      if (start && end) {
+        const diff = Math.ceil((end.getTime() - start.getTime()) / DAY_MS);
+        if (diff > 0) days += diff;
       }
-
-      const matchYear = itemTahun === tahun;
-
-      const quarters = ["TW I", "TW II", "TW III", "TW IV"];
-      const selectedIdx = quarters.indexOf(triwulan);
-      const itemIdx = quarters.indexOf(getQuarter(itemMonth || 0));
-      const matchQuarter = !triwulan || itemIdx <= selectedIdx;
-
-      return matchYear && matchQuarter;
-    });
-  }, [data, tahun, triwulan]);
-
-  const filteredDataDukung = React.useMemo(() => {
-    if (!dataDukung) return [];
-    return dataDukung.filter((item) => {
-      const dateStr = item.TanggalMulai;
-      if (!dateStr) return false;
-
-      let itemTahun;
-      let itemMonth;
-      if (dateStr.includes("-")) {
-        const parts = dateStr.split("-");
-        if (parts[0].length === 4) {
-          itemTahun = parseInt(parts[0]);
-          itemMonth = parseInt(parts[1]);
-        } else {
-          itemTahun = parseInt(parts[2]);
-          itemMonth = parseInt(parts[1]);
-        }
-      } else {
-        const d = parseIndonesianDate(dateStr);
-        itemTahun = d?.getFullYear();
-        itemMonth = (d?.getMonth() || 0) + 1;
-      }
-
-      const matchYear = itemTahun === tahun;
-
-      const quarters = ["TW I", "TW II", "TW III", "TW IV"];
-      const selectedIdx = quarters.indexOf(triwulan);
-      const itemIdx = quarters.indexOf(getQuarter(itemMonth || 0));
-      const matchQuarter = !triwulan || itemIdx <= selectedIdx;
-
-      // Filter by signed certificate
-      const isSigned = item.FileSertifikat?.includes("signed");
-      const isPenyelenggara = !item.PenyelenggaraPelatihan?.includes("Pusat Pelatihan Kelautan dan Perikanan");
-
-      return matchYear && matchQuarter && isSigned && isPenyelenggara;
-    });
-  }, [dataDukung, tahun, triwulan]);
-
-  // Calculate key analytics
-  const analytics = React.useMemo(() => {
-    if (!filteredDataPelatihan || !filteredDataDukung) return null;
-
-    const totalPelatihan = filteredDataPelatihan.length;
-    const totalPeserta = filteredDataDukung.length;
-
-    // Calculate average participants per training
-    const avgPeserta = totalPelatihan > 0 ? Math.round(totalPeserta / totalPelatihan) : 0;
-
-    // Calculate completion rate
-    const completedTrainings = filteredDataPelatihan.filter(item => {
-      const status = parseInt(item?.StatusPenerbitan);
-      return status >= 5;
-    }).length;
-    const completionRate = totalPelatihan > 0 ? Math.round((completedTrainings / totalPelatihan) * 100) : 0;
-
-    // Flatten participants from filtered trainings for consistent metrics
-    const participantsFromFilteredTrainings = filteredDataDukung;
-
-    // Calculate gender distribution
-    const maleCount = participantsFromFilteredTrainings.filter(item => ["L", "Laki - Laki"].includes(item.JenisKelamin)).length;
-    const femaleCount = participantsFromFilteredTrainings.filter(item => ["P", "Perempuan"].includes(item.JenisKelamin)).length;
-    const malePercentage = totalPeserta > 0 ? Math.round((maleCount / totalPeserta) * 100) : 0;
-    const femalePercentage = totalPeserta > 0 ? Math.round((femaleCount / totalPeserta) * 100) : 0;
-
-    // Calculate certification rate (Now 100% since we filter by signed)
-    const certifiedCount = totalPeserta;
-    const certificationRate = 100;
-
-    // Calculate monthly trend and growth
-    const monthlyData: { [key: string]: number } = {};
-    filteredDataDukung.forEach(item => {
-      if (item.TanggalMulai) {
-        const date = new Date(item.TanggalMulai);
-        if (!isNaN(date.getTime())) {
-          const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-          monthlyData[monthKey] = (monthlyData[monthKey] || 0) + 1;
-        }
-      }
-    });
-
-    const months = Object.keys(monthlyData).sort();
-    const lastMonth = months.length > 0 ? monthlyData[months[months.length - 1]] : 0;
-    const prevMonth = months.length > 1 ? monthlyData[months[months.length - 2]] : 0;
-    const growthRate = prevMonth > 0 ? Math.round(((lastMonth - prevMonth) / prevMonth) * 100) : 0;
-    const isPositiveGrowth = growthRate >= 0;
-
-    // Calculate training efficiency (avg participants per day)
-    const totalDays = filteredDataPelatihan.reduce((sum, item) => {
-      if (item.TanggalMulaiPelatihan && item.TanggalBerakhirPelatihan) {
-        const start = new Date(item.TanggalMulaiPelatihan);
-        const end = new Date(item.TanggalBerakhirPelatihan);
-        const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-        return sum + (days > 0 ? days : 0);
-      }
-      return sum;
-    }, 0);
-    const avgParticipantsPerDay = totalDays > 0 ? Math.round(totalPeserta / totalDays) : 0;
-
-    // Calculate performance score (weighted average)
-    const performanceScore = Math.round(
-      (completionRate * 0.4) +
-      (certificationRate * 0.4) +
-      ((totalPeserta / Math.max(totalPelatihan, 1)) / 50 * 100 * 0.2)
-    );
-
-    // Calculate total PNPB (HargaPelatihan * Signed Participants)
-    const totalPNPB = filteredDataPelatihan.reduce((sum, item) => {
+      if (parseInt(item?.StatusPenerbitan) >= 5) done++;
       const price = Number(item.HargaPelatihan || 0);
-      const signedParticipants = item.UserPelatihan?.filter(u => u.FileSertifikat?.includes("signed")).length || 0;
-      return sum + (price * signedParticipants);
-    }, 0);
+      if (price) {
+        let signed = 0;
+        for (const u of item.UserPelatihan || []) if (isSigned(u.FileSertifikat)) signed++;
+        pnbp += price * signed;
+      }
+    }
 
-    return {
-      totalPelatihan,
-      totalPeserta,
-      avgPeserta,
-      completionRate,
-      maleCount,
-      femaleCount,
-      malePercentage,
-      femalePercentage,
-      certifiedCount,
-      certificationRate,
-      growthRate,
-      isPositiveGrowth,
-      avgParticipantsPerDay,
-      performanceScore,
-      totalDays,
-      totalPNPB
-    };
-  }, [filteredDataPelatihan, filteredDataDukung]);
+    const duk: (typeof dukungIndexed)[number]["item"][] = [];
+    let m = 0, f = 0;
+    const monthly = new Array(12).fill(0);
+    for (const { item, start } of dukungIndexed) {
+      if (!inPeriod(start)) continue;
+      duk.push(item);
+      const jk = item.JenisKelamin;
+      if (jk === "L" || jk === "Laki - Laki") m++;
+      else if (jk === "P" || jk === "Perempuan") f++;
+      monthly[start!.getMonth()]++;
+    }
+    const activeMonths = monthly.filter((v) => v > 0);
+    const last = activeMonths[activeMonths.length - 1] ?? 0;
+    const prev = activeMonths[activeMonths.length - 2] ?? 0;
 
-  const genderRatio = analytics
-    ? Math.round((analytics.maleCount / Math.max(analytics.totalPeserta, 1)) * 100)
-    : 50;
+    return { pel, duk, days, done, pnbp, male: m, female: f, growth: prev > 0 ? Math.round(((last - prev) / prev) * 100) : null };
+  }, [pelatihanIndexed, dukungIndexed, tahun, quarterIdx]);
+
+  const totalPelatihan = period.pel.length;
+  const totalPeserta = period.duk.length;
+  const avgPeserta = totalPelatihan ? Math.round(totalPeserta / totalPelatihan) : 0;
+  const avgPerDay = period.days ? Math.round(totalPeserta / period.days) : 0;
+  const completionRate = pct(period.done, totalPelatihan);
+  const malePct = pct(period.male, totalPeserta);
+  const femalePct = pct(period.female, totalPeserta);
+  const tahunStr = String(tahun);
+
+  const initialLoading = (isFetching && !data?.length) || (isFetchingDukung && !dataDukung?.length);
+
+  if (initialLoading) return <SummarySkeleton />;
+
+  if (!data?.length) {
+    return (
+      <div className="mt-6 flex flex-col items-center rounded-3xl bg-white dark:bg-slate-900 ring-1 ring-slate-200/80 dark:ring-slate-800 p-12 text-center">
+        <Image src="/illustrations/not-found.png" alt="" width={320} height={320} className="w-64 h-auto" />
+        <h1 className="mt-4 text-xl font-black text-slate-900 dark:text-white">Belum ada data pelatihan</h1>
+        <p className="mt-1 text-sm text-slate-500 max-w-sm">Data capaian akan tampil setelah penyelenggaraan pelatihan tercatat di sistem.</p>
+      </div>
+    );
+  }
+
+  /* ============================ RENDER ============================ */
 
   return (
-    <div className="w-full min-h-screen bg-slate-50">
-      {isFetching || isFetchingDataDukung ? (
-        <div className="w-full h-[60vh] flex items-center justify-center">
-          <div className="flex flex-col items-center gap-4">
-            <HashLoader color="#3b82f6" size={50} />
-            <p className="text-sm font-medium text-slate-500 animate-pulse tracking-wide">Memuat data pelatihan…</p>
-          </div>
-        </div>
-      ) : data != null ? (
-        <div className="flex flex-col gap-8 max-w-[1920px] mx-auto pb-12">
+    <TooltipProvider delayDuration={150}>
+      <div className="w-full flex flex-col gap-6 max-w-[1920px] mx-auto pb-12">
+        {/* ─── HERO ─── */}
+        <section className="relative isolate overflow-hidden rounded-[2rem] bg-[#0B1B3F] text-white ring-1 ring-white/10 shadow-[0_30px_80px_-20px_rgba(37,99,235,0.45)]">
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(60%_80%_at_0%_0%,#2563EB_0%,transparent_60%),radial-gradient(50%_70%_at_100%_0%,#0EA5E9_0%,transparent_55%),radial-gradient(60%_60%_at_80%_100%,#1D4ED8_0%,transparent_60%)] opacity-90" />
+          <div className="absolute inset-0 -z-10 opacity-[0.15] [background-image:radial-gradient(rgba(255,255,255,0.8)_1px,transparent_1px)] [background-size:22px_22px] [mask-image:radial-gradient(ellipse_at_top_right,black_20%,transparent_70%)]" />
 
-          {/* ─── HERO ─────────────────────────────────────────────────────── */}
-          <div className="relative bg-gradient-to-br from-blue-700 via-indigo-700 to-violet-800 rounded-[2rem] p-8 md:p-10 text-white overflow-hidden shadow-2xl shadow-indigo-200/50">
-            <div className="absolute -top-20 -right-20 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-
-            {/* Top row: title + filter */}
-            <div className="relative z-10 flex flex-col md:flex-row md:items-start justify-between gap-5 mb-8">
+          <div className="p-5 md:p-8">
+            {/* Header + filter */}
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 mb-6">
               <div>
-                <p className="text-blue-300 text-[10px] font-bold uppercase tracking-[0.25em] mb-1.5">Realisasi Pelatihan Masyarakat</p>
-                <h2 className="text-3xl md:text-4xl font-black tracking-tight leading-tight">Capaian {triwulan} · {tahun}</h2>
-                <p className="text-blue-200/60 text-sm mt-1.5 font-medium">Data bersertifikat · diperbarui sesuai filter aktif</p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2.5">
-                <div className="flex items-center gap-1.5 bg-white/10 px-3 py-2 rounded-xl border border-white/15">
-                  <FiFilter className="w-3.5 h-3.5 text-blue-300" />
-                  <span className="text-[11px] font-bold text-blue-200 uppercase tracking-widest">Filter</span>
-                </div>
-                <Select value={tahun.toString()} onValueChange={(val) => setTahun(parseInt(val))}>
-                  <SelectTrigger className="w-[110px] h-10 rounded-xl border-white/20 bg-white/10 text-sm font-bold text-white hover:bg-white/20 transition-all focus:ring-0">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl shadow-2xl border-0">
-                    {tahunList.sort((a, b) => b - a).map((t) => (
-                      <SelectItem key={t} value={t.toString()} className="font-bold text-xs py-2.5">{t}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Select value={triwulan} onValueChange={setTriwulan}>
-                  <SelectTrigger className="w-[100px] h-10 rounded-xl border-white/20 bg-white/10 text-sm font-bold text-white hover:bg-white/20 transition-all focus:ring-0">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl shadow-2xl border-0">
-                    {["TW I", "TW II", "TW III", "TW IV"].map((tw) => (
-                      <SelectItem key={tw} value={tw} className="font-bold text-xs py-2.5">{tw}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {/* KPI strip */}
-            <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-3">
-              {[
-                { label: "Total Pelatihan", value: analytics?.totalPelatihan?.toLocaleString() ?? "—", sub: "program" },
-                { label: "Masyarakat Dilatih", value: analytics?.totalPeserta?.toLocaleString() ?? "—", sub: "peserta bersertifikat" },
-                {
-                  label: "Realisasi PNBP",
-                  value: formatToShorthandRupiah(analytics?.totalPNPB || 0),
-                  fullValue: formatToRupiah(analytics?.totalPNPB || 0),
-                  sub: "penerimaan negara",
-                  tooltip: true,
-                },
-                { label: "Tingkat Penyelesaian", value: `${analytics?.completionRate ?? 0}%`, sub: "program selesai" },
-              ].map((k) => (
-                <div key={k.label} className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl px-5 py-4 hover:bg-white/15 transition-colors duration-200">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-blue-200/70 mb-2">{k.label}</p>
-                  {k.tooltip ? (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <p className="text-2xl font-black tracking-tight cursor-help">{k.value}</p>
-                        </TooltipTrigger>
-                        <TooltipContent className="bg-white text-slate-800 px-4 py-2 rounded-xl font-bold shadow-xl text-sm">
-                          {k.fullValue}
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  ) : (
-                    <p className="text-2xl font-black tracking-tight">{k.value}</p>
-                  )}
-                  <p className="text-[11px] text-blue-200/50 mt-0.5 font-medium">{k.sub}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* ─── SEKSI 1: PROFIL PESERTA ─────────────────────────────────── */}
-          <SectionLabel color="blue" label="Profil Peserta" description="Komposisi demografis peserta pelatihan bersertifikat pada periode ini." />
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {/* Gender breakdown */}
-            <div className="bg-white rounded-[1.5rem] border border-slate-100 shadow-sm p-6">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4">Distribusi Gender</p>
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block" />
-                    <span className="text-sm font-semibold text-slate-700">Laki-laki</span>
-                  </div>
-                  <span className="text-sm font-black text-slate-800">{analytics?.maleCount?.toLocaleString() ?? 0} <span className="text-xs font-medium text-slate-400">({analytics?.malePercentage ?? 0}%)</span></span>
-                </div>
-                <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-700" style={{ width: `${genderRatio}%` }} />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-rose-400 inline-block" />
-                    <span className="text-sm font-semibold text-slate-700">Perempuan</span>
-                  </div>
-                  <span className="text-sm font-black text-slate-800">{analytics?.femaleCount?.toLocaleString() ?? 0} <span className="text-xs font-medium text-slate-400">({analytics?.femalePercentage ?? 0}%)</span></span>
-                </div>
-              </div>
-            </div>
-
-            {/* Avg per training */}
-            <div className="bg-white rounded-[1.5rem] border border-slate-100 shadow-sm p-6 flex flex-col justify-between">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4">Rata-rata Peserta per Pelatihan</p>
-              <div>
-                <p className="text-5xl font-black text-slate-800 tracking-tight">{analytics?.avgPeserta?.toLocaleString() ?? 0}</p>
-                <p className="text-xs font-medium text-slate-400 mt-1.5">orang / kegiatan</p>
-              </div>
-              <div className="mt-4 h-px bg-slate-100" />
-              <p className="text-xs text-slate-500 mt-3 leading-relaxed">Dari {analytics?.totalPelatihan} pelatihan dengan total {analytics?.totalPeserta?.toLocaleString()} peserta.</p>
-            </div>
-
-            {/* Avg per day */}
-            <div className="bg-white rounded-[1.5rem] border border-slate-100 shadow-sm p-6 flex flex-col justify-between">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4">Rata-rata Peserta per Hari</p>
-              <div>
-                <p className="text-5xl font-black text-slate-800 tracking-tight">{analytics?.avgParticipantsPerDay?.toLocaleString() ?? 0}</p>
-                <p className="text-xs font-medium text-slate-400 mt-1.5">orang / hari pelatihan</p>
-              </div>
-              <div className="mt-4 h-px bg-slate-100" />
-              <p className="text-xs text-slate-500 mt-3 leading-relaxed">Dihitung dari akumulasi {analytics?.totalDays?.toLocaleString() ?? 0} hari durasi kegiatan.</p>
-            </div>
-          </div>
-
-          {/* ─── SEKSI 2: TREN REALISASI ─────────────────────────────────── */}
-          <SectionLabel color="indigo" label="Tren Realisasi" description="Grafik bulanan peserta dilatih dan akumulasi PNBP sepanjang tahun anggaran." />
-
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-            <div className="xl:col-span-2 bg-white rounded-[1.5rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col">
-              <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-white to-slate-50/60">
-                <div className="flex items-center gap-3">
-                  <div className="w-1 h-6 bg-indigo-500 rounded-full" />
-                  <div>
-                    <h3 className="text-sm font-black text-slate-800">Trend Bulanan</h3>
-                    <p className="text-xs text-slate-500 font-medium">Peserta &amp; PNBP per bulan</p>
-                  </div>
-                </div>
-                {analytics && (
-                  <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border ${analytics.isPositiveGrowth ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-red-50 text-red-600 border-red-100"}`}>
-                    <TrendingUp className={`w-3.5 h-3.5 ${analytics.isPositiveGrowth ? "" : "rotate-180"}`} />
-                    {analytics.growthRate > 0 ? "+" : ""}{analytics.growthRate}% bulan ini
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/10 ring-1 ring-white/15 px-3 py-1 backdrop-blur-md text-[10px] font-bold uppercase tracking-[0.2em] text-sky-100">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-300 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-sky-300" />
                   </span>
+                  {isFetching ? "Memperbarui…" : "Realisasi Pelatihan Masyarakat"}
+                </span>
+                <h2 className="mt-3 text-3xl md:text-[44px] font-black tracking-[-0.03em] leading-[1.05]">
+                  Capaian <span className="bg-gradient-to-r from-sky-200 via-white to-blue-200 bg-clip-text text-transparent">s.d. {triwulan}</span> <span className="text-white/40">{tahun}</span>
+                </h2>
+                <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-blue-100/70">
+                  Januari – {BULAN[quarterIdx * 3 + 2]} {tahun} · peserta bersertifikat
+                  {period.growth !== null && (
+                    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold ring-1 ${period.growth >= 0 ? "bg-emerald-400/15 text-emerald-200 ring-emerald-300/30" : "bg-rose-400/15 text-rose-200 ring-rose-300/30"}`}>
+                      {period.growth >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                      {period.growth > 0 ? "+" : ""}
+                      {period.growth}% bulan terakhir
+                    </span>
+                  )}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-1.5 rounded-2xl bg-white/[0.07] ring-1 ring-white/10 p-1.5 backdrop-blur-xl">
+                <label className="relative">
+                  <CalendarRange className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-sky-200" />
+                  <select
+                    value={tahunStr}
+                    onChange={(e) => setTahun(parseInt(e.target.value))}
+                    className="h-9 pl-8 pr-2 rounded-xl border-none bg-white/10 text-sm font-bold text-white outline-none hover:bg-white/15 [&>option]:text-slate-900"
+                    aria-label="Tahun"
+                  >
+                    {years.map((t) => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </label>
+                {QUARTERS.map((q, i) => {
+                  const future = tahun === CURRENT_YEAR && i > CURRENT_QUARTER_IDX;
+                  const active = q === triwulan;
+                  return (
+                    <Tooltip key={q}>
+                      <TooltipTrigger asChild>
+                        <span>
+                          <button
+                            type="button"
+                            disabled={future}
+                            onClick={() => setTriwulan(q)}
+                            className={`h-9 min-w-[48px] px-3 rounded-xl text-xs font-black transition-all ${active ? "bg-white text-[#0B1B3F] shadow-[0_6px_20px_-6px_rgba(255,255,255,0.6)]" : future ? "text-white/25 cursor-not-allowed" : "text-blue-100/80 hover:bg-white/10 hover:text-white"}`}
+                          >
+                            {q.replace("TW ", "TW ")}
+                          </button>
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent className="text-xs font-bold">{future ? "Belum berjalan" : `Akumulasi s.d. ${q}`}</TooltipContent>
+                    </Tooltip>
+                  );
+                })}
+                {!isDefaultPeriod && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTahun(CURRENT_YEAR);
+                      setTriwulan(defaultQuarterFor(CURRENT_YEAR));
+                    }}
+                    className="h-9 px-3 rounded-xl text-xs font-bold text-sky-100 hover:bg-white/10 inline-flex items-center gap-1.5"
+                  >
+                    <RotateCcw className="h-3.5 w-3.5" /> Sekarang
+                  </button>
                 )}
               </div>
-              <div className="p-5 flex-1 max-h-[340px]">
-                <ChartMasyarakatDilatihMonthly data={filteredDataPelatihan} dataUser={filteredDataDukung} tahun={tahun.toString()} triwulan={triwulan} />
-              </div>
             </div>
-            <div className="xl:col-span-1 overflow-hidden">
-              <ChartSektorPembiayaanCard data={filteredDataPelatihan} dataUser={filteredDataDukung} />
-            </div>
-          </div>
 
-          {/* ─── SEKSI 3: STATUS PENYELENGGARAAN ─────────────────────────── */}
-          <SectionLabel color="emerald" label="Status Penyelenggaraan" description="Pipeline tahap administrasi pelatihan — dari pengajuan hingga penerbitan sertifikat." />
-
-          <div className="flex gap-3">
-            <div className="bg-white rounded-[1.5rem] border border-slate-100 shadow-sm overflow-hidden">
-              <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-3 bg-gradient-to-r from-white to-emerald-50/40">
-                <div className="w-1 h-6 bg-emerald-500 rounded-full" />
+            {/* Bento KPI */}
+            <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
+              {/* PNBP */}
+              <div className="group col-span-2 lg:col-span-2 lg:row-span-2 relative isolate overflow-hidden rounded-3xl bg-gradient-to-br from-white/[0.16] to-white/[0.04] ring-1 ring-white/15 p-5 md:p-6 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] flex flex-col justify-between min-h-[190px]">
+                <Wallet aria-hidden strokeWidth={1.5} className="pointer-events-none absolute -right-6 -bottom-8 -z-10 h-40 w-40 -rotate-12 text-amber-300 opacity-20 transition-all duration-500 group-hover:opacity-35 group-hover:-rotate-6" />
+                <div className="pointer-events-none absolute inset-0 -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 [background:linear-gradient(to_left,#F59E0B40_0%,transparent_70%)]" />
+                <div className="flex items-center justify-between">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-sky-100/80">Realisasi PNBP</p>
+                  <span className="rounded-full bg-white/10 ring-1 ring-white/15 px-2.5 py-0.5 text-[10px] font-bold text-sky-100">Penerimaan negara</span>
+                </div>
                 <div>
-                  <h3 className="text-sm font-black text-slate-800">Pipeline Administrasi</h3>
-                  <p className="text-xs text-slate-500 font-medium">Distribusi status {filteredDataPelatihan.length} pelatihan aktif periode ini</p>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <p className="w-fit cursor-help text-4xl md:text-[52px] font-black tracking-[-0.04em] tabular-nums leading-none">{formatToShorthandRupiah(period.pnbp)}</p>
+                    </TooltipTrigger>
+                    <TooltipContent className="text-sm font-bold">{formatToRupiah(period.pnbp)}</TooltipContent>
+                  </Tooltip>
+                  <p className="mt-2 text-xs text-blue-100/60">dari {fmt(totalPeserta)} peserta bersertifikat · {fmt(totalPelatihan)} pelatihan</p>
                 </div>
               </div>
-              <div className="p-6">
-                <StatsMetricStatus data={filteredDataPelatihan} tahun={tahun.toString()} />
-              </div>
-            </div>
-            <div className="xl:col-span-1">
-              <MetricsSummaryPelatihan data={filteredDataPelatihan} tahun={tahun.toString()} />
+
+              <Kpi className="lg:col-span-2" label="Total Pelatihan" value={fmt(totalPelatihan)} unit="kelas" icon={School} accent="#3B82F6" />
+              <Kpi className="lg:col-span-2" label="Masyarakat Dilatih" value={fmt(totalPeserta)} unit="peserta" icon={Users} accent="#06B6D4">
+                <div className="mt-2 flex h-1.5 rounded-full overflow-hidden bg-white/10" title={`Laki-laki ${malePct}% · Perempuan ${femalePct}%`}>
+                  <div className="h-full bg-sky-300" style={{ width: `${malePct}%` }} />
+                  <div className="h-full bg-pink-300" style={{ width: `${femalePct}%` }} />
+                </div>
+                <p className="mt-1 flex justify-between text-[10px] text-blue-100/60">
+                  <span>♂ {fmt(period.male)} · {malePct}%</span>
+                  <span>♀ {fmt(period.female)} · {femalePct}%</span>
+                </p>
+              </Kpi>
+              <Kpi className="lg:col-span-2" label="Penyelesaian" value={`${completionRate}%`} unit={`${fmt(period.done)}/${fmt(totalPelatihan)} kelas`} icon={CheckCircle2} accent="#10B981">
+                <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                  <div className="h-full rounded-full transition-all duration-700" style={{ width: `${completionRate}%`, background: "linear-gradient(90deg,#10B981,#fff)" }} />
+                </div>
+              </Kpi>
+              <Kpi className="lg:col-span-2" label="Rata-rata" value={fmt(avgPeserta)} unit="peserta / kelas" icon={Gauge} accent="#8B5CF6">
+                <p className="mt-1 text-[11px] text-blue-100/60">{fmt(avgPerDay)} peserta / hari · {fmt(period.days)} hari kegiatan</p>
+              </Kpi>
             </div>
           </div>
+        </section>
 
-
-          {/* ─── SEKSI 4: ANALISIS DISTRIBUSI ───────────────────────────── */}
-          <SectionLabel color="violet" label="Analisis Distribusi" description="Breakdown multidimensi: sektor, sumber pembiayaan, klaster, gender, dan penyelenggara." />
-
-          <div className="bg-white rounded-[1.5rem] border border-slate-100 shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center gap-3 bg-gradient-to-r from-white to-violet-50/40">
-              <div className="w-1 h-6 bg-violet-500 rounded-full" />
-              <div>
-                <h3 className="text-sm font-black text-slate-800">Detail Realisasi</h3>
-                <p className="text-xs text-slate-500 font-medium">Distribusi masyarakat dilatih per dimensi analitik</p>
-              </div>
-            </div>
-            <div className="p-0">
-              <ChartDetailMasyarakatDilatih data={filteredDataPelatihan} dataUser={filteredDataDukung} tahun={tahun.toString()} triwulan={triwulan} />
-            </div>
-          </div>
-
-        </div>
-      ) : (
-        <div className="relative max-w-7xl w-full mx-auto mt-20 p-6">
-          <div className="flex flex-col items-center bg-white rounded-[2rem] shadow-xl border border-slate-100 p-12">
-            <Image src="/illustrations/not-found.png" alt="Belum ada data" width={0} height={0} className="w-[320px] md:w-[380px]" />
-            <div className="text-center mt-4">
-              <h1 className="text-2xl font-black text-slate-800 tracking-tight">Belum Ada Data Pelatihan</h1>
-              <p className="text-sm text-slate-500 font-medium mt-2 max-w-sm mx-auto leading-relaxed">
-                Data capaian pelatihan belum tersedia. Pastikan penyelenggaraan pelatihan telah tercatat di sistem.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+        {/* ─── PUSAT INSIGHT: peta + tren + pipeline + aktivitas + komposisi (satu komponen) ─── */}
+        <Section icon={MapIcon} title="Sebaran & Insight Penyelenggara" desc="Klik titik di peta atau nama penyelenggara untuk melihat detailnya." />
+        <PenyelenggaraMap data={period.pel} tahun={tahunStr} />
+      </div>
+    </TooltipProvider>
   );
 };
 
-// ─── Section label ───────────────────────────────────────────────────────────
-const LABEL_COLORS = {
-  blue: { bar: "bg-blue-500", dot: "bg-blue-100", text: "text-blue-600" },
-  indigo: { bar: "bg-indigo-500", dot: "bg-indigo-100", text: "text-indigo-600" },
-  emerald: { bar: "bg-emerald-500", dot: "bg-emerald-100", text: "text-emerald-600" },
-  violet: { bar: "bg-violet-500", dot: "bg-violet-100", text: "text-violet-600" },
-} as const;
+/* ============================ UI ============================ */
 
-function SectionLabel({
-  label,
-  description,
-  color = "blue",
-}: {
-  label: string;
-  description: string;
-  color?: keyof typeof LABEL_COLORS;
-}) {
-  const c = LABEL_COLORS[color];
+function Kpi({ label, value, unit, icon: Icon, accent, className = "", children }: { label: string; value: string; unit: string; icon: LucideIcon; accent: string; className?: string; children?: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-4">
-      <div className={`w-1 h-10 ${c.bar} rounded-full flex-shrink-0`} />
-      <div className="flex-1 min-w-0">
-        <h3 className="text-lg font-black text-slate-800 tracking-tight leading-none">{label}</h3>
-        <p className="text-xs text-slate-500 font-medium mt-1 leading-relaxed">{description}</p>
+    <div className={`group relative isolate overflow-hidden rounded-3xl bg-white/[0.07] ring-1 ring-white/10 p-4 md:p-5 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] transition-colors hover:bg-white/[0.1] ${className}`}>
+      <div className="pointer-events-none absolute inset-0 -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: `linear-gradient(to left, ${accent}40 0%, transparent 75%)` }} />
+      <Icon aria-hidden strokeWidth={1.5} className="pointer-events-none absolute -right-4 -bottom-5 -z-10 h-24 w-24 -rotate-12 opacity-20 transition-all duration-500 group-hover:opacity-40 group-hover:-rotate-6" style={{ color: accent }} />
+      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-sky-100/70">{label}</p>
+      <div className="mt-1 flex items-baseline gap-1.5">
+        <span className="text-2xl md:text-3xl font-black tracking-tight tabular-nums">{value}</span>
+        <span className="text-[10px] font-bold uppercase text-sky-100/60">{unit}</span>
       </div>
+      {children}
     </div>
   );
 }
 
-export default SummaryPelatihan;
+function Section({ icon: Icon, title, desc }: { icon: LucideIcon; title: string; desc: string }) {
+  return (
+    <div className="flex items-center gap-3 pt-2">
+      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0B1B3F]/5 dark:bg-white/5 text-[#0B1B3F] dark:text-sky-200">
+        <Icon className="h-4 w-4" />
+      </span>
+      <div className="min-w-0">
+        <h3 className="text-base font-black text-slate-900 dark:text-white tracking-tight leading-tight">{title}</h3>
+        <p className="text-xs text-slate-500 truncate">{desc}</p>
+      </div>
+      <span className="ml-2 hidden md:block h-px flex-1 bg-gradient-to-r from-slate-200 to-transparent dark:from-slate-800" />
+    </div>
+  );
+}
 
+const SummarySkeleton = () => (
+  <div className="flex flex-col gap-6 animate-pulse">
+    <div className="h-80 rounded-[2rem] bg-slate-200 dark:bg-slate-800" />
+    <div className="h-[420px] rounded-3xl bg-slate-100 dark:bg-slate-800" />
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+      <div className="h-[380px] xl:col-span-2 rounded-3xl bg-slate-100 dark:bg-slate-800" />
+      <div className="h-[380px] rounded-3xl bg-slate-100 dark:bg-slate-800" />
+    </div>
+  </div>
+);
+
+export default SummaryPelatihan;

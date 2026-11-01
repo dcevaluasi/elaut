@@ -1,43 +1,32 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import { PelatihanMasyarakat } from "@/types/product";
-import { generateTanggalPelatihan, getStatusInfo, splitCityAndDate } from "@/utils/text";
 import Cookies from "js-cookie";
 import Link from "next/link";
-import { urlFileBeritaAcara, urlFileLapwas } from "@/constants/urls";
 import {
-    TbPencilCheck, TbPencilX, TbSend, TbSettings, TbDownload,
-    TbCertificate, TbShieldCheck, TbUsers, TbFileText,
-    TbCheck, TbLock, TbChevronDown, TbChevronUp, TbCircleCheck,
-    TbFileSpreadsheet, TbSignature, TbClipboardCheck, TbRocket,
-    TbAlertCircle, TbExternalLink,
+    TbPencilCheck, TbPencilX, TbSend, TbCertificate, TbShieldCheck, TbFileText, TbCheck, TbLock,
+    TbCircleCheck, TbFileSpreadsheet, TbSignature, TbClipboardCheck, TbAlertCircle, TbArrowRight, TbArrowLeft,
 } from "react-icons/tb";
 import { LuSignature } from "react-icons/lu";
-import { Button } from "@/components/ui/button";
-import UserPelatihanTable from "./Tables/UserPelatihanTable";
-import {
-    countUserWithCertificate, countUserWithNoStatus, countUserWithPassed,
-} from "@/utils/counter";
-import TTDeDetail from "./TTDeDetail";
+import { RiVerifiedBadgeFill } from "react-icons/ri";
+import { Download, Printer, Loader2, X } from "lucide-react";
+
+import { PelatihanMasyarakat } from "@/types/product";
+import { generateTanggalPelatihan, getStatusInfo, splitCityAndDate } from "@/utils/text";
+import { urlFileBeritaAcara, urlFileLapwas } from "@/constants/urls";
 import { ESELON_1 } from "@/constants/nomenclatures";
+import { countUserWithCertificate, countUserWithNoStatus, countUserWithPassed } from "@/utils/counter";
 import { useFetchDataPusatById } from "@/hooks/elaut/pusat/useFetchDataPusatById";
 import { downloadAndZipPDFs } from "@/utils/file";
+import { truncateText } from "@/utils";
+import Toast from "@/commons/Toast";
 import SendNoteAction from "@/commons/actions/lemdiklat/SendNoteAction";
 import { PassedParticipantAction } from "@/commons/actions/lemdiklat/PassedParticipantAction";
-import { truncateText } from "@/utils";
-import { RiVerifiedBadgeFill } from "react-icons/ri";
 import DialogSertifikatPelatihan, { DialogSertifikatHandle } from "@/components/sertifikat/dialogSertifikatPelatihan";
-import { Progress } from "@/components/ui/progress";
-import Toast from "@/commons/Toast";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-    ShieldCheck, FileText, Download, Printer, CheckCircle2,
-    Lock, Award, Users, FileCheck,
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import UserPelatihanTable from "./Tables/UserPelatihanTable";
+import TTDeDetail from "./TTDeDetail";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -45,550 +34,620 @@ interface Props {
 }
 
 type StepState = "done" | "active" | "locked";
+type IconType = React.ComponentType<{ className?: string }>;
 
-// ─── Small helper ─────────────────────────────────────────────────────────────
-const InfoRow = ({ label, value }: { label: string; value?: string }) => (
-    <div className="flex items-start gap-3 py-2 border-b border-slate-100 dark:border-white/[0.04] last:border-0">
-        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 w-32 shrink-0 mt-0.5">{label}</p>
-        <p className="text-xs font-bold text-slate-800 dark:text-white min-w-0 flex-1">{value || "—"}</p>
-    </div>
-);
+interface SttplStep {
+    id: number;
+    title: string;
+    subtitle: string;
+    icon: IconType;
+    accent: string;
+    state: StepState;
+    lockReason?: string;
+}
+
+const SIGNING_FLOW = ["7A", "7B", "7C", "7D", "8", "9", "10", "11", "12", "13", "14", "15"];
+const SIGNING_DONE = ["7C", "10", "14"];
+const CERT_BASE = "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde";
+
+/* ============================ KOMPONEN ============================ */
 
 const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
     const { adminPusatData } = useFetchDataPusatById(data?.VerifikatorPelatihan);
-    const [isPrinting, setIsPrinting] = React.useState(false);
-    const [progress, setProgress] = React.useState<number>(0);
-    const [counter, setCounter] = React.useState<number>(0);
-    const [isUploading, setIsUploading] = React.useState<boolean>(false);
-    const [isZipping, setIsZipping] = React.useState(false);
-    const [openSteps, setOpenSteps] = React.useState<number[]>([0, 1, 2, 3, 4]);
 
+    const [isPrinting, setIsPrinting] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [counter, setCounter] = useState(0);
+    const [isDownloading, setIsDownloading] = useState(false);
+    const [isZipping, setIsZipping] = useState(false);
+
+    const peserta = useMemo(() => data.UserPelatihan || [], [data.UserPelatihan]);
+
+    // Ref per peserta untuk unduh massal
     const refs = useRef<React.RefObject<DialogSertifikatHandle>[]>([]);
-    if (refs.current.length !== data.UserPelatihan.length) {
-        refs.current = data.UserPelatihan.map((_, i) => refs.current[i] ?? React.createRef<DialogSertifikatHandle>());
+    if (refs.current.length !== peserta.length) {
+        refs.current = peserta.map((_, i) => refs.current[i] ?? React.createRef<DialogSertifikatHandle>());
     }
 
-    const toggleStep = (id: number) =>
-        setOpenSteps(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]);
+    /* ---------- Hak akses (sekali) ---------- */
+    const [acc] = useState(() => ({ access: Cookies.get("Access") || "", role: Cookies.get("Role") || "" }));
+    const isAdmin = acc.access.includes("createPelatihan");
+    const isVerifikator = acc.access.includes("verifyCertificate");
+    const isKabalai = acc.access.includes("approveKabalai");
+    const isKapus = acc.access.includes("approveKapus");
+    const isKabadan = acc.access.includes("approveKabadan");
+    const isSigning = acc.access.includes("isSigning");
 
-    // ── Derived state ─────────────────────────────────────────────────────────
-    const statusNum = parseFloat(data.StatusPenerbitan) || 0;
-    const totalPeserta = data.UserPelatihan.length;
-    const allPassed = countUserWithNoStatus(data.UserPelatihan) === 0 && totalPeserta > 0;
-    const passedCount = countUserWithPassed(data.UserPelatihan);
-    const certCount = countUserWithCertificate(data.UserPelatihan);
-    const allCertified = certCount === totalPeserta && totalPeserta > 0;
-    const inSigningFlow = ["7A", "7B", "7C", "7D", "8", "9", "10", "11", "12", "13", "14", "15"].includes(data.StatusPenerbitan);
-    const signingDone = ["7C", "10", "14"].includes(data.StatusPenerbitan) || allCertified;
-    const isSttplSubmitted = statusNum >= 6;
+    /* ---------- Turunan (dihitung sekali) ---------- */
+    const status = String(data.StatusPenerbitan ?? "");
+    const statusNum = parseFloat(status) || 0;
+    const statusInfo = getStatusInfo(status);
+    const ttd = data.TtdSertifikat || "";
+    const id = data.IdPelatihan.toString();
+
+    const counts = useMemo(
+        () => ({ belum: countUserWithNoStatus(peserta), lulus: countUserWithPassed(peserta), cert: countUserWithCertificate(peserta) }),
+        [peserta]
+    );
+    const total = peserta.length;
+    const allPassed = total > 0 && counts.belum === 0;
+    const allCertified = total > 0 && counts.cert === total;
+    const inSigningFlow = SIGNING_FLOW.includes(status);
+    const signingDone = SIGNING_DONE.includes(status) || allCertified;
+    const isSubmitted = statusNum >= 6;
     const isVerified = statusNum > 6;
+    const showTTDe = isSigning && !!ttd && acc.role.includes(ttd) && statusNum >= 7 && statusNum <= 15;
 
-    const isAdmin = Cookies.get('Access')?.includes('createPelatihan');
-    const isVerifikator = Cookies.get('Access')?.includes('verifyCertificate');
-    const isKabalai = Cookies.get('Access')?.includes('approveKabalai');
-    const isKapus = Cookies.get('Access')?.includes('approveKapus');
-    const isKabadan = Cookies.get('Access')?.includes('approveKabadan');
-    const isSigning = Cookies.get('Access')?.includes('isSigning');
+    /* ---------- Langkah ---------- */
+    const steps: SttplStep[] = [
+        {
+            id: 0, title: "Kelulusan Peserta", icon: TbClipboardCheck, accent: "#3B82F6",
+            subtitle: allPassed ? `${counts.lulus} peserta lulus` : `${counts.belum} peserta belum ditentukan`,
+            state: allPassed ? "done" : "active",
+        },
+        {
+            id: 1, title: "Ajukan Penerbitan", icon: LuSignature as IconType, accent: "#8B5CF6",
+            subtitle: isSubmitted ? "Pengajuan telah dikirim" : allPassed ? "Siap diajukan ke Pusat" : "Tentukan kelulusan dulu",
+            state: isSubmitted ? "done" : allPassed ? "active" : "locked", lockReason: "Semua peserta harus ditentukan kelulusannya",
+        },
+        {
+            id: 2, title: "Verifikasi Pusat", icon: TbShieldCheck, accent: "#06B6D4",
+            subtitle: isVerified ? "Telah diverifikasi" : status === "6" ? "Menunggu verifikasi" : "Belum diajukan",
+            state: isVerified ? "done" : status === "6" ? "active" : "locked", lockReason: "Ajukan penerbitan STTPL dulu",
+        },
+        {
+            id: 3, title: "TTD Digital (BSrE)", icon: TbSignature, accent: "#10B981",
+            subtitle: signingDone ? "Penandatanganan selesai" : inSigningFlow ? statusInfo.label : "Menunggu verifikasi",
+            state: signingDone ? "done" : inSigningFlow ? "active" : "locked", lockReason: "Verifikasi Pusat harus selesai dulu",
+        },
+        {
+            id: 4, title: "e-STTPL Terbit", icon: TbCertificate, accent: "#F59E0B",
+            subtitle: allCertified ? `Semua ${total} e-STTPL terbit` : signingDone ? `${counts.cert} dari ${total} terbit` : "Menunggu penandatanganan",
+            state: allCertified ? "done" : signingDone ? "active" : "locked", lockReason: "Penandatanganan BSrE harus selesai dulu",
+        },
+    ];
+    const completed = steps.filter((s) => s.state === "done").length;
+    const pct = Math.round((completed / steps.length) * 100);
+    const firstActive = steps.find((s) => s.state === "active")?.id;
 
-    // ── Utilities ─────────────────────────────────────────────────────────────
+    const [current, setCurrent] = useState<number>(() => firstActive ?? 4);
+    const step = steps[current];
+
+    /* ---------- Aksi kontekstual ---------- */
+    const approveVerifStatus = ttd.includes("Kepala Balai") ? "7A" : "8";
+    const nextHint =
+        isVerifikator && status === "6" ? "Periksa pengajuan e-STTPL lalu approve atau minta perbaikan."
+            : isKabalai && status === "7A" ? "Setujui penerbitan untuk lanjut ke TTD BSrE Kabalai."
+                : isKapus && status === "8" ? "Setujui penerbitan e-STTPL."
+                    : isKabadan && status === "12" ? "Setujui penerbitan e-STTPL Kepala BPPSDM KP."
+                        : isAdmin && (status === "7" || status === "9") ? "Perbaiki pengajuan lalu kirim kembali ke verifikator."
+                            : isAdmin && !allPassed ? `Tentukan kelulusan ${counts.belum} peserta.`
+                                : isAdmin && allPassed && !isSubmitted ? "Kelulusan lengkap — ajukan penerbitan STTPL."
+                                    : null;
+    const showActionBar = isAdmin || isVerifikator || isKabalai || isKapus || isKabadan;
+
+    /* ---------- Unduhan ---------- */
     const handleDownloadAll = async () => {
-        setIsUploading(true);
+        setIsDownloading(true);
         setProgress(0);
-        for (let i = 0; i < refs.current.length; i++) {
-            await refs.current[i].current?.downloadPdf?.();
-            setProgress(((i + 1) / refs.current.length) * 100);
-            setCounter(i + 1);
+        setCounter(0);
+        try {
+            for (let i = 0; i < refs.current.length; i++) {
+                await refs.current[i].current?.downloadPdf?.();
+                setProgress(((i + 1) / refs.current.length) * 100);
+                setCounter(i + 1);
+            }
+            Toast.fire({ icon: "success", title: "Semua e-STTPL diunduh" });
+        } catch (e) {
+            console.error(e);
+            Toast.fire({ icon: "error", title: "Sebagian unduhan gagal" });
+        } finally {
+            setIsDownloading(false);
         }
-        setIsUploading(false);
     };
 
     const handleDownloadZip = async () => {
         setIsZipping(true);
         try {
             await downloadAndZipPDFs(
-                data.UserPelatihan,
-                `(${data.Program}) ${data.PenyelenggaraPelatihan} - ${generateTanggalPelatihan(data.TanggalMulaiPelatihan)} - ${generateTanggalPelatihan(data.TanggalBerakhirPelatihan)}`,
+                peserta,
+                `(${data.Program}) ${data.PenyelenggaraPelatihan} - ${generateTanggalPelatihan(data.TanggalMulaiPelatihan)} - ${generateTanggalPelatihan(data.TanggalBerakhirPelatihan)}`
             );
-        } catch (err) { console.error(err); }
-        finally { setIsZipping(false); }
+        } catch (e) {
+            console.error(e);
+            Toast.fire({ icon: "error", title: "Gagal membuat ZIP" });
+        } finally {
+            setIsZipping(false);
+        }
     };
 
     const handleDownloadExcel = () => {
-        const rows = data.UserPelatihan.map((item, idx) => {
-            let tempatLahir = (item as any).TempatLahir ?? "-";
-            let tanggalLahir = (item as any).TanggalLahir ?? "-";
+        const rows = peserta.map((item: any, idx) => {
+            let tempatLahir = item.TempatLahir ?? "-";
+            let tanggalLahir = item.TanggalLahir ?? "-";
             if (item.TempatTanggalLahir) {
                 try {
-                    const result = splitCityAndDate(item.TempatTanggalLahir);
-                    if (result.city && result.city !== "-") tempatLahir = result.city;
-                    if (result.date && result.date !== "-") tanggalLahir = result.date;
+                    const r = splitCityAndDate(item.TempatTanggalLahir);
+                    if (r.city && r.city !== "-") tempatLahir = r.city;
+                    if (r.date && r.date !== "-") tanggalLahir = r.date;
                 } catch {
-                    const commaMatch = item.TempatTanggalLahir.match(/^([^,]+),?\s*(.*)$/);
-                    if (commaMatch?.[2]) { tempatLahir = commaMatch[1].trim(); tanggalLahir = commaMatch[2].trim(); }
-                    else { tempatLahir = item.TempatTanggalLahir; }
+                    const m = String(item.TempatTanggalLahir).match(/^([^,]+),?\s*(.*)$/);
+                    if (m?.[2]) {
+                        tempatLahir = m[1].trim();
+                        tanggalLahir = m[2].trim();
+                    } else tempatLahir = item.TempatTanggalLahir;
                 }
             }
             return {
                 No: idx + 1,
-                Nama: item.Nama ?? (item as any).User?.Nama ?? "-",
-                NIK: (item as any).Nik ?? (item as any).User?.Nik ?? "-",
-                "No Telpon": (item as any).NoTelpon ?? (item as any).User?.NoTelpon ?? "-",
-                "Kabupaten / Kota": (item as any).Kota ?? (item as any).Kabupaten ?? "-",
-                Provinsi: item.Provinsi ?? (item as any).User?.Provinsi ?? "-",
-                Alamat: (item as any).Alamat ?? (item as any).User?.Alamat ?? "-",
+                Nama: item.Nama ?? item.User?.Nama ?? "-",
+                NIK: item.Nik ?? item.User?.Nik ?? "-",
+                "No Telpon": item.NoTelpon ?? item.User?.NoTelpon ?? "-",
+                "Kabupaten / Kota": item.Kota ?? item.Kabupaten ?? "-",
+                Provinsi: item.Provinsi ?? item.User?.Provinsi ?? "-",
+                Alamat: item.Alamat ?? item.User?.Alamat ?? "-",
                 "Tempat Lahir": tempatLahir,
                 "Tanggal Lahir": tanggalLahir,
                 "Jenis Kelamin": item.JenisKelamin ?? "-",
                 "Pendidikan Terakhir": item.PendidikanTerakhir ?? "-",
-                "No STTPL": item.NoRegistrasi ?? (item as any).NoSertifikat ?? "-",
-                "Link File STTPL": item.FileSertifikat ? `https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${item.FileSertifikat}` : "-",
+                "No STTPL": item.NoRegistrasi ?? item.NoSertifikat ?? "-",
+                "Link File STTPL": item.FileSertifikat ? `${CERT_BASE}/${item.FileSertifikat}` : "-",
             };
         });
         const ws = XLSX.utils.json_to_sheet(rows);
-        ws["!cols"] = [{ wch: 6 }, { wch: 35 }, { wch: 20 }, { wch: 18 }, { wch: 22 }, { wch: 22 }, { wch: 40 }, { wch: 22 }, { wch: 18 }, { wch: 16 }, { wch: 22 }, { wch: 30 }, { wch: 65 }];
+        ws["!cols"] = [6, 35, 20, 18, 22, 22, 40, 22, 18, 16, 22, 30, 65].map((wch) => ({ wch }));
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Peserta STTPL");
         saveAs(new Blob([XLSX.write(wb, { bookType: "xlsx", type: "array" })], { type: "application/octet-stream" }), `Daftar_Peserta_STTPL_${data.NamaPelatihan ?? "Pelatihan"}.xlsx`);
-        Toast.fire({ icon: "success", title: "Berhasil!", text: "File Excel berhasil diunduh." });
+        Toast.fire({ icon: "success", title: "File Excel diunduh" });
     };
 
-    // ── Timeline steps ────────────────────────────────────────────────────────
-    interface SttplStep { id: number; title: string; subtitle: string; icon: React.ReactNode; state: StepState; lockReason?: string; }
-    const steps: SttplStep[] = [
-        {
-            id: 0, icon: <TbClipboardCheck />,
-            title: "Kelulusan Peserta",
-            subtitle: allPassed ? `${passedCount} peserta telah diverifikasi kelulusannya` : `${countUserWithNoStatus(data.UserPelatihan)} peserta belum ditentukan kelulusannya`,
-            state: allPassed ? "done" : "active",
-        },
-        {
-            id: 1, icon: <LuSignature />,
-            title: "Ajukan Penerbitan STTPL",
-            subtitle: isSttplSubmitted ? "Pengajuan telah dikirim" : allPassed ? "Siap diajukan ke Pusat" : "Verifikasi kelulusan peserta terlebih dahulu",
-            state: isSttplSubmitted ? "done" : allPassed ? "active" : "locked",
-            lockReason: "Semua peserta harus ditentukan kelulusannya",
-        },
-        {
-            id: 2, icon: <TbShieldCheck />,
-            title: "Verifikasi Pusat",
-            subtitle: isVerified ? "Telah diverifikasi Pusat" : data.StatusPenerbitan === "6" ? "Menunggu verifikasi Pusat" : "Belum diajukan",
-            state: isVerified ? "done" : data.StatusPenerbitan === "6" ? "active" : "locked",
-            lockReason: "Ajukan penerbitan STTPL terlebih dahulu",
-        },
-        {
-            id: 3, icon: <TbSignature />,
-            title: "Penandatanganan Digital (BSrE)",
-            subtitle: signingDone ? "Proses penandatanganan selesai" : inSigningFlow ? `Status: ${getStatusInfo(data.StatusPenerbitan).label}` : "Menunggu verifikasi Pusat",
-            state: signingDone ? "done" : inSigningFlow ? "active" : "locked",
-            lockReason: "Verifikasi Pusat harus selesai lebih dahulu",
-        },
-        {
-            id: 4, icon: <TbCertificate />,
-            title: "e-STTPL Terbit",
-            subtitle: allCertified ? `Semua ${totalPeserta} e-STTPL telah terbit` : signingDone ? `${certCount} dari ${totalPeserta} e-STTPL terbit` : "Proses penandatanganan belum selesai",
-            state: allCertified ? "done" : signingDone ? "active" : "locked",
-            lockReason: "Penandatanganan BSrE harus selesai lebih dahulu",
-        },
-    ];
-
-    const completedCount = steps.filter(s => s.state === "done").length;
+    /* ============================ RENDER ============================ */
 
     return (
-        <div className="w-full space-y-6 py-1">
-
-            {/* ── Action Row ──────────────────────────────────────────────── */}
-            {(isAdmin || isVerifikator || isKabalai || isKapus || isKabadan) && (
-                <div className="flex flex-wrap items-center gap-2 p-4 bg-white dark:bg-slate-900/80 rounded-2xl border border-slate-100 dark:border-white/[0.05] shadow-sm">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-1">Aksi:</span>
-
-
-                    {/* Re-ajukan ke Verifikator */}
-                    {isAdmin && (data.StatusPenerbitan === "7" || data.StatusPenerbitan === "9") && (
-                        <SendNoteAction idPelatihan={data.IdPelatihan.toString()} title="Kirim ke Verifikator" description="Perbaiki pengajuan penerbitan STTPL" buttonLabel="Kirim ke Verifikator" icon={TbSend} buttonColor="teal" onSuccess={fetchData} status="6" pelatihan={data} />
-                    )}
-
-                    {/* Verifikator actions */}
-                    {isVerifikator && data.StatusPenerbitan === "6" && (
-                        <>
-                            <SendNoteAction idPelatihan={data.IdPelatihan.toString()} title="Perbaikan" description="Berikan catatan perbaikan" buttonLabel="Perbaikan Penerbitan" icon={TbPencilX} buttonColor="rose" onSuccess={fetchData} status="7" pelatihan={data} />
-                            <SendNoteAction idPelatihan={data.IdPelatihan.toString()} title="Approve Penerbitan" description="Setujui pengajuan penerbitan STTPL" buttonLabel="Approve Penerbitan" icon={TbPencilCheck} buttonColor="blue" onSuccess={fetchData} status={data.TtdSertifikat.includes("Kepala Balai") ? "7A" : "8"} pelatihan={data} />
-                        </>
-                    )}
-
-                    {/* Kabalai */}
-                    {isKabalai && data.StatusPenerbitan === "7A" && (
-                        <SendNoteAction idPelatihan={data.IdPelatihan.toString()} title="Approve Penerbitan" description="Approval pengajuan penerbitan STTPL" buttonLabel="Approve Penerbitan" icon={TbPencilCheck} buttonColor="teal" onSuccess={fetchData} status="7B" pelatihan={data} />
-                    )}
-
-                    {/* Kapus */}
-                    {isKapus && data.StatusPenerbitan === "8" && (
-                        <SendNoteAction idPelatihan={data.IdPelatihan.toString()} title="Approve Penerbitan" description={data.TtdSertifikat === ESELON_1.fullName ? "Diteruskan ke Kabadan" : "Approval penerbitan STTPL"} buttonLabel="Approve Penerbitan" icon={TbPencilCheck} buttonColor="teal" onSuccess={fetchData} status={data.TtdSertifikat === ESELON_1.fullName ? "12" : "10"} pelatihan={data} />
-                    )}
-
-                    {/* Kabadan */}
-                    {isKabadan && data.StatusPenerbitan === "12" && (
-                        <SendNoteAction idPelatihan={data.IdPelatihan.toString()} title="Approve Penerbitan" description="Approval penerbitan STTPL Kepala BPPSDM KP" buttonLabel="Approve Penerbitan" icon={TbPencilCheck} buttonColor="green" onSuccess={fetchData} status="14" pelatihan={data} />
-                    )}
-                </div>
-            )}
-
-            {/* TTDe block for active signers */}
-            {Cookies.get('Role')?.includes(data?.TtdSertifikat) && isSigning && (parseInt(data.StatusPenerbitan) >= 7 && parseInt(data.StatusPenerbitan) <= 15) && (
-                <div className="relative group">
-                    <TTDeDetail data={data} fetchData={fetchData} />
-                </div>
-            )}
-
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
-
-                {/* ── LEFT: Vertical Timeline ────────────────────────────── */}
-                <div>
-                    {/* Progress header */}
-                    <div className="flex items-center justify-between mb-5 px-1">
-                        <div>
-                            <h2 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-tight">Tahapan Penerbitan e-STTPL</h2>
-                            <p className="text-[11px] text-slate-400 mt-0.5">{completedCount} dari {steps.length} tahap selesai</p>
+        <div className="w-full space-y-5">
+            {/* ---------- Bar aksi ---------- */}
+            {showActionBar && (
+                <div className="rounded-3xl bg-white dark:bg-slate-900 ring-1 ring-slate-200/80 dark:ring-slate-800 shadow-sm p-3 md:p-4 flex flex-col lg:flex-row lg:items-center gap-3">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                        <span className="relative isolate flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#0B1B3F] text-sky-100">
+                            <span className="absolute inset-0 -z-10 bg-[radial-gradient(80%_80%_at_0%_0%,#8B5CF6_0%,transparent_70%)]" />
+                            <TbArrowRight className="w-5 h-5" />
+                        </span>
+                        <div className="min-w-0">
+                            <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Langkah berikutnya</p>
+                            <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200">{nextHint || "Tidak ada aksi yang menunggu Anda."}</p>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-32 h-2 bg-slate-100 dark:bg-white/[0.06] rounded-full overflow-hidden">
-                                <div className="h-full bg-gradient-to-r from-indigo-600 to-emerald-500 rounded-full transition-all duration-700"
-                                    style={{ width: `${(completedCount / steps.length) * 100}%` }} />
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                        {isAdmin && (status === "7" || status === "9") && (
+                            <SendNoteAction idPelatihan={id} title="Kirim ke Verifikator" description="Perbaiki pengajuan penerbitan STTPL" buttonLabel="Kirim ke Verifikator" icon={TbSend} buttonColor="teal" onSuccess={fetchData} status="6" pelatihan={data} />
+                        )}
+                        {isVerifikator && status === "6" && (
+                            <>
+                                <SendNoteAction idPelatihan={id} title="Perbaikan" description="Berikan catatan perbaikan" buttonLabel="Minta Perbaikan" icon={TbPencilX} buttonColor="rose" onSuccess={fetchData} status="7" pelatihan={data} />
+                                <SendNoteAction idPelatihan={id} title="Approve Penerbitan" description="Setujui pengajuan penerbitan STTPL" buttonLabel="Approve Penerbitan" icon={TbPencilCheck} buttonColor="blue" onSuccess={fetchData} status={approveVerifStatus} pelatihan={data} />
+                            </>
+                        )}
+                        {isKabalai && status === "7A" && (
+                            <SendNoteAction idPelatihan={id} title="Approve Penerbitan" description="Approval pengajuan penerbitan STTPL" buttonLabel="Approve Penerbitan" icon={TbPencilCheck} buttonColor="teal" onSuccess={fetchData} status="7B" pelatihan={data} />
+                        )}
+                        {isKapus && status === "8" && (
+                            <SendNoteAction
+                                idPelatihan={id}
+                                title="Approve Penerbitan"
+                                description={ttd === ESELON_1.fullName ? "Diteruskan ke Kabadan" : "Approval penerbitan STTPL"}
+                                buttonLabel="Approve Penerbitan"
+                                icon={TbPencilCheck}
+                                buttonColor="teal"
+                                onSuccess={fetchData}
+                                status={ttd === ESELON_1.fullName ? "12" : "10"}
+                                pelatihan={data}
+                            />
+                        )}
+                        {isKabadan && status === "12" && (
+                            <SendNoteAction idPelatihan={id} title="Approve Penerbitan" description="Approval penerbitan STTPL Kepala BPPSDM KP" buttonLabel="Approve Penerbitan" icon={TbPencilCheck} buttonColor="green" onSuccess={fetchData} status="14" pelatihan={data} />
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* ---------- Panel TTDe untuk penandatangan ---------- */}
+            {showTTDe && <TTDeDetail data={data} fetchData={fetchData} />}
+
+            <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-4 lg:gap-5 items-start">
+                {/* ---------- KIRI: timeline navy ---------- */}
+                <aside className="lg:sticky lg:top-24 relative isolate overflow-hidden rounded-3xl bg-[#0B1B3F] p-5 text-white ring-1 ring-white/10 shadow-[0_20px_50px_-20px_rgba(37,99,235,0.5)]">
+                    <div className="absolute inset-0 -z-10 bg-[radial-gradient(80%_50%_at_0%_0%,#7C3AED_0%,transparent_60%),radial-gradient(70%_50%_at_100%_100%,#0EA5E9_0%,transparent_60%)] opacity-70" />
+                    <div className="absolute inset-0 -z-10 opacity-[0.12] [background-image:radial-gradient(rgba(255,255,255,0.8)_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(to_bottom,black,transparent_80%)]" />
+                    <TbCertificate aria-hidden className="pointer-events-none absolute -right-6 -bottom-8 -z-10 w-40 h-40 -rotate-12 text-violet-300 opacity-10" />
+
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-sky-200/80">Penerbitan e-STTPL</p>
+                    <div className="mt-1 flex items-baseline justify-between">
+                        <h2 className="text-xl font-black tracking-tight">{completed}/{steps.length} selesai</h2>
+                        <span className="text-sm font-black tabular-nums">{pct}%</span>
+                    </div>
+                    <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                        <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, background: "linear-gradient(90deg,#A78BFA,#fff)" }} />
+                    </div>
+                    <p className="mt-2 inline-flex items-center gap-1.5 text-[11px] text-blue-100/70">
+                        Stage <span className="font-mono font-bold text-white">{status || "-"}</span> · {statusInfo.label}
+                    </p>
+
+                    <ol className="mt-5 flex lg:block gap-2 lg:space-y-1 overflow-x-auto lg:overflow-visible -mx-1 px-1 pb-1 lg:pb-0 scrollbar-hide">
+                        {steps.map((s, i) => {
+                            const Icon = s.icon;
+                            const sel = i === current;
+                            const done = s.state === "done";
+                            const locked = s.state === "locked";
+                            const needs = s.state === "active";
+                            const last = i === steps.length - 1;
+                            return (
+                                <li key={s.id} className="relative shrink-0 min-w-[210px] lg:min-w-0">
+                                    {!last && (
+                                        <span className="hidden lg:block absolute left-[25px] top-[50px] bottom-[-6px] w-[2px] rounded-full bg-white/10 overflow-hidden">
+                                            <span className="block w-full bg-gradient-to-b from-emerald-400 to-sky-400 transition-all duration-500" style={{ height: done ? "100%" : "0%" }} />
+                                        </span>
+                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={() => setCurrent(i)}
+                                        aria-current={sel ? "step" : undefined}
+                                        className={`group relative isolate w-full flex items-start gap-3 rounded-2xl p-2.5 text-left transition-all duration-300 overflow-hidden ${sel ? "bg-white/[0.12] backdrop-blur-xl ring-1 ring-white/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]" : "hover:bg-white/[0.06]"} ${locked && !sel ? "opacity-60" : ""}`}
+                                    >
+                                        {sel && <span aria-hidden className="pointer-events-none absolute inset-0 -z-10" style={{ background: `linear-gradient(to left, ${s.accent}59 0%, ${s.accent}1f 45%, transparent 85%)` }} />}
+                                        <span
+                                            className={`relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ring-1 transition-all duration-300 ${done ? "bg-emerald-500 ring-emerald-300/40 text-white" : sel || needs ? "text-white ring-white/30" : "bg-white/10 ring-white/10 text-sky-100/70"}`}
+                                            style={!done && (sel || needs) ? { background: s.accent, boxShadow: `0 6px 18px -4px ${s.accent}` } : undefined}
+                                        >
+                                            {done ? <TbCheck className="w-[18px] h-[18px]" /> : locked ? <TbLock className="w-4 h-4" /> : <Icon className="w-[18px] h-[18px]" />}
+                                        </span>
+                                        <span className="min-w-0 flex-1 pt-0.5">
+                                            <span className="flex items-center gap-2">
+                                                <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-blue-100/45">Tahap {i + 1}</span>
+                                                {done && <span className="text-[9px] font-bold text-emerald-300">Selesai</span>}
+                                                {needs && <span className="text-[9px] font-bold text-amber-300">Berlangsung</span>}
+                                            </span>
+                                            <span className={`block text-sm font-bold ${sel ? "text-white" : "text-blue-50/90"}`}>{s.title}</span>
+                                            <span className="block text-[11px] text-blue-100/55 truncate">{locked ? s.lockReason : s.subtitle}</span>
+                                        </span>
+                                    </button>
+                                </li>
+                            );
+                        })}
+                    </ol>
+
+                    {/* Statistik ringkas */}
+                    <div className="mt-4 grid grid-cols-2 gap-2">
+                        {[
+                            { label: "Peserta", val: total, cls: "text-white" },
+                            { label: "Lulus", val: counts.lulus, cls: "text-emerald-300" },
+                            { label: "Belum", val: counts.belum, cls: counts.belum ? "text-amber-300" : "text-white/60" },
+                            { label: "e-STTPL", val: counts.cert, cls: "text-violet-200" },
+                        ].map((m) => (
+                            <div key={m.label} className="rounded-2xl bg-white/[0.06] ring-1 ring-white/10 px-3 py-2.5">
+                                <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-blue-100/50">{m.label}</p>
+                                <p className={`text-xl font-black tabular-nums ${m.cls}`}>{m.val.toLocaleString("id-ID")}</p>
                             </div>
-                            <span className="text-xs font-black text-slate-600 dark:text-slate-300">{Math.round((completedCount / steps.length) * 100)}%</span>
+                        ))}
+                    </div>
+                </aside>
+
+                {/* ---------- KANAN: panel tahap terpilih ---------- */}
+                <div className="rounded-3xl bg-white dark:bg-slate-900 ring-1 ring-slate-200/80 dark:ring-slate-800 shadow-sm overflow-hidden flex flex-col min-w-0">
+                    <div className="flex items-center gap-3.5 px-5 md:px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+                        <span className="relative isolate flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#0B1B3F] text-white shadow-md">
+                            <span className="absolute inset-0 -z-10" style={{ background: `radial-gradient(80% 80% at 0% 0%, ${step.accent} 0%, transparent 75%)` }} />
+                            <step.icon className="w-[22px] h-[22px]" />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Tahap {current + 1} dari {steps.length}</p>
+                            <h3 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">{step.title}</h3>
+                            <p className="text-xs text-slate-500 truncate">{step.subtitle}</p>
                         </div>
+                        {step.state === "done" && <span className="hidden sm:inline-flex shrink-0 items-center gap-1 h-7 px-2.5 rounded-lg bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100 text-[11px] font-bold"><TbCheck className="w-3.5 h-3.5" /> Selesai</span>}
+                        {step.state === "active" && <span className="hidden sm:inline-flex shrink-0 items-center h-7 px-2.5 rounded-lg bg-[#0B1B3F] text-white text-[11px] font-bold">Berlangsung</span>}
                     </div>
 
-                    {/* Timeline */}
-                    <div className="relative">
-                        <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-slate-100 dark:bg-white/[0.05]" />
-                        <div className="space-y-3">
-                            {steps.map((step, idx) => {
-                                const isOpen = openSteps.includes(step.id);
-                                const isDone = step.state === "done";
-                                const isActive = step.state === "active";
-                                const isLocked = step.state === "locked";
-
-                                return (
-                                    <div key={step.id} className="relative pl-16">
-                                        {/* Dot */}
-                                        <div className={`absolute left-3.5 top-4 w-5 h-5 rounded-full flex items-center justify-center z-10 border-2 transition-all duration-300 ${isDone ? "bg-emerald-500 border-emerald-500 shadow-lg shadow-emerald-500/20" : isActive ? "bg-indigo-600 border-indigo-600 shadow-lg shadow-indigo-500/25 ring-4 ring-indigo-500/10" : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"}`}>
-                                            {isDone ? <TbCheck className="w-3 h-3 text-white" strokeWidth={3} />
-                                                : isLocked ? <TbLock className="w-2.5 h-2.5 text-slate-400" />
-                                                    : <span className="text-[9px] font-black text-white">{idx + 1}</span>}
-                                        </div>
-
-                                        {/* Card */}
-                                        <div className={`rounded-2xl border transition-all duration-300 overflow-hidden ${isDone ? "border-emerald-200/60 dark:border-emerald-900/30 bg-emerald-50/40 dark:bg-emerald-950/10" : isActive ? "border-indigo-200 dark:border-indigo-900/50 bg-indigo-50/50 dark:bg-indigo-950/10 shadow-sm" : "border-slate-100 dark:border-white/[0.04] bg-slate-50/50 dark:bg-slate-900/30 opacity-60"}`}>
-
-                                            {/* Card header */}
-                                            <button type="button" onClick={() => !isLocked && toggleStep(step.id)} disabled={isLocked} className="w-full flex items-center justify-between p-4 text-left disabled:cursor-not-allowed">
-                                                <div className="flex items-center gap-3">
-                                                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0 ${isDone ? "bg-emerald-500 text-white" : isActive ? "bg-indigo-600 text-white" : "bg-slate-200 dark:bg-slate-800 text-slate-400"}`}>
-                                                        {step.icon}
-                                                    </div>
-                                                    <div>
-                                                        <div className="flex items-center gap-2">
-                                                            <p className={`text-xs font-black uppercase tracking-tight ${isDone ? "text-emerald-700 dark:text-emerald-400" : isActive ? "text-indigo-700 dark:text-indigo-400" : "text-slate-400"}`}>
-                                                                {step.title}
-                                                            </p>
-                                                            {isDone && <span className="inline-flex items-center gap-0.5 text-[9px] font-black px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600">✓ Selesai</span>}
-                                                            {isActive && <span className="inline-flex items-center gap-0.5 text-[9px] font-black px-1.5 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-600 animate-pulse">● Berlangsung</span>}
-                                                        </div>
-                                                        <p className="text-[11px] text-slate-500 mt-0.5">{step.subtitle}</p>
-                                                        {isLocked && step.lockReason && (
-                                                            <p className="text-[10px] text-amber-600 dark:text-amber-400 flex items-center gap-1 mt-0.5 font-semibold">
-                                                                <TbLock className="w-2.5 h-2.5" /> {step.lockReason}
-                                                            </p>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                {!isLocked && (
-                                                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-colors shrink-0 ${isOpen ? "bg-slate-200 dark:bg-white/10" : "bg-slate-100 dark:bg-white/5"}`}>
-                                                        {isOpen ? <TbChevronUp className="w-3.5 h-3.5 text-slate-500" /> : <TbChevronDown className="w-3.5 h-3.5 text-slate-500" />}
-                                                    </div>
-                                                )}
-                                            </button>
-
-                                            {/* Card body */}
-                                            <AnimatePresence>
-                                                {isOpen && !isLocked && (
-                                                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
-                                                        <div className="px-4 pb-4 border-t border-slate-100 dark:border-white/[0.04] pt-3 space-y-3">
-
-                                                            {/* ── STEP 0: Kelulusan Peserta ─────────── */}
-                                                            {step.id === 0 && (
-                                                                <div className="space-y-3">
-                                                                    {/* Metadata row */}
-                                                                    {(data.TtdSertifikat || data.BeritaAcara || data.MemoPusat || adminPusatData) && (
-                                                                        <div className="grid grid-cols-2 gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
-                                                                            {data.TtdSertifikat && <InfoRow label="Penandatangan" value={data.TtdSertifikat} />}
-                                                                            {adminPusatData && <InfoRow label="Verifikator" value={adminPusatData.Nama} />}
-                                                                            {data.BeritaAcara && (
-                                                                                <div className="flex items-center gap-2 py-2 border-b border-slate-100 dark:border-white/[0.04]">
-                                                                                    <p className="text-[10px] font-black uppercase text-slate-400 w-32 shrink-0">Berita Acara</p>
-                                                                                    <Link target="_blank" href={`${urlFileBeritaAcara}/${data.BeritaAcara}`} className="text-xs font-bold text-blue-600 flex items-center gap-1 hover:underline">
-                                                                                        <TbFileText className="w-3.5 h-3.5" /> {truncateText(data.BeritaAcara, 15, "...")}
-                                                                                    </Link>
-                                                                                </div>
-                                                                            )}
-                                                                            {data.MemoPusat && (
-                                                                                <div className="flex items-center gap-2 py-2">
-                                                                                    <p className="text-[10px] font-black uppercase text-slate-400 w-32 shrink-0">Memo Lapwas</p>
-                                                                                    <Link target="_blank" href={`${urlFileLapwas}/${data.MemoPusat}`} className="text-xs font-bold text-amber-600 flex items-center gap-1 hover:underline">
-                                                                                        <TbShieldCheck className="w-3.5 h-3.5" /> Dokumen Lapwas
-                                                                                    </Link>
-                                                                                </div>
-                                                                            )}
-                                                                        </div>
-                                                                    )}
-
-                                                                    {/* PassedParticipant action */}
-                                                                    {countUserWithNoStatus(data.UserPelatihan) !== 0 && !isSigning && (
-                                                                        <PassedParticipantAction data={data.UserPelatihan} onSuccess={fetchData} />
-                                                                    )}
-
-                                                                    {/* Checklist */}
-                                                                    <div className="grid grid-cols-2 gap-2">
-                                                                        {[
-                                                                            { label: "Total Peserta", val: totalPeserta, color: "text-blue-600 bg-blue-50 dark:bg-blue-950/30 border-blue-100 dark:border-blue-900/30" },
-                                                                            { label: "Peserta Lulus", val: passedCount, color: "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 border-emerald-100 dark:border-emerald-900/30" },
-                                                                            { label: "Belum Ditentukan", val: countUserWithNoStatus(data.UserPelatihan), color: "text-amber-600 bg-amber-50 dark:bg-amber-950/30 border-amber-100 dark:border-amber-900/30" },
-                                                                            { label: "e-STTPL Terbit", val: certCount, color: "text-indigo-600 bg-indigo-50 dark:bg-indigo-950/30 border-indigo-100 dark:border-indigo-900/30" },
-                                                                        ].map((m, i) => (
-                                                                            <div key={i} className={`rounded-xl border p-3 ${m.color}`}>
-                                                                                <p className="text-[10px] font-black uppercase tracking-widest opacity-70 mb-0.5">{m.label}</p>
-                                                                                <p className="text-2xl font-black tabular-nums">{m.val}</p>
-                                                                            </div>
-                                                                        ))}
-                                                                    </div>
-                                                                </div>
-                                                            )}
-
-                                                            {/* ── STEP 1: Ajukan STTPL ──────────────── */}
-                                                            {step.id === 1 && (
-                                                                <div className="space-y-3">
-                                                                    {[
-                                                                        { label: "Semua peserta ditentukan kelulusannya", done: allPassed },
-                                                                        { label: "Status pelatihan: Pelaporan Penyelenggaraan (Stage 5)", done: data.StatusPenerbitan === "5" || isSttplSubmitted },
-                                                                    ].map((c, i) => (
-                                                                        <div key={i} className={`flex items-center gap-3 p-3 rounded-xl border ${c.done ? "bg-emerald-50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900/30" : "bg-rose-50 border-rose-200 dark:bg-rose-950/20 dark:border-rose-900/30"}`}>
-                                                                            <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${c.done ? "bg-emerald-500" : "bg-rose-400"}`}>
-                                                                                {c.done ? <TbCheck className="w-3 h-3 text-white" /> : <TbAlertCircle className="w-3 h-3 text-white" />}
-                                                                            </div>
-                                                                            <span className={`text-xs font-bold ${c.done ? "text-emerald-700 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>{c.label}</span>
-                                                                        </div>
-                                                                    ))}
-
-                                                                    {isSttplSubmitted ? (
-                                                                        <div className="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-900/30 text-xs font-bold text-indigo-700 dark:text-indigo-400 flex items-center gap-2">
-                                                                            <TbCircleCheck className="w-4 h-4" /> Pengajuan telah dikirim ke Pusat
-                                                                        </div>
-                                                                    ) : allPassed ? (
-                                                                        countUserWithNoStatus(data.UserPelatihan) === 0 ? (
-                                                                            <SendNoteAction idPelatihan={data.IdPelatihan.toString()} title="Ajukan Penerbitan STTPL" description="Ajukan penerbitan STTPL untuk pelatihan ini." buttonLabel="Ajukan Penerbitan STTPL Sekarang" icon={LuSignature} buttonColor="blue" onSuccess={fetchData} status="6" pelatihan={data} />
-                                                                        ) : null
-                                                                    ) : (
-                                                                        <p className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold text-center py-2">Lengkapi kelulusan peserta terlebih dahulu</p>
-                                                                    )}
-                                                                </div>
-                                                            )}
-
-                                                            {/* ── STEP 2: Verifikasi Pusat ──────────── */}
-                                                            {step.id === 2 && (
-                                                                <div className="space-y-3">
-                                                                    <div className={`p-4 rounded-xl border flex items-start gap-3 ${data.StatusPenerbitan === "6" ? "bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-900/30" : isVerified ? "bg-emerald-50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900/30" : "bg-slate-50 border-slate-200 dark:bg-slate-900 dark:border-slate-800"}`}>
-                                                                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${data.StatusPenerbitan === "6" ? "bg-amber-400 text-white" : isVerified ? "bg-emerald-500 text-white" : "bg-slate-300 text-slate-500"}`}>
-                                                                            <TbShieldCheck className="w-5 h-5" />
-                                                                        </div>
-                                                                        <div>
-                                                                            <p className="text-xs font-black text-slate-700 dark:text-slate-200">
-                                                                                {data.StatusPenerbitan === "6" ? "Menunggu verifikasi Pusat BPPSDM KP" : isVerified ? "Verifikasi Pusat selesai" : "—"}
-                                                                            </p>
-                                                                            {adminPusatData && <p className="text-[11px] text-slate-500 mt-0.5">Verifikator: {adminPusatData.Nama}</p>}
-                                                                        </div>
-                                                                    </div>
-                                                                    {/* Verifikator actions inline */}
-                                                                    {isVerifikator && data.StatusPenerbitan === "6" && (
-                                                                        <div className="flex gap-2">
-                                                                            <SendNoteAction idPelatihan={data.IdPelatihan.toString()} title="Perbaikan" description="Berikan catatan perbaikan" buttonLabel="Minta Perbaikan" icon={TbPencilX} buttonColor="rose" onSuccess={fetchData} status="7" pelatihan={data} />
-                                                                            <SendNoteAction idPelatihan={data.IdPelatihan.toString()} title="Approve" description="Setujui pengajuan penerbitan STTPL" buttonLabel="Approve Penerbitan" icon={TbPencilCheck} buttonColor="blue" onSuccess={fetchData} status={data.TtdSertifikat.includes("Kepala Balai") ? "7A" : "8"} pelatihan={data} />
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            )}
-
-                                                            {/* ── STEP 3: Penandatanganan BSrE ─────── */}
-                                                            {step.id === 3 && (
-                                                                <div className="space-y-3">
-                                                                    <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
-                                                                        <InfoRow label="Penandatangan" value={data.TtdSertifikat} />
-                                                                        <InfoRow label="Status BSrE" value={getStatusInfo(data.StatusPenerbitan).label} />
-                                                                    </div>
-                                                                    {signingDone && (
-                                                                        <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/30 text-xs font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-2">
-                                                                            <TbCheck className="w-4 h-4" /> Penandatanganan BSrE selesai
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            )}
-
-                                                            {/* ── STEP 4: e-STTPL Terbit ────────────── */}
-                                                            {step.id === 4 && !isSigning && (
-                                                                <div className="space-y-3">
-                                                                    {/* Toolbar */}
-                                                                    <div className="flex flex-wrap gap-2">
-                                                                        <Button variant="ghost" size="sm" onClick={() => setIsPrinting(!isPrinting)} className="h-8 px-3 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-blue-600">
-                                                                            <Printer className="w-3.5 h-3.5 mr-1" /> {isPrinting ? "Kembali ke Tabel" : "Mode Cetak Massal"}
-                                                                        </Button>
-                                                                        {allCertified && (
-                                                                            <Button onClick={handleDownloadZip} disabled={isZipping} variant="outline" size="sm" className="h-8 px-3 rounded-xl border-indigo-200 text-indigo-600 font-bold text-xs hover:bg-indigo-50">
-                                                                                <Download className="h-3.5 w-3.5 mr-1" />{isZipping ? "Membentuk ZIP..." : "Download ZIP e-STTPL"}
-                                                                            </Button>
-                                                                        )}
-                                                                        {(["11", "15"].includes(data.StatusPenerbitan)) && totalPeserta > 0 && (
-                                                                            <Button onClick={handleDownloadExcel} variant="outline" size="sm" className="h-8 px-3 rounded-xl border-emerald-200 text-emerald-700 font-bold text-xs hover:bg-emerald-50 gap-1.5">
-                                                                                <TbFileSpreadsheet className="h-4 w-4" /> Download Excel
-                                                                            </Button>
-                                                                        )}
-                                                                    </div>
-
-                                                                    {/* Table / Print view */}
-                                                                    {isPrinting ? (
-                                                                        <div className="space-y-3">
-                                                                            {isUploading && (
-                                                                                <div className="space-y-2 bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border">
-                                                                                    <div className="flex justify-between text-xs">
-                                                                                        <span className="font-bold text-blue-600 uppercase">Mengunduh e-STTPL...</span>
-                                                                                        <span className="font-mono font-bold text-slate-600">{Math.round(progress)}%</span>
-                                                                                    </div>
-                                                                                    <Progress value={progress} className="h-2 rounded-full" />
-                                                                                    <p className="text-[10px] text-slate-400 text-center">Memproses {counter} dari {totalPeserta} berkas</p>
-                                                                                </div>
-                                                                            )}
-                                                                            <div className="flex items-center justify-between">
-                                                                                <Button onClick={handleDownloadAll} size="sm" disabled={isUploading} className="h-9 px-4 rounded-xl bg-slate-900 text-white text-xs font-bold">
-                                                                                    <Printer className="h-3.5 w-3.5 mr-1.5" />{isUploading ? "Proses Unduh..." : "Download Cetak Massal"}
-                                                                                </Button>
-                                                                                <Button variant="ghost" size="sm" onClick={() => setIsPrinting(false)} className="text-xs font-bold text-slate-500 hover:text-rose-500">Tutup Mode Print</Button>
-                                                                            </div>
-                                                                            <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                                                                                {data.UserPelatihan.map((item, i) => (
-                                                                                    <div key={i} className="py-2.5 flex flex-col items-center justify-between text-xs gap-3">
-                                                                                        <div className="flex items-center gap-3">
-                                                                                            <span className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 font-bold text-[10px] flex items-center justify-center shrink-0">{i + 1}</span>
-                                                                                            <div>
-                                                                                                <p className="font-black text-slate-900 dark:text-white uppercase">{item.Nama}</p>
-                                                                                                <p className="text-[10px] text-slate-400">{item.NoRegistrasi}</p>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div className="flex items-center gap-2 w-full">
-                                                                                            {item.FileSertifikat?.includes('signed') && (
-                                                                                                <Link target="_blank" href={`https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/sertifikat-ttde/${item.FileSertifikat}`} className="flex items-center gap-1 px-3 py-1 bg-blue-50 dark:bg-blue-950 text-blue-600 rounded-lg text-[10px] font-bold hover:underline">
-                                                                                                    <RiVerifiedBadgeFill className="h-3.5 w-3.5" /> e-STTPL
-                                                                                                </Link>
-                                                                                            )}
-                                                                                            <DialogSertifikatPelatihan ref={refs.current[i]} pelatihan={data} userPelatihan={item} handleFetchingData={fetchData} isPrint={isPrinting} />
-                                                                                        </div>
-                                                                                    </div>
-                                                                                ))}
-                                                                            </div>
-                                                                        </div>
-                                                                    ) : (
-                                                                        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-sm">
-                                                                            <UserPelatihanTable pelatihan={data} data={data.UserPelatihan} onSuccess={fetchData} />
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            )}
-
-                                                        </div>
-                                                    </motion.div>
-                                                )}
-                                            </AnimatePresence>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
-
-                {/* ── RIGHT: Sidebar ─────────────────────────────────────── */}
-                <div className="space-y-4 lg:sticky lg:top-24">
-
-                    {/* Progress card */}
-                    <div className="bg-white dark:bg-slate-900/80 rounded-2xl border border-slate-100 dark:border-white/[0.05] shadow-sm p-5">
-                        <div className="flex items-center gap-2 mb-4">
-                            <TbCircleCheck className="text-indigo-500 w-4 h-4" />
-                            <h3 className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-white">Status Penerbitan</h3>
-                        </div>
-                        <div className="space-y-2.5">
-                            {[
-                                { label: "Kelulusan Peserta", done: allPassed },
-                                { label: "Pengajuan STTPL", done: isSttplSubmitted },
-                                { label: "Verifikasi Pusat", done: isVerified },
-                                { label: "Penandatanganan BSrE", done: signingDone },
-                                { label: "e-STTPL Terbit", done: allCertified },
-                            ].map((item, i) => (
-                                <div key={i} className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <div className={`w-2 h-2 rounded-full ${item.done ? "bg-emerald-500" : "bg-slate-200 dark:bg-slate-700"}`} />
-                                        <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">{item.label}</span>
-                                    </div>
-                                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${item.done ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400" : "bg-slate-100 text-slate-400 dark:bg-slate-800"}`}>
-                                        {item.done ? "✓ Selesai" : "Belum"}
-                                    </span>
+                    <div key={current} className="flex-1 p-5 md:p-6 animate-in fade-in slide-in-from-right-2 duration-300">
+                        {step.state === "locked" ? (
+                            <div className="py-10 flex flex-col items-center gap-3 text-center">
+                                <span className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 flex items-center justify-center"><TbLock className="w-5 h-5" /></span>
+                                <div>
+                                    <p className="text-sm font-bold text-slate-800 dark:text-slate-200">Tahap ini masih terkunci</p>
+                                    <p className="text-xs text-slate-500">{step.lockReason}</p>
                                 </div>
+                                {firstActive !== undefined && (
+                                    <button type="button" onClick={() => setCurrent(firstActive)} className="h-9 px-4 rounded-xl bg-[#0B1B3F] hover:bg-blue-700 text-white text-xs font-bold inline-flex items-center gap-1.5">
+                                        Ke tahap {firstActive + 1}: {steps[firstActive].title} <TbArrowRight className="w-4 h-4" />
+                                    </button>
+                                )}
+                            </div>
+                        ) : (
+                            <>
+                                {/* TAHAP 0 — Kelulusan */}
+                                {step.id === 0 && (
+                                    <div className="space-y-4">
+                                        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 rounded-2xl ring-1 ring-slate-200/80 dark:ring-slate-800 p-4">
+                                            <Info label="Penandatangan" value={ttd} />
+                                            <Info label="Verifikator" value={adminPusatData?.Nama} />
+                                            <div>
+                                                <dt className="text-[10px] text-slate-400">Berita Acara</dt>
+                                                <dd className="mt-0.5">
+                                                    {data.BeritaAcara ? (
+                                                        <Link target="_blank" href={`${urlFileBeritaAcara}/${data.BeritaAcara}`} className="text-xs font-semibold text-blue-600 hover:underline inline-flex items-center gap-1">
+                                                            <TbFileText className="w-3.5 h-3.5" /> {truncateText(data.BeritaAcara, 22, "…")}
+                                                        </Link>
+                                                    ) : (
+                                                        <span className="text-xs text-slate-300">—</span>
+                                                    )}
+                                                </dd>
+                                            </div>
+                                            <div>
+                                                <dt className="text-[10px] text-slate-400">Memo Lapwas</dt>
+                                                <dd className="mt-0.5">
+                                                    {data.MemoPusat ? (
+                                                        <Link target="_blank" href={`${urlFileLapwas}/${data.MemoPusat}`} className="text-xs font-semibold text-amber-600 hover:underline inline-flex items-center gap-1">
+                                                            <TbShieldCheck className="w-3.5 h-3.5" /> Dokumen Lapwas
+                                                        </Link>
+                                                    ) : (
+                                                        <span className="text-xs text-slate-300">—</span>
+                                                    )}
+                                                </dd>
+                                            </div>
+                                        </dl>
+
+                                        {/* Bar kelulusan */}
+                                        <div>
+                                            <div className="flex items-baseline justify-between text-xs mb-1.5">
+                                                <span className="font-semibold text-slate-600 dark:text-slate-300">Kelulusan ditentukan</span>
+                                                <span className="tabular-nums text-slate-500"><b className="text-slate-900 dark:text-white">{total - counts.belum}</b> / {total}</span>
+                                            </div>
+                                            <div className="h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden flex">
+                                                <div className="h-full bg-emerald-500 transition-all duration-700" style={{ width: `${total ? (counts.lulus / total) * 100 : 0}%` }} />
+                                                <div className="h-full bg-rose-400 transition-all duration-700" style={{ width: `${total ? ((total - counts.belum - counts.lulus) / total) * 100 : 0}%` }} />
+                                            </div>
+                                            <div className="mt-1.5 flex flex-wrap gap-3 text-[11px] text-slate-500">
+                                                <Legend dot="bg-emerald-500" label={`Lulus ${counts.lulus}`} />
+                                                <Legend dot="bg-rose-400" label={`Tidak lulus ${Math.max(0, total - counts.belum - counts.lulus)}`} />
+                                                <Legend dot="bg-slate-300" label={`Belum ${counts.belum}`} />
+                                            </div>
+                                        </div>
+
+                                        {counts.belum > 0 && !isSigning && <PassedParticipantAction data={peserta} onSuccess={fetchData} />}
+
+                                        <div className="rounded-xl ring-1 ring-slate-200/80 dark:ring-slate-800 overflow-hidden">
+                                            <UserPelatihanTable pelatihan={data} data={peserta} onSuccess={fetchData} />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* TAHAP 1 — Ajukan */}
+                                {step.id === 1 && (
+                                    <div className="space-y-3">
+                                        <Checklist
+                                            items={[
+                                                { label: "Semua peserta ditentukan kelulusannya", done: allPassed, onClick: () => setCurrent(0) },
+                                                { label: "Pelaporan penyelenggaraan (stage 5)", done: status === "5" || isSubmitted },
+                                            ]}
+                                        />
+                                        {isSubmitted ? (
+                                            <Notice tone="violet" icon={TbCircleCheck} text="Pengajuan telah dikirim ke Pusat." />
+                                        ) : allPassed && isAdmin ? (
+                                            <SendNoteAction idPelatihan={id} title="Ajukan Penerbitan STTPL" description="Ajukan penerbitan STTPL untuk pelatihan ini." buttonLabel="Ajukan Penerbitan STTPL Sekarang" icon={LuSignature} buttonColor="blue" onSuccess={fetchData} status="6" pelatihan={data} />
+                                        ) : null}
+                                    </div>
+                                )}
+
+                                {/* TAHAP 2 — Verifikasi Pusat */}
+                                {step.id === 2 && (
+                                    <div className="space-y-3">
+                                        <Notice
+                                            tone={isVerified ? "emerald" : "amber"}
+                                            icon={TbShieldCheck}
+                                            text={isVerified ? "Verifikasi Pusat selesai." : "Menunggu verifikasi Pusat BPPSDM KP."}
+                                            sub={adminPusatData?.Nama ? `Verifikator: ${adminPusatData.Nama}` : undefined}
+                                        />
+                                        {isVerifikator && status === "6" && <p className="text-[11px] text-slate-500">Gunakan tombol <b>Approve</b> atau <b>Minta Perbaikan</b> pada bar aksi di atas.</p>}
+                                    </div>
+                                )}
+
+                                {/* TAHAP 3 — BSrE */}
+                                {step.id === 3 && (
+                                    <div className="space-y-3">
+                                        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 rounded-2xl ring-1 ring-slate-200/80 dark:ring-slate-800 p-4">
+                                            <Info label="Penandatangan" value={ttd} />
+                                            <Info label="Status BSrE" value={statusInfo.label} />
+                                        </dl>
+                                        {signingDone && <Notice tone="emerald" icon={TbCheck} text="Penandatanganan BSrE selesai." />}
+                                        {showTTDe && <p className="text-[11px] text-slate-500">Panel penandatanganan Anda ada di atas.</p>}
+                                    </div>
+                                )}
+
+                                {/* TAHAP 4 — e-STTPL */}
+                                {step.id === 4 && (
+                                    <div className="space-y-3">
+                                        {!isSigning && (
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                <ToolBtn onClick={() => setIsPrinting((p) => !p)} icon={isPrinting ? X : Printer} active={isPrinting}>
+                                                    {isPrinting ? "Tutup mode cetak" : "Mode cetak massal"}
+                                                </ToolBtn>
+                                                {allCertified && (
+                                                    <ToolBtn onClick={handleDownloadZip} icon={isZipping ? Loader2 : Download} disabled={isZipping} spin={isZipping}>
+                                                        {isZipping ? "Membuat ZIP…" : "Unduh ZIP e-STTPL"}
+                                                    </ToolBtn>
+                                                )}
+                                                {["11", "15"].includes(status) && total > 0 && (
+                                                    <ToolBtn onClick={handleDownloadExcel} icon={TbFileSpreadsheet}>Unduh Excel</ToolBtn>
+                                                )}
+                                                <span className="ml-auto text-xs text-slate-500">
+                                                    <b className="text-slate-900 dark:text-white tabular-nums">{counts.cert}</b> / {total} terbit
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        {isPrinting && !isSigning ? (
+                                            <div className="space-y-3">
+                                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 ring-1 ring-slate-100 dark:ring-slate-800 p-3">
+                                                    {isDownloading ? (
+                                                        <div className="flex-1">
+                                                            <div className="flex justify-between text-xs mb-1.5">
+                                                                <span className="font-semibold text-slate-700 dark:text-slate-200">Mengunduh {counter} dari {total}…</span>
+                                                                <span className="font-mono font-bold text-slate-500">{Math.round(progress)}%</span>
+                                                            </div>
+                                                            <div className="h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                                                                <div className="h-full rounded-full bg-[#0B1B3F] transition-all" style={{ width: `${progress}%` }} />
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <p className="text-xs text-slate-500">Unduh seluruh e-STTPL sebagai PDF terpisah.</p>
+                                                    )}
+                                                    <button type="button" onClick={handleDownloadAll} disabled={isDownloading} className="h-10 px-4 rounded-xl bg-[#0B1B3F] hover:bg-blue-700 text-white text-xs font-bold inline-flex items-center justify-center gap-1.5 disabled:opacity-50">
+                                                        {isDownloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Printer className="w-4 h-4" />} Unduh semua
+                                                    </button>
+                                                </div>
+                                                <ul className="rounded-xl ring-1 ring-slate-200/80 dark:ring-slate-800 divide-y divide-slate-100 dark:divide-slate-800">
+                                                    {peserta.map((item, i) => (
+                                                        <li key={i} className="px-3.5 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                                            <div className="flex items-center gap-3 min-w-0">
+                                                                <span className="w-6 h-6 shrink-0 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold flex items-center justify-center tabular-nums">{i + 1}</span>
+                                                                <div className="min-w-0">
+                                                                    <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">{item.Nama}</p>
+                                                                    <p className="font-mono text-[10px] text-slate-400">{item.NoRegistrasi || "—"}</p>
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                {item.FileSertifikat?.includes("signed") && (
+                                                                    <Link target="_blank" href={`${CERT_BASE}/${item.FileSertifikat}`} className="inline-flex items-center gap-1 h-8 px-2.5 rounded-lg bg-blue-50 dark:bg-blue-950 text-blue-600 text-[11px] font-bold hover:underline">
+                                                                        <RiVerifiedBadgeFill className="w-3.5 h-3.5" /> e-STTPL
+                                                                    </Link>
+                                                                )}
+                                                                <DialogSertifikatPelatihan ref={refs.current[i]} pelatihan={data} userPelatihan={item} handleFetchingData={fetchData} isPrint={isPrinting} />
+                                                            </div>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        ) : (
+                                            <div className="rounded-xl ring-1 ring-slate-200/80 dark:ring-slate-800 overflow-hidden">
+                                                <UserPelatihanTable pelatihan={data} data={peserta} onSuccess={fetchData} />
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </div>
+
+                    {/* Navigasi */}
+                    <div className="flex items-center justify-between gap-3 px-5 md:px-6 py-3.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900">
+                        <button type="button" onClick={() => setCurrent((c) => Math.max(0, c - 1))} disabled={current === 0} className="h-10 px-3.5 rounded-xl text-sm font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 inline-flex items-center gap-1.5 disabled:invisible">
+                            <TbArrowLeft className="w-4 h-4" /> Sebelumnya
+                        </button>
+                        <div className="flex items-center gap-1.5" aria-hidden>
+                            {steps.map((s, i) => (
+                                <span key={s.id} className={`h-1.5 rounded-full transition-all duration-300 ${i === current ? "w-6 bg-[#0B1B3F] dark:bg-sky-400" : s.state === "done" ? "w-1.5 bg-emerald-400" : "w-1.5 bg-slate-200 dark:bg-slate-700"}`} />
                             ))}
                         </div>
-                        <div className="mt-4 pt-4 border-t border-slate-100 dark:border-white/[0.05]">
-                            <div className="flex justify-between text-xs mb-1.5">
-                                <span className="font-bold text-slate-500">Progress</span>
-                                <span className="font-black text-slate-700 dark:text-white">{completedCount}/{steps.length}</span>
-                            </div>
-                            <div className="w-full h-2 bg-slate-100 dark:bg-white/[0.06] rounded-full overflow-hidden">
-                                <div className="h-full bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-full transition-all duration-500" style={{ width: `${(completedCount / steps.length) * 100}%` }} />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Quick Stats */}
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/30 rounded-2xl p-4">
-                            <p className="text-[10px] font-black uppercase text-indigo-500 tracking-widest mb-1">Peserta</p>
-                            <p className="text-2xl font-black text-indigo-700 dark:text-indigo-300">{totalPeserta}</p>
-                            <p className="text-[10px] text-indigo-500 mt-0.5">Terdaftar</p>
-                        </div>
-                        <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl p-4">
-                            <p className="text-[10px] font-black uppercase text-emerald-500 tracking-widest mb-1">e-STTPL</p>
-                            <p className="text-2xl font-black text-emerald-700 dark:text-emerald-300">{certCount}</p>
-                            <p className="text-[10px] text-emerald-500 mt-0.5">Terbit</p>
-                        </div>
-                        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/30 rounded-2xl p-4">
-                            <p className="text-[10px] font-black uppercase text-amber-500 tracking-widest mb-1">Lulus</p>
-                            <p className="text-2xl font-black text-amber-700 dark:text-amber-300">{passedCount}</p>
-                            <p className="text-[10px] text-amber-500 mt-0.5">Terverifikasi</p>
-                        </div>
-                        <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl p-4">
-                            <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Belum</p>
-                            <p className="text-2xl font-black text-slate-600 dark:text-slate-300">{countUserWithNoStatus(data.UserPelatihan)}</p>
-                            <p className="text-[10px] text-slate-400 mt-0.5">Ditentukan</p>
-                        </div>
-                    </div>
-
-                    {/* Current stage info */}
-                    <div className="bg-white dark:bg-slate-900/80 rounded-2xl border border-slate-100 dark:border-white/[0.05] shadow-sm p-4">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Status Saat Ini</p>
-                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-black ${getStatusInfo(data.StatusPenerbitan).color} text-white`}>
-                            {React.cloneElement(getStatusInfo(data.StatusPenerbitan).icon as React.ReactElement, { className: "w-3.5 h-3.5" })}
-                            {getStatusInfo(data.StatusPenerbitan).label}
-                        </div>
-                        <p className="text-[10px] text-slate-400 mt-2 font-medium">Kode: {data.StatusPenerbitan}</p>
+                        <button type="button" onClick={() => setCurrent((c) => Math.min(steps.length - 1, c + 1))} disabled={current === steps.length - 1} className="h-10 px-4 rounded-xl bg-[#0B1B3F] hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 disabled:invisible">
+                            Berikutnya <TbArrowRight className="w-4 h-4" />
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     );
 };
+
+/* ============================ UI ============================ */
+
+function Info({ label, value }: { label: string; value?: string }) {
+    return (
+        <div className="min-w-0">
+            <dt className="text-[10px] text-slate-400">{label}</dt>
+            <dd className={`mt-0.5 text-xs font-semibold break-words ${value ? "text-slate-800 dark:text-slate-200" : "text-slate-300"}`}>{value || "—"}</dd>
+        </div>
+    );
+}
+
+function Legend({ dot, label }: { dot: string; label: string }) {
+    return (
+        <span className="inline-flex items-center gap-1.5">
+            <span className={`w-1.5 h-1.5 rounded-full ${dot}`} /> {label}
+        </span>
+    );
+}
+
+function Checklist({ items }: { items: { label: string; done: boolean; onClick?: () => void }[] }) {
+    return (
+        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {items.map((c) => (
+                <li key={c.label}>
+                    <button
+                        type="button"
+                        onClick={() => !c.done && c.onClick?.()}
+                        className={`w-full flex items-center gap-2.5 p-2.5 rounded-xl ring-1 text-left ${c.done ? "bg-emerald-50/60 ring-emerald-100 dark:bg-emerald-950/20 dark:ring-emerald-900/40 cursor-default" : "bg-rose-50/60 ring-rose-100 hover:ring-rose-200 dark:bg-rose-950/20 dark:ring-rose-900/40"}`}
+                    >
+                        <span className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-white ${c.done ? "bg-emerald-500" : "bg-rose-400"}`}>
+                            {c.done ? <TbCheck className="w-3 h-3" /> : <TbAlertCircle className="w-3 h-3" />}
+                        </span>
+                        <span className={`text-xs font-semibold ${c.done ? "text-emerald-700 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>{c.label}</span>
+                    </button>
+                </li>
+            ))}
+        </ul>
+    );
+}
+
+const NOTICE_TONE = {
+    emerald: "bg-emerald-50/60 ring-emerald-100 text-emerald-700 dark:bg-emerald-950/20 dark:ring-emerald-900/40 dark:text-emerald-300",
+    amber: "bg-amber-50/60 ring-amber-100 text-amber-700 dark:bg-amber-950/20 dark:ring-amber-900/40 dark:text-amber-300",
+    violet: "bg-violet-50/60 ring-violet-100 text-violet-700 dark:bg-violet-950/20 dark:ring-violet-900/40 dark:text-violet-300",
+} as const;
+
+function Notice({ tone, icon: Icon, text, sub }: { tone: keyof typeof NOTICE_TONE; icon: IconType; text: string; sub?: string }) {
+    return (
+        <div className={`flex items-start gap-2.5 rounded-xl ring-1 px-3.5 py-3 ${NOTICE_TONE[tone]}`}>
+            <Icon className="w-4 h-4 mt-0.5 shrink-0" />
+            <div>
+                <p className="text-xs font-bold">{text}</p>
+                {sub && <p className="text-[11px] opacity-80">{sub}</p>}
+            </div>
+        </div>
+    );
+}
+
+function ToolBtn({ onClick, icon: Icon, children, disabled, active, spin }: { onClick: () => void; icon: IconType; children: React.ReactNode; disabled?: boolean; active?: boolean; spin?: boolean }) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            disabled={disabled}
+            className={`h-9 px-3.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 transition-colors disabled:opacity-50 ${active ? "bg-[#0B1B3F] text-white" : "ring-1 ring-slate-200 dark:ring-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800"}`}
+        >
+            <Icon className={`w-4 h-4 ${spin ? "animate-spin" : ""}`} /> {children}
+        </button>
+    );
+}
 
 export default STTPLDetail;

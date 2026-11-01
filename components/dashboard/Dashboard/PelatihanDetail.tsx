@@ -1,32 +1,34 @@
 "use client";
 
-import React, { useState } from "react";
-import { Accordion } from "@/components/ui/accordion";
-import { PelatihanMasyarakat } from "@/types/product";
-import { generateTanggalPelatihan, getStatusInfo } from "@/utils/text";
+import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { replaceUrl } from "@/lib/utils";
-import Cookies from "js-cookie";
-import UserPelatihanTable from "./Tables/UserPelatihanTable";
 import Link from "next/link";
-import { urlFileSuratPemberitahuan } from "@/constants/urls";
+import Cookies from "js-cookie";
 import {
-    TbSchool, TbCalendar, TbCategory, TbClock, TbMapPin, TbRocket,
-    TbSettings, TbSignature, TbTag, TbCertificate, TbBuildingSkyscraper,
-    TbHierarchy, TbCash, TbUserCode, TbExternalLink, TbLayoutGrid,
-    TbUsers, TbStar, TbCheck, TbLock, TbAlertCircle, TbUpload,
-    TbFileText, TbUserStar, TbSend, TbChevronDown, TbChevronUp,
-    TbCircleCheck, TbInfoCircle, TbDownload,
+    TbSchool, TbCalendar, TbCategory, TbClock, TbMapPin, TbRocket, TbSettings, TbSignature, TbTag,
+    TbCertificate, TbBuildingSkyscraper, TbHierarchy, TbCash, TbUserCode, TbExternalLink, TbStar,
+    TbCheck, TbLock, TbAlertCircle, TbFileText, TbUserStar, TbSend, TbChevronDown, TbInfoCircle,
+    TbSpeakerphone, TbArrowRight, TbArrowLeft,
 } from "react-icons/tb";
+import { HiOutlineUserGroup } from "react-icons/hi2";
+import {
+    Users, FileText, GraduationCap, ShieldCheck, AlertCircle, Clock, Send, Trash2, Download, Globe, Calendar,
+} from "lucide-react";
+
+import { PelatihanMasyarakat } from "@/types/product";
+import { ModulPelatihan } from "@/types/module";
+import { generateTanggalPelatihan } from "@/utils/text";
+import { replaceUrl } from "@/lib/utils";
+import { urlFileSuratPemberitahuan } from "@/constants/urls";
+import { JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN } from "@/constants/pelatihan";
 import { isMoreThanToday } from "@/utils/time";
 import { countValidKeterangan } from "@/utils/counter";
-import { useFetchDataPusatById } from "@/hooks/elaut/pusat/useFetchDataPusatById";
+import { stringToArray } from "@/utils/input";
 import { useFetchDataInstrukturSelected } from "@/hooks/elaut/instruktur/useFetchDataInstruktur";
 import { useFetchDataMateriPelatihanMasyarakatById } from "@/hooks/elaut/modul/useFetchDataMateriPelatihanMasyarakat";
-import { Badge } from "@/components/ui/badge";
-import { ModulPelatihan } from "@/types/module";
-import { stringToArray } from "@/utils/input";
-import { JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN } from "@/constants/pelatihan";
+import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
+
+import UserPelatihanTable from "./Tables/UserPelatihanTable";
 import UploadSuratButton from "@/commons/actions/UploadSuratButton";
 import SendNoteAction from "@/commons/actions/lemdiklat/SendNoteAction";
 import EditPelatihanAction from "@/commons/actions/EditPelatihanAction";
@@ -36,19 +38,8 @@ import ChooseInstrukturAction from "@/commons/actions/instruktur/ChooseInstruktu
 import ImportPesertaAction from "@/commons/actions/ImportPesertaAction";
 import { ValidateParticipantAction } from "@/commons/actions/lemdiklat/ValidateParticipantAction";
 import EditPublishAction from "@/commons/actions/EditPublishAction";
-import HistoryButton from "@/commons/actions/HistoryButton";
 import PublishButton from "@/commons/actions/PublishButton";
-import { Button } from "@/components/ui/button";
-import Toast from "@/commons/Toast";
 import ZipPhotoParticipantAction from "@/commons/actions/lemdiklat/ZipPhotoParticipantAction";
-import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
-import {
-    Users, FileText, GraduationCap, ShieldCheck, CheckCircle2,
-    AlertCircle, Clock, Send, Trash2, Download, Lock,
-    Globe, Calendar, Building, UserCheck,
-} from "lucide-react";
-import { HiOutlineUserGroup } from "react-icons/hi2";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -56,622 +47,559 @@ interface Props {
     onSwitchToSttpl?: () => void;
 }
 
-// ─── Info Item ────────────────────────────────────────────────────────────────
-const InfoItem = ({ label, value, icon: Icon }: { label: string; value?: string | number; icon: any }) => (
-    <div className="flex items-start gap-3 py-2.5 border-b border-slate-100 dark:border-white/[0.04] last:border-0">
-        <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-white/[0.05] flex items-center justify-center shrink-0 mt-0.5">
-            <Icon className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-        </div>
-        <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none mb-0.5">{label}</p>
-            <p className="text-xs font-bold text-slate-800 dark:text-white truncate">
-                {value !== undefined && value !== null && value !== "" ? String(value) : "—"}
-            </p>
-        </div>
-    </div>
-);
-
-// ─── Step Status Types ────────────────────────────────────────────────────────
 type StepState = "done" | "active" | "locked";
+type IconType = React.ComponentType<{ className?: string }>;
 
 interface TimelineStep {
     id: number;
     title: string;
     subtitle: string;
-    icon: React.ReactNode;
+    icon: IconType;
+    accent: string;
     state: StepState;
     lockReason?: string;
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+const EMPTY_FOTO = "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/";
+const stageNum = (s?: string) => {
+    const n = parseFloat(String(s ?? ""));
+    return isNaN(n) ? 0 : n;
+};
+
+/* ============================ KOMPONEN ============================ */
+
 const PelatihanDetail: React.FC<Props> = ({ data, fetchData, onSwitchToSttpl }) => {
-    const { label, color, icon } = getStatusInfo(data.StatusPenerbitan);
-    const { adminPusatData } = useFetchDataPusatById(data?.VerifikatorPelatihan);
     const { instrukturs, fetchInstrukturData } = useFetchDataInstrukturSelected(stringToArray(data?.Instruktur));
     const { data: modulPelatihan } = useFetchDataMateriPelatihanMasyarakatById(data?.ModuleMateri);
-    const [expandedModul, setExpandedModul] = useState<number | null>(null);
-    const [openSteps, setOpenSteps] = useState<number[]>([0, 1, 2, 3, 4, 5]);
-    const [infoExpanded, setInfoExpanded] = useState(true);
 
-    React.useEffect(() => { fetchInstrukturData(); }, [fetchInstrukturData]);
+    useEffect(() => {
+        fetchInstrukturData();
+    }, [fetchInstrukturData]);
 
-    const isAdmin = Cookies.get('Access')?.includes('createPelatihan');
-    const isSPV = Cookies.get('Access')?.includes('supervisePelaksanaan');
-    const isVerifikator = Cookies.get('Access')?.includes('verifyPelaksanaan');
-    const canEdit = data.StatusPenerbitan === "0" || data.StatusPenerbitan === "1.2" || data.StatusPenerbitan === "3";
+    // Hak akses dibaca sekali
+    const [access] = useState(() => Cookies.get("Access") || "");
+    const isAdmin = access.includes("createPelatihan");
+    const isSPV = access.includes("supervisePelaksanaan");
+    const isVerifikator = access.includes("verifyPelaksanaan");
 
-    // ── Readiness checks ────────────────────────────────────────────────────
-    const hasSurat = !!(data.SuratPemberitahuan && data.SuratPemberitahuan !== "");
-    const hasModul = !!(data.ModuleMateri && data.ModuleMateri !== "");
-    const hasInstruktur = !!(data.Instruktur && data.Instruktur !== "");
-    const hasPeserta = !!(data.UserPelatihan && data.UserPelatihan.length > 0);
-    const canSubmitSPV = hasSurat && hasModul && hasInstruktur && hasPeserta;
+    const status = String(data.StatusPenerbitan ?? "");
+    const stage = stageNum(status);
+    const canEdit = status === "0" || status === "1.2" || status === "3" || status === "";
+    const isDraftOrRevisi = status === "0" || status === "1.2" || status === "";
+    const id = data.IdPelatihan.toString();
 
-    const toggleStep = (id: number) =>
-        setOpenSteps(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]);
+    /* ---------- Kesiapan ---------- */
+    const peserta = data.UserPelatihan || [];
+    const totalPeserta = peserta.length;
+    const validPeserta = useMemo(() => countValidKeterangan(peserta), [peserta]);
+    const hasSurat = !!data.SuratPemberitahuan;
+    const hasModul = !!data.ModuleMateri;
+    const hasInstruktur = !!data.Instruktur;
+    const hasPeserta = totalPeserta > 0;
+    const readiness = [
+        { label: "Surat Pemberitahuan", done: hasSurat, step: 1 },
+        { label: "Perangkat Pelatihan", done: hasModul, step: 2 },
+        { label: "Tenaga Pelatih", done: hasInstruktur, step: 3 },
+        { label: "Data Peserta", done: hasPeserta, step: 4 },
+    ];
+    const readyCount = readiness.filter((r) => r.done).length;
+    const canSubmitSPV = readyCount === 4;
 
-    // ── Step definitions ─────────────────────────────────────────────────────
+    /* ---------- Langkah ---------- */
     const steps: TimelineStep[] = [
-        {
-            id: 0,
-            title: "Informasi Pelatihan",
-            subtitle: "Detail, jadwal & legalitas kegiatan",
-            icon: <TbInfoCircle />,
-            state: "done",
-        },
-        {
-            id: 1,
-            title: "Surat Pemberitahuan",
-            subtitle: hasSurat ? "Dokumen telah diunggah" : "Upload dokumen resmi kegiatan",
-            icon: <TbFileText />,
-            state: hasSurat ? "done" : "active",
-        },
-        {
-            id: 2,
-            title: "Perangkat Pelatihan",
-            subtitle: hasModul ? `Modul dipilih` : "Pilih modul & materi pembelajaran",
-            icon: <TbUserCode />,
-            state: !hasSurat ? "locked" : hasModul ? "done" : "active",
-            lockReason: "Upload Surat Pemberitahuan terlebih dahulu",
-        },
-        {
-            id: 3,
-            title: "Tenaga Pelatih",
-            subtitle: hasInstruktur ? `${instrukturs?.length || 0} instruktur dipetakan` : "Tetapkan instruktur pengajar",
-            icon: <TbUserStar />,
-            state: !hasModul ? "locked" : hasInstruktur ? "done" : "active",
-            lockReason: "Pilih perangkat pelatihan terlebih dahulu",
-        },
-        {
-            id: 4,
-            title: "Data Peserta",
-            subtitle: hasPeserta ? `${data.UserPelatihan?.length} peserta terdaftar` : "Import & validasi peserta",
-            icon: <HiOutlineUserGroup />,
-            state: !hasInstruktur ? "locked" : hasPeserta ? "done" : "active",
-            lockReason: "Tetapkan instruktur terlebih dahulu",
-        },
+        { id: 0, title: "Informasi Pelatihan", subtitle: "Detail, jadwal & legalitas", icon: TbInfoCircle, accent: "#64748B", state: "done" },
+        { id: 1, title: "Surat Pemberitahuan", subtitle: hasSurat ? "Dokumen telah diunggah" : "Unggah dokumen resmi kegiatan", icon: TbFileText, accent: "#3B82F6", state: hasSurat ? "done" : "active" },
+        { id: 2, title: "Perangkat Pelatihan", subtitle: hasModul ? modulPelatihan?.NamaMateriPelatihan || "Modul dipilih" : "Pilih modul & materi", icon: TbUserCode, accent: "#8B5CF6", state: !hasSurat ? "locked" : hasModul ? "done" : "active", lockReason: "Unggah Surat Pemberitahuan dulu" },
+        { id: 3, title: "Tenaga Pelatih", subtitle: hasInstruktur ? `${instrukturs?.length || 0} instruktur dipetakan` : "Tetapkan instruktur", icon: TbUserStar, accent: "#06B6D4", state: !hasModul ? "locked" : hasInstruktur ? "done" : "active", lockReason: "Pilih perangkat pelatihan dulu" },
+        { id: 4, title: "Data Peserta", subtitle: hasPeserta ? `${totalPeserta} peserta · ${validPeserta} valid` : "Import & validasi peserta", icon: HiOutlineUserGroup as IconType, accent: "#10B981", state: !hasInstruktur ? "locked" : hasPeserta ? "done" : "active", lockReason: "Tetapkan instruktur dulu" },
         {
             id: 5,
             title: "Ajukan ke SPV",
-            subtitle: canSubmitSPV
-                ? (data.StatusPenerbitan === "0" || data.StatusPenerbitan === "1.2") ? "Siap diajukan ke SPV" : "Sudah diajukan"
-                : "Lengkapi semua langkah di atas",
-            icon: <TbSend />,
-            state: !canSubmitSPV ? "locked" : (data.StatusPenerbitan !== "0" && data.StatusPenerbitan !== "1.2") ? "done" : "active",
-            lockReason: "Lengkapi semua data pelatihan terlebih dahulu",
+            subtitle: !canSubmitSPV ? "Lengkapi semua langkah" : isDraftOrRevisi ? "Siap diajukan" : "Sudah diajukan",
+            icon: TbSend,
+            accent: "#F59E0B",
+            state: !canSubmitSPV ? "locked" : isDraftOrRevisi ? "active" : "done",
+            lockReason: "Lengkapi semua data pelatihan dulu",
         },
     ];
+    const completedCount = steps.filter((s) => s.state === "done").length;
+    const firstActive = steps.find((s) => s.state === "active")?.id;
 
-    const completedCount = steps.filter(s => s.state === "done").length;
+    // Langkah terpilih (default: yang perlu aksi), panel kanan menampilkan isinya
+    const [current, setCurrent] = useState<number>(() => firstActive ?? 4);
+    const focusStep = (sid: number) => {
+        setCurrent(sid);
+        requestAnimationFrame(() => document.getElementById("detail-steps")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    };
+    const step = steps[current];
+    const progressPct = Math.round((completedCount / steps.length) * 100);
+
+    const [expandedModul, setExpandedModul] = useState<number | null>(null);
+
+    /* ---------- Aksi kontekstual ---------- */
+    const showActions = isAdmin || isSPV || isVerifikator;
+    const nextHint =
+        isSPV && status === "1" ? "Tinjau kelengkapan lalu pilih verifikator atau minta perbaikan."
+            : isVerifikator && status === "2" ? "Periksa administrasi lalu setujui atau minta perbaikan."
+                : isAdmin && status === "3" ? "Perbaiki sesuai catatan, lalu kirim kembali ke verifikator."
+                    : isAdmin && isDraftOrRevisi && !canSubmitSPV ? `Lengkapi ${4 - readyCount} data persiapan untuk diajukan ke SPV.`
+                        : isAdmin && isDraftOrRevisi && canSubmitSPV ? "Semua data lengkap — ajukan ke SPV."
+                            : null;
+
+    const hasFoto = !!data.FotoPelatihan && data.FotoPelatihan !== EMPTY_FOTO;
+
+    /* ============================ RENDER ============================ */
 
     return (
-        <div className="w-full space-y-6 py-1">
-
-            {/* ── Action row (Edit / Delete / SPV / Verifikator actions) ────── */}
-            {(isAdmin || isSPV || isVerifikator) && (
-                <div className="flex flex-wrap items-center gap-2 p-4 bg-white dark:bg-slate-900/80 rounded-2xl border border-slate-100 dark:border-white/[0.05] shadow-sm">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-1">Aksi:</span>
-
-                    {isAdmin && (
-                        <>
-                            <EditPelatihanAction idPelatihan={data.IdPelatihan.toString()} currentData={data} onSuccess={fetchData} />
-                            <DeletePelatihanAction idPelatihan={data.IdPelatihan.toString()} pelatihan={data} handleFetchingData={fetchData} />
-                        </>
-                    )}
-
-                    {/* Kirim ke SPV */}
-                    {/* {isAdmin && data.SuratPemberitahuan !== "" && (data.StatusPenerbitan === "0" || data.StatusPenerbitan === "1.2") && (
-                        data.UserPelatihan?.length !== 0 ? (
-                            <SendNoteAction idPelatihan={data.IdPelatihan.toString()} title="Kirim ke SPV" description="Kirim pelaksanaan ini ke SPV untuk verifikasi" buttonLabel="Kirim ke SPV" icon={Send} buttonColor="blue" onSuccess={fetchData} status="1" pelatihan={data} />
-                        ) : (
-                            <Button variant="outline" size="sm" className="h-9 px-4 rounded-xl border-blue-200 text-blue-600 font-bold text-xs hover:bg-blue-50"
-                                onClick={() => Toast.fire({ icon: "warning", title: "Lengkapi Data", text: "Pastikan peserta sudah ditambahkan sebelum mengajukan ke SPV." })}>
-                                <Send className="h-3.5 w-3.5 mr-1.5" /> Kirim ke SPV
-                            </Button>
-                        )
-                    )} */}
-
-                    {/* Kirim ke Verifikator */}
-                    {isAdmin && data.SuratPemberitahuan !== "" && data.StatusPenerbitan === "3" && (
-                        <SendNoteAction idPelatihan={data.IdPelatihan.toString()} title="Kirim ke Verifikator" description="Kirim perbaikan ke Verifikator" buttonLabel="Kirim ke Verifikator" icon={Send} buttonColor="teal" onSuccess={fetchData} status="2" pelatihan={data} />
-                    )}
-
-                    {/* Tutup Pelatihan */}
-                    {isAdmin && (data.StatusPenerbitan === "4" || data.StatusPenerbitan === "1.1") && isMoreThanToday(data.TanggalBerakhirPelatihan) && (
-                        <SendNoteAction idPelatihan={data.IdPelatihan.toString()} title="Tutup Pelatihan" description="Tutup pelatihan dan mulai penerbitan STTPL." buttonLabel="Tutup Pelatihan" icon={Clock} buttonColor="neutral" onSuccess={fetchData} status="5" pelatihan={data} />
-                    )}
-
-
-                    {/* SPV Actions */}
-                    {isSPV && data.StatusPenerbitan === "1" && (
-                        <>
-                            <SendNoteAction idPelatihan={data.IdPelatihan.toString()} title="Minta Perbaikan" description="Berikan catatan perbaikan." buttonLabel="Minta Perbaikan" icon={AlertCircle} buttonColor="rose" onSuccess={fetchData} status="1.2" pelatihan={data} />
-                            <SendNoteAction idPelatihan={data.IdPelatihan.toString()} title="Pilih Verifikator" description="Tunjuk verifikator pelaksanaan." buttonLabel="Pilih Verifikator" icon={TbSettings} buttonColor="teal" onSuccess={fetchData} status="2" pelatihan={data} />
-                        </>
-                    )}
-
-                    {/* Verifikator Actions */}
-                    {isVerifikator && data.StatusPenerbitan === "2" && (
-                        <>
-                            <SendNoteAction idPelatihan={data.IdPelatihan.toString()} title="Minta Perbaikan" description="Minta perbaikan kelengkapan administrasi." buttonLabel="Minta Perbaikan" icon={Trash2} buttonColor="rose" onSuccess={fetchData} status="3" pelatihan={data} />
-                            <SendNoteAction idPelatihan={data.IdPelatihan.toString()} title="Setujui Pelaksanaan" description="Setujui pelaksanaan pelatihan ini." buttonLabel="Setujui Pelaksanaan" icon={ShieldCheck} buttonColor="teal" onSuccess={fetchData} status="4" pelatihan={data} />
-                        </>
-                    )}
+        <div className="w-full space-y-5">
+            {/* ---------- Bar aksi ---------- */}
+            {showActions && (
+                <div className="rounded-3xl bg-white dark:bg-slate-900 ring-1 ring-slate-200/80 dark:ring-slate-800 shadow-sm p-3 md:p-4 flex flex-col lg:flex-row lg:items-center gap-3">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                        <span className="relative isolate flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#0B1B3F] text-sky-100">
+                            <span className="absolute inset-0 -z-10 bg-[radial-gradient(80%_80%_at_0%_0%,#2563EB_0%,transparent_70%)]" />
+                            <TbArrowRight className="w-5 h-5" />
+                        </span>
+                        <div className="min-w-0">
+                            <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">Langkah berikutnya</p>
+                            <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200">{nextHint || "Tidak ada aksi yang menunggu Anda."}</p>
+                        </div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                        {isAdmin && status === "3" && hasSurat && (
+                            <SendNoteAction idPelatihan={id} title="Kirim ke Verifikator" description="Kirim perbaikan ke Verifikator" buttonLabel="Kirim ke Verifikator" icon={Send} buttonColor="teal" onSuccess={fetchData} status="2" pelatihan={data} />
+                        )}
+                        {isAdmin && (status === "4" || status === "1.1") && isMoreThanToday(data.TanggalBerakhirPelatihan) && (
+                            <SendNoteAction idPelatihan={id} title="Tutup Pelatihan" description="Tutup pelatihan dan mulai penerbitan STTPL." buttonLabel="Tutup Pelatihan" icon={Clock} buttonColor="neutral" onSuccess={fetchData} status="5" pelatihan={data} />
+                        )}
+                        {isSPV && status === "1" && (
+                            <>
+                                <SendNoteAction idPelatihan={id} title="Minta Perbaikan" description="Berikan catatan perbaikan." buttonLabel="Minta Perbaikan" icon={AlertCircle} buttonColor="rose" onSuccess={fetchData} status="1.2" pelatihan={data} />
+                                <SendNoteAction idPelatihan={id} title="Pilih Verifikator" description="Tunjuk verifikator pelaksanaan." buttonLabel="Pilih Verifikator" icon={TbSettings} buttonColor="teal" onSuccess={fetchData} status="2" pelatihan={data} />
+                            </>
+                        )}
+                        {isVerifikator && status === "2" && (
+                            <>
+                                <SendNoteAction idPelatihan={id} title="Minta Perbaikan" description="Minta perbaikan kelengkapan administrasi." buttonLabel="Minta Perbaikan" icon={Trash2} buttonColor="rose" onSuccess={fetchData} status="3" pelatihan={data} />
+                                <SendNoteAction idPelatihan={id} title="Setujui Pelaksanaan" description="Setujui pelaksanaan pelatihan ini." buttonLabel="Setujui Pelaksanaan" icon={ShieldCheck} buttonColor="teal" onSuccess={fetchData} status="4" pelatihan={data} />
+                            </>
+                        )}
+                        {isAdmin && (
+                            <>
+                                <span className="hidden lg:block h-6 w-px bg-slate-200 dark:bg-slate-800 mx-1" />
+                                <EditPelatihanAction idPelatihan={id} currentData={data} onSuccess={fetchData} />
+                                <DeletePelatihanAction idPelatihan={id} pelatihan={data} handleFetchingData={fetchData} />
+                            </>
+                        )}
+                        {stage >= 5 && onSwitchToSttpl && (
+                            <button type="button" onClick={onSwitchToSttpl} className="h-9 px-3.5 rounded-xl bg-[#0B1B3F] hover:bg-blue-700 text-white text-xs font-bold inline-flex items-center gap-1.5">
+                                Ke e-STTPL <TbArrowRight className="w-4 h-4" />
+                            </button>
+                        )}
+                    </div>
                 </div>
             )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
+            <div id="detail-steps" className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-4 lg:gap-5 items-start scroll-mt-28">
+                {/* ---------- KIRI: timeline vertikal (navy, seperti FormPelatihan) ---------- */}
+                <div className="space-y-4 lg:sticky lg:top-24">
+                    <aside className="relative isolate overflow-hidden rounded-3xl bg-[#0B1B3F] p-5 text-white ring-1 ring-white/10 shadow-[0_20px_50px_-20px_rgba(37,99,235,0.5)]">
+                        <div className="absolute inset-0 -z-10 bg-[radial-gradient(80%_50%_at_0%_0%,#2563EB_0%,transparent_60%),radial-gradient(70%_50%_at_100%_100%,#0EA5E9_0%,transparent_60%)] opacity-80" />
+                        <div className="absolute inset-0 -z-10 opacity-[0.12] [background-image:radial-gradient(rgba(255,255,255,0.8)_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(to_bottom,black,transparent_80%)]" />
+                        <TbSchool aria-hidden className="pointer-events-none absolute -right-6 -bottom-8 -z-10 w-40 h-40 -rotate-12 text-sky-300 opacity-10" />
 
-                {/* ── LEFT: Vertical Timeline ─────────────────────────────── */}
-                <div className="space-y-0">
-                    {/* Progress header */}
-                    <div className="flex items-center justify-between mb-5 px-1">
-                        <div>
-                            <h2 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-tight">Tahapan Persiapan</h2>
-                            <p className="text-[11px] text-slate-400 mt-0.5">{completedCount} dari {steps.length} langkah selesai</p>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-sky-200/80">Tahapan Persiapan</p>
+                        <div className="mt-1 flex items-baseline justify-between">
+                            <h2 className="text-xl font-black tracking-tight">{completedCount}/{steps.length} selesai</h2>
+                            <span className="text-sm font-black tabular-nums">{progressPct}%</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-32 h-2 bg-slate-100 dark:bg-white/[0.06] rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-gradient-to-r from-blue-600 to-emerald-500 rounded-full transition-all duration-700"
-                                    style={{ width: `${(completedCount / steps.length) * 100}%` }}
-                                />
-                            </div>
-                            <span className="text-xs font-black text-slate-600 dark:text-slate-300">{Math.round((completedCount / steps.length) * 100)}%</span>
+                        <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                            <div className="h-full rounded-full transition-all duration-700" style={{ width: `${progressPct}%`, background: "linear-gradient(90deg,#38BDF8,#fff)" }} />
                         </div>
-                    </div>
 
-                    {/* Timeline items */}
-                    <div className="relative">
-                        {/* Vertical line */}
-                        <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-slate-100 dark:bg-white/[0.05]" />
-
-                        <div className="space-y-3">
-                            {steps.map((step, idx) => {
-                                const isOpen = openSteps.includes(step.id);
-                                const isDone = step.state === "done";
-                                const isActive = step.state === "active";
-                                const isLocked = step.state === "locked";
-
+                        <ol className="mt-5 flex lg:block gap-2 lg:space-y-1 overflow-x-auto lg:overflow-visible -mx-1 px-1 pb-1 lg:pb-0 scrollbar-hide">
+                            {steps.map((s, i) => {
+                                const Icon = s.icon;
+                                const sel = i === current;
+                                const done = s.state === "done";
+                                const locked = s.state === "locked";
+                                const needs = s.state === "active";
+                                const last = i === steps.length - 1;
                                 return (
-                                    <div key={step.id} className="relative pl-16">
-                                        {/* Dot */}
-                                        <div className={`absolute left-3.5 top-4 w-5 h-5 rounded-full flex items-center justify-center z-10 border-2 transition-all duration-300 ${isDone ? "bg-emerald-500 border-emerald-500 shadow-lg shadow-emerald-500/20" : isActive ? "bg-blue-600 border-blue-600 shadow-lg shadow-blue-500/25 ring-4 ring-blue-500/10" : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"}`}>
-                                            {isDone
-                                                ? <TbCheck className="w-3 h-3 text-white" strokeWidth={3} />
-                                                : isLocked
-                                                    ? <TbLock className="w-2.5 h-2.5 text-slate-400" />
-                                                    : <span className="text-[9px] font-black text-white">{idx + 1}</span>}
-                                        </div>
-
-                                        {/* Card */}
-                                        <div className={`rounded-2xl border transition-all duration-300 overflow-hidden ${isDone ? "border-emerald-200/60 dark:border-emerald-900/30 bg-emerald-50/40 dark:bg-emerald-950/10" : isActive ? "border-blue-200 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-950/10 shadow-sm" : "border-slate-100 dark:border-white/[0.04] bg-slate-50/50 dark:bg-slate-900/30 opacity-60"}`}>
-
-                                            {/* Card header (always visible) */}
-                                            <button
-                                                type="button"
-                                                onClick={() => !isLocked && toggleStep(step.id)}
-                                                disabled={isLocked}
-                                                className="w-full flex items-center justify-between p-4 text-left disabled:cursor-not-allowed"
+                                    <li key={s.id} className="relative shrink-0 min-w-[210px] lg:min-w-0">
+                                        {!last && (
+                                            <span className="hidden lg:block absolute left-[25px] top-[50px] bottom-[-6px] w-[2px] rounded-full bg-white/10 overflow-hidden">
+                                                <span className="block w-full bg-gradient-to-b from-emerald-400 to-sky-400 transition-all duration-500" style={{ height: done ? "100%" : "0%" }} />
+                                            </span>
+                                        )}
+                                        <button
+                                            type="button"
+                                            onClick={() => setCurrent(i)}
+                                            aria-current={sel ? "step" : undefined}
+                                            className={`group relative isolate w-full flex items-start gap-3 rounded-2xl p-2.5 text-left transition-all duration-300 overflow-hidden ${sel ? "bg-white/[0.12] backdrop-blur-xl ring-1 ring-white/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]" : "hover:bg-white/[0.06]"} ${locked && !sel ? "opacity-60" : ""}`}
+                                        >
+                                            {sel && <span aria-hidden className="pointer-events-none absolute inset-0 -z-10" style={{ background: `linear-gradient(to left, ${s.accent}59 0%, ${s.accent}1f 45%, transparent 85%)` }} />}
+                                            <span
+                                                className={`relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ring-1 transition-all duration-300 ${done ? "bg-emerald-500 ring-emerald-300/40 text-white" : sel || needs ? "text-white ring-white/30" : "bg-white/10 ring-white/10 text-sky-100/70"}`}
+                                                style={!done && (sel || needs) ? { background: s.accent, boxShadow: `0 6px 18px -4px ${s.accent}` } : undefined}
                                             >
-                                                <div className="flex items-center gap-3">
-                                                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg shrink-0 ${isDone ? "bg-emerald-500 text-white" : isActive ? "bg-blue-600 text-white" : "bg-slate-200 dark:bg-slate-800 text-slate-400"}`}>
-                                                        {step.icon}
-                                                    </div>
-                                                    <div>
-                                                        <div className="flex items-center gap-2">
-                                                            <p className={`text-xs font-black uppercase tracking-tight ${isDone ? "text-emerald-700 dark:text-emerald-400" : isActive ? "text-blue-700 dark:text-blue-400" : "text-slate-400"}`}>
-                                                                {step.title}
-                                                            </p>
-                                                            {isDone && <span className="inline-flex items-center gap-0.5 text-[9px] font-black px-1.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600">✓ Selesai</span>}
-                                                            {isActive && <span className="inline-flex items-center gap-0.5 text-[9px] font-black px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-600 animate-pulse">● Perlu Aksi</span>}
-                                                        </div>
-                                                        <p className="text-[11px] text-slate-500 mt-0.5">{step.subtitle}</p>
-                                                        {isLocked && step.lockReason && (
-                                                            <p className="text-[10px] text-amber-600 dark:text-amber-400 flex items-center gap-1 mt-0.5 font-semibold">
-                                                                <TbLock className="w-2.5 h-2.5" /> {step.lockReason}
-                                                            </p>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                {!isLocked && (
-                                                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-colors shrink-0 ${isOpen ? "bg-slate-200 dark:bg-white/10" : "bg-slate-100 dark:bg-white/5"}`}>
-                                                        {isOpen ? <TbChevronUp className="w-3.5 h-3.5 text-slate-500" /> : <TbChevronDown className="w-3.5 h-3.5 text-slate-500" />}
-                                                    </div>
-                                                )}
-                                            </button>
-
-                                            {/* Card body */}
-                                            <AnimatePresence>
-                                                {isOpen && !isLocked && (
-                                                    <motion.div
-                                                        initial={{ height: 0, opacity: 0 }}
-                                                        animate={{ height: "auto", opacity: 1 }}
-                                                        exit={{ height: 0, opacity: 0 }}
-                                                        transition={{ duration: 0.25 }}
-                                                        className="overflow-hidden"
-                                                    >
-                                                        <div className="px-4 pb-4 border-t border-slate-100 dark:border-white/[0.04] pt-3">
-
-                                                            {/* ── STEP 0: Full Info ──────────────────── */}
-                                                            {step.id === 0 && (
-                                                                <div className="space-y-4">
-                                                                    <InfoSection title="Identitas & Program" icon={TbTag}>
-                                                                        <InfoItem label="Kode Pelatihan" value={data.KodePelatihan} icon={TbTag} />
-                                                                        <InfoItem label="Nama Pelatihan (ID)" value={data.NamaPelatihan} icon={TbSchool} />
-                                                                        <InfoItem label="Nama Pelatihan (EN)" value={data.NamaPelathanInggris} icon={Globe} />
-                                                                        <InfoItem label="Sektor / Jenis Program" value={data.JenisProgram} icon={TbHierarchy} />
-                                                                        <InfoItem label="Klaster / Bidang" value={data.BidangPelatihan} icon={TbCategory} />
-                                                                        <InfoItem label="Program Utama" value={data.Program} icon={TbRocket} />
-                                                                        <InfoItem label="Program Terobosan KKP" value={data.DukunganProgramTerobosan} icon={TbStar} />
-                                                                    </InfoSection>
-
-                                                                    <InfoSection title="Jadwal Pelaksanaan" icon={TbCalendar}>
-                                                                        <InfoItem label="Tanggal Mulai" value={generateTanggalPelatihan(data.TanggalMulaiPelatihan)} icon={TbCalendar} />
-                                                                        <InfoItem label="Tanggal Selesai" value={generateTanggalPelatihan(data.TanggalBerakhirPelatihan)} icon={TbClock} />
-                                                                        <InfoItem label="Mulai Pendaftaran" value={data.TanggalMulaiPendaftaran ? generateTanggalPelatihan(data.TanggalMulaiPendaftaran) : "-"} icon={TbCalendar} />
-                                                                        <InfoItem label="Tutup Pendaftaran" value={data.TanggalAkhirPendaftaran ? generateTanggalPelatihan(data.TanggalAkhirPendaftaran!) : "-"} icon={TbClock} />
-                                                                    </InfoSection>
-
-                                                                    <InfoSection title="Penyelenggara & Pembiayaan" icon={TbBuildingSkyscraper}>
-                                                                        <InfoItem label="Lembaga Penyelenggara" value={data.PenyelenggaraPelatihan} icon={TbBuildingSkyscraper} />
-                                                                        <InfoItem label="Lokasi Pelaksanaan" value={data.LokasiPelatihan} icon={TbMapPin} />
-                                                                        <InfoItem label="Metode Pelaksanaan" value={data.PelaksanaanPelatihan} icon={TbSchool} />
-                                                                        <InfoItem label="Sumber Pembiayaan" value={data.JenisPelatihan} icon={TbCash} />
-                                                                        {data.JenisPelatihan === JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN[1] && (
-                                                                            <InfoItem label="Biaya / Peserta" value={`Rp ${data.HargaPelatihan?.toLocaleString()}`} icon={TbCash} />
-                                                                        )}
-                                                                        <InfoItem label="Kuota Peserta" value={data.KoutaPelatihan ? `${data.KoutaPelatihan} Orang` : "-"} icon={Users} />
-                                                                    </InfoSection>
-
-                                                                    <InfoSection title="Legalitas & Sertifikasi" icon={TbCertificate}>
-                                                                        <InfoItem label="Penandatangan Sertifikat" value={data.TtdSertifikat} icon={TbSignature} />
-                                                                        <InfoItem label="Dibuat Pada" value={data.CreateAt ? generateTanggalPelatihan(data.CreateAt) : "-"} icon={Calendar} />
-                                                                    </InfoSection>
-                                                                </div>
-                                                            )}
-
-                                                            {/* ── STEP 1: Surat Pemberitahuan ───────── */}
-                                                            {step.id === 1 && (
-                                                                <div className="space-y-3">
-                                                                    <div className={`p-4 rounded-xl border ${hasSurat ? "bg-emerald-50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900/30" : "bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-900/30"}`}>
-                                                                        <div className="flex items-start gap-3">
-                                                                            <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${hasSurat ? "bg-emerald-500 text-white" : "bg-amber-400 text-white"}`}>
-                                                                                <TbFileText className="w-5 h-5" />
-                                                                            </div>
-                                                                            <div className="flex-1 min-w-0">
-                                                                                <p className="text-xs font-bold text-slate-700 dark:text-slate-200">
-                                                                                    {hasSurat ? "Surat Pemberitahuan telah diunggah" : "Surat Pemberitahuan belum diunggah"}
-                                                                                </p>
-                                                                                {hasSurat && (
-                                                                                    <p className="text-[11px] text-slate-500 mt-0.5 truncate">{data.SuratPemberitahuan}</p>
-                                                                                )}
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="flex flex-wrap gap-2">
-                                                                        {isAdmin && (
-                                                                            <UploadSuratButton
-                                                                                idPelatihan={String(data.IdPelatihan)}
-                                                                                pelatihan={data}
-                                                                                handleFetchingData={fetchData}
-                                                                            />
-                                                                        )}
-                                                                        {hasSurat && (
-                                                                            <Link target="_blank" href={`${urlFileSuratPemberitahuan}/${data.SuratPemberitahuan}`}
-                                                                                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all shadow-sm">
-                                                                                <FileText className="w-3.5 h-3.5" /> Lihat Surat
-                                                                            </Link>
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-                                                            )}
-
-                                                            {/* ── STEP 2: Perangkat Pelatihan ───────── */}
-                                                            {step.id === 2 && (
-                                                                <div className="space-y-3">
-                                                                    {canEdit && isAdmin && (
-                                                                        <ChooseModulAction idPelatihan={data.IdPelatihan.toString()} currentData={data} onSuccess={fetchData} />
-                                                                    )}
-                                                                    {!hasModul ? (
-                                                                        <div className="py-6 text-center rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
-                                                                            <TbUserCode className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                                                                            <p className="text-xs font-bold text-slate-400">Modul pelatihan belum dipilih</p>
-                                                                            <p className="text-[11px] text-slate-300 mt-1">Pilih paket modul menggunakan tombol di atas</p>
-                                                                        </div>
-                                                                    ) : (
-                                                                        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 overflow-hidden">
-                                                                            <div className="p-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                                                                                <div>
-                                                                                    <p className="text-[10px] font-black uppercase tracking-widest text-blue-600">{modulPelatihan?.BidangMateriPelatihan} • {modulPelatihan?.Tahun}</p>
-                                                                                    <p className="text-xs font-black text-slate-800 dark:text-white">{modulPelatihan?.NamaMateriPelatihan}</p>
-                                                                                </div>
-                                                                                <Badge className="bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-none text-xs">
-                                                                                    {modulPelatihan?.ModulPelatihan?.length || 0} Modul
-                                                                                </Badge>
-                                                                            </div>
-                                                                            <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                                                                                {modulPelatihan?.ModulPelatihan?.map((modul: ModulPelatihan) => (
-                                                                                    <div key={modul.IdModulPelatihan} className="p-3">
-                                                                                        <div className="flex items-center justify-between">
-                                                                                            <div className="flex items-center gap-2">
-                                                                                                <GraduationCap className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                                                                                                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{modul.NamaModulPelatihan}</span>
-                                                                                            </div>
-                                                                                            <div className="flex items-center gap-2">
-                                                                                                <Link href={`${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${modul.FileModule}`} target="_blank" className="text-[11px] font-bold text-blue-600 hover:underline flex items-center gap-1 bg-blue-50 dark:bg-blue-950 px-2 py-0.5 rounded">
-                                                                                                    <Download className="w-3 h-3" /> Modul
-                                                                                                </Link>
-                                                                                                <button type="button" onClick={() => setExpandedModul(expandedModul === modul.IdModulPelatihan ? null : modul.IdModulPelatihan)} className="text-slate-400 hover:text-slate-600 p-0.5">
-                                                                                                    <TbChevronDown className={`w-3.5 h-3.5 transition-transform ${expandedModul === modul.IdModulPelatihan ? "rotate-180" : ""}`} />
-                                                                                                </button>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        {expandedModul === modul.IdModulPelatihan && modul.BahanTayang?.map((bt, i) => (
-                                                                                            <div key={i} className="ml-5 mt-1.5 flex items-center justify-between text-[11px] text-slate-600">
-                                                                                                <span>• {bt.NamaBahanTayang}</span>
-                                                                                                <Link href={bt.BahanTayang ? `${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${bt.BahanTayang}` : bt.LinkVideo} target="_blank" className="text-blue-600 hover:underline flex items-center gap-0.5">
-                                                                                                    Lihat <TbExternalLink className="w-3 h-3" />
-                                                                                                </Link>
-                                                                                            </div>
-                                                                                        ))}
-                                                                                    </div>
-                                                                                ))}
-                                                                            </div>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            )}
-
-                                                            {/* ── STEP 3: Instruktur ────────────────── */}
-                                                            {step.id === 3 && (
-                                                                <div className="space-y-3">
-                                                                    <ChooseInstrukturAction idPelatihan={data.IdPelatihan.toString()} currentData={data} onSuccess={fetchData} />
-                                                                    {!hasInstruktur ? (
-                                                                        <div className="py-6 text-center rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
-                                                                            <TbUserStar className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                                                                            <p className="text-xs font-bold text-slate-400">Instruktur belum dipetakan</p>
-                                                                        </div>
-                                                                    ) : (
-                                                                        <div className="rounded-xl border border-slate-200/80 dark:border-slate-800 overflow-hidden divide-y divide-slate-100 dark:divide-slate-800">
-                                                                            {instrukturs?.map((item, idx) => (
-                                                                                <div key={idx} className="p-3 flex items-center justify-between gap-3">
-                                                                                    <div className="flex items-center gap-2.5">
-                                                                                        <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-black flex items-center justify-center text-xs shrink-0">
-                                                                                            {item.nama.charAt(0)}
-                                                                                        </div>
-                                                                                        <div>
-                                                                                            <p className="text-xs font-black text-slate-800 dark:text-white">{item.nama}</p>
-                                                                                            <p className="text-[10px] text-slate-400">{item.jenjang_jabatan} · {item.eselon_1}</p>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <Badge className="bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-none text-[10px]">
-                                                                                        {item.bidang_keahlian || "Instruktur"}
-                                                                                    </Badge>
-                                                                                </div>
-                                                                            ))}
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            )}
-
-                                                            {/* ── STEP 4: Peserta ───────────────────── */}
-                                                            {step.id === 4 && parseInt(data?.StatusPenerbitan) < 5 && (
-                                                                <div className="space-y-3">
-                                                                    <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/80">
-                                                                        <div className="flex items-center gap-2">
-                                                                            {canEdit && (
-                                                                                <ImportPesertaAction
-                                                                                    idPelatihan={data.IdPelatihan.toString()}
-                                                                                    statusApproval={data.StatusApproval}
-                                                                                    onSuccess={fetchData}
-                                                                                    onAddHistory={(msg) => handleAddHistoryTrainingInExisting(data!, msg, Cookies.get("Role"), `${Cookies.get("Nama")} - ${Cookies.get("Satker")}`)}
-                                                                                />
-                                                                            )}
-                                                                            <ZipPhotoParticipantAction users={data.UserPelatihan} onSuccess={fetchData} />
-                                                                            {data.UserPelatihan?.length !== 0 && countValidKeterangan(data.UserPelatihan) < data.UserPelatihan?.length && (
-                                                                                <ValidateParticipantAction data={data.UserPelatihan} onSuccess={fetchData} />
-                                                                            )}
-                                                                        </div>
-                                                                        <div className="flex items-center gap-3 text-xs font-bold text-slate-600">
-                                                                            <span>Total: <strong className="text-blue-600">{data.UserPelatihan?.length || 0}</strong></span>
-                                                                            <span className="text-slate-300">|</span>
-                                                                            <span>Valid: <strong className="text-emerald-600">{countValidKeterangan(data.UserPelatihan)}</strong></span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 overflow-hidden">
-                                                                        <UserPelatihanTable pelatihan={data} data={data.UserPelatihan || []} onSuccess={fetchData} />
-                                                                    </div>
-                                                                </div>
-                                                            )}
-
-                                                            {/* ── STEP 5: Ajukan ke SPV ────────────── */}
-                                                            {step.id === 5 && (
-                                                                <div className="space-y-3">
-                                                                    {/* Checklist */}
-                                                                    <div className="space-y-2">
-                                                                        {[
-                                                                            { label: "Surat Pemberitahuan diunggah", done: hasSurat },
-                                                                            { label: "Perangkat / modul dipilih", done: hasModul },
-                                                                            { label: "Instruktur ditetapkan", done: hasInstruktur },
-                                                                            { label: "Peserta pelatihan diimpor", done: hasPeserta },
-                                                                        ].map((item, i) => (
-                                                                            <div key={i} className={`flex items-center gap-3 p-3 rounded-xl border ${item.done ? "bg-emerald-50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900/30" : "bg-rose-50 border-rose-200 dark:bg-rose-950/20 dark:border-rose-900/30"}`}>
-                                                                                <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${item.done ? "bg-emerald-500" : "bg-rose-400"}`}>
-                                                                                    {item.done ? <TbCheck className="w-3 h-3 text-white" /> : <TbAlertCircle className="w-3 h-3 text-white" />}
-                                                                                </div>
-                                                                                <span className={`text-xs font-bold ${item.done ? "text-emerald-700 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>{item.label}</span>
-                                                                            </div>
-                                                                        ))}
-                                                                    </div>
-
-                                                                    {isAdmin && (data.StatusPenerbitan === "0" || data.StatusPenerbitan === "1.2") && canSubmitSPV && (
-                                                                        <SendNoteAction
-                                                                            idPelatihan={data.IdPelatihan.toString()}
-                                                                            title="Kirim ke SPV"
-                                                                            description="Ajukan pelaksanaan ke SPV untuk diverifikasi."
-                                                                            buttonLabel="Ajukan ke SPV Sekarang"
-                                                                            icon={Send}
-                                                                            buttonColor="blue"
-                                                                            onSuccess={fetchData}
-                                                                            status="1"
-                                                                            pelatihan={data}
-                                                                        />
-                                                                    )}
-
-                                                                    {!canSubmitSPV && (
-                                                                        <p className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold text-center py-2">
-                                                                            Lengkapi semua langkah di atas sebelum mengajukan ke SPV.
-                                                                        </p>
-                                                                    )}
-                                                                </div>
-                                                            )}
-
-                                                        </div>
-                                                    </motion.div>
-                                                )}
-                                            </AnimatePresence>
-                                        </div>
-                                    </div>
+                                                {done ? <TbCheck className="w-[18px] h-[18px]" /> : locked ? <TbLock className="w-4 h-4" /> : <Icon className="w-[18px] h-[18px]" />}
+                                            </span>
+                                            <span className="min-w-0 flex-1 pt-0.5">
+                                                <span className="flex items-center gap-2">
+                                                    <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-blue-100/45">Langkah {i + 1}</span>
+                                                    {done && <span className="text-[9px] font-bold text-emerald-300">Selesai</span>}
+                                                    {needs && <span className="text-[9px] font-bold text-amber-300">Perlu aksi</span>}
+                                                </span>
+                                                <span className={`block text-sm font-bold ${sel ? "text-white" : "text-blue-50/90"}`}>{s.title}</span>
+                                                <span className="block text-[11px] text-blue-100/55 truncate">{locked ? s.lockReason : s.subtitle}</span>
+                                            </span>
+                                        </button>
+                                    </li>
                                 );
                             })}
-                        </div>
-                    </div>
-                </div>
+                        </ol>
 
-                {/* ── RIGHT: Sidebar ────────────────────────────────────── */}
-                <div className="space-y-4 lg:sticky lg:top-24">
-
-                    {/* Readiness Summary Card */}
-                    <div className="bg-white dark:bg-slate-900/80 rounded-2xl border border-slate-100 dark:border-white/[0.05] shadow-sm p-5">
-                        <div className="flex items-center gap-2 mb-4">
-                            <TbCircleCheck className="text-blue-500 w-4 h-4" />
-                            <h3 className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-white">Kesiapan Kelas</h3>
-                        </div>
-                        <div className="space-y-2.5">
-                            {[
-                                { label: "Surat Pemberitahuan", done: hasSurat },
-                                { label: "Perangkat Pelatihan", done: hasModul },
-                                { label: "Tenaga Pelatih", done: hasInstruktur },
-                                { label: "Data Peserta", done: hasPeserta },
-                            ].map((item, i) => (
-                                <div key={i} className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <div className={`w-2 h-2 rounded-full ${item.done ? "bg-emerald-500" : "bg-slate-200 dark:bg-slate-700"}`} />
-                                        <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">{item.label}</span>
-                                    </div>
-                                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${item.done ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400" : "bg-slate-100 text-slate-400 dark:bg-slate-800"}`}>
-                                        {item.done ? "✓ Ada" : "Belum"}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-
-                        <div className="mt-4 pt-4 border-t border-slate-100 dark:border-white/[0.05]">
-                            <div className="flex justify-between text-xs mb-1.5">
-                                <span className="font-bold text-slate-500">Progress</span>
-                                <span className="font-black text-slate-700 dark:text-white">{[hasSurat, hasModul, hasInstruktur, hasPeserta].filter(Boolean).length}/4</span>
+                        {/* Statistik peserta ringkas */}
+                        <div className="mt-4 grid grid-cols-2 gap-2">
+                            <div className="rounded-2xl bg-white/[0.06] ring-1 ring-white/10 px-3 py-2.5">
+                                <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-blue-100/50">Peserta</p>
+                                <p className="text-xl font-black tabular-nums">{totalPeserta.toLocaleString("id-ID")}</p>
                             </div>
-                            <div className="w-full h-2 bg-slate-100 dark:bg-white/[0.06] rounded-full overflow-hidden">
-                                <div className="h-full bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full transition-all duration-500"
-                                    style={{ width: `${([hasSurat, hasModul, hasInstruktur, hasPeserta].filter(Boolean).length / 4) * 100}%` }} />
+                            <div className="rounded-2xl bg-white/[0.06] ring-1 ring-white/10 px-3 py-2.5">
+                                <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-blue-100/50">Valid</p>
+                                <p className="text-xl font-black tabular-nums text-emerald-300">
+                                    {validPeserta.toLocaleString("id-ID")}
+                                    {totalPeserta > 0 && <span className="ml-1 text-[10px] font-bold text-blue-100/50">{Math.round((validPeserta / totalPeserta) * 100)}%</span>}
+                                </p>
                             </div>
                         </div>
-                    </div>
+                    </aside>
 
-                    {/* Quick Stats */}
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/30 rounded-2xl p-4">
-                            <p className="text-[10px] font-black uppercase text-blue-500 tracking-widest mb-1">Peserta</p>
-                            <p className="text-2xl font-black text-blue-700 dark:text-blue-300">{data.UserPelatihan?.length || 0}</p>
-                            <p className="text-[10px] text-blue-500 mt-0.5">Terdaftar</p>
-                        </div>
-                        <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/30 rounded-2xl p-4">
-                            <p className="text-[10px] font-black uppercase text-emerald-500 tracking-widest mb-1">Valid</p>
-                            <p className="text-2xl font-black text-emerald-700 dark:text-emerald-300">{countValidKeterangan(data.UserPelatihan)}</p>
-                            <p className="text-[10px] text-emerald-500 mt-0.5">Terverifikasi</p>
-                        </div>
-                    </div>
-
-                    {/* Promosi & Publikasi */}
+                    {/* Publikasi */}
                     {isAdmin && (
-                        <div className="bg-white dark:bg-slate-900/80 rounded-2xl border border-slate-100 dark:border-white/[0.05] shadow-sm p-5">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-2">
-                                    <TbLayoutGrid className="text-indigo-500 w-4 h-4" />
-                                    <h3 className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-white">Publikasi Portal</h3>
-                                </div>
+                        <div className="rounded-3xl bg-white dark:bg-slate-900 ring-1 ring-slate-200/80 dark:ring-slate-800 shadow-sm p-4">
+                            <div className="flex items-center justify-between gap-2 mb-3">
+                                <h3 className="flex items-center gap-2 text-sm font-black text-slate-900 dark:text-white">
+                                    <TbSpeakerphone className="w-4 h-4 text-violet-500" /> Publikasi Portal
+                                </h3>
+                                <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold ${data.Status === "Publish" ? "text-emerald-600" : "text-slate-400"}`}>
+                                    <span className={`w-1.5 h-1.5 rounded-full ${data.Status === "Publish" ? "bg-emerald-500" : "bg-slate-300"}`} />
+                                    {data.Status === "Publish" ? "Tayang" : "Belum tayang"}
+                                </span>
                             </div>
-                            <div className="flex flex-wrap gap-2 mb-3">
+                            {hasFoto ? (
+                                <div className="flex gap-3 mb-3">
+                                    <div className="relative w-16 h-20 shrink-0 rounded-xl overflow-hidden ring-1 ring-slate-200 dark:ring-slate-800">
+                                        <Image className="object-cover" alt={data.NamaPelatihan} src={replaceUrl(data.FotoPelatihan)} fill sizes="64px" />
+                                    </div>
+                                    <p className="flex-1 min-w-0 text-xs text-slate-600 dark:text-slate-400 line-clamp-4">{data.DetailPelatihan || "Belum ada deskripsi."}</p>
+                                </div>
+                            ) : (
+                                <p className="mb-3 py-4 text-center text-[11px] text-slate-400 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">Flyer & deskripsi belum diatur</p>
+                            )}
+                            <div className="flex flex-wrap gap-2">
                                 <EditPublishAction
-                                    idPelatihan={data.IdPelatihan.toString()}
+                                    idPelatihan={id}
                                     currentDetail={data.DetailPelatihan}
                                     currentFoto={data.FotoPelatihan}
                                     tanggalPendaftaran={[data.TanggalMulaiPendaftaran, data.TanggalAkhirPendaftaran!]}
                                     currentData={data}
                                     onSuccess={fetchData}
                                 />
-                                {data.FotoPelatihan !== "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" && (
-                                    <PublishButton
-                                        title={data.Status === "Publish" ? "Take Down" : "Publish"}
-                                        statusPelatihan={data.Status ?? ""}
-                                        idPelatihan={data.IdPelatihan.toString()}
-                                        handleFetchingData={fetchData}
-                                    />
+                                {hasFoto && (
+                                    <PublishButton title={data.Status === "Publish" ? "Take Down" : "Publish"} statusPelatihan={data.Status ?? ""} idPelatihan={id} handleFetchingData={fetchData} />
                                 )}
                             </div>
-                            {data.FotoPelatihan !== "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/pelatihan/" ? (
-                                <div className="flex gap-3">
-                                    <div className="w-16 h-20 rounded-xl overflow-hidden relative shrink-0 border border-slate-200 dark:border-slate-800">
-                                        <Image className="object-cover" alt={data.NamaPelatihan} src={replaceUrl(data.FotoPelatihan)} fill />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Deskripsi:</p>
-                                        <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-3 font-medium">{data.DetailPelatihan || "Belum ada deskripsi."}</p>
-                                    </div>
-                                </div>
-                            ) : (
-                                <p className="text-[11px] text-slate-400 italic text-center py-3 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
-                                    Flyer & deskripsi belum diatur
-                                </p>
-                            )}
                         </div>
                     )}
+                </div>
+
+                {/* ---------- KANAN: panel langkah terpilih ---------- */}
+                <div className="rounded-3xl bg-white dark:bg-slate-900 ring-1 ring-slate-200/80 dark:ring-slate-800 shadow-sm overflow-hidden flex flex-col min-w-0">
+                    {/* Header langkah */}
+                    <div className="flex items-center gap-3.5 px-5 md:px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+                        <span className="relative isolate flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#0B1B3F] text-white shadow-md">
+                            <span className="absolute inset-0 -z-10" style={{ background: `radial-gradient(80% 80% at 0% 0%, ${step.accent} 0%, transparent 75%)` }} />
+                            <step.icon className="w-[22px] h-[22px]" />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Langkah {current + 1} dari {steps.length}</p>
+                            <h3 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">{step.title}</h3>
+                            <p className="text-xs text-slate-500 truncate">{step.subtitle}</p>
+                        </div>
+                        {step.state === "done" && <span className="hidden sm:inline-flex shrink-0 items-center gap-1 h-7 px-2.5 rounded-lg bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100 text-[11px] font-bold"><TbCheck className="w-3.5 h-3.5" /> Selesai</span>}
+                        {step.state === "active" && <span className="hidden sm:inline-flex shrink-0 items-center h-7 px-2.5 rounded-lg bg-[#0B1B3F] text-white text-[11px] font-bold">Perlu aksi</span>}
+                    </div>
+
+                    <div key={current} className="flex-1 p-5 md:p-6 animate-in fade-in slide-in-from-right-2 duration-300">
+                        {step.state === "locked" ? (
+                            <div className="py-10 flex flex-col items-center gap-3 text-center">
+                                <span className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 flex items-center justify-center"><TbLock className="w-5 h-5" /></span>
+                                <div>
+                                    <p className="text-sm font-bold text-slate-800 dark:text-slate-200">Langkah ini masih terkunci</p>
+                                    <p className="text-xs text-slate-500">{step.lockReason}</p>
+                                </div>
+                                {firstActive !== undefined && (
+                                    <button type="button" onClick={() => setCurrent(firstActive)} className="h-9 px-4 rounded-xl bg-[#0B1B3F] hover:bg-blue-700 text-white text-xs font-bold inline-flex items-center gap-1.5">
+                                        Ke langkah {firstActive + 1}: {steps[firstActive].title} <TbArrowRight className="w-4 h-4" />
+                                    </button>
+                                )}
+                            </div>
+                        ) : (
+                            <>
+                                {/* STEP 0 */}
+                                {step.id === 0 && (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <InfoSection title="Identitas & Program" icon={TbTag}>
+                                            <InfoItem label="Kode Pelatihan" value={data.KodePelatihan} icon={TbTag} mono />
+                                            <InfoItem label="Nama (EN)" value={data.NamaPelathanInggris} icon={Globe} />
+                                            <InfoItem label="Sektor" value={data.JenisProgram} icon={TbHierarchy} />
+                                            <InfoItem label="Klaster" value={data.BidangPelatihan} icon={TbCategory} />
+                                            <InfoItem label="Program" value={data.Program} icon={TbRocket} />
+                                            <InfoItem label="Program Terobosan" value={data.DukunganProgramTerobosan} icon={TbStar} />
+                                        </InfoSection>
+                                        <InfoSection title="Jadwal" icon={TbCalendar}>
+                                            <InfoItem label="Mulai" value={generateTanggalPelatihan(data.TanggalMulaiPelatihan)} icon={TbCalendar} />
+                                            <InfoItem label="Selesai" value={generateTanggalPelatihan(data.TanggalBerakhirPelatihan)} icon={TbClock} />
+                                            <InfoItem label="Buka Pendaftaran" value={data.TanggalMulaiPendaftaran ? generateTanggalPelatihan(data.TanggalMulaiPendaftaran) : ""} icon={TbCalendar} />
+                                            <InfoItem label="Tutup Pendaftaran" value={data.TanggalAkhirPendaftaran ? generateTanggalPelatihan(data.TanggalAkhirPendaftaran) : ""} icon={TbClock} />
+                                        </InfoSection>
+                                        <InfoSection title="Penyelenggara & Pembiayaan" icon={TbBuildingSkyscraper}>
+                                            <InfoItem label="Penyelenggara" value={data.PenyelenggaraPelatihan} icon={TbBuildingSkyscraper} />
+                                            <InfoItem label="Lokasi" value={data.LokasiPelatihan} icon={TbMapPin} />
+                                            <InfoItem label="Metode" value={data.PelaksanaanPelatihan} icon={TbSchool} />
+                                            <InfoItem label="Pembiayaan" value={data.JenisPelatihan} icon={TbCash} />
+                                            {data.JenisPelatihan === JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN[1] && (
+                                                <InfoItem label="Biaya / Peserta" value={`Rp ${Number(data.HargaPelatihan || 0).toLocaleString("id-ID")}`} icon={TbCash} />
+                                            )}
+                                            <InfoItem label="Kuota" value={data.KoutaPelatihan ? `${data.KoutaPelatihan} orang` : ""} icon={Users} />
+                                        </InfoSection>
+                                        <InfoSection title="Legalitas" icon={TbCertificate}>
+                                            <InfoItem label="Penandatangan" value={data.TtdSertifikat} icon={TbSignature} />
+                                            <InfoItem label="Dibuat" value={data.CreateAt ? generateTanggalPelatihan(data.CreateAt) : ""} icon={Calendar} />
+                                        </InfoSection>
+                                    </div>
+                                )}
+
+                                {/* STEP 1 */}
+                                {step.id === 1 && (
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                                        <div className={`flex-1 flex items-center gap-3 p-3 rounded-xl ring-1 ${hasSurat ? "bg-emerald-50/60 ring-emerald-100 dark:bg-emerald-950/20 dark:ring-emerald-900/40" : "bg-amber-50/60 ring-amber-100 dark:bg-amber-950/20 dark:ring-amber-900/40"}`}>
+                                            <span className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-white ${hasSurat ? "bg-emerald-500" : "bg-amber-500"}`}>
+                                                <TbFileText className="w-5 h-5" />
+                                            </span>
+                                            <div className="min-w-0">
+                                                <p className="text-xs font-bold text-slate-800 dark:text-slate-200">{hasSurat ? "Surat telah diunggah" : "Surat belum diunggah"}</p>
+                                                <p className="text-[11px] text-slate-500 truncate">{hasSurat ? data.SuratPemberitahuan : "Format PDF, ditandatangani pimpinan unit."}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            {isAdmin && <UploadSuratButton idPelatihan={id} pelatihan={data} handleFetchingData={fetchData} />}
+                                            {hasSurat && (
+                                                <Link target="_blank" href={`${urlFileSuratPemberitahuan}/${data.SuratPemberitahuan}`} className="h-9 px-3.5 rounded-xl ring-1 ring-slate-200 dark:ring-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 inline-flex items-center gap-1.5">
+                                                    <FileText className="w-3.5 h-3.5" /> Lihat Surat
+                                                </Link>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* STEP 2 */}
+                                {step.id === 2 && (
+                                    <div className="space-y-3">
+                                        {canEdit && isAdmin && <ChooseModulAction idPelatihan={id} currentData={data} onSuccess={fetchData} />}
+                                        {!hasModul ? (
+                                            <EmptyHint icon={TbUserCode} title="Modul belum dipilih" desc="Pilih paket modul menggunakan tombol di atas." />
+                                        ) : (
+                                            <div className="rounded-xl ring-1 ring-slate-200/80 dark:ring-slate-800 overflow-hidden">
+                                                <div className="px-3.5 py-2.5 flex items-center justify-between gap-3 bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800">
+                                                    <div className="min-w-0">
+                                                        <p className="text-[10px] font-semibold uppercase tracking-widest text-violet-600">{modulPelatihan?.BidangMateriPelatihan} · {modulPelatihan?.Tahun}</p>
+                                                        <p className="text-[13px] font-bold text-slate-800 dark:text-white truncate">{modulPelatihan?.NamaMateriPelatihan || "Memuat modul…"}</p>
+                                                    </div>
+                                                    <span className="shrink-0 text-[11px] font-bold text-slate-500">{modulPelatihan?.ModulPelatihan?.length || 0} modul</span>
+                                                </div>
+                                                <ul className="divide-y divide-slate-100 dark:divide-slate-800">
+                                                    {modulPelatihan?.ModulPelatihan?.map((m: ModulPelatihan) => {
+                                                        const exp = expandedModul === m.IdModulPelatihan;
+                                                        return (
+                                                            <li key={m.IdModulPelatihan} className="px-3.5 py-2.5">
+                                                                <div className="flex items-center justify-between gap-2">
+                                                                    <button type="button" onClick={() => setExpandedModul(exp ? null : m.IdModulPelatihan)} className="flex items-center gap-2 min-w-0 text-left">
+                                                                        <GraduationCap className="w-3.5 h-3.5 text-violet-500 shrink-0" />
+                                                                        <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate">{m.NamaModulPelatihan}</span>
+                                                                        {!!m.BahanTayang?.length && <TbChevronDown className={`w-3.5 h-3.5 shrink-0 text-slate-400 transition-transform ${exp ? "rotate-180" : ""}`} />}
+                                                                    </button>
+                                                                    <Link href={`${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${m.FileModule}`} target="_blank" className="shrink-0 text-[11px] font-bold text-blue-600 hover:underline inline-flex items-center gap-1">
+                                                                        <Download className="w-3 h-3" /> Unduh
+                                                                    </Link>
+                                                                </div>
+                                                                {exp && (
+                                                                    <ul className="ml-5 mt-1.5 space-y-1">
+                                                                        {m.BahanTayang?.map((bt, i) => (
+                                                                            <li key={i} className="flex items-center justify-between gap-2 text-[11px] text-slate-600 dark:text-slate-400">
+                                                                                <span className="truncate">• {bt.NamaBahanTayang}</span>
+                                                                                <Link href={bt.BahanTayang ? `${process.env.NEXT_PUBLIC_MODULE_FILE_URL}/${bt.BahanTayang}` : bt.LinkVideo} target="_blank" className="shrink-0 text-blue-600 hover:underline inline-flex items-center gap-0.5">
+                                                                                    Lihat <TbExternalLink className="w-3 h-3" />
+                                                                                </Link>
+                                                                            </li>
+                                                                        ))}
+                                                                    </ul>
+                                                                )}
+                                                            </li>
+                                                        );
+                                                    })}
+                                                </ul>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* STEP 3 */}
+                                {step.id === 3 && (
+                                    <div className="space-y-3">
+                                        <ChooseInstrukturAction idPelatihan={id} currentData={data} onSuccess={fetchData} />
+                                        {!hasInstruktur ? (
+                                            <EmptyHint icon={TbUserStar} title="Instruktur belum dipetakan" />
+                                        ) : (
+                                            <ul className="rounded-xl ring-1 ring-slate-200/80 dark:ring-slate-800 divide-y divide-slate-100 dark:divide-slate-800 overflow-hidden">
+                                                {instrukturs?.map((it, i) => (
+                                                    <li key={i} className="px-3.5 py-2.5 flex items-center justify-between gap-3">
+                                                        <div className="flex items-center gap-2.5 min-w-0">
+                                                            <span className="w-8 h-8 rounded-lg bg-[#0B1B3F] text-sky-100 font-black flex items-center justify-center text-xs shrink-0">{it.nama?.charAt(0)}</span>
+                                                            <div className="min-w-0">
+                                                                <p className="text-xs font-bold text-slate-800 dark:text-white truncate">{it.nama}</p>
+                                                                <p className="text-[10px] text-slate-400 truncate">{[it.jenjang_jabatan, it.eselon_1].filter(Boolean).join(" · ")}</p>
+                                                            </div>
+                                                        </div>
+                                                        <span className="shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-700 ring-1 ring-cyan-100">{it.bidang_keahlian || "Instruktur"}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* STEP 4 — tabel selalu tampil, aksi hanya sebelum stage 5 */}
+                                {step.id === 4 && (
+                                    <div className="space-y-3">
+                                        <div className="flex flex-wrap items-center justify-between gap-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 ring-1 ring-slate-100 dark:ring-slate-800">
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                {stage < 5 && canEdit && (
+                                                    <ImportPesertaAction
+                                                        idPelatihan={id}
+                                                        statusApproval={data.StatusApproval}
+                                                        onSuccess={fetchData}
+                                                        onAddHistory={(msg) => handleAddHistoryTrainingInExisting(data, msg, Cookies.get("Role"), `${Cookies.get("Nama")} - ${Cookies.get("Satker")}`)}
+                                                    />
+                                                )}
+                                                <ZipPhotoParticipantAction users={data.UserPelatihan} onSuccess={fetchData} />
+                                                {stage < 5 && hasPeserta && validPeserta < totalPeserta && <ValidateParticipantAction data={data.UserPelatihan} onSuccess={fetchData} />}
+                                            </div>
+                                            <div className="flex items-center gap-3 text-xs">
+                                                <span className="text-slate-500">Total <b className="text-slate-900 dark:text-white tabular-nums">{totalPeserta}</b></span>
+                                                <span className="text-slate-500">Valid <b className="text-emerald-600 tabular-nums">{validPeserta}</b></span>
+                                                {totalPeserta > validPeserta && <span className="text-slate-500">Belum <b className="text-amber-600 tabular-nums">{totalPeserta - validPeserta}</b></span>}
+                                            </div>
+                                        </div>
+                                        <div className="rounded-xl ring-1 ring-slate-200/80 dark:ring-slate-800 overflow-hidden bg-white dark:bg-slate-900">
+                                            <UserPelatihanTable pelatihan={data} data={peserta} onSuccess={fetchData} />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* STEP 5 */}
+                                {step.id === 5 && (
+                                    <div className="space-y-3">
+                                        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                            {readiness.map((r) => (
+                                                <li key={r.label}>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => !r.done && focusStep(r.step)}
+                                                        className={`w-full flex items-center gap-2.5 p-2.5 rounded-xl ring-1 text-left ${r.done ? "bg-emerald-50/60 ring-emerald-100 dark:bg-emerald-950/20 dark:ring-emerald-900/40 cursor-default" : "bg-rose-50/60 ring-rose-100 hover:ring-rose-200 dark:bg-rose-950/20 dark:ring-rose-900/40"}`}
+                                                    >
+                                                        <span className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-white ${r.done ? "bg-emerald-500" : "bg-rose-400"}`}>
+                                                            {r.done ? <TbCheck className="w-3 h-3" /> : <TbAlertCircle className="w-3 h-3" />}
+                                                        </span>
+                                                        <span className={`text-xs font-semibold ${r.done ? "text-emerald-700 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>{r.label}</span>
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        {isAdmin && isDraftOrRevisi && canSubmitSPV && (
+                                            <SendNoteAction idPelatihan={id} title="Kirim ke SPV" description="Ajukan pelaksanaan ke SPV untuk diverifikasi." buttonLabel="Ajukan ke SPV Sekarang" icon={Send} buttonColor="blue" onSuccess={fetchData} status="1" pelatihan={data} />
+                                        )}
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </div>
+
+                    {/* Navigasi langkah */}
+                    <div className="flex items-center justify-between gap-3 px-5 md:px-6 py-3.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900">
+                        <button
+                            type="button"
+                            onClick={() => setCurrent((c) => Math.max(0, c - 1))}
+                            disabled={current === 0}
+                            className="h-10 px-3.5 rounded-xl text-sm font-semibold text-slate-500 hover:text-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 inline-flex items-center gap-1.5 disabled:invisible"
+                        >
+                            <TbArrowLeft className="w-4 h-4" /> Sebelumnya
+                        </button>
+                        <div className="flex items-center gap-1.5" aria-hidden>
+                            {steps.map((s, i) => (
+                                <span key={s.id} className={`h-1.5 rounded-full transition-all duration-300 ${i === current ? "w-6 bg-[#0B1B3F] dark:bg-sky-400" : s.state === "done" ? "w-1.5 bg-emerald-400" : "w-1.5 bg-slate-200 dark:bg-slate-700"}`} />
+                            ))}
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setCurrent((c) => Math.min(steps.length - 1, c + 1))}
+                            disabled={current === steps.length - 1}
+                            className="h-10 px-4 rounded-xl bg-[#0B1B3F] hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center gap-1.5 disabled:invisible"
+                        >
+                            Berikutnya <TbArrowRight className="w-4 h-4" />
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
 
-// ─── InfoSection helper ───────────────────────────────────────────────────────
-function InfoSection({ title, icon: Icon, children }: { title: string; icon: any; children: React.ReactNode }) {
+/* ============================ UI ============================ */
+
+function InfoSection({ title, icon: Icon, children }: { title: string; icon: IconType; children: React.ReactNode }) {
     return (
-        <div className="rounded-xl border border-slate-100 dark:border-white/[0.04] bg-white dark:bg-slate-900/60 overflow-hidden">
-            <div className="flex items-center gap-2 px-4 py-2.5 border-b border-slate-100 dark:border-white/[0.04] bg-slate-50/70 dark:bg-white/[0.02]">
+        <div className="rounded-xl ring-1 ring-slate-200/80 dark:ring-slate-800 overflow-hidden">
+            <div className="flex items-center gap-2 px-3.5 py-2 bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800">
                 <Icon className="w-3.5 h-3.5 text-blue-500" />
-                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">{title}</h4>
+                <h4 className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">{title}</h4>
             </div>
-            <div className="px-4 py-1">{children}</div>
+            <dl className="px-3.5 py-1 divide-y divide-slate-100 dark:divide-slate-800">{children}</dl>
+        </div>
+    );
+}
+
+function InfoItem({ label, value, icon: Icon, mono }: { label: string; value?: string | number | null; icon: IconType; mono?: boolean }) {
+    const empty = value === undefined || value === null || value === "";
+    return (
+        <div className="flex items-start gap-2.5 py-2">
+            <Icon className="w-3.5 h-3.5 mt-0.5 shrink-0 text-slate-400" />
+            <div className="min-w-0 flex-1">
+                <dt className="text-[10px] text-slate-400">{label}</dt>
+                <dd className={`text-xs font-semibold break-words ${empty ? "text-slate-300" : "text-slate-800 dark:text-slate-200"} ${mono ? "font-mono" : ""}`}>{empty ? "—" : String(value)}</dd>
+            </div>
+        </div>
+    );
+}
+
+function EmptyHint({ icon: Icon, title, desc }: { icon: IconType; title: string; desc?: string }) {
+    return (
+        <div className="py-6 flex flex-col items-center gap-1.5 text-center rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+            <Icon className="w-7 h-7 text-slate-300" />
+            <p className="text-xs font-bold text-slate-500">{title}</p>
+            {desc && <p className="text-[11px] text-slate-400">{desc}</p>}
         </div>
     );
 }

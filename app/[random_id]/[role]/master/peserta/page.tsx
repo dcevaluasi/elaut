@@ -12,7 +12,7 @@ export default function Page() {
         <HeaderPageLayoutAdminElaut
           title="Master Data Peserta"
           description="Monitoring, kelola, dan perbarui data seluruh peserta pelatihan yang terdaftar di E-LAUT!"
-          icon={<HiUserGroup className="text-3xl text-blue-600" />}
+          icon={<HiUserGroup className="text-3xl " />}
         />
         <article className="w-full h-full">
           <TableMasterPeserta />

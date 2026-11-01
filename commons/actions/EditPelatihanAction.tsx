@@ -1,35 +1,19 @@
 "use client";
 
-import React, { ChangeEvent, useState } from "react";
-import {
-    AlertDialog,
-    AlertDialogTrigger,
-    AlertDialogContent,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogCancel,
-    AlertDialogAction,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import { TbEditCircle, TbX, TbCalendar, TbMapPin, TbTag, TbCurrencyDollar, TbBuildingBank, TbCheck, TbLoader2 } from "react-icons/tb";
+import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
+import {
+    TbEditCircle, TbX, TbMapPin, TbCheck, TbLoader2, TbSchool, TbLayoutGrid, TbFileText, TbCurrencyDollar,
+    TbBuildingCommunity, TbDeviceLaptop, TbClock, TbAlertCircle, TbRotate, TbStar, TbHierarchy,
+} from "react-icons/tb";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import Toast from "@/commons/Toast";
 import { elautBaseUrl } from "@/constants/urls";
-import {
-    Select,
-    SelectTrigger,
-    SelectValue,
-    SelectContent,
-    SelectItem,
-} from "@/components/ui/select";
 import { PelatihanMasyarakat } from "@/types/product";
 import { UPT } from "@/constants/nomenclatures";
 import { DUKUNGAN_PROGRAM_TEROBOSAN, JENIS_PELAKSANAAN, JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN, SEKTOR_PELATIHAN } from "@/constants/pelatihan";
 import { useFetchDataRumpunPelatihan } from "@/hooks/elaut/master/useFetchDataRumpunPelatihan";
-import { ProgramPelatihan, RumpunPelatihan } from "@/types/program";
 import ManageProgramPelatihanAction from "./master/program-pelatihan/ManageProgramPelatihanAction";
 
 interface EditPelatihanActionProps {
@@ -38,474 +22,385 @@ interface EditPelatihanActionProps {
     onSuccess?: () => void;
 }
 
-const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({
-    idPelatihan,
-    currentData,
-    onSuccess,
-}) => {
-    const [isOpen, setIsOpen] = useState(false);
+interface FormState {
+    NamaPelatihan: string;
+    LokasiPelatihan: string;
+    JenisProgram: string;
+    BidangPelatihan: string;
+    Program: string;
+    JenisPelatihan: string;
+    DukunganProgramTerobosan: string;
+    PenyelenggaraPelatihan: string;
+    PelaksanaanPelatihan: string;
+    TanggalMulaiPelatihan: string;
+    TanggalBerakhirPelatihan: string;
+    HargaPelatihan: number;
+}
 
-    const {
-        data: dataRumpunPelatihan,
-        loading: loadingRumpunPelatihan,
-        error: errorRumpunPelatihan,
-        fetchRumpunPelatihan
-    } = useFetchDataRumpunPelatihan();
+const EDITABLE_STATUS = ["0", "1.2", "3"];
+const BERBAYAR = "PNBP/BLU - Berbayar";
 
-    const [program, setProgram] = useState(currentData?.Program || "");
-    const [bidang, setBidang] = useState(currentData?.BidangPelatihan || "");
+const toDateInput = (v?: string) => (v ? String(v).slice(0, 10) : "");
+const fromData = (d?: PelatihanMasyarakat): FormState => ({
+    NamaPelatihan: d?.NamaPelatihan || "",
+    LokasiPelatihan: d?.LokasiPelatihan || "",
+    JenisProgram: d?.JenisProgram || "",
+    BidangPelatihan: d?.BidangPelatihan || "",
+    Program: d?.Program || "",
+    JenisPelatihan: d?.JenisPelatihan || "",
+    DukunganProgramTerobosan: d?.DukunganProgramTerobosan || "",
+    PenyelenggaraPelatihan: d?.PenyelenggaraPelatihan || "",
+    PelaksanaanPelatihan: d?.PelaksanaanPelatihan || "",
+    TanggalMulaiPelatihan: toDateInput(d?.TanggalMulaiPelatihan),
+    TanggalBerakhirPelatihan: toDateInput(d?.TanggalBerakhirPelatihan),
+    HargaPelatihan: Number(d?.HargaPelatihan) || 0,
+});
 
-    const [selectedRumpunPelatihan, setSelectedRumpunPelatihan] = useState<RumpunPelatihan | null>(null);
+const DATE_FMT = new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric" });
+const durasi = (a: string, b: string) => (a && b ? Math.round((new Date(b).getTime() - new Date(a).getTime()) / 86_400_000) + 1 : 0);
 
-    // update selected when data or bidang changes
-    React.useEffect(() => {
-        if (dataRumpunPelatihan && bidang) {
-            const found = dataRumpunPelatihan.find(item => item.name === bidang) || null;
-            setSelectedRumpunPelatihan(found);
+/* ============================ KOMPONEN ============================ */
+
+const EditPelatihanAction: React.FC<EditPelatihanActionProps> = ({ idPelatihan, currentData, onSuccess }) => {
+    const [hasAccess] = useState(() => !!Cookies.get("Access")?.includes("createPelatihan"));
+    const canEdit = hasAccess && EDITABLE_STATUS.includes(String(currentData?.StatusPenerbitan ?? ""));
+    const [open, setOpen] = useState(false);
+    const [form, setForm] = useState<FormState>(() => fromData(currentData));
+    const [tried, setTried] = useState(false);
+    const [saving, setSaving] = useState(false);
+
+    const { data: dataRumpun, fetchRumpunPelatihan } = useFetchDataRumpunPelatihan();
+
+    // Isi ulang dari data terbaru setiap kali dibuka
+    const initial = useMemo(() => fromData(currentData), [currentData]);
+    useEffect(() => {
+        if (open) {
+            setForm(initial);
+            setTried(false);
         }
-    }, [dataRumpunPelatihan, bidang]);
+    }, [open, initial]);
 
-    // controlled states
-    const [namaPelatihan, setNamaPelatihan] = useState(currentData?.NamaPelatihan || "");
-    const [jenisProgram, setJenisProgram] = useState(currentData?.JenisProgram || "");
-    const [jenisPelatihan, setJenisPelatihan] = useState(currentData?.JenisPelatihan || "");
-    const [dukunganProgramTerobosan, setDukunganProgramTerobosan] = useState(
-        currentData?.DukunganProgramTerobosan || ""
-    );
-    const [penyelenggaraPelatihan, setPenyelenggaraPelatihan] = useState(
-        currentData?.PenyelenggaraPelatihan || ""
-    );
-    const [tanggalMulaiPelatihan, setTanggalMulaiPelatihan] = useState(
-        currentData?.TanggalMulaiPelatihan || ""
-    );
-    const [tanggalBerakhirPelatihan, setTanggalBerakhirPelatihan] = useState(
-        currentData?.TanggalBerakhirPelatihan || ""
-    );
-    const [lokasiPelatihan, setLokasiPelatihan] = useState(currentData?.LokasiPelatihan || "");
-    const [pelaksanaanPelatihan, setPelaksanaanPelatihan] = useState(
-        currentData?.PelaksanaanPelatihan || ""
-    );
-    const [hargaPelatihan, setHargaPelatihan] = useState(currentData?.HargaPelatihan || 0);
+    const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((f) => ({ ...f, [k]: v }));
 
-    const [loading, setLoading] = useState(false);
+    const rumpunName = (r: any) => r?.name || r?.nama_rumpun_pelatihan || "";
+    const selectedRumpun = useMemo(() => dataRumpun?.find((r) => rumpunName(r) === form.BidangPelatihan) || null, [dataRumpun, form.BidangPelatihan]);
+    const programOptions = useMemo(() => {
+        const list = (selectedRumpun?.programs || []).map((p) => p.name_indo).filter(Boolean) as string[];
+        // jaga nilai lama yang tidak ada di daftar
+        if (form.Program && !list.includes(form.Program)) list.unshift(form.Program);
+        return list;
+    }, [selectedRumpun, form.Program]);
 
-    const handleSubmit = async () => {
-        const form = {
-            NamaPelatihan: namaPelatihan,
-            Program: program,
-            JenisProgram: jenisProgram,
-            JenisPelatihan: jenisPelatihan,
-            DukunganProgramTerobosan: dukunganProgramTerobosan,
-            PenyelenggaraPelatihan: penyelenggaraPelatihan,
-            TanggalMulaiPelatihan: tanggalMulaiPelatihan,
-            TanggalBerakhirPelatihan: tanggalBerakhirPelatihan,
-            LokasiPelatihan: lokasiPelatihan,
-            PelaksanaanPelatihan: pelaksanaanPelatihan,
-            HargaPelatihan: hargaPelatihan,
-            BidangPelatihan: bidang,
-        };
+    /* ---------- Validasi & perubahan ---------- */
+    const errors = {
+        NamaPelatihan: !form.NamaPelatihan.trim(),
+        BidangPelatihan: !form.BidangPelatihan,
+        Program: !form.Program,
+        Tanggal: !!form.TanggalMulaiPelatihan && !!form.TanggalBerakhirPelatihan && form.TanggalBerakhirPelatihan < form.TanggalMulaiPelatihan,
+        HargaPelatihan: form.JenisPelatihan === BERBAYAR && !(form.HargaPelatihan > 0),
+    };
+    const invalid = Object.values(errors).some(Boolean);
+    const changedKeys = (Object.keys(form) as (keyof FormState)[]).filter((k) => form[k] !== initial[k]);
+    const dirty = changedKeys.length > 0;
+    const err = (k: keyof typeof errors) => tried && errors[k];
 
+    const requestClose = () => {
+        if (saving) return;
+        if (dirty && !window.confirm("Perubahan belum disimpan. Tutup tanpa menyimpan?")) return;
+        setOpen(false);
+    };
+
+    const submit = async () => {
+        setTried(true);
+        if (invalid) {
+            Toast.fire({ icon: "warning", title: "Periksa kembali isian yang ditandai" });
+            return;
+        }
+        if (!dirty) return;
+        setSaving(true);
         try {
-            setLoading(true);
-            const response = await axios.put(
+            await axios.put(
                 `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${idPelatihan}`,
-                form,
-                {
-                    headers: {
-                        Authorization: `Bearer ${Cookies.get("XSRF091")}`,
-                    },
-                }
+                { ...form, NamaPelatihan: form.NamaPelatihan.trim(), LokasiPelatihan: form.LokasiPelatihan.trim(), HargaPelatihan: form.JenisPelatihan === BERBAYAR ? form.HargaPelatihan : 0 },
+                { headers: { Authorization: `Bearer ${Cookies.get("XSRF091")}` } }
             );
-            Toast.fire({
-                icon: "success",
-                title: "Berhasil!",
-                text: "Informasi pelatihan berhasil diperbarui.",
-            });
-            setIsOpen(false);
-            setLoading(false);
-            if (onSuccess) onSuccess();
-        } catch (error) {
-            console.error("ERROR UPDATE PELATIHAN: ", error);
-            setLoading(false);
-            Toast.fire({
-                icon: "error",
-                title: "Gagal!",
-                text: "Terjadi kesalahan saat memperbarui pelatihan.",
-            });
+            Toast.fire({ icon: "success", title: "Informasi pelatihan diperbarui", text: `${changedKeys.length} isian berubah` });
+            setOpen(false);
+            onSuccess?.();
+        } catch (e: any) {
+            console.error("ERROR UPDATE PELATIHAN:", e);
+            Toast.fire({ icon: "error", title: "Gagal memperbarui", text: e?.response?.data?.message || "Terjadi kesalahan, coba lagi." });
+        } finally {
+            setSaving(false);
         }
     };
 
+    if (!canEdit) return null;
+
+    const hari = durasi(form.TanggalMulaiPelatihan, form.TanggalBerakhirPelatihan);
+    const changed = (k: keyof FormState) => form[k] !== initial[k];
+
     return (
-        <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-            <AlertDialogTrigger asChild>
-                {
-                    (Cookies.get("Access")?.includes("createPelatihan") &&
-                        (currentData?.StatusPenerbitan === "0" || currentData?.StatusPenerbitan === "3" || currentData?.StatusPenerbitan === "1.2")) && (
-                            <Button
-                                variant="outline"
-                                className="h-11 px-5 rounded-2xl border border-amber-400/40 bg-amber-500/5 hover:bg-amber-500 text-amber-600 hover:text-white dark:text-amber-400 font-black text-xs uppercase tracking-wider flex items-center gap-2.5 transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-amber-500/20 active:scale-95"
-                            >
-                                <TbEditCircle className="h-5 w-5 shrink-0" />
-                                <span>Edit Informasi Pelatihan</span>
-                            </Button>
-                        )
-                }
-            </AlertDialogTrigger>
+        <>
+            {/* Tombol putih, selaras tombol aksi lain */}
+            <button
+                type="button"
+                onClick={() => setOpen(true)}
+                className="group h-9 px-3.5 rounded-xl bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 inline-flex items-center gap-1.5 shadow-sm hover:bg-slate-50 hover:ring-slate-300 dark:hover:bg-slate-800 transition-colors"
+            >
+                <TbEditCircle className="w-4 h-4 text-amber-500 transition-transform duration-300 group-hover:-rotate-12" />
+                Edit Informasi
+            </button>
 
-            <AlertDialogContent className="w-full max-w-4xl h-fit max-h-[92vh] p-0 overflow-hidden bg-white dark:bg-slate-900 border-none rounded-[32px] shadow-[0_32px_120px_rgba(0,0,0,0.25)] z-[999999] flex flex-col">
-                {/* Header */}
-                <div className="relative px-8 py-6 border-b border-slate-100 dark:border-white/5 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shadow-sm border border-amber-500/20 shrink-0">
-                            <TbEditCircle size={26} />
-                        </div>
-                        <div>
-                            <div className="flex items-center gap-2 mb-1">
-                                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                                <span className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">
-                                    Edit Pelatihan Mode
-                                </span>
+            <Dialog open={open} onOpenChange={(o) => (o ? setOpen(true) : requestClose())}>
+                <DialogContent
+                    onInteractOutside={(e) => dirty && e.preventDefault()}
+                    className="w-[calc(100vw-1.5rem)] sm:w-full max-w-3xl sm:max-w-3xl max-h-[90vh] p-0 gap-0 flex flex-col overflow-hidden rounded-3xl sm:rounded-3xl border-0 bg-slate-50 dark:bg-slate-950 shadow-2xl [&>button]:hidden"
+                >
+                    {/* Header hero */}
+                    <div className="relative isolate shrink-0 overflow-hidden bg-[#0B1B3F] text-white px-5 md:px-6 py-5">
+                        <div className="absolute inset-0 -z-10 bg-[radial-gradient(70%_120%_at_0%_0%,#2563EB_0%,transparent_60%),radial-gradient(50%_120%_at_100%_100%,#F59E0B_0%,transparent_60%)] opacity-80" />
+                        <div className="absolute inset-0 -z-10 opacity-[0.12] [background-image:radial-gradient(rgba(255,255,255,0.8)_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(to_left,black,transparent_70%)]" />
+                        <TbEditCircle aria-hidden className="pointer-events-none absolute -right-5 -bottom-7 -z-10 w-32 h-32 -rotate-12 text-amber-300 opacity-20" />
+
+                        <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-200/90">Edit Informasi Pelatihan</p>
+                                <DialogTitle className="mt-1 text-base md:text-lg font-black text-white leading-snug line-clamp-2 break-words">
+                                    {form.NamaPelatihan || "Tanpa nama"}
+                                </DialogTitle>
+                                <DialogDescription className="text-xs text-blue-100/70">
+                                    Kode <span className="font-mono text-sky-200">{currentData?.KodePelatihan || "-"}</span> · Stage {currentData?.StatusPenerbitan || "0"}
+                                </DialogDescription>
                             </div>
-                            <h2 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight leading-none">
-                                Edit Informasi Pelatihan
-                            </h2>
+                            <button type="button" onClick={requestClose} aria-label="Tutup" className="h-9 w-9 shrink-0 rounded-xl bg-white/10 ring-1 ring-white/20 flex items-center justify-center hover:bg-white/20">
+                                <TbX className="w-4 h-4" />
+                            </button>
+                        </div>
+                        <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
+                            <span className={`inline-flex items-center gap-1.5 h-7 px-2.5 rounded-lg ring-1 ${dirty ? "bg-amber-400/20 ring-amber-300/40 text-amber-100" : "bg-white/10 ring-white/15 text-blue-100/70"}`}>
+                                <span className={`w-1.5 h-1.5 rounded-full ${dirty ? "bg-amber-300" : "bg-white/40"}`} />
+                                {dirty ? `${changedKeys.length} isian diubah` : "Belum ada perubahan"}
+                            </span>
+                            {hari > 0 && <span className="inline-flex items-center h-7 px-2.5 rounded-lg bg-white/10 ring-1 ring-white/15 text-blue-100/80">{hari} hari pelaksanaan</span>}
                         </div>
                     </div>
-                    <button 
-                        onClick={() => setIsOpen(false)} 
-                        className="w-10 h-10 rounded-full hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 transition-colors"
-                    >
-                        <TbX size={22} />
-                    </button>
-                </div>
 
-                {/* Body Form */}
-                <div className="p-8 flex-1 overflow-y-auto space-y-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                    
-                    {/* Section 1: Informasi Utama */}
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-2">
-                            <span className="h-5 w-1 rounded-full bg-amber-500" />
-                            <h3 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider">
-                                Informasi Utama Pelatihan
-                            </h3>
-                        </div>
+                    {/* Body */}
+                    <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 md:p-5 space-y-4">
+                        <Section no="01" title="Identitas" desc="Nama & lokasi kegiatan" icon={TbSchool}>
+                            <Field label="Nama kegiatan" required className="md:col-span-2" error={err("NamaPelatihan") ? "Wajib diisi" : undefined} changed={changed("NamaPelatihan")}>
+                                <input value={form.NamaPelatihan} onChange={(e) => set("NamaPelatihan", e.target.value.toUpperCase())} placeholder="NAMA KEGIATAN PELATIHAN" className={inputCls(err("NamaPelatihan"))} />
+                            </Field>
+                            <Field label="Lokasi" icon={TbMapPin} changed={changed("LokasiPelatihan")}>
+                                <input value={form.LokasiPelatihan} onChange={(e) => set("LokasiPelatihan", e.target.value)} placeholder="BPPP Medan / Online" className={inputCls()} />
+                            </Field>
+                            <Field label="Penyelenggara" icon={TbBuildingCommunity} changed={changed("PenyelenggaraPelatihan")}>
+                                <NativeSelect value={form.PenyelenggaraPelatihan} onChange={(v) => set("PenyelenggaraPelatihan", v)} options={UPT} placeholder="Pilih penyelenggara" />
+                            </Field>
+                        </Section>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Nama Kegiatan */}
-                            <div className="space-y-1.5 md:col-span-2">
-                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                                    Nama Kegiatan <span className="text-rose-500">*</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    className="w-full h-11 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all placeholder:text-slate-400"
-                                    placeholder="Masukkan nama kegiatan pelatihan"
-                                    required
-                                    value={namaPelatihan}
-                                    onChange={(e: ChangeEvent<HTMLInputElement>) => setNamaPelatihan(e.target.value)}
+                        <Section no="02" title="Klasifikasi" desc="Sektor, klaster & program" icon={TbLayoutGrid}>
+                            <Field label="Sektor" icon={TbHierarchy} changed={changed("JenisProgram")}>
+                                <NativeSelect value={form.JenisProgram} onChange={(v) => set("JenisProgram", v)} options={SEKTOR_PELATIHAN} placeholder="Pilih sektor" />
+                            </Field>
+                            <Field label="Klaster" required error={err("BidangPelatihan") ? "Wajib dipilih" : undefined} changed={changed("BidangPelatihan")}>
+                                <NativeSelect
+                                    value={form.BidangPelatihan}
+                                    onChange={(v) => setForm((f) => ({ ...f, BidangPelatihan: v, Program: v === initial.BidangPelatihan ? initial.Program : "" }))}
+                                    options={(dataRumpun || []).map(rumpunName).filter(Boolean)}
+                                    placeholder={dataRumpun ? "Pilih klaster" : "Memuat klaster…"}
+                                    error={err("BidangPelatihan")}
                                 />
-                            </div>
-
-                            {/* Lokasi */}
-                            <div className="space-y-1.5">
-                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                                    Lokasi Pelatihan
-                                </label>
-                                <div className="relative">
-                                    <input
-                                        type="text"
-                                        className="w-full h-11 px-4 pl-10 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all placeholder:text-slate-400"
-                                        placeholder="Lokasi / Alamat Pelaksanaan"
-                                        value={lokasiPelatihan}
-                                        onChange={(e) => setLokasiPelatihan(e.target.value)}
-                                    />
-                                    <TbMapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-                                </div>
-                            </div>
-
-                            {/* Sektor */}
-                            <div className="space-y-1.5">
-                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                                    Sektor Pelatihan
-                                </label>
-                                <Select value={jenisProgram} onValueChange={setJenisProgram}>
-                                    <SelectTrigger className="w-full h-11 rounded-xl bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 font-semibold text-sm text-slate-800 dark:text-white">
-                                        <SelectValue placeholder="Pilih sektor" />
-                                    </SelectTrigger>
-                                    <SelectContent position="popper" className="z-[999999] rounded-xl" sideOffset={5}>
-                                        {SEKTOR_PELATIHAN.map((item, idx) => (
-                                            <SelectItem key={idx} value={item} className="text-sm font-semibold">
-                                                {item}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Section 2: Klaster & Program */}
-                    <div className="space-y-4 pt-2 border-t border-slate-100 dark:border-white/5">
-                        <div className="flex items-center gap-2">
-                            <span className="h-5 w-1 rounded-full bg-amber-500" />
-                            <h3 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider">
-                                Klaster & Program Pelatihan
-                            </h3>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Klaster */}
-                            <div className="space-y-1.5 md:col-span-2">
-                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                                    Klaster Pelatihan <span className="text-rose-500">*</span>
-                                </label>
-                                <Select
-                                    value={bidang}
-                                    onValueChange={(value) => {
-                                        setBidang(value);
-                                        const selected = dataRumpunPelatihan.find((item) => item.name === value || item.name == bidang);
-                                        setSelectedRumpunPelatihan(selected ?? null);
-                                    }}
-                                >
-                                    <SelectTrigger className="w-full h-11 rounded-xl bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 font-semibold text-sm text-slate-800 dark:text-white">
-                                        <SelectValue placeholder="Pilih klaster pelatihan" />
-                                    </SelectTrigger>
-                                    <SelectContent position="popper" className="z-[999999] rounded-xl" sideOffset={5}>
-                                        {dataRumpunPelatihan.map((item) => (
-                                            <SelectItem key={item.id_rumpun_pelatihan} value={item.name} className="text-sm font-semibold">
-                                                {item.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            {/* Program / Judul */}
-                            {(selectedRumpunPelatihan !== null || program !== "") && (
-                                <div className="space-y-1.5 md:col-span-2">
-                                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                                        Judul / Program Pelatihan <span className="text-rose-500">*</span>
-                                    </label>
-                                    <div className="flex flex-row gap-2">
-                                        <Select
-                                            value={program}
-                                            onValueChange={(value: string) => {
-                                                if (value === "__add_new__") {
-                                                    document.getElementById("trigger-add-program")?.click();
-                                                } else {
-                                                    setProgram(value);
-                                                }
-                                            }}
-                                        >
-                                            <SelectTrigger className="w-full h-11 rounded-xl bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 font-semibold text-sm text-slate-800 dark:text-white">
-                                                <SelectValue placeholder={`Pilih program klaster ${bidang}`} />
-                                            </SelectTrigger>
-                                            <SelectContent position="popper" className="z-[999999] rounded-xl" sideOffset={5}>
-                                                {selectedRumpunPelatihan?.programs.map((item: ProgramPelatihan) => (
-                                                    <SelectItem
-                                                        key={item.id_program_pelatihan}
-                                                        value={item.name_indo}
-                                                        className="text-sm font-semibold"
-                                                    >
-                                                        {item.name_indo}
-                                                    </SelectItem>
-                                                ))}
-                                                <div className="border-t border-slate-100 dark:border-white/10 my-1" />
-                                                <SelectItem value="__add_new__" className="text-amber-600 font-bold">
-                                                    ➕ Tambah Program Pelatihan Baru
-                                                </SelectItem>
-                                            </SelectContent>
-                                        </Select>
-
-                                        <ManageProgramPelatihanAction
-                                            onSuccess={() => {
-                                                fetchRumpunPelatihan();
-                                                Toast.fire({
-                                                    icon: "success",
-                                                    title: "Berhasil!",
-                                                    text: "Program pelatihan berhasil ditambahkan",
-                                                });
-                                            }}
+                            </Field>
+                            <Field label="Program" required icon={TbFileText} className="md:col-span-2" error={err("Program") ? "Wajib dipilih" : undefined} changed={changed("Program")}>
+                                <div className="flex gap-2">
+                                    <div className="flex-1 min-w-0">
+                                        <NativeSelect
+                                            value={form.Program}
+                                            onChange={(v) => set("Program", v)}
+                                            options={programOptions}
+                                            placeholder={form.BidangPelatihan ? (programOptions.length ? "Pilih program" : "Belum ada program di klaster ini") : "Pilih klaster dulu"}
+                                            disabled={!form.BidangPelatihan}
+                                            error={err("Program")}
                                         />
                                     </div>
+                                    <ManageProgramPelatihanAction
+                                        onSuccess={() => {
+                                            fetchRumpunPelatihan();
+                                            Toast.fire({ icon: "success", title: "Program pelatihan ditambahkan" });
+                                        }}
+                                    />
                                 </div>
+                            </Field>
+                        </Section>
+
+                        <Section no="03" title="Pelaksanaan & Pembiayaan" desc="Metode, sumber dana & program prioritas" icon={TbDeviceLaptop}>
+                            <Field label="Metode pelaksanaan" className="md:col-span-2" changed={changed("PelaksanaanPelatihan")}>
+                                <Choice options={JENIS_PELAKSANAAN} value={form.PelaksanaanPelatihan} onChange={(v) => set("PelaksanaanPelatihan", v)} />
+                            </Field>
+                            <Field label="Sumber pembiayaan" className="md:col-span-2" changed={changed("JenisPelatihan")}>
+                                <Choice options={JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN} value={form.JenisPelatihan} onChange={(v) => set("JenisPelatihan", v)} />
+                            </Field>
+                            {form.JenisPelatihan === BERBAYAR && (
+                                <Field label="Biaya per peserta" required icon={TbCurrencyDollar} error={err("HargaPelatihan") ? "Isi biaya pelatihan" : undefined} changed={changed("HargaPelatihan")}>
+                                    <div className="relative">
+                                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">Rp</span>
+                                        <input
+                                            inputMode="numeric"
+                                            value={form.HargaPelatihan ? new Intl.NumberFormat("id-ID").format(form.HargaPelatihan) : ""}
+                                            onChange={(e) => set("HargaPelatihan", Number(e.target.value.replace(/\D/g, "")) || 0)}
+                                            placeholder="0"
+                                            className={`${inputCls(err("HargaPelatihan"))} pl-10 font-bold tabular-nums`}
+                                        />
+                                    </div>
+                                </Field>
+                            )}
+                            <Field label="Dukungan program terobosan" icon={TbStar} className={form.JenisPelatihan === BERBAYAR ? "" : "md:col-span-2"} changed={changed("DukunganProgramTerobosan")}>
+                                <NativeSelect value={form.DukunganProgramTerobosan} onChange={(v) => set("DukunganProgramTerobosan", v)} options={DUKUNGAN_PROGRAM_TEROBOSAN} placeholder="Pilih dukungan program" />
+                            </Field>
+                        </Section>
+
+                        <Section no="04" title="Jadwal" desc="Waktu pelaksanaan" icon={TbClock}>
+                            <Field label="Tanggal mulai" changed={changed("TanggalMulaiPelatihan")}>
+                                <input
+                                    type="date"
+                                    value={form.TanggalMulaiPelatihan}
+                                    onChange={(e) => set("TanggalMulaiPelatihan", e.target.value)}
+                                    className={inputCls()}
+                                />
+                            </Field>
+                            <Field label="Tanggal berakhir" error={err("Tanggal") ? "Tidak boleh sebelum tanggal mulai" : undefined} changed={changed("TanggalBerakhirPelatihan")}>
+                                <input
+                                    type="date"
+                                    min={form.TanggalMulaiPelatihan || undefined}
+                                    value={form.TanggalBerakhirPelatihan}
+                                    onChange={(e) => set("TanggalBerakhirPelatihan", e.target.value)}
+                                    className={inputCls(err("Tanggal"))}
+                                />
+                            </Field>
+                            {hari > 0 && !errors.Tanggal && (
+                                <p className="md:col-span-2 -mt-1 text-xs text-slate-500">
+                                    {DATE_FMT.format(new Date(form.TanggalMulaiPelatihan))} – {DATE_FMT.format(new Date(form.TanggalBerakhirPelatihan))} · <b className="text-slate-800 dark:text-white">{hari} hari</b>
+                                </p>
+                            )}
+                        </Section>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="shrink-0 flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-2 px-5 md:px-6 py-3.5 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+                        <div className="flex items-center gap-2">
+                            {tried && invalid ? (
+                                <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-rose-600">
+                                    <TbAlertCircle className="w-4 h-4" /> Ada isian yang perlu diperbaiki
+                                </span>
+                            ) : (
+                                dirty && (
+                                    <button type="button" onClick={() => setForm(initial)} disabled={saving} className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-slate-800">
+                                        <TbRotate className="w-3.5 h-3.5" /> Kembalikan semula
+                                    </button>
+                                )
                             )}
                         </div>
-                    </div>
-
-                    {/* Section 3: Kategori & Pelaksanaan */}
-                    <div className="space-y-4 pt-2 border-t border-slate-100 dark:border-white/5">
-                        <div className="flex items-center gap-2">
-                            <span className="h-5 w-1 rounded-full bg-amber-500" />
-                            <h3 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider">
-                                Klasifikasi & Penyelenggara
-                            </h3>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Jenis Pelatihan */}
-                            <div className="space-y-1.5">
-                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                                    Jenis Pelatihan
-                                </label>
-                                <Select value={jenisPelatihan} onValueChange={setJenisPelatihan}>
-                                    <SelectTrigger className="w-full h-11 rounded-xl bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 font-semibold text-sm text-slate-800 dark:text-white">
-                                        <SelectValue placeholder="Pilih jenis pelatihan" />
-                                    </SelectTrigger>
-                                    <SelectContent position="popper" className="z-[999999] rounded-xl" sideOffset={5}>
-                                        {JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN.map((item, idx) => (
-                                            <SelectItem key={idx} value={item} className="text-sm font-semibold">
-                                                {item}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            {/* Dukungan Program Terobosan */}
-                            <div className="space-y-1.5">
-                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                                    Dukungan Program Terobosan
-                                </label>
-                                <Select value={dukunganProgramTerobosan} onValueChange={setDukunganProgramTerobosan}>
-                                    <SelectTrigger className="w-full h-11 rounded-xl bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 font-semibold text-sm text-slate-800 dark:text-white">
-                                        <SelectValue placeholder="Pilih dukungan program" />
-                                    </SelectTrigger>
-                                    <SelectContent position="popper" className="z-[999999] rounded-xl" sideOffset={5}>
-                                        {DUKUNGAN_PROGRAM_TEROBOSAN.map((item, idx) => (
-                                            <SelectItem key={idx} value={item} className="text-sm font-semibold">
-                                                {item}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            {/* Penyelenggara */}
-                            <div className="space-y-1.5">
-                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                                    Penyelenggara
-                                </label>
-                                <Select value={penyelenggaraPelatihan} onValueChange={setPenyelenggaraPelatihan}>
-                                    <SelectTrigger className="w-full h-11 rounded-xl bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 font-semibold text-sm text-slate-800 dark:text-white">
-                                        <SelectValue placeholder="Pilih penyelenggara" />
-                                    </SelectTrigger>
-                                    <SelectContent position="popper" className="z-[999999] rounded-xl" sideOffset={5}>
-                                        {UPT.map((item, idx) => (
-                                            <SelectItem key={idx} value={item} className="text-sm font-semibold">
-                                                {item}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            {/* Pelaksanaan */}
-                            <div className="space-y-1.5">
-                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                                    Metode Pelaksanaan
-                                </label>
-                                <Select value={pelaksanaanPelatihan} onValueChange={setPelaksanaanPelatihan}>
-                                    <SelectTrigger className="w-full h-11 rounded-xl bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 font-semibold text-sm text-slate-800 dark:text-white">
-                                        <SelectValue placeholder="Pilih pelaksanaan" />
-                                    </SelectTrigger>
-                                    <SelectContent position="popper" className="z-[999999] rounded-xl" sideOffset={5}>
-                                        {JENIS_PELAKSANAAN.map((item, idx) => (
-                                            <SelectItem key={idx} value={item} className="text-sm font-semibold">
-                                                {item}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                        <div className="flex gap-2">
+                            <button type="button" onClick={requestClose} disabled={saving} className="flex-1 sm:flex-none h-11 px-5 rounded-xl ring-1 ring-slate-200 dark:ring-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">
+                                Batal
+                            </button>
+                            <button
+                                type="button"
+                                onClick={submit}
+                                disabled={saving || !dirty}
+                                className="flex-1 sm:flex-none h-11 px-6 rounded-xl bg-[#0B1B3F] hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center justify-center gap-2 shadow-md shadow-blue-900/20 disabled:opacity-40"
+                            >
+                                {saving ? <TbLoader2 className="w-4 h-4 animate-spin" /> : <TbCheck className="w-4 h-4" />}
+                                {saving ? "Menyimpan…" : dirty ? "Simpan Perubahan" : "Tidak ada perubahan"}
+                            </button>
                         </div>
                     </div>
-
-                    {/* Section 4: Tanggal & Biaya */}
-                    <div className="space-y-4 pt-2 border-t border-slate-100 dark:border-white/5">
-                        <div className="flex items-center gap-2">
-                            <span className="h-5 w-1 rounded-full bg-amber-500" />
-                            <h3 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider">
-                                Jadwal & Biaya Pelatihan
-                            </h3>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            {/* Tanggal Mulai */}
-                            <div className="space-y-1.5">
-                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                                    Tanggal Mulai
-                                </label>
-                                <input
-                                    type="date"
-                                    className="w-full h-11 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all"
-                                    value={tanggalMulaiPelatihan}
-                                    onChange={(e) => setTanggalMulaiPelatihan(e.target.value)}
-                                />
-                            </div>
-
-                            {/* Tanggal Berakhir */}
-                            <div className="space-y-1.5">
-                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                                    Tanggal Berakhir
-                                </label>
-                                <input
-                                    type="date"
-                                    className="w-full h-11 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all"
-                                    value={tanggalBerakhirPelatihan}
-                                    onChange={(e) => setTanggalBerakhirPelatihan(e.target.value)}
-                                />
-                            </div>
-
-                            {/* Harga */}
-                            <div className="space-y-1.5">
-                                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                                    Harga Pelatihan (Rp)
-                                </label>
-                                <input
-                                    type="number"
-                                    min={0}
-                                    className="w-full h-11 px-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500 transition-all"
-                                    value={hargaPelatihan}
-                                    onChange={(e) => setHargaPelatihan(parseInt(e.target.value) || 0)}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Footer */}
-                <div className="p-6 bg-slate-50/80 dark:bg-white/5 border-t border-slate-100 dark:border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 rounded-b-[32px]">
-                    <button
-                        onClick={() => setIsOpen(false)}
-                        disabled={loading}
-                        className="px-6 py-3 text-xs font-black text-slate-400 uppercase tracking-widest hover:text-slate-900 dark:hover:text-white transition-colors"
-                    >
-                        Batal
-                    </button>
-                    <button
-                        onClick={handleSubmit}
-                        disabled={loading}
-                        className="h-12 px-8 bg-amber-500 hover:bg-amber-600 text-white rounded-xl flex items-center justify-center gap-2.5 font-black text-xs uppercase tracking-widest shadow-lg shadow-amber-500/25 transition-all hover:-translate-y-0.5 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
-                    >
-                        {loading ? (
-                            <>
-                                <TbLoader2 className="w-4 h-4 animate-spin" />
-                                <span>Menyimpan...</span>
-                            </>
-                        ) : (
-                            <>
-                                <TbCheck className="w-4 h-4" />
-                                <span>Simpan Perubahan</span>
-                            </>
-                        )}
-                    </button>
-                </div>
-            </AlertDialogContent>
-        </AlertDialog>
+                </DialogContent>
+            </Dialog>
+        </>
     );
 };
 
-export default EditPelatihanAction;
+/* ============================ UI ============================ */
 
+type IconType = React.ElementType;
+
+const inputCls = (error?: boolean) =>
+    `w-full h-11 px-3.5 rounded-xl border-none bg-slate-50 dark:bg-slate-800 ring-1 ${error ? "ring-rose-300 bg-rose-50/40" : "ring-slate-200 dark:ring-slate-700"} text-sm font-medium text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/30 placeholder:text-slate-400 placeholder:font-normal transition disabled:opacity-50`;
+
+function Section({ no, title, desc, icon: Icon, children }: { no: string; title: string; desc: string; icon: IconType; children: React.ReactNode }) {
+    return (
+        <section className="rounded-2xl bg-white dark:bg-slate-900 ring-1 ring-slate-200/80 dark:ring-slate-800 shadow-sm">
+            <header className="flex items-center gap-3 px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+                <span className="relative isolate flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#0B1B3F] text-sky-100">
+                    <span className="absolute inset-0 -z-10 bg-[radial-gradient(80%_80%_at_0%_0%,#2563EB_0%,transparent_70%)]" />
+                    <Icon className="w-4 h-4" />
+                </span>
+                <div className="min-w-0">
+                    <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-slate-400">Bagian {no}</p>
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white leading-tight">{title}</h3>
+                </div>
+                <p className="ml-auto hidden sm:block text-[11px] text-slate-400">{desc}</p>
+            </header>
+            <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">{children}</div>
+        </section>
+    );
+}
+
+function Field({ label, required, icon: Icon, error, changed, className = "", children }: { label: string; required?: boolean; icon?: IconType; error?: string; changed?: boolean; className?: string; children: React.ReactNode }) {
+    return (
+        <div className={`space-y-1.5 min-w-0 ${className}`}>
+            <div className="flex items-center justify-between gap-2">
+                <label className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                    {Icon && <Icon className="w-3.5 h-3.5 text-slate-400" />}
+                    {label} {required && <span className="text-rose-500">*</span>}
+                </label>
+                {changed && <span className="text-[10px] font-bold text-amber-600">diubah</span>}
+            </div>
+            {children}
+            {error && (
+                <p className="flex items-center gap-1 text-[11px] font-medium text-rose-500">
+                    <TbAlertCircle className="w-3 h-3" /> {error}
+                </p>
+            )}
+        </div>
+    );
+}
+
+function NativeSelect({ value, onChange, options, placeholder, disabled, error }: { value: string; onChange: (v: string) => void; options: readonly string[]; placeholder: string; disabled?: boolean; error?: boolean }) {
+    // nilai lama yang tidak ada di daftar tetap ditampilkan
+    const opts = value && !options.includes(value) ? [value, ...options] : options;
+    return (
+        <select value={value} onChange={(e) => onChange(e.target.value)} disabled={disabled} className={`${inputCls(error)} truncate`}>
+            <option value="">{placeholder}</option>
+            {opts.map((o) => (
+                <option key={o} value={o}>{o}</option>
+            ))}
+        </select>
+    );
+}
+
+function Choice({ options, value, onChange }: { options: readonly string[]; value: string; onChange: (v: string) => void }) {
+    return (
+        <div className="flex flex-wrap gap-1.5 rounded-xl p-1 bg-slate-50 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700">
+            {options.map((o) => {
+                const active = value === o;
+                return (
+                    <button
+                        key={o}
+                        type="button"
+                        onClick={() => onChange(o)}
+                        aria-pressed={active}
+                        className={`flex-1 min-w-[120px] h-9 px-3 rounded-lg text-xs font-bold inline-flex items-center justify-center gap-1.5 transition-all ${active ? "bg-[#0B1B3F] text-white shadow" : "text-slate-500 hover:text-slate-800 hover:bg-white dark:hover:bg-slate-700"}`}
+                    >
+                        {active && <TbCheck className="w-3.5 h-3.5" />} {o}
+                    </button>
+                );
+            })}
+        </div>
+    );
+}
+
+export default EditPelatihanAction;

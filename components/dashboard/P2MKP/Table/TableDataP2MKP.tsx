@@ -1,848 +1,628 @@
 "use client";
 
-import React, { useState, useMemo, useRef } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import React, { useDeferredValue, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import Cookies from "js-cookie";
-
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import { usePathname } from "next/navigation";
 import { useFetchDataP2MKP } from "@/hooks/elaut/p2mkp/useFetchDataP2MKP";
 import { useFetchDataPengajuanPenetapan } from "@/hooks/elaut/p2mkp/useFetchDataPengajuanPenetapan";
-import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-    Building2, MapPin, Search, ChevronLeft, ChevronRight,
-    Settings, ShieldCheck, Activity, Briefcase,
-    TrendingUp, Award, Phone, Mail, X, Filter, RotateCcw,
-    Layers, CheckCircle2, Globe, Tag
-} from "lucide-react";
-import { Loader2 } from "lucide-react";
-import DialogSertifikatP2MKP, { DialogSertifikatP2MKPHandle } from "@/components/sertifikat/dialogSertifikatP2MKP";
-import { P2MKP } from "@/types/p2mkp";
+import { P2MKP, PengajuanPenetapanP2MKP } from "@/types/p2mkp";
 import { P2MKPCertificateAction } from "./P2MKPCertificateAction";
-import Swal from "sweetalert2";
+import Toast from "@/commons/Toast";
 import { TbCertificate } from "react-icons/tb";
+import {
+    Building2,
+    MapPin,
+    Search,
+    ChevronLeft,
+    ChevronRight,
+    Settings,
+    Briefcase,
+    Phone,
+    Mail,
+    X,
+    Globe,
+    Tag,
+    Plus,
+    RefreshCw,
+    AlertCircle,
+    BadgeCheck,
+    FileWarning,
+    LucideIcon,
+} from "lucide-react";
+
+/* ============================ HELPERS ============================ */
+
+const fmt = (n: number) => n.toLocaleString("id-ID");
+const lc = (s?: string) => (s || "").trim().toLowerCase();
+const uniqSorted = (arr: string[]) => Array.from(new Set(arr.filter(Boolean))).sort((a, b) => a.localeCompare(b));
+
+const KLASIFIKASI_TONE = (k: string) => {
+    const v = k.toLowerCase();
+    if (v.includes("utama")) return { dot: "bg-violet-500", cls: "bg-violet-50 text-violet-700 ring-violet-200" };
+    if (v.includes("madya")) return { dot: "bg-emerald-500", cls: "bg-emerald-50 text-emerald-700 ring-emerald-200" };
+    if (v.includes("mula")) return { dot: "bg-blue-500", cls: "bg-blue-50 text-blue-700 ring-blue-200" };
+    return { dot: "bg-slate-400", cls: "bg-slate-50 text-slate-700 ring-slate-200" };
+};
+
+/** Waktu dibuat dari field yang tersedia (penamaan API bisa beda) */
+const createdOf = (r: any): number => {
+    const v = r?.created_at ?? r?.CreatedAt ?? r?.createdAt ?? r?.updated_at;
+    if (!v) return 0;
+    const t = typeof v === "number" ? v : Date.parse(String(v).replace(" ", "T"));
+    return isNaN(t) ? 0 : t;
+};
+
+type SortKey = "terbaru" | "terlama" | "nama";
+type CertFilter = "" | "sistem" | "manual";
+
+type Row = {
+    raw: P2MKP;
+    id: string;
+    nama: string;
+    nib: string;
+    pj: string;
+    telp: string;
+    email: string;
+    alamat: string;
+    kota: string;
+    provinsi: string;
+    kepemilikan: string;
+    klasifikasi: string;
+    penetapan?: PengajuanPenetapanP2MKP;
+    created: number;
+    idNum: number;
+    haystack: string;
+};
+
+/* ============================ COMPONENT ============================ */
 
 const TableDataP2MKP = () => {
     const { data: p2mkpData, loading, error, fetchP2MKPData } = useFetchDataP2MKP();
     const { data: penetapanData } = useFetchDataPengajuanPenetapan();
     const pathname = usePathname();
+    const base = `/admin/${pathname?.includes("lemdiklat") ? "lemdiklat" : "pusat"}/p2mkp/manage`;
+    const isSuperAdmin = !!Cookies.get("Access")?.includes("superAdmin");
 
-    // Filter states
-    const [searchQuery, setSearchQuery] = useState("");
-    const [selectedStatusKepemilikan, setSelectedStatusKepemilikan] = useState("all");
-    const [selectedProvinsi, setSelectedProvinsi] = useState("all");
-    const [selectedKota, setSelectedKota] = useState("all");
-    const [selectedKlasifikasi, setSelectedKlasifikasi] = useState("all");
-
-    // Pagination states
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
-
-    // Certificate dialog state
-    const [selectedP2MKP, setSelectedP2MKP] = useState<P2MKP | null>(null);
-    const [isSertifikatOpen, setIsSertifikatOpen] = useState(false);
-    const certRef = useRef<DialogSertifikatP2MKPHandle>(null);
-
-    // Extract dynamic dropdown options from fetched data
-    const optionsStatusKepemilikan = useMemo(() => {
+    /* ---------- Normalisasi sekali (hanya Approved) ---------- */
+    const rows: Row[] = useMemo(() => {
         if (!p2mkpData) return [];
-        const set = new Set<string>();
-        p2mkpData.forEach((item) => {
-            if (item.status_kepemilikan) {
-                set.add(item.status_kepemilikan.trim());
-            }
+        // Map penetapan approved → O(1) lookup (sebelumnya .find() per baris)
+        const approvedMap = new Map<string, PengajuanPenetapanP2MKP>();
+        (penetapanData || []).forEach((p) => {
+            if (lc(p.status) === "approved") approvedMap.set(String(p.id_Ppmkp), p);
         });
-        return Array.from(set).sort();
-    }, [p2mkpData]);
-
-    const optionsProvinsi = useMemo(() => {
-        if (!p2mkpData) return [];
-        const set = new Set<string>();
-        p2mkpData.forEach((item) => {
-            if (item.provinsi) {
-                set.add(item.provinsi.trim());
-            }
-        });
-        return Array.from(set).sort();
-    }, [p2mkpData]);
-
-    const optionsKota = useMemo(() => {
-        if (!p2mkpData) return [];
-        const set = new Set<string>();
-        p2mkpData.forEach((item) => {
-            if (selectedProvinsi !== "all" && selectedProvinsi) {
-                if (item.provinsi?.toLowerCase() === selectedProvinsi.toLowerCase() && item.kota) {
-                    set.add(item.kota.trim());
-                }
-            } else if (item.kota) {
-                set.add(item.kota.trim());
-            }
-        });
-        return Array.from(set).sort();
-    }, [p2mkpData, selectedProvinsi]);
-
-    const optionsKlasifikasi = useMemo(() => {
-        if (!p2mkpData) return [];
-        const set = new Set<string>();
-        p2mkpData.forEach((item) => {
-            const val = (item as any).klasifikasi || item.klasiikasi;
-            if (val) {
-                set.add(val.trim());
-            }
-        });
-        return Array.from(set).sort();
-    }, [p2mkpData]);
-
-    // Handle province change (resets city filter)
-    const handleProvinsiChange = (val: string) => {
-        setSelectedProvinsi(val);
-        setSelectedKota("all");
-        setCurrentPage(1);
-    };
-
-    // Main Filtering Logic
-    const filteredData = useMemo(() => {
-        if (!p2mkpData) return [];
-        return p2mkpData.filter((row) => {
-            const matchesStatus = (row.status || "").toLowerCase() === "approved";
-
-            const rowKlasifikasi = (row as any).klasifikasi || row.klasiikasi || "";
-            const rowNama = row.nama_ppmkp || row.nama_Ppmkp || "";
-
-            const matchesSearch = !searchQuery || [
-                rowNama,
-                row.nib,
-                row.nama_penanggung_jawab,
-                row.provinsi,
-                row.kota,
-                row.alamat,
-                row.status_kepemilikan,
-                rowKlasifikasi
-            ].some((val) => String(val || "").toLowerCase().includes(searchQuery.toLowerCase()));
-
-            const matchesKepemilikan = selectedStatusKepemilikan === "all" || !selectedStatusKepemilikan
-                || (row.status_kepemilikan || "").toLowerCase() === selectedStatusKepemilikan.toLowerCase();
-
-            const matchesProvinsi = selectedProvinsi === "all" || !selectedProvinsi
-                || (row.provinsi || "").toLowerCase() === selectedProvinsi.toLowerCase();
-
-            const matchesKota = selectedKota === "all" || !selectedKota
-                || (row.kota || "").toLowerCase() === selectedKota.toLowerCase();
-
-            const matchesKlasifikasi = selectedKlasifikasi === "all" || !selectedKlasifikasi
-                || rowKlasifikasi.toLowerCase() === selectedKlasifikasi.toLowerCase();
-
-            return matchesStatus && matchesSearch && matchesKepemilikan && matchesProvinsi && matchesKota && matchesKlasifikasi;
-        });
-    }, [p2mkpData, searchQuery, selectedStatusKepemilikan, selectedProvinsi, selectedKota, selectedKlasifikasi]);
-
-    // Active filters indicator check
-    const hasActiveFilters = searchQuery !== "" ||
-        selectedStatusKepemilikan !== "all" ||
-        selectedProvinsi !== "all" ||
-        selectedKota !== "all" ||
-        selectedKlasifikasi !== "all";
-
-    const activeFilterCount = [
-        searchQuery !== "",
-        selectedStatusKepemilikan !== "all",
-        selectedProvinsi !== "all",
-        selectedKota !== "all",
-        selectedKlasifikasi !== "all"
-    ].filter(Boolean).length;
-
-    const handleResetFilters = () => {
-        setSearchQuery("");
-        setSelectedStatusKepemilikan("all");
-        setSelectedProvinsi("all");
-        setSelectedKota("all");
-        setSelectedKlasifikasi("all");
-        setCurrentPage(1);
-    };
-
-    // Stats Calculation
-    const stats = useMemo(() => {
-        const totalApprovedAll = (p2mkpData || []).filter(p => (p.status || "").toLowerCase() === "approved").length;
-        const totalFiltered = filteredData.length;
-        const totalProvinsi = new Set(filteredData.map(p => p.provinsi).filter(Boolean)).size;
-        const totalKota = new Set(filteredData.map(p => p.kota).filter(Boolean)).size;
-        return { totalApprovedAll, totalFiltered, totalProvinsi, totalKota };
-    }, [p2mkpData, filteredData]);
-
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage) || 1;
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
-
-    // Helper for klasifikasi badges
-    const getKlasifikasiBadge = (klasifikasi?: string) => {
-        if (!klasifikasi) return <span className="text-[10px] text-slate-400 italic font-medium">Belum ditetapkan</span>;
-        const lower = klasifikasi.toLowerCase();
-        if (lower.includes("mula")) {
-            return (
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-blue-50 text-blue-700 border border-blue-200/80 inline-flex items-center gap-1.5 shadow-sm">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-                    {klasifikasi}
-                </span>
-            );
+        const out: Row[] = [];
+        for (const r of p2mkpData) {
+            if (lc(r.status) !== "approved") continue;
+            const nama = r.nama_ppmkp || r.nama_Ppmkp || "P2MKP Tanpa Nama";
+            const klasifikasi = ((r as any).klasifikasi || r.klasiikasi || "").trim();
+            const kota = (r.kota || "").trim();
+            const provinsi = (r.provinsi || "").trim();
+            const kepemilikan = (r.status_kepemilikan || "").trim();
+            out.push({
+                raw: r,
+                id: String(r.IdPpmkp),
+                nama,
+                nib: r.nib || "",
+                pj: r.nama_penanggung_jawab || "",
+                telp: r.no_telp || "",
+                email: r.email || "",
+                alamat: r.alamat || "",
+                kota,
+                provinsi,
+                kepemilikan,
+                klasifikasi,
+                penetapan: approvedMap.get(String(r.IdPpmkp)),
+                created: createdOf(r),
+                idNum: Number(r.IdPpmkp) || 0,
+                haystack: `${nama} ${r.nib ?? ""} ${r.nama_penanggung_jawab ?? ""} ${provinsi} ${kota} ${r.alamat ?? ""} ${kepemilikan} ${klasifikasi}`.toLowerCase(),
+            });
         }
-        if (lower.includes("madya")) {
-            return (
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200/80 inline-flex items-center gap-1.5 shadow-sm">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    {klasifikasi}
-                </span>
-            );
-        }
-        if (lower.includes("utama")) {
-            return (
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-black bg-purple-50 text-purple-700 border border-purple-200/80 inline-flex items-center gap-1.5 shadow-sm">
-                    <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse"></span>
-                    {klasifikasi}
-                </span>
-            );
-        }
-        return (
-            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 inline-flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                {klasifikasi}
-            </span>
+        return out;
+    }, [p2mkpData, penetapanData]);
+
+    const summary = useMemo(() => {
+        const prov = new Set<string>(), kota = new Set<string>();
+        let sistem = 0;
+        rows.forEach((r) => {
+            if (r.provinsi) prov.add(lc(r.provinsi));
+            if (r.kota) kota.add(lc(r.kota));
+            if (r.penetapan) sistem++;
+        });
+        return { provinsi: prov.size, kota: kota.size, sistem, manual: rows.length - sistem };
+    }, [rows]);
+
+    /* ---------- Filter ---------- */
+    const [search, setSearch] = useState("");
+    const q = useDeferredValue(search.trim().toLowerCase());
+    const [kepemilikan, setKepemilikan] = useState("");
+    const [klasifikasi, setKlasifikasi] = useState("");
+    const [provinsi, setProvinsi] = useState("");
+    const [kota, setKota] = useState("");
+    const [cert, setCert] = useState<CertFilter>("");
+    const [sort, setSort] = useState<SortKey>("terbaru");
+
+    const options = useMemo(
+        () => ({
+            kepemilikan: uniqSorted(rows.map((r) => r.kepemilikan)),
+            klasifikasi: uniqSorted(rows.map((r) => r.klasifikasi)),
+            provinsi: uniqSorted(rows.map((r) => r.provinsi)),
+        }),
+        [rows]
+    );
+    const kotaOptions = useMemo(() => uniqSorted(rows.filter((r) => !provinsi || lc(r.provinsi) === lc(provinsi)).map((r) => r.kota)), [rows, provinsi]);
+
+    const filtered = useMemo(() => {
+        const fk = lc(kepemilikan), fkl = lc(klasifikasi), fp = lc(provinsi), fko = lc(kota);
+        const list = rows.filter(
+            (r) =>
+                (!cert || (cert === "sistem" ? !!r.penetapan : !r.penetapan)) &&
+                (!fk || lc(r.kepemilikan) === fk) &&
+                (!fkl || lc(r.klasifikasi) === fkl) &&
+                (!fp || lc(r.provinsi) === fp) &&
+                (!fko || lc(r.kota) === fko) &&
+                (!q || r.haystack.includes(q))
         );
+        const newest = (a: Row, b: Row) => b.created - a.created || b.idNum - a.idNum;
+        if (sort === "nama") list.sort((a, b) => a.nama.localeCompare(b.nama));
+        else if (sort === "terlama") list.sort((a, b) => -newest(a, b));
+        else list.sort(newest);
+        return list;
+    }, [rows, q, cert, kepemilikan, klasifikasi, provinsi, kota, sort]);
+
+    const latestIds = useMemo(() => new Set([...rows].sort((a, b) => b.created - a.created || b.idNum - a.idNum).slice(0, 5).map((r) => r.id)), [rows]);
+
+    const resetAll = () => {
+        setSearch("");
+        setKepemilikan("");
+        setKlasifikasi("");
+        setProvinsi("");
+        setKota("");
+        setCert("");
     };
+    const hasFilter = !!(search || kepemilikan || klasifikasi || provinsi || kota || cert);
 
-    if (loading) return (
-        <div className="py-32 w-full items-center flex flex-col justify-center space-y-4">
-            <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
-            <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] animate-pulse text-center">Menarik Data Lembaga P2MKP...</p>
-        </div>
-    );
+    /* ---------- Pagination ---------- */
+    const [page, setPage] = useState(1);
+    const [perPage, setPerPage] = useState(10);
+    useEffect(() => setPage(1), [q, cert, kepemilikan, klasifikasi, provinsi, kota, sort, perPage]);
+    const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+    const safePage = Math.min(page, totalPages);
+    const start = (safePage - 1) * perPage;
+    const pageRows = filtered.slice(start, start + perPage);
 
-    if (error) return (
-        <div className="p-12 text-center bg-rose-50 rounded-3xl border border-rose-100 mx-auto max-w-2xl my-10 shadow-sm">
-            <ShieldCheck className="w-12 h-12 text-rose-500 mx-auto mb-4" />
-            <h3 className="text-xl font-black text-rose-900 mb-2 uppercase italic tracking-tight">Koneksi Database Terputus</h3>
-            <p className="text-rose-600 font-medium mb-6 text-sm">{error}</p>
-            <Button variant="outline" onClick={() => fetchP2MKPData()} className="border-rose-200 text-rose-700 hover:bg-rose-100 rounded-xl font-bold uppercase tracking-widest text-[10px]">
-                Coba Sinkronisasi Ulang
-            </Button>
-        </div>
-    );
+    // "/" → fokus pencarian
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => {
+            const t = e.target as HTMLElement;
+            if (e.key === "/" && !["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName)) {
+                e.preventDefault();
+                document.getElementById("search-p2mkp")?.focus();
+            }
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, []);
+
+    const certInfo = () =>
+        Toast.fire({
+            icon: "info",
+            title: "Sertifikat tidak tersedia",
+            text: "Penetapan lembaga ini tidak melalui sistem E-LAUT, sehingga sertifikat tidak dapat diakses.",
+        });
+
+    const initialLoading = loading && rows.length === 0;
+    const sistemPct = rows.length ? (summary.sistem / rows.length) * 100 : 0;
+
+    /* ============================ RENDER ============================ */
 
     return (
-        <>
-            <div className="space-y-8 pb-10 mt-6">
-                {/* 1. Statistics Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <Card className="group relative overflow-hidden shadow-sm border border-slate-200 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl transition-all duration-500 hover:shadow-blue-500/10">
-                        <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-700" />
-                        <CardContent className="p-5 flex flex-col justify-between h-full relative z-10">
-                            <div className="flex items-center justify-between mb-3">
-                                <div className="p-3 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
-                                    <Building2 className="h-5 w-5 text-white" />
-                                </div>
-                                <div className="flex flex-col items-end">
-                                    <span className="text-[9px] font-bold text-blue-100 uppercase tracking-widest opacity-80">Klasifikasi</span>
-                                    <div className="flex items-center gap-1.5">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                        <span className="text-[8px] font-bold text-white uppercase tracking-wider">Telah Ditetapkan</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="space-y-0.5">
-                                <p className="text-[10px] font-bold text-blue-100 uppercase tracking-wider opacity-80">Total P2MKP Terdaftar</p>
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-3xl font-black text-white tracking-tighter">{stats.totalFiltered}</span>
-                                    {hasActiveFilters && (
-                                        <span className="text-[10px] font-bold text-blue-200 opacity-90">
-                                            (dari {stats.totalApprovedAll})
-                                        </span>
-                                    )}
-                                    <span className="text-[10px] font-bold text-blue-200 uppercase tracking-tighter">Lembaga</span>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+        <div className="space-y-5 pb-10 mt-6">
+            {/* ---------- Stats ---------- */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                {initialLoading ? (
+                    [0, 1, 2, 3].map((i) => <div key={i} className="h-[132px] rounded-3xl bg-slate-200/70 dark:bg-slate-800 animate-pulse" />)
+                ) : (
+                    <>
+                        <StatCard
+                            label="P2MKP Ditetapkan"
+                            value={fmt(hasFilter ? filtered.length : rows.length)}
+                            unit="Lembaga"
+                            sub={hasFilter ? `dari ${fmt(rows.length)} lembaga` : `${options.klasifikasi.length} tingkat klasifikasi`}
+                            icon={Building2}
+                            accent="#3B82F6"
+                            active={!cert}
+                            onClick={() => setCert("")}
+                        />
+                        <StatCard label="Cakupan Wilayah" value={fmt(summary.kota)} unit="Kab/Kota" sub={`tersebar di ${fmt(summary.provinsi)} provinsi`} icon={Globe} accent="#06B6D4" />
+                        <StatCard
+                            label="Sertifikat via Sistem"
+                            value={fmt(summary.sistem)}
+                            unit="Lembaga"
+                            sub={`${sistemPct.toFixed(0)}% penetapan melalui E-LAUT`}
+                            icon={BadgeCheck}
+                            accent="#10B981"
+                            progress={sistemPct}
+                            active={cert === "sistem"}
+                            onClick={() => setCert(cert === "sistem" ? "" : "sistem")}
+                        />
+                        <StatCard
+                            label="Penetapan Manual"
+                            value={fmt(summary.manual)}
+                            unit="Lembaga"
+                            sub="tanpa sertifikat sistem — klik"
+                            icon={FileWarning}
+                            accent="#F59E0B"
+                            active={cert === "manual"}
+                            onClick={() => setCert(cert === "manual" ? "" : "manual")}
+                        />
+                    </>
+                )}
+            </div>
 
-                    <Card className="group relative overflow-hidden shadow-sm border border-slate-200 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl transition-all duration-500 hover:shadow-emerald-500/10">
-                        <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-700" />
-                        <CardContent className="p-5 flex flex-col justify-between h-full relative z-10">
-                            <div className="flex items-center justify-between mb-3">
-                                <div className="p-3 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
-                                    <MapPin className="h-5 w-5 text-white" />
-                                </div>
-                                <span className="text-[9px] font-bold text-emerald-100 uppercase tracking-widest opacity-80">
-                                    {stats.totalProvinsi} Provinsi
-                                </span>
-                            </div>
-                            <div className="space-y-0.5">
-                                <p className="text-[10px] font-bold text-emerald-100 uppercase tracking-wider opacity-80">Cakupan Wilayah</p>
-                                <div className="flex items-baseline gap-1.5">
-                                    <span className="text-3xl font-black text-white tracking-tighter">{stats.totalKota}</span>
-                                    <span className="text-[10px] font-bold text-emerald-200 uppercase tracking-tighter">Kabupaten / Kota</span>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="group relative overflow-hidden shadow-sm border border-slate-200 bg-gradient-to-br from-purple-600 to-indigo-800 rounded-2xl transition-all duration-500 hover:shadow-purple-500/10">
-                        <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all duration-700" />
-                        <CardContent className="p-5 flex flex-col justify-between h-full relative z-10">
-                            <div className="flex items-center justify-between mb-3">
-                                <div className="p-3 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
-                                    <Layers className="h-5 w-5 text-white" />
-                                </div>
-                                <span className="text-[9px] font-bold text-purple-100 uppercase tracking-widest opacity-80">Klasifikasi</span>
-                            </div>
-                            <div className="space-y-0.5">
-                                <p className="text-[10px] font-bold text-purple-100 uppercase tracking-wider opacity-80">Variasi Klasifikasi</p>
-                                <div className="flex items-baseline gap-1.5">
-                                    <span className="text-3xl font-black text-white tracking-tighter">{optionsKlasifikasi.length}</span>
-                                    <span className="text-[10px] font-bold text-purple-200 uppercase tracking-tighter">Tingkatan</span>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Card className="group relative overflow-hidden shadow-sm border border-slate-200 bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl transition-all duration-500">
-                        <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-32 h-32 bg-white/5 rounded-full blur-2xl" />
-                        <CardContent className="p-5 flex flex-col justify-between h-full relative z-10">
-                            <div className="flex items-center justify-between mb-3">
-                                <div className="p-3 bg-white/10 backdrop-blur-md rounded-xl border border-white/20">
-                                    <Filter className="h-5 w-5 text-amber-400" />
-                                </div>
-                                {hasActiveFilters && (
-                                    <span className="px-2 py-0.5 bg-amber-400/20 text-amber-300 text-[9px] font-bold rounded-full border border-amber-400/30">
-                                        {activeFilterCount} Filter Aktif
-                                    </span>
-                                )}
-                            </div>
-                            <div className="space-y-0.5">
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status Pencarian</p>
-                                <p className="text-sm font-bold text-white truncate">
-                                    {hasActiveFilters ? "Hasil Terfilter" : "Menampilkan Semua Data"}
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
+            {/* ---------- Toolbar ---------- */}
+            <div className="rounded-3xl bg-white dark:bg-slate-900 ring-1 ring-slate-200/80 dark:ring-slate-800 p-2.5 shadow-sm space-y-2.5">
+                <div className="flex flex-col lg:flex-row gap-2.5 lg:items-center">
+                    <div className="relative flex-1 group">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-blue-500" />
+                        <input
+                            id="search-p2mkp"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder="Cari lembaga, NIB, penanggung jawab, atau alamat..."
+                            className="pl-11 pr-14 border-none w-full h-11 bg-slate-50 dark:bg-slate-800 rounded-2xl text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500/20 placeholder:text-slate-400 placeholder:font-normal"
+                        />
+                        {search ? (
+                            <button type="button" onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-200" aria-label="Hapus pencarian">
+                                <X className="w-4 h-4" />
+                            </button>
+                        ) : (
+                            <kbd className="hidden md:block absolute right-3 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded-md bg-white ring-1 ring-slate-200 text-[10px] font-bold text-slate-400">/</kbd>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <select
+                            value={sort}
+                            onChange={(e) => setSort(e.target.value as SortKey)}
+                            title="Urutkan"
+                            className="h-11 shrink-0 border-none rounded-2xl bg-slate-50 dark:bg-slate-800 px-3 text-xs font-bold text-slate-600 outline-none hover:ring-1 hover:ring-slate-200"
+                        >
+                            <option value="terbaru">Terbaru</option>
+                            <option value="terlama">Terlama</option>
+                            <option value="nama">Nama A–Z</option>
+                        </select>
+                        <button type="button" onClick={() => fetchP2MKPData()} disabled={loading} title="Muat ulang" className="h-11 w-11 shrink-0 rounded-2xl bg-slate-50 dark:bg-slate-800 text-slate-600 flex items-center justify-center hover:ring-1 hover:ring-slate-200 disabled:opacity-40">
+                            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+                        </button>
+                        {isSuperAdmin && (
+                            <Link href={`${base}/create`} className="h-11 px-5 shrink-0 rounded-2xl bg-[#0B1B3F] hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-2 shadow-md shadow-blue-900/20 transition-colors">
+                                <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Tambah P2MKP</span>
+                            </Link>
+                        )}
+                    </div>
                 </div>
 
-                {/* 2. Interactive Filter Bar */}
-                <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-                    {/* Top Row: Search & Add Button */}
-                    <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
-                        <div className="relative flex-1 w-full group">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 transition-colors group-focus-within:text-blue-600" />
-                            <Input
-                                type="text"
-                                placeholder="Cari nama lembaga, NIB, penanggung jawab, atau alamat..."
-                                value={searchQuery}
-                                onChange={(e) => {
-                                    setSearchQuery(e.target.value);
-                                    setCurrentPage(1);
-                                }}
-                                className="pl-12 pr-10 h-12 w-full border border-slate-200 bg-slate-50/50 rounded-2xl focus-visible:ring-2 focus-visible:ring-blue-500/20 focus-visible:border-blue-500 transition-all font-semibold text-sm"
-                            />
-                            {searchQuery && (
-                                <button
-                                    onClick={() => setSearchQuery("")}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200/60 transition-all"
-                                >
-                                    <X className="w-4 h-4" />
-                                </button>
-                            )}
-                        </div>
-
-                        {
-                            Cookies.get('Access')?.includes('superAdmin') && <Button
-                                onClick={() => window.location.href = `/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/p2mkp/manage/create`}
-                                className="h-12 px-6 gap-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-md hover:shadow-lg transition-all hover:scale-[1.01] active:scale-95 shrink-0 w-full md:w-auto"
-                            >
-                                <Building2 className="w-4 h-4" />
-                                Tambah P2MKP Baru
-                            </Button>
-                        }
-
-                    </div>
-
-                    {/* Bottom Row: Filter Dropdowns */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1 border-t border-slate-100">
-                        {/* Filter Status Kepemilikan */}
-                        <div className="space-y-1">
-                            <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                                <Briefcase className="w-3 h-3 text-slate-400" />
-                                Status Kepemilikan
-                            </label>
-                            <Select
-                                value={selectedStatusKepemilikan}
-                                onValueChange={(val) => {
-                                    setSelectedStatusKepemilikan(val);
-                                    setCurrentPage(1);
-                                }}
-                            >
-                                <SelectTrigger className="h-10 rounded-xl bg-slate-50/80 border-slate-200 font-bold text-xs">
-                                    <SelectValue placeholder="Semua Kepemilikan" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all" className="font-bold text-xs">Semua Kepemilikan</SelectItem>
-                                    {optionsStatusKepemilikan.map((opt) => (
-                                        <SelectItem key={opt} value={opt} className="text-xs font-semibold">
-                                            {opt}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        {/* Filter Klasifikasi */}
-                        <div className="space-y-1">
-                            <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                                <Tag className="w-3 h-3 text-slate-400" />
-                                Klasifikasi
-                            </label>
-                            <Select
-                                value={selectedKlasifikasi}
-                                onValueChange={(val) => {
-                                    setSelectedKlasifikasi(val);
-                                    setCurrentPage(1);
-                                }}
-                            >
-                                <SelectTrigger className="h-10 rounded-xl bg-slate-50/80 border-slate-200 font-bold text-xs">
-                                    <SelectValue placeholder="Semua Klasifikasi" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all" className="font-bold text-xs">Semua Klasifikasi</SelectItem>
-                                    {optionsKlasifikasi.map((opt) => (
-                                        <SelectItem key={opt} value={opt} className="text-xs font-semibold">
-                                            {opt}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        {/* Filter Provinsi */}
-                        <div className="space-y-1">
-                            <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                                <Globe className="w-3 h-3 text-slate-400" />
-                                Provinsi
-                            </label>
-                            <Select
-                                value={selectedProvinsi}
-                                onValueChange={handleProvinsiChange}
-                            >
-                                <SelectTrigger className="h-10 rounded-xl bg-slate-50/80 border-slate-200 font-bold text-xs">
-                                    <SelectValue placeholder="Semua Provinsi" />
-                                </SelectTrigger>
-                                <SelectContent className="max-h-60">
-                                    <SelectItem value="all" className="font-bold text-xs">Semua Provinsi</SelectItem>
-                                    {optionsProvinsi.map((opt) => (
-                                        <SelectItem key={opt} value={opt} className="text-xs font-semibold">
-                                            {opt}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        {/* Filter Kota / Kabupaten */}
-                        <div className="space-y-1">
-                            <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                                <MapPin className="w-3 h-3 text-slate-400" />
-                                Kota / Kabupaten
-                            </label>
-                            <Select
-                                value={selectedKota}
-                                onValueChange={(val) => {
-                                    setSelectedKota(val);
-                                    setCurrentPage(1);
-                                }}
-                            >
-                                <SelectTrigger className="h-10 rounded-xl bg-slate-50/80 border-slate-200 font-bold text-xs">
-                                    <SelectValue placeholder="Semua Kota/Kab" />
-                                </SelectTrigger>
-                                <SelectContent className="max-h-60">
-                                    <SelectItem value="all" className="font-bold text-xs">Semua Kota / Kab</SelectItem>
-                                    {optionsKota.map((opt) => (
-                                        <SelectItem key={opt} value={opt} className="text-xs font-semibold">
-                                            {opt}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                    </div>
-
-                    {/* Active Filter Chips & Reset */}
-                    {hasActiveFilters && (
-                        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
-                            <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mr-1">
-                                Filter Aktif:
-                            </span>
-
-                            {searchQuery && (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg border border-blue-200 text-[11px] font-bold">
-                                    Cari: "{searchQuery}"
-                                    <button onClick={() => setSearchQuery("")} className="hover:text-blue-900 ml-1">
-                                        <X size={12} />
-                                    </button>
-                                </span>
-                            )}
-
-                            {selectedStatusKepemilikan !== "all" && (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg border border-emerald-200 text-[11px] font-bold">
-                                    Kepemilikan: {selectedStatusKepemilikan}
-                                    <button onClick={() => setSelectedStatusKepemilikan("all")} className="hover:text-emerald-900 ml-1">
-                                        <X size={12} />
-                                    </button>
-                                </span>
-                            )}
-
-                            {selectedKlasifikasi !== "all" && (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-purple-50 text-purple-700 rounded-lg border border-purple-200 text-[11px] font-bold">
-                                    Klasifikasi: {selectedKlasifikasi}
-                                    <button onClick={() => setSelectedKlasifikasi("all")} className="hover:text-purple-900 ml-1">
-                                        <X size={12} />
-                                    </button>
-                                </span>
-                            )}
-
-                            {selectedProvinsi !== "all" && (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 text-amber-800 rounded-lg border border-amber-200 text-[11px] font-bold">
-                                    Provinsi: {selectedProvinsi}
-                                    <button onClick={() => setSelectedProvinsi("all")} className="hover:text-amber-950 ml-1">
-                                        <X size={12} />
-                                    </button>
-                                </span>
-                            )}
-
-                            {selectedKota !== "all" && (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg border border-indigo-200 text-[11px] font-bold">
-                                    Kota: {selectedKota}
-                                    <button onClick={() => setSelectedKota("all")} className="hover:text-indigo-900 ml-1">
-                                        <X size={12} />
-                                    </button>
-                                </span>
-                            )}
-
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={handleResetFilters}
-                                className="h-7 px-2.5 text-[10px] font-extrabold text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg uppercase tracking-wider ml-auto gap-1"
-                            >
-                                <RotateCcw size={12} />
-                                Reset Filter
-                            </Button>
-                        </div>
-                    )}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                    <FilterSelect icon={Briefcase} placeholder="Semua kepemilikan" value={kepemilikan} onChange={setKepemilikan} options={options.kepemilikan} />
+                    <FilterSelect icon={Tag} placeholder="Semua klasifikasi" value={klasifikasi} onChange={setKlasifikasi} options={options.klasifikasi} />
+                    <FilterSelect
+                        icon={Globe}
+                        placeholder="Semua provinsi"
+                        value={provinsi}
+                        onChange={(v) => {
+                            setProvinsi(v);
+                            setKota("");
+                        }}
+                        options={options.provinsi}
+                    />
+                    <FilterSelect icon={MapPin} placeholder="Semua kota/kab" value={kota} onChange={setKota} options={kotaOptions} />
                 </div>
 
-                {/* 3. Main Data Table */}
-                <div className="relative bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden min-h-[400px]">
-                    <div className="overflow-x-auto">
-                        <table className="w-full border-collapse text-left">
-                            <thead>
-                                <tr className="border-b border-slate-100 bg-slate-50/80">
-                                    <th className="px-6 py-4 text-[10px] font-extrabold uppercase tracking-widest text-slate-400 text-center w-16">NO</th>
-                                    <th className="px-6 py-4 text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Lembaga P2MKP & Lokasi</th>
-                                    <th className="px-6 py-4 text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Klasifikasi & Kepemilikan</th>
-                                    <th className="px-6 py-4 text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Penanggung Jawab</th>
-                                    <th className="px-6 py-4 text-[10px] font-extrabold uppercase tracking-widest text-slate-400 text-center">Status</th>
-                                    <th className="px-6 py-4 text-[10px] font-extrabold uppercase tracking-widest text-slate-400 text-center w-44">Aksi</th>
+                {hasFilter && (
+                    <div className="flex flex-wrap items-center gap-1.5 px-1 pb-0.5">
+                        {search && <Chip label={`"${search}"`} onClear={() => setSearch("")} />}
+                        {cert && <Chip label={cert === "sistem" ? "Sertifikat via sistem" : "Penetapan manual"} onClear={() => setCert("")} />}
+                        {kepemilikan && <Chip label={kepemilikan} onClear={() => setKepemilikan("")} />}
+                        {klasifikasi && <Chip label={klasifikasi} onClear={() => setKlasifikasi("")} />}
+                        {provinsi && <Chip label={provinsi} onClear={() => { setProvinsi(""); setKota(""); }} />}
+                        {kota && <Chip label={kota} onClear={() => setKota("")} />}
+                        <button type="button" onClick={resetAll} className="text-[11px] font-semibold text-slate-400 hover:text-rose-600 px-1">
+                            Reset semua
+                        </button>
+                        <span className="ml-auto text-[11px] text-slate-400"><b className="text-slate-700 tabular-nums">{fmt(filtered.length)}</b> hasil</span>
+                    </div>
+                )}
+            </div>
+
+            {/* ---------- Tabel ---------- */}
+            <div className="bg-white dark:bg-slate-900 rounded-[1.75rem] ring-1 ring-slate-200/80 dark:ring-slate-800 shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead>
+                            <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+                                <th className="w-12 pl-5 pr-2 py-3 text-center font-semibold">No</th>
+                                <th className="px-3 py-3 font-semibold min-w-[280px]">Lembaga P2MKP</th>
+                                <th className="px-3 py-3 font-semibold min-w-[170px]">Klasifikasi</th>
+                                <th className="px-3 py-3 font-semibold min-w-[210px]">Penanggung Jawab</th>
+                                <th className="px-3 py-3 font-semibold w-[140px]">Sertifikat</th>
+                                <th className="w-[1%] px-5 py-3 text-right font-semibold">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                            {initialLoading ? (
+                                Array.from({ length: 6 }).map((_, i) => (
+                                    <tr key={i}>
+                                        <td colSpan={6} className="px-5 py-3">
+                                            <div className="h-12 rounded-xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : error && rows.length === 0 ? (
+                                <tr>
+                                    <td colSpan={6} className="py-16">
+                                        <div className="flex flex-col items-center gap-2 text-center">
+                                            <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center">
+                                                <AlertCircle className="w-5 h-5" />
+                                            </div>
+                                            <p className="text-sm font-bold text-slate-700">Gagal memuat data P2MKP</p>
+                                            <p className="text-xs text-slate-400 max-w-sm">{String((error as any)?.message || error)}</p>
+                                            <button type="button" onClick={() => fetchP2MKPData()} className="mt-2 h-9 px-4 rounded-xl bg-[#0B1B3F] text-white text-xs font-bold">Coba lagi</button>
+                                        </div>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                                <AnimatePresence mode="popLayout" initial={false}>
-                                    {paginatedData.map((row, index) => {
-                                        const globalIndex = startIndex + index + 1;
-                                        const namaLembaga = row.nama_ppmkp || row.nama_Ppmkp || "P2MKP Tanpa Nama";
-                                        const klasifikasiValue = (row as any).klasifikasi || row.klasiikasi;
-
-                                        // Find correlated approved penetapan from the system
-                                        const approvedPenetapan = (penetapanData || []).find(
-                                            (p) => String(p.id_Ppmkp) === String(row.IdPpmkp) && p.status?.toLowerCase() === "approved"
-                                        );
-
-                                        const handleCertificateClick = () => {
-                                            if (!approvedPenetapan) {
-                                                Swal.fire({
-                                                    icon: "warning",
-                                                    title: "Sertifikat Tidak Tersedia",
-                                                    html: `<p style="font-size:14px;color:#475569">Pengajuan Penetapan P2MKP untuk lembaga ini <strong>tidak melalui sistem</strong>. Sertifikat hanya dapat diakses jika penetapan diproses melalui sistem ELAUT.</p>`,
-                                                    confirmButtonColor: "#1e40af",
-                                                    confirmButtonText: "Mengerti",
-                                                    background: "#ffffff",
-                                                    customClass: { container: "z-[999999999]" },
-                                                });
-                                            }
-                                        };
-
-                                        return (
-                                            <motion.tr
-                                                key={row.IdPpmkp || index}
-                                                initial={{ opacity: 0, y: 8 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, scale: 0.98 }}
-                                                transition={{ duration: 0.25, delay: index * 0.03 }}
-                                                className="group/row hover:bg-slate-50/90 transition-all duration-200 border-l-4 border-l-transparent hover:border-l-blue-600"
-                                            >
-                                                {/* NO */}
-                                                <td className="px-6 py-5 text-center align-top">
-                                                    <span className="text-xs font-black text-slate-400 group-hover/row:text-blue-600 transition-colors">
-                                                        {globalIndex.toString().padStart(2, '0')}
+                            ) : pageRows.length === 0 ? (
+                                <tr>
+                                    <td colSpan={6} className="py-16">
+                                        <div className="flex flex-col items-center gap-2 text-center">
+                                            <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                                                <Building2 className="w-5 h-5 text-slate-400" />
+                                            </div>
+                                            <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{hasFilter ? "Lembaga tidak ditemukan" : "Belum ada P2MKP yang ditetapkan"}</p>
+                                            {hasFilter && (
+                                                <button type="button" onClick={resetAll} className="text-xs font-semibold text-blue-600 hover:underline">Reset filter</button>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : (
+                                pageRows.map((r, i) => {
+                                    const tone = r.klasifikasi ? KLASIFIKASI_TONE(r.klasifikasi) : null;
+                                    return (
+                                        <tr key={r.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/30 transition-colors">
+                                            <td className="pl-5 pr-2 py-3.5 text-center text-xs text-slate-400 tabular-nums align-top">{start + i + 1}</td>
+                                            <td className="px-3 py-3.5 align-top">
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="font-mono text-[10px] font-semibold text-slate-400">NIB {r.nib || "—"}</span>
+                                                    {latestIds.has(r.id) && (
+                                                        <span className="inline-flex items-center gap-1 px-1.5 py-px rounded-md bg-[#0B1B3F] text-white text-[9px] font-black uppercase">
+                                                            <span className="w-1 h-1 rounded-full bg-sky-300 animate-pulse" /> Terbaru
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <p className="text-[13px] font-semibold text-slate-900 dark:text-white leading-snug line-clamp-2">{r.nama}</p>
+                                                <p className="mt-0.5 flex items-start gap-1 text-[11px] text-slate-400">
+                                                    <MapPin className="w-3 h-3 shrink-0 mt-0.5" />
+                                                    <span className="line-clamp-2">
+                                                        {r.alamat && <span className="text-slate-500">{r.alamat} · </span>}
+                                                        {[r.kota, r.provinsi].filter(Boolean).join(", ") || "-"}
                                                     </span>
-                                                </td>
-
-                                                {/* Lembaga P2MKP & Lokasi */}
-                                                <td className="px-6 py-5 align-top">
-                                                    <div className="flex flex-col gap-1.5">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="text-[10px] font-extrabold text-blue-600 tracking-tight px-2 py-0.5 bg-blue-50 rounded-md border border-blue-100 uppercase">
-                                                                NIB: {row.nib || "N/A"}
-                                                            </span>
-                                                        </div>
-                                                        <h3 className="text-sm font-black text-slate-800 uppercase tracking-tight group-hover/row:text-blue-900 transition-colors leading-snug">
-                                                            {namaLembaga}
-                                                        </h3>
-                                                        <div className="flex items-start gap-1.5 text-slate-500 mt-0.5">
-                                                            <MapPin size={13} className="text-slate-400 shrink-0 mt-0.5 group-hover/row:text-blue-500 transition-colors" />
-                                                            <div className="flex flex-col text-[11px]">
-                                                                <span className="font-semibold text-slate-600 leading-tight">
-                                                                    {row.alamat || "Alamat tidak dicantumkan"}
-                                                                </span>
-                                                                <span className="font-bold text-slate-400 uppercase tracking-tight text-[10px] mt-0.5">
-                                                                    {row.kota || "-"}, {row.provinsi || "-"}
-                                                                </span>
-                                                            </div>
-                                                        </div>
+                                                </p>
+                                            </td>
+                                            <td className="px-3 py-3.5 align-top">
+                                                {tone ? (
+                                                    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full ring-1 text-[11px] font-semibold ${tone.cls}`}>
+                                                        <span className={`w-1.5 h-1.5 rounded-full ${tone.dot}`} /> {r.klasifikasi}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-[11px] text-slate-300 italic">Belum ditetapkan</span>
+                                                )}
+                                                <p className="mt-1 flex items-center gap-1 text-[11px] text-slate-500">
+                                                    <Briefcase className="w-3 h-3 text-slate-400" /> {r.kepemilikan || "Perorangan"}
+                                                </p>
+                                            </td>
+                                            <td className="px-3 py-3.5 align-top">
+                                                <div className="flex items-start gap-2">
+                                                    <div className="w-7 h-7 rounded-lg bg-[#0B1B3F] text-sky-100 flex items-center justify-center text-[11px] font-black shrink-0">
+                                                        {(r.pj || "P").charAt(0).toUpperCase()}
                                                     </div>
-                                                </td>
-
-                                                {/* Klasifikasi & Kepemilikan */}
-                                                <td className="px-6 py-5 align-top">
-                                                    <div className="flex flex-col gap-2 items-start">
-                                                        <div>
-                                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Klasifikasi:</span>
-                                                            {getKlasifikasiBadge(klasifikasiValue)}
-                                                        </div>
-
-                                                        <div className="pt-1">
-                                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Kepemilikan:</span>
-                                                            <span className="px-2.5 py-0.5 bg-slate-100 text-slate-700 text-[10px] font-bold rounded-md border border-slate-200 inline-flex items-center gap-1.5">
-                                                                <Briefcase size={11} className="text-slate-500" />
-                                                                {row.status_kepemilikan || "Perorangan"}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </td>
-
-                                                {/* Penanggung Jawab */}
-                                                <td className="px-6 py-5 align-top">
-                                                    <div className="flex flex-col gap-1.5">
-                                                        <div className="flex items-center gap-2">
-                                                            <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-[11px] font-black text-white shadow-sm shrink-0">
-                                                                {row.nama_penanggung_jawab?.charAt(0).toUpperCase() || "P"}
-                                                            </div>
-                                                            <div className="flex flex-col">
-                                                                <span className="text-[9px] font-extrabold text-blue-600 uppercase tracking-wider leading-none mb-0.5">Penanggung Jawab</span>
-                                                                <span className="text-xs font-bold text-slate-800 leading-tight">
-                                                                    {row.nama_penanggung_jawab || "Anonim"}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="flex flex-col gap-1 pl-9 text-[10px] text-slate-500 font-medium">
-                                                            {row.no_telp && (
-                                                                <div className="flex items-center gap-1.5">
-                                                                    <Phone size={11} className="text-slate-400 shrink-0" />
-                                                                    <span className="font-semibold text-slate-600">{row.no_telp}</span>
-                                                                </div>
-                                                            )}
-                                                            {row.email && (
-                                                                <div className="flex items-center gap-1.5 truncate max-w-[160px]">
-                                                                    <Mail size={11} className="text-slate-400 shrink-0" />
-                                                                    <span className="truncate text-slate-600" title={row.email}>{row.email}</span>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </td>
-
-                                                {/* Status Penetapan */}
-                                                <td className="px-6 py-5 text-center align-top">
-                                                    <div className="flex flex-col items-center gap-1">
-                                                        <span className="px-3 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-black rounded-full border border-emerald-200 uppercase tracking-wider inline-flex items-center gap-1 shadow-sm">
-                                                            <CheckCircle2 size={12} className="text-emerald-600" />
-                                                            {row.status || "APPROVED"}
-                                                        </span>
-                                                        <span className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest mt-0.5">
-                                                            Telah Ditetapkan
-                                                        </span>
-                                                    </div>
-                                                </td>
-
-                                                {/* Aksi */}
-                                                <td className="px-6 py-5 text-right align-top">
-                                                    <div className="flex flex-col gap-2 items-end">
-                                                        <button
-                                                            onClick={() => window.location.href = `/admin/${pathname.includes("lemdiklat") ? 'lemdiklat' : 'pusat'}/p2mkp/manage/${row.IdPpmkp}`}
-                                                            className="group/btn relative text-center w-full overflow-hidden flex items-center justify-center gap-2 px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-[10px] font-black shadow-sm hover:shadow-md transition-all"
-                                                        >
-                                                            <Settings size={12} className="group-hover/btn:rotate-90 transition-transform duration-300" />
-                                                            <span className="tracking-wider">KELOLA</span>
-                                                        </button>
-
-                                                        {approvedPenetapan ? (
-                                                            <P2MKPCertificateAction p2mkp={approvedPenetapan as unknown as P2MKP} />
-                                                        ) : (
-                                                            <button
-                                                                onClick={handleCertificateClick}
-                                                                className="group/cert relative w-full text-center overflow-hidden flex items-center justify-center gap-2 px-3 py-2 bg-slate-200 text-slate-500 rounded-xl text-[10px] font-black shadow-sm cursor-pointer hover:bg-amber-50 hover:text-amber-700 hover:border-amber-200 border border-slate-200 hover:border-amber-200 transition-all"
-                                                                title="Penetapan tidak melalui sistem — klik untuk info"
-                                                            >
-                                                                <TbCertificate className="w-4 h-4" />
-                                                                <span className="tracking-wider">SERTIFIKAT</span>
-                                                            </button>
+                                                    <div className="min-w-0">
+                                                        <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">{r.pj || "-"}</p>
+                                                        {r.telp && (
+                                                            <a href={`tel:${r.telp}`} className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-blue-600">
+                                                                <Phone className="w-3 h-3" /> {r.telp}
+                                                            </a>
+                                                        )}
+                                                        {r.email && (
+                                                            <a href={`mailto:${r.email}`} title={r.email} className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-blue-600 max-w-[180px]">
+                                                                <Mail className="w-3 h-3 shrink-0" /> <span className="truncate">{r.email}</span>
+                                                            </a>
                                                         )}
                                                     </div>
-                                                </td>
-                                            </motion.tr>
-                                        );
-                                    })}
-                                </AnimatePresence>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* Empty Filtered State */}
-                    {filteredData.length === 0 && (
-                        <div className="py-20 px-4 flex flex-col items-center justify-center text-center">
-                            <motion.div
-                                initial={{ scale: 0.9, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                className="relative flex items-center justify-center p-6 bg-slate-100 rounded-3xl mb-4 border border-slate-200"
-                            >
-                                <Filter className="w-10 h-10 text-slate-400" />
-                            </motion.div>
-                            <h4 className="text-slate-800 text-base font-black uppercase tracking-wider mb-1">
-                                Tidak Ada Data P2MKP Ditemukan
-                            </h4>
-                            <p className="text-slate-500 text-xs font-semibold max-w-sm mb-6 leading-relaxed">
-                                Tidak ditemukan lembaga P2MKP yang cocok dengan kriteria filter atau pencarian Anda.
-                            </p>
-                            {hasActiveFilters && (
-                                <Button
-                                    onClick={handleResetFilters}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white font-black text-[11px] uppercase tracking-wider rounded-xl px-5 h-10 shadow-md gap-2"
-                                >
-                                    <RotateCcw size={14} />
-                                    Reset Semua Filter
-                                </Button>
+                                                </div>
+                                            </td>
+                                            <td className="px-3 py-3.5 align-top">
+                                                {r.penetapan ? (
+                                                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Via sistem
+                                                    </span>
+                                                ) : (
+                                                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-600">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> Manual
+                                                    </span>
+                                                )}
+                                                <p className="mt-0.5 text-[10px] text-slate-400">Tahun {r.penetapan?.tahun_penetapan || "-"}</p>
+                                            </td>
+                                            <td className="px-5 py-3 align-top">
+                                                <div className="flex items-center justify-end gap-1">
+                                                    {r.penetapan ? (
+                                                        <P2MKPCertificateAction p2mkp={r.penetapan as unknown as P2MKP} />
+                                                    ) : (
+                                                        <button
+                                                            type="button"
+                                                            onClick={certInfo}
+                                                            title="Penetapan tidak melalui sistem"
+                                                            className="h-8 px-3 rounded-lg ring-1 ring-slate-200 dark:ring-slate-700 text-xs font-bold text-slate-400 inline-flex items-center gap-1.5 hover:bg-amber-50 hover:text-amber-700 hover:ring-amber-200"
+                                                        >
+                                                            <TbCertificate className="w-4 h-4" /> Sertifikat
+                                                        </button>
+                                                    )}
+                                                    <Link
+                                                        href={`${base}/${r.id}`}
+                                                        className="h-8 px-3 rounded-lg bg-[#0B1B3F] hover:bg-blue-700 text-white text-xs font-bold inline-flex items-center gap-1.5 transition-colors group/btn"
+                                                    >
+                                                        <Settings className="w-3.5 h-3.5 transition-transform duration-300 group-hover/btn:rotate-90" /> Kelola
+                                                    </Link>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
                             )}
-                        </div>
-                    )}
+                        </tbody>
+                    </table>
                 </div>
 
-                {/* 4. Enhanced Pagination Controls */}
-                {filteredData.length > 0 && (
-                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                        {/* Total Count Telemetry */}
+                {/* ---------- Pagination ---------- */}
+                {filtered.length > 0 && (
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-3 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500">
                         <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600">
-                                <span>Menampilkan</span>
-                                <span className="font-black text-slate-900 px-2 py-0.5 bg-slate-100 rounded-md">
-                                    {startIndex + 1} - {Math.min(startIndex + itemsPerPage, filteredData.length)}
-                                </span>
-                                <span>dari</span>
-                                <span className="font-black text-blue-600">{filteredData.length}</span>
-                                <span>Lembaga</span>
-                            </div>
-
-                            {/* Items Per Page Selector */}
-                            <div className="hidden md:flex items-center gap-1.5 ml-4 pl-4 border-l border-slate-200">
-                                <span className="text-[11px] font-bold text-slate-400">Tampilkan:</span>
-                                <Select
-                                    value={String(itemsPerPage)}
-                                    onValueChange={(val) => {
-                                        setItemsPerPage(Number(val));
-                                        setCurrentPage(1);
-                                    }}
-                                >
-                                    <SelectTrigger className="h-8 w-16 text-xs font-bold rounded-lg border-slate-200">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="8">8</SelectItem>
-                                        <SelectItem value="10">10</SelectItem>
-                                        <SelectItem value="15">15</SelectItem>
-                                        <SelectItem value="25">25</SelectItem>
-                                        <SelectItem value="50">50</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                            <span>
+                                <b className="text-slate-800 dark:text-white tabular-nums">{start + 1}–{Math.min(start + perPage, filtered.length)}</b> dari <b className="tabular-nums">{fmt(filtered.length)}</b>
+                            </span>
+                            <select value={perPage} onChange={(e) => setPerPage(Number(e.target.value))} className="h-8 rounded-lg bg-slate-50 dark:bg-slate-800 px-2 text-xs font-semibold outline-none ring-1 ring-slate-200 dark:ring-slate-700 border-none">
+                                {[10, 25, 50, 100].map((n) => (
+                                    <option key={n} value={n}>{n} / hal</option>
+                                ))}
+                            </select>
                         </div>
-
-                        {/* Page Buttons */}
-                        <div className="flex items-center gap-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-                                disabled={currentPage === 1}
-                                className="h-9 px-3 rounded-xl border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 font-bold text-xs"
-                            >
-                                <ChevronLeft size={16} className="mr-1" /> Prev
-                            </Button>
-
-                            <div className="flex items-center gap-1 px-1">
-                                {Array.from({ length: totalPages }, (_, i) => i + 1)
-                                    .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
-                                    .map((p, idx, arr) => {
-                                        const prev = arr[idx - 1];
-                                        const showEllipsis = prev && p - prev > 1;
-
-                                        return (
-                                            <React.Fragment key={p}>
-                                                {showEllipsis && (
-                                                    <span className="px-1 text-slate-400 text-xs font-bold">...</span>
-                                                )}
-                                                <button
-                                                    onClick={() => setCurrentPage(p)}
-                                                    className={`w-8 h-8 rounded-lg text-xs font-black transition-all ${currentPage === p
-                                                        ? "bg-blue-600 text-white shadow-md shadow-blue-500/20"
-                                                        : "text-slate-600 hover:bg-slate-100"
-                                                        }`}
-                                                >
-                                                    {p}
-                                                </button>
-                                            </React.Fragment>
-                                        );
-                                    })}
-                            </div>
-
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-                                disabled={currentPage === totalPages}
-                                className="h-9 px-3 rounded-xl border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 font-bold text-xs"
-                            >
-                                Next <ChevronRight size={16} className="ml-1" />
-                            </Button>
+                        <div className="flex items-center gap-1">
+                            <button type="button" onClick={() => setPage(safePage - 1)} disabled={safePage <= 1} className="h-8 w-8 rounded-lg hover:bg-slate-100 disabled:opacity-30 flex items-center justify-center" aria-label="Sebelumnya">
+                                <ChevronLeft className="w-4 h-4" />
+                            </button>
+                            {pageList(safePage, totalPages).map((p, i) =>
+                                p === "…" ? (
+                                    <span key={`e${i}`} className="px-1 text-slate-300">…</span>
+                                ) : (
+                                    <button
+                                        key={p}
+                                        type="button"
+                                        onClick={() => setPage(p)}
+                                        className={`h-8 min-w-8 px-2 rounded-lg text-xs font-bold tabular-nums ${p === safePage ? "bg-[#0B1B3F] text-white" : "hover:bg-slate-100 text-slate-600"}`}
+                                    >
+                                        {p}
+                                    </button>
+                                )
+                            )}
+                            <button type="button" onClick={() => setPage(safePage + 1)} disabled={safePage >= totalPages} className="h-8 w-8 rounded-lg hover:bg-slate-100 disabled:opacity-30 flex items-center justify-center" aria-label="Berikutnya">
+                                <ChevronRight className="w-4 h-4" />
+                            </button>
                         </div>
                     </div>
                 )}
             </div>
-        </>
+        </div>
     );
 };
 
 export default TableDataP2MKP;
 
+/* ============================ UI ============================ */
+
+function pageList(cur: number, total: number): (number | "…")[] {
+    const out: (number | "…")[] = [];
+    for (let p = 1; p <= total; p++) {
+        if (p === 1 || p === total || Math.abs(p - cur) <= 1) {
+            const prev = out[out.length - 1];
+            if (typeof prev === "number" && p - prev > 1) out.push("…");
+            out.push(p);
+        }
+    }
+    return out;
+}
+
+function Chip({ label, onClear }: { label: string; onClear: () => void }) {
+    return (
+        <span className="inline-flex items-center gap-1 h-7 pl-2.5 pr-1 rounded-full bg-blue-50 text-blue-700 ring-1 ring-blue-100 text-[11px] font-semibold">
+            {label}
+            <button type="button" onClick={onClear} className="p-0.5 rounded-full hover:bg-blue-100" aria-label={`Hapus ${label}`}>
+                <X className="w-3 h-3" />
+            </button>
+        </span>
+    );
+}
+
+function FilterSelect({ icon: Icon, placeholder, value, onChange, options }: { icon: LucideIcon; placeholder: string; value: string; onChange: (v: string) => void; options: string[] }) {
+    return (
+        <div className="relative">
+            <Icon className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 ${value ? "text-sky-200" : "text-slate-400"}`} />
+            <select
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                disabled={!options.length}
+                className={`w-full border-none h-10 pl-9 pr-3 rounded-xl text-xs font-semibold outline-none truncate transition-colors disabled:opacity-50 ${value ? "bg-[#0B1B3F] text-white" : "bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100"}`}
+            >
+                <option value="">{placeholder}</option>
+                {options.map((o) => (
+                    <option key={o} value={o}>{o}</option>
+                ))}
+            </select>
+        </div>
+    );
+}
+
+function StatCard({
+    label,
+    value,
+    unit,
+    sub,
+    icon: Icon,
+    accent,
+    progress,
+    active,
+    onClick,
+}: {
+    label: string;
+    value: string;
+    unit: string;
+    sub?: string;
+    icon: LucideIcon;
+    accent: string;
+    progress?: number;
+    active?: boolean;
+    onClick?: () => void;
+}) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            disabled={!onClick}
+            className={`group relative isolate overflow-hidden rounded-3xl bg-[#0B1B3F] p-5 text-left text-white ring-1 transition-all duration-300 ${onClick ? "hover:-translate-y-0.5 cursor-pointer" : "cursor-default"} ${active ? "ring-2 ring-white/50 shadow-xl" : "ring-white/10 shadow-lg"}`}
+            style={{ boxShadow: active ? `0 18px 40px -16px ${accent}` : undefined }}
+        >
+            <div className="absolute inset-0 -z-10 opacity-90" style={{ background: `radial-gradient(70% 90% at 100% 0%, ${accent}66 0%, transparent 60%), radial-gradient(60% 80% at 0% 100%, #2563EB55 0%, transparent 60%)` }} />
+            <div className="absolute inset-0 -z-10 opacity-[0.12] [background-image:radial-gradient(rgba(255,255,255,0.8)_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(to_left,black,transparent_70%)]" />
+            <div
+                className={`pointer-events-none absolute inset-0 -z-10 transition-opacity duration-500 ease-out ${active ? "opacity-70" : "opacity-0 group-hover:opacity-100"}`}
+                style={{ background: `linear-gradient(to left, ${accent}59 0%, ${accent}26 35%, transparent 75%)` }}
+            />
+            <Icon
+                aria-hidden
+                strokeWidth={1.5}
+                className={`pointer-events-none absolute -right-5 -bottom-7 -z-10 w-32 h-32 -rotate-12 transition-all duration-500 ease-out group-hover:-rotate-6 group-hover:scale-110 ${active ? "opacity-40" : "opacity-20 group-hover:opacity-40"}`}
+                style={{ color: accent, filter: `drop-shadow(0 0 24px ${accent}66)` }}
+            />
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-sky-100/75 pr-10">{label}</p>
+            <div className="mt-1 flex items-baseline gap-1.5">
+                <span className="text-3xl md:text-4xl font-black tracking-[-0.03em] tabular-nums">{value}</span>
+                <span className="text-[10px] font-bold uppercase text-sky-100/70">{unit}</span>
+            </div>
+            {progress !== undefined && (
+                <div className="mt-3 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${progress}%`, background: `linear-gradient(90deg, ${accent}, #fff)` }} />
+                </div>
+            )}
+            {sub && <p className="mt-2 text-[11px] font-medium text-blue-100/60 truncate">{sub}</p>}
+        </button>
+    );
+}

@@ -1,55 +1,56 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
 import LayoutAdminElaut, { HeaderPageLayoutAdminElaut } from "@/components/dashboard/Layouts/LayoutAdminElaut";
-import { MdFeedback, MdSearch, MdClear, MdCalendarToday, MdPerson, MdBusiness, MdStar, MdEdit, MdDelete, MdAdd, MdOutlineMessage } from "react-icons/md";
 import { getAllFeedbacks, getAllMaklumatPelayanan, saveMaklumatPelayanan, updateMaklumatPelayanan, deleteMaklumatPelayanan } from "@/utils/feedback";
 import { getRegulasi, createRegulasi, updateRegulasi, deleteRegulasi, RegulasiData } from "@/utils/regulasi";
 import { getDirectImageUrl } from "@/utils/imageHelper";
-import { HashLoader } from "react-spinners";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import Toast from "@/commons/Toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { IoAlbumsOutline } from "react-icons/io5";
 import {
-    Card,
-    CardHeader,
-    CardDescription,
-    CardTitle,
-    CardContent
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { IoAlbumsOutline, IoInformationOutline } from "react-icons/io5";
-import { MessageSquare, Star, TrendingUp, TrendingDown, Image as ImageIcon, Calendar, User, Building, Search, X, Info, Plus, ChevronRight, Book, Upload } from "lucide-react";
-import { FiExternalLink } from "react-icons/fi";
-import Image from "next/image";
+    MessageSquare,
+    Star,
+    TrendingUp,
+    TrendingDown,
+    Image as ImageIcon,
+    Calendar,
+    Building,
+    Search,
+    X,
+    Plus,
+    Book,
+    Upload,
+    Pencil,
+    Trash2,
+    ExternalLink,
+    RefreshCw,
+    ChevronLeft,
+    ChevronRight,
+    Loader2,
+    FileText,
+    LucideIcon,
+} from "lucide-react";
+
+/* ============================ TYPES ============================ */
 
 interface FeedbackData {
     id: string;
     nama: string;
     asalInstansi: string;
     masukanSaran: string;
-    ratings: {
-        kemudahanAkses: number;
-        kemudahanPenggunaan: number;
-        kecepatan: number;
-        desainTampilan: number;
-        kelengkapanFitur: number;
-        kejelasanInformasi: number;
-        responsifMobile: number;
-        kepuasanKeseluruhan: number;
-    };
-    createdAt: {
-        seconds: number;
-        nanoseconds: number;
-    };
+    ratings?: Partial<Record<RatingKey, number>>;
+    createdAt?: { seconds: number; nanoseconds: number };
 }
 
 interface MaklumatPelayanan {
@@ -57,1116 +58,1214 @@ interface MaklumatPelayanan {
     title: string;
     description: string;
     imageUrl: string;
-    createdAt: {
-        seconds: number;
-        nanoseconds: number;
-    };
+    createdAt?: { seconds: number; nanoseconds: number };
 }
 
+type RatingKey =
+    | "kemudahanAkses"
+    | "kemudahanPenggunaan"
+    | "kecepatan"
+    | "desainTampilan"
+    | "kelengkapanFitur"
+    | "kejelasanInformasi"
+    | "responsifMobile"
+    | "kepuasanKeseluruhan";
+
+type RegulasiForm = Omit<RegulasiData, "id" | "created_at" | "updated_at">;
+
+/* ============================ KONSTANTA & HELPERS ============================ */
+
+const RATING_QUESTIONS: { key: RatingKey; label: string }[] = [
+    { key: "kemudahanAkses", label: "Kemudahan Akses" },
+    { key: "kemudahanPenggunaan", label: "Kemudahan Penggunaan" },
+    { key: "kecepatan", label: "Kecepatan" },
+    { key: "desainTampilan", label: "Desain & Tampilan" },
+    { key: "kelengkapanFitur", label: "Kelengkapan Fitur" },
+    { key: "kejelasanInformasi", label: "Kejelasan Informasi" },
+    { key: "responsifMobile", label: "Responsif Mobile" },
+    { key: "kepuasanKeseluruhan", label: "Kepuasan Keseluruhan" },
+];
+
+const KATEGORI_REGULASI = [
+    "Undang-Undang",
+    "Peraturan Pemerintah",
+    "Peraturan Menteri",
+    "Keputusan Menteri",
+    "Peraturan Kepala Badan",
+    "Keputusan Kepala Badan",
+    "Peraturan Kepala Pusat",
+    "Keputusan Kepala Pusat",
+    "Edaran",
+];
+const STATUS_REGULASI = ["Berlaku", "Dicabut", "Harmonisasi", "Draft"];
+
+const EMPTY_MAKLUMAT = { title: "", description: "", imageUrl: "" };
+const EMPTY_REGULASI: RegulasiForm = {
+    kategori_regulasi: "",
+    tanggal_pengundangan: "",
+    tahun: "",
+    no_peraturan: "",
+    judul: "",
+    ruang_lingkup: "",
+    sumber: "",
+    status: "",
+    perubahan_turunan_terkait: "",
+    file: "",
+};
+
+const PAGE_SIZE = 10;
+const fmt = (n: number) => n.toLocaleString("id-ID");
+
+const DATE_FMT = new Intl.DateTimeFormat("id-ID", { day: "2-digit", month: "long", year: "numeric" });
+const TIME_FMT = new Intl.DateTimeFormat("id-ID", { hour: "2-digit", minute: "2-digit" });
+const toDate = (ts?: { seconds: number }) => (ts?.seconds ? new Date(ts.seconds * 1000) : null);
+const fmtDate = (ts?: { seconds: number }) => {
+    const d = toDate(ts);
+    return d ? DATE_FMT.format(d) : "-";
+};
+const fmtTime = (ts?: { seconds: number }) => {
+    const d = toDate(ts);
+    return d ? TIME_FMT.format(d) : "";
+};
+
+const avgRating = (r?: FeedbackData["ratings"]) => {
+    const v = Object.values(r || {}).filter((x): x is number => typeof x === "number" && x > 0);
+    return v.length ? Math.round((v.reduce((a, b) => a + b, 0) / v.length) * 10) / 10 : 0;
+};
+
+type Band = "kurang" | "cukup" | "baik" | "sangat";
+const bandOf = (r: number): Band | null => (r === 0 ? null : r <= 2.5 ? "kurang" : r <= 3.5 ? "cukup" : r <= 4.5 ? "baik" : "sangat");
+const BAND: Record<Band, { label: string; dot: string; text: string }> = {
+    kurang: { label: "Kurang", dot: "bg-rose-500", text: "text-rose-600" },
+    cukup: { label: "Cukup", dot: "bg-amber-500", text: "text-amber-600" },
+    baik: { label: "Baik", dot: "bg-blue-500", text: "text-blue-600" },
+    sangat: { label: "Sangat Baik", dot: "bg-emerald-500", text: "text-emerald-600" },
+};
+
+const getRegulasiFileUrl = (fileName?: string) => {
+    if (!fileName) return "";
+    if (fileName.startsWith("http")) return fileName;
+    return `https://elaut-bppsdm.kkp.go.id/api-elaut/public/regulasi_pelatihan/${fileName}`;
+};
+
+const statusTone = (s?: string) => {
+    const v = (s || "Berlaku").toLowerCase();
+    if (v === "dicabut") return "bg-rose-500";
+    if (v === "draft") return "bg-slate-400";
+    if (v === "harmonisasi") return "bg-amber-500";
+    return "bg-emerald-500";
+};
+
+/* ============================ PAGE ============================ */
+
+type ConfirmState = { title: string; description: React.ReactNode; onConfirm: () => Promise<void> | void } | null;
+
 export default function LayananPage() {
+    /* ---------- Data ---------- */
     const [feedbacks, setFeedbacks] = useState<FeedbackData[]>([]);
-    const [loadingFeedback, setLoadingFeedback] = useState(true);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [selectedFeedback, setSelectedFeedback] = useState<FeedbackData | null>(null);
-
     const [maklumatList, setMaklumatList] = useState<MaklumatPelayanan[]>([]);
-    const [loadingMaklumat, setLoadingMaklumat] = useState(true);
-    const [showMaklumatForm, setShowMaklumatForm] = useState(false);
-    const [editingMaklumat, setEditingMaklumat] = useState<MaklumatPelayanan | null>(null);
-    const [savingMaklumat, setSavingMaklumat] = useState(false);
-    const [maklumatForm, setMaklumatForm] = useState({
-        title: "",
-        description: "",
-        imageUrl: ""
-    });
-
-    const getRegulasiFileUrl = (fileName: string) => {
-        if (!fileName) return "";
-        if (fileName.startsWith('http')) return fileName;
-        return `https://elaut-bppsdm.kkp.go.id/api-elaut/public/regulasi_pelatihan/${fileName}`;
-    };
-
     const [regulasiList, setRegulasiList] = useState<RegulasiData[]>([]);
-    const [loadingRegulasi, setLoadingRegulasi] = useState(true);
-    const [showRegulasiForm, setShowRegulasiForm] = useState(false);
-    const [editingRegulasi, setEditingRegulasi] = useState<RegulasiData | null>(null);
-    const [savingRegulasi, setSavingRegulasi] = useState(false);
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [regulasiForm, setRegulasiForm] = useState<Omit<RegulasiData, 'id' | 'created_at' | 'updated_at'>>({
-        kategori_regulasi: "",
-        tanggal_pengundangan: "",
-        tahun: "",
-        no_peraturan: "",
-        judul: "",
-        ruang_lingkup: "",
-        sumber: "",
-        status: "",
-        perubahan_turunan_terkait: "",
-        file: ""
-    });
+    const [loading, setLoading] = useState({ feedback: true, maklumat: true, regulasi: true });
 
-    useEffect(() => {
-        fetchFeedbacks();
-        fetchMaklumat();
-        fetchRegulasiList();
+    const fetchFeedbacks = useCallback(async () => {
+        setLoading((l) => ({ ...l, feedback: true }));
+        try {
+            setFeedbacks(((await getAllFeedbacks()) as FeedbackData[]) || []);
+        } catch (e) {
+            console.error("Error fetching feedbacks:", e);
+        } finally {
+            setLoading((l) => ({ ...l, feedback: false }));
+        }
     }, []);
 
-    const fetchRegulasiList = async () => {
+    const fetchMaklumat = useCallback(async () => {
+        setLoading((l) => ({ ...l, maklumat: true }));
         try {
-            setLoadingRegulasi(true);
-            const data = await getRegulasi();
-            setRegulasiList(data || []);
-        } catch (error) {
-            console.error("Error fetching regulasi:", error);
+            setMaklumatList(((await getAllMaklumatPelayanan()) as MaklumatPelayanan[]) || []);
+        } catch (e) {
+            console.error("Error fetching maklumat:", e);
         } finally {
-            setLoadingRegulasi(false);
+            setLoading((l) => ({ ...l, maklumat: false }));
         }
-    };
+    }, []);
 
-    const fetchFeedbacks = async () => {
+    const fetchRegulasi = useCallback(async () => {
+        setLoading((l) => ({ ...l, regulasi: true }));
         try {
-            setLoadingFeedback(true);
-            const data = await getAllFeedbacks();
-            setFeedbacks(data as FeedbackData[]);
-        } catch (error) {
-            console.error("Error fetching feedbacks:", error);
+            setRegulasiList((await getRegulasi()) || []);
+        } catch (e) {
+            console.error("Error fetching regulasi:", e);
         } finally {
-            setLoadingFeedback(false);
+            setLoading((l) => ({ ...l, regulasi: false }));
         }
-    };
+    }, []);
 
-    const fetchMaklumat = async () => {
-        try {
-            setLoadingMaklumat(true);
-            const data = await getAllMaklumatPelayanan();
-            setMaklumatList(data as MaklumatPelayanan[]);
-        } catch (error) {
-            console.error("Error fetching maklumat:", error);
-        } finally {
-            setLoadingMaklumat(false);
-        }
-    };
+    useEffect(() => {
+        // paralel
+        fetchFeedbacks();
+        fetchMaklumat();
+        fetchRegulasi();
+    }, [fetchFeedbacks, fetchMaklumat, fetchRegulasi]);
 
-    const formatDate = (timestamp: { seconds: number }) => {
-        if (!timestamp) return "-";
-        const date = new Date(timestamp.seconds * 1000);
-        return new Intl.DateTimeFormat("id-ID", {
-            day: "2-digit",
-            month: "long",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-        }).format(date);
-    };
-
-    const calculateAverageRating = (ratings: FeedbackData["ratings"]): number => {
-        if (!ratings) return 0;
-        const values = Object.values(ratings).filter(v => v > 0);
-        if (values.length === 0) return 0;
-        return parseFloat((values.reduce((a, b) => a + b, 0) / values.length).toFixed(1));
-    };
-
-    const getRatingColor = (rating: number) => {
-        if (rating === 0) return "bg-slate-100 text-slate-500 border-slate-200";
-        if (rating <= 2.5) return "bg-rose-50 text-rose-600 border-rose-100";
-        if (rating <= 3.5) return "bg-amber-50 text-amber-600 border-amber-100";
-        if (rating <= 4.5) return "bg-blue-50 text-blue-600 border-blue-100";
-        return "bg-emerald-50 text-emerald-600 border-emerald-100";
-    };
-
-    const getRatingLabel = (rating: number) => {
-        if (rating === 0) return "N/A";
-        if (rating <= 2.5) return "Kurang";
-        if (rating <= 3.5) return "Cukup";
-        if (rating <= 4.5) return "Baik";
-        return "Sangat Baik";
-    };
-
-    const filteredFeedbacks = feedbacks.filter((feedback) => {
-        const searchLower = searchQuery.toLowerCase();
-        return (
-            feedback.nama?.toLowerCase().includes(searchLower) ||
-            feedback.asalInstansi?.toLowerCase().includes(searchLower) ||
-            feedback.masukanSaran?.toLowerCase().includes(searchLower)
-        );
-    });
-
-    const RATING_QUESTIONS = [
-        { key: 'kemudahanAkses', label: 'Kemudahan Akses' },
-        { key: 'kemudahanPenggunaan', label: 'Kemudahan Penggunaan' },
-        { key: 'kecepatan', label: 'Kecepatan' },
-        { key: 'desainTampilan', label: 'Desain & Tampilan' },
-        { key: 'kelengkapanFitur', label: 'Kelengkapan Fitur' },
-        { key: 'kejelasanInformasi', label: 'Kejelasan Informasi' },
-        { key: 'responsifMobile', label: 'Responsif Mobile' },
-        { key: 'kepuasanKeseluruhan', label: 'Kepuasan Keseluruhan' }
-    ];
-
-    const handleSaveMaklumat = async () => {
-        if (!maklumatForm.title || !maklumatForm.description || !maklumatForm.imageUrl) {
-            alert("Harap lengkapi semua field!");
-            return;
-        }
-
-        try {
-            setSavingMaklumat(true);
-            if (editingMaklumat) {
-                await updateMaklumatPelayanan(editingMaklumat.id, {
-                    title: maklumatForm.title,
-                    description: maklumatForm.description,
-                    imageUrl: maklumatForm.imageUrl
-                });
-            } else {
-                await saveMaklumatPelayanan({
-                    title: maklumatForm.title,
-                    description: maklumatForm.description,
-                    imageUrl: maklumatForm.imageUrl
-                });
-            }
-            cancelMaklumatForm();
-            fetchMaklumat();
-        } catch (error) {
-            console.error("Error saving maklumat:", error);
-        } finally {
-            setSavingMaklumat(false);
-        }
-    };
-
-    const handleEditMaklumat = (maklumat: MaklumatPelayanan) => {
-        setEditingMaklumat(maklumat);
-        setMaklumatForm({
-            title: maklumat.title,
-            description: maklumat.description,
-            imageUrl: maklumat.imageUrl
-        });
-        setShowMaklumatForm(true);
-    };
-
-    const handleDeleteMaklumat = async (maklumat: MaklumatPelayanan) => {
-        if (!confirm("Hapus maklumat ini?")) return;
-        try {
-            await deleteMaklumatPelayanan(maklumat.id);
-            fetchMaklumat();
-        } catch (error) {
-            console.error("Error deleting maklumat:", error);
-        }
-    };
-
-    const cancelMaklumatForm = () => {
-        setShowMaklumatForm(false);
-        setEditingMaklumat(null);
-        setMaklumatForm({ title: "", description: "", imageUrl: "" });
-    };
-
-    const handleSaveRegulasi = async () => {
-        if (!regulasiForm.judul || !regulasiForm.no_peraturan || !regulasiForm.kategori_regulasi) {
-            alert("Harap lengkapi judul, no peraturan, dan kategori!");
-            return;
-        }
-
-        try {
-            setSavingRegulasi(true);
-            
-            const formData = new FormData();
-            formData.append('kategori_regulasi', regulasiForm.kategori_regulasi);
-            formData.append('tanggal_pengundangan', regulasiForm.tanggal_pengundangan);
-            formData.append('tahun', regulasiForm.tahun.toString());
-            formData.append('no_peraturan', regulasiForm.no_peraturan);
-            formData.append('judul', regulasiForm.judul);
-            formData.append('ruang_lingkup', regulasiForm.ruang_lingkup);
-            formData.append('sumber', regulasiForm.sumber);
-            formData.append('status', regulasiForm.status);
-            formData.append('perubahan_turunan_terkait', regulasiForm.perubahan_turunan_terkait);
-            
-            if (selectedFile) {
-                formData.append('file', selectedFile);
-            } else if (regulasiForm.file) {
-                // Keep the old file string if we didn't select a new one
-                formData.append('file', regulasiForm.file);
-            }
-
-            if (editingRegulasi && editingRegulasi.id) {
-                formData.append('id', editingRegulasi.id.toString());
-                await updateRegulasi(formData);
-            } else {
-                await createRegulasi(formData);
-            }
-            
-            cancelRegulasiForm();
-            await fetchRegulasiList();
-        } catch (error: any) {
-            console.error("Error saving regulasi:", error);
-            alert(error?.message || "Gagal menyimpan regulasi");
-        } finally {
-            setSavingRegulasi(false);
-        }
-    };
-
-    const handleEditRegulasi = (item: RegulasiData) => {
-        setEditingRegulasi(item);
-        setRegulasiForm({
-            kategori_regulasi: item.kategori_regulasi || "",
-            tanggal_pengundangan: item.tanggal_pengundangan || "",
-            tahun: item.tahun || "",
-            no_peraturan: item.no_peraturan || "",
-            judul: item.judul || "",
-            ruang_lingkup: item.ruang_lingkup || "",
-            sumber: item.sumber || "",
-            status: item.status || "",
-            perubahan_turunan_terkait: item.perubahan_turunan_terkait || "",
-            file: item.file || ""
-        });
-        setSelectedFile(null);
-        setShowRegulasiForm(true);
-    };
-
-    const handleDeleteRegulasi = async (item: RegulasiData) => {
-        if (!item.id) return;
-        if (!confirm(`Hapus regulasi ${item.no_peraturan}?`)) return;
-        try {
-            await deleteRegulasi(item.id);
-            await fetchRegulasiList();
-        } catch (error: any) {
-            console.error("Error deleting regulasi:", error);
-            alert(error?.message || "Gagal menghapus regulasi");
-        }
-    };
-
-    const cancelRegulasiForm = () => {
-        setShowRegulasiForm(false);
-        setEditingRegulasi(null);
-        setRegulasiForm({
-            kategori_regulasi: "",
-            tanggal_pengundangan: "",
-            tahun: "",
-            no_peraturan: "",
-            judul: "",
-            ruang_lingkup: "",
-            sumber: "",
-            status: "",
-            perubahan_turunan_terkait: "",
-            file: ""
-        });
-        setSelectedFile(null);
-    };
-
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        setSelectedFile(file);
-    };
+    /* ---------- Konfirmasi global ---------- */
+    const [confirm, setConfirm] = useState<ConfirmState>(null);
+    const [confirming, setConfirming] = useState(false);
 
     return (
         <LayoutAdminElaut>
             <div className="flex flex-col w-full h-full gap-2">
                 <HeaderPageLayoutAdminElaut
                     title="Layanan & Publikasi"
-                    description="Monitoring masukan pengguna dan publikasi maklumat pelayanan sistem!"
+                    description="Monitoring masukan pengguna, publikasi maklumat pelayanan, dan regulasi pelatihan."
                     icon={<IoAlbumsOutline className="text-3xl" />}
                 />
 
-                <div className="space-y-10 py-4">
-                    <Tabs defaultValue="masukan-saran" className="w-full">
-                        <div className="flex justify-center mb-10">
-                            <TabsList className="bg-white/80 backdrop-blur-2xl border border-white/50 h-auto p-2 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)],0,0,0.3)] flex flex-wrap md:flex-nowrap items-center gap-2 w-full">
-                                <TabsTrigger
-                                    value="masukan-saran"
-                                    className="flex-1 w-full rounded-[2rem] py-3.5 px-6 data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=active]:shadow-blue-500/30 text-slate-500 font-bold transition-all duration-500 flex flex-col items-center gap-1 group ring-0 outline-none hover:text-blue-600"
-                                >
-                                    <div className="flex items-center gap-2.5">
-                                        <div className="p-1.5 bg-blue-100/50 rounded-xl group-data-[state=active]:bg-white/20 transition-colors">
-                                            <MessageSquare className="w-4 h-4" />
-                                        </div>
-                                        <span className="text-sm tracking-tight">Masukan & Saran</span>
-                                    </div>
-                                    <span className="text-[10px] opacity-60 group-data-[state=active]:opacity-80 font-medium uppercase tracking-widest leading-none mt-1">Feedback Pengguna</span>
-                                </TabsTrigger>
+                <Tabs defaultValue="masukan-saran" className="w-full mt-4">
+                    <TabBar
+                        tabs={[
+                            { value: "masukan-saran", label: "Masukan & Saran", sub: "Feedback pengguna", icon: MessageSquare, accent: "#3B82F6", count: feedbacks.length },
+                            { value: "maklumat-pelayanan", label: "Maklumat", sub: "Publikasi layanan", icon: ImageIcon, accent: "#06B6D4", count: maklumatList.length },
+                            { value: "regulasi", label: "Regulasi", sub: "Hukum & kebijakan", icon: Book, accent: "#8B5CF6", count: regulasiList.length },
+                        ]}
+                    />
 
-                                <TabsTrigger
-                                    value="maklumat-pelayanan"
-                                    className="flex-1 w-full rounded-[2rem] py-3.5 px-6 data-[state=active]:bg-gradient-to-br data-[state=active]:from-emerald-500 data-[state=active]:to-teal-600 data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=active]:shadow-emerald-500/30 text-slate-500 font-bold transition-all duration-500 flex flex-col items-center gap-1 group ring-0 outline-none hover:text-emerald-600"
-                                >
-                                    <div className="flex items-center gap-2.5">
-                                        <div className="p-1.5 bg-emerald-100/50 rounded-xl group-data-[state=active]:bg-white/20 transition-colors">
-                                            <ImageIcon className="w-4 h-4" />
-                                        </div>
-                                        <span className="text-sm tracking-tight">Maklumat</span>
-                                    </div>
-                                    <span className="text-[10px] opacity-60 group-data-[state=active]:opacity-80 font-medium uppercase tracking-widest leading-none mt-1">Publikasi Layanan</span>
-                                </TabsTrigger>
+                    <TabsContent value="masukan-saran" className="mt-5 outline-none">
+                        <FeedbackTab data={feedbacks} loading={loading.feedback} onRefresh={fetchFeedbacks} />
+                    </TabsContent>
 
-                                <TabsTrigger
-                                    value="regulasi"
-                                    className="flex-1 w-full rounded-[2rem] py-3.5 px-6 data-[state=active]:bg-gradient-to-br data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-xl data-[state=active]:shadow-indigo-500/30 text-slate-500 font-bold transition-all duration-500 flex flex-col items-center gap-1 group ring-0 outline-none hover:text-indigo-600"
-                                >
-                                    <div className="flex items-center gap-2.5">
-                                        <div className="p-1.5 bg-indigo-100/50 rounded-xl group-data-[state=active]:bg-white/20 transition-colors">
-                                            <Book className="w-4 h-4" />
-                                        </div>
-                                        <span className="text-sm tracking-tight">Regulasi</span>
-                                    </div>
-                                    <span className="text-[10px] opacity-60 group-data-[state=active]:opacity-80 font-medium uppercase tracking-widest leading-none mt-1">Hukum & Kebijakan</span>
-                                </TabsTrigger>
-                            </TabsList>
-                        </div>
+                    <TabsContent value="maklumat-pelayanan" className="mt-5 outline-none">
+                        <MaklumatTab data={maklumatList} loading={loading.maklumat} onRefresh={fetchMaklumat} onConfirm={setConfirm} />
+                    </TabsContent>
 
-                        <TabsContent value="masukan-saran" className="space-y-10 outline-none">
-                            {loadingFeedback ? (
-                                <div className="py-32 w-full flex flex-col items-center justify-center gap-4">
-                                    <HashLoader color="#3b82f6" size={60} />
-                                    <p className="text-sm font-medium text-slate-500 animate-pulse tracking-wide">Memuat masukan pengguna...</p>
-                                </div>
-                            ) : (
-                                <div className="flex flex-col gap-10">
-                                    {/* Metrics Grid */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-2xl shadow-blue-200 transition-all duration-500 hover:scale-[1.02] group">
-                                            <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
-                                            <div className="relative z-10 space-y-4">
-                                                <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 w-fit">
-                                                    <MessageSquare className="w-5 h-5" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-blue-100 text-[10px] font-bold uppercase tracking-widest opacity-80">Total Masukan</p>
-                                                    <h4 className="text-3xl font-black tracking-tighter">{feedbacks.length}</h4>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-2xl shadow-amber-200 transition-all duration-500 hover:scale-[1.02] group">
-                                            <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
-                                            <div className="relative z-10 space-y-4">
-                                                <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 w-fit">
-                                                    <Star className="w-5 h-5" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-amber-100 text-[10px] font-bold uppercase tracking-widest opacity-80">Rata-rata Rating</p>
-                                                    <h4 className="text-3xl font-black tracking-tighter">
-                                                        {feedbacks.length > 0
-                                                            ? (feedbacks.reduce((acc, f) => acc + calculateAverageRating(f.ratings), 0) / feedbacks.length).toFixed(1)
-                                                            : "0.0"}
-                                                    </h4>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-2xl shadow-emerald-200 transition-all duration-500 hover:scale-[1.02] group">
-                                            <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
-                                            <div className="relative z-10 space-y-4">
-                                                <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 w-fit">
-                                                    <TrendingUp className="w-5 h-5" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-emerald-100 text-[10px] font-bold uppercase tracking-widest opacity-80">Rating Tertinggi</p>
-                                                    <h4 className="text-3xl font-black tracking-tighter">
-                                                        {feedbacks.length > 0
-                                                            ? Math.max(...feedbacks.map((f) => calculateAverageRating(f.ratings))).toFixed(1)
-                                                            : "0.0"}
-                                                    </h4>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="bg-gradient-to-br from-rose-500 to-red-600 rounded-[2rem] p-6 text-white relative overflow-hidden shadow-2xl shadow-rose-200 transition-all duration-500 hover:scale-[1.02] group">
-                                            <div className="absolute top-0 right-0 -translate-y-4 translate-x-4 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
-                                            <div className="relative z-10 space-y-4">
-                                                <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 w-fit">
-                                                    <TrendingDown className="w-5 h-5" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-rose-100 text-[10px] font-bold uppercase tracking-widest opacity-80">Rating Terendah</p>
-                                                    <h4 className="text-3xl font-black tracking-tighter">
-                                                        {feedbacks.length > 0
-                                                            ? Math.min(...feedbacks.map((f) => calculateAverageRating(f.ratings)).filter((r) => r > 0)).toFixed(1)
-                                                            : "0.0"}
-                                                    </h4>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Action Bar */}
-                                    <div className="bg-white/60 backdrop-blur-xl border border-slate-200/60 shadow-sm rounded-[2rem] p-4 flex flex-col md:flex-row items-center gap-4">
-                                        <div className="relative flex-1 group w-full">
-                                            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                                            <Input
-                                                type="text"
-                                                placeholder="Cari masukan berdasarkan nama, instansi, atau kata kunci..."
-                                                value={searchQuery}
-                                                onChange={(e) => setSearchQuery(e.target.value)}
-                                                className="w-full h-14 pl-14 pr-6 bg-white border-slate-200/60 rounded-2xl focus:ring-4 focus:ring-blue-500/10 transition-all font-medium text-sm"
-                                            />
-                                        </div>
-                                        {searchQuery && (
-                                            <Button
-                                                variant="outline"
-                                                onClick={() => setSearchQuery("")}
-                                                className="h-14 px-8 rounded-2xl border-slate-200 font-bold text-xs uppercase tracking-wider hover:bg-slate-50 transition-all"
-                                            >
-                                                <X className="w-4 h-4 mr-2" /> Reset
-                                            </Button>
-                                        )}
-                                    </div>
-
-                                    {/* Table View */}
-                                    <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-200/60 overflow-hidden">
-                                        <div className="overflow-x-auto">
-                                            <Table>
-                                                <TableHeader className="bg-slate-50/50">
-                                                    <TableRow className="hover:bg-transparent border-slate-100">
-                                                        <TableHead className="w-16 text-center font-black text-[10px] uppercase tracking-widest text-slate-400 py-6">No</TableHead>
-                                                        <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-400 py-6">
-                                                            <div className="flex items-center gap-2">
-                                                                <Calendar className="w-3.5 h-3.5" /> Tanggal
-                                                            </div>
-                                                        </TableHead>
-                                                        <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-400 py-6">
-                                                            <div className="flex items-center gap-2">
-                                                                <User className="w-3.5 h-3.5" /> Identitas
-                                                            </div>
-                                                        </TableHead>
-                                                        <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-400 py-6 text-center">
-                                                            <div className="flex items-center gap-2 justify-center">
-                                                                <Star className="w-3.5 h-3.5" /> Penilaian
-                                                            </div>
-                                                        </TableHead>
-                                                        <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-400 py-6 text-center">Aksi</TableHead>
-                                                    </TableRow>
-                                                </TableHeader>
-                                                <TableBody>
-                                                    {filteredFeedbacks.length === 0 ? (
-                                                        <TableRow>
-                                                            <TableCell colSpan={5} className="py-20 text-center">
-                                                                <div className="flex flex-col items-center gap-3">
-                                                                    <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-400">
-                                                                        <MessageSquare className="w-8 h-8" />
-                                                                    </div>
-                                                                    <p className="font-bold text-slate-400 uppercase tracking-widest text-xs">
-                                                                        {searchQuery ? "Data tidak ditemukan" : "Belum ada masukan tersedia"}
-                                                                    </p>
-                                                                </div>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                    ) : (
-                                                        filteredFeedbacks.map((feedback, index) => {
-                                                            const avgRating = calculateAverageRating(feedback.ratings);
-                                                            return (
-                                                                <TableRow key={feedback.id} className="group hover:bg-slate-50/50 border-slate-100 transition-colors">
-                                                                    <TableCell className="text-center font-bold text-xs text-slate-400">{index + 1}</TableCell>
-                                                                    <TableCell className="py-6">
-                                                                        <div className="flex flex-col gap-0.5">
-                                                                            <span className="text-xs font-bold text-slate-700 uppercase tracking-tight">
-                                                                                {formatDate(feedback.createdAt).split(' pukul ')[0]}
-                                                                            </span>
-                                                                            <span className="text-[10px] text-slate-400 font-medium tracking-wider">
-                                                                                Pukul {formatDate(feedback.createdAt).split(' pukul ')[1]}
-                                                                            </span>
-                                                                        </div>
-                                                                    </TableCell>
-                                                                    <TableCell>
-                                                                        <div className="flex flex-col gap-0.5">
-                                                                            <span className="text-sm font-black text-slate-800 uppercase group-hover:text-blue-600 transition-colors">
-                                                                                {feedback.nama}
-                                                                            </span>
-                                                                            <div className="flex items-center gap-1.5 text-slate-500">
-                                                                                <Building className="w-3 h-3" />
-                                                                                <span className="text-[11px] font-medium tracking-tight">
-                                                                                    {feedback.asalInstansi}
-                                                                                </span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </TableCell>
-                                                                    <TableCell className="text-center">
-                                                                        <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-transparent transition-all group-hover:border-inherit" style={{ backgroundColor: getRatingColor(avgRating).split(' ')[0].replace('bg-', 'var(--') }}>
-                                                                            <div className={`px-3 py-1 rounded-lg ${getRatingColor(avgRating)} border shadow-sm flex items-center gap-2`}>
-                                                                                <span className={`text-[11px] font-black`}>
-                                                                                    {avgRating > 0 ? `${avgRating} / 5.0` : "N/A"}
-                                                                                </span>
-                                                                                <div className="w-1 h-3 bg-slate-200 rounded-full" />
-                                                                                <span className={`text-[10px] font-bold uppercase tracking-widest`}>
-                                                                                    {getRatingLabel(avgRating)}
-                                                                                </span>
-                                                                            </div>
-                                                                        </div>
-                                                                    </TableCell>
-                                                                    <TableCell className="text-center">
-                                                                        <Button
-                                                                            onClick={() => setSelectedFeedback(feedback)}
-                                                                            size="sm"
-                                                                            className="h-10 rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20 font-bold text-[10px] uppercase tracking-wider px-5"
-                                                                        >
-                                                                            <Info className="w-3.5 h-3.5 mr-2" /> Detail
-                                                                        </Button>
-                                                                    </TableCell>
-                                                                </TableRow>
-                                                            );
-                                                        })
-                                                    )}
-                                                </TableBody>
-                                            </Table>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        </TabsContent>
-
-                        <TabsContent value="maklumat-pelayanan" className="space-y-10 outline-none">
-                            {loadingMaklumat ? (
-                                <div className="py-32 w-full flex flex-col items-center justify-center gap-4">
-                                    <HashLoader color="#10b981" size={60} />
-                                    <p className="text-sm font-medium text-slate-500 animate-pulse tracking-wide">Memuat maklumat pelayanan...</p>
-                                </div>
-                            ) : (
-                                <div className="flex flex-col gap-10">
-                                    {/* Action Header */}
-                                    <div className="flex flex-col sm:flex-row justify-between items-center bg-white/60 backdrop-blur-xl border border-slate-200/60 shadow-sm rounded-[2rem] p-6 lg:p-8 gap-6">
-                                        <div className="flex items-center gap-5">
-                                            <div className="h-14 w-14 rounded-2xl bg-emerald-600/10 flex items-center justify-center text-emerald-600 shrink-0 border border-emerald-600/20 shadow-sm">
-                                                <ImageIcon className="w-7 h-7" />
-                                            </div>
-                                            <div>
-                                                <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">Maklumat Pelayanan</h3>
-                                                <p className="text-sm font-medium text-slate-500">Kelola publikasi standar pelayanan aplikasi!</p>
-                                            </div>
-                                        </div>
-                                        {!showMaklumatForm && (
-                                            <Button
-                                                onClick={() => setShowMaklumatForm(true)}
-                                                className="h-14 px-8 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold uppercase tracking-wider shadow-lg shadow-emerald-500/30 hover:-translate-y-1 transition-all w-full sm:w-auto"
-                                            >
-                                                <Plus className="w-5 h-5 mr-3" /> Tambah Maklumat
-                                            </Button>
-                                        )}
-                                    </div>
-
-                                    {showMaklumatForm && (
-                                        <Card className="rounded-[2.5rem] border-slate-200/60 overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-300">
-                                            <CardHeader className="p-8 border-b border-slate-100 bg-slate-50/50">
-                                                <div className="flex items-center justify-between">
-                                                    <div>
-                                                        <CardTitle className="text-xl font-black text-slate-800 uppercase tracking-tight">
-                                                            {editingMaklumat ? "Modifikasi Maklumat" : "Buat Maklumat Baru"}
-                                                        </CardTitle>
-                                                        <CardDescription className="text-slate-500 font-medium">Lengkapi detail publikasi di bawah ini!</CardDescription>
-                                                    </div>
-                                                    <Button variant="ghost" size="icon" onClick={cancelMaklumatForm} className="rounded-full hover:bg-rose-50 hover:text-rose-500">
-                                                        <X className="w-5 h-5" />
-                                                    </Button>
-                                                </div>
-                                            </CardHeader>
-                                            <CardContent className="p-8 space-y-6">
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                                    <div className="space-y-6">
-                                                        <div className="space-y-2.5">
-                                                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Judul Publikasi</label>
-                                                            <Input
-                                                                value={maklumatForm.title}
-                                                                onChange={(e) => setMaklumatForm({ ...maklumatForm, title: e.target.value })}
-                                                                placeholder="Contoh: Maklumat Pelayanan Utama..."
-                                                                className="h-12 rounded-xl bg-slate-50 border-slate-200 focus:ring-4 focus:ring-emerald-500/10 transition-all font-medium"
-                                                            />
-                                                        </div>
-                                                        <div className="space-y-2.5">
-                                                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Deskripsi Maklumat</label>
-                                                            <textarea
-                                                                value={maklumatForm.description}
-                                                                onChange={(e) => setMaklumatForm({ ...maklumatForm, description: e.target.value })}
-                                                                className="w-full p-4 text-sm font-medium bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-500/10 min-h-[120px] transition-all"
-                                                                placeholder="Deskripsikan secara detail isi maklumat..."
-                                                            />
-                                                        </div>
-                                                        <div className="space-y-2.5">
-                                                            <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">URL Media Gambar</label>
-                                                            <Input
-                                                                value={maklumatForm.imageUrl}
-                                                                onChange={(e) => setMaklumatForm({ ...maklumatForm, imageUrl: e.target.value })}
-                                                                placeholder="https://example.com/poster.jpg"
-                                                                className="h-12 rounded-xl bg-slate-50 border-slate-200 transition-all font-medium"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex flex-col gap-4">
-                                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1 text-center">Preview Visual</label>
-                                                        <div className="flex-1 bg-slate-100 rounded-2xl border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden relative group">
-                                                            {maklumatForm.imageUrl ? (
-                                                                <img
-                                                                    src={getDirectImageUrl(maklumatForm.imageUrl)}
-                                                                    alt="Preview"
-                                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                                                    onError={(e) => (e.currentTarget.src = "/illustrations/placeholder.png")}
-                                                                />
-                                                            ) : (
-                                                                <div className="flex flex-col items-center gap-3 text-slate-400">
-                                                                    <ImageIcon className="w-12 h-12 opacity-30" />
-                                                                    <p className="text-[11px] font-bold uppercase tracking-widest">Wunggu Input Media</p>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="flex gap-4 justify-end pt-6 border-t border-slate-100">
-                                                    <Button onClick={cancelMaklumatForm} variant="outline" className="h-12 px-8 rounded-xl font-bold uppercase tracking-wider">
-                                                        Batal
-                                                    </Button>
-                                                    <Button
-                                                        onClick={handleSaveMaklumat}
-                                                        disabled={savingMaklumat}
-                                                        className="h-12 px-10 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20"
-                                                    >
-                                                        {savingMaklumat ? "Memproses..." : editingMaklumat ? "Simpan Perubahan" : "Publikasikan"}
-                                                    </Button>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    )}
-
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                        {maklumatList.length === 0 ? (
-                                            <div className="col-span-full py-20 bg-white/40 rounded-[2rem] border border-dashed border-slate-300 flex flex-col items-center justify-center gap-4">
-                                                <ImageIcon className="w-16 h-16 text-slate-300" />
-                                                <p className="font-bold text-slate-400 uppercase tracking-widest text-xs">Belum ada maklumat dipublikasikan</p>
-                                            </div>
-                                        ) : (
-                                            maklumatList.map((maklumat) => (
-                                                <article key={maklumat.id} className="group bg-white rounded-[2.5rem] shadow-sm border border-slate-200/60 overflow-hidden flex flex-col md:flex-row transition-all duration-500 hover:shadow-2xl hover:shadow-slate-200 hover:-translate-y-1">
-                                                    <div className="relative w-full md:w-52 h-48 md:h-auto overflow-hidden shrink-0 transition-all duration-500 group-hover:w-full md:group-hover:w-60">
-                                                        <img
-                                                            src={getDirectImageUrl(maklumat.imageUrl)}
-                                                            alt={maklumat.title}
-                                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                                            onError={(e) => (e.currentTarget.src = "/illustrations/placeholder.png")}
-                                                        />
-                                                    </div>
-                                                    <div className="p-6 md:p-8 flex flex-col flex-1 gap-4">
-                                                        <div className="space-y-2">
-                                                            <div className="flex items-center gap-2 text-emerald-600 mb-1">
-                                                                <ImageIcon className="w-3.5 h-3.5" />
-                                                                <span className="text-[10px] font-black uppercase tracking-widest">Dipublikasikan</span>
-                                                            </div>
-                                                            <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight leading-tight group-hover:text-blue-600 transition-colors">
-                                                                {maklumat.title}
-                                                            </h3>
-                                                            <p className="text-sm text-slate-500 font-medium leading-relaxed line-clamp-2">
-                                                                {maklumat.description}
-                                                            </p>
-                                                        </div>
-
-                                                        <div className="mt-auto flex items-center justify-between pt-4 border-t border-slate-100">
-                                                            <div className="flex items-center gap-2 text-slate-400">
-                                                                <Calendar className="w-3.5 h-3.5" />
-                                                                <span className="text-[10px] font-bold uppercase tracking-wider">{formatDate(maklumat.createdAt).split(' pukul ')[0]}</span>
-                                                            </div>
-                                                            <div className="flex gap-2">
-                                                                <Button
-                                                                    onClick={() => handleEditMaklumat(maklumat)}
-                                                                    size="icon"
-                                                                    variant="outline"
-                                                                    className="h-10 w-10 rounded-xl border-slate-200 text-slate-600 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all"
-                                                                >
-                                                                    <MdEdit className="w-4 h-4" />
-                                                                </Button>
-                                                                <Button
-                                                                    onClick={() => handleDeleteMaklumat(maklumat)}
-                                                                    size="icon"
-                                                                    variant="outline"
-                                                                    className="h-10 w-10 rounded-xl border-slate-200 text-slate-600 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all"
-                                                                >
-                                                                    <MdDelete className="w-4 h-4" />
-                                                                </Button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </article>
-                                            ))
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-                        </TabsContent>
-
-                        <TabsContent value="regulasi" className="space-y-10 outline-none">
-                            {loadingRegulasi ? (
-                                <div className="py-32 w-full flex flex-col items-center justify-center gap-4">
-                                    <HashLoader color="#6366f1" size={60} />
-                                    <p className="text-sm font-medium text-slate-500 animate-pulse tracking-wide">Memuat regulasi...</p>
-                                </div>
-                            ) : (
-                                <div className="flex flex-col gap-10">
-                                    {/* Action Header */}
-                                    <div className="flex flex-col sm:flex-row justify-between items-center bg-white/60 backdrop-blur-xl border border-slate-200/60 shadow-sm rounded-[2rem] p-6 lg:p-8 gap-6">
-                                        <div className="flex items-center gap-5">
-                                            <div className="h-14 w-14 rounded-2xl bg-indigo-600/10 flex items-center justify-center text-indigo-600 shrink-0 border border-indigo-600/20 shadow-sm">
-                                                <Book className="w-7 h-7" />
-                                            </div>
-                                            <div>
-                                                <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight">Regulasi Pelatihan</h3>
-                                                <p className="text-sm font-medium text-slate-500">Kelola dasar hukum dan regulasi terkait pelatihan!</p>
-                                            </div>
-                                        </div>
-                                        {!showRegulasiForm && (
-                                            <Button
-                                                onClick={() => setShowRegulasiForm(true)}
-                                                className="h-14 px-8 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white font-bold uppercase tracking-wider shadow-lg shadow-indigo-500/30 hover:-translate-y-1 transition-all w-full sm:w-auto"
-                                            >
-                                                <Plus className="w-5 h-5 mr-3" /> Tambah Regulasi
-                                            </Button>
-                                        )}
-                                    </div>
-
-                                    {showRegulasiForm && (
-                                        <Card className="rounded-[2.5rem] border-slate-200/60 overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-300">
-                                            <CardHeader className="p-8 border-b border-slate-100 bg-slate-50/50">
-                                                <div className="flex items-center justify-between">
-                                                    <div>
-                                                        <CardTitle className="text-xl font-black text-slate-800 uppercase tracking-tight">
-                                                            {editingRegulasi ? "Modifikasi Regulasi" : "Tambah Regulasi Baru"}
-                                                        </CardTitle>
-                                                        <CardDescription className="text-slate-500 font-medium">Lengkapi detail dokumen regulasi di bawah ini!</CardDescription>
-                                                    </div>
-                                                    <Button variant="ghost" size="icon" onClick={cancelRegulasiForm} className="rounded-full hover:bg-rose-50 hover:text-rose-500">
-                                                        <X className="w-5 h-5" />
-                                                    </Button>
-                                                </div>
-                                            </CardHeader>
-                                            <CardContent className="p-8 space-y-6">
-                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                                    <div className="space-y-2.5">
-                                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Kategori Regulasi <span className="text-rose-500">*</span></label>
-                                                        <select
-                                                            value={regulasiForm.kategori_regulasi}
-                                                            onChange={(e) => setRegulasiForm({ ...regulasiForm, kategori_regulasi: e.target.value })}
-                                                            className="w-full h-12 px-3 rounded-xl bg-slate-50 border border-slate-200 transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
-                                                        >
-                                                            <option value="">Pilih Kategori</option>
-                                                            <option value="Undang-Undang">Undang-Undang</option>
-                                                            <option value="Peraturan Pemerintah">Peraturan Pemerintah</option>
-                                                            <option value="Peraturan Menteri">Peraturan Menteri</option>
-                                                            <option value="Keputusan Menteri">Keputusan Menteri</option>
-                                                            <option value="Peraturan Kepala Badan">Peraturan Kepala Badan</option>
-                                                            <option value="Keputusan Kepala Badan">Keputusan Kepala Badan</option>
-                                                            <option value="Peraturan Kepala Pusat">Peraturan Kepala Pusat</option>
-                                                            <option value="Keputusan Kepala Pusat">Keputusan Kepala Pusat</option>
-                                                            <option value="Edaran">Edaran</option>
-                                                        </select>
-                                                    </div>
-                                                    <div className="space-y-2.5">
-                                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">No Peraturan <span className="text-rose-500">*</span></label>
-                                                        <Input
-                                                            value={regulasiForm.no_peraturan}
-                                                            onChange={(e) => setRegulasiForm({ ...regulasiForm, no_peraturan: e.target.value })}
-                                                            placeholder="Contoh: Nomor 12 Tahun 2023"
-                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 transition-all font-medium"
-                                                        />
-                                                    </div>
-                                                    <div className="space-y-2.5">
-                                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Tahun</label>
-                                                        <Input
-                                                            type="number"
-                                                            value={regulasiForm.tahun}
-                                                            onChange={(e) => setRegulasiForm({ ...regulasiForm, tahun: e.target.value })}
-                                                            placeholder="Contoh: 2023"
-                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 transition-all font-medium"
-                                                        />
-                                                    </div>
-                                                    <div className="space-y-2.5 lg:col-span-3">
-                                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Judul / Tentang <span className="text-rose-500">*</span></label>
-                                                        <Input
-                                                            value={regulasiForm.judul}
-                                                            onChange={(e) => setRegulasiForm({ ...regulasiForm, judul: e.target.value })}
-                                                            placeholder="Judul lengkap peraturan..."
-                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 transition-all font-medium"
-                                                        />
-                                                    </div>
-                                                    <div className="space-y-2.5 lg:col-span-3">
-                                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Ruang Lingkup</label>
-                                                        <textarea
-                                                            value={regulasiForm.ruang_lingkup}
-                                                            onChange={(e) => setRegulasiForm({ ...regulasiForm, ruang_lingkup: e.target.value })}
-                                                            className="w-full p-4 text-sm font-medium bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 min-h-[100px] transition-all"
-                                                            placeholder="Ruang lingkup peraturan..."
-                                                        />
-                                                    </div>
-                                                    <div className="space-y-2.5">
-                                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Tanggal Pengundangan</label>
-                                                        <Input
-                                                            type="date"
-                                                            value={regulasiForm.tanggal_pengundangan}
-                                                            onChange={(e) => setRegulasiForm({ ...regulasiForm, tanggal_pengundangan: e.target.value })}
-                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 transition-all font-medium"
-                                                        />
-                                                    </div>
-                                                    <div className="space-y-2.5">
-                                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Status</label>
-                                                        <select
-                                                            value={regulasiForm.status}
-                                                            onChange={(e) => setRegulasiForm({ ...regulasiForm, status: e.target.value })}
-                                                            className="w-full h-12 px-3 rounded-xl bg-slate-50 border border-slate-200 transition-all font-medium text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
-                                                        >
-                                                            <option value="">Pilih Status</option>
-                                                            <option value="Berlaku">Berlaku</option>
-                                                            <option value="Dicabut">Dicabut</option>
-                                                            <option value="Harmonisasi">Harmonisasi</option>
-                                                            <option value="Draft">Draft</option>
-                                                        </select>
-                                                    </div>
-                                                    <div className="space-y-2.5">
-                                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Sumber</label>
-                                                        <Input
-                                                            value={regulasiForm.sumber}
-                                                            onChange={(e) => setRegulasiForm({ ...regulasiForm, sumber: e.target.value })}
-                                                            placeholder="Contoh: LN.2023/No.12"
-                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 transition-all font-medium"
-                                                        />
-                                                    </div>
-                                                    <div className="space-y-2.5 lg:col-span-2">
-                                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">Perubahan / Turunan Terkait</label>
-                                                        <Input
-                                                            value={regulasiForm.perubahan_turunan_terkait}
-                                                            onChange={(e) => setRegulasiForm({ ...regulasiForm, perubahan_turunan_terkait: e.target.value })}
-                                                            placeholder="Catatan peraturan turunan..."
-                                                            className="h-12 rounded-xl bg-slate-50 border-slate-200 transition-all font-medium"
-                                                        />
-                                                    </div>
-                                                    <div className="space-y-2.5">
-                                                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest ml-1">File Dokumen</label>
-                                                        <div className="relative group">
-                                                            <input
-                                                                type="file"
-                                                                accept=".pdf,.doc,.docx"
-                                                                onChange={handleFileUpload}
-                                                                className="hidden"
-                                                                id="upload-regulasi"
-                                                            />
-                                                            <label
-                                                                htmlFor="upload-regulasi"
-                                                                className={`h-12 w-full px-4 rounded-xl border border-slate-200 flex items-center justify-between cursor-pointer transition-all bg-slate-50 hover:bg-slate-100`}
-                                                            >
-                                                                <span className="text-sm font-medium text-slate-500 truncate pr-4">
-                                                                    {selectedFile ? selectedFile.name : regulasiForm.file ? "File Tersimpan (Pilih baru untuk ganti)" : "Pilih Dokumen PDF/Doc"}
-                                                                </span>
-                                                                <div className={`p-2 rounded-lg ${selectedFile || regulasiForm.file ? 'bg-emerald-100 text-emerald-600' : 'bg-indigo-100 text-indigo-600'}`}>
-                                                                    <Upload className="w-4 h-4" />
-                                                                </div>
-                                                            </label>
-                                                        </div>
-                                                        {(!selectedFile && regulasiForm.file) && (
-                                                            <a href={getRegulasiFileUrl(regulasiForm.file)} target="_blank" rel="noreferrer" className="text-[10px] font-bold text-emerald-500 hover:text-emerald-600 uppercase tracking-wider flex items-center gap-1 mt-2">
-                                                                <FiExternalLink /> Pratinjau Dokumen
-                                                            </a>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <div className="flex gap-4 justify-end pt-6 border-t border-slate-100">
-                                                    <Button type="button" onClick={cancelRegulasiForm} variant="outline" className="h-12 px-8 rounded-xl font-bold uppercase tracking-wider">
-                                                        Batal
-                                                    </Button>
-                                                    <Button
-                                                        type="button"
-                                                        onClick={handleSaveRegulasi}
-                                                        disabled={savingRegulasi}
-                                                        className="h-12 px-10 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white font-black uppercase tracking-widest shadow-lg shadow-indigo-500/20"
-                                                    >
-                                                        {savingRegulasi ? "Memproses..." : editingRegulasi ? "Simpan Perubahan" : "Simpan Regulasi"}
-                                                    </Button>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    )}
-
-                                    <div className="grid grid-cols-1 gap-6">
-                                        {regulasiList.length === 0 ? (
-                                            <div className="col-span-full py-20 bg-white/40 rounded-[2rem] border border-dashed border-slate-300 flex flex-col items-center justify-center gap-4">
-                                                <Book className="w-16 h-16 text-slate-300" />
-                                                <p className="font-bold text-slate-400 uppercase tracking-widest text-xs">Belum ada regulasi yang ditambahkan</p>
-                                            </div>
-                                        ) : (
-                                            <div className="bg-white rounded-[2.5rem] shadow-sm border border-slate-200/60 overflow-hidden">
-                                                <div className="overflow-x-auto">
-                                                    <Table>
-                                                        <TableHeader className="bg-slate-50/50">
-                                                            <TableRow className="hover:bg-transparent border-slate-100">
-                                                                <TableHead className="w-16 text-center font-black text-[10px] uppercase tracking-widest text-slate-400 py-6">No</TableHead>
-                                                                <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-400 py-6">Identitas Regulasi</TableHead>
-                                                                <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-400 py-6">Kategori & Tahun</TableHead>
-                                                                <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-400 py-6 text-center">Status</TableHead>
-                                                                <TableHead className="font-black text-[10px] uppercase tracking-widest text-slate-400 py-6 text-center">Aksi</TableHead>
-                                                            </TableRow>
-                                                        </TableHeader>
-                                                        <TableBody>
-                                                            {regulasiList.map((item, index) => (
-                                                                <TableRow key={item.id} className="group hover:bg-slate-50/50 border-slate-100 transition-colors">
-                                                                    <TableCell className="text-center font-bold text-xs text-slate-400">{index + 1}</TableCell>
-                                                                    <TableCell className="py-6 max-w-md">
-                                                                        <div className="flex flex-col gap-1.5">
-                                                                            <span className="text-xs font-bold text-slate-700 uppercase tracking-tight">
-                                                                                {item.no_peraturan}
-                                                                            </span>
-                                                                            <span className="text-sm font-black text-slate-800 line-clamp-2 leading-tight">
-                                                                                {item.judul}
-                                                                            </span>
-                                                                            {item.file && (
-                                                                                <a href={getRegulasiFileUrl(item.file)} target="_blank" rel="noreferrer" className="text-[10px] font-bold text-indigo-500 hover:text-indigo-600 uppercase tracking-wider flex items-center gap-1 mt-1 w-fit">
-                                                                                    <FiExternalLink /> Lihat Dokumen
-                                                                                </a>
-                                                                            )}
-                                                                        </div>
-                                                                    </TableCell>
-                                                                    <TableCell>
-                                                                        <div className="flex flex-col gap-1.5">
-                                                                            <Badge variant="outline" className="w-fit text-[10px] uppercase tracking-wider bg-indigo-50/50 text-indigo-600 border-indigo-200">
-                                                                                {item.kategori_regulasi}
-                                                                            </Badge>
-                                                                            <span className="text-xs font-bold text-slate-500">
-                                                                                Tahun: {item.tahun || "-"}
-                                                                            </span>
-                                                                        </div>
-                                                                    </TableCell>
-                                                                    <TableCell className="text-center">
-                                                                        <Badge className={`${item.status?.toLowerCase() === 'dicabut' ? 'bg-rose-100 text-rose-600 border-rose-200' : 'bg-emerald-100 text-emerald-600 border-emerald-200'} font-bold px-3 py-1 rounded-xl uppercase tracking-widest text-[10px]`}>
-                                                                            {item.status || "Berlaku"}
-                                                                        </Badge>
-                                                                    </TableCell>
-                                                                    <TableCell className="text-center">
-                                                                        <div className="flex gap-2 justify-center">
-                                                                            <Button
-                                                                                type="button"
-                                                                                onClick={() => handleEditRegulasi(item)}
-                                                                                size="icon"
-                                                                                variant="outline"
-                                                                                className="h-10 w-10 rounded-xl border-slate-200 text-slate-600 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all"
-                                                                            >
-                                                                                <MdEdit className="w-4 h-4" />
-                                                                            </Button>
-                                                                            <Button
-                                                                                type="button"
-                                                                                onClick={() => handleDeleteRegulasi(item)}
-                                                                                size="icon"
-                                                                                variant="outline"
-                                                                                className="h-10 w-10 rounded-xl border-slate-200 text-slate-600 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 transition-all"
-                                                                            >
-                                                                                <MdDelete className="w-4 h-4" />
-                                                                            </Button>
-                                                                        </div>
-                                                                    </TableCell>
-                                                                </TableRow>
-                                                            ))}
-                                                        </TableBody>
-                                                    </Table>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-                        </TabsContent>
-                    </Tabs>
-                </div>
+                    <TabsContent value="regulasi" className="mt-5 outline-none">
+                        <RegulasiTab data={regulasiList} loading={loading.regulasi} onRefresh={fetchRegulasi} onConfirm={setConfirm} />
+                    </TabsContent>
+                </Tabs>
             </div>
 
-            {/* Premium Detail Modal */}
-            {selectedFeedback && (
-                <div
-                    className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] animate-in fade-in duration-300"
-                    onClick={() => setSelectedFeedback(null)}
-                >
-                    <div
-                        className="bg-white rounded-[3rem] max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200/60 animate-in slide-in-from-bottom-5 duration-500"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        {/* Modal Header */}
-                        <div className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-slate-100 p-8 z-10 flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="h-14 w-14 rounded-2xl bg-blue-600/10 flex items-center justify-center text-blue-600 border border-blue-600/20 shadow-sm">
-                                    <MessageSquare className="w-7 h-7" />
-                                </div>
-                                <div>
-                                    <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">Detail Masukan</h2>
-                                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">{formatDate(selectedFeedback.createdAt)}</p>
-                                </div>
-                            </div>
-                            <Button variant="ghost" size="icon" onClick={() => setSelectedFeedback(null)} className="rounded-full h-12 w-12 hover:bg-slate-100">
-                                <X className="w-5 h-5" />
-                            </Button>
+            {/* Konfirmasi hapus (pengganti window.confirm) */}
+            <AlertDialog open={!!confirm} onOpenChange={(o) => !o && !confirming && setConfirm(null)}>
+                <AlertDialogContent className="rounded-3xl max-w-md">
+                    <AlertDialogHeader className="space-y-3">
+                        <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                            <Trash2 className="w-5 h-5" />
                         </div>
+                        <AlertDialogTitle className="font-black text-lg text-slate-900">{confirm?.title}</AlertDialogTitle>
+                        <AlertDialogDescription className="text-sm text-slate-500">{confirm?.description}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="mt-4 gap-2">
+                        <AlertDialogCancel className="rounded-xl" disabled={confirming}>Batal</AlertDialogCancel>
+                        <AlertDialogAction
+                            disabled={confirming}
+                            onClick={async (e) => {
+                                e.preventDefault();
+                                if (!confirm) return;
+                                setConfirming(true);
+                                try {
+                                    await confirm.onConfirm();
+                                    setConfirm(null);
+                                } finally {
+                                    setConfirming(false);
+                                }
+                            }}
+                            className="rounded-xl bg-rose-600 hover:bg-rose-700"
+                        >
+                            {confirming ? <Loader2 className="w-4 h-4 animate-spin" /> : "Hapus"}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </LayoutAdminElaut>
+    );
+}
 
-                        <div className="p-8 space-y-10">
-                            {/* Profile Card */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="p-6 bg-slate-50 rounded-3xl border border-slate-200/60 space-y-2">
-                                    <div className="flex items-center gap-2 text-slate-400 mb-1">
-                                        <User className="w-3.5 h-3.5" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">Nama Lengkap</span>
-                                    </div>
-                                    <p className="text-base font-black text-slate-800 uppercase">{selectedFeedback.nama}</p>
-                                </div>
-                                <div className="p-6 bg-slate-50 rounded-3xl border border-slate-200/60 space-y-2">
-                                    <div className="flex items-center gap-2 text-slate-400 mb-1">
-                                        <Building className="w-3.5 h-3.5" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">Asal Instansi</span>
-                                    </div>
-                                    <p className="text-base font-black text-slate-800 uppercase">{selectedFeedback.asalInstansi}</p>
-                                </div>
-                            </div>
+/* ============================ TAB: MASUKAN & SARAN ============================ */
 
-                            {/* Content Section */}
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <div className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-3">
-                                        <span>Masukan & Kritik</span>
-                                        <div className="h-px w-20 bg-slate-200" />
-                                    </div>
-                                    <Badge className={`${getRatingColor(calculateAverageRating(selectedFeedback.ratings))} font-bold px-4 rounded-xl border`}>
-                                        SKOR: {calculateAverageRating(selectedFeedback.ratings)} / 5.0
-                                    </Badge>
-                                </div>
-                                <div className="p-8 bg-blue-50/30 rounded-[2rem] border border-blue-100/50 shadow-inner">
-                                    <p className="text-slate-700 font-medium leading-relaxed italic text-lg text-center">
-                                        "{selectedFeedback.masukanSaran}"
+function FeedbackTab({ data, loading, onRefresh }: { data: FeedbackData[]; loading: boolean; onRefresh: () => void }) {
+    const [search, setSearch] = useState("");
+    const q = useDeferredValue(search.trim().toLowerCase());
+    const [band, setBand] = useState<Band | "">("");
+    const [page, setPage] = useState(1);
+    const [selected, setSelected] = useState<FeedbackData | null>(null);
+
+    // Normalisasi sekali: rata-rata dihitung sekali per item, urut terbaru
+    const rows = useMemo(
+        () =>
+            data
+                .map((f) => {
+                    const avg = avgRating(f.ratings);
+                    return { f, avg, band: bandOf(avg), haystack: `${f.nama ?? ""} ${f.asalInstansi ?? ""} ${f.masukanSaran ?? ""}`.toLowerCase() };
+                })
+                .sort((a, b) => (b.f.createdAt?.seconds || 0) - (a.f.createdAt?.seconds || 0)),
+        [data]
+    );
+
+    const stats = useMemo(() => {
+        const rated = rows.filter((r) => r.avg > 0).map((r) => r.avg);
+        const counts: Record<Band, number> = { kurang: 0, cukup: 0, baik: 0, sangat: 0 };
+        rows.forEach((r) => r.band && counts[r.band]++);
+        return {
+            total: rows.length,
+            avg: rated.length ? rated.reduce((a, b) => a + b, 0) / rated.length : 0,
+            max: rated.length ? Math.max(...rated) : 0,
+            min: rated.length ? Math.min(...rated) : 0, // sebelumnya Infinity bila semua 0
+            counts,
+        };
+    }, [rows]);
+
+    const filtered = useMemo(() => rows.filter((r) => (!q || r.haystack.includes(q)) && (!band || r.band === band)), [rows, q, band]);
+
+    useEffect(() => setPage(1), [q, band]);
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    const safePage = Math.min(page, totalPages);
+    const pageRows = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+    const fromIdx = filtered.length ? (safePage - 1) * PAGE_SIZE + 1 : 0;
+    const initialLoading = loading && data.length === 0;
+
+    return (
+        <div className="space-y-5">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                {initialLoading ? (
+                    <StatSkeletons />
+                ) : (
+                    <>
+                        <StatCard label="Total Masukan" value={fmt(stats.total)} unit="Masukan" sub="dari pengguna E-LAUT" icon={MessageSquare} accent="#3B82F6" active={!band} onClick={() => setBand("")} />
+                        <StatCard label="Rata-rata Rating" value={stats.avg.toFixed(1)} unit="/ 5.0" sub={stats.avg ? BAND[bandOf(stats.avg)!].label : "belum ada rating"} icon={Star} accent="#F59E0B" progress={(stats.avg / 5) * 100} />
+                        <StatCard label="Rating Tertinggi" value={stats.max.toFixed(1)} unit="/ 5.0" sub={`${fmt(stats.counts.sangat)} masukan sangat baik`} icon={TrendingUp} accent="#10B981" active={band === "sangat"} onClick={() => setBand(band === "sangat" ? "" : "sangat")} />
+                        <StatCard label="Rating Terendah" value={stats.min.toFixed(1)} unit="/ 5.0" sub={`${fmt(stats.counts.kurang)} masukan kurang — klik`} icon={TrendingDown} accent="#F43F5E" active={band === "kurang"} onClick={() => setBand(band === "kurang" ? "" : "kurang")} />
+                    </>
+                )}
+            </div>
+
+            <Toolbar search={search} setSearch={setSearch} placeholder="Cari nama, instansi, atau isi masukan..." onRefresh={onRefresh} loading={loading}>
+                <Segmented
+                    value={band}
+                    onChange={(v) => setBand(v as Band | "")}
+                    options={[
+                        { v: "", label: "Semua" },
+                        ...(Object.keys(BAND) as Band[]).map((k) => ({ v: k, label: `${BAND[k].label} (${stats.counts[k]})` })),
+                    ]}
+                />
+            </Toolbar>
+
+            <TableShell>
+                <thead>
+                    <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+                        <th className="w-12 pl-5 pr-2 py-3 text-center font-semibold">No</th>
+                        <th className="px-3 py-3 font-semibold w-[150px]">Tanggal</th>
+                        <th className="px-3 py-3 font-semibold min-w-[200px]">Pengirim</th>
+                        <th className="px-3 py-3 font-semibold min-w-[260px]">Masukan</th>
+                        <th className="px-3 py-3 font-semibold w-[150px]">Penilaian</th>
+                        <th className="w-[1%] px-5 py-3 text-right font-semibold">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {initialLoading ? (
+                        <SkeletonRows cols={6} />
+                    ) : pageRows.length === 0 ? (
+                        <EmptyRow cols={6} icon={MessageSquare} title={search || band ? "Masukan tidak ditemukan" : "Belum ada masukan"} />
+                    ) : (
+                        pageRows.map(({ f, avg, band: b }, i) => (
+                            <tr key={f.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/30 transition-colors cursor-pointer" onClick={() => setSelected(f)}>
+                                <td className="pl-5 pr-2 py-3.5 text-center text-xs text-slate-400 tabular-nums align-top">{fromIdx + i}</td>
+                                <td className="px-3 py-3.5 align-top">
+                                    <p className="text-xs font-semibold text-slate-700 dark:text-slate-200">{fmtDate(f.createdAt)}</p>
+                                    <p className="text-[11px] text-slate-400 tabular-nums">{fmtTime(f.createdAt)}</p>
+                                </td>
+                                <td className="px-3 py-3.5 align-top">
+                                    <p className="text-[13px] font-semibold text-slate-900 dark:text-white">{f.nama || "-"}</p>
+                                    <p className="flex items-center gap-1 text-[11px] text-slate-400">
+                                        <Building className="w-3 h-3" /> {f.asalInstansi || "-"}
                                     </p>
-                                </div>
-                            </div>
+                                </td>
+                                <td className="px-3 py-3.5 align-top">
+                                    <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 max-w-md">{f.masukanSaran || <span className="text-slate-300">Tanpa komentar</span>}</p>
+                                </td>
+                                <td className="px-3 py-3.5 align-top">
+                                    {b ? (
+                                        <div className="leading-tight">
+                                            <p className="inline-flex items-center gap-1 text-xs font-bold text-slate-800 dark:text-white tabular-nums">
+                                                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" /> {avg.toFixed(1)}
+                                            </p>
+                                            <p className={`flex items-center gap-1 text-[11px] font-medium ${BAND[b].text}`}>
+                                                <span className={`w-1.5 h-1.5 rounded-full ${BAND[b].dot}`} /> {BAND[b].label}
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <span className="text-xs text-slate-300">N/A</span>
+                                    )}
+                                </td>
+                                <td className="px-5 py-3 align-top text-right">
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSelected(f);
+                                        }}
+                                        className="h-8 px-3 rounded-lg ring-1 ring-slate-200 dark:ring-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50"
+                                    >
+                                        Detail
+                                    </button>
+                                </td>
+                            </tr>
+                        ))
+                    )}
+                </tbody>
+            </TableShell>
+            <Pager page={safePage} totalPages={totalPages} total={filtered.length} onChange={setPage} />
 
-                            {/* Detailed Ratings */}
-                            <div className="space-y-6">
-                                <div className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-3">
-                                    <span>Skor Indikator</span>
-                                    <div className="h-px flex-1 bg-slate-200" />
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {RATING_QUESTIONS.map((question) => {
-                                        const rating = selectedFeedback.ratings[question.key as keyof FeedbackData["ratings"]];
-                                        return (
-                                            <div
-                                                key={question.key}
-                                                className="flex items-center justify-between p-5 bg-white rounded-2xl border border-slate-100 transition-all hover:border-blue-200 hover:shadow-lg hover:shadow-blue-500/5"
-                                            >
-                                                <span className="text-xs font-bold text-slate-600">
-                                                    {question.label}
-                                                </span>
-                                                <div className="flex items-center gap-2">
-                                                    <span className={`text-sm font-black ${getRatingColor(rating).split(' ')[1]}`}>
-                                                        {rating > 0 ? rating : "N/A"}
-                                                    </span>
-                                                    <Star className={`w-4 h-4 ${rating > 0 ? "fill-yellow-400 text-yellow-400" : "text-slate-200"}`} />
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
+            {selected && <FeedbackModal f={selected} onClose={() => setSelected(null)} />}
+        </div>
+    );
+}
 
-                            <div className="flex justify-end pt-4">
-                                <Button
-                                    onClick={() => setSelectedFeedback(null)}
-                                    className="h-14 px-10 rounded-2xl bg-slate-900 hover:bg-black text-white font-black uppercase tracking-widest transition-all shadow-xl shadow-slate-900/20"
-                                >
-                                    Tutup Detail
-                                </Button>
-                            </div>
+function FeedbackModal({ f, onClose }: { f: FeedbackData; onClose: () => void }) {
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [onClose]);
+
+    const avg = avgRating(f.ratings);
+    const b = bandOf(avg);
+
+    return (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/50 backdrop-blur-sm" onClick={onClose}>
+            <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white dark:bg-slate-900 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                {/* Header bergaya hero */}
+                <div className="relative isolate overflow-hidden bg-[#0B1B3F] text-white px-6 py-5">
+                    <div className="absolute inset-0 -z-10 bg-[radial-gradient(70%_120%_at_0%_0%,#2563EB_0%,transparent_60%),radial-gradient(50%_120%_at_100%_100%,#0EA5E9_0%,transparent_60%)] opacity-90" />
+                    <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-sky-200/80">Detail Masukan</p>
+                            <h2 className="mt-1 text-lg font-black truncate">{f.nama || "-"}</h2>
+                            <p className="text-xs text-blue-100/70 flex items-center gap-1">
+                                <Building className="w-3.5 h-3.5" /> {f.asalInstansi || "-"} · {fmtDate(f.createdAt)} {fmtTime(f.createdAt)}
+                            </p>
+                        </div>
+                        <button onClick={onClose} className="rounded-xl p-2 text-blue-100/70 hover:bg-white/10 hover:text-white" aria-label="Tutup">
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
+                    <div className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-white/10 ring-1 ring-white/15 px-3 py-2">
+                        <Star className="w-4 h-4 fill-amber-300 text-amber-300" />
+                        <span className="text-xl font-black tabular-nums">{avg ? avg.toFixed(1) : "N/A"}</span>
+                        <span className="text-xs text-blue-100/70">/ 5.0 {b ? `· ${BAND[b].label}` : ""}</span>
+                    </div>
+                </div>
+
+                <div className="p-6 space-y-6">
+                    <div>
+                        <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-2">Masukan & saran</p>
+                        <blockquote className="rounded-2xl bg-slate-50 dark:bg-slate-800/50 p-5 text-sm leading-relaxed text-slate-700 dark:text-slate-200 border-l-4 border-blue-500">
+                            {f.masukanSaran || <span className="text-slate-400">Tanpa komentar.</span>}
+                        </blockquote>
+                    </div>
+
+                    <div>
+                        <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-3">Skor indikator</p>
+                        <div className="space-y-2.5">
+                            {RATING_QUESTIONS.map((qq) => {
+                                const v = f.ratings?.[qq.key] ?? 0;
+                                return (
+                                    <div key={qq.key} className="flex items-center gap-3">
+                                        <span className="w-44 shrink-0 text-xs font-medium text-slate-600 dark:text-slate-300">{qq.label}</span>
+                                        <div className="flex-1 h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                                            <div className="h-full rounded-full bg-gradient-to-r from-amber-300 to-amber-500" style={{ width: `${(v / 5) * 100}%` }} />
+                                        </div>
+                                        <span className="w-8 text-right text-xs font-bold tabular-nums text-slate-700 dark:text-slate-200">{v > 0 ? v : "-"}</span>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    );
+}
+
+/* ============================ TAB: MAKLUMAT ============================ */
+
+function MaklumatTab({
+    data,
+    loading,
+    onRefresh,
+    onConfirm,
+}: {
+    data: MaklumatPelayanan[];
+    loading: boolean;
+    onRefresh: () => void;
+    onConfirm: (c: ConfirmState) => void;
+}) {
+    const [form, setForm] = useState(EMPTY_MAKLUMAT);
+    const [editing, setEditing] = useState<MaklumatPelayanan | null>(null);
+    const [showForm, setShowForm] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [imgError, setImgError] = useState(false);
+
+    const sorted = useMemo(() => [...data].sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)), [data]);
+
+    const open = (m?: MaklumatPelayanan) => {
+        setEditing(m || null);
+        setForm(m ? { title: m.title, description: m.description, imageUrl: m.imageUrl } : EMPTY_MAKLUMAT);
+        setImgError(false);
+        setShowForm(true);
+    };
+    const close = () => {
+        setShowForm(false);
+        setEditing(null);
+        setForm(EMPTY_MAKLUMAT);
+    };
+
+    const valid = form.title.trim() && form.description.trim() && form.imageUrl.trim();
+
+    const save = async () => {
+        if (!valid) {
+            Toast.fire({ icon: "warning", title: "Lengkapi judul, deskripsi, dan URL gambar" });
+            return;
+        }
+        setSaving(true);
+        try {
+            const payload = { title: form.title.trim(), description: form.description.trim(), imageUrl: form.imageUrl.trim() };
+            if (editing) await updateMaklumatPelayanan(editing.id, payload);
+            else await saveMaklumatPelayanan(payload);
+            Toast.fire({ icon: "success", title: editing ? "Maklumat diperbarui" : "Maklumat dipublikasikan" });
+            close();
+            onRefresh();
+        } catch (e) {
+            console.error(e);
+            Toast.fire({ icon: "error", title: "Gagal menyimpan maklumat" });
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const remove = (m: MaklumatPelayanan) =>
+        onConfirm({
+            title: "Hapus maklumat?",
+            description: (
+                <>
+                    Maklumat <b className="text-slate-900">{m.title}</b> akan dihapus dari publikasi.
+                </>
+            ),
+            onConfirm: async () => {
+                try {
+                    await deleteMaklumatPelayanan(m.id);
+                    Toast.fire({ icon: "success", title: "Maklumat dihapus" });
+                    onRefresh();
+                } catch {
+                    Toast.fire({ icon: "error", title: "Gagal menghapus maklumat" });
+                }
+            },
+        });
+
+    const initialLoading = loading && data.length === 0;
+
+    return (
+        <div className="space-y-5">
+            <SectionBar icon={ImageIcon} title="Maklumat Pelayanan" desc={`${fmt(data.length)} publikasi standar pelayanan`} onRefresh={onRefresh} loading={loading}>
+                {!showForm && <PrimaryButton onClick={() => open()} icon={Plus}>Tambah Maklumat</PrimaryButton>}
+            </SectionBar>
+
+            {showForm && (
+                <FormCard title={editing ? "Ubah Maklumat" : "Maklumat Baru"} onClose={close}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                            <Field label="Judul publikasi" required>
+                                <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Contoh: Maklumat Pelayanan Utama" className={inputCls} />
+                            </Field>
+                            <Field label="Deskripsi" required hint={`${form.description.length} karakter`}>
+                                <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Isi maklumat secara singkat dan jelas..." className={`${inputCls} h-auto min-h-[120px] py-3`} />
+                            </Field>
+                            <Field label="URL gambar" required hint="Mendukung link Google Drive / gambar langsung">
+                                <input
+                                    value={form.imageUrl}
+                                    onChange={(e) => {
+                                        setForm({ ...form, imageUrl: e.target.value });
+                                        setImgError(false);
+                                    }}
+                                    placeholder="https://..."
+                                    className={inputCls}
+                                />
+                            </Field>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <span className="text-[11px] font-semibold text-slate-500">Pratinjau</span>
+                            <div className="flex-1 min-h-[220px] rounded-2xl bg-slate-50 dark:bg-slate-800/50 ring-1 ring-dashed ring-slate-200 dark:ring-slate-700 overflow-hidden flex items-center justify-center">
+                                {form.imageUrl && !imgError ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img src={getDirectImageUrl(form.imageUrl)} alt="Pratinjau" className="w-full h-full object-cover" onError={() => setImgError(true)} />
+                                ) : (
+                                    <div className="flex flex-col items-center gap-2 text-slate-400 text-center px-4">
+                                        <ImageIcon className="w-10 h-10 opacity-40" />
+                                        <p className="text-xs font-medium">{imgError ? "Gambar tidak dapat dimuat, periksa URL." : "Menunggu URL gambar"}</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                    <FormActions onCancel={close} onSave={save} saving={saving} disabled={!valid} label={editing ? "Simpan Perubahan" : "Publikasikan"} />
+                </FormCard>
             )}
-        </LayoutAdminElaut>
+
+            {initialLoading ? (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {[0, 1].map((i) => (
+                        <div key={i} className="h-48 rounded-3xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
+                    ))}
+                </div>
+            ) : sorted.length === 0 ? (
+                <EmptyBox icon={ImageIcon} title="Belum ada maklumat dipublikasikan" />
+            ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {sorted.map((m) => (
+                        <article key={m.id} className="group flex flex-col sm:flex-row overflow-hidden rounded-3xl bg-white dark:bg-slate-900 ring-1 ring-slate-200/80 dark:ring-slate-800 shadow-sm hover:shadow-lg transition-shadow">
+                            <div className="relative w-full sm:w-48 h-44 sm:h-auto shrink-0 bg-slate-100 overflow-hidden">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                    src={getDirectImageUrl(m.imageUrl)}
+                                    alt={m.title}
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    onError={(e) => (e.currentTarget.src = "/illustrations/placeholder.png")}
+                                />
+                            </div>
+                            <div className="flex flex-1 flex-col gap-2 p-5">
+                                <p className="flex items-center gap-1.5 text-[11px] text-slate-400">
+                                    <Calendar className="w-3.5 h-3.5" /> {fmtDate(m.createdAt)}
+                                </p>
+                                <h3 className="text-[15px] font-bold text-slate-900 dark:text-white leading-snug">{m.title}</h3>
+                                <p className="text-sm text-slate-500 leading-relaxed line-clamp-3">{m.description}</p>
+                                <div className="mt-auto pt-3 flex items-center justify-end gap-1">
+                                    <a href={getDirectImageUrl(m.imageUrl)} target="_blank" rel="noreferrer" className="h-8 px-2.5 rounded-lg text-xs font-semibold text-slate-500 hover:bg-slate-50 inline-flex items-center gap-1">
+                                        <ExternalLink className="w-3.5 h-3.5" /> Gambar
+                                    </a>
+                                    <IconBtn title="Ubah" onClick={() => open(m)} icon={Pencil} tone="amber" />
+                                    <IconBtn title="Hapus" onClick={() => remove(m)} icon={Trash2} tone="rose" />
+                                </div>
+                            </div>
+                        </article>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
+/* ============================ TAB: REGULASI ============================ */
+
+function RegulasiTab({
+    data,
+    loading,
+    onRefresh,
+    onConfirm,
+}: {
+    data: RegulasiData[];
+    loading: boolean;
+    onRefresh: () => void;
+    onConfirm: (c: ConfirmState) => void;
+}) {
+    const [form, setForm] = useState<RegulasiForm>(EMPTY_REGULASI);
+    const [editing, setEditing] = useState<RegulasiData | null>(null);
+    const [showForm, setShowForm] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [file, setFile] = useState<File | null>(null);
+
+    const [search, setSearch] = useState("");
+    const q = useDeferredValue(search.trim().toLowerCase());
+    const [kategori, setKategori] = useState("");
+    const [page, setPage] = useState(1);
+
+    const rows = useMemo(
+        () =>
+            [...data]
+                .sort((a, b) => Number(b.tahun || 0) - Number(a.tahun || 0) || (a.judul || "").localeCompare(b.judul || ""))
+                .map((r) => ({ r, haystack: `${r.no_peraturan ?? ""} ${r.judul ?? ""} ${r.kategori_regulasi ?? ""} ${r.tahun ?? ""} ${r.ruang_lingkup ?? ""}`.toLowerCase() })),
+        [data]
+    );
+    const kategoriCounts = useMemo(() => {
+        const m = new Map<string, number>();
+        data.forEach((r) => r.kategori_regulasi && m.set(r.kategori_regulasi, (m.get(r.kategori_regulasi) || 0) + 1));
+        return m;
+    }, [data]);
+
+    const filtered = useMemo(() => rows.filter((x) => (!q || x.haystack.includes(q)) && (!kategori || x.r.kategori_regulasi === kategori)), [rows, q, kategori]);
+    useEffect(() => setPage(1), [q, kategori]);
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    const safePage = Math.min(page, totalPages);
+    const pageRows = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+    const fromIdx = filtered.length ? (safePage - 1) * PAGE_SIZE + 1 : 0;
+
+    const open = (item?: RegulasiData) => {
+        setEditing(item || null);
+        setForm(
+            item
+                ? {
+                    kategori_regulasi: item.kategori_regulasi || "",
+                    tanggal_pengundangan: item.tanggal_pengundangan || "",
+                    tahun: item.tahun || "",
+                    no_peraturan: item.no_peraturan || "",
+                    judul: item.judul || "",
+                    ruang_lingkup: item.ruang_lingkup || "",
+                    sumber: item.sumber || "",
+                    status: item.status || "",
+                    perubahan_turunan_terkait: item.perubahan_turunan_terkait || "",
+                    file: item.file || "",
+                }
+                : EMPTY_REGULASI
+        );
+        setFile(null);
+        setShowForm(true);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+    const close = () => {
+        setShowForm(false);
+        setEditing(null);
+        setForm(EMPTY_REGULASI);
+        setFile(null);
+    };
+
+    const set = <K extends keyof RegulasiForm>(k: K, v: RegulasiForm[K]) => setForm((f) => ({ ...f, [k]: v }));
+    const valid = form.judul.trim() && form.no_peraturan.trim() && form.kategori_regulasi;
+
+    const save = async () => {
+        if (!valid) {
+            Toast.fire({ icon: "warning", title: "Lengkapi kategori, nomor, dan judul peraturan" });
+            return;
+        }
+        setSaving(true);
+        try {
+            const fd = new FormData();
+            (Object.keys(form) as (keyof RegulasiForm)[]).forEach((k) => {
+                if (k !== "file") fd.append(k, String(form[k] ?? ""));
+            });
+            if (file) fd.append("file", file);
+            else if (form.file) fd.append("file", form.file);
+
+            if (editing?.id) {
+                fd.append("id", String(editing.id));
+                await updateRegulasi(fd);
+            } else {
+                await createRegulasi(fd);
+            }
+            Toast.fire({ icon: "success", title: editing ? "Regulasi diperbarui" : "Regulasi ditambahkan" });
+            close();
+            onRefresh();
+        } catch (e: any) {
+            console.error(e);
+            Toast.fire({ icon: "error", title: "Gagal menyimpan regulasi", text: e?.message });
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const remove = (item: RegulasiData) =>
+        onConfirm({
+            title: "Hapus regulasi?",
+            description: (
+                <>
+                    <b className="text-slate-900">{item.no_peraturan}</b> — {item.judul} akan dihapus permanen.
+                </>
+            ),
+            onConfirm: async () => {
+                if (!item.id) return;
+                try {
+                    await deleteRegulasi(item.id);
+                    Toast.fire({ icon: "success", title: "Regulasi dihapus" });
+                    onRefresh();
+                } catch (e: any) {
+                    Toast.fire({ icon: "error", title: "Gagal menghapus regulasi", text: e?.message });
+                }
+            },
+        });
+
+    const initialLoading = loading && data.length === 0;
+
+    return (
+        <div className="space-y-5">
+            <SectionBar icon={Book} title="Regulasi Pelatihan" desc={`${fmt(data.length)} dasar hukum & kebijakan pelatihan`} onRefresh={onRefresh} loading={loading}>
+                {!showForm && <PrimaryButton onClick={() => open()} icon={Plus}>Tambah Regulasi</PrimaryButton>}
+            </SectionBar>
+
+            {showForm && (
+                <FormCard title={editing ? "Ubah Regulasi" : "Regulasi Baru"} onClose={close}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <Field label="Kategori" required>
+                            <select value={form.kategori_regulasi} onChange={(e) => set("kategori_regulasi", e.target.value)} className={inputCls}>
+                                <option value="">Pilih kategori</option>
+                                {KATEGORI_REGULASI.map((k) => (
+                                    <option key={k} value={k}>{k}</option>
+                                ))}
+                            </select>
+                        </Field>
+                        <Field label="Nomor peraturan" required>
+                            <input value={form.no_peraturan} onChange={(e) => set("no_peraturan", e.target.value)} placeholder="Nomor 12 Tahun 2023" className={inputCls} />
+                        </Field>
+                        <Field label="Tahun">
+                            <input type="number" inputMode="numeric" value={form.tahun} onChange={(e) => set("tahun", e.target.value)} placeholder="2023" className={inputCls} />
+                        </Field>
+                        <Field label="Judul / tentang" required className="lg:col-span-3">
+                            <input value={form.judul} onChange={(e) => set("judul", e.target.value)} placeholder="Judul lengkap peraturan" className={inputCls} />
+                        </Field>
+                        <Field label="Ruang lingkup" className="lg:col-span-3">
+                            <textarea value={form.ruang_lingkup} onChange={(e) => set("ruang_lingkup", e.target.value)} placeholder="Ruang lingkup peraturan..." className={`${inputCls} h-auto min-h-[90px] py-3`} />
+                        </Field>
+                        <Field label="Tanggal pengundangan">
+                            <input type="date" value={form.tanggal_pengundangan} onChange={(e) => set("tanggal_pengundangan", e.target.value)} className={inputCls} />
+                        </Field>
+                        <Field label="Status">
+                            <select value={form.status} onChange={(e) => set("status", e.target.value)} className={inputCls}>
+                                <option value="">Pilih status</option>
+                                {STATUS_REGULASI.map((s) => (
+                                    <option key={s} value={s}>{s}</option>
+                                ))}
+                            </select>
+                        </Field>
+                        <Field label="Sumber">
+                            <input value={form.sumber} onChange={(e) => set("sumber", e.target.value)} placeholder="LN.2023/No.12" className={inputCls} />
+                        </Field>
+                        <Field label="Perubahan / turunan terkait" className="lg:col-span-2">
+                            <input value={form.perubahan_turunan_terkait} onChange={(e) => set("perubahan_turunan_terkait", e.target.value)} placeholder="Catatan peraturan turunan..." className={inputCls} />
+                        </Field>
+                        <Field label="File dokumen" hint="PDF / DOC / DOCX">
+                            <label htmlFor="upload-regulasi" className={`${inputCls} flex items-center justify-between gap-2 cursor-pointer hover:bg-slate-100`}>
+                                <span className="truncate text-slate-500">{file ? file.name : form.file ? "File tersimpan — pilih untuk ganti" : "Pilih dokumen"}</span>
+                                <Upload className={`w-4 h-4 shrink-0 ${file || form.file ? "text-emerald-600" : "text-slate-400"}`} />
+                            </label>
+                            <input id="upload-regulasi" type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={(e) => setFile(e.target.files?.[0] || null)} />
+                            {!file && form.file && (
+                                <a href={getRegulasiFileUrl(form.file)} target="_blank" rel="noreferrer" className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:underline">
+                                    <ExternalLink className="w-3 h-3" /> Lihat dokumen saat ini
+                                </a>
+                            )}
+                        </Field>
+                    </div>
+                    <FormActions onCancel={close} onSave={save} saving={saving} disabled={!valid} label={editing ? "Simpan Perubahan" : "Simpan Regulasi"} />
+                </FormCard>
+            )}
+
+            <Toolbar search={search} setSearch={setSearch} placeholder="Cari nomor, judul, kategori, atau tahun..." onRefresh={onRefresh} loading={loading}>
+                <select
+                    value={kategori}
+                    onChange={(e) => setKategori(e.target.value)}
+                    className={`h-11 rounded-2xl px-3 text-xs font-bold outline-none ${kategori ? "bg-[#0B1B3F] text-white" : "bg-slate-50 dark:bg-slate-800 text-slate-600"}`}
+                >
+                    <option value="">Semua kategori</option>
+                    {Array.from(kategoriCounts.entries()).map(([k, n]) => (
+                        <option key={k} value={k}>{k} ({n})</option>
+                    ))}
+                </select>
+            </Toolbar>
+
+            <TableShell>
+                <thead>
+                    <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+                        <th className="w-12 pl-5 pr-2 py-3 text-center font-semibold">No</th>
+                        <th className="px-3 py-3 font-semibold min-w-[320px]">Regulasi</th>
+                        <th className="px-3 py-3 font-semibold w-[200px]">Kategori</th>
+                        <th className="px-3 py-3 font-semibold w-[120px]">Status</th>
+                        <th className="w-[1%] px-5 py-3 text-right font-semibold">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {initialLoading ? (
+                        <SkeletonRows cols={5} />
+                    ) : pageRows.length === 0 ? (
+                        <EmptyRow cols={5} icon={Book} title={search || kategori ? "Regulasi tidak ditemukan" : "Belum ada regulasi"} />
+                    ) : (
+                        pageRows.map(({ r }, i) => (
+                            <tr key={r.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/30 transition-colors">
+                                <td className="pl-5 pr-2 py-3.5 text-center text-xs text-slate-400 tabular-nums align-top">{fromIdx + i}</td>
+                                <td className="px-3 py-3.5 align-top">
+                                    <p className="text-[11px] font-semibold text-slate-500">{r.no_peraturan}</p>
+                                    <p className="text-[13px] font-semibold text-slate-900 dark:text-white leading-snug line-clamp-2">{r.judul}</p>
+                                    {r.file ? (
+                                        <a href={getRegulasiFileUrl(r.file)} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:underline">
+                                            <FileText className="w-3 h-3" /> Lihat dokumen
+                                        </a>
+                                    ) : (
+                                        <p className="mt-1 text-[11px] text-slate-300">Tanpa dokumen</p>
+                                    )}
+                                </td>
+                                <td className="px-3 py-3.5 align-top">
+                                    <p className="text-xs font-medium text-slate-700 dark:text-slate-200">{r.kategori_regulasi || "-"}</p>
+                                    <p className="text-[11px] text-slate-400 tabular-nums">Tahun {r.tahun || "-"}</p>
+                                </td>
+                                <td className="px-3 py-3.5 align-top">
+                                    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-300">
+                                        <span className={`w-1.5 h-1.5 rounded-full ${statusTone(r.status)}`} /> {r.status || "Berlaku"}
+                                    </span>
+                                </td>
+                                <td className="px-5 py-3 align-top">
+                                    <div className="flex justify-end gap-1">
+                                        <IconBtn title="Ubah" onClick={() => open(r)} icon={Pencil} tone="amber" />
+                                        <IconBtn title="Hapus" onClick={() => remove(r)} icon={Trash2} tone="rose" />
+                                    </div>
+                                </td>
+                            </tr>
+                        ))
+                    )}
+                </tbody>
+            </TableShell>
+            <Pager page={safePage} totalPages={totalPages} total={filtered.length} onChange={setPage} />
+        </div>
+    );
+}
+
+/* ============================ UI BERSAMA ============================ */
+
+const inputCls =
+    "w-full h-11 px-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500/30 placeholder:text-slate-400 placeholder:font-normal";
+
+function TabBar({ tabs }: { tabs: { value: string; label: string; sub: string; icon: LucideIcon; accent: string; count: number }[] }) {
+    // Tab bar navy — tab aktif kaca (glassmorphism) + ikon besar di latar, sama dengan DashboardMainView
+    return (
+        <div className="relative isolate overflow-hidden rounded-[1.75rem] bg-[#0B1B3F] ring-1 ring-white/10 shadow-[0_20px_50px_-20px_rgba(37,99,235,0.5)]">
+            <div className="absolute inset-0 -z-10 bg-[radial-gradient(50%_120%_at_0%_0%,#2563EB_0%,transparent_60%),radial-gradient(40%_120%_at_100%_100%,#0EA5E9_0%,transparent_60%)] opacity-70" />
+            <div className="absolute inset-0 -z-10 opacity-[0.12] [background-image:radial-gradient(rgba(255,255,255,0.8)_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(to_right,black,transparent_70%)]" />
+            <div className="overflow-x-auto scrollbar-hide">
+                <TabsList className="bg-transparent h-auto p-1.5 grid grid-cols-3 gap-1.5 min-w-[520px] w-full">
+                    {tabs.map((t) => {
+                        const Icon = t.icon;
+                        return (
+                            <TabsTrigger
+                                key={t.value}
+                                value={t.value}
+                                style={{ ["--accent" as string]: t.accent }}
+                                className="group relative isolate overflow-hidden justify-start rounded-[1.35rem] py-3 px-4 text-blue-100/70 font-bold ring-1 ring-transparent transition-all duration-300 outline-none
+                                    hover:text-white hover:bg-white/[0.06]
+                                    focus-visible:ring-2 focus-visible:ring-sky-300/60
+                                    data-[state=active]:text-white data-[state=active]:bg-white/[0.12] data-[state=active]:backdrop-blur-xl data-[state=active]:ring-white/25
+                                    data-[state=active]:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_12px_30px_-12px_var(--accent)]"
+                            >
+                                {/* Glow aksen kanan → kiri */}
+                                <span
+                                    aria-hidden
+                                    className="pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 group-hover:opacity-50 group-data-[state=active]:opacity-100"
+                                    style={{ background: `linear-gradient(to left, ${t.accent}59 0%, ${t.accent}1f 40%, transparent 80%)` }}
+                                />
+                                {/* Kilau kaca */}
+                                <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-1/2 bg-gradient-to-b from-white/[0.14] to-transparent opacity-0 transition-opacity duration-300 group-data-[state=active]:opacity-100" />
+                                {/* Ikon besar di latar */}
+                                <Icon
+                                    aria-hidden
+                                    strokeWidth={1.5}
+                                    className="pointer-events-none absolute -right-3 -bottom-4 -z-10 w-16 h-16 -rotate-12 opacity-[0.08] transition-all duration-500 ease-out group-hover:opacity-20 group-hover:-rotate-6 group-data-[state=active]:opacity-35 group-data-[state=active]:scale-110 group-data-[state=active]:-rotate-6"
+                                    style={{ color: t.accent, filter: `drop-shadow(0 0 16px ${t.accent}80)` }}
+                                />
+
+                                <div className="flex items-center gap-2.5">
+                                    <div className="p-1.5 rounded-xl bg-white/10 text-sky-100 ring-1 ring-white/10 transition-all duration-300 group-hover:bg-white/15 group-data-[state=active]:text-white group-data-[state=active]:ring-white/30 group-data-[state=active]:[background:var(--accent)] group-data-[state=active]:shadow-[0_6px_16px_-4px_var(--accent)]">
+                                        <Icon className="w-4 h-4" />
+                                    </div>
+                                    <div className="flex flex-col items-start leading-none">
+                                        <span className="text-sm tracking-tight whitespace-nowrap flex items-center gap-1.5">
+                                            {t.label}
+                                            <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-white/10 group-data-[state=active]:bg-white/20 tabular-nums">{fmt(t.count)}</span>
+                                        </span>
+                                        <span className="hidden sm:block mt-1 text-[9px] font-semibold uppercase tracking-[0.16em] whitespace-nowrap text-blue-100/45 group-data-[state=active]:text-sky-100/80">{t.sub}</span>
+                                    </div>
+                                </div>
+
+                                {/* Garis aksen bawah */}
+                                <span
+                                    aria-hidden
+                                    className="pointer-events-none absolute bottom-0 left-4 right-4 h-[2px] rounded-full opacity-0 scale-x-50 transition-all duration-300 group-data-[state=active]:opacity-100 group-data-[state=active]:scale-x-100"
+                                    style={{ background: `linear-gradient(90deg, transparent, ${t.accent}, transparent)` }}
+                                />
+                            </TabsTrigger>
+                        );
+                    })}
+                </TabsList>
+            </div>
+        </div>
+    );
+}
+
+function StatCard({
+    label,
+    value,
+    unit,
+    sub,
+    icon: Icon,
+    accent,
+    progress,
+    active,
+    onClick,
+}: {
+    label: string;
+    value: string;
+    unit: string;
+    sub?: string;
+    icon: LucideIcon;
+    accent: string;
+    progress?: number;
+    active?: boolean;
+    onClick?: () => void;
+}) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            disabled={!onClick}
+            className={`group relative isolate overflow-hidden rounded-3xl bg-[#0B1B3F] p-5 text-left text-white ring-1 transition-all duration-300 ${onClick ? "hover:-translate-y-0.5 cursor-pointer" : "cursor-default"} ${active ? "ring-2 ring-white/50 shadow-xl" : "ring-white/10 shadow-lg"}`}
+            style={{ boxShadow: active ? `0 18px 40px -16px ${accent}` : undefined }}
+        >
+            <div className="absolute inset-0 -z-10 opacity-90" style={{ background: `radial-gradient(70% 90% at 100% 0%, ${accent}66 0%, transparent 60%), radial-gradient(60% 80% at 0% 100%, #2563EB55 0%, transparent 60%)` }} />
+            <div className="absolute inset-0 -z-10 opacity-[0.12] [background-image:radial-gradient(rgba(255,255,255,0.8)_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(to_left,black,transparent_70%)]" />
+            <div
+                className={`pointer-events-none absolute inset-0 -z-10 transition-opacity duration-500 ease-out ${active ? "opacity-70" : "opacity-0 group-hover:opacity-100"}`}
+                style={{ background: `linear-gradient(to left, ${accent}59 0%, ${accent}26 35%, transparent 75%)` }}
+            />
+            <Icon
+                aria-hidden
+                strokeWidth={1.5}
+                className={`pointer-events-none absolute -right-5 -bottom-7 -z-10 w-32 h-32 -rotate-12 transition-all duration-500 ease-out group-hover:-rotate-6 group-hover:scale-110 ${active ? "opacity-40" : "opacity-20 group-hover:opacity-40"}`}
+                style={{ color: accent, filter: `drop-shadow(0 0 24px ${accent}66)` }}
+            />
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-sky-100/75 pr-10">{label}</p>
+            <div className="mt-1 flex items-baseline gap-1.5">
+                <span className="text-3xl md:text-4xl font-black tracking-[-0.03em] tabular-nums">{value}</span>
+                <span className="text-[10px] font-bold uppercase text-sky-100/70">{unit}</span>
+            </div>
+            {progress !== undefined && (
+                <div className="mt-3 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${progress}%`, background: `linear-gradient(90deg, ${accent}, #fff)` }} />
+                </div>
+            )}
+            {sub && <p className="mt-2 text-[11px] font-medium text-blue-100/60 truncate">{sub}</p>}
+        </button>
+    );
+}
+
+const StatSkeletons = () => (
+    <>
+        {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="h-[132px] rounded-3xl bg-slate-200/70 dark:bg-slate-800 animate-pulse" />
+        ))}
+    </>
+);
+
+function Toolbar({
+    search,
+    setSearch,
+    placeholder,
+    onRefresh,
+    loading,
+    children,
+}: {
+    search: string;
+    setSearch: (v: string) => void;
+    placeholder: string;
+    onRefresh: () => void;
+    loading: boolean;
+    children?: React.ReactNode;
+}) {
+    return (
+        <div className="flex flex-col lg:flex-row gap-2.5 lg:items-center rounded-3xl bg-white dark:bg-slate-900 ring-1 ring-slate-200/80 dark:ring-slate-800 p-2.5 shadow-sm">
+            <div className="relative flex-1 group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-blue-500" />
+                <input
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder={placeholder}
+                    className="pl-11 pr-10 w-full h-11 bg-slate-50 dark:bg-slate-800 rounded-2xl text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500/20 placeholder:text-slate-400 placeholder:font-normal"
+                />
+                {search && (
+                    <button type="button" onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-200" aria-label="Hapus pencarian">
+                        <X className="w-4 h-4" />
+                    </button>
+                )}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+                {children}
+                <button type="button" onClick={onRefresh} disabled={loading} title="Muat ulang" className="h-11 w-11 rounded-2xl bg-slate-50 dark:bg-slate-800 text-slate-600 flex items-center justify-center hover:ring-1 hover:ring-slate-200 disabled:opacity-40">
+                    <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+                </button>
+            </div>
+        </div>
+    );
+}
+
+function Segmented({ value, onChange, options }: { value: string; onChange: (v: string) => void; options: { v: string; label: string }[] }) {
+    return (
+        <div className="flex items-center p-1 rounded-2xl bg-slate-50 dark:bg-slate-800 overflow-x-auto scrollbar-hide max-w-full">
+            {options.map((o) => (
+                <button
+                    key={o.v || "all"}
+                    type="button"
+                    onClick={() => onChange(o.v)}
+                    className={`h-9 px-3 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${value === o.v ? "bg-[#0B1B3F] text-white shadow-md" : "text-slate-500 hover:text-slate-800"}`}
+                >
+                    {o.label}
+                </button>
+            ))}
+        </div>
+    );
+}
+
+function SectionBar({
+    icon: Icon,
+    title,
+    desc,
+    onRefresh,
+    loading,
+    children,
+}: {
+    icon: LucideIcon;
+    title: string;
+    desc: string;
+    onRefresh: () => void;
+    loading: boolean;
+    children?: React.ReactNode;
+}) {
+    return (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-3xl bg-white dark:bg-slate-900 ring-1 ring-slate-200/80 dark:ring-slate-800 p-4 md:p-5 shadow-sm">
+            <div className="flex items-center gap-3.5">
+                <div className="relative isolate overflow-hidden w-12 h-12 rounded-2xl bg-[#0B1B3F] text-sky-100 flex items-center justify-center shadow-md shadow-blue-600/20 shrink-0">
+                    <div className="absolute inset-0 -z-10 bg-[radial-gradient(80%_80%_at_0%_0%,#2563EB_0%,transparent_70%)]" />
+                    <Icon className="w-5 h-5" />
+                </div>
+                <div>
+                    <h3 className="text-base font-black text-slate-900 dark:text-white">{title}</h3>
+                    <p className="text-xs text-slate-500">{desc}</p>
+                </div>
+            </div>
+            <div className="flex items-center gap-2">
+                <button type="button" onClick={onRefresh} disabled={loading} title="Muat ulang" className="h-11 w-11 rounded-2xl bg-slate-50 dark:bg-slate-800 text-slate-600 flex items-center justify-center hover:ring-1 hover:ring-slate-200 disabled:opacity-40">
+                    <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+                </button>
+                {children}
+            </div>
+        </div>
+    );
+}
+
+function PrimaryButton({ onClick, icon: Icon, children }: { onClick: () => void; icon: LucideIcon; children: React.ReactNode }) {
+    return (
+        <button type="button" onClick={onClick} className="h-11 px-5 rounded-2xl bg-[#0B1B3F] hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-2 shadow-md shadow-blue-900/20 transition-colors">
+            <Icon className="w-4 h-4" /> {children}
+        </button>
+    );
+}
+
+function FormCard({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
+    return (
+        <div className="rounded-3xl bg-white dark:bg-slate-900 ring-1 ring-slate-200/80 dark:ring-slate-800 shadow-xl overflow-hidden">
+            <div className="flex items-center justify-between px-5 md:px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+                <h3 className="text-base font-black text-slate-900 dark:text-white">{title}</h3>
+                <button type="button" onClick={onClose} className="rounded-xl p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700" aria-label="Tutup form">
+                    <X className="w-5 h-5" />
+                </button>
+            </div>
+            <div className="p-5 md:p-6 space-y-6">{children}</div>
+        </div>
+    );
+}
+
+function FormActions({ onCancel, onSave, saving, disabled, label }: { onCancel: () => void; onSave: () => void; saving: boolean; disabled?: boolean; label: string }) {
+    return (
+        <div className="flex flex-col-reverse sm:flex-row gap-2 justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
+            <button type="button" onClick={onCancel} disabled={saving} className="h-11 px-5 rounded-xl ring-1 ring-slate-200 dark:ring-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50">
+                Batal
+            </button>
+            <button type="button" onClick={onSave} disabled={saving || disabled} className="h-11 px-6 rounded-xl bg-[#0B1B3F] hover:bg-blue-700 text-white text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-40">
+                {saving && <Loader2 className="w-4 h-4 animate-spin" />} {saving ? "Menyimpan…" : label}
+            </button>
+        </div>
+    );
+}
+
+function Field({ label, required, hint, className = "", children }: { label: string; required?: boolean; hint?: string; className?: string; children: React.ReactNode }) {
+    return (
+        <div className={`space-y-1.5 ${className}`}>
+            <div className="flex items-baseline justify-between gap-2">
+                <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                    {label} {required && <span className="text-rose-500">*</span>}
+                </label>
+                {hint && <span className="text-[10px] text-slate-400">{hint}</span>}
+            </div>
+            {children}
+        </div>
+    );
+}
+
+function IconBtn({ title, onClick, icon: Icon, tone }: { title: string; onClick: () => void; icon: LucideIcon; tone: "amber" | "rose" }) {
+    return (
+        <button
+            type="button"
+            title={title}
+            aria-label={title}
+            onClick={onClick}
+            className={`h-8 w-8 rounded-lg text-slate-400 flex items-center justify-center transition-colors ${tone === "amber" ? "hover:bg-amber-50 hover:text-amber-600" : "hover:bg-rose-50 hover:text-rose-600"}`}
+        >
+            <Icon className="w-4 h-4" />
+        </button>
+    );
+}
+
+function TableShell({ children }: { children: React.ReactNode }) {
+    return (
+        <div className="bg-white dark:bg-slate-900 rounded-[1.75rem] ring-1 ring-slate-200/80 dark:ring-slate-800 shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+                <table className="w-full text-left">{children}</table>
+            </div>
+        </div>
+    );
+}
+
+const SkeletonRows = ({ cols }: { cols: number }) => (
+    <>
+        {Array.from({ length: 5 }).map((_, i) => (
+            <tr key={i}>
+                <td colSpan={cols} className="px-5 py-3">
+                    <div className="h-11 rounded-xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
+                </td>
+            </tr>
+        ))}
+    </>
+);
+
+const EmptyRow = ({ cols, icon: Icon, title }: { cols: number; icon: LucideIcon; title: string }) => (
+    <tr>
+        <td colSpan={cols} className="py-16">
+            <div className="flex flex-col items-center text-center gap-2">
+                <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                    <Icon className="w-5 h-5 text-slate-400" />
+                </div>
+                <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{title}</p>
+            </div>
+        </td>
+    </tr>
+);
+
+const EmptyBox = ({ icon: Icon, title }: { icon: LucideIcon; title: string }) => (
+    <div className="py-16 flex flex-col items-center gap-2 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+        <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+            <Icon className="w-5 h-5 text-slate-400" />
+        </div>
+        <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{title}</p>
+    </div>
+);
+
+function Pager({ page, totalPages, total, onChange }: { page: number; totalPages: number; total: number; onChange: (p: number) => void }) {
+    if (total <= PAGE_SIZE) return null;
+    const from = (page - 1) * PAGE_SIZE + 1;
+    const to = Math.min(page * PAGE_SIZE, total);
+    return (
+        <div className="flex items-center justify-between px-1 text-xs text-slate-500">
+            <span>
+                <b className="text-slate-800 dark:text-white tabular-nums">{from}–{to}</b> dari <b className="tabular-nums">{fmt(total)}</b>
+            </span>
+            <div className="flex items-center gap-1">
+                <button type="button" onClick={() => onChange(page - 1)} disabled={page <= 1} className="h-8 w-8 rounded-lg hover:bg-slate-100 disabled:opacity-30 flex items-center justify-center" aria-label="Sebelumnya">
+                    <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="px-2 font-semibold tabular-nums">{page} / {totalPages}</span>
+                <button type="button" onClick={() => onChange(page + 1)} disabled={page >= totalPages} className="h-8 w-8 rounded-lg hover:bg-slate-100 disabled:opacity-30 flex items-center justify-center" aria-label="Berikutnya">
+                    <ChevronRight className="w-4 h-4" />
+                </button>
+            </div>
+        </div>
     );
 }
