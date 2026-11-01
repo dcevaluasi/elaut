@@ -1,515 +1,243 @@
-"use client";
-
-import React from "react";
-import {
-    AnimatePresence,
-    motion,
-    useReducedMotion,
-    useScroll,
-    useTransform,
-} from "framer-motion";
-import { Check, ExternalLink, Search, Share2, X, Youtube } from "lucide-react";
-
+import type { Metadata } from "next";
 import Footer from "@/components/ui/footer";
-import { VideoCard } from "@/components/video/VideoCard";
-import { getAllVideoPelatihans, incrementVideoClick } from "@/utils/videoPelatihan";
+import { getAllVideoPelatihans } from "@/utils/videoPelatihan";
 import { extractYoutubeId } from "@/utils/videos";
-import { cn } from "@/lib/utils";
+import VideoGratisClient from "./VideoGratisClient";
+import { ChevronDown } from "lucide-react";
 
-/* ------------------------------------------------------------------ */
-/*  Types & helpers                                                     */
-/* ------------------------------------------------------------------ */
-type RawVideo = Parameters<typeof VideoCard>[0]["video"];
+/* ============================ KONSTANTA ============================ */
 
-type VideoItem = {
-    id: Parameters<typeof incrementVideoClick>[0];
-    ytId: string;
-    nama: string;
-    program: string;
-    penyelenggara: string;
-    description: string;
-    /** Lowercased text used for searching. */
-    searchText: string;
-    /** Original record, passed to <VideoCard> untouched. */
-    raw: RawVideo;
+const SITE = "https://elaut-bppsdm.kkp.go.id";
+/** ⚠️ Samakan dengan lokasi file ini di folder app/. */
+const PAGE_PATH = "/video-pelatihan";
+const PAGE_URL = `${SITE}${PAGE_PATH}`;
+/** TODO: gambar OG sendiri 1200×630 di /public. */
+const OG_IMAGE = `${SITE}/images/og-video-pelatihan.png`;
+
+const TITLE = "Video Pelatihan Gratis Kelautan & Perikanan – Belajar Online | E-LAUT KKP";
+const DESCRIPTION =
+    "Tonton ratusan video pelatihan gratis Kelautan dan Perikanan dari KKP: budidaya ikan & udang, pengolahan hasil perikanan, penangkapan, mesin perikanan, hingga kewirausahaan. Belajar online kapan saja di E-LAUT.";
+
+/* ============================ DATA (cache server) ============================ */
+
+type RawVideo = Record<string, any>;
+let cache: { at: number; data: RawVideo[] } | null = null;
+const TTL = 10 * 60 * 1000;
+
+/** Ambil video (cache 10 menit, batas waktu 6 detik agar halaman tidak tertahan). */
+async function loadVideos(): Promise<RawVideo[] | null> {
+    if (cache && Date.now() - cache.at < TTL) return cache.data;
+    try {
+        const data = await Promise.race([getAllVideoPelatihans(), new Promise<never>((_, rej) => setTimeout(() => rej(new Error("timeout")), 6000))]);
+        // JSON round-trip → objek polos (mis. Timestamp Firestore) agar aman dikirim ke client
+        const plain: RawVideo[] = JSON.parse(JSON.stringify(Array.isArray(data) ? data : []));
+        cache = { at: Date.now(), data: plain };
+        return plain;
+    } catch (e) {
+        console.error("SSR video gagal, fallback ke fetch di browser:", e);
+        return cache?.data ?? null;
+    }
+}
+
+const ytOf = (v: RawVideo) => extractYoutubeId(v.linkPelatihan ?? "");
+const thumbOf = (id: string) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+
+/** Tanggal unggah (wajib untuk rich result VideoObject) — dicoba beberapa nama field. */
+const uploadDateOf = (v: RawVideo): string | undefined => {
+    for (const k of ["createdAt", "created_at", "CreatedAt", "tanggalUpload", "updatedAt"]) {
+        const x = v[k];
+        if (!x) continue;
+        const d = typeof x === "object" && "seconds" in x ? new Date(x.seconds * 1000) : new Date(x);
+        if (!isNaN(d.getTime())) return d.toISOString();
+    }
+    return undefined;
 };
 
-const ALL = "Semua";
-const PAGE_SIZE = 9;
-const QUERY_PARAM = "v";
+/* ============================ METADATA ============================ */
 
-const toVideoItem = (raw: unknown): VideoItem => {
-    const v = (raw ?? {}) as Record<string, any>;
-    const nama = v.namaPelatihan ?? "Video pelatihan";
-    const program = v.programPelatihan || v.jenisProgramPelatihan || "Umum";
-    const penyelenggara = v.penyelenggara ?? "";
-    const description = v.descriptionVideo ?? "";
+const BASE_META: Metadata = {
+    metadataBase: new URL(SITE),
+    title: TITLE,
+    description: DESCRIPTION,
+    applicationName: "E-LAUT",
+    category: "education",
+    keywords: [
+        "video pelatihan gratis",
+        "video pelatihan perikanan",
+        "video pelatihan kelautan",
+        "pelatihan online KKP",
+        "belajar budidaya ikan",
+        "video budidaya udang",
+        "video budidaya lele",
+        "pelatihan pengolahan ikan",
+        "pelatihan penangkapan ikan",
+        "kursus perikanan gratis",
+        "e-learning perikanan",
+        "pelatihan gratis KKP",
+        "BPPSDM KP",
+        "E-LAUT KKP",
+        "Kementerian Kelautan dan Perikanan",
+    ],
+    authors: [{ name: "BPPSDM KP – Kementerian Kelautan dan Perikanan", url: SITE }],
+    creator: "BPPSDM KP",
+    publisher: "Kementerian Kelautan dan Perikanan Republik Indonesia",
+    alternates: { canonical: PAGE_PATH, languages: { "id-ID": PAGE_PATH } },
+    robots: {
+        index: true,
+        follow: true,
+        googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
+    },
+    formatDetection: { telephone: false, email: false, address: false },
+    openGraph: {
+        title: TITLE,
+        description: DESCRIPTION,
+        url: PAGE_URL,
+        type: "website",
+        siteName: "E-LAUT – Elektronik Layanan Pelatihan Utama Terpadu",
+        locale: "id_ID",
+        images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "Video Pelatihan Gratis Kelautan dan Perikanan – E-LAUT" }],
+    },
+    twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION, images: [OG_IMAGE] },
+};
+
+type SP = { v?: string };
+
+/** Tautan `?v=<id>` → judul, deskripsi & gambar mengikuti video (pratinjau saat dibagikan). */
+export async function generateMetadata({ searchParams }: { searchParams?: SP | Promise<SP> }): Promise<Metadata> {
+    const sp = (await searchParams) ?? {};
+    if (!sp.v) return BASE_META;
+    const video = (await loadVideos())?.find((x) => ytOf(x) === sp.v);
+    if (!video) return BASE_META;
+
+    const name = video.namaPelatihan ?? "Video pelatihan";
+    const desc = (video.descriptionVideo || `Tonton video pelatihan "${name}" secara gratis di E-LAUT KKP.`).slice(0, 160);
+    const img = thumbOf(sp.v);
     return {
-        id: v.id,
-        ytId: extractYoutubeId(v.linkPelatihan ?? ""),
-        nama,
-        program,
-        penyelenggara,
-        description,
-        searchText: [nama, program, v.jenisProgramPelatihan, penyelenggara, description]
-            .filter(Boolean)
-            .join(" ")
-            .toLowerCase(),
-        raw: raw as RawVideo,
+        ...BASE_META,
+        title: `${name} – Video Pelatihan Gratis | E-LAUT KKP`,
+        description: desc,
+        // canonical tetap ke halaman koleksi agar tidak dianggap konten duplikat
+        openGraph: { ...BASE_META.openGraph, type: "video.other", title: name, description: desc, url: `${PAGE_URL}?v=${sp.v}`, images: [{ url: img, width: 480, height: 360, alt: name }], videos: [{ url: `https://www.youtube.com/embed/${sp.v}` }] },
+        twitter: { card: "summary_large_image", title: name, description: desc, images: [img] },
     };
-};
-
-/** Keeps `?v=<youtube id>` in the URL so an open video can be shared. */
-const setVideoParam = (ytId: string | null) => {
-    const url = new URL(window.location.href);
-    if (ytId) url.searchParams.set(QUERY_PARAM, ytId);
-    else url.searchParams.delete(QUERY_PARAM);
-    window.history.replaceState(null, "", url);
-};
-
-/* ------------------------------------------------------------------ */
-/*  Data hook                                                           */
-/* ------------------------------------------------------------------ */
-function useVideos() {
-    const [videos, setVideos] = React.useState<VideoItem[]>([]);
-    const [status, setStatus] = React.useState<"loading" | "ready" | "error">("loading");
-    const requestId = React.useRef(0);
-
-    const load = React.useCallback(async () => {
-        const id = ++requestId.current;
-        setStatus("loading");
-        try {
-            const data = await getAllVideoPelatihans();
-            if (id !== requestId.current) return;
-            const list = (Array.isArray(data) ? data : []).map(toVideoItem).filter((v) => v.ytId);
-            setVideos(list.reverse());
-            setStatus("ready");
-        } catch (error) {
-            if (id !== requestId.current) return;
-            console.error(error);
-            setStatus("error");
-        }
-    }, []);
-
-    React.useEffect(() => {
-        load();
-        return () => {
-            requestId.current++;
-        };
-    }, [load]);
-
-    return { videos, status, reload: load };
 }
 
-/* ------------------------------------------------------------------ */
-/*  Player modal                                                        */
-/* ------------------------------------------------------------------ */
-function VideoModal({ video, onClose }: { video: VideoItem; onClose: () => void }) {
-    const [copied, setCopied] = React.useState(false);
+/* ============================ FAQ (tampil + rich result) ============================ */
 
-    React.useEffect(() => {
-        const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-        const prev = document.body.style.overflow;
-        document.body.style.overflow = "hidden";
-        window.addEventListener("keydown", onKey);
-        return () => {
-            document.body.style.overflow = prev;
-            window.removeEventListener("keydown", onKey);
-        };
-    }, [onClose]);
+const FAQ = [
+    { q: "Apakah video pelatihan di E-LAUT benar-benar gratis?", a: "Ya. Seluruh video pelatihan di E-LAUT dapat ditonton gratis tanpa perlu login atau mendaftar." },
+    {
+        q: "Materi apa saja yang tersedia?",
+        a: "Tersedia materi budidaya ikan dan udang, pengolahan dan pemasaran hasil perikanan, penangkapan ikan, mesin perikanan, konservasi, kepelautan, hingga kewirausahaan sektor kelautan dan perikanan.",
+    },
+    { q: "Siapa penyelenggara video pelatihan ini?", a: "Video disusun oleh Pusat Pelatihan dan Balai Pelatihan di bawah BPPSDM Kementerian Kelautan dan Perikanan bersama instruktur profesional." },
+    {
+        q: "Apakah menonton video mendapatkan sertifikat?",
+        a: "Video bersifat pembelajaran mandiri. Untuk memperoleh sertifikat (STTPL), daftar dan ikuti pelatihan resmi melalui E-LAUT hingga dinyatakan lulus.",
+    },
+    { q: "Bagaimana cara membagikan video ke teman?", a: "Buka video lalu klik tombol “Bagikan”. Tautan yang dibagikan akan langsung membuka video tersebut di E-LAUT." },
+];
 
-    const share = async () => {
-        const url = window.location.href; // already contains ?v=<id>
-        try {
-            if (navigator.share) {
-                await navigator.share({ title: video.nama, text: `Tonton "${video.nama}" di E-LAUT`, url });
-                return;
-            }
-            await navigator.clipboard.writeText(url);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-        } catch {
-            /* share sheet dismissed or clipboard blocked */
-        }
+/* ============================ PAGE ============================ */
+
+export default async function VideoPelatihanPage() {
+    const videos = await loadVideos();
+    const list = (videos ?? []).filter((v) => ytOf(v)).slice().reverse(); // terbaru dulu
+
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "CollectionPage",
+                "@id": `${PAGE_URL}#webpage`,
+                url: PAGE_URL,
+                name: TITLE,
+                description: DESCRIPTION,
+                inLanguage: "id-ID",
+                isPartOf: { "@type": "WebSite", name: "E-LAUT", url: SITE },
+                breadcrumb: { "@id": `${PAGE_URL}#breadcrumb` },
+                mainEntity: { "@id": `${PAGE_URL}#videos` },
+                publisher: {
+                    "@type": "GovernmentOrganization",
+                    name: "BPPSDM Kementerian Kelautan dan Perikanan",
+                    url: SITE,
+                    parentOrganization: { "@type": "GovernmentOrganization", name: "Kementerian Kelautan dan Perikanan Republik Indonesia", url: "https://kkp.go.id" },
+                },
+            },
+            {
+                "@type": "BreadcrumbList",
+                "@id": `${PAGE_URL}#breadcrumb`,
+                itemListElement: [
+                    { "@type": "ListItem", position: 1, name: "Beranda", item: SITE },
+                    { "@type": "ListItem", position: 2, name: "Video Pelatihan Gratis", item: PAGE_URL },
+                ],
+            },
+            {
+                "@type": "ItemList",
+                "@id": `${PAGE_URL}#videos`,
+                name: "Video Pelatihan Gratis Kelautan dan Perikanan",
+                numberOfItems: list.length,
+                itemListElement: list.slice(0, 50).map((v, i) => {
+                    const id = ytOf(v);
+                    const uploadDate = uploadDateOf(v);
+                    return {
+                        "@type": "ListItem",
+                        position: i + 1,
+                        url: `${PAGE_URL}?v=${id}`,
+                        item: {
+                            "@type": "VideoObject",
+                            name: v.namaPelatihan ?? "Video pelatihan",
+                            description: v.descriptionVideo || `Video pelatihan ${v.programPelatihan || "kelautan dan perikanan"} oleh ${v.penyelenggara || "BPPSDM KP"}.`,
+                            thumbnailUrl: [thumbOf(id)],
+                            ...(uploadDate ? { uploadDate } : {}),
+                            embedUrl: `https://www.youtube.com/embed/${id}`,
+                            contentUrl: `https://www.youtube.com/watch?v=${id}`,
+                            inLanguage: "id-ID",
+                            isAccessibleForFree: true,
+                            genre: v.programPelatihan || v.jenisProgramPelatihan || undefined,
+                            ...(v.penyelenggara ? { creator: { "@type": "Organization", name: v.penyelenggara } } : {}),
+                        },
+                    };
+                }),
+            },
+            {
+                "@type": "FAQPage",
+                mainEntity: FAQ.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+            },
+        ],
     };
 
     return (
-        <motion.div
-            role="dialog"
-            aria-modal="true"
-            aria-label={video.nama}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            onClick={onClose}
-            className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-        >
-            <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
-            <motion.div
-                initial={{ opacity: 0, scale: 0.9, y: 30 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: 30 }}
-                transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
-                onClick={(e) => e.stopPropagation()}
-                className="relative z-10 max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-3xl border border-white/10 bg-[#050d1a] shadow-2xl shadow-blue-500/20"
-            >
-                <button
-                    type="button"
-                    onClick={onClose}
-                    aria-label="Tutup video"
-                    className="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-black/40 text-white backdrop-blur-sm transition-all hover:scale-110 hover:bg-red-500/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
-                >
-                    <X className="h-4 w-4" />
-                </button>
+        <>
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
 
-                <div className="aspect-video w-full bg-black">
-                    <iframe
-                        src={`https://www.youtube.com/embed/${video.ytId}?autoplay=1&rel=0&modestbranding=1`}
-                        allow="accelerometer; autoplay; encrypted-media; picture-in-picture"
-                        allowFullScreen
-                        className="h-full w-full"
-                        title={video.nama}
-                    />
-                </div>
+            <VideoGratisClient initialVideos={videos} />
 
-                <div className="flex flex-col gap-4 border-t border-white/5 bg-[#020617]/50 px-6 py-5 md:flex-row md:items-center md:justify-between md:px-8">
-                    <div className="flex min-w-0 items-start gap-4">
-                        <span className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-500/30 bg-red-600/20 md:mt-0">
-                            <Youtube className="h-5 w-5 text-red-400" aria-hidden="true" />
-                        </span>
-                        <div className="min-w-0">
-                            <h3 className="font-calsans text-base text-white md:text-lg">{video.nama}</h3>
-                            {video.description && (
-                                <p className="mt-1 max-w-2xl text-sm leading-relaxed text-gray-400">{video.description}</p>
-                            )}
-                            <div className="mt-3 flex flex-wrap gap-2">
-                                <span className="rounded-md border border-blue-500/20 bg-blue-500/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-300">
-                                    {video.program}
-                                </span>
-                                {video.penyelenggara && (
-                                    <span className="rounded-md border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gray-300">
-                                        {video.penyelenggara}
-                                    </span>
-                                )}
-                            </div>
-                        </div>
+            {/* Konten teks untuk SEO (tetap berguna bagi pengunjung) */}
+            <section aria-labelledby="faq-video" className="relative bg-[#020617] font-jakarta text-white">
+                <div className="mx-auto max-w-7xl px-4 pb-20 space-y-5">
+                    <div>
+                        <h2 id="faq-video" className="text-xl md:text-2xl font-calsans">Belajar perikanan & kelautan gratis lewat video</h2>
+                        <p className="mt-1 max-w-3xl text-sm text-slate-400 leading-relaxed">
+                            E-LAUT menghadirkan koleksi video pelatihan resmi Kementerian Kelautan dan Perikanan untuk nelayan, pembudidaya, pengolah, pelajar, dan masyarakat umum.
+                            Pelajari teknik budidaya, pengolahan hasil perikanan, penangkapan, hingga kewirausahaan — kapan saja dan dari mana saja.
+                        </p>
                     </div>
-
-                    <div className="flex shrink-0 gap-2">
-                        <a
-                            href={`https://youtu.be/${video.ytId}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-white/5 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-white/15 md:flex-none"
-                        >
-                            <ExternalLink className="h-4 w-4" aria-hidden="true" />
-                            YouTube
-                        </a>
-                        <button
-                            type="button"
-                            onClick={share}
-                            className={cn(
-                                "inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white transition-colors md:flex-none",
-                                copied ? "bg-emerald-600" : "bg-blue-600 hover:bg-blue-500"
-                            )}
-                        >
-                            {copied ? <Check className="h-4 w-4" aria-hidden="true" /> : <Share2 className="h-4 w-4" aria-hidden="true" />}
-                            {copied ? "Tautan disalin" : "Bagikan"}
-                        </button>
+                    <div className="grid gap-2.5 md:grid-cols-2">
+                        {FAQ.map((f, i) => (
+                            <details key={f.q} open={i === 0} className="group rounded-2xl bg-white/[0.04] ring-1 ring-white/10 open:bg-white/[0.06] open:ring-white/20 transition-colors">
+                                <summary className="flex cursor-pointer list-none items-start justify-between gap-3 px-5 py-4 [&::-webkit-details-marker]:hidden">
+                                    <h3 className="text-sm font-bold leading-snug">{f.q}</h3>
+                                    <ChevronDown className="w-4 h-4 mt-0.5 shrink-0 text-slate-400 transition-transform group-open:rotate-180" />
+                                </summary>
+                                <p className="px-5 pb-4 -mt-1 text-sm text-slate-400 leading-relaxed">{f.a}</p>
+                            </details>
+                        ))}
                     </div>
                 </div>
-            </motion.div>
-        </motion.div>
-    );
-}
-
-function GridSkeleton() {
-    return (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3" aria-busy="true" aria-label="Memuat video">
-            {Array.from({ length: 6 }, (_, i) => (
-                <div key={i} className="relative aspect-video min-h-[300px] w-full overflow-hidden rounded-[2rem] border border-white/5 bg-[#1e293b]/40">
-                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-                    <div className="absolute inset-x-0 bottom-0 space-y-4 p-6">
-                        <div className="h-6 w-3/4 rounded-lg bg-white/10" />
-                        <div className="h-4 w-full rounded-lg bg-white/10" />
-                        <div className="h-4 w-1/2 rounded-lg bg-white/10" />
-                    </div>
-                </div>
-            ))}
-        </div>
-    );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Page                                                                */
-/* ------------------------------------------------------------------ */
-export default function VideoGratisPage() {
-    const reduceMotion = useReducedMotion();
-    const searchRef = React.useRef<HTMLInputElement>(null);
-    const { videos, status, reload } = useVideos();
-
-    const [query, setQuery] = React.useState("");
-    const [category, setCategory] = React.useState(ALL);
-    const [visible, setVisible] = React.useState(PAGE_SIZE);
-    const [active, setActive] = React.useState<VideoItem | null>(null);
-
-    /* Parallax: hero fades & shrinks, background glow drifts. */
-    const { scrollYProgress } = useScroll();
-    const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, reduceMotion ? 1 : 0]);
-    const heroScale = useTransform(scrollYProgress, [0, 0.3], [1, reduceMotion ? 1 : 0.92]);
-    const glowY = useTransform(scrollYProgress, [0, 1], ["0%", reduceMotion ? "0%" : "-30%"]);
-
-    /* Filtering */
-    const categories = React.useMemo(
-        () => [ALL, ...Array.from(new Set(videos.map((v) => v.program))).sort()],
-        [videos]
-    );
-    const filtered = React.useMemo(() => {
-        const q = query.trim().toLowerCase();
-        return videos.filter(
-            (v) => (category === ALL || v.program === category) && (!q || v.searchText.includes(q))
-        );
-    }, [videos, query, category]);
-    const shown = filtered.slice(0, visible);
-    const isFiltering = query.trim() !== "" || category !== ALL;
-
-    React.useEffect(() => setVisible(PAGE_SIZE), [query, category]);
-
-    /* Open the video from a shared link (?v=<id>) once the list has loaded. */
-    React.useEffect(() => {
-        if (status !== "ready") return;
-        const ytId = new URLSearchParams(window.location.search).get(QUERY_PARAM);
-        const match = ytId && videos.find((v) => v.ytId === ytId);
-        if (match) setActive(match);
-    }, [status, videos]);
-
-    /* "/" focuses search, like many modern sites. */
-    React.useEffect(() => {
-        const onKey = (e: KeyboardEvent) => {
-            const typing = (e.target as HTMLElement)?.closest("input, textarea");
-            if (e.key === "/" && !typing && !active) {
-                e.preventDefault();
-                searchRef.current?.focus();
-            }
-        };
-        window.addEventListener("keydown", onKey);
-        return () => window.removeEventListener("keydown", onKey);
-    }, [active]);
-
-    const openVideo = (video: VideoItem) => {
-        setActive(video);
-        setVideoParam(video.ytId);
-        incrementVideoClick(video.id).catch(() => { });
-    };
-    const closeVideo = React.useCallback(() => {
-        setActive(null);
-        setVideoParam(null);
-    }, []);
-
-    const resetFilters = () => {
-        setQuery("");
-        setCategory(ALL);
-    };
-
-    return (
-        <section className="flex min-h-screen flex-col overflow-x-hidden bg-[#020617] pt-16 font-jakarta text-white selection:bg-blue-500/30">
-            {/* Background with parallax glow */}
-            <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
-                <motion.div style={{ y: glowY }} className="absolute inset-0">
-                    <div className="absolute left-[-10%] top-[-20%] h-[60%] w-[60%] rounded-full bg-blue-600/15 blur-[140px]" />
-                    <div className="absolute bottom-[-10%] right-[-10%] h-[50%] w-[50%] rounded-full bg-indigo-600/15 blur-[140px]" />
-                    <div className="absolute right-0 top-[30%] h-[40%] w-[40%] rounded-full bg-cyan-600/10 blur-[110px]" />
-                </motion.div>
-                <div className="absolute inset-0 opacity-[0.05] [background-image:linear-gradient(white_1px,transparent_1px),linear-gradient(90deg,white_1px,transparent_1px)] [background-size:56px_56px] [mask-image:radial-gradient(ellipse_at_top,black_20%,transparent_70%)]" />
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-15 contrast-150" />
-            </div>
-
-            <main className="relative z-10 mt-8 flex flex-1 flex-col">
-                {/* Hero */}
-                <motion.header
-                    style={{ opacity: heroOpacity, scale: heroScale }}
-                    initial="hidden"
-                    animate="show"
-                    variants={{ show: { transition: { staggerChildren: 0.1 } } }}
-                    className="mx-auto max-w-6xl space-y-5 px-4 pb-6 pt-16 text-center md:px-8"
-                >
-                    <motion.span
-                        variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
-                        className="inline-flex items-center gap-2 rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-[10px] font-bold uppercase leading-none tracking-[0.2em] text-blue-400"
-                    >
-                        <Youtube className="h-3.5 w-3.5" aria-hidden="true" />
-                        Edukasi E-LAUT
-                    </motion.span>
-                    <motion.h1
-                        variants={{ hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0 } }}
-                        className="font-calsans text-3xl leading-[1] tracking-tight md:text-5xl lg:text-6xl"
-                    >
-                        Koleksi Video
-                        <br />
-                        <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-indigo-400 bg-clip-text text-transparent">
-                            Pelatihan Gratis
-                        </span>
-                    </motion.h1>
-                    <motion.p
-                        variants={{ hidden: { opacity: 0 }, show: { opacity: 1 } }}
-                        className="mx-auto max-w-xl text-xs font-light leading-relaxed text-gray-400 md:text-sm"
-                    >
-                        Akses modul video pembelajaran secara gratis. Tingkatkan keahlian Kelautan dan Perikanan Anda dari
-                        mana saja bersama instruktur profesional.
-                    </motion.p>
-                </motion.header>
-
-                {/* Search + category filter (sticky while browsing) */}
-                <div className="sticky top-16 z-20 mx-auto mb-10 mt-6 w-full max-w-7xl px-4 md:px-8">
-                    <motion.div
-                        initial={{ opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.35 }}
-                        className="space-y-3 rounded-3xl border border-white/10 bg-[#0b1324]/80 p-3 shadow-2xl backdrop-blur-xl"
-                    >
-                        <label className="flex items-center rounded-2xl bg-white/5 px-3 transition focus-within:bg-white/10 focus-within:ring-2 focus-within:ring-blue-500/40">
-                            <Search className="h-5 w-5 shrink-0 text-gray-400" aria-hidden="true" />
-                            <span className="sr-only">Cari video</span>
-                            <input
-                                ref={searchRef}
-                                type="search"
-                                value={query}
-                                onChange={(e) => setQuery(e.target.value)}
-                                placeholder="Cari kelas, teknik budidaya, atau penyelenggara…"
-                                className="w-full bg-transparent px-3 py-3 text-sm text-white outline-none border-none placeholder:text-gray-500 [&::-webkit-search-cancel-button]:hidden"
-                            />
-                            {query ? (
-                                <button
-                                    type="button"
-                                    onClick={() => setQuery("")}
-                                    aria-label="Hapus pencarian"
-                                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-gray-400 hover:bg-white/10 hover:text-white"
-                                >
-                                    <X className="h-4 w-4" />
-                                </button>
-                            ) : (
-                                <kbd className="hidden shrink-0 rounded-md border border-white/15 px-1.5 py-0.5 font-mono text-[11px] text-gray-400 md:block">
-                                    /
-                                </kbd>
-                            )}
-                        </label>
-
-                        {categories.length > 2 && (
-                            <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none]" role="tablist" aria-label="Kategori program">
-                                {categories.map((c) => (
-                                    <button
-                                        key={c}
-                                        type="button"
-                                        role="tab"
-                                        aria-selected={category === c}
-                                        onClick={() => setCategory(c)}
-                                        className={cn(
-                                            "shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all",
-                                            category === c
-                                                ? "border-blue-400/60 bg-blue-600 text-white shadow-lg shadow-blue-600/30"
-                                                : "border-white/10 bg-white/5 text-gray-300 hover:border-white/25 hover:text-white"
-                                        )}
-                                    >
-                                        {c}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </motion.div>
-                </div>
-
-                {/* Results */}
-                <div className="mx-auto w-full max-w-7xl px-4 pb-24 md:px-8">
-                    {status === "ready" && (
-                        <div className="mb-5 flex flex-wrap items-center justify-between gap-2 text-sm text-gray-400" aria-live="polite">
-                            <p>
-                                <span className="font-semibold text-white">{filtered.length}</span> video
-                                {isFiltering && " ditemukan"}
-                            </p>
-                            {isFiltering && (
-                                <button type="button" onClick={resetFilters} className="text-blue-300 underline-offset-4 hover:underline">
-                                    Reset filter
-                                </button>
-                            )}
-                        </div>
-                    )}
-
-                    {status === "loading" && <GridSkeleton />}
-
-                    {status === "error" && (
-                        <div className="flex flex-col items-center gap-4 rounded-3xl border border-white/10 bg-white/5 py-20 text-center">
-                            <p className="text-gray-300">Video gagal dimuat. Periksa koneksi lalu coba lagi.</p>
-                            <button
-                                type="button"
-                                onClick={reload}
-                                className="rounded-full bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
-                            >
-                                Coba lagi
-                            </button>
-                        </div>
-                    )}
-
-                    {status === "ready" && filtered.length === 0 && (
-                        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-white/10 bg-white/5 px-6 py-20 text-center text-gray-400">
-                            <Youtube className="mb-4 h-12 w-12 opacity-50" aria-hidden="true" />
-                            <p className="text-lg text-gray-300">
-                                {videos.length === 0 ? "Belum ada video pelatihan." : "Tidak ada video yang sesuai."}
-                            </p>
-                            {isFiltering && (
-                                <button
-                                    type="button"
-                                    onClick={resetFilters}
-                                    className="mt-4 rounded-full border border-white/15 px-5 py-2 text-sm text-white transition-colors hover:bg-white/10"
-                                >
-                                    Tampilkan semua video
-                                </button>
-                            )}
-                        </div>
-                    )}
-
-                    {status === "ready" && shown.length > 0 && (
-                        <>
-                            <motion.div layout={!reduceMotion} className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                                <AnimatePresence mode="popLayout">
-                                    {shown.map((video, i) => (
-                                        <motion.div
-                                            key={String(video.id)}
-                                            layout={!reduceMotion}
-                                            initial={{ opacity: 0, y: 30 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, scale: 0.95 }}
-                                            // Cap the stagger so long lists don't wait seconds for the last card.
-                                            transition={{ duration: 0.4, delay: Math.min(i % PAGE_SIZE, 6) * 0.06 }}
-                                        >
-                                            <VideoCard video={video.raw} onClick={() => openVideo(video)} />
-                                        </motion.div>
-                                    ))}
-                                </AnimatePresence>
-                            </motion.div>
-
-                            {filtered.length > shown.length && (
-                                <div className="mt-10 flex flex-col items-center gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => setVisible((n) => n + PAGE_SIZE)}
-                                        className="rounded-full border border-blue-500/30 bg-white/5 px-8 py-3 text-sm font-semibold text-blue-300 transition-all hover:border-transparent hover:bg-blue-600 hover:text-white"
-                                    >
-                                        Muat lebih banyak
-                                    </button>
-                                    <p className="text-xs text-gray-500">
-                                        {shown.length} dari {filtered.length} video
-                                    </p>
-                                </div>
-                            )}
-                        </>
-                    )}
-                </div>
-            </main>
+            </section>
 
             <Footer />
-
-            <AnimatePresence>{active && <VideoModal video={active} onClose={closeVideo} />}</AnimatePresence>
-        </section>
+        </>
     );
 }

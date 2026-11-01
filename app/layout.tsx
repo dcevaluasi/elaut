@@ -199,7 +199,7 @@ export default function RootLayout({
       </head>
       <body
         suppressHydrationWarning={true}
-        className={`${inter.className} ${myFont.variable} ${bosNormal.variable} ${plusSansJakarta.variable} ${tuwir.variable} ${delius.variable} ${bos.variable} ${bosBold.variable}  ${bosItalic.variable} ${cambria.variable} antialiased bg-[#020617] text-white tracking-tight `}
+        className={`${inter.className} ${myFont.variable} ${bosNormal.variable} ${plusSansJakarta.variable} ${tuwir.variable} ${delius.variable} ${bos.variable} ${bosBold.variable}  ${bosItalic.variable} ${cambria.variable} antialiased  bg-[#020617] text-white tracking-tight `}
       >
         <LanguageProvider>
           <div className="flex flex-col overflow-hidden supports-[overflow:clip]:overflow-clip relative">

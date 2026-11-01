@@ -4,7 +4,6 @@ import React from "react";
 import axios, { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
 import { User } from "@/types/user";
-import UserService from "@/components/user-service";
 import Footer from "@/components/ui/footer";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -76,7 +75,6 @@ export default function Page() {
             </div>
           </div>
         </div>
-        <UserService user={userDetail} />
       </section>
       <Footer />
     </>

@@ -161,7 +161,7 @@ export default function MapSection({ p2mkpList, loading }: { p2mkpList: P2MKP[];
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Cari nama, kota, bidang…"
-                className="w-full bg-transparent px-2.5 py-3 text-sm text-white outline-none placeholder:text-gray-500 [&::-webkit-search-cancel-button]:hidden"
+                className="w-full border-none bg-transparent px-2.5 py-3 text-sm text-white outline-none placeholder:text-gray-500 [&::-webkit-search-cancel-button]:hidden"
               />
               {query && (
                 <button type="button" onClick={() => setQuery("")} aria-label="Hapus pencarian" className="text-gray-400 hover:text-white">

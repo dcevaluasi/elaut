@@ -243,7 +243,7 @@ export default function FaqSection() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Cari pertanyaan, mis. “dokumen”, “klasifikasi”…"
-            className="w-full bg-transparent px-3 py-3.5 text-sm text-white outline-none placeholder:text-gray-500 [&::-webkit-search-cancel-button]:hidden"
+            className="w-full bg-transparent border-none px-3 py-3.5 text-sm text-white outline-none placeholder:text-gray-500 [&::-webkit-search-cancel-button]:hidden"
           />
           {query && (
             <button
