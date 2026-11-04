@@ -24,13 +24,15 @@ interface ImportPesertaActionProps {
 
 /* ===================== VALIDASI ===================== */
 
-type FieldKey = "nik" | "nama" | "tanggalLahir" | "alamat" | "provinsi" | "kabupaten" | "noTelpon";
+type FieldKey = "nik" | "nama" | "tanggalLahir" | "jenisKelamin" | "pendidikan" | "alamat" | "provinsi" | "kabupaten" | "noTelpon";
 
 // Alias nama kolom header excel (dinormalisasi: lowercase, tanpa spasi/simbol)
 const COLUMN_ALIASES: Record<FieldKey, string[]> = {
     nik: ["nik", "noktp", "nomorktp", "nomorinduk", "nomorindukkependudukan"],
     nama: ["nama", "namalengkap", "namapeserta"],
     tanggalLahir: ["tanggallahir", "tgllahir", "tanggallahirddmmmmyyyy"],
+    jenisKelamin: ["jeniskelamin", "jk", "kelamin", "gender", "jeniskelaminlp"],
+    pendidikan: ["pendidikanterakhir", "pendidikan", "pendterakhir", "pendidikanterakhirpeserta"],
     alamat: ["alamat", "alamatlengkap"],
     provinsi: ["provinsi", "prov"],
     kabupaten: ["kabupaten", "kabupatenkota", "kota", "kabkota", "kab"],
@@ -41,11 +43,31 @@ const FIELD_LABEL: Record<FieldKey, string> = {
     nik: "NIK",
     nama: "Nama",
     tanggalLahir: "Tanggal Lahir",
+    jenisKelamin: "Jenis Kelamin",
+    pendidikan: "Pendidikan Terakhir",
     alamat: "Alamat",
     provinsi: "Provinsi",
     kabupaten: "Kabupaten",
     noTelpon: "No Telpon",
 };
+
+/** Nilai valid Jenis Kelamin */
+const JENIS_KELAMIN = ["L", "P"];
+
+/** Nilai valid Pendidikan Terakhir (dicocokkan tanpa membedakan huruf besar/kecil & spasi) */
+const PENDIDIKAN = [
+    "SD/Sederajat",
+    "SMP/Sederajat",
+    "SMA/Sederajat",
+    "Di/Dii/DIII",
+    "DIV/S1",
+    "S2",
+    "S3",
+    "Tidak Bersekolah",
+    "Tidak Diketahui",
+];
+const normPend = (v: string) => v.toUpperCase().replace(/\s+/g, "");
+const PENDIDIKAN_SET = new Set(PENDIDIKAN.map(normPend));
 
 const BULAN = [
     "JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI",
@@ -80,7 +102,7 @@ const parseTanggalLahir = (value: string): Date | null => {
 };
 
 /** Validasi struktur NIK, return pesan error atau null */
-const validateNIK = (nik: string, tglLahir: Date | null): string | null => {
+const validateNIK = (nik: string): string | null => {
     if (!/^\d+$/.test(nik)) {
         return "NIK harus berisi angka saja (pastikan kolom NIK berformat Text di Excel)";
     }
@@ -90,19 +112,10 @@ const validateNIK = (nik: string, tglLahir: Date | null): string | null => {
 
     let dd = Number(nik.substring(6, 8));
     const mm = Number(nik.substring(8, 10));
-    const yy = Number(nik.substring(10, 12));
     if (dd > 40) dd -= 40; // perempuan: tanggal + 40
     if (dd < 1 || dd > 31 || mm < 1 || mm > 12) return "Bagian tanggal lahir pada NIK tidak valid";
     if (nik.substring(12) === "0000") return "Nomor urut NIK tidak valid";
-
-    // Cocokkan dengan tanggal lahir
-    if (tglLahir) {
-        const sama =
-            tglLahir.getDate() === dd &&
-            tglLahir.getMonth() + 1 === mm &&
-            tglLahir.getFullYear() % 100 === yy;
-        if (!sama) return "Tanggal lahir pada NIK tidak sesuai dengan kolom Tanggal Lahir";
-    }
+    // Tidak dicocokkan dengan kolom Tanggal Lahir
     return null;
 };
 
@@ -175,12 +188,22 @@ const validateExcel = async (file: File, existingNIK: string[] = []): Promise<Va
             }
         }
 
+        // Jenis kelamin: hanya L / P
+        const jk = get("jenisKelamin").toUpperCase();
+        if (!jk) messages.push("Jenis Kelamin wajib diisi");
+        else if (!JENIS_KELAMIN.includes(jk)) messages.push(`Jenis Kelamin "${get("jenisKelamin")}" tidak valid, isi L atau P`);
+
+        // Pendidikan terakhir: sesuai daftar
+        const pend = get("pendidikan");
+        if (!pend) messages.push("Pendidikan Terakhir wajib diisi");
+        else if (!PENDIDIKAN_SET.has(normPend(pend))) messages.push(`Pendidikan Terakhir "${pend}" tidak valid, pilih: ${PENDIDIKAN.join(", ")}`);
+
         // NIK
         const nik = get("nik").replace(/\s/g, "");
         if (!nik) {
             messages.push("NIK wajib diisi");
         } else {
-            const nikError = validateNIK(nik, tglLahir);
+            const nikError = validateNIK(nik);
             if (nikError) messages.push(nikError);
             if (nikSeen.has(nik)) messages.push(`NIK duplikat dengan baris ${nikSeen.get(nik)}`);
             else nikSeen.set(nik, excelRow);
@@ -357,7 +380,10 @@ const ImportPesertaAction: React.FC<ImportPesertaActionProps> = ({ idPelatihan, 
                                 <div className="min-w-0">
                                     <p className="text-[13px] font-semibold text-slate-800 dark:text-white">Template Import Peserta (.xlsx)</p>
                                     <p className="text-[11px] text-slate-500">
-                                        Kolom wajib: NIK, Nama, Tanggal Lahir (<span className="font-mono">15 APRIL 2026</span>), Alamat, Provinsi, Kabupaten, No Telpon.
+                                        Kolom wajib: NIK, Nama, Tanggal Lahir (<span className="font-mono">15 APRIL 2026</span>), Jenis Kelamin (<span className="font-mono">L/P</span>), Pendidikan Terakhir, Alamat, Provinsi, Kabupaten, No Telpon.
+                                    </p>
+                                    <p className="mt-1 text-[11px] text-slate-500">
+                                        Pendidikan Terakhir: <span className="font-medium text-slate-700 dark:text-slate-300">{PENDIDIKAN.join(" · ")}</span>
                                     </p>
                                 </div>
                                 <Link

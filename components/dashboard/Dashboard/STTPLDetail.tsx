@@ -17,7 +17,7 @@ import { PelatihanMasyarakat } from "@/types/product";
 import { generateTanggalPelatihan, getStatusInfo, splitCityAndDate } from "@/utils/text";
 import { urlFileBeritaAcara, urlFileLapwas } from "@/constants/urls";
 import { ESELON_1 } from "@/constants/nomenclatures";
-import { countUserWithCertificate, countUserWithNoStatus, countUserWithPassed } from "@/utils/counter";
+import { countUserWithCertificate } from "@/utils/counter";
 import { useFetchDataPusatById } from "@/hooks/elaut/pusat/useFetchDataPusatById";
 import { downloadAndZipPDFs } from "@/utils/file";
 import { truncateText } from "@/utils";
@@ -25,7 +25,7 @@ import Toast from "@/commons/Toast";
 import SendNoteAction from "@/commons/actions/lemdiklat/SendNoteAction";
 import { PassedParticipantAction } from "@/commons/actions/lemdiklat/PassedParticipantAction";
 import DialogSertifikatPelatihan, { DialogSertifikatHandle } from "@/components/sertifikat/dialogSertifikatPelatihan";
-import UserPelatihanTable from "./Tables/UserPelatihanTable";
+import UserPelatihanTable, { HADIR, LULUS, TIDAK_HADIR, TIDAK_LULUS, isProgramBerlulus } from "./Tables/UserPelatihanTable";
 import TTDeDetail from "./TTDeDetail";
 
 interface Props {
@@ -85,10 +85,21 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
     const ttd = data.TtdSertifikat || "";
     const id = data.IdPelatihan.toString();
 
-    const counts = useMemo(
-        () => ({ belum: countUserWithNoStatus(peserta), lulus: countUserWithPassed(peserta), cert: countUserWithCertificate(peserta) }),
-        [peserta]
-    );
+    // AKP & SJM: Lulus / Mengikuti / Tidak Lulus. Lainnya: Mengikuti / Tidak Mengikuti
+    const berlulus = isProgramBerlulus(data);
+    const L = berlulus ? { ok: "Lulus", mid: "Mengikuti", bad: "Tidak lulus", step: "Kelulusan Peserta", verb: "kelulusan" } : { ok: "Mengikuti", mid: "", bad: "Tidak mengikuti", step: "Kehadiran Peserta", verb: "kehadiran" };
+    const counts = useMemo(() => {
+        const valid = berlulus ? [LULUS, HADIR, TIDAK_LULUS] : [HADIR, TIDAK_HADIR];
+        let ok = 0, mid = 0, bad = 0, belum = 0;
+        peserta.forEach((u) => {
+            const v = u.IsActice;
+            if (!valid.includes(v)) belum++;
+            else if (berlulus ? v === LULUS : v === HADIR) ok++;
+            else if (berlulus && v === HADIR) mid++;
+            else bad++;
+        });
+        return { belum, lulus: ok, mid, bad, cert: countUserWithCertificate(peserta) };
+    }, [peserta, berlulus]);
     const total = peserta.length;
     const allPassed = total > 0 && counts.belum === 0;
     const allCertified = total > 0 && counts.cert === total;
@@ -101,14 +112,14 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
     /* ---------- Langkah ---------- */
     const steps: SttplStep[] = [
         {
-            id: 0, title: "Kelulusan Peserta", icon: TbClipboardCheck, accent: "#3B82F6",
-            subtitle: allPassed ? `${counts.lulus} peserta lulus` : `${counts.belum} peserta belum ditentukan`,
+            id: 0, title: L.step, icon: TbClipboardCheck, accent: "#3B82F6",
+            subtitle: allPassed ? `${counts.lulus} peserta ${L.ok.toLowerCase()}` : `${counts.belum} peserta belum ditentukan`,
             state: allPassed ? "done" : "active",
         },
         {
             id: 1, title: "Ajukan Penerbitan", icon: LuSignature as IconType, accent: "#8B5CF6",
-            subtitle: isSubmitted ? "Pengajuan telah dikirim" : allPassed ? "Siap diajukan ke Pusat" : "Tentukan kelulusan dulu",
-            state: isSubmitted ? "done" : allPassed ? "active" : "locked", lockReason: "Semua peserta harus ditentukan kelulusannya",
+            subtitle: isSubmitted ? "Pengajuan telah dikirim" : allPassed ? "Siap diajukan ke Pusat" : `Tentukan ${L.verb} dulu`,
+            state: isSubmitted ? "done" : allPassed ? "active" : "locked", lockReason: `Semua peserta harus ditentukan ${L.verb}nya`,
         },
         {
             id: 2, title: "Verifikasi Pusat", icon: TbShieldCheck, accent: "#06B6D4",
@@ -141,8 +152,8 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                 : isKapus && status === "8" ? "Setujui penerbitan e-STTPL."
                     : isKabadan && status === "12" ? "Setujui penerbitan e-STTPL Kepala BPPSDM KP."
                         : isAdmin && (status === "7" || status === "9") ? "Perbaiki pengajuan lalu kirim kembali ke verifikator."
-                            : isAdmin && !allPassed ? `Tentukan kelulusan ${counts.belum} peserta.`
-                                : isAdmin && allPassed && !isSubmitted ? "Kelulusan lengkap — ajukan penerbitan STTPL."
+                            : isAdmin && !allPassed ? `Tentukan ${L.verb} ${counts.belum} peserta.`
+                                : isAdmin && allPassed && !isSubmitted ? `Status ${L.verb} lengkap — ajukan penerbitan STTPL.`
                                     : null;
     const showActionBar = isAdmin || isVerifikator || isKabalai || isKapus || isKabadan;
 
@@ -341,7 +352,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                     <div className="mt-4 grid grid-cols-2 gap-2">
                         {[
                             { label: "Peserta", val: total, cls: "text-white" },
-                            { label: "Lulus", val: counts.lulus, cls: "text-emerald-300" },
+                            { label: L.ok, val: counts.lulus, cls: "text-emerald-300" },
                             { label: "Belum", val: counts.belum, cls: counts.belum ? "text-amber-300" : "text-white/60" },
                             { label: "e-STTPL", val: counts.cert, cls: "text-violet-200" },
                         ].map((m) => (
@@ -420,16 +431,18 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         {/* Bar kelulusan */}
                                         <div>
                                             <div className="flex items-baseline justify-between text-xs mb-1.5">
-                                                <span className="font-semibold text-slate-600 dark:text-slate-300">Kelulusan ditentukan</span>
+                                                <span className="font-semibold text-slate-600 dark:text-slate-300">Status {L.verb} ditentukan</span>
                                                 <span className="tabular-nums text-slate-500"><b className="text-slate-900 dark:text-white">{total - counts.belum}</b> / {total}</span>
                                             </div>
                                             <div className="h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden flex">
                                                 <div className="h-full bg-emerald-500 transition-all duration-700" style={{ width: `${total ? (counts.lulus / total) * 100 : 0}%` }} />
-                                                <div className="h-full bg-rose-400 transition-all duration-700" style={{ width: `${total ? ((total - counts.belum - counts.lulus) / total) * 100 : 0}%` }} />
+                                                {berlulus && <div className="h-full bg-teal-400 transition-all duration-700" style={{ width: `${total ? (counts.mid / total) * 100 : 0}%` }} />}
+                                                <div className="h-full bg-rose-400 transition-all duration-700" style={{ width: `${total ? (counts.bad / total) * 100 : 0}%` }} />
                                             </div>
                                             <div className="mt-1.5 flex flex-wrap gap-3 text-[11px] text-slate-500">
-                                                <Legend dot="bg-emerald-500" label={`Lulus ${counts.lulus}`} />
-                                                <Legend dot="bg-rose-400" label={`Tidak lulus ${Math.max(0, total - counts.belum - counts.lulus)}`} />
+                                                <Legend dot="bg-emerald-500" label={`${L.ok} ${counts.lulus}`} />
+                                                {berlulus && <Legend dot="bg-teal-400" label={`${L.mid} ${counts.mid}`} />}
+                                                <Legend dot="bg-rose-400" label={`${L.bad} ${counts.bad}`} />
                                                 <Legend dot="bg-slate-300" label={`Belum ${counts.belum}`} />
                                             </div>
                                         </div>
@@ -447,7 +460,7 @@ const STTPLDetail: React.FC<Props> = ({ data, fetchData }) => {
                                     <div className="space-y-3">
                                         <Checklist
                                             items={[
-                                                { label: "Semua peserta ditentukan kelulusannya", done: allPassed, onClick: () => setCurrent(0) },
+                                                { label: `Semua peserta ditentukan ${L.verb}nya`, done: allPassed, onClick: () => setCurrent(0) },
                                                 { label: "Pelaporan penyelenggaraan (stage 5)", done: status === "5" || isSubmitted },
                                             ]}
                                         />

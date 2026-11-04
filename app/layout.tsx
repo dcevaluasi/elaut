@@ -1,208 +1,140 @@
 import "./css/style.css";
 import "leaflet/dist/leaflet.css";
 
-import { Delius_Unicase, Inter, Plus_Jakarta_Sans } from "next/font/google";
-
+import type { Metadata, Viewport } from "next";
+import { Delius_Unicase, Plus_Jakarta_Sans } from "next/font/google";
 import localFont from "next/font/local";
 
 import Header from "@/components/ui/header";
+import FloatingContact from "@/components/ui/floating-contact";
+import { LanguageProvider } from "@/context/LanguageContext";
 
-const myFont = localFont({
-  src: "./font/calsans.ttf",
-  variable: "--font-calsans",
-});
+/* ============================ FONTS ============================ */
 
-const bos = localFont({
-  src: "./font/bos.ttf",
-  variable: "--font-bos",
-});
+const calsans = localFont({ src: "./font/calsans.ttf", variable: "--font-calsans", display: "swap" });
+const bos = localFont({ src: "./font/bos.ttf", variable: "--font-bos", display: "swap" });
+const bosBold = localFont({ src: "./font/bookmanoldstyle_bold.ttf", variable: "--font-bosBold", display: "swap" });
+const bosItalic = localFont({ src: "./font/bookmanoldstyle_italic.ttf", variable: "--font-bosItalic", display: "swap" });
+const bosNormal = localFont({ src: "./font/booksold.ttf", variable: "--font-bosNormal", display: "swap" });
+const cambria = localFont({ src: "./font/cambria.ttf", variable: "--font-cambria", display: "swap" });
+const tuwir = localFont({ src: "./font/Tuwir.ttf", variable: "--font-tuwir", display: "swap" });
 
-const bosBold = localFont({
-  src: "./font/bookmanoldstyle_bold.ttf",
-  variable: "--font-bosBold",
-});
+const delius = Delius_Unicase({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-delius", display: "swap" });
+// Satu instance Plus Jakarta Sans dipakai untuk kedua variabel (dulu dimuat dua kali)
+const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-plusSansJakarta", display: "swap" });
 
-const bosItalic = localFont({
-  src: "./font/bookmanoldstyle_italic.ttf",
-  variable: "--font-bosItalic",
-});
+/* ============================ METADATA ============================ */
 
-const bosNormal = localFont({
-  src: "./font/booksold.ttf",
-  variable: "--font-bosNormal",
-});
+const SITE = "https://elaut-bppsdm.kkp.go.id";
 
-const cambria = localFont({
-  src: "./font/cambria.ttf",
-  variable: "--font-cambria",
-});
-
-const tuwir = localFont({
-  src: "./font/Tuwir.ttf",
-  variable: "--font-tuwir",
-});
-
-const delius = Delius_Unicase({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-delius",
-});
-
-const inter = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
-const plusSansJakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  variable: "--font-plusSansJakarta",
-});
-
-import { Metadata, Viewport } from "next";
-
-/*
-  METADATA WEBSITE E-LAUT - OPTIMIZED FOR SEARCH ENGINES
-*/
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE),
   title: {
     default: "E-LAUT | Elektronik Layanan Pelatihan Kelautan & Perikanan Terpadu",
-    template: "%s"
+    template: "%s",
   },
   description:
     "Portal resmi E-LAUT Kementerian Kelautan dan Perikanan (KKP). Platform terpadu untuk pendaftaran pelatihan, sertifikasi kompetensi, dan pengembangan SDM Kelautan dan Perikanan di Indonesia.",
-  metadataBase: new URL("https://elaut-bppsdm.kkp.go.id"),
-  alternates: {
-    canonical: "/",
-    languages: {
-      "id-ID": "/",
-    },
-  },
+  alternates: { canonical: "/", languages: { "id-ID": "/" } },
   applicationName: "E-LAUT",
-  authors: [{ name: "BPPSDM KP - Kementerian Kelautan dan Perikanan" }],
+  authors: [{ name: "BPPSDM KP - Kementerian Kelautan dan Perikanan", url: SITE }],
+  creator: "BPPSDM KP",
+  publisher: "Kementerian Kelautan dan Perikanan Republik Indonesia",
   generator: "Next.js",
   keywords: [
-    "E-LAUT", "E-MILEA", "e-milea", "elatar", "pentaru", "e-latar", "pelaut", "elut", "Badan Penyuluah", "puslatkp", "puslat kp", "Puslat KP", "PUSLAT  KP", "Pusat Pelatihan KP", "emilea", "EMILEA", "elearning kkp", "ELAUT", "Elaut", "e-laut", "Kementerian Kelautan dan Perikanan", "KKP", "BPPSDM KP",
-    "pelatihan kelautan", "pelatihan perikanan", "sertifikasi kompetensi", "diklat perikanan",
-    "sertifikat kelautan", "BSTF", "pelatihan", "training", "waingapu", "ekonomi biru", "blu economy", "Awak Kapal Perikanan", "AKP", "P2MKP", "BPPP",
-    "pendaftaran pelatihan online", "CORPU KKP", "corpu", "Corpu", "Maritime Training Center", "training center", "layanan masyarakat KKP", "SDM Maritim", "indonesia maritime training", "budidaya", "Budi Daya", "HACCP", "SPI", "CPIB", "CBIB", "ANKAPIN", "ATKAPIN", "tegal", "Tegal", "Banyuwangi", "banyuwangi", "bitung", "Bitung", "Ambon", "BPPP Tegal", "BPPP Ambon", "BPPP Bitung", "BPPP Medan", "BPPP Banyuwangi", "BRBIH Depok", "BRBIH", "Rating", "diklat teknis kp"
+    "E-LAUT", "ELAUT", "e-laut", "E-MILEA", "emilea", "e-latar", "pentaru",
+    "Kementerian Kelautan dan Perikanan", "KKP", "BPPSDM KP", "Puslat KP", "Pusat Pelatihan KP",
+    "pelatihan kelautan", "pelatihan perikanan", "diklat perikanan", "diklat teknis KP",
+    "sertifikasi kompetensi", "sertifikat kelautan", "pendaftaran pelatihan online", "elearning KKP",
+    "Awak Kapal Perikanan", "AKP", "BSTF", "ANKAPIN", "ATKAPIN", "HACCP", "CPIB", "CBIB",
+    "P2MKP", "BPPP", "BPPP Tegal", "BPPP Ambon", "BPPP Bitung", "BPPP Medan", "BPPP Banyuwangi", "BRBIH Depok",
+    "CORPU KKP", "Maritime Training Center", "SDM Maritim", "ekonomi biru", "budidaya",
   ],
   referrer: "origin-when-cross-origin",
   robots: {
     index: true,
     follow: true,
-    nocache: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
+    // `nocache: true` dihapus — itu meminta mesin pencari tidak menyimpan cache halaman (merugikan SEO)
+    googleBot: { index: true, follow: true, "max-video-preview": -1, "max-image-preview": "large", "max-snippet": -1 },
   },
-  icons: {
-    icon: "/logo-kkp.png",
-    shortcut: "/logo-kkp.png",
-    apple: "/logo-kkp.png",
-  },
+  formatDetection: { telephone: false, email: false, address: false },
+  icons: { icon: "/logo-kkp.png", shortcut: "/logo-kkp.png", apple: "/logo-kkp.png" },
   openGraph: {
     type: "website",
     locale: "id_ID",
-    url: "https://elaut-bppsdm.kkp.go.id",
+    url: SITE,
     siteName: "E-LAUT KKP",
     title: "E-LAUT | Portal Pelatihan & Sertifikasi Resmi KKP RI",
     description: "Akses mudah layanan pelatihan dan sertifikasi kelautan dan perikanan terpadu Indonesia.",
-    images: [
-      {
-        url: "/images/hero-img6.jpg",
-        width: 1200,
-        height: 630,
-        alt: "E-LAUT - Elektronik Layanan Pelatihan Kelautan dan Perikanan Terpadu",
-      },
-    ],
+    images: [{ url: "/images/hero-img6.jpg", width: 1200, height: 630, alt: "E-LAUT - Elektronik Layanan Pelatihan Kelautan dan Perikanan Terpadu" }],
   },
   twitter: {
     card: "summary_large_image",
     site: "@kkpgoid",
     creator: "@kkpgoid",
     title: "E-LAUT | Portal Pelatihan & Sertifikasi Resmi KKP RI",
-    description: "Tingkatkan kompetensi maritim anda melalui platform elektronik terpadu E-LAUT.",
+    description: "Tingkatkan kompetensi maritim Anda melalui platform elektronik terpadu E-LAUT.",
     images: ["/images/hero-img6.jpg"],
   },
-  verification: {
-    google: "google-site-verification-id", // User should replace with actual ID if available
-  },
-  category: "Education",
+  // Isi dengan kode asli dari Google Search Console (placeholder dihapus agar tidak mengirim kode palsu)
+  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ? { verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION } } : {}),
+  category: "education",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#020617",
+  themeColor: "#F8FAFC", // light mode (warna bilah browser di HP)
+  colorScheme: "light",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
 };
 
-import { LanguageProvider } from "@/context/LanguageContext";
+/* ============================ JSON-LD ============================ */
 
-import FloatingContact from "@/components/ui/floating-contact";
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "E-LAUT KKP",
+  alternateName: "Elektronik Layanan Pelatihan Kelautan dan Perikanan Terpadu",
+  url: SITE,
+  inLanguage: "id-ID",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: `${SITE}/pelatihan?q={search_term_string}`,
+    "query-input": "required name=search_term_string",
+  },
+};
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "E-LAUT KKP",
-    "alternateName": "Elektronik Layanan Pelatihan Kelautan dan Perikanan Terpadu",
-    "url": "https://elaut-bppsdm.kkp.go.id",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://elaut-bppsdm.kkp.go.id/pelatihan?q={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
-  };
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "GovernmentOrganization",
+  name: "Badan Penyuluhan dan Pengembangan SDM Kelautan dan Perikanan (BPPSDM KP)",
+  alternateName: ["BPPSDM KP", "E-LAUT KKP"],
+  url: SITE,
+  logo: `${SITE}/logo-kkp.png`,
+  parentOrganization: { "@type": "GovernmentOrganization", name: "Kementerian Kelautan dan Perikanan Republik Indonesia", url: "https://www.kkp.go.id" },
+  contactPoint: { "@type": "ContactPoint", telephone: "+62-21-3519070", contactType: "customer service", areaServed: "ID", availableLanguage: "Indonesian" },
+  sameAs: ["https://www.facebook.com/bppsdm_puslatkp", "https://twitter.com/bppsdm_puslatkp", "https://www.instagram.com/bppsdm_puslatkp"],
+};
 
-  const organizationJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "GovernmentOrganization",
-    "name": "Kementerian Kelautan dan Perikanan RI",
-    "alternateName": "BPPSDM KP",
-    "url": "https://www.kkp.go.id",
-    "logo": "https://elaut-bppsdm.kkp.go.id/logo-kkp.png",
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "telephone": "+62-21-3519070",
-      "contactType": "customer service",
-      "areaServed": "ID",
-      "availableLanguage": "Indonesian"
-    },
-    "sameAs": [
-      "https://www.facebook.com/bppsdm_puslatkp",
-      "https://twitter.com/bppsdm_puslatkp",
-      "https://www.instagram.com/bppsdm_puslatkp"
-    ]
-  };
+const ld = (o: object) => ({ __html: JSON.stringify(o).replace(/</g, "\\u003c") });
 
+/* ============================ LAYOUT ============================ */
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id">
+    <html lang="id" className="scroll-smooth ">
       <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={ld(websiteJsonLd)} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={ld(organizationJsonLd)} />
       </head>
       <body
-        suppressHydrationWarning={true}
-        className={`${inter.className} ${myFont.variable} ${bosNormal.variable} ${plusSansJakarta.variable} ${tuwir.variable} ${delius.variable} ${bos.variable} ${bosBold.variable}  ${bosItalic.variable} ${cambria.variable} antialiased  bg-[#020617] text-white tracking-tight `}
+        suppressHydrationWarning
+        style={{ ["--font-inter" as string]: "var(--font-plusSansJakarta)" }}
+        className={`${jakarta.className} ${jakarta.variable} ${calsans.variable} ${bosNormal.variable} ${tuwir.variable} ${delius.variable} ${bos.variable} ${bosBold.variable} ${bosItalic.variable} ${cambria.variable} antialiased tracking-tight text-slate-900 selection:bg-blue-500/20 selection:text-slate-900`}
       >
         <LanguageProvider>
-          <div className="flex flex-col overflow-hidden supports-[overflow:clip]:overflow-clip relative">
+          <div className="relative flex min-h-screen flex-col overflow-hidden supports-[overflow:clip]:overflow-clip">
             <Header />
             {children}
             <FloatingContact />

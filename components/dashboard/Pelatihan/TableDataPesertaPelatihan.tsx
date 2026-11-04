@@ -450,38 +450,7 @@ const TableDataPesertaPelatihan = () => {
     }
   };
 
-  const handleReviseCertificate = async (id_pelatihan: number) => {
-    try {
-      const token = Cookies.get("XSRF091")
-      const updateData = new FormData()
-      updateData.append('IsRevisi', '1')
 
-      const response = await axios.put(
-        `${elautBaseUrl}/lemdik/UpdatePelatihan?id=${id_pelatihan}`,
-        updateData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      )
-
-      Toast.fire({
-        icon: "success",
-        title: "Yeayyy!!",
-        text: `Silahkan melakukan revisi sertifikat, notifikasi sudah dikirimkan ke pihak pusat/penandatangan!`,
-      });
-      handleFetchingPublicTrainingDataById()
-    } catch (error: any) {
-      Toast.fire({
-        icon: "error",
-        title: "Upssss!!",
-        text: `Gagal menghapus draft sertifikat!`,
-      });
-      handleFetchingPublicTrainingDataById()
-    }
-  }
   return (
     <div className="">
       <div className="flex flex-col w-full">

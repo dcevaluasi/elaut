@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 
 import Link from "next/link";
 import Logo from "./logo";
-import MobileMenu from "./mobile-menu";
 import { usePathname } from "next/navigation";
 
 import {
@@ -102,7 +101,6 @@ export default function HeaderProfile() {
             </ul>
           </nav>
 
-          <MobileMenu isTop={top} />
         </div>
       </div>
     </header>
@@ -125,16 +123,15 @@ const NavDropDown = ({
       <PopoverTrigger asChild>
         <li className="cursor-pointer">
           <div
-            className={`font-medium ${
-              !top || usePathname().includes("bppp")
+            className={`font-medium ${!top || usePathname().includes("bppp")
                 ? "text-gray-600 hover:text-gray-900 hover:scale-105"
                 : (top && usePathname().includes("pelatihan")) ||
                   usePathname().includes("sertifikasi") ||
                   usePathname().includes("cek-sertifikat") ||
                   usePathname().includes("users")
-                ? "text-gray-900 hover:text-gray-900 hover:scale-105"
-                : "text-gray-200 hover:text-white hover:scale-105"
-            }  px-5 py-3 flex items-center transition duration-150 ease-in-out`}
+                  ? "text-gray-900 hover:text-gray-900 hover:scale-105"
+                  : "text-gray-200 hover:text-white hover:scale-105"
+              }  px-5 py-3 flex items-center transition duration-150 ease-in-out`}
           >
             {name} <HiMiniChevronDown className="text-lg" />
           </div>
@@ -160,16 +157,15 @@ const NavLink = ({
     <li>
       <Link
         href={href}
-        className={`font-medium ${
-          !top || usePathname().includes("bppp")
+        className={`font-medium ${!top || usePathname().includes("bppp")
             ? "text-gray-600 hover:text-gray-900 hover:scale-105"
             : (top && usePathname().includes("pelatihan")) ||
               usePathname().includes("sertifikasi") ||
               usePathname().includes("cek-sertifikat") ||
               usePathname().includes("users")
-            ? "text-gray-900 hover:text-gray-900 hover:scale-105"
-            : "text-gray-800 hover:text-gray-900 hover:scale-105"
-        }  px-5 py-3 flex items-center transition duration-150 ease-in-out`}
+              ? "text-gray-900 hover:text-gray-900 hover:scale-105"
+              : "text-gray-800 hover:text-gray-900 hover:scale-105"
+          }  px-5 py-3 flex items-center transition duration-150 ease-in-out`}
       >
         {name}
       </Link>
@@ -190,16 +186,15 @@ const NavLinkDefault = ({
     <li>
       <Link
         href={href}
-        className={`font-medium ${
-          !top || usePathname().includes("bppp")
+        className={`font-medium ${!top || usePathname().includes("bppp")
             ? "text-gray-600 hover:text-gray-900 hover:scale-105"
             : (top && usePathname().includes("pelatihan")) ||
               usePathname().includes("sertifikasi") ||
               usePathname().includes("cek-sertifikat") ||
               usePathname().includes("users")
-            ? "text-gray-900 hover:text-gray-900 hover:scale-105"
-            : "text-gray-200 hover:text-white hover:scale-105"
-        }  px-5 py-3 flex items-center transition duration-150 ease-in-out`}
+              ? "text-gray-900 hover:text-gray-900 hover:scale-105"
+              : "text-gray-200 hover:text-white hover:scale-105"
+          }  px-5 py-3 flex items-center transition duration-150 ease-in-out`}
       >
         {name}
       </Link>

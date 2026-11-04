@@ -18,6 +18,7 @@ import Toast from "@/commons/Toast";
 import { countUserWithCertificate, countUserWithDrafCertificate, countUserWithTanggalSertifikat } from "@/utils/counter";
 import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { HADIR, LULUS } from "./Tables/UserPelatihanTable";
 
 interface Props {
     data: PelatihanMasyarakat;
@@ -39,7 +40,10 @@ const authHeader = () => ({ Authorization: `Bearer ${Cookies.get("XSRF091")}` })
 /* ============================ KOMPONEN ============================ */
 
 const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
-    const users = useMemo(() => data.UserPelatihan || [], [data.UserPelatihan]);
+    // Hanya peserta Lulus / Mengikuti yang diproses (tanggal, draft, TTDe)
+    const allUsers = useMemo(() => data.UserPelatihan || [], [data.UserPelatihan]);
+    const users = useMemo(() => allUsers.filter((u) => u.IsActice === LULUS || u.IsActice === HADIR), [allUsers]);
+    const excluded = allUsers.length - users.length;
     const total = users.length;
 
     /* ---------- Hitungan (sekali per perubahan data) ---------- */
@@ -183,20 +187,31 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
             return;
         }
         setSigning(true);
+        // Peserta target yang belum signed & belum punya draft → tidak ikut ditandatangani
+        const unsigned = users.filter((u) => !u.FileSertifikat?.includes("signed"));
+        const tanpaDraft = unsigned.filter((u) => !u.FileSertifikat).length;
+        const willComplete = total > 0 && tanpaDraft === 0;
         try {
             await axios.post(
                 `${elautBaseUrl}/lemdik/sendSertifikatTtde`,
                 { idPelatihan: data.IdPelatihan.toString(), kodeParafrase: passphrase, nik: Cookies.get("NIK") },
                 { headers: authHeader() }
             );
-            await axios.put(
-                `${elautBaseUrl}/lemdik/updatePelatihan?id=${data.IdPelatihan}`,
-                // CATATAN: StatusApproval = passphrase dipertahankan dari kode lama — sebaiknya ditinjau (menyimpan passphrase tidak aman)
-                { StatusPenerbitan: NEXT_STATUS[String(data.StatusPenerbitan)] ?? "15", StatusApproval: passphrase },
-                { headers: { ...authHeader(), "Content-Type": "multipart/form-data" } }
-            );
+            // Status hanya diubah bila jumlah signed = jumlah target; jika belum, tetap di stage sekarang
+            if (willComplete) {
+                await axios.put(
+                    `${elautBaseUrl}/lemdik/updatePelatihan?id=${data.IdPelatihan}`,
+                    // CATATAN: StatusApproval = passphrase dipertahankan dari kode lama — sebaiknya ditinjau (menyimpan passphrase tidak aman)
+                    { StatusPenerbitan: NEXT_STATUS[String(data.StatusPenerbitan)] ?? "15", StatusApproval: passphrase },
+                    { headers: { ...authHeader(), "Content-Type": "multipart/form-data" } }
+                );
+            }
             await handleAddHistoryTrainingInExisting(data, "Telah menandatangani STTPL", Cookies.get("Role"), `${Cookies.get("Nama")} - ${Cookies.get("Satker")}`);
-            Toast.fire({ icon: "success", title: "Berhasil ditandatangani", text: "e-STTPL telah ditandatangani secara elektronik." });
+            Toast.fire(
+                willComplete
+                    ? { icon: "success", title: "Berhasil ditandatangani", text: `Semua ${total} e-STTPL telah ditandatangani.` }
+                    : { icon: "info", title: "Sebagian ditandatangani", text: `${tanpaDraft} peserta belum punya draft (halaman lain). Status belum diubah — lanjutkan halaman berikutnya.` }
+            );
             setPassphrase("");
             setSignOpen(false);
             fetchData();
@@ -251,7 +266,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                 </div>
 
                 <div className="mt-5 grid grid-cols-2 lg:grid-cols-4 gap-2.5">
-                    <HeroStat icon={Hash} label="Target" value={`${total}`} sub="peserta" />
+                    <HeroStat icon={Hash} label="Target" value={`${total}`} sub={excluded ? `Lulus/Mengikuti · ${excluded} dilewati` : "Lulus/Mengikuti"} />
                     <HeroStat icon={CalendarCheck} label="Tanggal TTDe" value={hasTanggal ? `${counts.tanggal}/${total}` : "Belum"} sub={hasTanggal ? "sudah ditetapkan" : "wajib sebelum TTDe"} warn={!hasTanggal} />
                     <HeroStat icon={FileCheck} label="Draft siap" value={`${counts.draft}/${total}`} pct={total ? (counts.draft / total) * 100 : 0} accent="#F59E0B" />
                     <HeroStat icon={ShieldCheck} label="Tuntas TTDe" value={`${counts.signed}/${total}`} pct={total ? (counts.signed / total) * 100 : 0} accent="#10B981" />
@@ -395,7 +410,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 className="w-full h-11 px-3.5 rounded-xl border-none bg-slate-50 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500/30"
                             />
                             {tanggal && <p className="text-xs text-slate-500">Tercetak: <b className="text-slate-800 dark:text-white">{getDateInIndonesianFormat(tanggal)}</b></p>}
-                            <p className="text-[11px] text-slate-400">Diterapkan ke seluruh {total} peserta. Pilih sesuai hari penandatanganan digital.</p>
+                            <p className="text-[11px] text-slate-400">Diterapkan ke {total} peserta Lulus/Mengikuti. Pilih sesuai hari penandatanganan digital.</p>
                         </div>
                         {savingDate && <ProgressBar value={dateProgress} label={`Menerapkan tanggal… ${dateProgress}%`} />}
                     </div>

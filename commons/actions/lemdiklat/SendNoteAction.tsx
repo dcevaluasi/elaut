@@ -1,54 +1,18 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import {
-    LayoutGrid,
-    MessageSquareText,
-    FileUp,
-    CheckCircle2,
-    Save,
-    X,
-    Users,
-    ShieldCheck,
-    AlertCircle,
-    Info,
-    FileText,
-    ExternalLink,
-    Send
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@/lib/utils";
-import {
-    Select,
-    SelectTrigger,
-    SelectContent,
-    SelectItem,
-    SelectValue,
-} from "@/components/ui/select";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { IconType } from "react-icons";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import Toast from "@/commons/Toast";
 import { elautBaseUrl, urlFileBeritaAcara } from "@/constants/urls";
-import { IconType } from "react-icons";
 import { handleAddHistoryTrainingInExisting } from "@/firebase/firestore/services";
 import { PelatihanMasyarakat } from "@/types/product";
 import { useFetchDataPusat } from "@/hooks/elaut/pusat/useFetchDataPusat";
 import { breakdownStatus } from "@/lib/utils";
-import { generateTanggalPelatihan } from "@/utils/text";
 import { generatePelatihanMessage } from "@/utils/messages";
-import { PusatDetail } from "@/types/pusat";
+import { TbCheck, TbChevronDown, TbExternalLink, TbFileText, TbLoader2, TbMessage2, TbSend, TbShieldCheck, TbTrash, TbUpload, TbX } from "react-icons/tb";
 
 interface SendNoteActionProps {
     idPelatihan: string;
@@ -62,374 +26,223 @@ interface SendNoteActionProps {
     pelatihan: PelatihanMasyarakat;
 }
 
-const SendNoteAction: React.FC<SendNoteActionProps> = ({
-    idPelatihan,
-    title,
-    description,
-    buttonLabel,
-    icon: Icon,
-    buttonColor = "blue",
-    onSuccess,
-    status,
-    pelatihan,
-}) => {
+const TONE: Record<string, { accent: string; icon: string; btn: string }> = {
+    blue: { accent: "#3B82F6", icon: "text-blue-600", btn: "bg-[#0B1B3F] hover:bg-blue-700" },
+    teal: { accent: "#10B981", icon: "text-emerald-600", btn: "bg-emerald-600 hover:bg-emerald-700" },
+    rose: { accent: "#F43F5E", icon: "text-rose-600", btn: "bg-rose-600 hover:bg-rose-700" },
+    amber: { accent: "#F59E0B", icon: "text-amber-600", btn: "bg-amber-600 hover:bg-amber-700" },
+    neutral: { accent: "#64748B", icon: "text-slate-600", btn: "bg-slate-700 hover:bg-slate-800" },
+};
+const UPLOAD_STATUS = ["1.25", "1.5", "5", "7", "9"];
+const WA_DELAY_MS = 60_000; // jeda antar penerima (bukan setelah pesan terakhir)
+
+const SendNoteAction: React.FC<SendNoteActionProps> = ({ idPelatihan, title, description, buttonLabel, icon: Icon, buttonColor = "blue", onSuccess, status, pelatihan }) => {
+    const tone = TONE[buttonColor] || TONE.blue;
     const [isOpen, setIsOpen] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState("");
-    const [verifikatorPelaksanaan, setVerifikatorPelaksanaan] = useState(pelatihan!.VerifikatorPelatihan)
-    const [verifikatorSertifikat, setVerifikatorSertifikat] = useState(pelatihan!.VerifikatorSertifikat)
-    const [beritaAcaraFile, setBeritaAcaraFile] = useState<File | null>(null);
-    const [lapPengawasan, setLapPengawasan] = useState<File | null>(null);
-    const [isPengawas, setIsPengawas] = useState(false)
-    const oldFileUrl = pelatihan!.BeritaAcara
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files.length > 0) {
-            setBeritaAcaraFile(e.target.files[0]);
+    const [verifikatorId, setVerifikatorId] = useState(String(pelatihan?.VerifikatorPelatihan ?? ""));
+    const [file, setFile] = useState<File | null>(null);
+
+    const { adminPusatData, loading: loadingPusat, fetchAdminPusatData } = useFetchDataPusat(status);
+    useEffect(() => {
+        if (isOpen && !adminPusatData?.length) fetchAdminPusatData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen]);
+
+    const pickVerifikator = !!Cookies.get("Access")?.includes("supervisePelaksanaan") && pelatihan?.StatusPenerbitan === "1" && title === "Pilih Verifikator";
+    const showUpload = UPLOAD_STATUS.includes(String(pelatihan?.StatusPenerbitan ?? ""));
+    const needFile = title === "Ajukan Penerbitan STTPL";
+    const oldFile = pelatihan?.BeritaAcara;
+    const verifikators = (adminPusatData ?? []).filter((a) => breakdownStatus(a.Status)[0] === "Verifikator");
+    const selected = verifikators.find((a) => String(a.IdAdminPusat) === verifikatorId) || null;
+
+    const missing = [!message.trim() && "catatan", pickVerifikator && !selected && "verifikator", needFile && !file && "dokumen"].filter(Boolean) as string[];
+
+    const close = (o = false) => {
+        if (saving) return;
+        setIsOpen(o);
+        if (!o) {
+            setMessage("");
+            setFile(null);
         }
     };
-    const [isSubmitting, setIsSubmitting] = useState(false)
 
-
-    const { adminPusatData, loading: loadingPusat, error, fetchAdminPusatData } = useFetchDataPusat(status)
-
-    useEffect(() => {
-        fetchAdminPusatData()
-    }, [fetchAdminPusatData])
-
-
-    console.log({ adminPusatData })
-
-    const [response, setResponse] = React.useState<any>(null);
-
-    const [selectedVerifikator, setSelectedVerifikator] = useState<PusatDetail | null>(null)
-
-    const handleSendMessage = async (
-        pelatihan: PelatihanMasyarakat,
-        text: string,
-        statusPenerbitan?: string
-    ) => {
-        setLoading(true);
-        setResponse(null);
-
-        try {
-            let recipients: string[] = [];
-
-            if (statusPenerbitan === "1") {
-                recipients = adminPusatData
-                    .map((item) => item.NoTelpon)
-                    .filter((phone) => !!phone && phone.trim() !== "");
-            } else if (statusPenerbitan === "2") {
-                recipients = [selectedVerifikator?.NoTelpon!];
-            } else if (statusPenerbitan === "6") {
-                recipients = [verifikatorSertifikat];
-            } else {
-                recipients = [];
+    // Kirim WA di latar belakang (tidak menahan dialog)
+    const notifyWhatsapp = async () => {
+        const phones =
+            status === "1" ? (adminPusatData ?? []).map((a) => a.NoTelpon) : status === "2" ? [selected?.NoTelpon] : status === "6" ? [pelatihan?.VerifikatorSertifikat] : [];
+        const list = phones.filter((p): p is string => !!p && p.trim() !== "");
+        const text = generatePelatihanMessage(pelatihan, status);
+        for (let i = 0; i < list.length; i++) {
+            const to = list[i].includes("@s.whatsapp.net") ? list[i] : `${list[i]}@s.whatsapp.net`;
+            try {
+                await axios.post("/api/sendWhatsapp", { to, text });
+            } catch (e) {
+                console.error("WA gagal:", to, e);
             }
-
-            for (const [index, phone] of recipients.entries()) {
-                const formattedTo = phone.includes("@s.whatsapp.net")
-                    ? phone
-                    : `${phone}@s.whatsapp.net`;
-
-                const message = generatePelatihanMessage(pelatihan, statusPenerbitan!);
-
-                const res = await axios.post("/api/sendWhatsapp", {
-                    to: formattedTo,
-                    text: message,
-                });
-
-                // ⏱ Wait 5 seconds before next iteration
-                await new Promise((resolve) => setTimeout(resolve, 60000));
-            }
-
-            setResponse({ success: true, total: recipients.length });
-        } catch (error: any) {
-            console.error(error);
-            setResponse(error.response?.data || { message: "Request failed" });
-        } finally {
-            setLoading(false);
+            if (i < list.length - 1) await new Promise((r) => setTimeout(r, WA_DELAY_MS));
         }
     };
 
     const handleSubmit = async () => {
-        setIsSubmitting(true)
-        setLoading(true);
-        setIsOpen(true)
-        setLoading(true)
-        const formData = new FormData();
-        formData.append("StatusPenerbitan", status);
-        formData.append("VerifikatorPelatihan", verifikatorPelaksanaan);
-        formData.append("VerifikatorSertifikat", selectedVerifikator?.NoTelpon!);
-        if (beritaAcaraFile) formData.append("BeritaAcara", beritaAcaraFile);
-        if (lapPengawasan) formData.append("MemoPusat", lapPengawasan);
-        if (status == "4") formData.append("PemberitahuanDiterima", "Active")
+        if (missing.length) return;
+        setSaving(true);
+        const fd = new FormData();
+        fd.append("StatusPenerbitan", status);
+        fd.append("VerifikatorPelatihan", verifikatorId);
+        // dulu selalu dikirim → tertimpa "undefined" bila tidak memilih verifikator
+        if (selected?.NoTelpon) fd.append("VerifikatorSertifikat", selected.NoTelpon);
+        if (file) fd.append("BeritaAcara", file);
+        if (status === "4") fd.append("PemberitahuanDiterima", "Active");
 
         try {
-
-            const response = await axios.put(
-                `${elautBaseUrl}/lemdik/updatePelatihan?id=${idPelatihan}`,
-                formData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${Cookies.get("XSRF091")}`,
-                        "Content-Type": "multipart/form-data",
-                    },
-                }
-            );
-
-            await handleAddHistoryTrainingInExisting(
-                pelatihan,
-                message,
-                Cookies.get("Role"),
-                `${Cookies.get("Nama")} - ${Cookies.get("Satker")}`
-            );
-
-            handleSendMessage(pelatihan, message, status)
-
-            Toast.fire({
-                icon: "success",
-                title: "Berhasil!",
-                text: `${title} berhasil diproses.`,
+            await axios.put(`${elautBaseUrl}/lemdik/updatePelatihan?id=${idPelatihan}`, fd, {
+                headers: { Authorization: `Bearer ${Cookies.get("XSRF091")}`, "Content-Type": "multipart/form-data" },
             });
-
-            setMessage("");
-            setVerifikatorPelaksanaan("");
-            setSelectedVerifikator(null)
-
-            setBeritaAcaraFile(null);
-
+            await handleAddHistoryTrainingInExisting(pelatihan, message.trim(), Cookies.get("Role"), `${Cookies.get("Nama")} - ${Cookies.get("Satker")}`);
+            notifyWhatsapp();
+            Toast.fire({ icon: "success", title: "Berhasil", text: `${title} berhasil diproses.` });
+            setSaving(false);
+            close(false);
             onSuccess();
-        } catch (error) {
-            setMessage("");
-            Toast.fire({
-                icon: "error",
-                title: "Gagal!",
-                text: "Terjadi kesalahan saat memproses tindakan.",
-            });
-
-        } finally {
-            setLoading(false);
-            setIsSubmitting(false)
-            setIsOpen(false);
+        } catch (e) {
+            console.error(e);
+            setSaving(false);
+            Toast.fire({ icon: "error", title: "Gagal", text: "Terjadi kesalahan saat memproses tindakan." }); // catatan tidak dihapus
         }
     };
 
-    const colorGradients: Record<string, string> = {
-        blue: "from-blue-600 to-indigo-700",
-        teal: "from-teal-500 to-emerald-700",
-        rose: "from-rose-500 to-pink-700",
-        amber: "from-amber-500 to-orange-700",
-        neutral: "from-slate-600 to-slate-800",
-    };
-
-    const gradient = colorGradients[buttonColor] || colorGradients.blue;
-
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-                <Button
-                    variant="outline"
-                    className={cn(
-                        " h-10 flex items-center gap-2.5 rounded-xl px-4 border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm font-bold text-xs transition-all duration-300 shadow-sm",
-                        buttonColor === "blue" && "hover:border-blue-500 hover:text-blue-600",
-                        buttonColor === "teal" && "hover:border-teal-500 hover:text-teal-600",
-                        buttonColor === "rose" && "hover:border-rose-500 hover:text-rose-600",
-                        buttonColor === "amber" && "hover:border-amber-500 hover:text-amber-600",
-                        buttonColor === "neutral" && "hover:border-slate-500 hover:text-slate-600"
-                    )}
+        <>
+            <button
+                type="button"
+                onClick={() => setIsOpen(true)}
+                className="group h-9 px-3.5 rounded-xl bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 inline-flex items-center gap-1.5 shadow-sm hover:bg-slate-50 hover:ring-slate-300 dark:hover:bg-slate-800 transition-colors"
+            >
+                <Icon className={`w-4 h-4 ${tone.icon} transition-transform duration-300 group-hover:-rotate-6`} />
+                {buttonLabel}
+            </button>
+
+            <Dialog open={isOpen} onOpenChange={close}>
+                <DialogContent
+                    onInteractOutside={(e) => saving && e.preventDefault()}
+                    onEscapeKeyDown={(e) => saving && e.preventDefault()}
+                    className="w-[calc(100vw-1.5rem)] sm:w-full max-w-lg sm:max-w-lg max-h-[calc(100dvh-2rem)] p-0 gap-0 flex flex-col overflow-hidden rounded-3xl sm:rounded-3xl border-0 bg-slate-50 dark:bg-slate-950 shadow-2xl [&>button]:hidden"
                 >
-                    <div className={cn(
-                        "p-1 rounded-lg transition-colors",
-                        buttonColor === "blue" && "bg-blue-50 text-blue-500 group-hover:bg-blue-500 ",
-                        buttonColor === "teal" && "bg-teal-50 text-teal-500 group-hover:bg-teal-500 ",
-                        buttonColor === "rose" && "bg-rose-50 text-rose-500 group-hover:bg-rose-500 ",
-                        buttonColor === "amber" && "bg-amber-50 text-amber-500 group-hover:bg-amber-500 ",
-                        buttonColor === "neutral" && "bg-slate-100 text-slate-500 group-hover:bg-slate-500 "
-                    )}>
-                        <Icon className="h-3.5 w-3.5" />
+                    {/* Header */}
+                    <div className="relative isolate shrink-0 overflow-hidden bg-[#0B1B3F] text-white px-5 py-5">
+                        <div className="absolute inset-0 -z-10 opacity-80" style={{ background: `radial-gradient(70% 120% at 0% 0%, #2563EB 0%, transparent 60%), radial-gradient(50% 120% at 100% 100%, ${tone.accent} 0%, transparent 60%)` }} />
+                        <div className="absolute inset-0 -z-10 opacity-[0.12] [background-image:radial-gradient(rgba(255,255,255,0.8)_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(to_left,black,transparent_70%)]" />
+                        <Icon aria-hidden className="pointer-events-none absolute -right-5 -bottom-7 -z-10 w-32 h-32 -rotate-12 opacity-20" style={{ color: tone.accent }} />
+                        <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-sky-200/90 font-mono">{pelatihan?.KodePelatihan}</p>
+                                <DialogTitle className="mt-1 text-base md:text-lg font-black text-white leading-snug">{title}</DialogTitle>
+                                <DialogDescription className="text-xs text-blue-100/70">{description}</DialogDescription>
+                            </div>
+                            <button type="button" onClick={() => close(false)} disabled={saving} aria-label="Tutup" className="h-9 w-9 shrink-0 rounded-xl bg-white/10 ring-1 ring-white/20 flex items-center justify-center hover:bg-white/20 disabled:opacity-40">
+                                <TbX className="w-4 h-4" />
+                            </button>
+                        </div>
+                        <p className="mt-3 text-[11px] text-blue-100/70 truncate">{pelatihan?.NamaPelatihan}</p>
                     </div>
-                    <span>{buttonLabel}</span>
-                </Button>
-            </DialogTrigger>
 
-            <DialogContent className="w-[95vw] md:w-full max-w-lg p-0 bg-white/95 dark:bg-slate-950/95 backdrop-blur-3xl border-white/50 dark:border-slate-800 rounded-3xl md:rounded-[3rem] overflow-hidden shadow-2xl z-[99999]">
-                <div className="flex flex-col">
-                    <DialogHeader className="p-8 pb-4 space-y-6">
-                        <div className="flex flex-col md:flex-row items-center gap-6">
-                            <div className={cn(
-                                "w-20 h-20 shrink-0 rounded-[2rem] bg-gradient-to-br text-white flex items-center justify-center text-4xl shadow-2xl",
-                                gradient,
-                                buttonColor === "blue" && "shadow-blue-600/20",
-                                buttonColor === "teal" && "shadow-teal-400/20",
-                                buttonColor === "rose" && "shadow-rose-600/20",
-                                buttonColor === "amber" && "shadow-amber-600/20",
-                                buttonColor === "neutral" && "shadow-slate-600/20"
-                            )}>
-                                <Icon />
-                            </div>
-                            <div className="space-y-2 text-center md:text-left">
-                                <DialogTitle className="font-black text-2xl text-slate-900 dark:text-white tracking-tight leading-tight">
-                                    {title}
-                                </DialogTitle>
-                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-pulse" />
-                                    <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">{pelatihan.KodePelatihan}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="relative p-6 rounded-[2rem] bg-slate-50 dark:bg-slate-900 shadow-inner border border-slate-100 dark:border-slate-800">
-                            <div className="absolute top-0 right-0 p-4 opacity-5">
-                                <Icon className="w-12 h-12" />
-                            </div>
-                            <DialogDescription className="text-sm text-slate-600 dark:text-slate-400 font-bold leading-relaxed">
-                                {description}
-                            </DialogDescription>
-                        </div>
-                    </DialogHeader>
-
-                    <div className="px-8 pb-8 space-y-6">
-                        {/* Verifikator Selection */}
-                        {(Cookies.get('Access')?.includes('supervisePelaksanaan') && (pelatihan?.StatusPenerbitan == "1") && title == "Pilih Verifikator") && (
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-2">
-                                    <ShieldCheck className="w-4 h-4 text-indigo-500" />
-                                    <Label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Tunjuk Verifikator Pelaksanaan</Label>
-                                </div>
-                                <Select
-                                    value={verifikatorPelaksanaan?.toString() ?? ""}
-                                    onValueChange={(value) => {
-                                        setVerifikatorPelaksanaan(value);
-                                        const selected = adminPusatData.find((item) => item.IdAdminPusat.toString() === value);
-                                        setSelectedVerifikator(selected ?? null);
-                                    }}
-                                    disabled={loading || loadingPusat}
-                                >
-                                    <SelectTrigger className="h-12 rounded-2xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 font-bold text-sm">
-                                        <SelectValue placeholder="Pilih Nama Verifikator..." />
-                                    </SelectTrigger>
-                                    <SelectContent className="z-[999999]">
-                                        {loadingPusat ? (
-                                            <div className="p-4 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Memuat Data Pusat...</div>
-                                        ) : (
-                                            adminPusatData
-                                                .filter((item) => breakdownStatus(item.Status)[0] === "Verifikator")
-                                                .map((admin) => (
-                                                    <SelectItem key={admin.IdAdminPusat} value={admin.IdAdminPusat.toString()} className="font-bold py-3">
-                                                        {admin.Nama}
-                                                    </SelectItem>
-                                                ))
-                                        )}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        )}
-
-                        {/* File Upload Section */}
-                        {(pelatihan?.StatusPenerbitan == "1.25" || pelatihan?.StatusPenerbitan == "1.5" || pelatihan?.StatusPenerbitan == "5" || pelatihan?.StatusPenerbitan == "7" || pelatihan?.StatusPenerbitan == "9") && (
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-2">
-                                    <FileUp className="w-4 h-4 text-indigo-500" />
-                                    <Label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Unggah Dokumen Penerbitan STTPL</Label>
-                                </div>
-                                <div className="relative group/upload">
-                                    <input
-                                        type="file"
-                                        id="sttplDoc"
-                                        accept=".pdf,.doc,.docx"
-                                        onChange={handleFileChange}
-                                        disabled={loading}
-                                        className="hidden"
-                                    />
-                                    <label
-                                        htmlFor="sttplDoc"
-                                        className="flex flex-col items-center justify-center w-full h-28 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-900 hover:border-indigo-500 transition-all cursor-pointer overflow-hidden p-4 text-center"
+                    {/* Body */}
+                    <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 space-y-3">
+                        {pickVerifikator && (
+                            <Section icon={TbShieldCheck} title="Verifikator pelaksanaan" required>
+                                <div className="relative">
+                                    <select
+                                        value={verifikatorId}
+                                        onChange={(e) => setVerifikatorId(e.target.value)}
+                                        disabled={saving || loadingPusat}
+                                        className="w-full h-11 pl-3.5 pr-9 border-none rounded-xl bg-slate-50 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 text-sm font-semibold outline-none appearance-none focus:ring-2 focus:ring-blue-500/30 disabled:opacity-60"
                                     >
-                                        <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 mb-2 flex items-center justify-center group-hover/upload:scale-110 transition-transform">
-                                            <FileText className="w-5 h-5" />
-                                        </div>
-                                        <p className="text-[10px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest truncate max-w-full px-4">
-                                            {beritaAcaraFile ? beritaAcaraFile.name : "Klik untuk Pilih File (PDF, DOC, DOCX)"}
-                                        </p>
-                                    </label>
+                                        <option value="">{loadingPusat ? "Memuat verifikator…" : "Pilih verifikator"}</option>
+                                        {verifikators.map((a) => (
+                                            <option key={a.IdAdminPusat} value={String(a.IdAdminPusat)}>{a.Nama}</option>
+                                        ))}
+                                    </select>
+                                    <TbChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 </div>
-                                {oldFileUrl && (
-                                    <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600">
-                                                <CheckCircle2 className="w-4 h-4" />
-                                            </div>
-                                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">File Terupload Saat Ini</span>
-                                        </div>
-                                        <a href={`${urlFileBeritaAcara}/${oldFileUrl}`} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black text-indigo-600 underline underline-offset-4 hover:text-indigo-700 transition-colors uppercase">
-                                            Lihat Dokumen
-                                        </a>
-                                    </div>
-                                )}
-                            </div>
+                                {selected?.NoTelpon && <p className="mt-1.5 text-[11px] text-slate-500">Notifikasi WhatsApp dikirim ke {selected.Nama}.</p>}
+                            </Section>
                         )}
 
-                        {/* Message/Notes Section */}
-                        <div className="space-y-3">
-                            <div className="flex items-center gap-2">
-                                <MessageSquareText className="w-4 h-4 text-indigo-500" />
-                                <Label className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Tambahkan Catatan atau Pesan Instansi</Label>
-                            </div>
-                            <Textarea
-                                placeholder="Jelaskan alasan pengajuan atau catatan perbaikan di sini..."
+                        {showUpload && (
+                            <Section icon={TbFileText} title="Dokumen penerbitan STTPL" required={needFile}>
+                                {file ? (
+                                    <div className="flex items-center justify-between gap-3 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/20 ring-1 ring-emerald-200 dark:ring-emerald-900/40 px-3 py-2.5">
+                                        <span className="flex items-center gap-2 min-w-0">
+                                            <TbCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                                            <span className="text-xs font-semibold truncate" title={file.name}>{file.name}</span>
+                                        </span>
+                                        <button type="button" onClick={() => setFile(null)} disabled={saving} aria-label="Hapus file" className="h-7 w-7 rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 flex items-center justify-center">
+                                            <TbTrash className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <label htmlFor={`doc-${idPelatihan}-${status}`} className="flex items-center gap-3 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/40 px-3 py-3 cursor-pointer hover:border-blue-400 hover:bg-blue-50/40">
+                                        <span className="w-9 h-9 shrink-0 rounded-xl bg-[#0B1B3F] text-sky-200 flex items-center justify-center"><TbUpload className="w-4 h-4" /></span>
+                                        <span className="min-w-0">
+                                            <span className="block text-xs font-bold">{oldFile ? "Ganti dokumen" : "Pilih dokumen"}</span>
+                                            <span className="block text-[10px] text-slate-400">PDF, DOC, atau DOCX</span>
+                                        </span>
+                                        <input id={`doc-${idPelatihan}-${status}`} type="file" accept=".pdf,.doc,.docx" className="sr-only" disabled={saving} onChange={(e) => { setFile(e.target.files?.[0] || null); e.target.value = ""; }} />
+                                    </label>
+                                )}
+                                {oldFile && !file && (
+                                    <a href={`${urlFileBeritaAcara}/${oldFile}`} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:underline">
+                                        <TbExternalLink className="w-3.5 h-3.5" /> Lihat dokumen saat ini
+                                    </a>
+                                )}
+                            </Section>
+                        )}
+
+                        <Section icon={TbMessage2} title="Catatan" required hint={`${message.length} karakter`}>
+                            <textarea
+                                rows={4}
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
-                                disabled={loading}
-                                className="min-h-[100px] rounded-[1.5rem] bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 p-4 font-bold text-sm tracking-tight focus:ring-2 focus:ring-indigo-500"
+                                disabled={saving}
+                                placeholder="Tulis alasan pengajuan atau catatan perbaikan…"
+                                className="w-full px-3.5 py-2.5 border-none rounded-xl bg-slate-50 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 text-sm outline-none resize-none focus:ring-2 focus:ring-blue-500/30 placeholder:text-slate-400"
                             />
-                        </div>
+                        </Section>
                     </div>
 
-                    <DialogFooter className="p-8 pt-4 bg-white/50 dark:bg-slate-950/50 backdrop-blur-sm border-t border-slate-100 dark:border-slate-800 shrink-0">
-                        <div className="flex flex-col sm:flex-row items-center justify-end gap-3 w-full">
-                            <Button
-                                variant="ghost"
-                                onClick={() => setIsOpen(false)}
-                                disabled={loading}
-                                className="w-full sm:w-auto h-12 px-8 rounded-2xl text-slate-500 font-black uppercase tracking-widest text-[10px] hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
-                            >
-                                <X className="w-4 h-4 mr-2" />
-                                Batalkan
-                            </Button>
-                            <Button
-                                onClick={handleSubmit}
-                                disabled={loading || !message || (title === "Ajukan Penerbitan STTPL" && !beritaAcaraFile)}
-                                className={cn(
-                                    "w-full sm:w-auto h-12 px-10 rounded-2xl text-white font-black uppercase tracking-[0.2em] text-[10px] shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3",
-                                    buttonColor === "blue" && "bg-blue-600 hover:bg-blue-700 shadow-blue-500/20",
-                                    buttonColor === "teal" && "bg-green-500 hover:bg-green-500 shadow-green-500/20",
-                                    buttonColor === "rose" && "bg-rose-600 hover:bg-rose-700 shadow-rose-500/20",
-                                    buttonColor === "amber" && "bg-amber-600 hover:bg-amber-700 shadow-amber-500/20",
-                                    buttonColor === "neutral" && "bg-slate-700 hover:bg-slate-800 shadow-slate-500/20"
-                                )}
-                            >
-                                {loading ? (
-                                    <>
-                                        <motion.div
-                                            animate={{ rotate: 360 }}
-                                            transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                                            className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
-                                        />
-                                        <span>Memproses Data...</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Send className="w-4 h-4" />
-                                        <span>Konfirmasi & Kirim</span>
-                                    </>
-                                )}
-                            </Button>
+                    {/* Footer */}
+                    <div className="shrink-0 flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-2 px-5 py-3.5 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+                        <p className={`text-[11px] ${missing.length ? "text-amber-600" : "text-slate-400"}`}>{missing.length ? `Lengkapi: ${missing.join(", ")}` : "Siap dikirim"}</p>
+                        <div className="flex gap-2">
+                            <button type="button" onClick={() => close(false)} disabled={saving} className="flex-1 sm:flex-none h-11 px-5 rounded-xl ring-1 ring-slate-200 dark:ring-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 disabled:opacity-40">
+                                Batal
+                            </button>
+                            <button type="button" onClick={handleSubmit} disabled={saving || missing.length > 0} className={`flex-1 sm:flex-none h-11 px-6 rounded-xl text-white text-sm font-bold inline-flex items-center justify-center gap-2 shadow-md disabled:opacity-40 ${tone.btn}`}>
+                                {saving ? <TbLoader2 className="w-4 h-4 animate-spin" /> : <TbSend className="w-4 h-4" />}
+                                {saving ? "Memproses…" : "Kirim"}
+                            </button>
                         </div>
-                    </DialogFooter>
-                </div>
-            </DialogContent>
-        </Dialog>
+                    </div>
+                </DialogContent>
+            </Dialog>
+        </>
     );
 };
+
+function Section({ icon: Icon, title, required, hint, children }: { icon: React.ComponentType<{ className?: string }>; title: string; required?: boolean; hint?: string; children: React.ReactNode }) {
+    return (
+        <section className="rounded-2xl bg-white dark:bg-slate-900 ring-1 ring-slate-200/80 dark:ring-slate-800 shadow-sm p-3.5">
+            <div className="mb-2 flex items-center justify-between gap-2">
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-white">
+                    <Icon className="w-4 h-4 text-slate-400" /> {title} {required && <span className="text-rose-500">*</span>}
+                </span>
+                {hint && <span className="text-[10px] text-slate-400 tabular-nums">{hint}</span>}
+            </div>
+            {children}
+        </section>
+    );
+}
 
 export default SendNoteAction;

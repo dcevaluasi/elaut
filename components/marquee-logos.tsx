@@ -3,26 +3,15 @@
 import React from "react";
 import Marquee from "react-fast-marquee";
 import Image from "next/image";
-import Link from "next/link";
+import { ExternalLink, ShieldCheck } from "lucide-react";
 
-const logos = [
+const LOGOS = [
+  { name: "WBS KKP", desc: "Whistleblowing System Kementerian Kelautan dan Perikanan", image: "/layanan/logo_wbs.png", link: "https://wbs.kkp.go.id/register" },
+  { name: "SP4N-LAPOR!", desc: "Layanan aspirasi dan pengaduan online rakyat", image: "/layanan/logo_lapor.png", link: "https://span.lapor.go.id/" },
+  { name: "GOL KPK", desc: "Gratifikasi Online Komisi Pemberantasan Korupsi", image: "/layanan/logo_gol_kpk.png", link: "https://gol.kpk.go.id/login" },
   {
-    name: "WBS KKP",
-    image: "/layanan/logo_wbs.png",
-    link: "https://wbs.kkp.go.id/register",
-  },
-  {
-    name: "SPAN Lapor",
-    image: "/layanan/logo_lapor.png",
-    link: "https://span.lapor.go.id/",
-  },
-  {
-    name: "GOL KPK",
-    image: "/layanan/logo_gol_kpk.png",
-    link: "https://gol.kpk.go.id/login",
-  },
-  {
-    name: "SIPPN PUSLAT KP",
+    name: "SIPPN",
+    desc: "Standar pelayanan penetapan P2MKP di Sistem Informasi Pelayanan Publik Nasional",
     image: "/layanan/logo_sippn.svg",
     link: "https://sippn.menpan.go.id/pelayanan-publik/penetapan-dan-klasifikasi-pusat-pelatihan-mandiri-kelautan-dan-perikanan-p2mkp-8346341",
   },
@@ -30,52 +19,48 @@ const logos = [
 
 const MarqueeLogos = () => {
   return (
-    <div className="w-full pt-10 pb-20 bg-transparent relative z-10 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 mb-10 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-4">
-          <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-          Layanan Pengaduan & Transparansi
+    <section aria-labelledby="integritas-title" className="relative z-10 w-full overflow-hidden bg-[#020617] font-jakarta text-white pt-12 pb-20">
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(50%_60%_at_50%_0%,#2563EB1f_0%,transparent_70%)]" />
+
+      <div className="relative mx-auto max-w-7xl px-6 md:px-12">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-8">
+          <div className="space-y-2">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 ring-1 ring-white/15 text-[10px] font-bold uppercase tracking-[0.2em] text-sky-100">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-300" /> Pengaduan & transparansi
+            </span>
+            <h2 id="integritas-title" className="font-calsans text-2xl md:text-3xl tracking-tight">
+              Komitmen integritas pelayanan publik KKP
+            </h2>
+            <p className="max-w-2xl text-sm text-slate-400 leading-relaxed">
+              Laporkan pengaduan, gratifikasi, atau dugaan pelanggaran layanan pelatihan E-LAUT melalui kanal resmi pemerintah berikut.
+            </p>
+          </div>
         </div>
-        <h2 className="text-white font-calsans text-2xl md:text-3xl tracking-tight">
-          Komitmen Integritas & Pelayanan
-        </h2>
       </div>
 
-      <Marquee
-        gradient={true}
-        gradientColor="#020617"
-        speed={40}
-        pauseOnHover={true}
-        autoFill={true}
-        className="py-10"
-      >
-        <div className="flex items-center gap-12 px-6">
-          {logos.map((logo, index) => (
-            <Link
-              key={index}
+      {/* Marquee (dekoratif, gerak) */}
+      <Marquee gradient gradientColor="#020617" gradientWidth={80} speed={40} pauseOnHover autoFill className="py-4">
+        <div className="flex items-center gap-5 px-2.5">
+          {LOGOS.map((logo) => (
+            <a
+              key={logo.name}
               href={logo.link}
               target="_blank"
-              rel="noopener noreferrer"
-              className="group"
+              rel="noopener noreferrer external"
+              aria-label={`${logo.name} — ${logo.desc} (tab baru)`}
+              className="group relative isolate flex w-56 h-28 items-center justify-center overflow-hidden rounded-3xl bg-white/[0.04] ring-1 ring-white/10 p-6 transition-all duration-500 hover:bg-white/[0.08] hover:ring-white/20 hover:-translate-y-1"
             >
-              <div className="relative w-64 h-32 flex items-center justify-center p-8 rounded-[2rem] bg-white/[0.03] backdrop-blur-xl border border-white/10 shadow-2xl transition-all duration-500 group-hover:bg-white/[0.08] group-hover:border-white/20 group-hover:-translate-y-2 group-hover:shadow-blue-500/10 overflow-hidden">
-                {/* Subtle internal glow */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 via-transparent to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-
-                <div className="relative w-full h-full grayscale group-hover:grayscale-0 transition-all duration-700 transform group-hover:scale-110">
-                  <Image
-                    src={logo.image}
-                    alt={logo.name}
-                    fill
-                    className="object-contain"
-                  />
-                </div>
-              </div>
-            </Link>
+              <span aria-hidden className="pointer-events-none absolute inset-0 -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(70%_70%_at_50%_100%,#38BDF833_0%,transparent_70%)]" />
+              <span className="relative block w-full h-full grayscale opacity-80 transition-all duration-500 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105">
+                <Image src={logo.image} alt={`Logo ${logo.name}`} fill sizes="224px" className="object-contain" />
+              </span>
+            </a>
           ))}
         </div>
       </Marquee>
-    </div>
+
+
+    </section>
   );
 };
 

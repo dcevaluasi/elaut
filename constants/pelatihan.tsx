@@ -478,23 +478,27 @@ export const JENIS_PELATIHAN_BY_SUMBER_PEMBIAYAAN = [
   "PNBP/BLU - Berbayar",
   "Reguler - APBN",
   "Kerja Sama",
+  "Tidak Ada Sumber Pembiayaan"
 ]
 
 export const DUKUNGAN_PROGRAM_TEROBOSAN = [
+  "Kampung Nelayan Merah Putih",
+  "Budi Daya Ikan Darat Tematik",
+  "Swasembada Garam Nasional",
+  "Kapal Ikan Modern",
+  "Modeling Tambak Udang Terintegrasi",
+  "Revitalisasi Tambak Pantura Jawa",
   "Non Terobosan",
   "Perluasan Kawasan Konservasi",
-  "Kampung Nelayan Maju/Modern (Kalaju/Kalamo)",
-  "Pengembangan Budi Daya Bekerlanjutan",
   "Pengawasan Pesisir dan Pulau-Pulau Kecil",
-  "Penangkapan Ikan Terukur (PIT)",
+  "Penangkapan Ikan Terukur (PIT) Berbasis Kuota",
   "Penanganan Sampah Pelastik/Bulan Cinta Laut (BCL)",
   "Blue Economy",
-  "Koperasi Desa Merah Putih"
 ]
 
 export const JENIS_PENILAIAN_PELATIHAN = [
-  "Ujian Pre-Test dan Post-Test",
-  "Tidak Ada Penilaian Teknis"
+  "Pre-Test dan Post-Test",
+  "Tidak Ada Penilaian/Evaluasi Peserta"
 ]
 
 export const PROGRAM_SISJAMU = [

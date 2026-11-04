@@ -1,13 +1,15 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
 import axios from "axios";
 import Cookies from "js-cookie";
 import {
   TbSchool, TbClock, TbFileText, TbArrowRight, TbArrowLeft, TbCheck, TbLayoutGrid,
   TbCurrencyDollar, TbMapPin, TbPlus, TbAlertCircle, TbCalendar, TbBuildingCommunity,
-  TbAward, TbListCheck, TbLoader2, TbPencil, TbRefresh, TbDeviceLaptop,
+  TbAward, TbListCheck, TbLoader2, TbPencil, TbRefresh, TbDeviceLaptop, TbBook2, TbExternalLink, TbBooks,
 } from "react-icons/tb";
 import { RiVerifiedBadgeLine } from "react-icons/ri";
 
@@ -21,8 +23,99 @@ import {
 } from "@/constants/pelatihan";
 import { useFetchDataRumpunPelatihan } from "@/hooks/elaut/master/useFetchDataRumpunPelatihan";
 import addData from "@/firebase/firestore/addData";
+import firebaseApp from "@/firebase/config";
 
 /* ============================ KONFIG ============================ */
+
+/**
+ * Pemetaan Sektor → Klaster/Rumpun.
+ * Data rumpun dari API belum punya field sektor, jadi dipetakan di sini (cocok sebagian, tidak peka huruf besar).
+ * Sektor yang tidak ada di peta → semua klaster ditampilkan.
+ * TODO: lengkapi sesuai nomenklatur resmi / pindahkan ke API bila rumpun sudah punya field sektor.
+ */
+const KLASTER_BY_SEKTOR: { sektor: string; klaster: string[] }[] = [
+  {
+    sektor: "Perikanan",
+    klaster: [
+      "Sistem Jaminan Mutu",
+      "Budi Daya",
+      "Pengolahan dan Pemasaran",
+      "Kampung Nelayan Merah Putih (KNMP)",
+      "Teknis Lainnya (Rekayasa, Enumerator, Koperasi, Dll)",
+      "Satuan Pendidikan KP",
+    ],
+  },
+  {
+    sektor: "Kelautan",
+    klaster: ["Konservasi dan Kemitigasian", "Kelautan dan Kemaritiman (Garam, Oseanografi, Biologi, Iklim, Marine Debris)"],
+  },
+  {
+    sektor: "Awak Kapal Perikanan",
+    klaster: [
+      "Penangkapan dan Alat Tangkap Ikan",
+      "Permesinan dan Mekanisasi",
+      "Pengawasan dan Kepelabuhanan Perikanan",
+      "Pembentukan Keahlian Awak Kapal Perikanan (AKP)",
+      "Peningkatan Keahlian Awak Kapal Perikanan (AKP)",
+      "Updating Keahlian Awak Kapal Perikanan (AKP)",
+    ],
+  },
+];
+
+/** Cocokkan nama klaster konfigurasi dengan nama rumpun di API (abaikan huruf besar, spasi, isi kurung, "budidaya"/"budi daya"). */
+const keyOf = (s = "") => norm(s).replace(/\s*\(.*$/, "").replace(/budidaya/g, "budi daya").replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, " ").trim();
+const sameKlaster = (a: string, b: string) => {
+  const x = keyOf(a), y = keyOf(b);
+  return !!x && !!y && (x === y || x.startsWith(y) || y.startsWith(x));
+};
+
+const norm = (s = "") => s.toLowerCase().replace(/\s+/g, " ").trim();
+const rumpunName = (r: { name?: string; nama_rumpun_pelatihan?: string }) => r.name || r.nama_rumpun_pelatihan || "";
+
+/* ---------- Materi program (Firestore: documents/<nama program>) ---------- */
+type Materi = { group_ind?: string; name_ind: string; name_eng?: string; theory: number; practice: number };
+type MateriCategories = Record<string, Materi[]>;
+const materiDb = getFirestore(firebaseApp);
+const materiCache = new Map<string, MateriCategories | null>();
+
+function useMateriProgram(programName: string) {
+  const [state, setState] = useState<{ loading: boolean; data: MateriCategories | null; error: boolean }>({ loading: false, data: null, error: false });
+  const [nonce, setNonce] = useState(0);
+  const reload = React.useCallback(() => {
+    materiCache.delete(programName);
+    setNonce((n) => n + 1);
+  }, [programName]);
+
+  // Kembali dari tab "Lengkapi materi" → cek ulang otomatis bila materi masih kosong
+  useEffect(() => {
+    const onFocus = () => programName && materiCache.get(programName) === null && reload();
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [programName, reload]);
+
+  useEffect(() => {
+    if (!programName) return setState({ loading: false, data: null, error: false });
+    if (materiCache.has(programName)) return setState({ loading: false, data: materiCache.get(programName)!, error: false });
+    let cancelled = false;
+    setState({ loading: true, data: null, error: false });
+    (async () => {
+      try {
+        const snap = await getDoc(doc(materiDb, "documents", programName));
+        const cats = snap.exists() ? ((snap.data()?.categories as MateriCategories) || {}) : {};
+        const val = Object.values(cats).some((l) => l?.length) ? cats : null;
+        materiCache.set(programName, val);
+        if (!cancelled) setState({ loading: false, data: val, error: false });
+      } catch (e) {
+        console.error("Gagal memuat materi program:", e);
+        if (!cancelled) setState({ loading: false, data: null, error: true });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [programName, nonce]);
+  return { ...state, reload };
+}
 
 type IconType = React.ComponentType<{ className?: string; size?: number }>;
 
@@ -103,9 +196,31 @@ function FormPelatihan({ edit = false, onSuccess }: { edit: boolean; onSuccess?:
 
   const { data: dataRumpun } = useFetchDataRumpunPelatihan();
   const selectedRumpun = useMemo(
-    () => dataRumpun?.find((r) => (r.name || r.nama_rumpun_pelatihan) === form.bidangPelatihan) || null,
+    () => dataRumpun?.find((r) => rumpunName(r) === form.bidangPelatihan) || null,
     [dataRumpun, form.bidangPelatihan]
   );
+
+  /**
+   * Opsi klaster untuk sektor terpilih, sesuai KLASTER_BY_SEKTOR (urutan & nama mengikuti konfigurasi).
+   * Tiap opsi dipasangkan dengan rumpun API (untuk daftar program); nilai yang disimpan = nama rumpun API bila cocok.
+   */
+  const klasterOptions = useMemo(() => {
+    const sektor = norm(form.jenisProgram);
+    if (!sektor) return [];
+    const all = dataRumpun ?? [];
+    const rule =
+      KLASTER_BY_SEKTOR.find((m) => norm(m.sektor) === sektor) ||
+      KLASTER_BY_SEKTOR.find((m) => sektor.includes(norm(m.sektor)) || norm(m.sektor).includes(sektor));
+    if (!rule) return all.map((r) => ({ label: rumpunName(r), value: rumpunName(r), programs: Array.isArray(r.programs) ? r.programs.length : 0 }));
+    return rule.klaster.map((label) => {
+      const r = all.find((x) => sameKlaster(rumpunName(x), label));
+      return { label, value: r ? rumpunName(r) : label, programs: r && Array.isArray(r.programs) ? r.programs.length : 0 };
+    });
+  }, [dataRumpun, form.jenisProgram]);
+
+  const materi = useMateriProgram(form.program);
+  const pathname = usePathname();
+  const programPageHref = `${pathname?.match(/^\/admin\/[^/]+/)?.[0] ?? "/admin/lemdiklat"}/master/program-pelatihan`;
 
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -142,7 +257,12 @@ function FormPelatihan({ edit = false, onSuccess }: { edit: boolean; onSuccess?:
   };
 
   /* ---------- Validasi ---------- */
-  const missing = useMemo(() => missingOf(form), [form]);
+  const missing = useMemo(() => {
+    const m = missingOf(form);
+    // Program wajib sudah punya materi → tidak bisa lanjut / simpan selama materi belum ada atau masih dimuat
+    if (form.program && !materi.data) m[1] = [...m[1], materi.loading ? "Materi (sedang dimuat)" : "Materi program"];
+    return m;
+  }, [form, materi.data, materi.loading]);
   const valid = missing.map((m) => m.length === 0);
   const showErr = tried.has(step);
   const err = (label: string) => showErr && missing[step].includes(label);
@@ -385,25 +505,38 @@ function FormPelatihan({ edit = false, onSuccess }: { edit: boolean; onSuccess?:
             {step === 1 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <Field label="Sektor / jenis program" required icon={TbLayoutGrid} hint="Kelompok besar bidang pelatihan sektor KP." error={err("Sektor")}>
-                  <select value={form.jenisProgram} onChange={(e) => set("jenisProgram", e.target.value)} className={inputCls(err("Sektor"))}>
+                  <select
+                    value={form.jenisProgram}
+                    onChange={(e) => setForm((f) => ({ ...f, jenisProgram: e.target.value, bidangPelatihan: "", program: "" }))}
+                    className={inputCls(err("Sektor"))}
+                  >
                     <option value="">Pilih sektor</option>
                     {SEKTOR_PELATIHAN.map((s) => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </Field>
-                <Field label="Klaster / rumpun" required icon={TbLayoutGrid} hint="Rumpun ilmu fokus teknis pelatihan." error={err("Klaster")}>
+                <Field
+                  label="Klaster / rumpun"
+                  required
+                  icon={TbLayoutGrid}
+                  hint={form.jenisProgram ? `${klasterOptions.length} klaster untuk sektor ${form.jenisProgram}` : "Pilih sektor dulu."}
+                  error={err("Klaster")}
+                >
                   <select
                     value={form.bidangPelatihan}
                     onChange={(e) => setForm((f) => ({ ...f, bidangPelatihan: e.target.value, program: "" }))}
                     className={inputCls(err("Klaster"))}
-                    disabled={!dataRumpun}
+                    disabled={!dataRumpun || !form.jenisProgram}
                   >
-                    <option value="">{dataRumpun ? "Pilih klaster" : "Memuat klaster…"}</option>
-                    {dataRumpun?.map((r) => {
-                      const name = r.name || r.nama_rumpun_pelatihan || "";
-                      return <option key={r.id_rumpun_pelatihan} value={name}>{r.nama_rumpun_pelatihan || r.name}</option>;
-                    })}
+                    <option value="">{!dataRumpun ? "Memuat klaster…" : !form.jenisProgram ? "Pilih sektor dulu" : "Pilih klaster"}</option>
+                    {klasterOptions.map((k) => (
+                      <option key={k.label} value={k.value}>
+                        {k.label}
+                        {k.programs ? ` (${k.programs} program)` : ""}
+                      </option>
+                    ))}
                   </select>
                 </Field>
+
                 <Field
                   label="Program pelatihan"
                   required
@@ -414,20 +547,23 @@ function FormPelatihan({ edit = false, onSuccess }: { edit: boolean; onSuccess?:
                 >
                   <div className="flex flex-col sm:flex-row gap-2">
                     <select value={form.program} onChange={(e) => set("program", e.target.value)} disabled={!selectedRumpun} className={`${inputCls(err("Program"))} flex-1 disabled:opacity-50`}>
-                      <option value="">{selectedRumpun ? (selectedRumpun.programs?.length ? "Pilih program" : "Belum ada program di klaster ini") : "Pilih klaster dulu"}</option>
+                      <option value="">{selectedRumpun ? (selectedRumpun.programs?.length ? "Pilih program" : "Belum ada program di klaster ini") : form.bidangPelatihan ? "Klaster belum terdaftar di master Rumpun" : "Pilih klaster dulu"}</option>
                       {selectedRumpun?.programs?.map((p) => (
                         <option key={p.id_program_pelatihan} value={p.name_indo || String(p.id_program_pelatihan)}>{p.name_indo}</option>
                       ))}
                     </select>
-                    <button
-                      type="button"
-                      onClick={() => Toast.fire({ icon: "info", title: "Program baru", text: "Tambahkan melalui menu Master › Program Pelatihan terlebih dahulu." })}
+                    <Link
+                      href={programPageHref}
+                      target="_blank"
+                      title="Tambah program di Master › Program Pelatihan (tab baru, draf form tetap tersimpan)"
                       className="h-11 shrink-0 px-4 rounded-xl ring-1 ring-slate-200 dark:ring-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 inline-flex items-center justify-center gap-1.5"
                     >
                       <TbPlus size={15} /> Program baru
-                    </button>
+                    </Link>
                   </div>
                 </Field>
+
+                {form.program && <MateriPreview program={form.program} state={materi} href={`${programPageHref}?materi=${encodeURIComponent(form.program)}`} />}
               </div>
             )}
 
@@ -606,6 +742,87 @@ function FormPelatihan({ edit = false, onSuccess }: { edit: boolean; onSuccess?:
 }
 
 /* ============================ UI ============================ */
+
+/** Isi materi program terpilih. Kosong → info + tautan ke halaman Program Pelatihan untuk melengkapi. */
+function MateriPreview({ program, state, href }: { program: string; state: { loading: boolean; data: MateriCategories | null; error: boolean; reload: () => void }; href: string }) {
+  const cats = state.data ? Object.entries(state.data).filter(([, l]) => l?.length) : [];
+  const total = cats.reduce(
+    (a, [, l]) => {
+      l.forEach((m) => {
+        a.n++;
+        a.t += Number(m.theory) || 0;
+        a.p += Number(m.practice) || 0;
+      });
+      return a;
+    },
+    { n: 0, t: 0, p: 0 }
+  );
+
+  return (
+    <div className="md:col-span-2 overflow-hidden rounded-2xl bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-700">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 bg-[#0B1B3F] text-white">
+        <p className="flex items-center gap-2 text-sm font-bold min-w-0">
+          <TbBooks size={16} className="text-sky-300 shrink-0" /> <span className="truncate">Materi: {program}</span>
+        </p>
+        {state.data && (
+          <span className="text-[11px] text-sky-100/80 tabular-nums">
+            {total.n} materi · {total.t} JP teori · {total.p} JP praktik · <b className="text-white">{total.t + total.p} JP</b>
+          </span>
+        )}
+      </div>
+
+      {state.loading ? (
+        <div className="p-4 space-y-2">
+          {[0, 1, 2].map((i) => <div key={i} className="h-8 rounded-lg bg-slate-100 dark:bg-slate-800 animate-pulse" />)}
+        </div>
+      ) : state.data ? (
+        <div className="max-h-72 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800">
+          {cats.map(([cat, list]) => (
+            <div key={cat} className="px-4 py-3">
+              <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-blue-600 mb-1.5">{cat}</p>
+              <ol className="space-y-1">
+                {list.map((m, i) => (
+                  <li key={`${cat}-${i}`} className="flex items-start justify-between gap-3 text-xs">
+                    <span className="text-slate-700 dark:text-slate-200">
+                      <span className="text-slate-400 tabular-nums mr-1.5">{i + 1}.</span>
+                      {m.name_ind}
+                    </span>
+                    <span className="shrink-0 text-[11px] text-slate-400 tabular-nums">T {Number(m.theory) || 0} · P {Number(m.practice) || 0}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4">
+          <p className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
+            <TbAlertCircle size={18} className="text-amber-500 shrink-0 mt-0.5" />
+            <span>
+              {state.error ? "Materi gagal dimuat." : <><b>Belum ada materi</b> untuk program ini.</>} Lengkapi materi di halaman Program Pelatihan dulu — langkah berikutnya terkunci sampai materi tersedia.
+            </span>
+          </p>
+          <div className="flex shrink-0 gap-2">
+            <button
+              type="button"
+              onClick={state.reload}
+              className="h-10 px-3.5 rounded-xl ring-1 ring-slate-200 dark:ring-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 inline-flex items-center gap-1.5"
+            >
+              <TbRefresh size={15} /> Cek ulang
+            </button>
+            <Link
+              href={href}
+              target="_blank"
+              className="shrink-0 h-10 px-4 rounded-xl bg-[#0B1B3F] hover:bg-blue-700 text-white text-xs font-bold inline-flex items-center justify-center gap-1.5 transition-colors"
+            >
+              <TbBook2 size={15} /> Lengkapi materi <TbExternalLink size={14} />
+            </Link>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 const inputCls = (error?: boolean) =>
   `w-full h-11 px-3.5 rounded-xl border-none bg-slate-50 dark:bg-slate-800 ring-1 ${error ? "ring-rose-300 bg-rose-50/40" : "ring-slate-200 dark:ring-slate-700"} text-sm font-medium text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/30 placeholder:text-slate-400 placeholder:font-normal transition`;

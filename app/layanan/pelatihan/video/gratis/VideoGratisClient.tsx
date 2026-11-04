@@ -249,7 +249,7 @@ export default function VideoGratisClient({ initialVideos }: { initialVideos?: u
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
                                 placeholder="Cari kelas, teknik budidaya, atau penyelenggara…"
-                                className="w-full h-11 pl-11 pr-12 rounded-2xl bg-white/[0.08] ring-1 ring-white/10 text-sm text-white placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-sky-300/50 [&::-webkit-search-cancel-button]:hidden"
+                                className="w-full h-11 pl-11 pr-12 border-none rounded-2xl bg-white/[0.08] ring-1 ring-white/10 text-sm text-white placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-sky-300/50 [&::-webkit-search-cancel-button]:hidden"
                             />
                             {query ? (
                                 <button type="button" onClick={() => setQuery("")} aria-label="Hapus pencarian" className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg grid place-items-center text-slate-400 hover:bg-white/10 hover:text-white">

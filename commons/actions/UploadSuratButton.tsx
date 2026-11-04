@@ -1,20 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import { elautBaseUrl, urlFileSuratPemberitahuan } from "@/constants/urls";
-import axios from "axios";
-import Toast from "@/commons/Toast";
-import Cookies from "js-cookie";
-import { FiUploadCloud, FiFileText } from "react-icons/fi";
-import { TbX, TbCheck, TbLoader2, TbExternalLink, TbDownload, TbTrash, TbFileCheck } from "react-icons/tb";
 import Link from "next/link";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { elautBaseUrl, urlFileSuratPemberitahuan } from "@/constants/urls";
+import Toast from "@/commons/Toast";
 import { PelatihanMasyarakat } from "@/types/product";
+import { TbX, TbCheck, TbLoader2, TbExternalLink, TbTrash, TbFileCheck, TbFileText, TbCloudUpload, TbFileDescription } from "react-icons/tb";
 
 interface UploadSuratButtonProps {
   idPelatihan: string;
@@ -22,87 +16,59 @@ interface UploadSuratButtonProps {
   handleFetchingData?: () => void;
 }
 
-const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
-  idPelatihan,
-  pelatihan,
-  handleFetchingData,
-}) => {
+type IconType = React.ComponentType<{ className?: string }>;
+
+const FORMAT_URL = "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static/suratPemberitahuan/c2lnbmVkX19QZW1iZXJpdGFodWFuX2tlZ2lhdGFuX3BlbGF0aWhhbl9NUE1fQ1BJQl8xMy0xNV9Pa3RvYmVyXzIwMjZfMjAyNjEwMDIxMDUyMjYucGRm";
+/** Status penerbitan yang masih boleh mengubah surat: Draft, Perbaikan Verifikator, Perbaikan SPV */
+const EDITABLE_STATUS = ["0", "3", "1.2"];
+
+const isPdf = (f: File) => f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf");
+const fmtSize = (b: number) => (b >= 1024 * 1024 ? `${(b / 1024 / 1024).toFixed(2)} MB` : `${Math.max(1, Math.round(b / 1024))} KB`);
+
+const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({ idPelatihan, pelatihan, handleFetchingData }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      if (!selectedFile.name.toLowerCase().endsWith(".pdf")) {
-        Toast.fire({
-          icon: "error",
-          title: "Oopsss!",
-          text: "File harus berformat PDF!",
-        });
-        return;
-      }
-      setFile(selectedFile);
+  const canManage = !!Cookies.get("Access")?.includes("createPelatihan") && EDITABLE_STATUS.includes(String(pelatihan?.StatusPenerbitan ?? ""));
+  // Dulu `!= ""` → undefined/null terbaca "sudah ada"
+  const existing = (pelatihan?.SuratPemberitahuan || "").trim();
+  const hasExisting = !!existing;
+
+  if (!canManage) return null;
+
+  const pick = (f?: File | null) => {
+    if (!f) return;
+    if (!isPdf(f)) {
+      Toast.fire({ icon: "error", title: "Format tidak didukung", text: "File surat harus berformat PDF." });
+      return;
     }
+    setFile(f);
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = () => {
+  const close = () => {
+    if (isUploading) return;
+    setIsOpen(false);
+    setFile(null);
     setIsDragging(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const selectedFile = e.dataTransfer.files[0];
-      if (selectedFile.name.toLowerCase().endsWith(".pdf")) {
-        setFile(selectedFile);
-      } else {
-        Toast.fire({
-          icon: "error",
-          title: "Oopsss!",
-          text: "File harus berformat PDF!",
-        });
-      }
-    }
   };
 
   const handleUpload = async () => {
     if (!file) return;
-
     setIsUploading(true);
     const formData = new FormData();
     formData.append("SuratPemberitahuan", file);
-
     try {
       await axios.put(`${elautBaseUrl}/lemdik/UpdatePelatihan?id=${idPelatihan}`, formData, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get("XSRF091")}`,
-          "Content-Type": "multipart/form-data",
-        },
+        headers: { Authorization: `Bearer ${Cookies.get("XSRF091")}`, "Content-Type": "multipart/form-data" },
       });
-
-      Toast.fire({
-        icon: "success",
-        title: "Yeayyy!",
-        text: "Berhasil mengupload surat pemberitahuan pelatihan!",
-      });
-
+      Toast.fire({ icon: "success", title: hasExisting ? "Surat diperbarui" : "Surat diunggah", text: "Surat pemberitahuan pelatihan berhasil disimpan." });
       handleFetchingData?.();
       setIsOpen(false);
       setFile(null);
     } catch {
-      Toast.fire({
-        icon: "error",
-        title: "Oopsss!",
-        text: "Gagal mengupload surat pemberitahuan!",
-      });
+      Toast.fire({ icon: "error", title: "Gagal mengunggah", text: "Surat pemberitahuan belum tersimpan. Coba lagi." });
     } finally {
       setIsUploading(false);
     }
@@ -110,192 +76,171 @@ const UploadSuratButton: React.FC<UploadSuratButtonProps> = ({
 
   return (
     <>
-      <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-        {Cookies.get("Access")?.includes("createPelatihan") &&
-          (pelatihan?.StatusPenerbitan === "0" || pelatihan?.StatusPenerbitan === "3" || pelatihan?.StatusPenerbitan === "1.2") && (
-            <AlertDialogTrigger asChild>
-              <Button
-                variant="outline"
-                className="h-11 px-5 rounded-2xl border border-purple-400/40 bg-purple-500/5 hover:bg-purple-600 text-purple-600 hover:text-white dark:text-purple-400 font-black text-xs  tracking-wider flex items-center gap-2.5 transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-purple-500/20 active:scale-95 cursor-pointer"
-              >
-                <FiUploadCloud className="h-5 w-5 shrink-0" />
-                <span>{pelatihan?.SuratPemberitahuan != "" ? 'Edit' : 'Upload'} Surat Pemberitahuan</span>
-                {pelatihan?.SuratPemberitahuan != "" && (
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                )}
-              </Button>
-            </AlertDialogTrigger>
-          )}
+      {/* Tombol putih — sama dengan Edit / Import Peserta */}
+      <button
+        type="button"
+        onClick={() => setIsOpen(true)}
+        className="group h-9 px-3.5 rounded-xl bg-white dark:bg-slate-900 ring-1 ring-slate-200 dark:ring-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 inline-flex items-center gap-1.5 shadow-sm hover:bg-slate-50 hover:ring-slate-300 dark:hover:bg-slate-800 transition-colors"
+      >
+        <TbCloudUpload className="w-4 h-4 text-violet-600 transition-transform duration-300 group-hover:-translate-y-0.5" />
+        {hasExisting ? "Ganti" : "Upload"} Surat Pemberitahuan
+        {hasExisting && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" title="Surat sudah diunggah" />}
+      </button>
 
-        <AlertDialogContent className="w-full max-w-2xl p-0 overflow-hidden bg-white dark:bg-slate-900 border-none rounded-[32px] shadow-[0_32px_120px_rgba(0,0,0,0.25)] z-[999999] flex flex-col">
-          {/* Header */}
-          <div className="relative px-8 py-6 border-b border-slate-100 dark:border-white/5 bg-gradient-to-r from-purple-500/10 via-purple-500/5 to-transparent flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-purple-500/10 dark:bg-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-400 shadow-sm border border-purple-500/20 shrink-0">
-                <FiUploadCloud size={26} />
+      <Dialog open={isOpen} onOpenChange={(o) => (o ? setIsOpen(true) : close())}>
+        <DialogContent
+          onInteractOutside={(e) => isUploading && e.preventDefault()}
+          className="w-[calc(100vw-1.5rem)] sm:w-full max-w-xl sm:max-w-xl max-h-[90vh] p-0 gap-0 flex flex-col overflow-hidden rounded-3xl sm:rounded-3xl border-0 bg-slate-50 dark:bg-slate-950 shadow-2xl [&>button]:hidden"
+        >
+          {/* Header hero */}
+          <div className="relative isolate shrink-0 overflow-hidden bg-[#0B1B3F] text-white px-5 md:px-6 py-5">
+            <div className="absolute inset-0 -z-10 bg-[radial-gradient(70%_120%_at_0%_0%,#2563EB_0%,transparent_60%),radial-gradient(50%_120%_at_100%_100%,#8B5CF6_0%,transparent_60%)] opacity-80" />
+            <div className="absolute inset-0 -z-10 opacity-[0.12] [background-image:radial-gradient(rgba(255,255,255,0.8)_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(to_left,black,transparent_70%)]" />
+            <TbFileDescription aria-hidden className="pointer-events-none absolute -right-5 -bottom-7 -z-10 w-32 h-32 -rotate-12 text-violet-300 opacity-20" />
+
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-violet-200/90">Surat Pemberitahuan</p>
+                <DialogTitle className="mt-1 text-base md:text-lg font-black text-white leading-snug">Pemberitahuan pelaksanaan pelatihan</DialogTitle>
+                <DialogDescription className="text-xs text-blue-100/70 truncate">{pelatihan?.NamaPelatihan || "Unggah surat resmi dalam format PDF."}</DialogDescription>
               </div>
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
-                  <span className="text-[10px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest">
-                    Surat Pemberitahuan Mode
-                  </span>
-                </div>
-                <h2 className="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight leading-none">
-                  Pemberitahuan Pelaksanaan Pelatihan
-                </h2>
-              </div>
+              <button type="button" onClick={close} disabled={isUploading} aria-label="Tutup" className="h-9 w-9 shrink-0 rounded-xl bg-white/10 ring-1 ring-white/20 flex items-center justify-center hover:bg-white/20 disabled:opacity-40">
+                <TbX className="w-4 h-4" />
+              </button>
             </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="w-10 h-10 rounded-full hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-white/5 flex items-center justify-center text-slate-400 transition-colors"
-            >
-              <TbX size={22} />
-            </button>
+
+            <div className="mt-4 inline-flex items-center gap-2 rounded-xl bg-white/[0.08] ring-1 ring-white/15 backdrop-blur px-3 py-1.5 text-[11px] font-semibold">
+              <span className={`w-1.5 h-1.5 rounded-full ${hasExisting ? "bg-emerald-400" : "bg-amber-300"}`} />
+              {hasExisting ? "Surat sudah diunggah — unggah file baru untuk mengganti" : "Belum ada surat diunggah"}
+            </div>
           </div>
 
           {/* Body */}
-          <div className="p-8 flex-1 overflow-y-auto space-y-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-
-            {/* Existing File Card if available */}
-            {pelatihan?.SuratPemberitahuan && (
-              <div className="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500 text-white flex items-center justify-center shrink-0">
-                    <TbFileCheck size={22} />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-slate-800 dark:text-white">Surat Pemberitahuan Terupload</p>
-                    <p className="text-[11px] font-medium text-slate-400">File sudah pernah diunggah sebelumnya</p>
-                  </div>
+          <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 md:p-5 space-y-4">
+            {/* 01 Format */}
+            <Section no="01" title="Gunakan format acuan" icon={TbFileText} accent="#3B82F6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[13px] font-semibold text-slate-800 dark:text-white">Format resmi surat pemberitahuan</p>
+                  <p className="text-[11px] text-slate-500">Isi sesuai format, tanda tangani, lalu simpan sebagai PDF.</p>
                 </div>
-                <Link
-                  href={`${urlFileSuratPemberitahuan}/${pelatihan?.SuratPemberitahuan}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="h-9 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shrink-0"
-                >
-                  <TbExternalLink size={15} />
-                  Lihat Surat
+                <Link href={FORMAT_URL} target="_blank" rel="noopener noreferrer" className="h-9 px-3.5 shrink-0 rounded-xl bg-white dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 inline-flex items-center justify-center gap-1.5 hover:bg-slate-50">
+                  <TbExternalLink className="w-4 h-4" /> Lihat format
                 </Link>
               </div>
-            )}
+            </Section>
 
-            {/* Dropzone */}
-            <div className="space-y-2">
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                Upload File Surat Pemberitahuan (PDF) <span className="text-rose-500">*</span>
-              </label>
-
-              {file ? (
-                <div className="p-5 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-md">
-                      <FiFileText size={22} />
-                    </div>
+            {/* 02 Unggah */}
+            <Section no="02" title={hasExisting ? "Ganti file surat" : "Unggah file surat"} icon={TbCloudUpload} accent="#8B5CF6">
+              {hasExisting && !file && (
+                <div className="mb-3 flex items-center justify-between gap-3 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/20 ring-1 ring-emerald-100 dark:ring-emerald-900/40 px-3 py-2.5">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="w-8 h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center shrink-0">
+                      <TbFileCheck className="w-4 h-4" />
+                    </span>
                     <div className="min-w-0">
-                      <p className="text-xs font-black text-slate-800 dark:text-white truncate">
-                        {file.name}
-                      </p>
-                      <p className="text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-widest mt-0.5">
-                        {(file.size / (1024 * 1024)).toFixed(2)} MB • File Siap Diupload
-                      </p>
+                      <p className="text-xs font-bold text-emerald-800 dark:text-emerald-200">Surat saat ini</p>
+                      <p className="text-[11px] text-emerald-700/70 dark:text-emerald-300/70 truncate" title={existing}>{existing}</p>
                     </div>
                   </div>
-                  <button
-                    onClick={() => setFile(null)}
-                    className="w-9 h-9 rounded-xl hover:bg-rose-100 hover:text-rose-600 text-slate-400 flex items-center justify-center transition-colors shrink-0"
-                  >
-                    <TbTrash size={18} />
+                  <Link href={`${urlFileSuratPemberitahuan}/${existing}`} target="_blank" rel="noopener noreferrer" className="h-8 px-3 shrink-0 rounded-lg bg-white dark:bg-slate-900 ring-1 ring-emerald-200 dark:ring-emerald-800 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 inline-flex items-center gap-1 hover:bg-emerald-50">
+                    <TbExternalLink className="w-3.5 h-3.5" /> Lihat
+                  </Link>
+                </div>
+              )}
+
+              {file ? (
+                <div className="flex items-center justify-between gap-3 rounded-xl bg-violet-50/70 dark:bg-violet-950/20 ring-1 ring-violet-200 dark:ring-violet-900/40 px-3 py-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="w-10 h-10 rounded-xl bg-[#0B1B3F] text-violet-200 flex items-center justify-center shrink-0 shadow-md">
+                      <TbFileText className="w-5 h-5" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-bold text-slate-900 dark:text-white truncate" title={file.name}>{file.name}</p>
+                      <p className="text-[11px] text-violet-700/80 dark:text-violet-300/80 tabular-nums">{fmtSize(file.size)} · siap diunggah</p>
+                    </div>
+                  </div>
+                  <button type="button" onClick={() => setFile(null)} disabled={isUploading} aria-label="Hapus file" className="h-9 w-9 shrink-0 rounded-xl text-slate-400 hover:bg-rose-50 hover:text-rose-600 flex items-center justify-center disabled:opacity-40">
+                    <TbTrash className="w-4 h-4" />
                   </button>
                 </div>
               ) : (
                 <label
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
                   htmlFor="surat-file-upload"
-                  className={`flex flex-col items-center justify-center h-40 px-6 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${isDragging
-                    ? "border-purple-500 bg-purple-500/10 ring-4 ring-purple-500/10"
-                    : "border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5 hover:border-purple-500/50 hover:bg-purple-500/5"
-                    }`}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragging(true);
+                  }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDragging(false);
+                    pick(e.dataTransfer.files?.[0]);
+                  }}
+                  className={`flex flex-col items-center justify-center gap-1.5 h-36 px-6 rounded-xl border-2 border-dashed cursor-pointer text-center transition-all ${isDragging ? "border-violet-500 bg-violet-50 dark:bg-violet-950/20" : "border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/40 hover:border-violet-400 hover:bg-violet-50/40"}`}
                 >
-                  <div className="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-600 flex items-center justify-center mb-2">
-                    <FiUploadCloud className="w-6 h-6" />
-                  </div>
-                  <p className="text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-wider mb-1 text-center">
-                    Klik atau seret file PDF ke sini
-                  </p>
-                  <p className="text-[11px] font-medium text-slate-400">
-                    Format yang didukung: <span className="font-bold text-purple-600">PDF (.pdf)</span>
-                  </p>
+                  <span className="w-11 h-11 rounded-xl bg-[#0B1B3F] text-violet-200 flex items-center justify-center shadow-md">
+                    <TbCloudUpload className="w-5 h-5" />
+                  </span>
+                  <p className="text-[13px] font-bold text-slate-800 dark:text-white">{isDragging ? "Lepaskan file di sini" : "Klik atau seret file PDF ke sini"}</p>
+                  <p className="text-[11px] text-slate-500">Hanya format <b>PDF</b></p>
                   <input
                     id="surat-file-upload"
                     type="file"
-                    accept="application/pdf"
-                    className="hidden"
-                    onChange={handleFileChange}
+                    accept="application/pdf,.pdf"
+                    className="sr-only"
+                    onChange={(e) => {
+                      pick(e.target.files?.[0]);
+                      e.target.value = "";
+                    }}
                   />
                 </label>
               )}
-            </div>
-
-            {/* Format Reference */}
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center shrink-0">
-                  <FiFileText size={18} />
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-slate-800 dark:text-white">Format Acuan Surat Pemberitahuan</p>
-                  <p className="text-[11px] font-medium text-slate-400">Unduh atau lihat sampel format resmi surat</p>
-                </div>
-              </div>
-              <Link
-                href="https://drive.google.com/file/d/1UgueTM2mgScHViD7IZAXiNIyzSKYXTQo/view?usp=sharing"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="h-9 px-3 bg-slate-200 hover:bg-slate-300 dark:bg-white/10 dark:hover:bg-white/20 text-slate-700 dark:text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shrink-0"
-              >
-                <TbExternalLink size={15} />
-                Lihat Format
-              </Link>
-            </div>
+            </Section>
           </div>
 
           {/* Footer */}
-          <div className="p-6 bg-slate-50/80 dark:bg-white/5 border-t border-slate-100 dark:border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4 rounded-b-[32px]">
-            <button
-              onClick={() => setIsOpen(false)}
-              disabled={isUploading}
-              className="px-6 py-3 text-xs font-black text-slate-400 uppercase tracking-widest hover:text-slate-900 dark:hover:text-white transition-colors"
-            >
-              Batal
-            </button>
-            <Button
-              variant="outline"
-              onClick={handleUpload}
-              disabled={!file || isUploading}
-              className="h-12 px-8 bg-purple-600 text-slate-400 hover:bg-purple-700 text-purpl  rounded-xl flex items-center justify-center gap-2.5 font-black text-xs uppercase tracking-widest shadow-lg shadow-purple-600/25 transition-all hover:-translate-y-0.5 active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
-            >
-              {isUploading ? (
-                <>
-                  <TbLoader2 className="w-4 h-4 animate-spin" />
-                  <span>Mengirim...</span>
-                </>
-              ) : (
-                <>
-                  <TbCheck className="w-4 h-4" />
-                  <span>Upload Surat</span>
-                </>
-              )}
-            </Button>
+          <div className="shrink-0 flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-2 px-5 md:px-6 py-3.5 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+            <p className="text-[11px] text-slate-400">{file ? "File siap diunggah" : "Belum ada file dipilih"}</p>
+            <div className="flex gap-2">
+              <button type="button" onClick={close} disabled={isUploading} className="flex-1 sm:flex-none h-11 px-5 rounded-xl ring-1 ring-slate-200 dark:ring-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40">
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleUpload}
+                disabled={!file || isUploading}
+                className="flex-1 sm:flex-none h-11 px-6 rounded-xl bg-[#0B1B3F] hover:bg-blue-700 text-white text-sm font-bold inline-flex items-center justify-center gap-2 shadow-md shadow-blue-900/20 disabled:opacity-40"
+              >
+                {isUploading ? <TbLoader2 className="w-4 h-4 animate-spin" /> : <TbCheck className="w-4 h-4" />}
+                {isUploading ? "Mengunggah…" : hasExisting ? "Ganti Surat" : "Unggah Surat"}
+              </button>
+            </div>
           </div>
-        </AlertDialogContent>
-      </AlertDialog>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
 
-export default UploadSuratButton;
+/* ===================== UI ===================== */
 
+function Section({ no, title, icon: Icon, accent, children }: { no: string; title: string; icon: IconType; accent: string; children: React.ReactNode }) {
+  return (
+    <section className="rounded-2xl bg-white dark:bg-slate-900 ring-1 ring-slate-200/80 dark:ring-slate-800 shadow-sm">
+      <header className="flex items-center gap-3 px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+        <span className="relative isolate flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#0B1B3F] text-sky-100">
+          <span className="absolute inset-0 -z-10" style={{ background: `radial-gradient(80% 80% at 0% 0%, ${accent} 0%, transparent 70%)` }} />
+          <Icon className="w-4 h-4" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-slate-400">Langkah {no}</p>
+          <h3 className="text-sm font-black text-slate-900 dark:text-white leading-tight">{title}</h3>
+        </div>
+      </header>
+      <div className="p-4">{children}</div>
+    </section>
+  );
+}
+
+export default UploadSuratButton;

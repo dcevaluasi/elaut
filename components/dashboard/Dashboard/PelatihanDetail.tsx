@@ -96,11 +96,13 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData, onSwitchToSttpl }) 
     const hasModul = !!data.ModuleMateri;
     const hasInstruktur = !!data.Instruktur;
     const hasPeserta = totalPeserta > 0;
+    const allValid = hasPeserta && validPeserta >= totalPeserta; // wajib semua valid sebelum ke SPV
+    const belumValid = Math.max(0, totalPeserta - validPeserta);
     const readiness = [
         { label: "Surat Pemberitahuan", done: hasSurat, step: 1 },
         { label: "Perangkat Pelatihan", done: hasModul, step: 2 },
         { label: "Tenaga Pelatih", done: hasInstruktur, step: 3 },
-        { label: "Data Peserta", done: hasPeserta, step: 4 },
+        { label: hasPeserta && !allValid ? `Validasi Peserta (${belumValid} belum valid)` : "Data Peserta Valid", done: allValid, step: 4 },
     ];
     const readyCount = readiness.filter((r) => r.done).length;
     const canSubmitSPV = readyCount === 4;
@@ -111,7 +113,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData, onSwitchToSttpl }) 
         { id: 1, title: "Surat Pemberitahuan", subtitle: hasSurat ? "Dokumen telah diunggah" : "Unggah dokumen resmi kegiatan", icon: TbFileText, accent: "#3B82F6", state: hasSurat ? "done" : "active" },
         { id: 2, title: "Perangkat Pelatihan", subtitle: hasModul ? modulPelatihan?.NamaMateriPelatihan || "Modul dipilih" : "Pilih modul & materi", icon: TbUserCode, accent: "#8B5CF6", state: !hasSurat ? "locked" : hasModul ? "done" : "active", lockReason: "Unggah Surat Pemberitahuan dulu" },
         { id: 3, title: "Tenaga Pelatih", subtitle: hasInstruktur ? `${instrukturs?.length || 0} instruktur dipetakan` : "Tetapkan instruktur", icon: TbUserStar, accent: "#06B6D4", state: !hasModul ? "locked" : hasInstruktur ? "done" : "active", lockReason: "Pilih perangkat pelatihan dulu" },
-        { id: 4, title: "Data Peserta", subtitle: hasPeserta ? `${totalPeserta} peserta · ${validPeserta} valid` : "Import & validasi peserta", icon: HiOutlineUserGroup as IconType, accent: "#10B981", state: !hasInstruktur ? "locked" : hasPeserta ? "done" : "active", lockReason: "Tetapkan instruktur dulu" },
+        { id: 4, title: "Data Peserta", subtitle: !hasPeserta ? "Import & validasi peserta" : allValid ? `${totalPeserta} peserta · semua valid` : `${belumValid} dari ${totalPeserta} belum valid`, icon: HiOutlineUserGroup as IconType, accent: "#10B981", state: !hasInstruktur ? "locked" : allValid ? "done" : "active", lockReason: "Tetapkan instruktur dulu" },
         {
             id: 5,
             title: "Ajukan ke SPV",
@@ -119,7 +121,7 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData, onSwitchToSttpl }) 
             icon: TbSend,
             accent: "#F59E0B",
             state: !canSubmitSPV ? "locked" : isDraftOrRevisi ? "active" : "done",
-            lockReason: "Lengkapi semua data pelatihan dulu",
+            lockReason: hasPeserta && !allValid ? `Validasi semua peserta dulu (${belumValid} belum valid)` : "Lengkapi semua data pelatihan dulu",
         },
     ];
     const completedCount = steps.filter((s) => s.state === "done").length;
@@ -142,9 +144,10 @@ const PelatihanDetail: React.FC<Props> = ({ data, fetchData, onSwitchToSttpl }) 
         isSPV && status === "1" ? "Tinjau kelengkapan lalu pilih verifikator atau minta perbaikan."
             : isVerifikator && status === "2" ? "Periksa administrasi lalu setujui atau minta perbaikan."
                 : isAdmin && status === "3" ? "Perbaiki sesuai catatan, lalu kirim kembali ke verifikator."
-                    : isAdmin && isDraftOrRevisi && !canSubmitSPV ? `Lengkapi ${4 - readyCount} data persiapan untuk diajukan ke SPV.`
-                        : isAdmin && isDraftOrRevisi && canSubmitSPV ? "Semua data lengkap — ajukan ke SPV."
-                            : null;
+                    : isAdmin && isDraftOrRevisi && hasPeserta && !allValid && readyCount === 3 ? `Validasi ${belumValid} peserta yang belum valid sebelum diajukan ke SPV.`
+                        : isAdmin && isDraftOrRevisi && !canSubmitSPV ? `Lengkapi ${4 - readyCount} data persiapan untuk diajukan ke SPV.`
+                            : isAdmin && isDraftOrRevisi && canSubmitSPV ? "Semua data lengkap — ajukan ke SPV."
+                                : null;
 
     const hasFoto = !!data.FotoPelatihan && data.FotoPelatihan !== EMPTY_FOTO;
 
