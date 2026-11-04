@@ -283,6 +283,7 @@ export default async function ProgramPelatihanPage({ params }: { params: Params 
           </ul>
         </div>
       </section>
+      {/* sdf */}
 
       <section aria-labelledby="program-faq" className="mx-auto w-full max-w-7xl px-4 md:px-8 pb-16 space-y-3">
         <h2 id="program-faq" className="font-calsans text-xl md:text-2xl">Pertanyaan seputar {p.name.toLowerCase()}</h2>
