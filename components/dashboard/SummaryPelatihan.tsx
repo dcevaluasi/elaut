@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import Image from "next/image";
 import dayjs from "dayjs";
 import {
@@ -8,12 +8,17 @@ import {
   Map as MapIcon, LucideIcon,
 } from "lucide-react";
 
-import useFetchDataDukung from "@/hooks/elaut/useFetchDataDukung";
-import { useFetchAllDataPelatihanMasyarakat } from "@/hooks/elaut/pelatihan/useFetchDataPelatihanMasyarakat";
+import useFetchDataDukung, { prefetchDataDukung } from "@/hooks/elaut/useFetchDataDukung";
+import { useFetchAllDataPelatihanMasyarakat, prefetchPelatihanMasyarakat } from "@/hooks/elaut/pelatihan/useFetchDataPelatihanMasyarakat";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { parseIndonesianDate, tahunList } from "@/utils/time";
 import { formatToRupiah, formatToShorthandRupiah } from "@/lib/utils";
 import PenyelenggaraMap from "./PenyelenggaraMap";
+
+/* Mulai 2 request paralel SAAT MODUL DIMUAT (sebelum render/useEffect) → hemat ±1 siklus render.
+ * Hook di bawah memakai request yang sama (dedupe), jadi tidak ada fetch ganda. */
+prefetchPelatihanMasyarakat();
+prefetchDataDukung();
 
 /* ============================ HELPERS ============================ */
 
@@ -21,7 +26,6 @@ const QUARTERS = ["TW I", "TW II", "TW III", "TW IV"] as const;
 type Quarter = (typeof QUARTERS)[number];
 
 const DAY_MS = 86_400_000;
-const PUSAT = "Pusat Pelatihan Kelautan dan Perikanan";
 const NOW = dayjs();
 const CURRENT_YEAR = NOW.year();
 const CURRENT_QUARTER_IDX = Math.floor(NOW.month() / 3);
@@ -30,16 +34,20 @@ const BULAN = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "
 const quarterIdxOf = (month: number) => Math.min(3, Math.max(0, Math.ceil(month / 3) - 1));
 const defaultQuarterFor = (year: number): Quarter => QUARTERS[year === CURRENT_YEAR ? CURRENT_QUARTER_IDX : 3];
 
-/** Parse "YYYY-MM-DD", "DD-MM-YYYY", atau tanggal Indonesia → Date | null */
+/** Parse "YYYY-MM-DD", "DD-MM-YYYY", atau tanggal Indonesia → Date | null (hasil di-cache per string) */
+const dateCache = new Map<string, Date | null>();
 const parseDate = (s?: string | null): Date | null => {
   if (!s) return null;
+  const hit = dateCache.get(s);
+  if (hit !== undefined) return hit;
+  let d: Date | null;
   if (s.includes("-")) {
     const [a, b, c] = s.split("-");
-    const d = a.length === 4 ? new Date(+a, +b - 1, parseInt(c)) : new Date(+c, +b - 1, +a);
-    return isNaN(d.getTime()) ? null : d;
-  }
-  const d = parseIndonesianDate(s);
-  return d && !isNaN(d.getTime()) ? d : null;
+    d = a.length === 4 ? new Date(+a, +b - 1, parseInt(c)) : new Date(+c, +b - 1, +a);
+  } else d = parseIndonesianDate(s);
+  const out = d && !isNaN(d.getTime()) ? d : null;
+  dateCache.set(s, out);
+  return out;
 };
 
 const fmt = (n: number) => n.toLocaleString("id-ID");
@@ -49,37 +57,48 @@ const isSigned = (f?: string) => !!f && f.includes("signed");
 /* ============================ KOMPONEN ============================ */
 
 const SummaryPelatihan: React.FC = () => {
-  const { data: dataDukung, isFetching: isFetchingDukung } = useFetchDataDukung();
+  const { data: dataDukung, isFetching: isFetchingDukung } = useFetchDataDukung(); // pusat sudah dikecualikan di hook
   const { data, isFetching } = useFetchAllDataPelatihanMasyarakat();
 
-  const [tahun, setTahun] = useState(CURRENT_YEAR);
+  const [tahun, setTahunState] = useState(CURRENT_YEAR);
   const [triwulan, setTriwulan] = useState<Quarter>(() => defaultQuarterFor(CURRENT_YEAR));
-  useEffect(() => setTriwulan(defaultQuarterFor(tahun)), [tahun]);
+  // Ganti tahun + triwulan sekaligus (tanpa useEffect → tanpa render ganda)
+  const setTahun = (y: number) => {
+    setTahunState(y);
+    setTriwulan(defaultQuarterFor(y));
+  };
 
   const years = useMemo(() => [...tahunList].sort((a, b) => b - a), []);
   const quarterIdx = QUARTERS.indexOf(triwulan);
   const isDefaultPeriod = tahun === CURRENT_YEAR && triwulan === defaultQuarterFor(CURRENT_YEAR);
 
-  /* ---------- Index tanggal (parse sekali) ---------- */
+  /* ---------- Index (parse sekali per data) ---------- */
   const pelatihanIndexed = useMemo(
-    () => (data || []).map((item) => ({ item, start: parseDate(item.TanggalMulaiPelatihan), end: parseDate(item.TanggalBerakhirPelatihan) })),
+    () =>
+      (data || []).map((item) => {
+        let signed = 0;
+        if (Number(item.HargaPelatihan || 0)) for (const u of item.UserPelatihan || []) if (isSigned(u.FileSertifikat)) signed++;
+        return { item, start: parseDate(item.TanggalMulaiPelatihan), end: parseDate(item.TanggalBerakhirPelatihan), signed };
+      }),
     [data]
   );
-  const dukungIndexed = useMemo(
-    () =>
-      (dataDukung || [])
-        .filter((u) => isSigned(u.FileSertifikat) && !u.PenyelenggaraPelatihan?.includes(PUSAT))
-        .map((item) => ({ item, start: parseDate(item.TanggalMulai) })),
-    [dataDukung]
-  );
+  const dukungIndexed = useMemo(() => {
+    const out: { jk: string; start: Date }[] = [];
+    for (const u of dataDukung || []) {
+      if (!isSigned(u.FileSertifikat)) continue;
+      const start = parseDate(u.TanggalMulai);
+      if (start) out.push({ jk: u.JenisKelamin, start });
+    }
+    return out;
+  }, [dataDukung]);
 
-  /* ---------- Filter periode (s.d. triwulan) dalam 1 loop ---------- */
-  const period = useMemo(() => {
-    const inPeriod = (d: Date | null) => !!d && d.getFullYear() === tahun && quarterIdxOf(d.getMonth() + 1) <= quarterIdx;
+  /* ---------- Periode (s.d. triwulan) — dipisah agar data pelatihan tampil tanpa menunggu data peserta ---------- */
+  const inPeriod = (d: Date | null) => !!d && d.getFullYear() === tahun && quarterIdxOf(d.getMonth() + 1) <= quarterIdx;
 
+  const pelPeriod = useMemo(() => {
     const pel: (typeof pelatihanIndexed)[number]["item"][] = [];
     let days = 0, done = 0, pnbp = 0;
-    for (const { item, start, end } of pelatihanIndexed) {
+    for (const { item, start, end, signed } of pelatihanIndexed) {
       if (!inPeriod(start)) continue;
       pel.push(item);
       if (start && end) {
@@ -87,44 +106,42 @@ const SummaryPelatihan: React.FC = () => {
         if (diff > 0) days += diff;
       }
       if (parseInt(item?.StatusPenerbitan) >= 5) done++;
-      const price = Number(item.HargaPelatihan || 0);
-      if (price) {
-        let signed = 0;
-        for (const u of item.UserPelatihan || []) if (isSigned(u.FileSertifikat)) signed++;
-        pnbp += price * signed;
-      }
+      if (signed) pnbp += Number(item.HargaPelatihan) * signed;
     }
+    return { pel, days, done, pnbp };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pelatihanIndexed, tahun, quarterIdx]);
 
-    const duk: (typeof dukungIndexed)[number]["item"][] = [];
-    let m = 0, f = 0;
+  const dukPeriod = useMemo(() => {
+    let total = 0, male = 0, female = 0;
     const monthly = new Array(12).fill(0);
-    for (const { item, start } of dukungIndexed) {
+    for (const { jk, start } of dukungIndexed) {
       if (!inPeriod(start)) continue;
-      duk.push(item);
-      const jk = item.JenisKelamin;
-      if (jk === "L" || jk === "Laki - Laki") m++;
-      else if (jk === "P" || jk === "Perempuan") f++;
-      monthly[start!.getMonth()]++;
+      total++;
+      if (jk === "L" || jk === "Laki - Laki") male++;
+      else if (jk === "P" || jk === "Perempuan") female++;
+      monthly[start.getMonth()]++;
     }
-    const activeMonths = monthly.filter((v) => v > 0);
-    const last = activeMonths[activeMonths.length - 1] ?? 0;
-    const prev = activeMonths[activeMonths.length - 2] ?? 0;
+    const active = monthly.filter((v) => v > 0);
+    const last = active[active.length - 1] ?? 0;
+    const prev = active[active.length - 2] ?? 0;
+    return { total, male, female, growth: prev > 0 ? Math.round(((last - prev) / prev) * 100) : null };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dukungIndexed, tahun, quarterIdx]);
 
-    return { pel, duk, days, done, pnbp, male: m, female: f, growth: prev > 0 ? Math.round(((last - prev) / prev) * 100) : null };
-  }, [pelatihanIndexed, dukungIndexed, tahun, quarterIdx]);
-
-  const totalPelatihan = period.pel.length;
-  const totalPeserta = period.duk.length;
+  const totalPelatihan = pelPeriod.pel.length;
+  const totalPeserta = dukPeriod.total;
+  const loadingPeserta = isFetchingDukung && !dataDukung?.length;
   const avgPeserta = totalPelatihan ? Math.round(totalPeserta / totalPelatihan) : 0;
-  const avgPerDay = period.days ? Math.round(totalPeserta / period.days) : 0;
-  const completionRate = pct(period.done, totalPelatihan);
-  const malePct = pct(period.male, totalPeserta);
-  const femalePct = pct(period.female, totalPeserta);
+  const avgPerDay = pelPeriod.days ? Math.round(totalPeserta / pelPeriod.days) : 0;
+  const completionRate = pct(pelPeriod.done, totalPelatihan);
+  const malePct = pct(dukPeriod.male, totalPeserta);
+  const femalePct = pct(dukPeriod.female, totalPeserta);
   const tahunStr = String(tahun);
+  const peserta = (v: string) => (loadingPeserta ? "…" : v);
 
-  const initialLoading = (isFetching && !data?.length) || (isFetchingDukung && !dataDukung?.length);
-
-  if (initialLoading) return <SummarySkeleton />;
+  // Hanya tunggu data pelatihan; data peserta menyusul per-KPI
+  if (isFetching && !data?.length) return <SummarySkeleton />;
 
   if (!data?.length) {
     return (
@@ -155,18 +172,18 @@ const SummaryPelatihan: React.FC = () => {
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-300 opacity-75" />
                     <span className="relative inline-flex h-2 w-2 rounded-full bg-sky-300" />
                   </span>
-                  {isFetching ? "Memperbarui…" : "Realisasi Pelatihan Masyarakat"}
+                  {isFetching || isFetchingDukung ? "Memperbarui…" : "Realisasi Pelatihan Masyarakat"}
                 </span>
                 <h2 className="mt-3 text-3xl md:text-[44px] font-black tracking-[-0.03em] leading-[1.05]">
                   Capaian <span className="bg-gradient-to-r from-sky-200 via-white to-blue-200 bg-clip-text text-transparent">s.d. {triwulan}</span> <span className="text-white/40">{tahun}</span>
                 </h2>
                 <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-blue-100/70">
                   Januari – {BULAN[quarterIdx * 3 + 2]} {tahun} · peserta bersertifikat
-                  {period.growth !== null && (
-                    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold ring-1 ${period.growth >= 0 ? "bg-emerald-400/15 text-emerald-200 ring-emerald-300/30" : "bg-rose-400/15 text-rose-200 ring-rose-300/30"}`}>
-                      {period.growth >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                      {period.growth > 0 ? "+" : ""}
-                      {period.growth}% bulan terakhir
+                  {dukPeriod.growth !== null && (
+                    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold ring-1 ${dukPeriod.growth >= 0 ? "bg-emerald-400/15 text-emerald-200 ring-emerald-300/30" : "bg-rose-400/15 text-rose-200 ring-rose-300/30"}`}>
+                      {dukPeriod.growth >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                      {dukPeriod.growth > 0 ? "+" : ""}
+                      {dukPeriod.growth}% bulan terakhir
                     </span>
                   )}
                 </p>
@@ -199,7 +216,7 @@ const SummaryPelatihan: React.FC = () => {
                             onClick={() => setTriwulan(q)}
                             className={`h-9 min-w-[48px] px-3 rounded-xl text-xs font-black transition-all ${active ? "bg-white text-[#0B1B3F] shadow-[0_6px_20px_-6px_rgba(255,255,255,0.6)]" : future ? "text-white/25 cursor-not-allowed" : "text-blue-100/80 hover:bg-white/10 hover:text-white"}`}
                           >
-                            {q.replace("TW ", "TW ")}
+                            {q}
                           </button>
                         </span>
                       </TooltipTrigger>
@@ -210,10 +227,7 @@ const SummaryPelatihan: React.FC = () => {
                 {!isDefaultPeriod && (
                   <button
                     type="button"
-                    onClick={() => {
-                      setTahun(CURRENT_YEAR);
-                      setTriwulan(defaultQuarterFor(CURRENT_YEAR));
-                    }}
+                    onClick={() => setTahun(CURRENT_YEAR)}
                     className="h-9 px-3 rounded-xl text-xs font-bold text-sky-100 hover:bg-white/10 inline-flex items-center gap-1.5"
                   >
                     <RotateCcw className="h-3.5 w-3.5" /> Sekarang
@@ -235,40 +249,40 @@ const SummaryPelatihan: React.FC = () => {
                 <div>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <p className="w-fit cursor-help text-4xl md:text-[52px] font-black tracking-[-0.04em] tabular-nums leading-none">{formatToShorthandRupiah(period.pnbp)}</p>
+                      <p className="w-fit cursor-help text-4xl md:text-[52px] font-black tracking-[-0.04em] tabular-nums leading-none">{formatToShorthandRupiah(pelPeriod.pnbp)}</p>
                     </TooltipTrigger>
-                    <TooltipContent className="text-sm font-bold">{formatToRupiah(period.pnbp)}</TooltipContent>
+                    <TooltipContent className="text-sm font-bold">{formatToRupiah(pelPeriod.pnbp)}</TooltipContent>
                   </Tooltip>
-                  <p className="mt-2 text-xs text-blue-100/60">dari {fmt(totalPeserta)} peserta bersertifikat · {fmt(totalPelatihan)} pelatihan</p>
+                  <p className="mt-2 text-xs text-blue-100/60">dari {peserta(fmt(totalPeserta))} peserta bersertifikat · {fmt(totalPelatihan)} pelatihan</p>
                 </div>
               </div>
 
               <Kpi className="lg:col-span-2" label="Total Pelatihan" value={fmt(totalPelatihan)} unit="kelas" icon={School} accent="#3B82F6" />
-              <Kpi className="lg:col-span-2" label="Masyarakat Dilatih" value={fmt(totalPeserta)} unit="peserta" icon={Users} accent="#06B6D4">
+              <Kpi className="lg:col-span-2" label="Masyarakat Dilatih" value={peserta(fmt(totalPeserta))} unit="peserta" icon={Users} accent="#06B6D4" loading={loadingPeserta}>
                 <div className="mt-2 flex h-1.5 rounded-full overflow-hidden bg-white/10" title={`Laki-laki ${malePct}% · Perempuan ${femalePct}%`}>
                   <div className="h-full bg-sky-300" style={{ width: `${malePct}%` }} />
                   <div className="h-full bg-pink-300" style={{ width: `${femalePct}%` }} />
                 </div>
                 <p className="mt-1 flex justify-between text-[10px] text-blue-100/60">
-                  <span>♂ {fmt(period.male)} · {malePct}%</span>
-                  <span>♀ {fmt(period.female)} · {femalePct}%</span>
+                  <span>♂ {fmt(dukPeriod.male)} · {malePct}%</span>
+                  <span>♀ {fmt(dukPeriod.female)} · {femalePct}%</span>
                 </p>
               </Kpi>
-              <Kpi className="lg:col-span-2" label="Penyelesaian" value={`${completionRate}%`} unit={`${fmt(period.done)}/${fmt(totalPelatihan)} kelas`} icon={CheckCircle2} accent="#10B981">
+              <Kpi className="lg:col-span-2" label="Penyelesaian" value={`${completionRate}%`} unit={`${fmt(pelPeriod.done)}/${fmt(totalPelatihan)} kelas`} icon={CheckCircle2} accent="#10B981">
                 <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden">
                   <div className="h-full rounded-full transition-all duration-700" style={{ width: `${completionRate}%`, background: "linear-gradient(90deg,#10B981,#fff)" }} />
                 </div>
               </Kpi>
-              <Kpi className="lg:col-span-2" label="Rata-rata" value={fmt(avgPeserta)} unit="peserta / kelas" icon={Gauge} accent="#8B5CF6">
-                <p className="mt-1 text-[11px] text-blue-100/60">{fmt(avgPerDay)} peserta / hari · {fmt(period.days)} hari kegiatan</p>
+              <Kpi className="lg:col-span-2" label="Rata-rata" value={peserta(fmt(avgPeserta))} unit="peserta / kelas" icon={Gauge} accent="#8B5CF6" loading={loadingPeserta}>
+                <p className="mt-1 text-[11px] text-blue-100/60">{peserta(fmt(avgPerDay))} peserta / hari · {fmt(pelPeriod.days)} hari kegiatan</p>
               </Kpi>
             </div>
           </div>
         </section>
 
-        {/* ─── PUSAT INSIGHT: peta + tren + pipeline + aktivitas + komposisi (satu komponen) ─── */}
+        {/* ─── PUSAT INSIGHT ─── */}
         <Section icon={MapIcon} title="Sebaran & Insight Penyelenggara" desc="Klik titik di peta atau nama penyelenggara untuk melihat detailnya." />
-        <PenyelenggaraMap data={period.pel} tahun={tahunStr} />
+        <PenyelenggaraMap data={pelPeriod.pel} tahun={tahunStr} />
       </div>
     </TooltipProvider>
   );
@@ -276,17 +290,21 @@ const SummaryPelatihan: React.FC = () => {
 
 /* ============================ UI ============================ */
 
-function Kpi({ label, value, unit, icon: Icon, accent, className = "", children }: { label: string; value: string; unit: string; icon: LucideIcon; accent: string; className?: string; children?: React.ReactNode }) {
+function Kpi({ label, value, unit, icon: Icon, accent, className = "", loading, children }: { label: string; value: string; unit: string; icon: LucideIcon; accent: string; className?: string; loading?: boolean; children?: React.ReactNode }) {
   return (
     <div className={`group relative isolate overflow-hidden rounded-3xl bg-white/[0.07] ring-1 ring-white/10 p-4 md:p-5 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] transition-colors hover:bg-white/[0.1] ${className}`}>
       <div className="pointer-events-none absolute inset-0 -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: `linear-gradient(to left, ${accent}40 0%, transparent 75%)` }} />
       <Icon aria-hidden strokeWidth={1.5} className="pointer-events-none absolute -right-4 -bottom-5 -z-10 h-24 w-24 -rotate-12 opacity-20 transition-all duration-500 group-hover:opacity-40 group-hover:-rotate-6" style={{ color: accent }} />
       <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-sky-100/70">{label}</p>
       <div className="mt-1 flex items-baseline gap-1.5">
-        <span className="text-2xl md:text-3xl font-black tracking-tight tabular-nums">{value}</span>
+        {loading ? (
+          <span className="inline-block h-7 md:h-8 w-20 rounded-lg bg-white/15 animate-pulse" aria-label="Memuat" />
+        ) : (
+          <span className="text-2xl md:text-3xl font-black tracking-tight tabular-nums">{value}</span>
+        )}
         <span className="text-[10px] font-bold uppercase text-sky-100/60">{unit}</span>
       </div>
-      {children}
+      <div className={loading ? "opacity-40" : undefined}>{children}</div>
     </div>
   );
 }

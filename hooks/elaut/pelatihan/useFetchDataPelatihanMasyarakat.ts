@@ -56,6 +56,12 @@ function loadPelatihan(force = false): Promise<PelatihanMasyarakat[]> {
   return promise
 }
 
+/** Mulai fetch lebih awal (mis. saat modul di-import / hover menu). Aman dipanggil berkali-kali. */
+export const prefetchPelatihanMasyarakat = () => {
+  if (typeof window === 'undefined' || !getToken()) return
+  loadPelatihan().catch(() => { })
+}
+
 /** Paksa data di-fetch ulang di semua hook (mis. setelah create/update pelatihan) */
 export const invalidatePelatihanMasyarakat = () => loadPelatihan(true)
 

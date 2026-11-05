@@ -8,7 +8,7 @@ import { TbCalendar, TbPencilCheck, TbExternalLink, TbX, TbCheck, TbLoader2, TbA
 import { HiOutlineEyeOff } from "react-icons/hi";
 import { HiOutlineEye } from "react-icons/hi2";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
-import { Clock, Key, ShieldCheck, FileCheck, CheckCircle2, ChevronRight, ChevronLeft, Hash, FileText, Search, CalendarCheck, LucideIcon } from "lucide-react";
+import { Clock, Key, ShieldCheck, FileCheck, CheckCircle2, ChevronRight, ChevronLeft, Hash, FileText, Search, CalendarCheck, GraduationCap, LucideIcon } from "lucide-react";
 
 import { PelatihanMasyarakat } from "@/types/product";
 import DialogSertifikatPelatihan, { DialogSertifikatHandle } from "@/components/sertifikat/dialogSertifikatPelatihan";
@@ -32,6 +32,13 @@ const NEXT_STATUS: Record<string, string> = { "7B": "7D", "10": "11" }; // selai
 const CERT_URL = "https://elaut-bppsdm.kkp.go.id/api-elaut/public/static";
 
 type Filter = "" | "belum" | "draft" | "signed";
+type Peran = "" | "peserta" | "pelatih";
+
+/** Status pelatih (sertifikat "Sebagai Pelatih / As Trainer"). Dicocokkan longgar agar aman bila prefiks berbeda. */
+export const PELATIH = "{PELATIH}{SEBAGAI PELATIH}{As Trainer}";
+export const isPelatih = (u: { IsActice?: string }) => /SEBAGAI PELATIH|As Trainer/i.test(u?.IsActice ?? "");
+/** Yang diproses TTDe: peserta Lulus / Mengikuti + pelatih */
+const isTarget = (u: { IsActice?: string }) => u?.IsActice === LULUS || u?.IsActice === HADIR || isPelatih(u);
 
 const statusOf = (u: any): Exclude<Filter, ""> => (u.FileSertifikat?.includes("signed") ? "signed" : u.FileSertifikat ? "draft" : "belum");
 
@@ -40,11 +47,14 @@ const authHeader = () => ({ Authorization: `Bearer ${Cookies.get("XSRF091")}` })
 /* ============================ KOMPONEN ============================ */
 
 const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
-    // Hanya peserta Lulus / Mengikuti yang diproses (tanggal, draft, TTDe)
+    // Diproses (tanggal, draft, TTDe): peserta Lulus / Mengikuti + pelatih "Sebagai Pelatih"
     const allUsers = useMemo(() => data.UserPelatihan || [], [data.UserPelatihan]);
-    const users = useMemo(() => allUsers.filter((u) => u.IsActice === LULUS || u.IsActice === HADIR), [allUsers]);
+    const users = useMemo(() => allUsers.filter(isTarget), [allUsers]);
     const excluded = allUsers.length - users.length;
     const total = users.length;
+    const totalPelatih = useMemo(() => users.filter(isPelatih).length, [users]);
+    const totalPeserta = total - totalPelatih;
+    const targetLabel = totalPelatih ? `${totalPeserta} peserta · ${totalPelatih} pelatih` : "Lulus/Mengikuti";
 
     /* ---------- Hitungan (sekali per perubahan data) ---------- */
     const counts = useMemo(
@@ -68,22 +78,26 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
     /* ---------- Filter & halaman ---------- */
     const [search, setSearch] = useState("");
     const [filter, setFilter] = useState<Filter>("");
+    const [peran, setPeran] = useState<Peran>("");
     const [page, setPage] = useState(1);
 
     const statusCounts = useMemo(() => {
         const c = { belum: 0, draft: 0, signed: 0 };
-        users.forEach((u) => c[statusOf(u)]++);
+        users.forEach((u) => (!peran || (peran === "pelatih") === isPelatih(u)) && c[statusOf(u)]++);
         return c;
-    }, [users]);
+    }, [users, peran]);
 
     const filtered = useMemo(() => {
         const q = search.trim().toLowerCase();
         return users.filter(
-            (u) => (!filter || statusOf(u) === filter) && (!q || `${u.Nama ?? ""} ${u.NoRegistrasi ?? ""}`.toLowerCase().includes(q))
+            (u) =>
+                (!filter || statusOf(u) === filter) &&
+                (!peran || (peran === "pelatih") === isPelatih(u)) &&
+                (!q || `${u.Nama ?? ""} ${u.NoRegistrasi ?? ""}`.toLowerCase().includes(q))
         );
-    }, [users, search, filter]);
+    }, [users, search, filter, peran]);
 
-    useEffect(() => setPage(1), [search, filter]);
+    useEffect(() => setPage(1), [search, filter, peran]);
     const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
     const safePage = Math.min(page, totalPages);
     const pageUsers = useMemo(() => filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE), [filtered, safePage]);
@@ -209,7 +223,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
             await handleAddHistoryTrainingInExisting(data, "Telah menandatangani STTPL", Cookies.get("Role"), `${Cookies.get("Nama")} - ${Cookies.get("Satker")}`);
             Toast.fire(
                 willComplete
-                    ? { icon: "success", title: "Berhasil ditandatangani", text: `Semua ${total} e-STTPL telah ditandatangani.` }
+                    ? { icon: "success", title: "Berhasil ditandatangani", text: `Semua ${total} e-STTPL telah ditandatangani${totalPelatih ? ` (termasuk ${totalPelatih} sertifikat pelatih)` : ""}.` }
                     : { icon: "info", title: "Sebagian ditandatangani", text: `${tanpaDraft} peserta belum punya draft (halaman lain). Status belum diubah — lanjutkan halaman berikutnya.` }
             );
             setPassphrase("");
@@ -266,7 +280,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                 </div>
 
                 <div className="mt-5 grid grid-cols-2 lg:grid-cols-4 gap-2.5">
-                    <HeroStat icon={Hash} label="Target" value={`${total}`} sub={excluded ? `Lulus/Mengikuti · ${excluded} dilewati` : "Lulus/Mengikuti"} />
+                    <HeroStat icon={Hash} label="Target" value={`${total}`} sub={excluded ? `${targetLabel} · ${excluded} dilewati` : targetLabel} />
                     <HeroStat icon={CalendarCheck} label="Tanggal TTDe" value={hasTanggal ? `${counts.tanggal}/${total}` : "Belum"} sub={hasTanggal ? "sudah ditetapkan" : "wajib sebelum TTDe"} warn={!hasTanggal} />
                     <HeroStat icon={FileCheck} label="Draft siap" value={`${counts.draft}/${total}`} pct={total ? (counts.draft / total) * 100 : 0} accent="#F59E0B" />
                     <HeroStat icon={ShieldCheck} label="Tuntas TTDe" value={`${counts.signed}/${total}`} pct={total ? (counts.signed / total) * 100 : 0} accent="#10B981" />
@@ -306,6 +320,26 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                         </button>
                     ))}
                 </div>
+                {totalPelatih > 0 && (
+                    <div className="flex items-center p-1 rounded-2xl bg-slate-50 dark:bg-slate-800 overflow-x-auto scrollbar-hide" role="radiogroup" aria-label="Peran">
+                        {([
+                            ["", "Semua peran", total],
+                            ["peserta", "Peserta", totalPeserta],
+                            ["pelatih", "Pelatih", totalPelatih],
+                        ] as [Peran, string, number][]).map(([k, label, n]) => (
+                            <button
+                                key={k || "all"}
+                                type="button"
+                                role="radio"
+                                aria-checked={peran === k}
+                                onClick={() => setPeran(k)}
+                                className={`h-9 px-3 rounded-xl text-xs font-bold whitespace-nowrap transition-all inline-flex items-center gap-1.5 ${peran === k ? "bg-[#0B1B3F] text-white shadow-md" : "text-slate-500 hover:text-slate-800"}`}
+                            >
+                                {k === "pelatih" && <GraduationCap className="w-3.5 h-3.5" />} {label} <span className="opacity-60 tabular-nums">{n}</span>
+                            </button>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* ---------- Pagination ---------- */}
@@ -332,7 +366,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                     pageUsers.map((item, i) => {
                         const originalIndex = indexById.get(item.IdUserPelatihan) ?? -1;
                         return (
-                            <div key={item.IdUserPelatihan ?? i} className="group p-5 rounded-[1.5rem] bg-white border border-slate-100 hover:border-blue-200 transition-all shadow-sm hover:shadow-md flex flex-col gap-4">
+                            <div key={item.IdUserPelatihan ?? i} className={`group p-5 rounded-[1.5rem] bg-white border ${isPelatih(item) ? "border-violet-100 border-l-4 border-l-violet-400" : "border-slate-100"} hover:border-blue-200 transition-all shadow-sm hover:shadow-md flex flex-col gap-4`}>
                                 <div className="flex items-center justify-between gap-3">
                                     <div className="flex items-center gap-3 overflow-hidden">
                                         <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-xs font-black text-slate-400 shrink-0">
@@ -340,7 +374,14 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                                         </div>
                                         <div className="overflow-hidden">
                                             <p className="text-sm font-black text-slate-900 truncate uppercase leading-none mb-1">{item.Nama}</p>
-                                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{item.NoRegistrasi}</p>
+                                            <p className="flex flex-wrap items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                                                {item.NoRegistrasi}
+                                                {isPelatih(item) && (
+                                                    <span title="Sertifikat: Sebagai Pelatih / As Trainer" className="inline-flex items-center gap-1 rounded-md bg-violet-50 px-1.5 py-0.5 text-[9px] font-black tracking-wider text-violet-700 ring-1 ring-violet-200 normal-case">
+                                                        <GraduationCap className="w-3 h-3" /> Sebagai Pelatih <span className="font-semibold italic opacity-70">As Trainer</span>
+                                                    </span>
+                                                )}
+                                            </p>
                                         </div>
                                     </div>
                                     {item.FileSertifikat?.includes("signed") ? (
@@ -386,8 +427,8 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                     <div className="flex flex-col items-center justify-center gap-2 py-16 rounded-3xl border border-dashed border-slate-200 bg-white dark:bg-slate-900 dark:border-slate-800">
                         <Search className="w-5 h-5 text-slate-300" />
                         <p className="text-sm font-bold text-slate-600 dark:text-slate-300">Tidak ada peserta yang cocok</p>
-                        {(search || filter) && (
-                            <button type="button" onClick={() => { setSearch(""); setFilter(""); }} className="text-xs font-semibold text-blue-600 hover:underline">
+                        {(search || filter || peran) && (
+                            <button type="button" onClick={() => { setSearch(""); setFilter(""); setPeran(""); }} className="text-xs font-semibold text-blue-600 hover:underline">
                                 Reset filter
                             </button>
                         )}
@@ -410,7 +451,7 @@ const TTDeDetail: React.FC<Props> = ({ data, fetchData }) => {
                                 className="w-full h-11 px-3.5 rounded-xl border-none bg-slate-50 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 text-sm font-semibold outline-none focus:ring-2 focus:ring-blue-500/30"
                             />
                             {tanggal && <p className="text-xs text-slate-500">Tercetak: <b className="text-slate-800 dark:text-white">{getDateInIndonesianFormat(tanggal)}</b></p>}
-                            <p className="text-[11px] text-slate-400">Diterapkan ke {total} peserta Lulus/Mengikuti. Pilih sesuai hari penandatanganan digital.</p>
+                            <p className="text-[11px] text-slate-400">Diterapkan ke {total} orang ({targetLabel}). Pilih sesuai hari penandatanganan digital.</p>
                         </div>
                         {savingDate && <ProgressBar value={dateProgress} label={`Menerapkan tanggal… ${dateProgress}%`} />}
                     </div>

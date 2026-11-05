@@ -149,7 +149,7 @@ export default function Hero() {
             </div>
 
             <p className="mt-6 max-w-2xl text-sm md:text-lg leading-relaxed text-blue-100/75">
-              Platform <strong className="text-white">pelatihan dan sertifikasi kelautan dan perikanan</strong> resmi Kementerian Kelautan dan Perikanan — daftar pelatihan, belajar daring, dan raih sertifikat kompetensi ber-TTE.
+              Platform <strong className="text-white">pelatihan kelautan dan perikanan</strong> resmi Kementerian Kelautan dan Perikanan — daftar pelatihan, belajar daring, dan raih sertifikat kompetensi ber-TTE.
             </p>
 
             <div className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">

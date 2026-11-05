@@ -7,6 +7,7 @@ import { AKP_CERTIFICATIONS, AQUACULTURE_CERTIFICATIONS, OCEAN_CERTIFICATIONS } 
 import Footer from "@/components/ui/footer";
 import JadwalPelatihan from "./JadwalPelatihan";
 
+// Harus sama dengan ID di JadwalPelatihan.tsx (konstanta dari file "use client" tidak bisa diimpor ke Server Component)
 const SEARCH_FORM_ID = "hp-search";
 const SEARCH_INPUT_ID = "hp-q";
 
@@ -79,14 +80,13 @@ const PROGRAMS: Record<string, ProgramInfo> = {
 };
 const ORDER = ["perikanan", "akp", "kelautan"] as const;
 
-/** Nama folder dinamis bebas ([program], [slug], …) — ambil nilai pertama */
-type Params = Record<string, string>;
-const getSlug = async (params: Params | Promise<Params>) => String(Object.values((await params) ?? {})[0] ?? "").toLowerCase();
+/** Folder: app/layanan/pelatihan/program/[slug] */
+type Params = { slug: string };
+const getSlug = async (params: Params | Promise<Params>) => String((await params)?.slug ?? "").toLowerCase();
 
 export const dynamicParams = false; // slug selain di atas → 404
 export function generateStaticParams() {
-  // ⚠️ Ganti kunci "program" bila nama folder dinamis berbeda (mis. [slug] → { slug })
-  return Object.keys(PROGRAMS).map((program) => ({ program }));
+  return Object.keys(PROGRAMS).map((slug) => ({ slug })); // kunci harus sama dengan nama folder [slug]
 }
 
 export async function generateMetadata({ params }: { params: Params | Promise<Params> }): Promise<Metadata> {
@@ -198,6 +198,7 @@ export default async function ProgramPelatihanPage({ params }: { params: Params 
               </h1>
               <p className="mt-5 max-w-xl text-sm md:text-base leading-relaxed text-blue-100/75">{p.tagline}</p>
 
+              {/* Cari — berfungsi tanpa JS (GET ?q=), disempurnakan oleh JadwalPelatihan */}
               <form id={SEARCH_FORM_ID} role="search" action={`${BASE}/${slug}#cari-pelatihan`} method="get"
                 className="mt-7 flex max-w-xl items-center gap-2 rounded-2xl bg-[#0B1B3F]/80 backdrop-blur p-1.5 ring-1 ring-white/10 shadow-[0_20px_60px_-30px_rgba(37,99,235,0.8)] focus-within:ring-2 focus-within:ring-sky-400/60">
                 <label htmlFor={SEARCH_INPUT_ID} className="sr-only">Cari jadwal {p.name.toLowerCase()}</label>
@@ -212,7 +213,7 @@ export default async function ProgramPelatihanPage({ params }: { params: Params 
               <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xs text-blue-100/75">
                 {[
                   { icon: BadgeCheck, text: "STTPL ber-TTE & terverifikasi" },
-                  { icon: Wallet, text: "Banyak pelatihan gratis" },
+                  { icon: Wallet, text: "Banyak pelatihan" },
                   { icon: ShieldCheck, text: "Instruktur & lembaga resmi KKP" },
                 ].map((t) => (
                   <li key={t.text} className="inline-flex items-center gap-1.5"><t.icon className="w-4 h-4 text-emerald-300" aria-hidden />{t.text}</li>
@@ -283,7 +284,6 @@ export default async function ProgramPelatihanPage({ params }: { params: Params 
           </ul>
         </div>
       </section>
-      {/* sdf */}
 
       <section aria-labelledby="program-faq" className="mx-auto w-full max-w-7xl px-4 md:px-8 pb-16 space-y-3">
         <h2 id="program-faq" className="font-calsans text-xl md:text-2xl">Pertanyaan seputar {p.name.toLowerCase()}</h2>
