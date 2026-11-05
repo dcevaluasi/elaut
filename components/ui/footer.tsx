@@ -97,7 +97,7 @@ export default function Footer() {
         <h2 id="footer-title" className="sr-only">Informasi E-LAUT KKP</h2>
         <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(50%_60%_at_0%_100%,#2563EB26_0%,transparent_65%),radial-gradient(40%_50%_at_100%_0%,#0EA5E91a_0%,transparent_70%)]" />
         <div aria-hidden className="absolute inset-0 -z-10 opacity-[0.05] [background-image:radial-gradient(rgba(255,255,255,0.8)_1px,transparent_1px)] [background-size:22px_22px] [mask-image:linear-gradient(to_top,black,transparent_80%)]" />
-
+        {/* testing */}
         <div className="mx-auto max-w-7xl px-4 md:px-8 py-12 md:py-16">
           <div className="grid gap-10 lg:grid-cols-[1.2fr_2.8fr]">
             {/* Identitas (NAP) */}
